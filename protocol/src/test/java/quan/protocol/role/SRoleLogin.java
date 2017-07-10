@@ -1,6 +1,7 @@
 package quan.protocol.role;
 
 import java.util.HashSet;
+import quan.protocol.user.UserInfo;
 import java.io.IOException;
 import quan.protocol.stream.WritableStream;
 import java.util.HashMap;
@@ -26,6 +27,7 @@ public class SRoleLogin extends Protocol {
     private ArrayList<RoleInfo> roleInfoList;//角色信息
     private HashSet<RoleInfo> roleInfoSet;//角色信息
     private HashMap<Long, RoleInfo> roleInfoMap;//角色信息
+    private UserInfo userInfo;//用户信息
 
     public SRoleLogin() {
         roleId = 111L;
@@ -33,6 +35,7 @@ public class SRoleLogin extends Protocol {
         roleInfoList = new ArrayList<>();
         roleInfoSet = new HashSet<>();
         roleInfoMap = new HashMap<>();
+        userInfo = new UserInfo();
     }
 
     public long getRoleId() {
@@ -63,6 +66,14 @@ public class SRoleLogin extends Protocol {
         return roleInfoMap;
     }
 
+    public UserInfo getUserInfo() {
+        return userInfo;
+    }
+
+    public void setUserInfo(UserInfo userInfo) {
+        this.userInfo = userInfo;
+    }
+
 
     @Override
     public void serialize(WritableStream writable) throws IOException {
@@ -82,6 +93,7 @@ public class SRoleLogin extends Protocol {
             writable.writeLong(roleInfoMapKey);
             roleInfoMap.get(roleInfoMapKey).serialize(writable);
         }
+        userInfo.serialize(writable);
     }
 
     @Override
@@ -111,6 +123,7 @@ public class SRoleLogin extends Protocol {
             roleInfoMapValue.parse(readable);
             roleInfoMap.put(roleInfoMapKey, roleInfoMapValue);
         }
+        userInfo.parse(readable);
     }
 
     @Override
@@ -121,6 +134,7 @@ public class SRoleLogin extends Protocol {
                 ",roleInfoList=" + roleInfoList +
                 ",roleInfoSet=" + roleInfoSet +
                 ",roleInfoMap=" + roleInfoMap +
+                ",userInfo=" + userInfo +
                 '}';
 
     }

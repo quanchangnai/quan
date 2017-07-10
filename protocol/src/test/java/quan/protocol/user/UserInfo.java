@@ -1,4 +1,4 @@
-package quan.protocol.role;
+package quan.protocol.user;
 
 import java.io.IOException;
 import quan.protocol.stream.WritableStream;
@@ -24,16 +24,8 @@ public class UserInfo extends Bean {
 
     public UserInfo() {
         name = "";
-        ;
-        ;
-        ;
-        ;
-        ;
         eventState = "";
         functionState = "";
-        ;
-        ;
-        ;
     }
 
     public String getName() {

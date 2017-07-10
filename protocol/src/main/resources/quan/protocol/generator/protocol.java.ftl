@@ -44,20 +44,30 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         ${field.name} = <#if field.value?? && field.value!= "">"${field.value}"<#else>""</#if>;
     <#elseif field.type == "bytes">
         ${field.name} = new byte[0];
-    <#elseif field.type == "bool">
-        <#if field.value?? && field.value != "">${field.name} = ${field.value}</#if>;
     <#elseif field.type == "byte">
-        <#if field.value?? && field.value != "">${field.name} = (byte) ${field.value}</#if>;
+        <#if field.value?? && field.value != "">
+        ${field.name} = (byte) ${field.value};
+        </#if>
     <#elseif field.type == "short">
-        <#if field.value?? && field.value != "">${field.name} = (short) ${field.value}</#if>;
+        <#if field.value?? && field.value != "">
+        ${field.name} = (short) ${field.value};
+        </#if>
     <#elseif field.type == "long">
-        <#if field.value?? && field.value != "">${field.name} = ${field.value}L</#if>;
+        <#if field.value?? && field.value != "">
+        ${field.name} = ${field.value}L;
+        </#if>
     <#elseif field.type == "float">
-        <#if field.value?? && field.value != "">${field.name} = ${field.value}F</#if>;
+        <#if field.value?? && field.value != "">
+        ${field.name} = ${field.value}F;
+        </#if>
     <#elseif field.type == "double">
-        <#if field.value?? && field.value != "">${field.name} = ${field.value}D</#if>;
+        <#if field.value?? && field.value != "">
+        ${field.name} = ${field.value}D;
+        </#if>
     <#elseif field.builtInType>
-        <#if field.value?? && field.value != "">${field.name} = ${field.value}</#if>;
+        <#if field.value?? && field.value != "">
+        ${field.name} = ${field.value};
+        </#if>
     <#elseif field.enumType>
         <#if field.value??>
         ${field.name} = ${field.type}.${field.value};

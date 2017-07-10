@@ -37,7 +37,7 @@ public class NioClient extends NetworkApp {
         try {
             ioEventExecutor = new IoEventExecutor(this);
         } catch (IOException e) {
-            throw new RuntimeException("事件循环构造异常", e);
+            throw new RuntimeException(e);
         }
     }
 

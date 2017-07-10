@@ -79,23 +79,24 @@ public class WritableStream {
     }
 
     public void writeFloat(float n) throws IOException {
+        boolean flag = true;
         float f;
-        if (n > -21474836 && n < 21474836) {//Integer.MAX_VALUE / 100;
-            f = (float) (Math.round(n * 100)) / 100;
+        if (flag && n > -2147483 && n < 2147483) {//Integer.MAX_VALUE / 1000;
+            f = (float) ((int)(n * 1000)) / 1000;
         } else {
             BigDecimal bigDecimal = new BigDecimal(n);
-            f = bigDecimal.setScale(2, BigDecimal.ROUND_FLOOR).floatValue();
+            f = bigDecimal.setScale(3, BigDecimal.ROUND_DOWN).floatValue();
         }
         writeVarLong(Float.floatToIntBits(f));
     }
 
     public void writeDouble(double n) throws IOException {
         double d;
-        if (n > -92233720368547758L && n < 92233720368547758L) {//Long.MAX_VALUE / 100;
-            d = (double) (Math.round(n * 100)) / 100;
+        if (n > -9223372036854775L && n < 9223372036854775L) {//Long.MAX_VALUE / 1000;
+            d = (double) ((int)(n * 1000)) / 1000;
         } else {
             BigDecimal bigDecimal = new BigDecimal(n);
-            d = bigDecimal.setScale(2, BigDecimal.ROUND_FLOOR).doubleValue();
+            d = bigDecimal.setScale(3, BigDecimal.ROUND_DOWN).doubleValue();
         }
         writeVarLong(Double.doubleToLongBits(d));
     }

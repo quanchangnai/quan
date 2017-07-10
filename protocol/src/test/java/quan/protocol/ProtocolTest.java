@@ -2,7 +2,7 @@ package quan.protocol;
 
 import quan.protocol.role.RoleInfo;
 import quan.protocol.role.SRoleLogin;
-import quan.protocol.role.UserInfo;
+import quan.protocol.user.UserInfo;
 import quan.protocol.stream.ReadableStream;
 import quan.protocol.stream.WritableStream;
 
@@ -13,38 +13,38 @@ public class ProtocolTest {
 
     public static void main(String[] args) throws Exception {
 //        test1();
-        test2();
-//        test3();
+//        test2();
+        test3();
     }
 
     private static void test1() throws Exception {
         System.err.println("====================test1================================");
         WritableStream writableStream = new WritableStream();
 
-        writableStream.writeBool(false);
-        writableStream.writeByte((byte) -100);
-        writableStream.writeShort((short) -1);
-        writableStream.writeInt(-1);
-        writableStream.writeInt(23);
-        writableStream.writeFloat(21474834.9999F);
-        writableStream.writeDouble(Float.MAX_VALUE);
-        writableStream.writeLong(System.currentTimeMillis());
-        writableStream.writeString("hello，你好");
+//        writableStream.writeBool(false);
+//        writableStream.writeByte((byte) -100);
+//        writableStream.writeShort((short) -1);
+//        writableStream.writeInt(-1);
+//        writableStream.writeInt(23);
+        writableStream.writeFloat(42.1425F);
+//        writableStream.writeDouble(Float.MAX_VALUE);
+//        writableStream.writeLong(System.currentTimeMillis());
+//        writableStream.writeString("hello，你好");
 
         byte[] bytes = writableStream.toBytes();
         System.err.println("字节数:" + bytes.length);
 
         ReadableStream readableStream = new ReadableStream(bytes);
 
-        System.err.println(readableStream.readBool());
-        System.err.println(readableStream.readByte());
-        System.err.println(readableStream.readShort());
-        System.err.println(readableStream.readInt());
-        System.err.println(readableStream.readInt());
+//        System.err.println(readableStream.readBool());
+//        System.err.println(readableStream.readByte());
+//        System.err.println(readableStream.readShort());
+//        System.err.println(readableStream.readInt());
+//        System.err.println(readableStream.readInt());
         System.err.println(readableStream.readFloat());
-        System.err.println(readableStream.readDouble());
-        System.err.println(readableStream.readLong());
-        System.err.println(readableStream.readString());
+//        System.err.println(readableStream.readDouble());
+//        System.err.println(readableStream.readLong());
+//        System.err.println(readableStream.readString());
     }
 
     private static void test2() throws Exception {
@@ -67,7 +67,7 @@ public class ProtocolTest {
         sRoleLogin1.setRoleInfo(roleInfo1);
         sRoleLogin1.getRoleInfoList().add(roleInfo1);
         sRoleLogin1.getRoleInfoSet().add(roleInfo1);
-        sRoleLogin1.getRoleInfoMap().put(roleInfo1.getRoleId(),roleInfo1);
+        sRoleLogin1.getRoleInfoMap().put(roleInfo1.getRoleId(), roleInfo1);
 
         sRoleLogin1.serialize(writableStream);
 

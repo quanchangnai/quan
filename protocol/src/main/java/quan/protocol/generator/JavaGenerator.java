@@ -75,6 +75,11 @@ public class JavaGenerator extends Generator {
                 fieldDefinition.setBasicType(type);
                 fieldDefinition.setClassType(type.substring(0, 1).toUpperCase() + type.substring(1));
             }
+        } else {
+            if (type.contains(".")) {
+                beanDefinition.getImports().add(type);
+                fieldDefinition.setType(type.substring(type.lastIndexOf(".")+1));
+            }
         }
 
         if (type.equals("set") || type.equals("list") || type.equals("map")) {
