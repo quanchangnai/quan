@@ -10,8 +10,8 @@ import quan.protocol.stream.ReadableStream;
  */
 public class UserInfo extends Bean {
 
-    private String name;
-    private int level;
+    private String name;//名字
+    private int level;//等级
     private int experience;
     private int icon;
     private int power;

@@ -1,13 +1,12 @@
-<#if packageName !=".">package ${packageName};
+<#if packageName !=".">
+package ${packageName};
 
 </#if>
 /**
 <#if comment !="">
  * ${comment}
- * Created by {@link quan.protocol.generator.JavaGenerator}
-<#else>
- * Created by {@link quan.protocol.generator.JavaGenerator}
 </#if>
+ * Created by {@link quan.protocol.generator.JavaGenerator}
  */
 public enum ${name} {
 

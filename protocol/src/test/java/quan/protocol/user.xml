@@ -4,8 +4,8 @@
     <import file="role.xml"/>
 
     <bean name="UserInfo">
-        <field name="name" type="string"/>
-        <field name="level" type="int"/>
+        <field name="name" type="string"/>名字
+        <field name="level" type="int"/>等级
         <field name="experience" type="int"/>
         <field name="icon" type="int"/>
         <field name="power" type="int"/>

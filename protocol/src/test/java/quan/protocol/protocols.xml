@@ -2,6 +2,7 @@
 <protocols package="quan.protocol.test">
 
     <import file="user.xml"/>
+    <import file="role.xml"/>
 
     <protocol id="1111" name="Test">测试协议
         <field name="testId" type="long" value="111"/>
