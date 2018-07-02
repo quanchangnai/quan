@@ -18,7 +18,10 @@ public class ProtocolTest {
 
     private static void test1() throws Exception {
         System.err.println("====================test1================================");
-
+        VarIntBuffer buffer = new VarIntBuffer();
+        buffer.writeLong(System.currentTimeMillis());
+        System.err.println(buffer.availableBytes().length);
+        System.err.println(Long.toBinaryString(buffer.readLong()).length());
     }
 
     private static void test2() throws Exception {
