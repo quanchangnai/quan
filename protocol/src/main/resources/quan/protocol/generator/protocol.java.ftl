@@ -100,78 +100,78 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 </#list>
 
     @Override
-    public void serialize(WritableStream writable) throws IOException {
+    public void serialize(VarIntBuffer buffer) throws IOException {
 <#if definitionType==3>
-        writable.writeInt(ID);
+        buffer.writeInt(ID);
 </#if>
 <#list fields as field>
     <#if field.type=="set" || field.type=="list">
-        writable.writeInt(${field.name}.size());
+        buffer.writeInt(${field.name}.size());
         for (${field.basicValueType} ${field.name}Value : ${field.name}) {
         <#if field.valueBuiltInType>
-            writable.write${field.valueType?cap_first}(${field.name}Value);
+            buffer.write${field.valueType?cap_first}(${field.name}Value);
         <#else>
-            ${field.name}Value.serialize(writable);
+            ${field.name}Value.serialize(buffer);
         </#if>
         }
     <#elseif field.type=="map">
-        writable.writeInt(${field.name}.size());
+        buffer.writeInt(${field.name}.size());
         for (${field.basicKeyType} ${field.name}Key : ${field.name}.keySet()) {
-            writable.write${field.keyType?cap_first}(${field.name}Key);
+            buffer.write${field.keyType?cap_first}(${field.name}Key);
         <#if field.valueBuiltInType>
-            writable.write${field.valueType?cap_first}(${field.name}.get(${field.name}Key));
+            buffer.write${field.valueType?cap_first}(${field.name}.get(${field.name}Key));
         <#else>
-            ${field.name}.get(${field.name}Key).serialize(writable);
+            ${field.name}.get(${field.name}Key).serialize(buffer);
         </#if>
         }
     <#elseif field.builtInType>
-        writable.write${field.type?cap_first}(${field.name});
+        buffer.write${field.type?cap_first}(${field.name});
     <#elseif field.enumType>
-        writable.writeInt(${field.name}.getValue());
+        buffer.writeInt(${field.name}.getValue());
     <#else>
-        ${field.name}.serialize(writable);
+        ${field.name}.serialize(buffer);
     </#if>
 </#list>
     }
 
     @Override
-    public void parse(ReadableStream readable) throws IOException {
+    public void parse(VarIntBuffer buffer) throws IOException {
 <#if definitionType==3>
-        if (readable.readInt() != ID) {
-            readable.reset();
-            throw new IOException("协议解析出错，id不匹配,目标值：" + ID + "，实际值：" + readable.readInt());
+        if (buffer.readInt() != ID) {
+            buffer.reset();
+            throw new IOException("协议解析出错，id不匹配,目标值：" + ID + "，实际值：" + buffer.readInt());
         }
 </#if>
 <#list fields as field>
     <#if field.type=="set" || field.type=="list">
-        int ${field.name}Size = readable.readInt();
+        int ${field.name}Size = buffer.readInt();
         for (int i = 0; i < ${field.name}Size; i++) {
         <#if field.valueBuiltInType>
-            ${field.name}.add(readable.read${field.valueType?cap_first}());
+            ${field.name}.add(buffer.read${field.valueType?cap_first}());
         <#else>
             ${field.valueType} ${field.name}Value = new ${field.valueType}();
-            ${field.name}Value.parse(readable);
+            ${field.name}Value.parse(buffer);
             ${field.name}.add(${field.name}Value);
         </#if>
         }
     <#elseif field.type=="map">
-        int ${field.name}Size = readable.readInt();
+        int ${field.name}Size = buffer.readInt();
         for (int i = 0; i < ${field.name}Size; i++) {
         <#if field.valueBuiltInType>
-            ${field.name}.put(readable.read${field.keyType?cap_first}(), readable.read${field.valueType?cap_first}());
+            ${field.name}.put(buffer.read${field.keyType?cap_first}(), buffer.read${field.valueType?cap_first}());
         <#else>
-            ${field.basicKeyType} ${field.name}Key = readable.read${field.keyType?cap_first}();
+            ${field.basicKeyType} ${field.name}Key = buffer.read${field.keyType?cap_first}();
             ${field.basicValueType} ${field.name}Value = new ${field.valueType}();
-            ${field.name}Value.parse(readable);
+            ${field.name}Value.parse(buffer);
             ${field.name}.put(${field.name}Key, ${field.name}Value);
         </#if>
         }
     <#elseif field.builtInType>
-        ${field.name} = readable.read${field.type?cap_first}();
+        ${field.name} = buffer.read${field.type?cap_first}();
     <#elseif field.enumType>
-        ${field.name} = ${field.type}.valueOf(readable.readInt());
+        ${field.name} = ${field.type}.valueOf(buffer.readInt());
     <#else>
-        ${field.name}.parse(readable);
+        ${field.name}.parse(buffer);
     </#if>
 </#list>
     }

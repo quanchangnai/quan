@@ -1,8 +1,5 @@
 package quan.protocol;
 
-import quan.protocol.stream.ReadableStream;
-import quan.protocol.stream.WritableStream;
-
 import java.io.IOException;
 
 /**
@@ -12,26 +9,26 @@ public abstract class Bean {
 
     public byte[] serialize() {
         try {
-            WritableStream writable = new WritableStream();
-            serialize(writable);
-            return writable.toBytes();
+            VarIntBuffer buffer = new VarIntBuffer();
+            serialize(buffer);
+            return buffer.availableBytes();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public abstract void serialize(WritableStream writable) throws IOException;
+    public abstract void serialize(VarIntBuffer buffer) throws IOException;
 
     public void parse(byte[] bytes) {
         try {
-            ReadableStream readable = new ReadableStream(bytes);
-            parse(readable);
+            VarIntBuffer buffer = new VarIntBuffer(bytes);
+            parse(buffer);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public abstract void parse(ReadableStream readable) throws IOException;
+    public abstract void parse(VarIntBuffer buffer) throws IOException;
 
 
 }

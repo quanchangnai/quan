@@ -2,8 +2,7 @@ package quan.protocol.generator;
 
 import quan.protocol.Bean;
 import quan.protocol.Protocol;
-import quan.protocol.stream.ReadableStream;
-import quan.protocol.stream.WritableStream;
+import quan.protocol.VarIntBuffer;
 
 import java.util.List;
 
@@ -38,8 +37,7 @@ public class JavaGenerator extends Generator {
             beanDefinition.getImports().add(Bean.class.getName());
         }
         beanDefinition.getImports().add("java.io.IOException");
-        beanDefinition.getImports().add(ReadableStream.class.getName());
-        beanDefinition.getImports().add(WritableStream.class.getName());
+        beanDefinition.getImports().add(VarIntBuffer.class.getName());
         for (FieldDefinition fieldDefinition : beanDefinition.getFields()) {
             processField(fieldDefinition);
         }
@@ -78,7 +76,7 @@ public class JavaGenerator extends Generator {
         } else {
             if (type.contains(".")) {
                 beanDefinition.getImports().add(type);
-                fieldDefinition.setType(type.substring(type.lastIndexOf(".")+1));
+                fieldDefinition.setType(type.substring(type.lastIndexOf(".") + 1));
             }
         }
 

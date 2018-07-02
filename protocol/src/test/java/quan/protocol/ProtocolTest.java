@@ -3,8 +3,6 @@ package quan.protocol;
 import quan.protocol.role.RoleInfo;
 import quan.protocol.role.SRoleLogin;
 import quan.protocol.user.UserInfo;
-import quan.protocol.stream.ReadableStream;
-import quan.protocol.stream.WritableStream;
 
 /**
  * Created by quanchangnai on 2017/7/5.
@@ -12,45 +10,20 @@ import quan.protocol.stream.WritableStream;
 public class ProtocolTest {
 
     public static void main(String[] args) throws Exception {
-//        test1();
-//        test2();
+        test1();
+        test2();
         test3();
+        test4();
     }
 
     private static void test1() throws Exception {
         System.err.println("====================test1================================");
-        WritableStream writableStream = new WritableStream();
 
-//        writableStream.writeBool(false);
-//        writableStream.writeByte((byte) -100);
-//        writableStream.writeShort((short) -1);
-//        writableStream.writeInt(-1);
-//        writableStream.writeInt(23);
-        writableStream.writeFloat(42.1425F);
-//        writableStream.writeDouble(Float.MAX_VALUE);
-//        writableStream.writeLong(System.currentTimeMillis());
-//        writableStream.writeString("hello，你好");
-
-        byte[] bytes = writableStream.toBytes();
-        System.err.println("字节数:" + bytes.length);
-
-        ReadableStream readableStream = new ReadableStream(bytes);
-
-//        System.err.println(readableStream.readBool());
-//        System.err.println(readableStream.readByte());
-//        System.err.println(readableStream.readShort());
-//        System.err.println(readableStream.readInt());
-//        System.err.println(readableStream.readInt());
-        System.err.println(readableStream.readFloat());
-//        System.err.println(readableStream.readDouble());
-//        System.err.println(readableStream.readLong());
-//        System.err.println(readableStream.readString());
     }
 
     private static void test2() throws Exception {
         System.err.println("====================test2================================");
 
-        WritableStream writableStream = new WritableStream();
         RoleInfo roleInfo1 = new RoleInfo();
         roleInfo1.setRoleId(1);
         roleInfo1.setRoleName("role");
@@ -69,16 +42,18 @@ public class ProtocolTest {
         sRoleLogin1.getRoleInfoSet().add(roleInfo1);
         sRoleLogin1.getRoleInfoMap().put(roleInfo1.getRoleId(), roleInfo1);
 
-        sRoleLogin1.serialize(writableStream);
+        VarIntBuffer buffer = new VarIntBuffer();
 
-        byte[] bytes = writableStream.toBytes();
+        sRoleLogin1.serialize(buffer);
+
+        byte[] bytes = buffer.availableBytes();
         System.err.println("字节数:" + bytes.length);
 
-        ReadableStream readableStream = new ReadableStream(bytes);
 
         SRoleLogin sRoleLogin2 = new SRoleLogin();
-        sRoleLogin2.parse(readableStream);
+        sRoleLogin2.parse(buffer);
         System.err.println("sRoleLogin2=" + sRoleLogin2);
+        System.err.println("sRoleLogin2.getRoleInfo().getData()=" + new String(sRoleLogin2.getRoleInfo().getData()));
 
     }
 
@@ -98,9 +73,9 @@ public class ProtocolTest {
         userInfo1.setCurrentState(42234);
         userInfo1.setBuyPowerCount(5345);
 
-        WritableStream writableStream = new WritableStream();
-        userInfo1.serialize(writableStream);
-        System.err.println("字节数:" + writableStream.toBytes().length);
+        VarIntBuffer buffer = new VarIntBuffer();
+        userInfo1.serialize(buffer);
+        System.err.println("字节数:" + buffer.availableBytes().length);
 
         long start = System.nanoTime();
         long end = 0;
@@ -117,6 +92,28 @@ public class ProtocolTest {
 
         System.err.println("test 耗时(ns)：" + (end - start));
         System.err.println("test 耗时(ms)：" + (end - start) / 1000000);
+    }
+
+    private static void test4() throws Exception {
+        System.err.println("====================test4================================");
+        VarIntBuffer buffer = new VarIntBuffer();
+        buffer.writeBool(true);
+//        buffer.reset();
+        buffer.writeLong(System.currentTimeMillis());
+        buffer.writeDouble(321.435454345);
+        for (int i = 0; i < 1000; i++) {
+            buffer.writeString("你好" + i);
+        }
+
+        System.err.println(buffer.readBool());
+//        buffer.reset();
+//        System.err.println(buffer.readBool());
+        System.err.println(buffer.readLong());
+        System.err.println(buffer.readDouble());
+        for (int i = 0; i < 10; i++) {
+            System.err.println(buffer.readString());
+        }
+        System.err.println(buffer.capacity());
     }
 
 }

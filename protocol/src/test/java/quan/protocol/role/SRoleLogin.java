@@ -2,11 +2,10 @@ package quan.protocol.role;
 
 import java.util.HashSet;
 import quan.protocol.user.UserInfo;
+import quan.protocol.VarIntBuffer;
 import java.io.IOException;
-import quan.protocol.stream.WritableStream;
 import java.util.HashMap;
 import quan.protocol.Protocol;
-import quan.protocol.stream.ReadableStream;
 import java.util.ArrayList;
 
 /**
@@ -76,54 +75,54 @@ public class SRoleLogin extends Protocol {
 
 
     @Override
-    public void serialize(WritableStream writable) throws IOException {
-        writable.writeInt(ID);
-        writable.writeLong(roleId);
-        roleInfo.serialize(writable);
-        writable.writeInt(roleInfoList.size());
+    public void serialize(VarIntBuffer buffer) throws IOException {
+        buffer.writeInt(ID);
+        buffer.writeLong(roleId);
+        roleInfo.serialize(buffer);
+        buffer.writeInt(roleInfoList.size());
         for (RoleInfo roleInfoListValue : roleInfoList) {
-            roleInfoListValue.serialize(writable);
+            roleInfoListValue.serialize(buffer);
         }
-        writable.writeInt(roleInfoSet.size());
+        buffer.writeInt(roleInfoSet.size());
         for (RoleInfo roleInfoSetValue : roleInfoSet) {
-            roleInfoSetValue.serialize(writable);
+            roleInfoSetValue.serialize(buffer);
         }
-        writable.writeInt(roleInfoMap.size());
+        buffer.writeInt(roleInfoMap.size());
         for (long roleInfoMapKey : roleInfoMap.keySet()) {
-            writable.writeLong(roleInfoMapKey);
-            roleInfoMap.get(roleInfoMapKey).serialize(writable);
+            buffer.writeLong(roleInfoMapKey);
+            roleInfoMap.get(roleInfoMapKey).serialize(buffer);
         }
-        userInfo.serialize(writable);
+        userInfo.serialize(buffer);
     }
 
     @Override
-    public void parse(ReadableStream readable) throws IOException {
-        if (readable.readInt() != ID) {
-            readable.reset();
-            throw new IOException("协议解析出错，id不匹配,目标值：" + ID + "，实际值：" + readable.readInt());
+    public void parse(VarIntBuffer buffer) throws IOException {
+        if (buffer.readInt() != ID) {
+            buffer.reset();
+            throw new IOException("协议解析出错，id不匹配,目标值：" + ID + "，实际值：" + buffer.readInt());
         }
-        roleId = readable.readLong();
-        roleInfo.parse(readable);
-        int roleInfoListSize = readable.readInt();
+        roleId = buffer.readLong();
+        roleInfo.parse(buffer);
+        int roleInfoListSize = buffer.readInt();
         for (int i = 0; i < roleInfoListSize; i++) {
             RoleInfo roleInfoListValue = new RoleInfo();
-            roleInfoListValue.parse(readable);
+            roleInfoListValue.parse(buffer);
             roleInfoList.add(roleInfoListValue);
         }
-        int roleInfoSetSize = readable.readInt();
+        int roleInfoSetSize = buffer.readInt();
         for (int i = 0; i < roleInfoSetSize; i++) {
             RoleInfo roleInfoSetValue = new RoleInfo();
-            roleInfoSetValue.parse(readable);
+            roleInfoSetValue.parse(buffer);
             roleInfoSet.add(roleInfoSetValue);
         }
-        int roleInfoMapSize = readable.readInt();
+        int roleInfoMapSize = buffer.readInt();
         for (int i = 0; i < roleInfoMapSize; i++) {
-            long roleInfoMapKey = readable.readLong();
+            long roleInfoMapKey = buffer.readLong();
             RoleInfo roleInfoMapValue = new RoleInfo();
-            roleInfoMapValue.parse(readable);
+            roleInfoMapValue.parse(buffer);
             roleInfoMap.put(roleInfoMapKey, roleInfoMapValue);
         }
-        userInfo.parse(readable);
+        userInfo.parse(buffer);
     }
 
     @Override

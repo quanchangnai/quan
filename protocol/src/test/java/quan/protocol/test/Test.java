@@ -1,9 +1,8 @@
 package quan.protocol.test;
 
+import quan.protocol.VarIntBuffer;
 import java.io.IOException;
-import quan.protocol.stream.WritableStream;
 import quan.protocol.Protocol;
-import quan.protocol.stream.ReadableStream;
 
 /**
  * 测试协议
@@ -34,18 +33,18 @@ public class Test extends Protocol {
 
 
     @Override
-    public void serialize(WritableStream writable) throws IOException {
-        writable.writeInt(ID);
-        writable.writeLong(testId);
+    public void serialize(VarIntBuffer buffer) throws IOException {
+        buffer.writeInt(ID);
+        buffer.writeLong(testId);
     }
 
     @Override
-    public void parse(ReadableStream readable) throws IOException {
-        if (readable.readInt() != ID) {
-            readable.reset();
-            throw new IOException("协议解析出错，id不匹配,目标值：" + ID + "，实际值：" + readable.readInt());
+    public void parse(VarIntBuffer buffer) throws IOException {
+        if (buffer.readInt() != ID) {
+            buffer.reset();
+            throw new IOException("协议解析出错，id不匹配,目标值：" + ID + "，实际值：" + buffer.readInt());
         }
-        testId = readable.readLong();
+        testId = buffer.readLong();
     }
 
     @Override

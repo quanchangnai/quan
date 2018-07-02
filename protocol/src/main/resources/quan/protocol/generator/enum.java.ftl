@@ -41,7 +41,7 @@ public enum ${name} {
 
     @Override
     public String toString() {
-        return "RoleType{" +
+        return "${name}{" +
                 "name='" + name() + '\'' +
                 ",value=" + value +
                 '}';

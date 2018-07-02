@@ -2,11 +2,10 @@ package quan.protocol.role;
 
 import java.util.HashSet;
 import java.util.Arrays;
+import quan.protocol.VarIntBuffer;
 import java.io.IOException;
-import quan.protocol.stream.WritableStream;
 import java.util.HashMap;
 import quan.protocol.Bean;
-import quan.protocol.stream.ReadableStream;
 import java.util.ArrayList;
 
 /**
@@ -139,55 +138,55 @@ public class RoleInfo extends Bean {
 
 
     @Override
-    public void serialize(WritableStream writable) throws IOException {
-        writable.writeLong(roleId);
-        writable.writeBool(bo);
-        writable.writeByte(by);
-        writable.writeShort(s);
-        writable.writeInt(i);
-        writable.writeFloat(f);
-        writable.writeDouble(d);
-        writable.writeString(roleName);
-        writable.writeInt(roleType.getValue());
-        writable.writeBytes(data);
-        writable.writeInt(list.size());
+    public void serialize(VarIntBuffer buffer) throws IOException {
+        buffer.writeLong(roleId);
+        buffer.writeBool(bo);
+        buffer.writeByte(by);
+        buffer.writeShort(s);
+        buffer.writeInt(i);
+        buffer.writeFloat(f);
+        buffer.writeDouble(d);
+        buffer.writeString(roleName);
+        buffer.writeInt(roleType.getValue());
+        buffer.writeBytes(data);
+        buffer.writeInt(list.size());
         for (int listValue : list) {
-            writable.writeInt(listValue);
+            buffer.writeInt(listValue);
         }
-        writable.writeInt(set.size());
+        buffer.writeInt(set.size());
         for (int setValue : set) {
-            writable.writeInt(setValue);
+            buffer.writeInt(setValue);
         }
-        writable.writeInt(map.size());
+        buffer.writeInt(map.size());
         for (int mapKey : map.keySet()) {
-            writable.writeInt(mapKey);
-            writable.writeInt(map.get(mapKey));
+            buffer.writeInt(mapKey);
+            buffer.writeInt(map.get(mapKey));
         }
     }
 
     @Override
-    public void parse(ReadableStream readable) throws IOException {
-        roleId = readable.readLong();
-        bo = readable.readBool();
-        by = readable.readByte();
-        s = readable.readShort();
-        i = readable.readInt();
-        f = readable.readFloat();
-        d = readable.readDouble();
-        roleName = readable.readString();
-        roleType = RoleType.valueOf(readable.readInt());
-        data = readable.readBytes();
-        int listSize = readable.readInt();
+    public void parse(VarIntBuffer buffer) throws IOException {
+        roleId = buffer.readLong();
+        bo = buffer.readBool();
+        by = buffer.readByte();
+        s = buffer.readShort();
+        i = buffer.readInt();
+        f = buffer.readFloat();
+        d = buffer.readDouble();
+        roleName = buffer.readString();
+        roleType = RoleType.valueOf(buffer.readInt());
+        data = buffer.readBytes();
+        int listSize = buffer.readInt();
         for (int i = 0; i < listSize; i++) {
-            list.add(readable.readInt());
+            list.add(buffer.readInt());
         }
-        int setSize = readable.readInt();
+        int setSize = buffer.readInt();
         for (int i = 0; i < setSize; i++) {
-            set.add(readable.readInt());
+            set.add(buffer.readInt());
         }
-        int mapSize = readable.readInt();
+        int mapSize = buffer.readInt();
         for (int i = 0; i < mapSize; i++) {
-            map.put(readable.readInt(), readable.readInt());
+            map.put(buffer.readInt(), buffer.readInt());
         }
     }
 

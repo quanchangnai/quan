@@ -1,9 +1,8 @@
 package quan.protocol.user;
 
+import quan.protocol.VarIntBuffer;
 import java.io.IOException;
-import quan.protocol.stream.WritableStream;
 import quan.protocol.Bean;
-import quan.protocol.stream.ReadableStream;
 
 /**
  * Created by {@link quan.protocol.generator.JavaGenerator}
@@ -118,33 +117,33 @@ public class UserInfo extends Bean {
 
 
     @Override
-    public void serialize(WritableStream writable) throws IOException {
-        writable.writeString(name);
-        writable.writeInt(level);
-        writable.writeInt(experience);
-        writable.writeInt(icon);
-        writable.writeInt(power);
-        writable.writeInt(modifyNameCount);
-        writable.writeString(eventState);
-        writable.writeString(functionState);
-        writable.writeInt(lucky);
-        writable.writeInt(currentState);
-        writable.writeInt(buyPowerCount);
+    public void serialize(VarIntBuffer buffer) throws IOException {
+        buffer.writeString(name);
+        buffer.writeInt(level);
+        buffer.writeInt(experience);
+        buffer.writeInt(icon);
+        buffer.writeInt(power);
+        buffer.writeInt(modifyNameCount);
+        buffer.writeString(eventState);
+        buffer.writeString(functionState);
+        buffer.writeInt(lucky);
+        buffer.writeInt(currentState);
+        buffer.writeInt(buyPowerCount);
     }
 
     @Override
-    public void parse(ReadableStream readable) throws IOException {
-        name = readable.readString();
-        level = readable.readInt();
-        experience = readable.readInt();
-        icon = readable.readInt();
-        power = readable.readInt();
-        modifyNameCount = readable.readInt();
-        eventState = readable.readString();
-        functionState = readable.readString();
-        lucky = readable.readInt();
-        currentState = readable.readInt();
-        buyPowerCount = readable.readInt();
+    public void parse(VarIntBuffer buffer) throws IOException {
+        name = buffer.readString();
+        level = buffer.readInt();
+        experience = buffer.readInt();
+        icon = buffer.readInt();
+        power = buffer.readInt();
+        modifyNameCount = buffer.readInt();
+        eventState = buffer.readString();
+        functionState = buffer.readString();
+        lucky = buffer.readInt();
+        currentState = buffer.readInt();
+        buyPowerCount = buffer.readInt();
     }
 
     @Override
