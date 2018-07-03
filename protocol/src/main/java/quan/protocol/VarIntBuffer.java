@@ -2,6 +2,7 @@ package quan.protocol;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.ByteBuffer;
 
 /**
  * VarInt缓冲区，使用了ZigZag和VarInt编码，字节流采用大端模式
@@ -9,7 +10,7 @@ import java.math.BigDecimal;
  */
 public class VarIntBuffer {
     /**
-     * 内部字节缓冲区
+     * 字节缓冲区
      */
     private byte[] buffer;
     /**
@@ -17,33 +18,42 @@ public class VarIntBuffer {
      */
     private final int initCapacity;
     /**
-     * 当前操作位置
+     * 当前位置
      */
     private int position;
     /**
-     * 当前操作类型，true：读，false：写
+     * 当前是在读数据还是在写数据，true：读，false：写
      */
     private boolean reading;
     /**
-     * 当前操作的结束位置
+     * 结束位置，后面的是无效数据
      */
     private int end;
 
     public VarIntBuffer() {
-        this(128);
+        this(64);
     }
 
     public VarIntBuffer(int initCapacity) {
         this.initCapacity = initCapacity;
-        buffer = new byte[initCapacity];
+        this.buffer = new byte[initCapacity];
         this.end = capacity() - 1;
     }
 
     public VarIntBuffer(byte[] buffer) {
-        this.initCapacity = 128;
-        this.buffer = buffer;
-        this.position = capacity() - 1;
+        this.initCapacity = 64;
+        if (buffer.length >= initCapacity) {
+            this.buffer = buffer;
+        } else {
+            this.buffer = new byte[initCapacity];
+            System.arraycopy(buffer, 0, this.buffer, 0, buffer.length);
+        }
+        this.position = buffer.length - 1;
         this.end = capacity() - 1;
+    }
+
+    public VarIntBuffer(ByteBuffer buffer) {
+        this(buffer.array());
     }
 
     public int capacity() {
@@ -55,7 +65,9 @@ public class VarIntBuffer {
     }
 
     /**
-     * 当前可用的字节数组
+     * 当前可用的字节数组<br/>
+     * 当前正在读数据时：[0,end]<br/>
+     * 当前正在写数据时：[0,position)<br/>
      *
      * @return
      */
@@ -66,25 +78,56 @@ public class VarIntBuffer {
         } else {
             System.arraycopy(buffer, 0, bytes, 0, bytes.length);
         }
-
         return bytes;
     }
 
     /**
-     * 当前可用的字节数。当前正在读数据时，有效数据：[position,end]。当前正在写数据时，可用数据:[0,position]
+     * 当前可用的字节数
      *
      * @return
      */
     public int available() {
         if (reading) {
-            return end - position + 1;
+            return end + 1;
         } else {
-            return position + 1;
+            return position;
         }
     }
 
+
     /**
-     * 读取VarInt，只能是[8,16,32,64]位整数的一种
+     * 当前剩余可用的字节数组<br/>
+     * 当前正在读数据时：[position,end]<br/>
+     * 当前正在写数据时：[0,position)<br/>
+     *
+     * @return
+     */
+    public byte[] remainingBytes() {
+        byte[] bytes = new byte[remaining()];
+        if (reading) {
+            System.arraycopy(buffer, position, bytes, 0, bytes.length);
+        } else {
+            System.arraycopy(buffer, 0, bytes, 0, bytes.length);
+        }
+        return bytes;
+    }
+
+    /**
+     * 当前剩余可用的字节数
+     *
+     * @return
+     */
+    public int remaining() {
+        if (reading) {
+            return end - position + 1;
+        } else {
+            return position;
+        }
+    }
+
+
+    /**
+     * 读取VarInt，bits只能是[8,16,32,64]中的一种
      *
      * @param bits
      * @return
@@ -92,7 +135,7 @@ public class VarIntBuffer {
      */
     protected long readVarInt(int bits) throws IOException {
         if (bits != 8 && bits != 16 && bits != 32 && bits != 64) {
-            throw new IllegalArgumentException("参数bits取值范围错误，限定范围[8,16,32,64]");
+            throw new IllegalArgumentException("参数bits限定取值范围[8,16,32,64],实际值：" + bits);
         }
         int position = reading ? this.position : 0;
         int shift = 0;
@@ -103,7 +146,7 @@ public class VarIntBuffer {
             if ((b & 0b10000000) == 0) {
                 if (!reading) {
                     reading = true;
-                    end = this.position;
+                    end = this.position - 1;
                 }
                 this.position = position;
                 //ZigZag解码
@@ -143,11 +186,27 @@ public class VarIntBuffer {
     }
 
     public float readFloat() throws IOException {
-        return Float.intBitsToFloat(readInt());
+        return readFloat(-1);
+    }
+
+    public float readFloat(int scale) throws IOException {
+        if (scale < 0) {
+            return Float.intBitsToFloat(readInt());
+        } else {
+            return (float) (readInt() / Math.pow(10, scale));
+        }
     }
 
     public double readDouble() throws IOException {
-        return Double.longBitsToDouble(readLong());
+        return readDouble(-1);
+    }
+
+    public double readDouble(int scale) throws IOException {
+        if (scale < 0) {
+            return Double.longBitsToDouble(readLong());
+        } else {
+            return readLong() / Math.pow(10, scale);
+        }
     }
 
     public String readString() throws IOException {
@@ -181,8 +240,10 @@ public class VarIntBuffer {
         while (true) {
             if ((n & ~0b1111111) == 0) {
                 buffer[position++] = (byte) (n & 0b1111111);
-                reading = false;
-                end = capacity() - 1;
+                if (reading) {
+                    reading = false;
+                    end = capacity() - 1;
+                }
                 this.position = position;
                 return;
             } else {
@@ -222,14 +283,43 @@ public class VarIntBuffer {
     }
 
     public void writeFloat(float n) throws IOException {
-        float f = new BigDecimal(n).setScale(3, BigDecimal.ROUND_DOWN).floatValue();
-        writeVarInt(Float.floatToIntBits(f));
+        writeFloat(n, -1);
+    }
+
+    public void writeFloat(float n, int scale) throws IOException {
+        if (scale < 0) {
+            writeVarInt(Float.floatToIntBits(n));
+        } else {
+            n = new BigDecimal(n).setScale(scale, BigDecimal.ROUND_FLOOR).floatValue();
+            int times = (int) Math.pow(10, scale);
+            long threshold = Integer.MAX_VALUE / times;
+            if (n >= -threshold && n <= threshold) {
+                writeInt((int) Math.floor(n * times));
+            } else {
+                throw new IllegalArgumentException("参数n超出了限定范围[" + -threshold + "," + threshold + "]中，无法转换为指定精度的定点型");
+            }
+        }
     }
 
     public void writeDouble(double n) throws IOException {
-        double d = new BigDecimal(n).setScale(3, BigDecimal.ROUND_DOWN).doubleValue();
-        writeVarInt(Double.doubleToLongBits(d));
+        writeDouble(n, -1);
     }
+
+    public void writeDouble(double n, int scale) throws IOException {
+        if (scale < 0) {
+            writeVarInt(Double.doubleToLongBits(n));
+        } else {
+            n = new BigDecimal(n).setScale(scale, BigDecimal.ROUND_DOWN).doubleValue();
+            int times = (int) Math.pow(10, scale);
+            long threshold = Long.MAX_VALUE / times;
+            if (n >= -threshold && n <= threshold) {
+                writeLong(Math.round(n * times));
+            } else {
+                throw new IllegalArgumentException("参数n超出了限定范围[" + -threshold + "," + threshold + "]中，无法转换为指定精度的定点型");
+            }
+        }
+    }
+
 
     public void writeString(String s) throws IOException {
         writeBytes(s.getBytes("UTF-8"));

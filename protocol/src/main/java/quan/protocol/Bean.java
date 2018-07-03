@@ -11,7 +11,7 @@ public abstract class Bean {
         try {
             VarIntBuffer buffer = new VarIntBuffer();
             serialize(buffer);
-            return buffer.availableBytes();
+            return buffer.remainingBytes();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

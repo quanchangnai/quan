@@ -10,18 +10,38 @@ import quan.protocol.user.UserInfo;
 public class ProtocolTest {
 
     public static void main(String[] args) throws Exception {
-        test1();
-        test2();
-        test3();
+
+//        test1();
+//        test2();
+//        test3();
         test4();
     }
 
     private static void test1() throws Exception {
         System.err.println("====================test1================================");
         VarIntBuffer buffer = new VarIntBuffer();
-        buffer.writeLong(System.currentTimeMillis());
-        System.err.println(buffer.availableBytes().length);
-        System.err.println(Long.toBinaryString(buffer.readLong()).length());
+//        buffer.writeLong(System.currentTimeMillis());
+//        System.err.println(buffer.available());
+//        System.err.println(buffer.remaining());
+//        System.err.println(Long.toBinaryString(buffer.readLong()).length());
+//        System.err.println(buffer.available());
+//        System.err.println(buffer.remaining());
+//
+//        buffer.reset();
+        int scale = 0;
+        int times = (int) Math.pow(10, scale);
+        Integer i = Integer.MAX_VALUE / times;
+        System.err.println(i);
+        buffer.writeFloat(i,scale);
+        float f = buffer.readFloat(scale);
+        System.err.println((int)f);
+//
+//        buffer.writeDouble(321.5453);
+//        System.err.println(buffer.available());
+//        buffer.reset();
+//        buffer.writeDouble(321.5453, 1);
+//        System.err.println(buffer.available());
+//        System.err.println(buffer.readDouble(1));
     }
 
     private static void test2() throws Exception {
@@ -82,41 +102,56 @@ public class ProtocolTest {
 
         long start = System.nanoTime();
         long end = 0;
-        for (int i = 1; i <= 100000; i++) {
+        int n = 1000000;
+        for (int i = 1; i <= n; i++) {
             byte[] bytes = userInfo1.serialize();
             UserInfo userInfo2 = new UserInfo();
             userInfo2.parse(bytes);
-            if (i == 100000) {
+            if (i == n) {
                 end = System.nanoTime();
-                System.err.println("userInfo2:" + userInfo2);
+//                System.err.println("userInfo2:" + userInfo2);
             }
         }
 
 
+        System.err.println("编码解码次数：" + n);
         System.err.println("test 耗时(ns)：" + (end - start));
         System.err.println("test 耗时(ms)：" + (end - start) / 1000000);
+        System.err.println("test 平均耗时(ms)：" + (end - start) / (n * 1000000.));
     }
 
     private static void test4() throws Exception {
         System.err.println("====================test4================================");
         VarIntBuffer buffer = new VarIntBuffer();
-        buffer.writeBool(true);
-//        buffer.reset();
-        buffer.writeLong(System.currentTimeMillis());
-        buffer.writeDouble(321.435454345);
-        for (int i = 0; i < 1000; i++) {
-            buffer.writeString("你好" + i);
+
+        long start = System.currentTimeMillis();
+
+        int n = 100000;
+        for (int i = 0; i < n; i++) {
+//            buffer.writeFloat(321.43545434F);
+//            buffer.writeFloat(321.43545434F,3);
+//            buffer.writeDouble(321.43545434D);
+            buffer.writeDouble(321.43545434D, 3);
+//            buffer.writeLong(321L);
         }
 
-        System.err.println(buffer.readBool());
-//        buffer.reset();
-//        System.err.println(buffer.readBool());
-        System.err.println(buffer.readLong());
-        System.err.println(buffer.readDouble());
-        for (int i = 0; i < 10; i++) {
-            System.err.println(buffer.readString());
+//        System.err.println(buffer.available());
+
+        for (int i = 0; i < n; i++) {
+//            buffer.readFloat();
+            //读写次数:100000,耗时：481，  占用字节:500000
+//            buffer.readFloat(3);
+            //读写次数:100000,耗时：196，  占用字节:300000
+//            buffer.readDouble();
+            //读写次数:100000,耗时：1678， 占用字节:1000000
+            buffer.readDouble(3);
+            //读写次数:100000,耗时：278， 占用字节:300000
+//            buffer.readLong();
+            //读写次数:100000,耗时：78，  占用字节:200000
         }
-        System.err.println(buffer.capacity());
+        long end = System.currentTimeMillis();
+        ;
+        System.err.println("读写次数:" + n + ",耗时：" + (end - start) + "，占用字节:" + buffer.available());
     }
 
 }
