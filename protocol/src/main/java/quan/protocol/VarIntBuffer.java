@@ -309,11 +309,11 @@ public class VarIntBuffer {
         if (scale < 0) {
             writeVarInt(Double.doubleToLongBits(n));
         } else {
-            n = new BigDecimal(n).setScale(scale, BigDecimal.ROUND_DOWN).doubleValue();
+            n = new BigDecimal(n).setScale(scale, BigDecimal.ROUND_FLOOR).doubleValue();
             int times = (int) Math.pow(10, scale);
             long threshold = Long.MAX_VALUE / times;
             if (n >= -threshold && n <= threshold) {
-                writeLong(Math.round(n * times));
+                writeLong((long) Math.floor(n * times));
             } else {
                 throw new IllegalArgumentException("参数n超出了限定范围[" + -threshold + "," + threshold + "]中，无法转换为指定精度的定点型");
             }
