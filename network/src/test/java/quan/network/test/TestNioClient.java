@@ -1,6 +1,6 @@
 package quan.network.test;
 
-import quan.network.app.NioClient;
+import quan.network.bootstrap.NioClient;
 import quan.network.handler.HandlerChain;
 import quan.network.handler.HandlerContext;
 import quan.network.handler.HandlerInitializer;
@@ -24,7 +24,7 @@ public class TestNioClient {
 
             }
         });
-        client.setReconnectWaitTime(15 * 1000);
+        client.setReconnectTime(15 * 1000);
         client.connect();
     }
 

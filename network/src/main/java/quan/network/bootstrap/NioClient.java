@@ -1,7 +1,7 @@
-package quan.network.app;
+package quan.network.bootstrap;
 
 import quan.network.connection.Connection;
-import quan.network.util.SingleThreadExecutor;
+import quan.network.util.TaskExecutor;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -18,13 +18,13 @@ import java.util.Set;
  *
  * @author quanchangnai
  */
-public class NioClient extends NetworkApp {
+public class NioClient extends Bootstrap {
 
-    private IoEventExecutor ioEventExecutor;
+    private ReadWriteExecutor readWriteExecutor;
 
     private boolean autoReconnect = true;
 
-    private long reconnectWaitTime = 60 * 1000;
+    private long reconnectTime = 60 * 1000;
 
     public NioClient(int port) {
         this.ip = "127.0.0.1";
@@ -34,11 +34,6 @@ public class NioClient extends NetworkApp {
     public NioClient(String ip, int port) {
         this.ip = ip;
         this.port = port;
-        try {
-            ioEventExecutor = new IoEventExecutor(this);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public boolean isAutoReconnect() {
@@ -49,12 +44,12 @@ public class NioClient extends NetworkApp {
         this.autoReconnect = autoReconnect;
     }
 
-    public long getReconnectWaitTime() {
-        return reconnectWaitTime;
+    public long getReconnectTime() {
+        return reconnectTime;
     }
 
-    public void setReconnectWaitTime(long reconnectWaitTime) {
-        this.reconnectWaitTime = reconnectWaitTime;
+    public void setReconnectTime(long reconnectTime) {
+        this.reconnectTime = reconnectTime;
     }
 
     @Override
@@ -73,15 +68,15 @@ public class NioClient extends NetworkApp {
         }
         logger.debug("连接服务器");
         try {
-            ioEventExecutor = new IoEventExecutor(this);
+            readWriteExecutor = new ReadWriteExecutor(this);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        ioEventExecutor.submit(this::doConnect);
+        readWriteExecutor.submit(this::doConnect);
 
         setRunning(true);
-        ioEventExecutor.start();
+        readWriteExecutor.start();
     }
 
     private void doConnect() {
@@ -99,7 +94,7 @@ public class NioClient extends NetworkApp {
                     socketChannel.setOption((SocketOption<Boolean>) socketOption, (Boolean) optionValue);
                 }
             }
-            ioEventExecutor.registerChannel(socketChannel);
+            readWriteExecutor.registerChannel(socketChannel);
             socketChannel.connect(new InetSocketAddress(getIp(), getPort()));
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -109,7 +104,8 @@ public class NioClient extends NetworkApp {
     public void disconnect() {
         logger.debug("断开连接");
         setRunning(false);
-        ioEventExecutor.stop();
+        readWriteExecutor.stop();
+        readWriteExecutor = null;
     }
 
     private void reconnect() {
@@ -117,7 +113,7 @@ public class NioClient extends NetworkApp {
             return;
         }
         try {
-            Thread.sleep(getReconnectWaitTime());
+            Thread.sleep(getReconnectTime());
         } catch (InterruptedException e1) {
             logger.error(e1);
         }
@@ -125,13 +121,13 @@ public class NioClient extends NetworkApp {
         doConnect();
     }
 
-    private static class IoEventExecutor extends SingleThreadExecutor {
+    private static class ReadWriteExecutor extends TaskExecutor {
 
         private NioClient client;
 
         private Selector selector;
 
-        public IoEventExecutor(NioClient client) throws IOException {
+        public ReadWriteExecutor(NioClient client) throws IOException {
             this.client = client;
             this.selector = Selector.open();
         }
@@ -199,13 +195,13 @@ public class NioClient extends NetworkApp {
                             tryReconnect();
                             break;
                         }
-                        socketChannel.register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
+                        socketChannel.register(selector, SelectionKey.OP_READ);
                         Connection connection = new Connection(selectedKey, this);
                         connection.setReadBufferSize(client.getReadBufferSize());
                         connection.setWriteBufferSize(client.getWriteBufferSize());
                         connection.getHandlerChain().addLast(client.getHandler());
                         selectedKey.attach(connection);
-                        connection.connected();
+                        connection.triggerConnected();
                     }
                 }
 

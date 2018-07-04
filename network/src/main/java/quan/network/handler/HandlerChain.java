@@ -1,7 +1,7 @@
 package quan.network.handler;
 
 import quan.network.connection.Connection;
-import quan.network.util.SingleThreadExecutor;
+import quan.network.util.TaskExecutor;
 
 import java.nio.ByteBuffer;
 
@@ -14,7 +14,7 @@ public class HandlerChain {
 
     private Connection connection;
 
-    private SingleThreadExecutor executor;
+    private TaskExecutor executor;
 
     private HandlerContext head;
 
@@ -33,7 +33,7 @@ public class HandlerChain {
         return connection;
     }
 
-    public SingleThreadExecutor getExecutor() {
+    public TaskExecutor getExecutor() {
         return executor;
     }
 

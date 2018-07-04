@@ -2,7 +2,7 @@ package quan.network.test;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import quan.network.app.NioServer;
+import quan.network.bootstrap.NioServer;
 import quan.network.handler.HandlerChain;
 import quan.network.handler.HandlerContext;
 import quan.network.handler.HandlerInitializer;
@@ -46,7 +46,7 @@ public class TestNioServer {
     }
 
 
-    private static class TestServerInboundHandler implements InboundHandler {
+    private static class TestServerInboundHandler implements InboundHandler<String> {
 
         @Override
         public void onHandlerAdded(HandlerContext handlerContext) throws Exception {
@@ -68,7 +68,7 @@ public class TestNioServer {
         }
 
         @Override
-        public void onReceived(HandlerContext handlerContext, Object msg) throws Exception {
+        public void onReceived(HandlerContext handlerContext, String msg) throws Exception {
             System.err.println("onReceived:" + msg);
 //		handlerContext.onSend(msg);
             handlerContext.triggerReceived(msg);
@@ -88,7 +88,7 @@ public class TestNioServer {
     }
 
 
-    private static class TestServerInboundHandler2 implements InboundHandler {
+    private static class TestServerInboundHandler2 implements InboundHandler<String> {
 
         private static final Logger logger = LogManager.getLogger(TestServerInboundHandler2.class);
 
@@ -111,7 +111,7 @@ public class TestNioServer {
         }
 
         @Override
-        public void onReceived(HandlerContext handlerContext, Object msg) throws Exception {
+        public void onReceived(HandlerContext handlerContext, String msg) throws Exception {
             System.err.println("onReceived2:" + msg);
             handlerContext.send(msg);
         }

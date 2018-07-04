@@ -288,7 +288,7 @@ public class VarIntBuffer {
 
     public void writeFloat(float n, int scale) throws IOException {
         if (scale < 0) {
-            writeVarInt(Float.floatToIntBits(n));
+            writeInt(Float.floatToIntBits(n));
         } else {
             n = new BigDecimal(n).setScale(scale, BigDecimal.ROUND_FLOOR).floatValue();
             int times = (int) Math.pow(10, scale);
@@ -307,7 +307,7 @@ public class VarIntBuffer {
 
     public void writeDouble(double n, int scale) throws IOException {
         if (scale < 0) {
-            writeVarInt(Double.doubleToLongBits(n));
+            writeLong(Double.doubleToLongBits(n));
         } else {
             n = new BigDecimal(n).setScale(scale, BigDecimal.ROUND_FLOOR).doubleValue();
             int times = (int) Math.pow(10, scale);

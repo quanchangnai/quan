@@ -4,7 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import quan.network.handler.HandlerChain;
 import quan.network.handler.HandlerContext;
-import quan.network.util.SingleThreadExecutor;
+import quan.network.util.TaskExecutor;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -23,21 +23,15 @@ import java.util.Queue;
  */
 public class Connection {
 
-    private static final Logger logger = LogManager.getLogger(Connection.class);
+    protected final Logger logger = LogManager.getLogger(getClass());
 
-    public static final int STATE_INIT = 0;// 初始状态
-
-    public static final int STATE_CONNECTED = 1;// 连接已建立
-
-    public static final int STATE_DISCONNECTED = 2;// 连接已断开
-
-    private int state;
+    private boolean connected;
 
     private SelectionKey selectionKey;
 
     private SocketChannel socketChannel;
 
-    private SingleThreadExecutor executor;
+    private TaskExecutor executor;
 
     protected HandlerChain handlerChain;
 
@@ -53,12 +47,11 @@ public class Connection {
 
     private Map<Object, Object> attrs = new HashMap<>();
 
-    public Connection(SelectionKey selectionKey, SingleThreadExecutor executor) {
+    public Connection(SelectionKey selectionKey, TaskExecutor executor) {
         this.executor = executor;
         this.selectionKey = selectionKey;
         this.socketChannel = (SocketChannel) selectionKey.channel();
         this.handlerChain = new HandlerChain(this);
-        this.state = STATE_INIT;
         this.readBuffer = ByteBuffer.allocate(readBufferSize);
         this.writeBuffer = ByteBuffer.allocate(writeBufferSize);
     }
@@ -91,12 +84,12 @@ public class Connection {
         this.writeBuffer = ByteBuffer.allocate(writeBufferSize);
     }
 
-    public SingleThreadExecutor getExecutor() {
+    public TaskExecutor getExecutor() {
         return executor;
     }
 
     public boolean isConnected() {
-        return state == STATE_CONNECTED;
+        return connected;
     }
 
     public Object putAttr(Object key, Object value) {
@@ -111,17 +104,11 @@ public class Connection {
         return attrs.remove(key);
     }
 
-    /**
-     * 获取连接地址
-     *
-     * @return
-     */
     public InetSocketAddress getRemoteAddress() {
         try {
             return (InetSocketAddress) socketChannel.getRemoteAddress();
         } catch (IOException e) {
-            logger.error("获取连接地址异常", e);
-
+            logger.error(e);
         }
         return null;
     }
@@ -132,24 +119,24 @@ public class Connection {
      * @return 读取的字节数，负数表示连接已断开
      */
     public int read() {
-        int readedBytesNum;
+        int readedCount;
         try {
-            readedBytesNum = doRead(readBuffer);
-            if (readedBytesNum < 0) {
+            readedCount = doRead(readBuffer);
+            if (readedCount < 0) {
                 close();
-                return readedBytesNum;
+                return -1;
             } else {
                 readBuffer.flip();
-                received(readBuffer);
+                triggerReceived(readBuffer);
             }
         } catch (IOException e) {
-            exceptionCaught(e);
+            triggerExceptionCaught(e);
             close();
-            readedBytesNum = -1;
+            readedCount = -1;
         } finally {
             readBuffer.clear();
         }
-        return readedBytesNum;
+        return readedCount;
     }
 
     protected int doRead(ByteBuffer readBuffer) throws IOException {
@@ -171,7 +158,7 @@ public class Connection {
         }
 
         writeBuffer.clear();
-        int writedBytesNum = 0;
+        int writedCount = 0;
 
         for (ByteBuffer msgBuffer = msgQueue.poll(); msgBuffer != null; msgBuffer = msgQueue.poll()) {
             if (writeBuffer.remaining() > msgBuffer.remaining()) {
@@ -189,12 +176,12 @@ public class Connection {
                     if (!writeBuffer.hasRemaining()) {
                         //缓冲区填满了
                         writeBuffer.flip();
-                        int doWritedBytesNum = doWrite(writeBuffer);
+                        int doWritedCount = doWrite(writeBuffer);
                         writeBuffer.clear();
-                        if (doWritedBytesNum < 0) {
-                            return doWritedBytesNum;
+                        if (doWritedCount < 0) {
+                            return doWritedCount;
                         } else {
-                            writedBytesNum += doWritedBytesNum;
+                            writedCount += doWritedCount;
                         }
                     }
                 }
@@ -204,60 +191,60 @@ public class Connection {
         writeBuffer.flip();
         if (writeBuffer.hasRemaining()) {
             //缓冲区还有数据没有写入通道
-            int doWritedBytesNum = doWrite(writeBuffer);
-            if (doWritedBytesNum < 0) {
-                return doWritedBytesNum;
+            int doWritedCount = doWrite(writeBuffer);
+            if (doWritedCount < 0) {
+                return -1;
             } else {
-                writedBytesNum += doWritedBytesNum;
+                writedCount += doWritedCount;
             }
         }
-        return writedBytesNum;
+        return writedCount;
     }
 
     protected int doWrite(ByteBuffer writeBuffer) {
-        int writedBytesNum;
+        int writedCount;
         try {
-            writedBytesNum = socketChannel.write(writeBuffer);
+            writedCount = socketChannel.write(writeBuffer);
         } catch (IOException e) {
-            exceptionCaught(e);
+            triggerExceptionCaught(e);
             close();
-            writedBytesNum = -1;
+            writedCount = -1;
         }
-        return writedBytesNum;
+        return writedCount;
     }
 
     /**
-     * 连接建立了的
+     * 触发建立建立了
      */
-    public void connected() {
-        this.state = STATE_CONNECTED;
+    public void triggerConnected() {
+        this.connected = true;
         handlerChain.triggerConnected();
     }
 
     /**
-     * 连接断开了
+     * 触发连接断开了
      */
-    protected void disconnected() {
+    protected void triggerDisconnected() {
         handlerChain.triggerDisconnected();
         handlerChain.removeAll();
-        this.state = STATE_DISCONNECTED;
+        this.connected = false;
     }
 
     /**
-     * 收到了消息
+     * 触发收到了消息
      *
      * @param msg
      */
-    protected void received(ByteBuffer msg) {
+    protected void triggerReceived(ByteBuffer msg) {
         handlerChain.triggerReceived(msg);
     }
 
     /**
-     * 捕获了异常
+     * 触发捕获了异常
      *
      * @param cause
      */
-    protected void exceptionCaught(Throwable cause) {
+    protected void triggerExceptionCaught(Throwable cause) {
         handlerChain.triggerExceptionCaught(cause);
     }
 
@@ -288,7 +275,7 @@ public class Connection {
 
             selectionKey.cancel();
             socketChannel.close();
-            disconnected();
+            triggerDisconnected();
         } catch (IOException e) {
             logger.error("关闭连接异常", e);
         }

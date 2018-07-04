@@ -6,15 +6,15 @@ import org.apache.logging.log4j.Logger;
 import java.util.concurrent.*;
 
 /**
- * 单线程执行器
+ * 基于单线程的任务执行器
  *
  * @author quanchangnai
  */
-public class SingleThreadExecutor implements Executor, Runnable {
+public class TaskExecutor implements Executor, Runnable {
 
     protected final Logger logger = LogManager.getLogger(getClass());
 
-    private volatile boolean running = false;
+    private volatile boolean running;
 
     private Thread thread;
 
@@ -46,11 +46,12 @@ public class SingleThreadExecutor implements Executor, Runnable {
                 try {
                     task.run();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error(e);
                 }
             }
             after();
         }
+        taskQueue.clear();
         end();
     }
 

@@ -1,8 +1,8 @@
-package quan.network.app;
+package quan.network.bootstrap;
 
 import quan.network.connection.Connection;
 import quan.network.handler.NetworkHandler;
-import quan.network.util.SingleThreadExecutor;
+import quan.network.util.TaskExecutor;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -24,15 +24,15 @@ import java.util.concurrent.LinkedBlockingQueue;
  *
  * @author quanchangnai
  */
-public class NioServer extends NetworkApp {
+public class NioServer extends Bootstrap {
 
-    private AcceptEventExecutor acceptEventExecutor;
+    private AcceptExecutor acceptExecutor;
 
     private int readWriteThreadNum;
 
-    private ReadWriteEventExecutor[] readWriteEventExecutors;
+    private ReadWriteExecutor[] readWriteExecutors;
 
-    private int readWriteEventExecutorIndex;
+    private int readWriteExecutorIndex;
 
     private Map<SocketOption<?>, Object> serverSocketOptions = new LinkedHashMap<>();
 
@@ -42,8 +42,7 @@ public class NioServer extends NetworkApp {
     }
 
     public NioServer(int port, NetworkHandler handler) {
-        this.ip = "0.0.0.0";
-        this.port = port;
+        this(port);
         this.setHandler(handler);
     }
 
@@ -72,28 +71,34 @@ public class NioServer extends NetworkApp {
         if (getHandler() == null) {
             throw new NullPointerException("handler");
         }
+
         logger.debug("开启服务器");
+
+        if (isRunning()) {
+            stop();
+        }
+
         try {
-            acceptEventExecutor = new AcceptEventExecutor(this);
+            acceptExecutor = new AcceptExecutor(this);
             if (readWriteThreadNum <= 0) {
                 readWriteThreadNum = Runtime.getRuntime().availableProcessors() * 2;
             }
-
-            readWriteEventExecutors = new ReadWriteEventExecutor[readWriteThreadNum];
+            readWriteExecutors = new ReadWriteExecutor[readWriteThreadNum];
             for (int i = 0; i < readWriteThreadNum; i++) {
-                readWriteEventExecutors[i] = new ReadWriteEventExecutor(this);
+                readWriteExecutors[i] = new ReadWriteExecutor(this);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
         setRunning(true);
-        acceptEventExecutor.start();
-        for (int i = 0; i < readWriteEventExecutors.length; i++) {
-            readWriteEventExecutors[i].start();
+
+        acceptExecutor.start();
+        for (int i = 0; i < readWriteExecutors.length; i++) {
+            readWriteExecutors[i].start();
         }
 
-        acceptEventExecutor.submit(() -> {
+        acceptExecutor.submit(() -> {
             try {
                 ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
                 serverSocketChannel.configureBlocking(false);
@@ -106,7 +111,7 @@ public class NioServer extends NetworkApp {
                     }
                 }
                 serverSocketChannel.socket().bind(new InetSocketAddress(getIp(), getPort()));
-                acceptEventExecutor.registerChannel(serverSocketChannel);
+                acceptExecutor.registerChannel(serverSocketChannel);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -117,26 +122,30 @@ public class NioServer extends NetworkApp {
     public void stop() {
         logger.debug("停止服务器");
         setRunning(false);
-        acceptEventExecutor.stop();
-        for (int i = 0; i < readWriteEventExecutors.length; i++) {
-            readWriteEventExecutors[i].stop();
+
+        acceptExecutor.stop();
+        acceptExecutor = null;
+
+        for (int i = 0; i < readWriteExecutors.length; i++) {
+            readWriteExecutors[i].stop();
         }
+        readWriteExecutors = null;
     }
 
-    private ReadWriteEventExecutor nextReadWriteThreadExecutor() {
-        if (readWriteEventExecutorIndex > readWriteEventExecutors.length - 1) {
-            readWriteEventExecutorIndex = 0;
+    private ReadWriteExecutor nextReadWriteThreadExecutor() {
+        if (readWriteExecutorIndex > readWriteExecutors.length - 1) {
+            readWriteExecutorIndex = 0;
         }
-        return readWriteEventExecutors[readWriteEventExecutorIndex++];
+        return readWriteExecutors[readWriteExecutorIndex++];
     }
 
-    private static class AcceptEventExecutor extends SingleThreadExecutor {
+    private static class AcceptExecutor extends TaskExecutor {
 
         private NioServer server;
 
         private Selector selector;
 
-        public AcceptEventExecutor(NioServer server) throws IOException {
+        public AcceptExecutor(NioServer server) throws IOException {
             this.server = server;
             this.selector = Selector.open();
         }
@@ -163,7 +172,7 @@ public class NioServer extends NetworkApp {
             try {
                 select();
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error(e);
             }
         }
 
@@ -189,9 +198,8 @@ public class NioServer extends NetworkApp {
                         }
                     }
 
-                    ReadWriteEventExecutor readWriteEventExecutor = server.nextReadWriteThreadExecutor();
-                    readWriteEventExecutor.registerChannel(socketChannel);
-
+                    ReadWriteExecutor readWriteExecutor = server.nextReadWriteThreadExecutor();
+                    readWriteExecutor.registerChannel(socketChannel);
                 }
             }
         }
@@ -205,7 +213,7 @@ public class NioServer extends NetworkApp {
                 }
                 selector.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error(e);
             } finally {
                 if (server.isRunning()) {
                     server.stop();
@@ -215,7 +223,7 @@ public class NioServer extends NetworkApp {
         }
     }
 
-    private static class ReadWriteEventExecutor extends SingleThreadExecutor {
+    private static class ReadWriteExecutor extends TaskExecutor {
 
         private NioServer server;
 
@@ -223,7 +231,7 @@ public class NioServer extends NetworkApp {
 
         private Selector selector;
 
-        public ReadWriteEventExecutor(NioServer server) throws IOException {
+        public ReadWriteExecutor(NioServer server) throws IOException {
             this.server = server;
             this.acceptedChannels = new LinkedBlockingQueue<>();
             this.selector = Selector.open();
@@ -256,7 +264,7 @@ public class NioServer extends NetworkApp {
                 select();
                 doRegisterChannels();
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error(e);
             }
 
         }
@@ -271,7 +279,7 @@ public class NioServer extends NetworkApp {
                 }
                 selector.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error(e);
             }
         }
 
@@ -281,13 +289,13 @@ public class NioServer extends NetworkApp {
                 if (socketChannel == null) {
                     break;
                 }
-                SelectionKey selectionKey = socketChannel.register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
+                SelectionKey selectionKey = socketChannel.register(selector, SelectionKey.OP_READ);
                 Connection connection = new Connection(selectionKey, this);
                 connection.setReadBufferSize(server.getReadBufferSize());
                 connection.setWriteBufferSize(server.getWriteBufferSize());
                 connection.getHandlerChain().addLast(server.getHandler());
                 selectionKey.attach(connection);
-                connection.connected();
+                connection.triggerConnected();
             }
         }
 

@@ -3,7 +3,7 @@ package quan.network.handler;
 /**
  * @author quanchangnai
  */
-public interface InboundHandler extends NetworkHandler {
+public interface InboundHandler<M> extends NetworkHandler {
 
     /**
      * 连接建立了
@@ -32,7 +32,7 @@ public interface InboundHandler extends NetworkHandler {
      * @param msg
      * @throws Exception
      */
-    default void onReceived(HandlerContext handlerContext, Object msg) throws Exception {
+    default void onReceived(HandlerContext handlerContext, M msg) throws Exception {
         handlerContext.triggerReceived(msg);
     }
 

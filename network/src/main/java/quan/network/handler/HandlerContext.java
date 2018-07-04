@@ -1,7 +1,7 @@
 package quan.network.handler;
 
 import quan.network.connection.Connection;
-import quan.network.util.SingleThreadExecutor;
+import quan.network.util.TaskExecutor;
 
 /**
  * 处理器上下文
@@ -14,7 +14,7 @@ public class HandlerContext {
 
     private HandlerChain chain;
 
-    private SingleThreadExecutor executor;
+    private TaskExecutor executor;
 
     HandlerContext prev;
 
@@ -38,7 +38,7 @@ public class HandlerContext {
         return chain.getConnection();
     }
 
-    public SingleThreadExecutor getExecutor() {
+    public TaskExecutor getExecutor() {
         return executor;
     }
 
