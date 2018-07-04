@@ -191,7 +191,11 @@ public class VarIntBuffer {
 
     public float readFloat(int scale) throws IOException {
         if (scale < 0) {
-            return Float.intBitsToFloat(readInt());
+            float v = Float.intBitsToFloat(readInt());
+            if (Float.isNaN(v)) {
+                throw new IOException("读取float型数据异常，读到了NaN");
+            }
+            return v;
         } else {
             return (float) (readInt() / Math.pow(10, scale));
         }
@@ -203,7 +207,11 @@ public class VarIntBuffer {
 
     public double readDouble(int scale) throws IOException {
         if (scale < 0) {
-            return Double.longBitsToDouble(readLong());
+            double v = Double.longBitsToDouble(readLong());
+            if (Double.isNaN(v)) {
+                throw new IOException("读取double型数据异常，读到了NaN");
+            }
+            return v;
         } else {
             return readLong() / Math.pow(10, scale);
         }
@@ -296,7 +304,7 @@ public class VarIntBuffer {
             if (n >= -threshold && n <= threshold) {
                 writeInt((int) Math.floor(n * times));
             } else {
-                throw new IllegalArgumentException("参数n超出了限定范围[" + -threshold + "," + threshold + "]中，无法转换为指定精度的定点型");
+                throw new IllegalArgumentException("参数n超出了限定范围[" + -threshold + "," + threshold + "]中，无法转换为指定精度的定点型数据");
             }
         }
     }
@@ -315,7 +323,7 @@ public class VarIntBuffer {
             if (n >= -threshold && n <= threshold) {
                 writeLong((long) Math.floor(n * times));
             } else {
-                throw new IllegalArgumentException("参数n超出了限定范围[" + -threshold + "," + threshold + "]中，无法转换为指定精度的定点型");
+                throw new IllegalArgumentException("参数n超出了限定范围[" + -threshold + "," + threshold + "]中，无法转换为指定精度的定点型数据");
             }
         }
     }
