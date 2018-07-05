@@ -15,9 +15,13 @@ import java.util.List;
  * @author quanchangnai
  */
 public class LengthFieldCodec implements InboundHandler, OutboundHandler {
-
+    /**
+     * 长度字段本身占多长
+     */
     private final int lengthFieldLength;
-
+    /**
+     * 总长度是否包含长度字段
+     */
     private final boolean lengthFieldInclude;
     /**
      * 上次解码缓存下来的半包

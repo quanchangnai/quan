@@ -1,5 +1,7 @@
 package quan.network.handler;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import quan.network.connection.Connection;
 import quan.network.util.TaskExecutor;
 
@@ -12,9 +14,9 @@ import java.nio.ByteBuffer;
  */
 public class HandlerChain {
 
-    private Connection connection;
+    protected final Logger logger = LogManager.getLogger(getClass());
 
-    private TaskExecutor executor;
+    private Connection connection;
 
     private HandlerContext head;
 
@@ -22,7 +24,6 @@ public class HandlerChain {
 
     public HandlerChain(Connection connection) {
         this.connection = connection;
-        this.executor = connection.getExecutor();
         this.head = new HeadHandlerContext(null, this);
         this.tail = new TailHandlerContext(null, this);
         this.head.next = tail;
@@ -34,7 +35,7 @@ public class HandlerChain {
     }
 
     public TaskExecutor getExecutor() {
-        return executor;
+        return connection.getExecutor();
     }
 
     public void addLast(NetworkHandler handler) {
@@ -142,7 +143,6 @@ public class HandlerChain {
                 } catch (Exception e) {
                     handlerContext.triggerExceptionCaught(e);
                 }
-
             }
         }
 
@@ -164,21 +164,9 @@ public class HandlerChain {
         }
 
         @Override
-        public void onConnected(HandlerContext handlerContext) throws Exception {
-        }
-
-        @Override
-        public void onDisconnected(HandlerContext handlerContext) throws Exception {
-        }
-
-        @Override
-        public void onReceived(HandlerContext handlerContext, Object msg) throws Exception {
-        }
-
-        @Override
-        public void onExceptionCaught(HandlerContext handlerContext, Throwable cause) throws Exception {
+        public void onExceptionCaught(HandlerContext handlerContext, Throwable cause) {
             handlerContext.close();
-            cause.printStackTrace();
+            logger.error(cause);
         }
 
     }

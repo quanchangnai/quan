@@ -14,8 +14,6 @@ public class HandlerContext {
 
     private HandlerChain chain;
 
-    private TaskExecutor executor;
-
     HandlerContext prev;
 
     HandlerContext next;
@@ -23,7 +21,6 @@ public class HandlerContext {
     public HandlerContext(NetworkHandler handler, HandlerChain chain) {
         this.handler = handler;
         this.chain = chain;
-        this.executor = chain.getExecutor();
     }
 
     public NetworkHandler getHandler() {
@@ -39,7 +36,7 @@ public class HandlerContext {
     }
 
     public TaskExecutor getExecutor() {
-        return executor;
+        return chain.getExecutor();
     }
 
     private static boolean isInbound(NetworkHandler handler) {
@@ -73,71 +70,71 @@ public class HandlerContext {
     }
 
     public void triggerConnected() {
-        if (executor.isInMyThread()) {
-            invokeNextHandlerConnected();
+        if (getExecutor().isInMyThread()) {
+            triggerNextHandlerConnected();
         } else {
-            executor.submit(this::invokeNextHandlerConnected);
+            getExecutor().submit(this::triggerNextHandlerConnected);
         }
     }
 
-    private void invokeNextHandlerConnected() {
+    private void triggerNextHandlerConnected() {
         try {
             HandlerContext nextInboundHandleContext = findNextInboundHandlerContext();
             if (nextInboundHandleContext != null && nextInboundHandleContext.getHandler() != null) {
                 ((InboundHandler) nextInboundHandleContext.getHandler()).onConnected(nextInboundHandleContext);
             }
         } catch (Exception e) {
-            invokeNextHandlerEexceptionCaught(e);
+            triggerNextHandlerEexceptionCaught(e);
         }
     }
 
     public void triggerDisconnected() {
-        if (executor.isInMyThread()) {
-            invokeNextHandlerDisconnected();
+        if (getExecutor().isInMyThread()) {
+            triggerNextHandlerDisconnected();
         } else {
-            executor.submit(this::invokeNextHandlerDisconnected);
+            getExecutor().submit(this::triggerNextHandlerDisconnected);
         }
     }
 
-    private void invokeNextHandlerDisconnected() {
+    private void triggerNextHandlerDisconnected() {
         try {
             HandlerContext nextInboundHandleContext = findNextInboundHandlerContext();
             if (nextInboundHandleContext != null && nextInboundHandleContext.getHandler() != null) {
                 ((InboundHandler) nextInboundHandleContext.getHandler()).onDisconnected(nextInboundHandleContext);
             }
         } catch (Exception e) {
-            invokeNextHandlerEexceptionCaught(e);
+            triggerNextHandlerEexceptionCaught(e);
         }
     }
 
     public void triggerReceived(Object msg) {
-        if (executor.isInMyThread()) {
-            invokeNextHandlerReceived(msg);
+        if (getExecutor().isInMyThread()) {
+            triggerNextHandlerReceived(msg);
         } else {
-            executor.submit(() -> invokeNextHandlerReceived(msg));
+            getExecutor().submit(() -> triggerNextHandlerReceived(msg));
         }
     }
 
-    private void invokeNextHandlerReceived(Object msg) {
+    private void triggerNextHandlerReceived(Object msg) {
         try {
             HandlerContext nextInboundHandleContext = findNextInboundHandlerContext();
             if (nextInboundHandleContext != null && nextInboundHandleContext.getHandler() != null) {
                 ((InboundHandler) nextInboundHandleContext.getHandler()).onReceived(nextInboundHandleContext, msg);
             }
         } catch (Exception e) {
-            invokeNextHandlerEexceptionCaught(e);
+            triggerNextHandlerEexceptionCaught(e);
         }
     }
 
     public void triggerExceptionCaught(Throwable cause) {
-        if (executor.isInMyThread()) {
-            invokeNextHandlerEexceptionCaught(cause);
+        if (getExecutor().isInMyThread()) {
+            triggerNextHandlerEexceptionCaught(cause);
         } else {
-            executor.submit(() -> invokeNextHandlerEexceptionCaught(cause));
+            getExecutor().submit(() -> triggerNextHandlerEexceptionCaught(cause));
         }
     }
 
-    private void invokeNextHandlerEexceptionCaught(Throwable cause) {
+    private void triggerNextHandlerEexceptionCaught(Throwable cause) {
         HandlerContext nextInboundHandleContext = findNextInboundHandlerContext();
         try {
             if (nextInboundHandleContext != null && nextInboundHandleContext.getHandler() != null) {
@@ -149,40 +146,40 @@ public class HandlerContext {
     }
 
     public void send(Object msg) {
-        if (executor.isInMyThread()) {
-            invokePrevHandlerSend(msg);
+        if (getExecutor().isInMyThread()) {
+            triggerPrevHandlerSend(msg);
         } else {
-            executor.submit(() -> invokePrevHandlerSend(msg));
+            getExecutor().submit(() -> triggerPrevHandlerSend(msg));
         }
     }
 
-    private void invokePrevHandlerSend(Object msg) {
+    private void triggerPrevHandlerSend(Object msg) {
         HandlerContext prevOutboundHandlerContext = findPrevOutboundHandlerContext();
         try {
             if (prevOutboundHandlerContext != null && prevOutboundHandlerContext.getHandler() != null) {
                 ((OutboundHandler) prevOutboundHandlerContext.getHandler()).onSend(prevOutboundHandlerContext, msg);
             }
         } catch (Exception e) {
-            invokeNextHandlerEexceptionCaught(e);
+            triggerNextHandlerEexceptionCaught(e);
         }
     }
 
     public void close() {
-        if (executor.isInMyThread()) {
-            invokePrevHandlerClose();
+        if (getExecutor().isInMyThread()) {
+            triggerPrevHandlerClose();
         } else {
-            executor.submit(this::invokePrevHandlerClose);
+            getExecutor().submit(this::triggerPrevHandlerClose);
         }
     }
 
-    private void invokePrevHandlerClose() {
+    private void triggerPrevHandlerClose() {
         HandlerContext prevOutboundHandlerContext = findPrevOutboundHandlerContext();
         try {
             if (prevOutboundHandlerContext != null && prevOutboundHandlerContext.getHandler() != null) {
                 ((OutboundHandler) prevOutboundHandlerContext.getHandler()).onClose(prevOutboundHandlerContext);
             }
         } catch (Exception e) {
-            invokeNextHandlerEexceptionCaught(e);
+            triggerNextHandlerEexceptionCaught(e);
         }
     }
 
