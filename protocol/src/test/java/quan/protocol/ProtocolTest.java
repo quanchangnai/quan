@@ -10,11 +10,10 @@ import quan.protocol.user.UserInfo;
 public class ProtocolTest {
 
     public static void main(String[] args) throws Exception {
-
-//        test1();
+        test1();
 //        test2();
 //        test3();
-        test4();
+//        test4();
     }
 
     private static void test1() throws Exception {
@@ -28,13 +27,11 @@ public class ProtocolTest {
 //        System.err.println(buffer.remaining());
 //
 //        buffer.reset();
-        int scale = 0;
-        int times = (int) Math.pow(10, scale);
-        Integer i = Integer.MAX_VALUE / times;
-        System.err.println(i);
-        buffer.writeFloat(i,scale);
-        float f = buffer.readFloat(scale);
-        System.err.println((int)f);
+        int scale = -1;
+        float f1 = 115252524523.4342425F;
+        buffer.writeFloat(f1,-1);
+        float f2 = buffer.readFloat(-1);
+        System.err.println(f1-f2);
 //
 //        buffer.writeDouble(321.5453);
 //        System.err.println(buffer.available());
@@ -131,27 +128,27 @@ public class ProtocolTest {
 //            buffer.writeFloat(321.43545434F);
 //            buffer.writeFloat(321.43545434F,3);
 //            buffer.writeDouble(321.43545434D);
-            buffer.writeDouble(321.43545434D, 3);
-//            buffer.writeLong(321L);
+//            buffer.writeDouble(321.43545434D, 3);
+            buffer.writeLong(321L);
         }
 
 //        System.err.println(buffer.available());
 
         for (int i = 0; i < n; i++) {
 //            buffer.readFloat();
-            //读写次数:100000,耗时：481，  占用字节:500000
+            //读写次数:100000,耗时：10，占用字节:400000,缓存区总大小:524288
 //            buffer.readFloat(3);
-            //读写次数:100000,耗时：196，  占用字节:300000
+            //读写次数:100000,耗时：63，占用字节:300000,缓存区总大小:524288
 //            buffer.readDouble();
-            //读写次数:100000,耗时：1678， 占用字节:1000000
-            buffer.readDouble(3);
-            //读写次数:100000,耗时：278， 占用字节:300000
-//            buffer.readLong();
-            //读写次数:100000,耗时：78，  占用字节:200000
+            //读写次数:100000,耗时：12，占用字节:800000,缓存区总大小:1048576
+//            bu  ffer.readDouble(3);
+            //读写次数:100000,耗时：156，占用字节:300000,缓存区总大小:524288
+            buffer.readLong();
+            //读写次数:100000,耗时：10，占用字节:200000,缓存区总大小:262144
         }
         long end = System.currentTimeMillis();
         ;
-        System.err.println("读写次数:" + n + ",耗时：" + (end - start) + "，占用字节:" + buffer.available());
+        System.err.println("读写次数:" + n + ",耗时：" + (end - start) + "，占用字节:" + buffer.available()+",缓存区总大小:"+buffer.capacity());
     }
 
 }

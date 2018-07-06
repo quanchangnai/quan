@@ -14,10 +14,6 @@ public class VarIntBuffer {
      */
     private byte[] buffer;
     /**
-     * 初始容量
-     */
-    private final int initCapacity;
-    /**
      * 当前位置
      */
     private int position;
@@ -35,19 +31,12 @@ public class VarIntBuffer {
     }
 
     public VarIntBuffer(int initCapacity) {
-        this.initCapacity = initCapacity;
         this.buffer = new byte[initCapacity];
         this.end = capacity() - 1;
     }
 
     public VarIntBuffer(byte[] buffer) {
-        this.initCapacity = 64;
-        if (buffer.length >= initCapacity) {
-            this.buffer = buffer;
-        } else {
-            this.buffer = new byte[initCapacity];
-            System.arraycopy(buffer, 0, this.buffer, 0, buffer.length);
-        }
+        this.buffer = buffer;
         this.position = buffer.length - 1;
         this.end = capacity() - 1;
     }
@@ -186,32 +175,55 @@ public class VarIntBuffer {
     }
 
     public float readFloat() throws IOException {
-        return readFloat(-1);
+        int position = reading ? this.position : 0;
+        int shift = 0;
+        int temp = 0;
+        while (shift < 32) {
+            final byte b = buffer[position++];
+            temp |= (b & 0b11111111L) << shift;
+            shift += 8;
+        }
+
+        if (!reading) {
+            reading = true;
+            end = this.position - 1;
+        }
+        this.position = position;
+
+        return Float.intBitsToFloat(temp);
     }
 
     public float readFloat(int scale) throws IOException {
         if (scale < 0) {
-            float v = Float.intBitsToFloat(readInt());
-            if (Float.isNaN(v)) {
-                throw new IOException("读取float型数据异常，读到了NaN");
-            }
-            return v;
+            return readFloat();
         } else {
-            return (float) (readInt() / Math.pow(10, scale));
+            return (float) readDouble(scale);
         }
     }
 
     public double readDouble() throws IOException {
-        return readDouble(-1);
+        int position = reading ? this.position : 0;
+        int shift = 0;
+        long temp = 0;
+
+        while (shift < 64) {
+            final byte b = buffer[position++];
+            temp |= (b & 0b11111111L) << shift;
+            shift += 8;
+        }
+
+        if (!reading) {
+            reading = true;
+            end = this.position - 1;
+        }
+        this.position = position;
+
+        return Double.longBitsToDouble(temp);
     }
 
     public double readDouble(int scale) throws IOException {
         if (scale < 0) {
-            double v = Double.longBitsToDouble(readLong());
-            if (Double.isNaN(v)) {
-                throw new IOException("读取double型数据异常，读到了NaN");
-            }
-            return v;
+            return readDouble();
         } else {
             return readLong() / Math.pow(10, scale);
         }
@@ -226,16 +238,25 @@ public class VarIntBuffer {
     }
 
 
-    protected void checkCapacity(int addValue) {
-        int realAddValue = addValue > 10 ? addValue : initCapacity;
+    /**
+     * 检测并增加缓冲区容量
+     *
+     * @param needValue 需要增加的容量
+     */
+    protected void checkCapacity(int needValue) {
         int capacity = capacity();
         int position = reading ? 0 : this.position;
-        if (position + addValue >= capacity) {
-            byte[] buffer = new byte[capacity + realAddValue];
+        if (position + needValue >= capacity) {
+            int newCapacity = capacity;
+            while (needValue > 0) {
+                newCapacity += capacity;
+                needValue -= capacity;
+            }
+            byte[] buffer = new byte[newCapacity];
             System.arraycopy(this.buffer, 0, buffer, 0, capacity);
             this.buffer = buffer;
             if (!reading) {
-                end = capacity() - 1;
+                end = capacity - 1;
             }
         }
     }
@@ -291,31 +312,48 @@ public class VarIntBuffer {
     }
 
     public void writeFloat(float n) throws IOException {
-        writeFloat(n, -1);
+        checkCapacity(4);
+        int position = reading ? 0 : this.position;
+        int temp = Float.floatToIntBits(n);
+        int shift = 0;
+        while (shift < 32) {
+            buffer[position++] = (byte) (temp >> shift & 0b11111111);
+            shift += 8;
+        }
+        if (reading) {
+            reading = false;
+            end = capacity() - 1;
+        }
+        this.position = position;
     }
 
     public void writeFloat(float n, int scale) throws IOException {
         if (scale < 0) {
-            writeInt(Float.floatToIntBits(n));
+            writeFloat(n);
         } else {
-            n = new BigDecimal(n).setScale(scale, BigDecimal.ROUND_FLOOR).floatValue();
-            int times = (int) Math.pow(10, scale);
-            long threshold = Integer.MAX_VALUE / times;
-            if (n >= -threshold && n <= threshold) {
-                writeInt((int) Math.floor(n * times));
-            } else {
-                throw new IllegalArgumentException("参数n超出了限定范围[" + -threshold + "," + threshold + "]中，无法转换为指定精度的定点型数据");
-            }
+            writeDouble(n, scale);
         }
     }
 
     public void writeDouble(double n) throws IOException {
-        writeDouble(n, -1);
+        checkCapacity(8);
+        int position = reading ? 0 : this.position;
+        long temp = Double.doubleToLongBits(n);
+        int shift = 0;
+        while (shift < 64) {
+            buffer[position++] = (byte) (temp >>> shift & 0b11111111);
+            shift += 8;
+        }
+        if (reading) {
+            reading = false;
+            end = capacity() - 1;
+        }
+        this.position = position;
     }
 
     public void writeDouble(double n, int scale) throws IOException {
         if (scale < 0) {
-            writeLong(Double.doubleToLongBits(n));
+            writeDouble(n);
         } else {
             n = new BigDecimal(n).setScale(scale, BigDecimal.ROUND_FLOOR).doubleValue();
             int times = (int) Math.pow(10, scale);
