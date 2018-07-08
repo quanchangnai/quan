@@ -12,6 +12,7 @@
     <modules>
         <module>network</module>
         <module>protocol</module>
+        <module>mongo-mapping</module>
     </modules>
 
     <properties>
