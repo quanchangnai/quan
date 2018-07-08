@@ -5,10 +5,10 @@ import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 
 /**
- * VarInt缓冲区，使用了ZigZag和VarInt编码，字节流采用大端模式
+ * Varint缓冲区，使用了Varint和ZigZag编码，字节流采用大端模式
  * Created by quanchangnai on 2018/7/2.
  */
-public class VarIntBuffer {
+public class VarintBuffer {
     /**
      * 字节缓冲区
      */
@@ -26,22 +26,22 @@ public class VarIntBuffer {
      */
     private int end;
 
-    public VarIntBuffer() {
+    public VarintBuffer() {
         this(64);
     }
 
-    public VarIntBuffer(int initCapacity) {
+    public VarintBuffer(int initCapacity) {
         this.buffer = new byte[initCapacity];
         this.end = capacity() - 1;
     }
 
-    public VarIntBuffer(byte[] buffer) {
+    public VarintBuffer(byte[] buffer) {
         this.buffer = buffer;
         this.position = buffer.length - 1;
         this.end = capacity() - 1;
     }
 
-    public VarIntBuffer(ByteBuffer buffer) {
+    public VarintBuffer(ByteBuffer buffer) {
         this(buffer.array());
     }
 

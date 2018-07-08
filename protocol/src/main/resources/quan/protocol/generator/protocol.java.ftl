@@ -13,14 +13,14 @@ import ${import};
 </#if>
  * Created by {@link quan.protocol.generator.JavaGenerator}
  */
-public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType ==3>Protocol</#if> {
+public class ${name} extends <#if definitionType ==2>ProtoObject<#elseif definitionType ==3>Protocol</#if> {
 
 <#if definitionType ==3>
-    public static final int ID = ${id};//协议id
+    public static final int _ID = ${id};//协议id
 
     @Override
     public int getId() {
-        return ID;
+        return _ID;
     }
 
 </#if>
@@ -102,7 +102,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     @Override
     public void serialize(VarIntBuffer buffer) throws IOException {
 <#if definitionType==3>
-        buffer.writeInt(ID);
+        buffer.writeInt(_ID);
 </#if>
 <#list fields as field>
     <#if field.type=="set" || field.type=="list">
@@ -137,9 +137,9 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     @Override
     public void parse(VarIntBuffer buffer) throws IOException {
 <#if definitionType==3>
-        if (buffer.readInt() != ID) {
-            buffer.reset();
-            throw new IOException("协议解析出错，id不匹配,目标值：" + ID + "，实际值：" + buffer.readInt());
+        int _id = buffer.readInt();
+        if (_id != _ID) {
+            throw new IOException("协议ID不匹配,目标值：" + _ID + "，实际值：" + _id);
         }
 </#if>
 <#list fields as field>

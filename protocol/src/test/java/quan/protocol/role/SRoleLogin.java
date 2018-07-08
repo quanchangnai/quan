@@ -2,7 +2,7 @@ package quan.protocol.role;
 
 import java.util.HashSet;
 import quan.protocol.user.UserInfo;
-import quan.protocol.VarIntBuffer;
+import quan.protocol.VarintBuffer;
 import java.io.IOException;
 import java.util.HashMap;
 import quan.protocol.Protocol;
@@ -14,11 +14,11 @@ import java.util.ArrayList;
  */
 public class SRoleLogin extends Protocol {
 
-    public static final int ID = 2222;//协议id
+    public static final int _ID = 2222;//协议id
 
     @Override
     public int getId() {
-        return ID;
+        return _ID;
     }
 
     private long roleId;//角色id
@@ -75,8 +75,8 @@ public class SRoleLogin extends Protocol {
 
 
     @Override
-    public void serialize(VarIntBuffer buffer) throws IOException {
-        buffer.writeInt(ID);
+    public void serialize(VarintBuffer buffer) throws IOException {
+        buffer.writeInt(_ID);
         buffer.writeLong(roleId);
         roleInfo.serialize(buffer);
         buffer.writeInt(roleInfoList.size());
@@ -96,10 +96,10 @@ public class SRoleLogin extends Protocol {
     }
 
     @Override
-    public void parse(VarIntBuffer buffer) throws IOException {
-        if (buffer.readInt() != ID) {
-            buffer.reset();
-            throw new IOException("协议解析出错，id不匹配,目标值：" + ID + "，实际值：" + buffer.readInt());
+    public void parse(VarintBuffer buffer) throws IOException {
+        int _id = buffer.readInt();
+        if (_id != _ID) {
+            throw new IOException("协议ID不匹配,目标值：" + _ID + "，实际值：" + _id);
         }
         roleId = buffer.readLong();
         roleInfo.parse(buffer);

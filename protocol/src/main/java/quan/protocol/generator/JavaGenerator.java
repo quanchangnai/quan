@@ -1,9 +1,10 @@
 package quan.protocol.generator;
 
-import quan.protocol.Bean;
+import quan.protocol.ProtoObject;
 import quan.protocol.Protocol;
-import quan.protocol.VarIntBuffer;
+import quan.protocol.VarintBuffer;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -34,10 +35,10 @@ public class JavaGenerator extends Generator {
         if (beanDefinition instanceof ProtocolDefinition) {
             beanDefinition.getImports().add(Protocol.class.getName());
         } else {
-            beanDefinition.getImports().add(Bean.class.getName());
+            beanDefinition.getImports().add(ProtoObject.class.getName());
         }
-        beanDefinition.getImports().add("java.io.IOException");
-        beanDefinition.getImports().add(VarIntBuffer.class.getName());
+        beanDefinition.getImports().add(IOException.class.getName());
+        beanDefinition.getImports().add(VarintBuffer.class.getName());
         for (FieldDefinition fieldDefinition : beanDefinition.getFields()) {
             processField(fieldDefinition);
         }

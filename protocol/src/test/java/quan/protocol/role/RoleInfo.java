@@ -1,18 +1,18 @@
 package quan.protocol.role;
 
 import java.util.HashSet;
+import quan.protocol.ProtoObject;
 import java.util.Arrays;
-import quan.protocol.VarIntBuffer;
+import quan.protocol.VarintBuffer;
 import java.io.IOException;
 import java.util.HashMap;
-import quan.protocol.Bean;
 import java.util.ArrayList;
 
 /**
  * 角色信息
  * Created by {@link quan.protocol.generator.JavaGenerator}
  */
-public class RoleInfo extends Bean {
+public class RoleInfo extends ProtoObject {
 
     private long roleId;//角色id
     private boolean bo;
@@ -138,7 +138,7 @@ public class RoleInfo extends Bean {
 
 
     @Override
-    public void serialize(VarIntBuffer buffer) throws IOException {
+    public void serialize(VarintBuffer buffer) throws IOException {
         buffer.writeLong(roleId);
         buffer.writeBool(bo);
         buffer.writeByte(by);
@@ -165,7 +165,7 @@ public class RoleInfo extends Bean {
     }
 
     @Override
-    public void parse(VarIntBuffer buffer) throws IOException {
+    public void parse(VarintBuffer buffer) throws IOException {
         roleId = buffer.readLong();
         bo = buffer.readBool();
         by = buffer.readByte();

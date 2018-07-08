@@ -1,13 +1,13 @@
 package quan.protocol.user;
 
-import quan.protocol.VarIntBuffer;
+import quan.protocol.ProtoObject;
+import quan.protocol.VarintBuffer;
 import java.io.IOException;
-import quan.protocol.Bean;
 
 /**
  * Created by {@link quan.protocol.generator.JavaGenerator}
  */
-public class UserInfo extends Bean {
+public class UserInfo extends ProtoObject {
 
     private String name;//名字
     private int level;//等级
@@ -117,7 +117,7 @@ public class UserInfo extends Bean {
 
 
     @Override
-    public void serialize(VarIntBuffer buffer) throws IOException {
+    public void serialize(VarintBuffer buffer) throws IOException {
         buffer.writeString(name);
         buffer.writeInt(level);
         buffer.writeInt(experience);
@@ -132,7 +132,7 @@ public class UserInfo extends Bean {
     }
 
     @Override
-    public void parse(VarIntBuffer buffer) throws IOException {
+    public void parse(VarintBuffer buffer) throws IOException {
         name = buffer.readString();
         level = buffer.readInt();
         experience = buffer.readInt();

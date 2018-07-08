@@ -10,15 +10,15 @@ import quan.protocol.user.UserInfo;
 public class ProtocolTest {
 
     public static void main(String[] args) throws Exception {
-        test1();
-//        test2();
-//        test3();
+//        test1();
+        test2();
+        test3();
 //        test4();
     }
 
     private static void test1() throws Exception {
         System.err.println("====================test1================================");
-        VarIntBuffer buffer = new VarIntBuffer();
+        VarintBuffer buffer = new VarintBuffer();
 //        buffer.writeLong(System.currentTimeMillis());
 //        System.err.println(buffer.available());
 //        System.err.println(buffer.remaining());
@@ -62,7 +62,7 @@ public class ProtocolTest {
         sRoleLogin1.getRoleInfoSet().add(roleInfo1);
         sRoleLogin1.getRoleInfoMap().put(roleInfo1.getRoleId(), roleInfo1);
 
-        VarIntBuffer buffer = new VarIntBuffer();
+        VarintBuffer buffer = new VarintBuffer();
 
         sRoleLogin1.serialize(buffer);
 
@@ -93,9 +93,9 @@ public class ProtocolTest {
         userInfo1.setCurrentState(42234);
         userInfo1.setBuyPowerCount(5345);
 
-        VarIntBuffer buffer = new VarIntBuffer();
+        VarintBuffer buffer = new VarintBuffer();
         userInfo1.serialize(buffer);
-        System.err.println("字节数:" + buffer.availableBytes().length);
+        System.err.println("实际占用字节:" + buffer.availableBytes().length);
 
         long start = System.nanoTime();
         long end = 0;
@@ -119,7 +119,7 @@ public class ProtocolTest {
 
     private static void test4() throws Exception {
         System.err.println("====================test4================================");
-        VarIntBuffer buffer = new VarIntBuffer();
+        VarintBuffer buffer = new VarintBuffer();
 
         long start = System.currentTimeMillis();
 
@@ -141,7 +141,7 @@ public class ProtocolTest {
             //读写次数:100000,耗时：63，占用字节:300000,缓存区总大小:524288
 //            buffer.readDouble();
             //读写次数:100000,耗时：12，占用字节:800000,缓存区总大小:1048576
-//            bu  ffer.readDouble(3);
+//            buffer.readDouble(3);
             //读写次数:100000,耗时：156，占用字节:300000,缓存区总大小:524288
             buffer.readLong();
             //读写次数:100000,耗时：10，占用字节:200000,缓存区总大小:262144
