@@ -30,8 +30,8 @@ public class VarintBuffer {
         this(64);
     }
 
-    public VarintBuffer(int initCapacity) {
-        this.buffer = new byte[initCapacity];
+    public VarintBuffer(int capacity) {
+        this.buffer = new byte[capacity];
         this.end = capacity() - 1;
     }
 

@@ -1,6 +1,6 @@
 package quan.network.test;
 
-import quan.network.bootstrap.NioClient;
+import quan.network.bootstrap.ClientBootstrap;
 import quan.network.handler.HandlerChain;
 import quan.network.handler.HandlerContext;
 import quan.network.handler.HandlerInitializer;
@@ -13,7 +13,7 @@ import java.net.StandardSocketOptions;
 public class TestNioClient {
 
     public static void main(String[] args) {
-        NioClient client = new NioClient("127.0.0.1", 8007);
+        ClientBootstrap client = new ClientBootstrap("127.0.0.1", 8007);
         client.setSocketOption(StandardSocketOptions.SO_KEEPALIVE, true);
         client.setHandler(new HandlerInitializer() {
             @Override

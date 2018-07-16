@@ -20,11 +20,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * 基于nio的网络服务器，单线程负责处理新通道的接受，一组线程负责处理已有通道的读写，<br>
- * 其中的一个线程负责处理多个通道的操作， 一个通道的所有操作都是在单线程中完成的。
+ * 其中的一个线程负责处理多个通道的操作，一个通道的所有操作都是在单线程中完成的。
  *
  * @author quanchangnai
  */
-public class NioServer extends Bootstrap {
+public class ServerBootstrap extends Bootstrap {
 
     private AcceptExecutor acceptExecutor;
 
@@ -36,12 +36,12 @@ public class NioServer extends Bootstrap {
 
     private Map<SocketOption<?>, Object> serverSocketOptions = new LinkedHashMap<>();
 
-    public NioServer(int port) {
+    public ServerBootstrap(int port) {
         this.ip = "0.0.0.0";
         this.port = port;
     }
 
-    public NioServer(int port, NetworkHandler handler) {
+    public ServerBootstrap(int port, NetworkHandler handler) {
         this(port);
         this.setHandler(handler);
     }
@@ -141,11 +141,11 @@ public class NioServer extends Bootstrap {
 
     private static class AcceptExecutor extends TaskExecutor {
 
-        private NioServer server;
+        private ServerBootstrap server;
 
         private Selector selector;
 
-        public AcceptExecutor(NioServer server) throws IOException {
+        public AcceptExecutor(ServerBootstrap server) throws IOException {
             this.server = server;
             this.selector = Selector.open();
         }
@@ -225,13 +225,13 @@ public class NioServer extends Bootstrap {
 
     private static class ReadWriteExecutor extends TaskExecutor {
 
-        private NioServer server;
+        private ServerBootstrap server;
 
         private BlockingQueue<SocketChannel> acceptedChannels;
 
         private Selector selector;
 
-        public ReadWriteExecutor(NioServer server) throws IOException {
+        public ReadWriteExecutor(ServerBootstrap server) throws IOException {
             this.server = server;
             this.acceptedChannels = new LinkedBlockingQueue<>();
             this.selector = Selector.open();

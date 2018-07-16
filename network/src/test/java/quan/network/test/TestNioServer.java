@@ -2,7 +2,7 @@ package quan.network.test;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import quan.network.bootstrap.NioServer;
+import quan.network.bootstrap.ServerBootstrap;
 import quan.network.handler.HandlerChain;
 import quan.network.handler.HandlerContext;
 import quan.network.handler.HandlerInitializer;
@@ -15,7 +15,7 @@ import java.net.StandardSocketOptions;
 public class TestNioServer {
 
     public static void main(String[] args) throws Exception {
-        NioServer server = new NioServer(8007);
+        ServerBootstrap server = new ServerBootstrap(8007);
 //        server.setReadBufferSize(1);
         server.setWriteBufferSize(30);
         server.setSocketOption(StandardSocketOptions.SO_KEEPALIVE, true);

@@ -18,7 +18,7 @@ import java.util.Set;
  *
  * @author quanchangnai
  */
-public class NioClient extends Bootstrap {
+public class ClientBootstrap extends Bootstrap {
 
     private ReadWriteExecutor readWriteExecutor;
 
@@ -26,12 +26,12 @@ public class NioClient extends Bootstrap {
 
     private long reconnectTime = 60 * 1000;
 
-    public NioClient(int port) {
+    public ClientBootstrap(int port) {
         this.ip = "127.0.0.1";
         this.port = port;
     }
 
-    public NioClient(String ip, int port) {
+    public ClientBootstrap(String ip, int port) {
         this.ip = ip;
         this.port = port;
     }
@@ -123,11 +123,11 @@ public class NioClient extends Bootstrap {
 
     private static class ReadWriteExecutor extends TaskExecutor {
 
-        private NioClient client;
+        private ClientBootstrap client;
 
         private Selector selector;
 
-        public ReadWriteExecutor(NioClient client) throws IOException {
+        public ReadWriteExecutor(ClientBootstrap client) throws IOException {
             this.client = client;
             this.selector = Selector.open();
         }
