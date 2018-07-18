@@ -12,7 +12,7 @@ import quan.network.handler.codec.StringCodec;
 
 import java.net.StandardSocketOptions;
 
-public class TestNioServer {
+public class NioServerTest {
 
     public static void main(String[] args) throws Exception {
         ServerBootstrap server = new ServerBootstrap(8007);

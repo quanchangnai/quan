@@ -10,7 +10,7 @@ import quan.network.handler.codec.StringCodec;
 
 import java.net.StandardSocketOptions;
 
-public class TestNioClient {
+public class NioClientTest {
 
     public static void main(String[] args) {
         ClientBootstrap client = new ClientBootstrap("127.0.0.1", 8007);
@@ -18,7 +18,7 @@ public class TestNioClient {
         client.setHandler(new HandlerInitializer() {
             @Override
             public void initHandler(HandlerChain handlerChain) throws Exception {
-                handlerChain.addLast(new LengthFieldCodec(1, true));
+//                handlerChain.addLast(new LengthFieldCodec(1, true));
                 handlerChain.addLast(new StringCodec());
                 handlerChain.addLast(new TestClientInboundHandler());
 
@@ -38,7 +38,6 @@ public class TestNioClient {
         @Override
         public void onConnected(HandlerContext handlerContext) throws Exception {
             System.err.println("onConnected");
-
         }
 
         @Override
@@ -53,7 +52,7 @@ public class TestNioClient {
             new Thread() {
                 public void run() {
                     try {
-                        Thread.sleep(3000);
+                        Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
