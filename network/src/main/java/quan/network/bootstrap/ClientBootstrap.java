@@ -11,6 +11,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -54,32 +55,22 @@ public class ClientBootstrap extends Bootstrap {
 
     @Override
     public void start() {
-        connect();
-    }
+        Objects.requireNonNull(getHandler(), "handler不能为空");
 
-    @Override
-    public void stop() {
-        disconnect();
-    }
-
-    public void connect() {
-        if (getHandler() == null) {
-            throw new NullPointerException("handler");
-        }
-        logger.debug("连接服务器");
         try {
             readWriteExecutor = new ReadWriteExecutor(this);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        readWriteExecutor.submit(this::doConnect);
-
         setRunning(true);
         readWriteExecutor.start();
+
+        readWriteExecutor.submit(this::connect);
     }
 
-    private void doConnect() {
+
+    protected void connect() {
         try {
             if (!isRunning()) {
                 return;
@@ -101,24 +92,25 @@ public class ClientBootstrap extends Bootstrap {
         }
     }
 
-    public void disconnect() {
-        logger.debug("断开连接");
+    @Override
+    public void stop() {
         setRunning(false);
         readWriteExecutor.stop();
         readWriteExecutor = null;
     }
 
-    private void reconnect() {
+
+    protected void reconnect() {
         if (!isRunning() || !isAutoReconnect()) {
             return;
         }
         try {
             Thread.sleep(getReconnectTime());
-        } catch (InterruptedException e1) {
-            logger.error(e1);
+        } catch (InterruptedException e) {
+            logger.error(e);
         }
 
-        doConnect();
+        connect();
     }
 
     private static class ReadWriteExecutor extends TaskExecutor {
@@ -170,7 +162,7 @@ public class ClientBootstrap extends Bootstrap {
                 logger.error(e);
             } finally {
                 if (client.isRunning()) {
-                    client.disconnect();
+                    client.stop();
                 }
             }
         }
