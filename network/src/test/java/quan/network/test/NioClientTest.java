@@ -25,7 +25,7 @@ public class NioClientTest {
             }
         });
         client.setReconnectTime(15 * 1000);
-        client.connect();
+        client.start();
     }
 
     private static class TestClientInboundHandler implements InboundHandler {

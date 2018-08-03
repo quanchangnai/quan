@@ -16,26 +16,22 @@ public class AioServerTest {
     static int n = 1;
 
     public static void main(String[] args) throws Exception {
-        AsynchronousChannelGroup channelGroup = AsynchronousChannelGroup.withFixedThreadPool(5, new ThreadFactory() {
-            @Override
-            public Thread newThread(Runnable r) {
-                return new Thread(r, "Thread" + n++);
-            }
-        });
+        AsynchronousChannelGroup channelGroup = AsynchronousChannelGroup.withFixedThreadPool(5, r -> new Thread(r, "Thread" + n++));
         AsynchronousServerSocketChannel serverSocketChannel = AsynchronousServerSocketChannel.open(channelGroup);
+
         serverSocketChannel.bind(new InetSocketAddress(8007));
         serverSocketChannel.accept(null, new CompletionHandler<AsynchronousSocketChannel, Object>() {
             @Override
             public void completed(AsynchronousSocketChannel socketChannel, Object attachment) {
-                System.err.println("accept completed");
+                System.err.println("accept completed" + ":" + Thread.currentThread().getName());
+                serverSocketChannel.accept(null, this);
                 write(socketChannel);
                 read(socketChannel);
-                serverSocketChannel.accept(null, this);
             }
 
             @Override
             public void failed(Throwable exc, Object attachment) {
-
+                exc.printStackTrace();
             }
         });
     }
@@ -52,12 +48,23 @@ public class AioServerTest {
 
             @Override
             public void failed(Throwable exc, Object attachment) {
+                exc.printStackTrace();
             }
         });
     }
 
     public static void write(AsynchronousSocketChannel socketChannel) {
-        System.err.println("write");
-        socketChannel.write(ByteBuffer.wrap("aaa".getBytes()));
+        socketChannel.write(ByteBuffer.wrap("aaa".getBytes()), null, new CompletionHandler<Integer, Object>() {
+            @Override
+            public void completed(Integer result, Object attachment) {
+                System.err.println("write completed" + ":" + Thread.currentThread().getName());
+            }
+
+            @Override
+            public void failed(Throwable exc, Object attachment) {
+                exc.printStackTrace();
+            }
+        });
+
     }
 }

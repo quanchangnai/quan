@@ -11,10 +11,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -68,11 +65,7 @@ public class ServerBootstrap extends Bootstrap {
 
     @Override
     public void start() {
-        if (getHandler() == null) {
-            throw new NullPointerException("handler");
-        }
-
-        logger.debug("开启服务器");
+        Objects.requireNonNull(getHandler(), "handler不能为空");
 
         if (isRunning()) {
             stop();
@@ -120,7 +113,6 @@ public class ServerBootstrap extends Bootstrap {
 
     @Override
     public void stop() {
-        logger.debug("停止服务器");
         setRunning(false);
 
         acceptExecutor.stop();
