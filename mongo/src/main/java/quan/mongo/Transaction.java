@@ -51,17 +51,14 @@ public class Transaction {
         if (enabled.get()) {
             return;
         }
-        Instrumentation instrumentation = ByteBuddyAgent.getInstrumentation();
+        Instrumentation instrumentation = ByteBuddyAgent.install();
         new AgentBuilder.Default()
-                .with(AgentBuilder.RedefinitionStrategy.REDEFINITION)
-                .with(AgentBuilder.LambdaInstrumentationStrategy.ENABLED)
-                .type(ElementMatchers.any())
-                .transform(new Transformer())
                 .with(AgentBuilder.TypeStrategy.Default.REBASE)
                 .with(AgentBuilder.LambdaInstrumentationStrategy.ENABLED)
-//                .enableNativeMethodPrefix("original$")
+                .enableNativeMethodPrefix("original$")
+                .type(ElementMatchers.any())
+                .transform(new Transformer())
                 .installOn(instrumentation);
-
         enabled.set(true);
     }
 

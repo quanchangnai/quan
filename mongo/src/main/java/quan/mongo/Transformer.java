@@ -7,6 +7,9 @@ import net.bytebuddy.dynamic.DynamicType;
 import net.bytebuddy.matcher.ElementMatchers;
 import net.bytebuddy.utility.JavaModule;
 
+import java.io.File;
+import java.io.IOException;
+
 /**
  * JavaAgent字节码转换器
  * Created by quanchangnai on 2018/8/6.
