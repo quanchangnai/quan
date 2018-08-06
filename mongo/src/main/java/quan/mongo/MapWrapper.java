@@ -1,4 +1,4 @@
-package quan.mongo.wrapper;
+package quan.mongo;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -7,15 +7,33 @@ import java.util.function.Consumer;
  * Map
  * Created by quanchangnai on 2017/5/23.
  */
-public class MapWrapper<K, V> extends AbstractMap<K, V> implements TypeWrapper {
+public class MapWrapper<K, V> extends AbstractMap<K, V> implements Data, UpdateCallback {
+
     //当前数据
     private Map<K, V> current = new HashMap<>();
+
     //记录添加数据的key
     private Set<K> added = new HashSet<>();
+
     //记录删除数据
     private Map<K, V> removed = new HashMap<>();
+
     //记录被替换的数据
     private final Map<K, V> replaced = new HashMap<>();
+
+    /**
+     * 所属的MappingData
+     */
+    private MappingData mappingData;
+
+    protected void setMappingData(MappingData mappingData) {
+        this.mappingData = mappingData;
+    }
+
+    @Override
+    public MappingData getMappingData() {
+        return mappingData;
+    }
 
     @Override
     public void commit() {
@@ -23,8 +41,8 @@ public class MapWrapper<K, V> extends AbstractMap<K, V> implements TypeWrapper {
         removed.clear();
         replaced.clear();
         for (V value : current.values()) {
-            if (value instanceof TypeWrapper) {
-                ((TypeWrapper) value).commit();
+            if (value instanceof Data) {
+                ((Data) value).commit();
             }
         }
     }
@@ -38,8 +56,8 @@ public class MapWrapper<K, V> extends AbstractMap<K, V> implements TypeWrapper {
         removed.clear();
         replaced.clear();
         for (V value : current.values()) {
-            if (value instanceof TypeWrapper) {
-                ((TypeWrapper) value).rollback();
+            if (value instanceof Data) {
+                ((Data) value).rollback();
             }
         }
     }

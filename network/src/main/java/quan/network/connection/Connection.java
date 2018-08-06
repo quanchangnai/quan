@@ -249,7 +249,7 @@ public class Connection {
     }
 
     /**
-     * 发送消息，具体的逻辑中调用{@link HandlerContext#send(Object)}
+     * 发送消息，不能在具体逻辑中直接调用，具体逻辑中应该调用{@link HandlerContext#send(Object)}
      *
      * @param msg
      */
@@ -265,14 +265,13 @@ public class Connection {
     }
 
     /**
-     * 关闭连接，具体的逻辑中调用{@link HandlerContext#close()}
+     * 关闭连接，不能在具体逻辑中直接调用，具体逻辑中应该调用{@link HandlerContext#close()}
      */
     public void close() {
         try {
             if (!this.isConnected()) {
                 return;
             }
-
             selectionKey.cancel();
             socketChannel.close();
             triggerDisconnected();

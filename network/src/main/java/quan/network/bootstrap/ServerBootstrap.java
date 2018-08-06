@@ -40,7 +40,7 @@ public class ServerBootstrap extends Bootstrap {
 
     public ServerBootstrap(int port, NetworkHandler handler) {
         this(port);
-        this.setHandler(handler);
+        this.handler = handler;
     }
 
     public <T> void setServerSocketOption(SocketOption<T> option, T value) {

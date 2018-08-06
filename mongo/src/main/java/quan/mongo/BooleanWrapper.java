@@ -1,25 +1,27 @@
-package quan.mongo.wrapper;
+package quan.mongo;
 
 /**
- * short
+ * Boolean
  * Created by quanchangnai on 2017/5/23.
  */
-public class ShortWrapper implements TypeWrapper {
-    //当前值
-    private short current;
-    //原始值
-    private short origin;
+public class BooleanWrapper implements Data {
 
-    public ShortWrapper(short value) {
+    //当前值
+    private boolean current;
+
+    //原始值
+    private boolean origin;
+
+    public BooleanWrapper(boolean value) {
         this.current = value;
         this.origin = value;
     }
 
-    public void set(short value) {
+    public void set(boolean value) {
         this.current = value;
     }
 
-    public short get() {
+    public boolean get() {
         return this.current;
     }
 
@@ -38,14 +40,14 @@ public class ShortWrapper implements TypeWrapper {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ShortWrapper transInt = (ShortWrapper) o;
+        BooleanWrapper booleanWrapper = (BooleanWrapper) o;
 
-        return current == transInt.current;
+        return current == booleanWrapper.current;
     }
 
     @Override
     public int hashCode() {
-        return current;
+        return Boolean.hashCode(current);
     }
 
     @Override

@@ -1,25 +1,29 @@
-package quan.mongo.wrapper;
+package quan.mongo;
+
+import quan.mongo.Data;
 
 /**
- * String
+ * Float
  * Created by quanchangnai on 2017/5/23.
  */
-public class StringWrapper implements TypeWrapper {
-    //当前值
-    private String current;
-    //原始值
-    private String origin;
+public class FloatWrapper implements Data {
 
-    public StringWrapper(String value) {
+    //当前值
+    private float current;
+
+    //原始值
+    private float origin;
+
+    public FloatWrapper(float value) {
         this.origin = value;
         this.current = value;
     }
 
-    public void set(String value) {
+    public void set(float value) {
         this.current = value;
     }
 
-    public String get() {
+    public float get() {
         return this.current;
     }
 
@@ -41,8 +45,8 @@ public class StringWrapper implements TypeWrapper {
     @Override
     public String toDebugString() {
         return "{" +
-                "current='" + current + '\'' +
-                ", origin='" + origin + '\'' +
+                "current=" + current +
+                ", origin=" + origin +
                 '}';
     }
 }

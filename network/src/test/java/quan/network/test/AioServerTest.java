@@ -6,7 +6,6 @@ import java.nio.channels.AsynchronousChannelGroup;
 import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
-import java.util.concurrent.ThreadFactory;
 
 /**
  * Created by quanchangnai on 2018/7/17.
@@ -31,6 +30,7 @@ public class AioServerTest {
 
             @Override
             public void failed(Throwable exc, Object attachment) {
+                System.err.println("accept failed");
                 exc.printStackTrace();
             }
         });
@@ -48,13 +48,15 @@ public class AioServerTest {
 
             @Override
             public void failed(Throwable exc, Object attachment) {
+                System.err.println("read failed");
                 exc.printStackTrace();
             }
         });
     }
 
     public static void write(AsynchronousSocketChannel socketChannel) {
-        socketChannel.write(ByteBuffer.wrap("aaa".getBytes()), null, new CompletionHandler<Integer, Object>() {
+        String content = "aaa:" + System.currentTimeMillis();
+        socketChannel.write(ByteBuffer.wrap(content.getBytes()), null, new CompletionHandler<Integer, Object>() {
             @Override
             public void completed(Integer result, Object attachment) {
                 System.err.println("write completed" + ":" + Thread.currentThread().getName());
@@ -62,6 +64,7 @@ public class AioServerTest {
 
             @Override
             public void failed(Throwable exc, Object attachment) {
+                System.err.println("write failed");
                 exc.printStackTrace();
             }
         });

@@ -1,25 +1,27 @@
-package quan.mongo.wrapper;
+package quan.mongo;
 
 /**
- * float
+ * Byte
  * Created by quanchangnai on 2017/5/23.
  */
-public class FloatWrapper implements TypeWrapper {
+public class ByteWrapper implements Data {
+
     //当前值
-    private float current;
+    private byte current;
+
     //原始值
-    private float origin;
+    private byte origin;
 
-    public FloatWrapper(float value) {
+    public ByteWrapper(byte value) {
+        this.current = value;
         this.origin = value;
+    }
+
+    public void set(byte value) {
         this.current = value;
     }
 
-    public void set(float value) {
-        this.current = value;
-    }
-
-    public float get() {
+    public byte get() {
         return this.current;
     }
 
@@ -31,6 +33,21 @@ public class FloatWrapper implements TypeWrapper {
     @Override
     public void rollback() {
         this.current = origin;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ByteWrapper byteWrapper = (ByteWrapper) o;
+
+        return current == byteWrapper.current;
+    }
+
+    @Override
+    public int hashCode() {
+        return current;
     }
 
     @Override

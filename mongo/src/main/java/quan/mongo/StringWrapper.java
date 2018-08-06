@@ -1,25 +1,29 @@
-package quan.mongo.wrapper;
+package quan.mongo;
+
+import quan.mongo.Data;
 
 /**
- * long
+ * String
  * Created by quanchangnai on 2017/5/23.
  */
-public class LongWrapper implements TypeWrapper {
-    //当前值
-    private long current;
-    //原始值
-    private long origin;
+public class StringWrapper implements Data {
 
-    public LongWrapper(long value) {
+    //当前值
+    private String current;
+
+    //原始值
+    private String origin;
+
+    public StringWrapper(String value) {
         this.origin = value;
         this.current = value;
     }
 
-    public void set(long value) {
+    public void set(String value) {
         this.current = value;
     }
 
-    public long get() {
+    public String get() {
         return this.current;
     }
 
@@ -41,8 +45,8 @@ public class LongWrapper implements TypeWrapper {
     @Override
     public String toDebugString() {
         return "{" +
-                "current=" + current +
-                ", origin=" + origin +
+                "current='" + current + '\'' +
+                ", origin='" + origin + '\'' +
                 '}';
     }
 }

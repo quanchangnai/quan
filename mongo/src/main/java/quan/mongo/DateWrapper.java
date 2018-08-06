@@ -1,4 +1,6 @@
-package quan.mongo.wrapper;
+package quan.mongo;
+
+import quan.mongo.Data;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -7,14 +9,17 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 /**
- * 日期
+ * Date
  * Created by quanchangnai on 2017/6/2.
  */
-public class DateWrapper implements TypeWrapper {
+public class DateWrapper implements Data {
+
     //日期格式
     public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+
     //当前值
     private Date current;
+
     //原始值
     private Date origin;
 

@@ -1,25 +1,27 @@
-package quan.mongo.wrapper;
+package quan.mongo;
 
 /**
- * boolean
+ * Integer
  * Created by quanchangnai on 2017/5/23.
  */
-public class BooleanWrapper implements TypeWrapper {
-    //当前值
-    private boolean current;
-    //原始值
-    private boolean origin;
+public class IntegerWrapper implements Data {
 
-    public BooleanWrapper(boolean value) {
+    //当前值
+    private int current;
+
+    //原始值
+    private int origin;
+
+    public IntegerWrapper(int value) {
         this.current = value;
         this.origin = value;
     }
 
-    public void set(boolean value) {
+    public void set(int value) {
         this.current = value;
     }
 
-    public boolean get() {
+    public int get() {
         return this.current;
     }
 
@@ -38,14 +40,14 @@ public class BooleanWrapper implements TypeWrapper {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        BooleanWrapper booleanWrapper = (BooleanWrapper) o;
+        IntegerWrapper integerWrapper = (IntegerWrapper) o;
 
-        return current == booleanWrapper.current;
+        return current == integerWrapper.current;
     }
 
     @Override
     public int hashCode() {
-        return Boolean.hashCode(current);
+        return current;
     }
 
     @Override

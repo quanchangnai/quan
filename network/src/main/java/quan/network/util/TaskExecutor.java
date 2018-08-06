@@ -45,7 +45,7 @@ public class TaskExecutor implements Executor, Runnable {
             for (Runnable task = taskQueue.poll(); task != null; task = taskQueue.poll()) {
                 try {
                     task.run();
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     logger.error(e);
                 }
             }

@@ -1,25 +1,29 @@
-package quan.mongo.wrapper;
+package quan.mongo;
+
+import quan.mongo.Data;
 
 /**
- * int
+ * Double
  * Created by quanchangnai on 2017/5/23.
  */
-public class IntegerWrapper implements TypeWrapper {
+public class DoubleWrapper implements Data {
+
     //当前值
-    private int current;
+    private double current;
+
     //原始值
-    private int origin;
+    private double origin;
 
-    public IntegerWrapper(int value) {
-        this.current = value;
+    public DoubleWrapper(double value) {
         this.origin = value;
-    }
-
-    public void set(int value) {
         this.current = value;
     }
 
-    public int get() {
+    public void set(double value) {
+        this.current = value;
+    }
+
+    public double get() {
         return this.current;
     }
 
@@ -31,21 +35,6 @@ public class IntegerWrapper implements TypeWrapper {
     @Override
     public void rollback() {
         this.current = origin;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        IntegerWrapper integerWrapper = (IntegerWrapper) o;
-
-        return current == integerWrapper.current;
-    }
-
-    @Override
-    public int hashCode() {
-        return current;
     }
 
     @Override

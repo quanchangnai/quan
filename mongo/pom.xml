@@ -19,6 +19,16 @@
             <artifactId>mongo-java-driver</artifactId>
             <version>3.8.0</version>
         </dependency>
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
+            <version>1.8.11</version>
+        </dependency>
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy-agent</artifactId>
+            <version>1.8.11</version>
+        </dependency>
     </dependencies>
 
 </project>

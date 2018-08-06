@@ -1,10 +1,10 @@
-package quan.mongo.wrapper;
+package quan.mongo;
 
 /**
- * 类型包装器
+ * 数据，支持提交、回滚，用以实现事务
  * Created by quanchangnai on 2017/5/18.
  */
-public interface TypeWrapper {
+public interface Data {
 
     default void commit() {
     }

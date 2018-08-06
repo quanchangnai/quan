@@ -5,14 +5,13 @@ import quan.network.handler.HandlerChain;
 import quan.network.handler.HandlerContext;
 import quan.network.handler.HandlerInitializer;
 import quan.network.handler.InboundHandler;
-import quan.network.handler.codec.LengthFieldCodec;
 import quan.network.handler.codec.StringCodec;
 
 import java.net.StandardSocketOptions;
 
 public class NioClientTest {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         ClientBootstrap client = new ClientBootstrap("127.0.0.1", 8007);
         client.setSocketOption(StandardSocketOptions.SO_KEEPALIVE, true);
         client.setHandler(new HandlerInitializer() {
@@ -26,6 +25,8 @@ public class NioClientTest {
         });
         client.setReconnectTime(15 * 1000);
         client.start();
+
+
     }
 
     private static class TestClientInboundHandler implements InboundHandler {

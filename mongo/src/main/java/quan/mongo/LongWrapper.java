@@ -1,25 +1,29 @@
-package quan.mongo.wrapper;
+package quan.mongo;
+
+import quan.mongo.Data;
 
 /**
- * byte
+ * Long
  * Created by quanchangnai on 2017/5/23.
  */
-public class ByteWrapper implements TypeWrapper {
+public class LongWrapper implements Data {
+
     //当前值
-    private byte current;
+    private long current;
+
     //原始值
-    private byte origin;
+    private long origin;
 
-    public ByteWrapper(byte value) {
-        this.current = value;
+    public LongWrapper(long value) {
         this.origin = value;
-    }
-
-    public void set(byte value) {
         this.current = value;
     }
 
-    public byte get() {
+    public void set(long value) {
+        this.current = value;
+    }
+
+    public long get() {
         return this.current;
     }
 
@@ -31,21 +35,6 @@ public class ByteWrapper implements TypeWrapper {
     @Override
     public void rollback() {
         this.current = origin;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        ByteWrapper byteWrapper = (ByteWrapper) o;
-
-        return current == byteWrapper.current;
-    }
-
-    @Override
-    public int hashCode() {
-        return current;
     }
 
     @Override

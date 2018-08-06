@@ -6,6 +6,7 @@ import quan.network.connection.Connection;
 import quan.network.util.TaskExecutor;
 
 import java.nio.ByteBuffer;
+import java.util.Objects;
 
 /**
  * 处理器链，管理连接上的所有的上行处理器和下行处理器，采用双端链表实现
@@ -39,9 +40,7 @@ public class HandlerChain {
     }
 
     public void addLast(NetworkHandler handler) {
-        if (handler == null) {
-            throw new NullPointerException("handler");
-        }
+        Objects.requireNonNull(handler, "参数handler不能为空");
         HandlerContext handlerContext = new HandlerContext(handler, this);
         handlerContext.prev = tail.prev;
         handlerContext.next = tail;
@@ -55,9 +54,7 @@ public class HandlerChain {
     }
 
     public void addFirst(NetworkHandler handler) {
-        if (handler == null) {
-            throw new NullPointerException("handler");
-        }
+        Objects.requireNonNull(handler, "参数handler不能为空");
         HandlerContext handlerContext = new HandlerContext(handler, this);
         handlerContext.prev = head;
         handlerContext.next = head.next;
@@ -138,11 +135,8 @@ public class HandlerChain {
             if (msg instanceof ByteBuffer) {
                 connection.send((ByteBuffer) msg);
             } else {
-                try {
-                    throw new IllegalArgumentException("发送的消息经过OutboundHandler链处理后的最终结果必须是ByteBuffer类型");
-                } catch (Exception e) {
-                    handlerContext.triggerExceptionCaught(e);
-                }
+                Exception exception = new IllegalArgumentException("发送的消息经过OutboundHandler链处理后的最终结果必须是ByteBuffer类型");
+                handlerContext.triggerExceptionCaught(exception);
             }
         }
 

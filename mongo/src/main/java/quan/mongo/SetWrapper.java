@@ -1,4 +1,4 @@
-package quan.mongo.wrapper;
+package quan.mongo;
 
 import java.util.AbstractSet;
 import java.util.HashSet;
@@ -9,21 +9,38 @@ import java.util.Set;
  * Set
  * Created by quanchangnai on 2017/5/23.
  */
-public class SetWrapper<E> extends AbstractSet<E> implements TypeWrapper {
+public class SetWrapper<E> extends AbstractSet<E> implements Data, UpdateCallback {
+
     //当前数据
     private Set<E> current = new HashSet<>();
+
     //记录添加的数据
     private Set<E> added = new HashSet<>();
+
     //记录删除的数据
     private Set<E> removed = new HashSet<>();
+
+    /**
+     * 所属的MappingData
+     */
+    private MappingData mappingData;
+
+    protected void setMappingData(MappingData mappingData) {
+        this.mappingData = mappingData;
+    }
+
+    @Override
+    public MappingData getMappingData() {
+        return mappingData;
+    }
 
     @Override
     public void commit() {
         added.clear();
         removed.clear();
         for (E e : current) {
-            if (e instanceof TypeWrapper) {
-                ((TypeWrapper) e).commit();
+            if (e instanceof Data) {
+                ((Data) e).commit();
             }
         }
     }
@@ -35,8 +52,8 @@ public class SetWrapper<E> extends AbstractSet<E> implements TypeWrapper {
         added.clear();
         removed.clear();
         for (E e : current) {
-            if (e instanceof TypeWrapper) {
-                ((TypeWrapper) e).rollback();
+            if (e instanceof Data) {
+                ((Data) e).rollback();
             }
         }
     }

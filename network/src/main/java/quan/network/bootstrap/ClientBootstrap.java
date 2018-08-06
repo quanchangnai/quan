@@ -1,6 +1,7 @@
 package quan.network.bootstrap;
 
 import quan.network.connection.Connection;
+import quan.network.handler.NetworkHandler;
 import quan.network.util.TaskExecutor;
 
 import java.io.IOException;
@@ -37,6 +38,13 @@ public class ClientBootstrap extends Bootstrap {
         this.port = port;
     }
 
+    public ClientBootstrap(String ip, int port, NetworkHandler handler) {
+        this.ip = ip;
+        this.port = port;
+        this.handler = handler;
+    }
+
+
     public boolean isAutoReconnect() {
         return autoReconnect;
     }
@@ -56,6 +64,9 @@ public class ClientBootstrap extends Bootstrap {
     @Override
     public void start() {
         Objects.requireNonNull(getHandler(), "handler不能为空");
+        if (isRunning()) {
+            stop();
+        }
 
         try {
             readWriteExecutor = new ReadWriteExecutor(this);

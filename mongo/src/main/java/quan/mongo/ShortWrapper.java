@@ -1,25 +1,27 @@
-package quan.mongo.wrapper;
+package quan.mongo;
 
 /**
- * double
+ * Short
  * Created by quanchangnai on 2017/5/23.
  */
-public class DoubleWrapper implements TypeWrapper {
+public class ShortWrapper implements Data {
+
     //当前值
-    private double current;
+    private short current;
+
     //原始值
-    private double origin;
+    private short origin;
 
-    public DoubleWrapper(double value) {
+    public ShortWrapper(short value) {
+        this.current = value;
         this.origin = value;
+    }
+
+    public void set(short value) {
         this.current = value;
     }
 
-    public void set(double value) {
-        this.current = value;
-    }
-
-    public double get() {
+    public short get() {
         return this.current;
     }
 
@@ -31,6 +33,21 @@ public class DoubleWrapper implements TypeWrapper {
     @Override
     public void rollback() {
         this.current = origin;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ShortWrapper transInt = (ShortWrapper) o;
+
+        return current == transInt.current;
+    }
+
+    @Override
+    public int hashCode() {
+        return current;
     }
 
     @Override
