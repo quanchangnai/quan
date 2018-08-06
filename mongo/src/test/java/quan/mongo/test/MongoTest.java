@@ -1,9 +1,6 @@
 package quan.mongo.test;
 
-import net.bytebuddy.agent.ByteBuddyAgent;
 import quan.mongo.Transaction;
-
-import javax.management.relation.Role;
 
 /**
  * Created by quanchangnai on 2018/8/6.
@@ -11,6 +8,7 @@ import javax.management.relation.Role;
 public class MongoTest {
 
     public static void main(String[] args) throws Exception {
+        new Role().toString();
         Transaction.enable();
 
         while (true) {
@@ -23,15 +21,19 @@ public class MongoTest {
     private static void test() {
         try {
             RoleData roleData = new RoleData();
-            roleData.say();
+            roleData.update();
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-//        Runnable runnable1 = () -> {
-//            System.err.println("runnable1");
-//        };
-//        runnable1.run();
+        Runnable runnable1 = () -> {
+            System.err.println("runnable1");
+            Runnable runnable2 = () -> {
+                System.err.println("runnable2");
+            };
+            runnable2.run();
+        };
+        runnable1.run();
 
     }
 

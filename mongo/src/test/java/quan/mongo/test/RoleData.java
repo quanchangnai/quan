@@ -5,11 +5,12 @@ import quan.mongo.Transactional;
 /**
  * Created by quanchangnai on 2018/8/6.
  */
-public class RoleData {
+@Transactional
+public class RoleData extends BaseData {
 
     @Transactional
-    public void say() {
-        System.err.println("============say=================");
+    public void update() {
+        System.err.println("update=================");
 
 //        Runnable runnable1=()->{
 //            System.err.println("runnable1");
@@ -20,7 +21,7 @@ public class RoleData {
 //        };
 //        runnable1.run();
 
-        throw new RuntimeException("say exception");
+//        throw new RuntimeException("update exception");
     }
 
 }

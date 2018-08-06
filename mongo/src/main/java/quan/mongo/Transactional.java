@@ -1,15 +1,14 @@
 package quan.mongo;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * 被注解的方法将会在事务中执行
  * Created by quanchangnai on 2018/8/6.
  */
-@Target(ElementType.METHOD)
+@Documented
+@Inherited
+@Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Transactional {
 }

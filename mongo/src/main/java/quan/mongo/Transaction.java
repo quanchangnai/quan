@@ -56,7 +56,7 @@ public class Transaction {
                 .with(AgentBuilder.TypeStrategy.Default.REBASE)
                 .with(AgentBuilder.LambdaInstrumentationStrategy.ENABLED)
                 .enableNativeMethodPrefix("original$")
-                .type(ElementMatchers.any())
+                .type(ElementMatchers.hasAnnotation(ElementMatchers.annotationType(Transactional.class)))
                 .transform(new Transformer())
                 .installOn(instrumentation);
         enabled.set(true);
