@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * 事务
@@ -26,7 +25,7 @@ public class Transaction {
     /**
      * 是否已经开启事务支持
      */
-    private static AtomicBoolean enabled = new AtomicBoolean(false);
+    private static boolean enabled;
 
     /**
      * 事务是否失败
@@ -34,7 +33,7 @@ public class Transaction {
     private boolean failed;
 
     /**
-     * 事务进入计数，当值减到0时提交或回滚事务
+     * 事务进入计数
      */
     private int enterCount;
 
@@ -52,8 +51,8 @@ public class Transaction {
     /**
      * 开启事务支持
      */
-    public static void enable() {
-        if (enabled.get()) {
+    public static synchronized void enable() {
+        if (enabled) {
             return;
         }
         Instrumentation instrumentation = ByteBuddyAgent.install();
@@ -64,11 +63,11 @@ public class Transaction {
                 .type(ElementMatchers.hasAnnotation(ElementMatchers.annotationType(Transactional.class)))
                 .transform(new Transformer())
                 .installOn(instrumentation);
-        enabled.set(true);
+        enabled = true;
     }
 
     /**
-     * 开始事务
+     * 开始事务，重复开始时事务进入次数加1
      */
     public static void start() {
         Transaction current = current();
@@ -80,9 +79,28 @@ public class Transaction {
     }
 
     /**
+     * 结束当前事务，事务进入次数减1，当值减到0时提交或回滚事务
+     *
+     * @return
+     */
+    public static void end() {
+        Transaction current = current();
+        if (current == null) {
+            return;
+        }
+        if (--current.enterCount < 1) {
+            if (current.isFailed()) {
+                current.rollback();
+            } else {
+                current.commit();
+            }
+        }
+    }
+
+    /**
      * 执行成功时提交事务
      */
-    public void commit() {
+    private void commit() {
         System.err.println("commit==================");
         for (MappingData mappingData : mappingDatas) {
             mappingData.commit();
@@ -103,7 +121,7 @@ public class Transaction {
     /**
      * 执行失败时回滚事务
      */
-    public void rollback() {
+    private void rollback() {
         System.err.println("rollback==================");
         for (MappingData mappingData : mappingDatas) {
             mappingData.rollback();
@@ -124,15 +142,6 @@ public class Transaction {
     public boolean isFailed() {
         return failed;
     }
-
-    public int getEnterCount() {
-        return enterCount;
-    }
-
-    public int subEnterCount() {
-        return --enterCount;
-    }
-
 
     /**
      * 当前事务

@@ -16,21 +16,10 @@ public class InterceptAdvice {
 
     @Advice.OnMethodExit(onThrowable = Throwable.class)
     public static void onMethodExit(@Advice.Thrown Throwable thrown) {
-        Transaction current = Transaction.current();
-        int enterCount = current.subEnterCount();
-
-        boolean failed = current.isFailed();
         if (thrown != null) {
-            failed = true;
             Transaction.fail();
         }
-        if (enterCount <= 0) {
-            if (failed) {
-                current.rollback();
-            } else {
-                current.commit();
-            }
-        }
+        Transaction.end();
     }
 
 }
