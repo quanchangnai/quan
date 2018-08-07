@@ -34,9 +34,9 @@ public class Transaction {
     private boolean failed;
 
     /**
-     * 事务层次，当值为0时提交或回滚事务
+     * 事务进入计数，当值减到0时提交或回滚事务
      */
-    private int layer = 1;
+    private int enterCount;
 
     /**
      * 当前事务管理的MappingData
@@ -70,13 +70,13 @@ public class Transaction {
     /**
      * 开始事务
      */
-    public static Transaction start() {
-        Transaction transaction = current();
-        if (transaction == null) {
-            transaction = new Transaction();
-            threadLocal.set(transaction);
+    public static void start() {
+        Transaction current = current();
+        if (current == null) {
+            current = new Transaction();
+            threadLocal.set(current);
         }
-        return transaction;
+        current.enterCount++;
     }
 
     /**
@@ -125,13 +125,14 @@ public class Transaction {
         return failed;
     }
 
-    public int getLayer() {
-        return layer;
+    public int getEnterCount() {
+        return enterCount;
     }
 
-    public void setLayer(int layer) {
-        this.layer = layer;
+    public int subEnterCount() {
+        return --enterCount;
     }
+
 
     /**
      * 当前事务

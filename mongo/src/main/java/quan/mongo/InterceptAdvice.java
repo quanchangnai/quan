@@ -11,25 +11,20 @@ public class InterceptAdvice {
 
     @Advice.OnMethodEnter
     public static void onMethodEnter() {
-        Transaction current = Transaction.current();
-        if (current == null) {
-            Transaction.start();
-        } else {
-            current.setLayer(current.getLayer() + 1);
-        }
+        Transaction.start();
     }
 
     @Advice.OnMethodExit(onThrowable = Throwable.class)
     public static void onMethodExit(@Advice.Thrown Throwable thrown) {
         Transaction current = Transaction.current();
-        current.setLayer(current.getLayer() - 1);
+        int enterCount = current.subEnterCount();
 
         boolean failed = current.isFailed();
         if (thrown != null) {
             failed = true;
             Transaction.fail();
         }
-        if (current.getLayer() <= 0) {
+        if (enterCount <= 0) {
             if (failed) {
                 current.rollback();
             } else {
