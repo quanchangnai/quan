@@ -25,7 +25,6 @@ public class Role implements IRole {
     private void init() {
         for (int i = 1; i <= 2; i++) {
             roleData.getItems().add(new ItemData(i, i));
-
         }
     }
 
@@ -45,9 +44,23 @@ public class Role implements IRole {
 
         ListWrapper<ItemData> items = (ListWrapper<ItemData>) roleData.getItems();
         System.err.println("items:" + items.size() + "," + items.toDebugString());
-        items.get(0).setItemNum(15);
+        items.get(0).setItemNum(1);
 
-//        Transaction.fail();
-        throw new RuntimeException("update exception");
+        try {
+            update2();
+        } catch (Throwable e) {
+            System.err.println("e:"+e);
+        }
+
+        Transaction.fail();
+
+    }
+
+    @Transactional
+    public void update2() {
+        System.err.println("update2=================");
+        roleData.getItems().get(1).setItemNum(2);
+//        throw new RuntimeException("update exception");
+
     }
 }

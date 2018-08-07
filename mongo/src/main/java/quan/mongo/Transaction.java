@@ -34,6 +34,11 @@ public class Transaction {
     private boolean failed;
 
     /**
+     * 事务层次，当值为0时提交或回滚事务
+     */
+    private int layer = 1;
+
+    /**
      * 当前事务管理的MappingData
      */
     private Set<MappingData> mappingDatas = new HashSet();
@@ -65,10 +70,13 @@ public class Transaction {
     /**
      * 开始事务
      */
-    public static void start() {
-        if (current() == null) {
-            threadLocal.set(new Transaction());
+    public static Transaction start() {
+        Transaction transaction = current();
+        if (transaction == null) {
+            transaction = new Transaction();
+            threadLocal.set(transaction);
         }
+        return transaction;
     }
 
     /**
@@ -115,6 +123,14 @@ public class Transaction {
 
     public boolean isFailed() {
         return failed;
+    }
+
+    public int getLayer() {
+        return layer;
+    }
+
+    public void setLayer(int layer) {
+        this.layer = layer;
     }
 
     /**
