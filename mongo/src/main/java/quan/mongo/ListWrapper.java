@@ -293,8 +293,20 @@ public class ListWrapper<E> extends AbstractList<E> implements Data, UpdateCallb
 
     @Override
     public String toDebugString() {
+        String currentStr = "[";
+        for (E e : current) {
+            if (e instanceof Data) {
+                currentStr += "" + ((Data) e).toDebugString() + ", ";
+            } else {
+                currentStr += "" + e + ", ";
+            }
+        }
+        if (currentStr.endsWith(", ")) {
+            currentStr = currentStr.substring(0, currentStr.length() - 2);
+        }
+        currentStr += "]";
         return "{" +
-                "current=" + current +
+                "current=" + currentStr +
                 ", operations=" + operations +
                 '}';
     }

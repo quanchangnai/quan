@@ -1,5 +1,6 @@
 package quan.mongo.test;
 
+import quan.mongo.ListWrapper;
 import quan.mongo.Transaction;
 import quan.mongo.Transactional;
 
@@ -11,13 +12,25 @@ public class Role implements IRole {
 
     private RoleData roleData = new RoleData();
 
+    public Role() {
+        init();
+    }
+
     @Override
     public String toString() {
         return "Role{}";
     }
 
-    @Override
     @Transactional
+    private void init() {
+        for (int i = 1; i <= 2; i++) {
+            roleData.getItems().add(new ItemData(i, i));
+
+        }
+    }
+
+    @Transactional
+    @Override
     public void update() {
         System.err.println("update=================");
 
@@ -30,9 +43,9 @@ public class Role implements IRole {
 //        };
 //        runnable1.run();
 
-        int size = roleData.getItems().size();
-        System.err.println("list:" + size + "," + roleData.getItems());
-        roleData.getItems().add(new ItemData(++size, size));
+        ListWrapper<ItemData> items = (ListWrapper<ItemData>) roleData.getItems();
+        System.err.println("items:" + items.size() + "," + items.toDebugString());
+        items.get(0).setItemNum(15);
 
 //        Transaction.fail();
         throw new RuntimeException("update exception");

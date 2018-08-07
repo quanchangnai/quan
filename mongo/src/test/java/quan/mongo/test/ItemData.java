@@ -34,6 +34,7 @@ public class ItemData extends BaseData {
     }
 
     public void setItemId(int itemId) {
+        onUpdateData();
         this.itemId.set(itemId);
     }
 
@@ -42,6 +43,7 @@ public class ItemData extends BaseData {
     }
 
     public void setItemNum(int itemNum) {
+        onUpdateData();
         this.itemNum.set(itemNum);
     }
 
@@ -50,6 +52,14 @@ public class ItemData extends BaseData {
         return "ItemData{" +
                 "itemId=" + itemId +
                 ", itemNum=" + itemNum +
+                '}';
+    }
+
+    @Override
+    public String toDebugString() {
+        return "ItemData{" +
+                "itemId=" + itemId.toDebugString() +
+                ", itemNum=" + itemNum.toDebugString() +
                 '}';
     }
 }

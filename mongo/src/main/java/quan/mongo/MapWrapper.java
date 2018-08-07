@@ -326,11 +326,28 @@ public class MapWrapper<K, V> extends AbstractMap<K, V> implements Data, UpdateC
     @Override
     public String toDebugString() {
         return "{" +
-                "current=" + current +
+                "current=" + toDebugString(current) +
                 ", added=" + added +
-                ", removed=" + removed +
-                ", replaced=" + replaced +
+                ", removed=" + toDebugString(removed) +
+                ", replaced=" + toDebugString(replaced) +
                 '}';
     }
 
+    public String toDebugString(Map<K, V> map) {
+        String str = "[";
+        for (K key : current.keySet()) {
+            V value = current.get(key);
+            str += "" + key;
+            if (value instanceof Data) {
+                str += "=" + ((Data) value).toDebugString() + ", ";
+            } else {
+                str += "=" + value + ", ";
+            }
+        }
+        if (str.endsWith(", ")) {
+            str = str.substring(0, str.length() - 2);
+        }
+        str += "]";
+        return str;
+    }
 }

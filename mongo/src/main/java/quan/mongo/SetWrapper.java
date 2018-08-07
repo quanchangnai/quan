@@ -130,10 +130,26 @@ public class SetWrapper<E> extends AbstractSet<E> implements Data, UpdateCallbac
     @Override
     public String toDebugString() {
         return "{" +
-                "current=" + current +
-                ", added=" + added +
-                ", removed=" + removed +
+                "current=" + toDebugString(current) +
+                ", added=" + toDebugString(added) +
+                ", removed=" + toDebugString(removed) +
                 '}';
+    }
+
+    public String toDebugString(Set<E> set) {
+        String str = "[";
+        for (E e : set) {
+            if (e instanceof Data) {
+                str += "" + ((Data) e).toDebugString() + ", ";
+            } else {
+                str += "" + e + ", ";
+            }
+        }
+        if (str.endsWith(", ")) {
+            str = str.substring(0, str.length() - 2);
+        }
+        str += "]";
+        return str;
     }
 
 }
