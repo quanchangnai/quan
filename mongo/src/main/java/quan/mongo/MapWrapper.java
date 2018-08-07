@@ -192,11 +192,6 @@ public class MapWrapper<K, V> extends AbstractMap<K, V> implements Data, UpdateC
         return current.isEmpty();
     }
 
-    @Override
-    public String toString() {
-        return current.toString();
-    }
-
     private abstract class InnerIterator<E> implements Iterator<E> {
         private Iterator<Entry<K, V>> it;
         private Entry<K, V> currentEntry;
@@ -324,6 +319,11 @@ public class MapWrapper<K, V> extends AbstractMap<K, V> implements Data, UpdateC
     }
 
     @Override
+    public String toString() {
+        return current.toString();
+    }
+
+    @Override
     public String toDebugString() {
         return "{" +
                 "current=" + current +
@@ -333,30 +333,4 @@ public class MapWrapper<K, V> extends AbstractMap<K, V> implements Data, UpdateC
                 '}';
     }
 
-    public static void main(String[] args) {
-        // TODO: 2017/6/2 测试代码
-        MapWrapper<Integer, Integer> map = new MapWrapper<>();
-        map.put(1, 1);
-        map.put(1, 11);
-        map.commit();
-        System.err.println(map);
-        map.put(11, 1);
-        map.put(21, 2);
-        map.put(31, 3);
-        map.put(31, 33);
-        map.put(41, 44);
-        map.remove(11);
-        map.commit();
-        System.err.println(map);
-        map.keySet().remove(1);
-        for (Integer k : map.keySet()) {
-            System.err.println("k=" + k + ",v=" + map.get(k));
-        }
-        Iterator<Integer> keyIterator = map.keySet().iterator();
-        System.err.println("keyIterator.next()=" + keyIterator.next());
-        keyIterator.remove();
-        map.values().remove(44);
-        map.rollback();
-        System.err.println(map);
-    }
 }

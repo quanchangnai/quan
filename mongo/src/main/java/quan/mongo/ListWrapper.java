@@ -287,6 +287,11 @@ public class ListWrapper<E> extends AbstractList<E> implements Data, UpdateCallb
     }
 
     @Override
+    public String toString() {
+        return current.toString();
+    }
+
+    @Override
     public String toDebugString() {
         return "{" +
                 "current=" + current +
@@ -294,36 +299,4 @@ public class ListWrapper<E> extends AbstractList<E> implements Data, UpdateCallb
                 '}';
     }
 
-    public static void main(String[] args) {
-        // TODO: 2017/6/2 测试代码
-        ListWrapper<Integer> list = new ListWrapper<>();
-        list.add(10);
-        list.add(20);
-        list.set(0, 30);
-        list.remove(1);
-        list.rollback();
-        System.err.println(list);
-        list.add(11);
-        list.add(12);
-        list.set(0, 100);
-        list.commit();
-        System.err.println(list);
-        list.remove(0);
-        list.set(0, 110);
-        list.add(200);
-        list.add(300);
-        list.add(400);
-        list.commit();
-        System.err.println(list);
-
-        Iterator<Integer> iterator = list.iterator();
-        while (iterator.hasNext()) {
-            Integer i = iterator.next();
-            if (i < 200) {
-                iterator.remove();
-            }
-        }
-        list.rollback();
-        System.err.println(list);
-    }
 }

@@ -123,6 +123,11 @@ public class SetWrapper<E> extends AbstractSet<E> implements Data, UpdateCallbac
     }
 
     @Override
+    public String toString() {
+        return current.toString();
+    }
+
+    @Override
     public String toDebugString() {
         return "{" +
                 "current=" + current +
@@ -131,40 +136,4 @@ public class SetWrapper<E> extends AbstractSet<E> implements Data, UpdateCallbac
                 '}';
     }
 
-    public static void main(String[] args) {
-        // TODO: 2017/6/2 测试代码
-        SetWrapper<Integer> set = new SetWrapper<>();
-        set.add(1);
-        set.commit();
-        System.err.println(set);
-        System.err.println("========");
-        set.remove(1);
-        set.rollback();
-        System.err.println(set);
-        System.err.println("========");
-        set.remove(4);
-        set.add(1);
-        System.err.println(set);
-        set.rollback();
-        System.err.println("========");
-        System.err.println(set);
-
-        set.remove(2);
-        set.remove(new IntegerWrapper(3));
-        set.add(3);
-        set.add(4);
-        set.add(5);
-        set.commit();
-        System.err.println(set);
-        System.err.println("========");
-        Iterator<Integer> iterator = set.iterator();
-        while (iterator.hasNext()) {
-            Integer i = iterator.next();
-            if (i < 3) {
-                iterator.remove();
-            }
-        }
-        set.rollback();
-        System.err.println(set);
-    }
 }
