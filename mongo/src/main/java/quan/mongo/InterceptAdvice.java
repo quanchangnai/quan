@@ -5,7 +5,7 @@ import net.bytebuddy.asm.Advice;
 
 /**
  * 拦截通知
- * Created by quanchangnai on 2018/5/22.
+ * Created by quanchangnai on 2018/8/6.
  */
 public class InterceptAdvice {
 

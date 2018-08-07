@@ -15,9 +15,6 @@ public interface UpdateCallback {
         if (transaction == null) {
             throw new RuntimeException("当前不在事务中，禁止修改数据");
         }
-        MappingData mappingData = getMappingData();
-        if (mappingData != null) {
-            transaction.addMappingData(mappingData);
-        }
+        transaction.addMappingData(getMappingData());
     }
 }

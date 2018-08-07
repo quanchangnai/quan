@@ -44,7 +44,7 @@ public class Role implements IRole {
 
         ListWrapper<ItemData> items = (ListWrapper<ItemData>) roleData.getItems();
         System.err.println("items:" + items.size() + "," + items.toDebugString());
-        items.get(0).setItemNum(1);
+        items.get(0).setItemNum(11);
 
         try {
             update2();
@@ -59,7 +59,7 @@ public class Role implements IRole {
     @Transactional
     public void update2() {
         System.err.println("update2=================");
-        roleData.getItems().get(1).setItemNum(2);
+        roleData.getItems().get(1).setItemNum(12);
 //        throw new RuntimeException("update exception");
 
     }

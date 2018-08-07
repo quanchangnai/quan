@@ -14,7 +14,7 @@ import java.util.Set;
 
 /**
  * 事务
- * Created by quanchangnai on 2017/6/2.
+ * Created by quanchangnai on 2018/8/6.
  */
 public class Transaction {
 
@@ -136,6 +136,9 @@ public class Transaction {
      * @param mappingData
      */
     void addMappingData(MappingData mappingData) {
+        if (mappingData == null) {
+            return;
+        }
         mappingDatas.add(mappingData);
     }
 
