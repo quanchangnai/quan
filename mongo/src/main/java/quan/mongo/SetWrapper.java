@@ -82,6 +82,9 @@ public class SetWrapper<E> extends AbstractSet<E> implements Data, UpdateCallbac
         if (!removed.remove(e) && notContains) {
             added.add(e);
         }
+        if (e instanceof UpdateCallback) {
+            ((UpdateCallback) e).setMappingData(getMappingData());
+        }
         return notContains;
     }
 

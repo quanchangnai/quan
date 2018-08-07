@@ -8,7 +8,7 @@ import quan.mongo.Transactional;
  * Created by quanchangnai on 2018/8/6.
  */
 @Transactional
-public class Role implements IRole {
+public class Role {
 
     private RoleData roleData = new RoleData();
 
@@ -29,7 +29,6 @@ public class Role implements IRole {
     }
 
     @Transactional
-    @Override
     public void update() {
         System.err.println("update=================");
 
@@ -52,7 +51,7 @@ public class Role implements IRole {
             System.err.println("e:" + e);
         }
 
-        Transaction.fail();
+//        Transaction.fail();
 
     }
 
@@ -60,7 +59,7 @@ public class Role implements IRole {
     public void update2() {
         System.err.println("update2=================");
         roleData.getItems().get(1).setItemNum(12);
-        throw new RuntimeException("update exception");
+//        throw new RuntimeException("update exception");
 
     }
 }

@@ -7,9 +7,14 @@ package quan.mongo;
 public abstract class ReferenceData implements Data, UpdateCallback {
 
     /**
-     * 所属的MappingData
+     * 所属的MappingData，当前值
      */
-    private MappingData mappingData;
+    protected MappingData currentMappingData;
+
+    /**
+     * 所属的MappingData，原始值
+     */
+    protected MappingData originMappingData;
 
     /**
      * 不要手动调用
@@ -17,12 +22,12 @@ public abstract class ReferenceData implements Data, UpdateCallback {
      * @param mappingData
      */
     public void setMappingData(MappingData mappingData) {
-        this.mappingData = mappingData;
+        this.currentMappingData = mappingData;
     }
 
     @Override
     public MappingData getMappingData() {
-        return mappingData;
+        return currentMappingData;
     }
 
 }

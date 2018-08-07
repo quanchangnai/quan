@@ -1,12 +1,13 @@
 package quan.mongo.test;
 
 import quan.mongo.IntegerWrapper;
+import quan.mongo.ReferenceData;
 
 /**
  * 实际是生成的
  * Created by quanchangnai on 2018/8/7.
  */
-public class ItemData extends BaseData {
+public class ItemData extends ReferenceData {
 
     private IntegerWrapper itemId = new IntegerWrapper(0);
 
@@ -21,12 +22,14 @@ public class ItemData extends BaseData {
     public void commit() {
         itemId.commit();
         itemNum.commit();
+        originMappingData = currentMappingData;
     }
 
     @Override
     public void rollback() {
         itemId.rollback();
         itemNum.rollback();
+        currentMappingData = originMappingData;
     }
 
     public int getItemId() {

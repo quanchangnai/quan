@@ -100,6 +100,9 @@ public class MapWrapper<K, V> extends AbstractMap<K, V> implements Data, UpdateC
         V origin = current.get(key);
         onPut(key, origin);
         current.put(key, value);
+        if (value instanceof UpdateCallback) {
+            ((UpdateCallback) value).setMappingData(getMappingData());
+        }
         return origin;
     }
 

@@ -4,7 +4,7 @@ package quan.mongo;
  * 映射数据
  * Created by quanchangnai on 2018/8/6.
  */
-public abstract class MappingData extends ReferenceData {
+public abstract class MappingData implements Data, UpdateCallback {
 
     @Override
     public void setMappingData(MappingData mappingData) {

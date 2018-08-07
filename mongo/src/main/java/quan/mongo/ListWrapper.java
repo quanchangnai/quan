@@ -92,6 +92,9 @@ public class ListWrapper<E> extends AbstractList<E> implements Data, UpdateCallb
     public void add(int index, E e) {
         onAdd(index);
         current.add(index, e);
+        if (e instanceof UpdateCallback) {
+            ((UpdateCallback) e).setMappingData(getMappingData());
+        }
     }
 
     private void onSet(int index) {
@@ -108,7 +111,11 @@ public class ListWrapper<E> extends AbstractList<E> implements Data, UpdateCallb
 
     public E set(int index, E e) {
         onSet(index);
-        return current.set(index, e);
+        E old = current.set(index, e);
+        if (e instanceof UpdateCallback) {
+            ((UpdateCallback) e).setMappingData(getMappingData());
+        }
+        return old;
     }
 
     private void onRemove(int index) {
