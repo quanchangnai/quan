@@ -26,7 +26,13 @@ public class MapWrapper<K, V> extends AbstractMap<K, V> implements Data, UpdateC
      */
     private MappingData mappingData;
 
-    protected void setMappingData(MappingData mappingData) {
+    /**
+     * 不要手动调用
+     *
+     * @param mappingData
+     */
+    @Override
+    public void setMappingData(MappingData mappingData) {
         this.mappingData = mappingData;
     }
 
@@ -34,6 +40,7 @@ public class MapWrapper<K, V> extends AbstractMap<K, V> implements Data, UpdateC
     public MappingData getMappingData() {
         return mappingData;
     }
+
 
     @Override
     public void commit() {
@@ -63,6 +70,7 @@ public class MapWrapper<K, V> extends AbstractMap<K, V> implements Data, UpdateC
     }
 
     private void onPut(K key, V origin) {
+        onUpdateData();
         if (this.added.contains(key)) {
             return; // 之前有添加数据的记录，不需要再次记录
         }
@@ -89,12 +97,14 @@ public class MapWrapper<K, V> extends AbstractMap<K, V> implements Data, UpdateC
         if (null == value || null == key) {
             throw new NullPointerException();
         }
-        V origin = current.put(key, value);
+        V origin = current.get(key);
         onPut(key, origin);
+        current.put(key, value);
         return origin;
     }
 
     private void onRemove(K key, V value) {
+        onUpdateData();
         if (!this.added.remove(key)) {
             V replacedValue = this.replaced.remove(key);
             this.removed.put(key, replacedValue == null ? value : replacedValue);
@@ -103,10 +113,11 @@ public class MapWrapper<K, V> extends AbstractMap<K, V> implements Data, UpdateC
 
     @Override
     public V remove(Object key) {
-        V value = current.remove(key);
+        V value = current.get(key);
         if (value != null) {
             onRemove((K) key, value);
         }
+        current.remove(key);
         return value;
     }
 

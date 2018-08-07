@@ -6,13 +6,18 @@ package quan.mongo;
  */
 public interface UpdateCallback {
 
+    void setMappingData(MappingData mappingData);
+
     MappingData getMappingData();
 
     default void onUpdateData() {
         Transaction transaction = Transaction.current();
         if (transaction == null) {
-            throw new RuntimeException("当前没有开启事务，不能修改数据");
+            throw new RuntimeException("当前不在事务中，不能修改数据");
         }
-        transaction.addMappingData(getMappingData());
+        MappingData mappingData = getMappingData();
+        if (mappingData != null) {
+            transaction.addMappingData(mappingData);
+        }
     }
 }

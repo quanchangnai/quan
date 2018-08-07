@@ -19,7 +19,13 @@ public class ListWrapper<E> extends AbstractList<E> implements Data, UpdateCallb
      */
     private MappingData mappingData;
 
-    protected void setMappingData(MappingData mappingData) {
+    /**
+     * 不要手动调用
+     *
+     * @param mappingData
+     */
+    @Override
+    public void setMappingData(MappingData mappingData) {
         this.mappingData = mappingData;
     }
 
@@ -76,32 +82,38 @@ public class ListWrapper<E> extends AbstractList<E> implements Data, UpdateCallb
 
 
     private void onAdd(int index) {
+        checkIndex(index, true);
+        onUpdateData();
         Operation<E> operation = new Operation<>(Operation.ADD, index, null);
         operations.push(operation);
+
     }
 
     public void add(int index, E e) {
-        checkIndex(index, true);
         onAdd(index);
         current.add(index, e);
     }
 
     private void onSet(int index) {
+        checkIndex(index, false);
+        onUpdateData();
         E origin = null;
         if (index < current.size()) {
             origin = current.get(index);
         }
         Operation<E> operation = new Operation<>(Operation.SET, index, origin);
         operations.push(operation);
+
     }
 
     public E set(int index, E e) {
-        checkIndex(index, false);
         onSet(index);
         return current.set(index, e);
     }
 
     private void onRemove(int index) {
+        checkIndex(index, false);
+        onUpdateData();
         E origin = null;
         if (index < current.size()) {
             origin = current.get(index);
@@ -112,7 +124,6 @@ public class ListWrapper<E> extends AbstractList<E> implements Data, UpdateCallb
 
     @Override
     public E remove(int index) {
-        checkIndex(index, false);
         onRemove(index);
         return current.remove(index);
     }

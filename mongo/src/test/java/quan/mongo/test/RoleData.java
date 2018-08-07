@@ -1,27 +1,34 @@
 package quan.mongo.test;
 
-import quan.mongo.Transactional;
+import quan.mongo.ListWrapper;
+
+import java.util.List;
 
 /**
+ * 实际是生成的
  * Created by quanchangnai on 2018/8/6.
  */
-@Transactional
 public class RoleData extends BaseData {
 
-    @Transactional
-    public void update() {
-        System.err.println("update=================");
+    private ListWrapper<ItemData> items = new ListWrapper<>();
 
-//        Runnable runnable1=()->{
-//            System.err.println("runnable1");
-//            Runnable runnable2=()->{
-//                System.err.println("runnable2");
-//            };
-//            runnable2.run();
-//        };
-//        runnable1.run();
-
-//        throw new RuntimeException("update exception");
+    public RoleData() {
+        items.setMappingData(getMappingData());
     }
+
+    @Override
+    public void commit() {
+        items.commit();
+    }
+
+    @Override
+    public void rollback() {
+        items.rollback();
+    }
+
+    public List<ItemData> getItems() {
+        return items;
+    }
+
 
 }

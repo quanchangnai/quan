@@ -24,7 +24,7 @@ public class Transaction {
     private static ThreadLocal<Transaction> threadLocal = new ThreadLocal<>();
 
     /**
-     * 事务支持是否已经开启
+     * 是否已经开启事务支持
      */
     private static AtomicBoolean enabled = new AtomicBoolean(false);
 

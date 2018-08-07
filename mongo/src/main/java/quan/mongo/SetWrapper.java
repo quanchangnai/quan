@@ -25,7 +25,13 @@ public class SetWrapper<E> extends AbstractSet<E> implements Data, UpdateCallbac
      */
     private MappingData mappingData;
 
-    protected void setMappingData(MappingData mappingData) {
+    /**
+     * 不要手动调用
+     *
+     * @param mappingData
+     */
+    @Override
+    public void setMappingData(MappingData mappingData) {
         this.mappingData = mappingData;
     }
 
@@ -71,6 +77,7 @@ public class SetWrapper<E> extends AbstractSet<E> implements Data, UpdateCallbac
 
     @Override
     public boolean add(E e) {
+        onUpdateData();
         boolean notContains = current.add(e);
         if (!removed.remove(e) && notContains) {
             added.add(e);
@@ -107,6 +114,7 @@ public class SetWrapper<E> extends AbstractSet<E> implements Data, UpdateCallbac
 
         @Override
         public void remove() {
+            onUpdateData();
             iterator.remove();
             if (!added.remove(lastRet)) {
                 removed.add(lastRet);

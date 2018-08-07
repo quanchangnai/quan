@@ -11,7 +11,12 @@ public abstract class ReferenceData implements Data, UpdateCallback {
      */
     private MappingData mappingData;
 
-    protected void setMappingData(MappingData mappingData) {
+    /**
+     * 不要手动调用
+     *
+     * @param mappingData
+     */
+    public void setMappingData(MappingData mappingData) {
         this.mappingData = mappingData;
     }
 
