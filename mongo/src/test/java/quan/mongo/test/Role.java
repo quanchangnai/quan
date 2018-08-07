@@ -49,10 +49,10 @@ public class Role implements IRole {
         try {
             update2();
         } catch (Throwable e) {
-            System.err.println("e:"+e);
+            System.err.println("e:" + e);
         }
 
-//        Transaction.fail();
+        Transaction.fail();
 
     }
 
@@ -60,7 +60,7 @@ public class Role implements IRole {
     public void update2() {
         System.err.println("update2=================");
         roleData.getItems().get(1).setItemNum(12);
-//        throw new RuntimeException("update exception");
+        throw new RuntimeException("update exception");
 
     }
 }

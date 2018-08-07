@@ -13,7 +13,7 @@ public interface UpdateCallback {
     default void onUpdateData() {
         Transaction transaction = Transaction.current();
         if (transaction == null) {
-            throw new RuntimeException("当前不在事务中，禁止修改数据");
+            throw new UnsupportedOperationException("当前不在事务中，禁止修改数据");
         }
         transaction.addMappingData(getMappingData());
     }

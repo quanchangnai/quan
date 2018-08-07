@@ -16,10 +16,7 @@ public class InterceptAdvice {
 
     @Advice.OnMethodExit(onThrowable = Throwable.class)
     public static void onMethodExit(@Advice.Thrown Throwable thrown) {
-        if (thrown != null) {
-            Transaction.fail();
-        }
-        Transaction.end();
+        Transaction.end(thrown != null);
     }
 
 }

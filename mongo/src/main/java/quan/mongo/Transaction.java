@@ -18,8 +18,14 @@ import java.util.Set;
  */
 public class Transaction {
 
+    /**
+     * logger
+     */
     protected final Logger logger = LogManager.getLogger(getClass());
 
+    /**
+     * 保存事务为线程本地变量
+     */
     private static ThreadLocal<Transaction> threadLocal = new ThreadLocal<>();
 
     /**
@@ -47,6 +53,8 @@ public class Transaction {
      */
     private List<Runnable> afterCommitTasks = new ArrayList<>();
 
+    private Transaction() {
+    }
 
     /**
      * 开启事务支持
@@ -67,9 +75,19 @@ public class Transaction {
     }
 
     /**
+     * 检测是否开启了事务支持
+     */
+    private static void checkEnabled() {
+        if (!enabled) {
+            throw new UnsupportedOperationException("未开启事务支持");
+        }
+    }
+
+    /**
      * 开始事务，重复开始时事务进入次数加1
      */
     public static void start() {
+        checkEnabled();
         Transaction current = current();
         if (current == null) {
             current = new Transaction();
@@ -81,13 +99,15 @@ public class Transaction {
     /**
      * 结束当前事务，事务进入次数减1，当值减到0时提交或回滚事务
      *
-     * @return
+     * @param fail 是否失败
      */
-    public static void end() {
+    public static void end(boolean fail) {
+        checkEnabled();
         Transaction current = current();
         if (current == null) {
             return;
         }
+        current.failed = current.failed || fail;
         if (--current.enterCount < 1) {
             if (current.isFailed()) {
                 current.rollback();
@@ -152,6 +172,7 @@ public class Transaction {
      * @return
      */
     public static Transaction current() {
+        checkEnabled();
         return threadLocal.get();
     }
 
@@ -159,6 +180,7 @@ public class Transaction {
      * 标记当前事务为失败状态
      */
     public static void fail() {
+        checkEnabled();
         Transaction current = current();
         if (current != null) {
             current.failed = true;
