@@ -20,13 +20,13 @@ public class RoleData extends MappingData {
     }
 
     @Override
-    public void commit() {
+    protected void commit() {
         items.commit();
         item.commit();
     }
 
     @Override
-    public void rollback() {
+    protected void rollback() {
         items.rollback();
         item.rollback();
     }

@@ -1,7 +1,5 @@
 package quan.mongo;
 
-import quan.mongo.Data;
-
 /**
  * Double包装器
  * Created by quanchangnai on 2017/5/23.
@@ -20,7 +18,7 @@ public class DoubleWrapper {
     }
 
     public double set(double value) {
-        double ret =  this.current;
+        double ret = this.current;
         this.current = value;
         return ret;
     }

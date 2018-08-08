@@ -1,7 +1,7 @@
 package quan.mongo;
 
 /**
- * 集合包装器
+ * 集合包装器，支持提交、回滚数据
  * Created by quanchangnai on 2018/8/6.
  */
 public interface CollectionWrapper {

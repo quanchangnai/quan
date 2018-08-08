@@ -53,6 +53,8 @@ public class Role {
         }
 
         try {
+            String s = Transaction.execute(this::update2);
+            System.err.println("update2=" + s);
             update2();
         } catch (Exception e) {
             e.printStackTrace();
@@ -62,15 +64,15 @@ public class Role {
         System.err.println("roleData2:" + roleData.toDebugString());
     }
 
-    @Transactional
-    public void update2() {
+    public String update2() {
         System.err.println("update2=================");
 //        roleData.getItems().get(1).setItemNum(12);
         if (roleData.getItems().size() > 1) {
             ItemData itemData = roleData.getItems().remove(1);
             System.err.println("itemData=" + itemData.toDebugString());
         }
-        throw new RuntimeException("update exception");
+//        throw new RuntimeException("update exception");
 
+        return "update2";
     }
 }

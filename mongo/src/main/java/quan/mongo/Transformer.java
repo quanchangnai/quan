@@ -15,6 +15,22 @@ public class Transformer implements AgentBuilder.Transformer {
 
     @Override
     public DynamicType.Builder<?> transform(DynamicType.Builder<?> builder, TypeDescription typeDescription, ClassLoader classLoader, JavaModule module) {
-        return builder.method(ElementMatchers.isAnnotatedWith(Transactional.class)).intercept(Advice.to(InterceptAdvice.class));
+        return builder.method(ElementMatchers.isAnnotatedWith(Transactional.class)).intercept(Advice.to(AdviceImpl.class));
+    }
+
+    /**
+     * 通知实现
+     */
+    private static class AdviceImpl {
+
+        @Advice.OnMethodEnter
+        public static void onMethodEnter() {
+            Transaction.start();
+        }
+
+        @Advice.OnMethodExit(onThrowable = Throwable.class)
+        public static void onMethodExit(@Advice.Thrown Throwable thrown) {
+            Transaction.end(thrown != null);
+        }
     }
 }

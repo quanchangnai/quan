@@ -2,7 +2,7 @@ package quan.mongo;
 
 /**
  * 支持提交、回滚的数据，用以实现事务
- * Created by quanchangnai on 2017/5/18.
+ * Created by quanchangnai on 2018/8/6.
  */
 public abstract class Data {
 
@@ -28,13 +28,13 @@ public abstract class Data {
      *
      * @param setData
      */
-    protected void onUpdateData(Object setData) {
+    protected void onUpdateData(ReferenceData setData) {
         Transaction transaction = Transaction.current();
         if (transaction == null) {
             throw new UnsupportedOperationException("当前不在事务中，禁止修改数据");
         }
-        if (setData instanceof ReferenceData) {
-            MappingData setDataOwner = ((ReferenceData) setData).getOwner();
+        if (setData != null) {
+            MappingData setDataOwner = setData.getOwner();
             if (setDataOwner != null && setDataOwner != getOwner()) {
                 throw new UnsupportedOperationException("设置的数据当前正受到其它" + MappingData.class.getSimpleName() + "管理:" + setDataOwner);
             }
