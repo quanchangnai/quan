@@ -1,12 +1,10 @@
 package quan.mongo;
 
-import quan.mongo.Data;
-
 /**
- * Long
+ * Long包装器
  * Created by quanchangnai on 2017/5/23.
  */
-public class LongWrapper implements Data {
+public class LongWrapper {
 
     //当前值
     private long current;
@@ -19,20 +17,20 @@ public class LongWrapper implements Data {
         this.current = value;
     }
 
-    public void set(long value) {
+    public long set(long value) {
+        long ret = this.current;
         this.current = value;
+        return ret;
     }
 
     public long get() {
         return this.current;
     }
 
-    @Override
     public void commit() {
         this.origin = current;
     }
 
-    @Override
     public void rollback() {
         this.current = origin;
     }
@@ -42,7 +40,6 @@ public class LongWrapper implements Data {
         return String.valueOf(current);
     }
 
-    @Override
     public String toDebugString() {
         return "{" +
                 "current=" + current +

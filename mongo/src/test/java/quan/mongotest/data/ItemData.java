@@ -1,10 +1,10 @@
-package quan.mongo.test;
+package quan.mongotest.data;
 
 import quan.mongo.IntegerWrapper;
 import quan.mongo.ReferenceData;
 
 /**
- * 实际是生成的
+ * 手写测试代码，实际应该是生成的
  * Created by quanchangnai on 2018/8/7.
  */
 public class ItemData extends ReferenceData {
@@ -19,35 +19,35 @@ public class ItemData extends ReferenceData {
     }
 
     @Override
-    public void commit() {
+    protected void commit() {
+        super.commit();
         itemId.commit();
         itemNum.commit();
-        originMappingData = currentMappingData;
     }
 
     @Override
-    public void rollback() {
+    protected void rollback() {
+        super.rollback();
         itemId.rollback();
         itemNum.rollback();
-        currentMappingData = originMappingData;
     }
 
     public int getItemId() {
         return itemId.get();
     }
 
-    public void setItemId(int itemId) {
-        onUpdateData();
-        this.itemId.set(itemId);
+    public int setItemId(int itemId) {
+        onUpdateData(null);
+        return this.itemId.set(itemId);
     }
 
     public int getItemNum() {
         return itemNum.get();
     }
 
-    public void setItemNum(int itemNum) {
-        onUpdateData();
-        this.itemNum.set(itemNum);
+    public int setItemNum(int itemNum) {
+        onUpdateData(null);
+        return this.itemNum.set(itemNum);
     }
 
     @Override
@@ -63,6 +63,7 @@ public class ItemData extends ReferenceData {
         return "ItemData{" +
                 "itemId=" + itemId.toDebugString() +
                 ", itemNum=" + itemNum.toDebugString() +
+                ", owner=" + getOwner() +
                 '}';
     }
 }

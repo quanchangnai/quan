@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * 事务
@@ -29,9 +30,9 @@ public class Transaction {
     private static ThreadLocal<Transaction> threadLocal = new ThreadLocal<>();
 
     /**
-     * 是否已经开启事务支持
+     * 是否已经开启声明式事务支持
      */
-    private static boolean enabled;
+    private static boolean declarative;
 
     /**
      * 事务是否失败
@@ -57,10 +58,10 @@ public class Transaction {
     }
 
     /**
-     * 开启事务支持
+     * 开启声明式事务支持
      */
-    public static synchronized void enable() {
-        if (enabled) {
+    public static synchronized void declarative() {
+        if (declarative) {
             return;
         }
         Instrumentation instrumentation = ByteBuddyAgent.install();
@@ -71,23 +72,13 @@ public class Transaction {
                 .type(ElementMatchers.hasAnnotation(ElementMatchers.annotationType(Transactional.class)))
                 .transform(new Transformer())
                 .installOn(instrumentation);
-        enabled = true;
+        declarative = true;
     }
 
     /**
-     * 检测是否开启了事务支持
-     */
-    private static void checkEnabled() {
-        if (!enabled) {
-            throw new UnsupportedOperationException("未开启事务支持");
-        }
-    }
-
-    /**
-     * 开始事务，重复开始时事务进入次数加1
+     * 开始事务，进入次数加1
      */
     public static void start() {
-        checkEnabled();
         Transaction current = current();
         if (current == null) {
             current = new Transaction();
@@ -97,12 +88,11 @@ public class Transaction {
     }
 
     /**
-     * 结束当前事务，事务进入次数减1，当值减到0时提交或回滚事务
+     * 结束当前事务，进入次数减1，当值减到0时提交或回滚事务
      *
      * @param fail 是否失败
      */
     public static void end(boolean fail) {
-        checkEnabled();
         Transaction current = current();
         if (current == null) {
             return;
@@ -114,6 +104,44 @@ public class Transaction {
             } else {
                 current.commit();
             }
+        }
+    }
+
+    /**
+     * 编程式事务
+     *
+     * @param task 在事务中执行的任务
+     */
+    public static void execute(Runnable task) {
+        boolean fail = false;
+        start();
+        try {
+            task.run();
+        } catch (Throwable e) {
+            fail = true;
+            throw e;
+        } finally {
+            end(fail);
+        }
+    }
+
+    /**
+     * 编程式事务
+     *
+     * @param task 在事务中执行的任务
+     * @param <T>  任务的返回结果
+     * @return
+     */
+    public static <T> T execute(Supplier<T> task) {
+        boolean fail = false;
+        start();
+        try {
+            return task.get();
+        } catch (Throwable e) {
+            fail = true;
+            throw e;
+        } finally {
+            end(fail);
         }
     }
 
@@ -172,7 +200,6 @@ public class Transaction {
      * @return
      */
     public static Transaction current() {
-        checkEnabled();
         return threadLocal.get();
     }
 
@@ -180,7 +207,6 @@ public class Transaction {
      * 标记当前事务为失败状态
      */
     public static void fail() {
-        checkEnabled();
         Transaction current = current();
         if (current != null) {
             current.failed = true;

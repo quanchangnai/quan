@@ -3,10 +3,10 @@ package quan.mongo;
 import java.util.*;
 
 /**
- * List
+ * List包装器
  * Created by quanchangnai on 2017/5/23.
  */
-public class ListWrapper<E> extends AbstractList<E> implements Data, UpdateCallback {
+public class ListWrapper<E> extends AbstractList<E> implements CollectionWrapper {
 
     //当前数据
     private List<E> current = new ArrayList<>();
@@ -15,37 +15,45 @@ public class ListWrapper<E> extends AbstractList<E> implements Data, UpdateCallb
     private Deque<Operation<E>> operations = new ArrayDeque<>();
 
     /**
-     * 所属的MappingData
+     * 当前拥有者
      */
-    private MappingData mappingData;
+    private MappingData currentOwner;
+
+    /**
+     * 原始拥有者
+     */
+    private MappingData originOwner;
+
+    public ListWrapper(MappingData owner) {
+        this.currentOwner = owner;
+        this.originOwner = owner;
+    }
 
     /**
      * 不要手动调用
      *
-     * @param mappingData
+     * @param owner
      */
-    @Override
-    public void setMappingData(MappingData mappingData) {
-        this.mappingData = mappingData;
+    public void setOwner(MappingData owner) {
+        this.currentOwner = owner;
     }
 
-    @Override
-    public MappingData getMappingData() {
-        return mappingData;
+    public MappingData getOwner() {
+        return currentOwner;
     }
 
-    @Override
     public void commit() {
+        originOwner = currentOwner;
         operations.clear();
         for (E e : current) {
-            if (e instanceof Data) {
-                ((Data) e).commit();
+            if (e instanceof ReferenceData) {
+                ((ReferenceData) e).commit();
             }
         }
     }
 
-    @Override
     public void rollback() {
+        currentOwner = originOwner;
         while (!operations.isEmpty()) {
             Operation<E> operation = operations.pop();
             if (operation.type.equals(Operation.ADD)) {
@@ -58,8 +66,8 @@ public class ListWrapper<E> extends AbstractList<E> implements Data, UpdateCallb
         }
         operations.clear();
         for (E e : current) {
-            if (e instanceof Data) {
-                ((Data) e).rollback();
+            if (e instanceof ReferenceData) {
+                ((ReferenceData) e).rollback();
             }
         }
     }
@@ -81,25 +89,26 @@ public class ListWrapper<E> extends AbstractList<E> implements Data, UpdateCallb
     }
 
 
-    private void onAdd(int index) {
+    public void add(int index, E e) {
         checkIndex(index, true);
-        onUpdateData();
+        onUpdateData(e);
+
         Operation<E> operation = new Operation<>(Operation.ADD, index, null);
         operations.push(operation);
 
-    }
-
-    public void add(int index, E e) {
-        onAdd(index);
         current.add(index, e);
-        if (e instanceof UpdateCallback) {
-            ((UpdateCallback) e).setMappingData(getMappingData());
+
+        if (e instanceof ReferenceData) {
+            ((ReferenceData) e).setOwner(getOwner());
         }
     }
 
-    private void onSet(int index) {
+    public E set(int index, E e) {
+        //校验
         checkIndex(index, false);
-        onUpdateData();
+        onUpdateData(e);
+
+        //记录操作
         E origin = null;
         if (index < current.size()) {
             origin = current.get(index);
@@ -107,32 +116,36 @@ public class ListWrapper<E> extends AbstractList<E> implements Data, UpdateCallb
         Operation<E> operation = new Operation<>(Operation.SET, index, origin);
         operations.push(operation);
 
-    }
-
-    public E set(int index, E e) {
-        onSet(index);
+        //替换数据
         E old = current.set(index, e);
-        if (e instanceof UpdateCallback) {
-            ((UpdateCallback) e).setMappingData(getMappingData());
+
+        if (e instanceof CollectionWrapper) {
+            ((CollectionWrapper) e).setOwner(getOwner());
+        }
+        if (old instanceof CollectionWrapper) {
+            ((CollectionWrapper) e).setOwner(null);
         }
         return old;
     }
 
-    private void onRemove(int index) {
+    @Override
+    public E remove(int index) {
+        //校验
         checkIndex(index, false);
-        onUpdateData();
+        onUpdateData(null);
         E origin = null;
         if (index < current.size()) {
             origin = current.get(index);
         }
         Operation<E> operation = new Operation<>(Operation.REMOVE, index, origin);
         operations.push(operation);
-    }
 
-    @Override
-    public E remove(int index) {
-        onRemove(index);
-        return current.remove(index);
+        //删除数据
+        E value = current.remove(index);
+        if (value instanceof CollectionWrapper) {
+            ((CollectionWrapper) value).setOwner(null);
+        }
+        return value;
     }
 
     public boolean remove(Object o) {
@@ -298,12 +311,11 @@ public class ListWrapper<E> extends AbstractList<E> implements Data, UpdateCallb
         return current.toString();
     }
 
-    @Override
     public String toDebugString() {
         String currentStr = "[";
         for (E e : current) {
-            if (e instanceof Data) {
-                currentStr += "" + ((Data) e).toDebugString() + ", ";
+            if (e instanceof ReferenceData) {
+                currentStr += "" + ((ReferenceData) e).toDebugString() + ", ";
             } else {
                 currentStr += "" + e + ", ";
             }
@@ -315,6 +327,7 @@ public class ListWrapper<E> extends AbstractList<E> implements Data, UpdateCallb
         return "{" +
                 "current=" + currentStr +
                 ", operations=" + operations +
+                ", owner=" + getOwner() +
                 '}';
     }
 

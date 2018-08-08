@@ -1,8 +1,9 @@
-package quan.mongo.test;
+package quan.mongotest;
 
-import quan.mongo.ListWrapper;
 import quan.mongo.Transaction;
 import quan.mongo.Transactional;
+import quan.mongotest.data.ItemData;
+import quan.mongotest.data.RoleData;
 
 /**
  * Created by quanchangnai on 2018/8/6.
@@ -13,7 +14,7 @@ public class Role {
     private RoleData roleData = new RoleData();
 
     public Role() {
-        init();
+        Transaction.execute(this::init);
     }
 
     @Override
@@ -21,7 +22,6 @@ public class Role {
         return "Role{}";
     }
 
-    @Transactional
     private void init() {
         for (int i = 1; i <= 2; i++) {
             roleData.getItems().add(new ItemData(i, i));
@@ -41,25 +41,36 @@ public class Role {
 //        };
 //        runnable1.run();
 
-        ListWrapper<ItemData> items = (ListWrapper<ItemData>) roleData.getItems();
-        System.err.println("items:" + items.size() + "," + items.toDebugString());
-        items.get(0).setItemNum(11);
+        System.err.println("roleData1:" + roleData.toDebugString());
+        if (roleData.getItems().isEmpty()) {
+            roleData.getItems().add(new ItemData(1, 2));
+        }
+        roleData.getItems().get(0).setItemNum(2);
+//        roleData.setItem(new ItemData(100, 100));
+        if (roleData.getItem() != null) {
+            roleData.getItem().setItemNum(200);
+            roleData.setItem(null);
+        }
 
         try {
             update2();
-        } catch (Throwable e) {
-            System.err.println("e:" + e);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
 //        Transaction.fail();
-
+        System.err.println("roleData2:" + roleData.toDebugString());
     }
 
     @Transactional
     public void update2() {
         System.err.println("update2=================");
-        roleData.getItems().get(1).setItemNum(12);
-//        throw new RuntimeException("update exception");
+//        roleData.getItems().get(1).setItemNum(12);
+        if (roleData.getItems().size() > 1) {
+            ItemData itemData = roleData.getItems().remove(1);
+            System.err.println("itemData=" + itemData.toDebugString());
+        }
+        throw new RuntimeException("update exception");
 
     }
 }

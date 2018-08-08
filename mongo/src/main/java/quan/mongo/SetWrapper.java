@@ -6,10 +6,10 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * Set
+ * Set包装器
  * Created by quanchangnai on 2017/5/23.
  */
-public class SetWrapper<E> extends AbstractSet<E> implements Data, UpdateCallback {
+public class SetWrapper<E> extends AbstractSet<E> implements CollectionWrapper {
 
     //当前数据
     private Set<E> current = new HashSet<>();
@@ -21,45 +21,55 @@ public class SetWrapper<E> extends AbstractSet<E> implements Data, UpdateCallbac
     private Set<E> removed = new HashSet<>();
 
     /**
-     * 所属的MappingData
+     * 当前拥有者
      */
-    private MappingData mappingData;
+    private MappingData currentOwner;
+
+    /**
+     * 原始拥有者
+     */
+    private MappingData originOwner;
+
+    public SetWrapper(MappingData owner) {
+        this.currentOwner = owner;
+        this.originOwner = owner;
+    }
 
     /**
      * 不要手动调用
      *
-     * @param mappingData
+     * @param owner
      */
     @Override
-    public void setMappingData(MappingData mappingData) {
-        this.mappingData = mappingData;
+    public void setOwner(MappingData owner) {
+        this.currentOwner = owner;
     }
 
     @Override
-    public MappingData getMappingData() {
-        return mappingData;
+    public MappingData getOwner() {
+        return currentOwner;
     }
 
-    @Override
     public void commit() {
+        originOwner = currentOwner;
         added.clear();
         removed.clear();
         for (E e : current) {
-            if (e instanceof Data) {
-                ((Data) e).commit();
+            if (e instanceof ReferenceData) {
+                ((ReferenceData) e).commit();
             }
         }
     }
 
-    @Override
     public void rollback() {
+        currentOwner = originOwner;
         current.removeAll(added);
         current.addAll(removed);
         added.clear();
         removed.clear();
         for (E e : current) {
-            if (e instanceof Data) {
-                ((Data) e).rollback();
+            if (e instanceof ReferenceData) {
+                ((ReferenceData) e).rollback();
             }
         }
     }
@@ -77,13 +87,13 @@ public class SetWrapper<E> extends AbstractSet<E> implements Data, UpdateCallbac
 
     @Override
     public boolean add(E e) {
-        onUpdateData();
+        onUpdateData(e);
         boolean notContains = current.add(e);
         if (!removed.remove(e) && notContains) {
             added.add(e);
         }
-        if (e instanceof UpdateCallback) {
-            ((UpdateCallback) e).setMappingData(getMappingData());
+        if (e instanceof ReferenceData) {
+            ((ReferenceData) e).setOwner(getOwner());
         }
         return notContains;
     }
@@ -117,10 +127,13 @@ public class SetWrapper<E> extends AbstractSet<E> implements Data, UpdateCallbac
 
         @Override
         public void remove() {
-            onUpdateData();
+            onUpdateData(null);
             iterator.remove();
             if (!added.remove(lastRet)) {
                 removed.add(lastRet);
+                if (lastRet instanceof ReferenceData) {
+                    ((ReferenceData) lastRet).setOwner(null);
+                }
             }
         }
     }
@@ -130,20 +143,20 @@ public class SetWrapper<E> extends AbstractSet<E> implements Data, UpdateCallbac
         return current.toString();
     }
 
-    @Override
     public String toDebugString() {
         return "{" +
                 "current=" + toDebugString(current) +
                 ", added=" + toDebugString(added) +
                 ", removed=" + toDebugString(removed) +
+                ", owner=" + getOwner() +
                 '}';
     }
 
     public String toDebugString(Set<E> set) {
         String str = "[";
         for (E e : set) {
-            if (e instanceof Data) {
-                str += "" + ((Data) e).toDebugString() + ", ";
+            if (e instanceof ReferenceData) {
+                str += "" + ((ReferenceData) e).toDebugString() + ", ";
             } else {
                 str += "" + e + ", ";
             }

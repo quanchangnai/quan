@@ -4,15 +4,10 @@ package quan.mongo;
  * 映射数据
  * Created by quanchangnai on 2018/8/6.
  */
-public abstract class MappingData implements Data, UpdateCallback {
+public abstract class MappingData extends Data {
 
     @Override
-    public void setMappingData(MappingData mappingData) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public MappingData getMappingData() {
+    protected MappingData getOwner() {
         return this;
     }
 
@@ -21,14 +16,26 @@ public abstract class MappingData implements Data, UpdateCallback {
      *
      * @return
      */
-    public abstract String collection();
+    public String collection() {
+        return getClass().getName();
+    }
 
     /**
-     * 索引
+     * 普通索引
      *
      * @return
      */
-    public abstract String[] indexes();
+    public String[] indexes() {
+        return new String[0];
+    }
 
+    /**
+     * 唯一索引
+     *
+     * @return
+     */
+    public String[] uniques() {
+        return new String[0];
+    }
 
 }

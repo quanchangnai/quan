@@ -4,10 +4,10 @@ import java.util.*;
 import java.util.function.Consumer;
 
 /**
- * Map
+ * Map包装器
  * Created by quanchangnai on 2017/5/23.
  */
-public class MapWrapper<K, V> extends AbstractMap<K, V> implements Data, UpdateCallback {
+public class MapWrapper<K, V> extends AbstractMap<K, V> implements CollectionWrapper {
 
     //当前数据
     private Map<K, V> current = new HashMap<>();
@@ -22,40 +22,50 @@ public class MapWrapper<K, V> extends AbstractMap<K, V> implements Data, UpdateC
     private final Map<K, V> replaced = new HashMap<>();
 
     /**
-     * 所属的MappingData
+     * 当前拥有者
      */
-    private MappingData mappingData;
+    private MappingData currentOwner;
+
+    /**
+     * 原始拥有者
+     */
+    private MappingData originOwner;
+
+    public MapWrapper(MappingData owner) {
+        this.currentOwner = owner;
+        this.originOwner = owner;
+    }
 
     /**
      * 不要手动调用
      *
-     * @param mappingData
+     * @param owner
      */
     @Override
-    public void setMappingData(MappingData mappingData) {
-        this.mappingData = mappingData;
+    public void setOwner(MappingData owner) {
+        this.currentOwner = owner;
     }
 
     @Override
-    public MappingData getMappingData() {
-        return mappingData;
+    public MappingData getOwner() {
+        return currentOwner;
     }
 
 
-    @Override
     public void commit() {
+        originOwner = currentOwner;
         added.clear();
         removed.clear();
         replaced.clear();
         for (V value : current.values()) {
-            if (value instanceof Data) {
-                ((Data) value).commit();
+            if (value instanceof ReferenceData) {
+                ((ReferenceData) value).commit();
             }
         }
     }
 
-    @Override
     public void rollback() {
+        currentOwner = originOwner;
         current.keySet().removeAll(added);
         current.putAll(removed);
         current.putAll(replaced);
@@ -63,14 +73,15 @@ public class MapWrapper<K, V> extends AbstractMap<K, V> implements Data, UpdateC
         removed.clear();
         replaced.clear();
         for (V value : current.values()) {
-            if (value instanceof Data) {
-                ((Data) value).rollback();
+            if (value instanceof ReferenceData) {
+                ((ReferenceData) value).rollback();
             }
         }
     }
 
-    private void onPut(K key, V origin) {
-        onUpdateData();
+    private void onPut(K key, V origin, V value) {
+        onUpdateData(value);
+
         if (this.added.contains(key)) {
             return; // 之前有添加数据的记录，不需要再次记录
         }
@@ -94,23 +105,30 @@ public class MapWrapper<K, V> extends AbstractMap<K, V> implements Data, UpdateC
 
     @Override
     public V put(K key, V value) {
-        if (null == value || null == key) {
-            throw new NullPointerException();
+        Objects.requireNonNull(key);
+        Objects.requireNonNull(value);
+
+        onPut(key, current.get(key), value);
+
+        V origin = current.put(key, value);
+
+        if (value instanceof ReferenceData) {
+            ((ReferenceData) value).setOwner(getOwner());
         }
-        V origin = current.get(key);
-        onPut(key, origin);
-        current.put(key, value);
-        if (value instanceof UpdateCallback) {
-            ((UpdateCallback) value).setMappingData(getMappingData());
+        if (origin instanceof ReferenceData) {
+            ((ReferenceData) origin).setOwner(null);
         }
         return origin;
     }
 
     private void onRemove(K key, V value) {
-        onUpdateData();
+        onUpdateData(null);
         if (!this.added.remove(key)) {
             V replacedValue = this.replaced.remove(key);
             this.removed.put(key, replacedValue == null ? value : replacedValue);
+        }
+        if (value instanceof ReferenceData) {
+            ((ReferenceData) value).setOwner(null);
         }
     }
 
@@ -121,6 +139,9 @@ public class MapWrapper<K, V> extends AbstractMap<K, V> implements Data, UpdateC
             onRemove((K) key, value);
         }
         current.remove(key);
+        if (value instanceof ReferenceData) {
+            ((ReferenceData) value).setOwner(null);
+        }
         return value;
     }
 
@@ -326,13 +347,13 @@ public class MapWrapper<K, V> extends AbstractMap<K, V> implements Data, UpdateC
         return current.toString();
     }
 
-    @Override
     public String toDebugString() {
         return "{" +
                 "current=" + toDebugString(current) +
                 ", added=" + added +
                 ", removed=" + toDebugString(removed) +
                 ", replaced=" + toDebugString(replaced) +
+                ", owner=" + getOwner() +
                 '}';
     }
 
@@ -341,8 +362,8 @@ public class MapWrapper<K, V> extends AbstractMap<K, V> implements Data, UpdateC
         for (K key : current.keySet()) {
             V value = current.get(key);
             str += "" + key;
-            if (value instanceof Data) {
-                str += "=" + ((Data) value).toDebugString() + ", ";
+            if (value instanceof ReferenceData) {
+                str += "=" + ((ReferenceData) value).toDebugString() + ", ";
             } else {
                 str += "=" + value + ", ";
             }

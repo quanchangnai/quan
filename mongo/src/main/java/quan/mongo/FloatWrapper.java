@@ -1,12 +1,10 @@
 package quan.mongo;
 
-import quan.mongo.Data;
-
 /**
- * Float
+ * Float包装器
  * Created by quanchangnai on 2017/5/23.
  */
-public class FloatWrapper implements Data {
+public class FloatWrapper {
 
     //当前值
     private float current;
@@ -19,20 +17,20 @@ public class FloatWrapper implements Data {
         this.current = value;
     }
 
-    public void set(float value) {
+    public float set(float value) {
+        float ret = this.current;
         this.current = value;
+        return ret;
     }
 
     public float get() {
         return this.current;
     }
 
-    @Override
     public void commit() {
         this.origin = current;
     }
 
-    @Override
     public void rollback() {
         this.current = origin;
     }
@@ -42,7 +40,6 @@ public class FloatWrapper implements Data {
         return String.valueOf(current);
     }
 
-    @Override
     public String toDebugString() {
         return "{" +
                 "current=" + current +

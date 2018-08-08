@@ -1,12 +1,10 @@
 package quan.mongo;
 
-import quan.mongo.Data;
-
 /**
- * String
+ * String包装器
  * Created by quanchangnai on 2017/5/23.
  */
-public class StringWrapper implements Data {
+public class StringWrapper {
 
     //当前值
     private String current;
@@ -19,20 +17,20 @@ public class StringWrapper implements Data {
         this.current = value;
     }
 
-    public void set(String value) {
+    public String set(String value) {
+        String ret = this.current;
         this.current = value;
+        return ret;
     }
 
     public String get() {
         return this.current;
     }
 
-    @Override
     public void commit() {
         this.origin = current;
     }
 
-    @Override
     public void rollback() {
         this.current = origin;
     }
@@ -42,7 +40,6 @@ public class StringWrapper implements Data {
         return String.valueOf(current);
     }
 
-    @Override
     public String toDebugString() {
         return "{" +
                 "current='" + current + '\'' +

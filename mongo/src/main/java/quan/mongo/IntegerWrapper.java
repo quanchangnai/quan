@@ -1,10 +1,10 @@
 package quan.mongo;
 
 /**
- * Integer
+ * Integer包装器
  * Created by quanchangnai on 2017/5/23.
  */
-public class IntegerWrapper implements Data {
+public class IntegerWrapper {
 
     //当前值
     private int current;
@@ -17,20 +17,20 @@ public class IntegerWrapper implements Data {
         this.origin = value;
     }
 
-    public void set(int value) {
+    public int set(int value) {
+        int ret = this.current;
         this.current = value;
+        return ret;
     }
 
     public int get() {
         return this.current;
     }
 
-    @Override
     public void commit() {
         this.origin = current;
     }
 
-    @Override
     public void rollback() {
         this.current = origin;
     }
@@ -55,7 +55,6 @@ public class IntegerWrapper implements Data {
         return String.valueOf(current);
     }
 
-    @Override
     public String toDebugString() {
         return "{" +
                 "current=" + current +

@@ -1,10 +1,10 @@
 package quan.mongo;
 
 /**
- * Boolean
+ * Boolean包装器
  * Created by quanchangnai on 2017/5/23.
  */
-public class BooleanWrapper implements Data {
+public class BooleanWrapper {
 
     //当前值
     private boolean current;
@@ -17,20 +17,20 @@ public class BooleanWrapper implements Data {
         this.origin = value;
     }
 
-    public void set(boolean value) {
+    public boolean set(boolean value) {
+        boolean ret =  this.current;
         this.current = value;
+        return ret;
     }
 
     public boolean get() {
         return this.current;
     }
 
-    @Override
     public void commit() {
         this.origin = current;
     }
 
-    @Override
     public void rollback() {
         this.current = origin;
     }
@@ -55,7 +55,6 @@ public class BooleanWrapper implements Data {
         return String.valueOf(current);
     }
 
-    @Override
     public String toDebugString() {
         return "{" +
                 "current=" + current +

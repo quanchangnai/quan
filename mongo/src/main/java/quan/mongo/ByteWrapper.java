@@ -1,10 +1,10 @@
 package quan.mongo;
 
 /**
- * Byte
+ * Byte包装器
  * Created by quanchangnai on 2017/5/23.
  */
-public class ByteWrapper implements Data {
+public class ByteWrapper{
 
     //当前值
     private byte current;
@@ -17,20 +17,20 @@ public class ByteWrapper implements Data {
         this.origin = value;
     }
 
-    public void set(byte value) {
+    public byte set(byte value) {
+        byte ret = this.current;
         this.current = value;
+        return ret;
     }
 
     public byte get() {
         return this.current;
     }
 
-    @Override
     public void commit() {
         this.origin = current;
     }
 
-    @Override
     public void rollback() {
         this.current = origin;
     }
@@ -55,7 +55,6 @@ public class ByteWrapper implements Data {
         return String.valueOf(current);
     }
 
-    @Override
     public String toDebugString() {
         return "{" +
                 "current=" + current +

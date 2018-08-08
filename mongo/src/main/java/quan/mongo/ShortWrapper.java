@@ -1,10 +1,10 @@
 package quan.mongo;
 
 /**
- * Short
+ * Short包装器
  * Created by quanchangnai on 2017/5/23.
  */
-public class ShortWrapper implements Data {
+public class ShortWrapper {
 
     //当前值
     private short current;
@@ -17,20 +17,20 @@ public class ShortWrapper implements Data {
         this.origin = value;
     }
 
-    public void set(short value) {
+    public short set(short value) {
+        short ret = this.current;
         this.current = value;
+        return ret;
     }
 
     public short get() {
         return this.current;
     }
 
-    @Override
     public void commit() {
         this.origin = current;
     }
 
-    @Override
     public void rollback() {
         this.current = origin;
     }
@@ -55,7 +55,6 @@ public class ShortWrapper implements Data {
         return String.valueOf(current);
     }
 
-    @Override
     public String toDebugString() {
         return "{" +
                 "current=" + current +

@@ -4,30 +4,40 @@ package quan.mongo;
  * 引用数据
  * Created by quanchangnai on 2018/8/6.
  */
-public abstract class ReferenceData implements Data, UpdateCallback {
+public abstract class ReferenceData extends Data {
 
     /**
-     * 所属的MappingData，当前值
+     * 当前拥有者
      */
-    protected MappingData currentMappingData;
+    private MappingData currentOwner;
 
     /**
-     * 所属的MappingData，原始值
+     * 原始拥有者
      */
-    protected MappingData originMappingData;
+    private MappingData originOwner;
 
-    /**
-     * 不要手动调用
-     *
-     * @param mappingData
-     */
-    public void setMappingData(MappingData mappingData) {
-        this.currentMappingData = mappingData;
+    protected void setOwner(MappingData owner) {
+        this.currentOwner = owner;
     }
 
     @Override
-    public MappingData getMappingData() {
-        return currentMappingData;
+    protected MappingData getOwner() {
+        return currentOwner;
     }
+
+    /**
+     * 提交数据
+     */
+    protected void commit() {
+        originOwner = currentOwner;
+    }
+
+    /**
+     * 回滚数据
+     */
+    protected void rollback() {
+        currentOwner = originOwner;
+    }
+
 
 }

@@ -1,4 +1,4 @@
-package quan.mongo.test;
+package quan.mongotest;
 
 import quan.mongo.Transaction;
 
@@ -8,7 +8,7 @@ import quan.mongo.Transaction;
 public class MongoTest {
 
     public static void main(String[] args) throws Exception {
-        Transaction.enable();
+        Transaction.declarative();
 
         Role role = new Role();
         while (true) {

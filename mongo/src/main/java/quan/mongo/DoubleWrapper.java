@@ -3,10 +3,10 @@ package quan.mongo;
 import quan.mongo.Data;
 
 /**
- * Double
+ * Double包装器
  * Created by quanchangnai on 2017/5/23.
  */
-public class DoubleWrapper implements Data {
+public class DoubleWrapper {
 
     //当前值
     private double current;
@@ -19,20 +19,20 @@ public class DoubleWrapper implements Data {
         this.current = value;
     }
 
-    public void set(double value) {
+    public double set(double value) {
+        double ret =  this.current;
         this.current = value;
+        return ret;
     }
 
     public double get() {
         return this.current;
     }
 
-    @Override
     public void commit() {
         this.origin = current;
     }
 
-    @Override
     public void rollback() {
         this.current = origin;
     }
@@ -42,7 +42,6 @@ public class DoubleWrapper implements Data {
         return String.valueOf(current);
     }
 
-    @Override
     public String toDebugString() {
         return "{" +
                 "current=" + current +
