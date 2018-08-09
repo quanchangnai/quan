@@ -12,6 +12,9 @@ public class BooleanWrapper {
     //原始值
     private boolean origin;
 
+    public BooleanWrapper() {
+    }
+
     public BooleanWrapper(boolean value) {
         this.current = value;
         this.origin = value;

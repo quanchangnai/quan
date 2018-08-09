@@ -11,10 +11,11 @@ import quan.mongotest.data.RoleData;
 @Transactional
 public class Role {
 
-    private RoleData roleData = new RoleData();
+    private RoleData roleData = new RoleData(1000);
 
     public Role() {
-        Transaction.execute(this::init);
+//        Transaction.execute(this::init);
+        init();
     }
 
     @Override
@@ -22,7 +23,9 @@ public class Role {
         return "Role{}";
     }
 
+
     private void init() {
+//        roleData = new RoleData(1000);
         for (int i = 1; i <= 2; i++) {
             roleData.getItems().add(new ItemData(i, i));
         }
@@ -52,10 +55,12 @@ public class Role {
             roleData.setItem(null);
         }
 
+        roleData.getList2().add(roleData.getList2().size() + 1);
+
         try {
-            String s = Transaction.execute(this::update2);
+            String s = Transaction.execute(this::update2);//495857386
             System.err.println("update2=" + s);
-            update2();
+//            update2();
         } catch (Exception e) {
             e.printStackTrace();
         }

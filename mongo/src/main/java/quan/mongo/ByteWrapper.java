@@ -12,6 +12,9 @@ public class ByteWrapper{
     //原始值
     private byte origin;
 
+    public ByteWrapper() {
+    }
+
     public ByteWrapper(byte value) {
         this.current = value;
         this.origin = value;

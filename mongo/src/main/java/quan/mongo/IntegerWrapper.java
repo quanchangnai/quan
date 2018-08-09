@@ -12,6 +12,9 @@ public class IntegerWrapper {
     //原始值
     private int origin;
 
+    public IntegerWrapper() {
+    }
+
     public IntegerWrapper(int value) {
         this.current = value;
         this.origin = value;

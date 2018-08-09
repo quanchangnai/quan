@@ -1,5 +1,7 @@
 package quan.mongo;
 
+import org.bson.Document;
+
 /**
  * 支持提交、回滚的数据，用以实现事务
  * Created by quanchangnai on 2018/8/6.
@@ -24,13 +26,13 @@ public abstract class Data {
     protected abstract void rollback();
 
     /**
-     * 修改数据时
+     * 校验设置数据
      *
-     * @param setData
+     * @param setData 设置的引用数据
      */
-    protected void onUpdateData(ReferenceData setData) {
+    protected void checkSetData(ReferenceData setData) {
         Transaction transaction = Transaction.current();
-        if (transaction == null) {
+        if (transaction == null && !getOwner().isDecodingState()) {
             throw new UnsupportedOperationException("当前不在事务中，禁止修改数据");
         }
         if (setData != null) {
@@ -40,8 +42,20 @@ public abstract class Data {
             }
         }
         //交给事务管理
-        transaction.addMappingData(getOwner());
+        transaction.manageData(getOwner());
     }
+
+    /**
+     * 编码
+     */
+    public abstract Document doEncode();
+
+    /**
+     * 解码
+     *
+     * @param document
+     */
+    public abstract void doDecode(Document document);
 
     /**
      * 调试数据

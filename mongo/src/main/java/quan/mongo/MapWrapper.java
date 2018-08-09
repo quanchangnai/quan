@@ -80,7 +80,11 @@ public class MapWrapper<K, V> extends AbstractMap<K, V> implements CollectionWra
     }
 
     private void onPut(K key, V origin, V value) {
-        onUpdateData(value);
+        Objects.requireNonNull(key, "key不能为null");
+        if (!allowedClasses.contains(key.getClass())) {
+            throw new IllegalArgumentException("key的类型非法：" + key.getClass());
+        }
+        checkUpdateData(true, value);
 
         if (this.added.contains(key)) {
             return; // 之前有添加数据的记录，不需要再次记录
@@ -105,9 +109,6 @@ public class MapWrapper<K, V> extends AbstractMap<K, V> implements CollectionWra
 
     @Override
     public V put(K key, V value) {
-        Objects.requireNonNull(key);
-        Objects.requireNonNull(value);
-
         onPut(key, current.get(key), value);
 
         V origin = current.put(key, value);
@@ -122,7 +123,7 @@ public class MapWrapper<K, V> extends AbstractMap<K, V> implements CollectionWra
     }
 
     private void onRemove(K key, V value) {
-        onUpdateData(null);
+        checkUpdateData(false, null);
         if (!this.added.remove(key)) {
             V replacedValue = this.replaced.remove(key);
             this.removed.put(key, replacedValue == null ? value : replacedValue);

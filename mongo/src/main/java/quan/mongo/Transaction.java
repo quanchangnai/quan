@@ -47,7 +47,7 @@ public class Transaction {
     /**
      * 当前事务管理的MappingData
      */
-    private Set<MappingData> mappingDatas = new HashSet();
+    private Set<MappingData> managedDatas = new HashSet();
 
     /**
      * 事务提交后需要执行的任务
@@ -149,12 +149,20 @@ public class Transaction {
      * 执行成功时提交事务
      */
     private void commit() {
-        System.err.println("commit==================");
-        for (MappingData mappingData : mappingDatas) {
-            mappingData.commit();
+        for (MappingData data : managedDatas) {
+            data.commit();
+            if (data.isNewState()) {
+                //异步插入
+                System.err.println("异步插入==================");
+                data.encode();
+            } else if (data.isNormalState()) {
+                //异步更新
+                System.err.println("异步更新==================");
+                data.encode();
+            }
         }
 
-        mappingDatas.clear();
+        managedDatas.clear();
         threadLocal.set(null);
 
         for (Runnable task : afterCommitTasks) {
@@ -171,23 +179,23 @@ public class Transaction {
      */
     private void rollback() {
         System.err.println("rollback==================");
-        for (MappingData mappingData : mappingDatas) {
-            mappingData.rollback();
+        for (MappingData data : managedDatas) {
+            data.rollback();
         }
-        mappingDatas.clear();
+        managedDatas.clear();
         threadLocal.set(null);
     }
 
     /**
-     * 添加MappingData到受事务管理的集合里
+     * 事务管理MappingData
      *
-     * @param mappingData
+     * @param data
      */
-    void addMappingData(MappingData mappingData) {
-        if (mappingData == null) {
+    void manageData(MappingData data) {
+        if (data == null) {
             return;
         }
-        mappingDatas.add(mappingData);
+        managedDatas.add(data);
     }
 
     public boolean isFailed() {

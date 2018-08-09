@@ -12,6 +12,9 @@ public class FloatWrapper {
     //原始值
     private float origin;
 
+    public FloatWrapper() {
+    }
+
     public FloatWrapper(float value) {
         this.origin = value;
         this.current = value;

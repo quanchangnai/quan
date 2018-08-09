@@ -12,6 +12,9 @@ public class LongWrapper {
     //原始值
     private long origin;
 
+    public LongWrapper() {
+    }
+
     public LongWrapper(long value) {
         this.origin = value;
         this.current = value;

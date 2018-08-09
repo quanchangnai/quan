@@ -26,9 +26,6 @@ public class ReferenceWrapper<V extends ReferenceData> {
         if (origin != current && origin != null) {
             origin.rollback();
         }
-        if (origin != current && current != null) {
-            current.rollback();
-        }
         current = origin;
     }
 

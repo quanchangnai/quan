@@ -12,6 +12,11 @@ public class StringWrapper {
     //原始值
     private String origin;
 
+    public StringWrapper() {
+        this.origin = "";
+        this.current = "";
+    }
+
     public StringWrapper(String value) {
         this.origin = value;
         this.current = value;

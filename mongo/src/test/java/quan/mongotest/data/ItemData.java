@@ -1,6 +1,8 @@
 package quan.mongotest.data;
 
+import org.bson.Document;
 import quan.mongo.IntegerWrapper;
+import quan.mongo.MappingData;
 import quan.mongo.ReferenceData;
 
 /**
@@ -32,12 +34,18 @@ public class ItemData extends ReferenceData {
         itemNum.rollback();
     }
 
+    @Override
+    protected void setOwner(MappingData owner) {
+        super.setOwner(owner);
+        //其他
+    }
+
     public int getItemId() {
         return itemId.get();
     }
 
     public int setItemId(int itemId) {
-        onUpdateData(null);
+        checkSetData(null);
         return this.itemId.set(itemId);
     }
 
@@ -46,8 +54,18 @@ public class ItemData extends ReferenceData {
     }
 
     public int setItemNum(int itemNum) {
-        onUpdateData(null);
+        checkSetData(null);
         return this.itemNum.set(itemNum);
+    }
+
+    @Override
+    public void doDecode(Document document) {
+
+    }
+
+    @Override
+    public Document doEncode() {
+        return null;
     }
 
     @Override

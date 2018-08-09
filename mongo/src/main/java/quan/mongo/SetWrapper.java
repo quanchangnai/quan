@@ -87,7 +87,7 @@ public class SetWrapper<E> extends AbstractSet<E> implements CollectionWrapper {
 
     @Override
     public boolean add(E e) {
-        onUpdateData(e);
+        checkUpdateData(true, e);
         boolean notContains = current.add(e);
         if (!removed.remove(e) && notContains) {
             added.add(e);
@@ -127,7 +127,7 @@ public class SetWrapper<E> extends AbstractSet<E> implements CollectionWrapper {
 
         @Override
         public void remove() {
-            onUpdateData(null);
+            checkUpdateData(false, null);
             iterator.remove();
             if (!added.remove(lastRet)) {
                 removed.add(lastRet);

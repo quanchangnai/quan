@@ -91,7 +91,7 @@ public class ListWrapper<E> extends AbstractList<E> implements CollectionWrapper
 
     public void add(int index, E e) {
         checkIndex(index, true);
-        onUpdateData(e);
+        checkUpdateData(true, e);
 
         Operation<E> operation = new Operation<>(Operation.ADD, index, null);
         operations.push(operation);
@@ -106,7 +106,7 @@ public class ListWrapper<E> extends AbstractList<E> implements CollectionWrapper
     public E set(int index, E e) {
         //校验
         checkIndex(index, false);
-        onUpdateData(e);
+        checkUpdateData(true, e);
 
         //记录操作
         E origin = null;
@@ -132,7 +132,7 @@ public class ListWrapper<E> extends AbstractList<E> implements CollectionWrapper
     public E remove(int index) {
         //校验
         checkIndex(index, false);
-        onUpdateData(null);
+        checkUpdateData(false, null);
         E origin = null;
         if (index < current.size()) {
             origin = current.get(index);

@@ -12,6 +12,9 @@ public class ShortWrapper {
     //原始值
     private short origin;
 
+    public ShortWrapper() {
+    }
+
     public ShortWrapper(short value) {
         this.current = value;
         this.origin = value;

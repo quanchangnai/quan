@@ -12,6 +12,9 @@ public class DoubleWrapper {
     //原始值
     private double origin;
 
+    public DoubleWrapper() {
+    }
+
     public DoubleWrapper(double value) {
         this.origin = value;
         this.current = value;
