@@ -1,7 +1,7 @@
 package quan.mongo;
 
 /**
- * 引用数据
+ * 引用数据，对应MongoDB的一个内嵌文档
  * Created by quanchangnai on 2018/8/6.
  */
 public abstract class ReferenceData extends Data {

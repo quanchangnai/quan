@@ -3,7 +3,7 @@ package quan.mongo;
 import org.bson.Document;
 
 /**
- * 映射数据
+ * 映射数据，映射到MongoDB集合的一个顶层文档，相当于关系型数据库表的一行
  * Created by quanchangnai on 2018/8/6.
  */
 public abstract class MappingData extends Data {

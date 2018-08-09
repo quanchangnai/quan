@@ -6,7 +6,7 @@ import java.util.*;
  * List包装器
  * Created by quanchangnai on 2017/5/23.
  */
-public class ListWrapper<E> extends AbstractList<E> implements CollectionWrapper {
+public class ListWrapper<E> extends AbstractList<E> implements Container {
 
     //当前数据
     private List<E> current = new ArrayList<>();
@@ -119,11 +119,11 @@ public class ListWrapper<E> extends AbstractList<E> implements CollectionWrapper
         //替换数据
         E old = current.set(index, e);
 
-        if (e instanceof CollectionWrapper) {
-            ((CollectionWrapper) e).setOwner(getOwner());
+        if (e instanceof Container) {
+            ((Container) e).setOwner(getOwner());
         }
-        if (old instanceof CollectionWrapper) {
-            ((CollectionWrapper) e).setOwner(null);
+        if (old instanceof Container) {
+            ((Container) e).setOwner(null);
         }
         return old;
     }
@@ -142,8 +142,8 @@ public class ListWrapper<E> extends AbstractList<E> implements CollectionWrapper
 
         //删除数据
         E value = current.remove(index);
-        if (value instanceof CollectionWrapper) {
-            ((CollectionWrapper) value).setOwner(null);
+        if (value instanceof Container) {
+            ((Container) value).setOwner(null);
         }
         return value;
     }

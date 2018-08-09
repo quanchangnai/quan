@@ -7,15 +7,15 @@ import java.util.function.Consumer;
  * Map包装器
  * Created by quanchangnai on 2017/5/23.
  */
-public class MapWrapper<K, V> extends AbstractMap<K, V> implements CollectionWrapper {
+public class MapWrapper<K, V> extends AbstractMap<K, V> implements Container {
 
     //当前数据
     private Map<K, V> current = new HashMap<>();
 
-    //记录添加数据的key
+    //记录添加的数据
     private Set<K> added = new HashSet<>();
 
-    //记录删除数据
+    //记录删除的数据
     private Map<K, V> removed = new HashMap<>();
 
     //记录被替换的数据

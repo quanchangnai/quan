@@ -9,7 +9,7 @@ import java.util.Set;
  * Set包装器
  * Created by quanchangnai on 2017/5/23.
  */
-public class SetWrapper<E> extends AbstractSet<E> implements CollectionWrapper {
+public class SetWrapper<E> extends AbstractSet<E> implements Container {
 
     //当前数据
     private Set<E> current = new HashSet<>();

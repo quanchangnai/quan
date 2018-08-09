@@ -5,25 +5,25 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * 集合包装器，支持提交、回滚数据
+ * 支持提交、回滚数据的容器
  * Created by quanchangnai on 2018/8/6.
  */
-public interface CollectionWrapper {
+public interface Container {
 
     /**
-     * 允许添加到集合里的数据类型
+     * 允许添加到容器里的数据类型
      */
     List<Class<?>> allowedClasses = Arrays.asList(Byte.class, Boolean.class, Short.class, Integer.class, Long.class, Double.class, String.class);
 
     /**
-     * 拥有者
+     * 容器的拥有者
      *
      * @param owner
      */
     void setOwner(MappingData owner);
 
     /**
-     * 拥有者
+     * 容器的拥有者
      */
     MappingData getOwner();
 

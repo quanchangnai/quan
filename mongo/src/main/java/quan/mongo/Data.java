@@ -3,13 +3,13 @@ package quan.mongo;
 import org.bson.Document;
 
 /**
- * 支持提交、回滚的数据，用以实现事务
+ * 支持提交、回滚的数据
  * Created by quanchangnai on 2018/8/6.
  */
 public abstract class Data {
 
     /**
-     * 拥有者
+     * 数据的拥有者
      *
      * @return
      */
