@@ -39,7 +39,7 @@ public class HandlerChain {
         return connection.getExecutor();
     }
 
-    public void addLast(NetworkHandler handler) {
+    public void addLast(Handler handler) {
         Objects.requireNonNull(handler, "参数handler不能为空");
         HandlerContext handlerContext = new HandlerContext(handler, this);
         handlerContext.prev = tail.prev;
@@ -53,7 +53,7 @@ public class HandlerChain {
         }
     }
 
-    public void addFirst(NetworkHandler handler) {
+    public void addFirst(Handler handler) {
         Objects.requireNonNull(handler, "参数handler不能为空");
         HandlerContext handlerContext = new HandlerContext(handler, this);
         handlerContext.prev = head;
@@ -67,7 +67,7 @@ public class HandlerChain {
         }
     }
 
-    public void remove(NetworkHandler handler) {
+    public void remove(Handler handler) {
         if (handler == null) {
             throw new NullPointerException("handler");
         }
@@ -121,12 +121,12 @@ public class HandlerChain {
 
     private class HeadHandlerContext extends HandlerContext implements OutboundHandler, InboundHandler {
 
-        public HeadHandlerContext(NetworkHandler handler, HandlerChain chain) {
+        public HeadHandlerContext(Handler handler, HandlerChain chain) {
             super(handler, chain);
         }
 
         @Override
-        public NetworkHandler getHandler() {
+        public Handler getHandler() {
             return this;
         }
 
@@ -148,12 +148,12 @@ public class HandlerChain {
 
     private class TailHandlerContext extends HandlerContext implements InboundHandler {
 
-        public TailHandlerContext(NetworkHandler handler, HandlerChain chain) {
+        public TailHandlerContext(Handler handler, HandlerChain chain) {
             super(handler, chain);
         }
 
         @Override
-        public NetworkHandler getHandler() {
+        public Handler getHandler() {
             return this;
         }
 

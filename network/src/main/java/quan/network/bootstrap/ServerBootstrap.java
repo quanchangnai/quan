@@ -1,7 +1,7 @@
 package quan.network.bootstrap;
 
 import quan.network.connection.Connection;
-import quan.network.handler.NetworkHandler;
+import quan.network.handler.Handler;
 import quan.network.util.TaskExecutor;
 
 import java.io.IOException;
@@ -38,7 +38,7 @@ public class ServerBootstrap extends Bootstrap {
         this.port = port;
     }
 
-    public ServerBootstrap(int port, NetworkHandler handler) {
+    public ServerBootstrap(int port, Handler handler) {
         this(port);
         this.handler = handler;
     }

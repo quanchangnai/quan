@@ -2,7 +2,7 @@ package quan.network.bootstrap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import quan.network.handler.NetworkHandler;
+import quan.network.handler.Handler;
 
 import java.net.SocketOption;
 import java.util.LinkedHashMap;
@@ -22,7 +22,7 @@ public abstract class Bootstrap {
 
     protected volatile boolean running;
 
-    protected NetworkHandler handler;
+    protected Handler handler;
 
     protected Map<SocketOption<?>, Object> socketOptions = new LinkedHashMap<>();
 
@@ -46,11 +46,11 @@ public abstract class Bootstrap {
         this.running = running;
     }
 
-    public NetworkHandler getHandler() {
+    public Handler getHandler() {
         return handler;
     }
 
-    public void setHandler(NetworkHandler handler) {
+    public void setHandler(Handler handler) {
         this.handler = handler;
     }
 

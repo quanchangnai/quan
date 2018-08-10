@@ -3,7 +3,7 @@ package quan.network.handler;
 /**
  * @author quanchangnai
  */
-public interface OutboundHandler extends NetworkHandler {
+public interface OutboundHandler extends Handler {
 
     /**
      * 发送消息

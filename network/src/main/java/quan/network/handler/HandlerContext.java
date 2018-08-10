@@ -10,7 +10,7 @@ import quan.network.util.TaskExecutor;
  */
 public class HandlerContext {
 
-    private NetworkHandler handler;
+    private Handler handler;
 
     private HandlerChain chain;
 
@@ -18,12 +18,12 @@ public class HandlerContext {
 
     HandlerContext next;
 
-    public HandlerContext(NetworkHandler handler, HandlerChain chain) {
+    public HandlerContext(Handler handler, HandlerChain chain) {
         this.handler = handler;
         this.chain = chain;
     }
 
-    public NetworkHandler getHandler() {
+    public Handler getHandler() {
         return handler;
     }
 
@@ -39,11 +39,11 @@ public class HandlerContext {
         return chain.getExecutor();
     }
 
-    private static boolean isInbound(NetworkHandler handler) {
+    private static boolean isInbound(Handler handler) {
         return handler instanceof InboundHandler;
     }
 
-    private static boolean isOutbound(NetworkHandler handler) {
+    private static boolean isOutbound(Handler handler) {
         return handler instanceof OutboundHandler;
     }
 

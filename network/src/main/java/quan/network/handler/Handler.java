@@ -5,7 +5,7 @@ package quan.network.handler;
  *
  * @author quanchangnai
  */
-public interface NetworkHandler {
+public interface Handler {
 
     /**
      * 当前处理器被加进到处理器链中了
