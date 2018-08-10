@@ -100,7 +100,7 @@ public class ${name} extends <#if definitionType ==2>ProtoObject<#elseif definit
 </#list>
 
     @Override
-    public void serialize(VarIntBuffer buffer) throws IOException {
+    public void encode(VarintBuffer buffer) throws IOException {
 <#if definitionType==3>
         buffer.writeInt(_ID);
 </#if>
@@ -111,7 +111,7 @@ public class ${name} extends <#if definitionType ==2>ProtoObject<#elseif definit
         <#if field.valueBuiltInType>
             buffer.write${field.valueType?cap_first}(${field.name}Value);
         <#else>
-            ${field.name}Value.serialize(buffer);
+            ${field.name}Value.encode(buffer);
         </#if>
         }
     <#elseif field.type=="map">
@@ -121,7 +121,7 @@ public class ${name} extends <#if definitionType ==2>ProtoObject<#elseif definit
         <#if field.valueBuiltInType>
             buffer.write${field.valueType?cap_first}(${field.name}.get(${field.name}Key));
         <#else>
-            ${field.name}.get(${field.name}Key).serialize(buffer);
+            ${field.name}.get(${field.name}Key).encode(buffer);
         </#if>
         }
     <#elseif field.builtInType>
@@ -129,13 +129,13 @@ public class ${name} extends <#if definitionType ==2>ProtoObject<#elseif definit
     <#elseif field.enumType>
         buffer.writeInt(${field.name}.getValue());
     <#else>
-        ${field.name}.serialize(buffer);
+        ${field.name}.encode(buffer);
     </#if>
 </#list>
     }
 
     @Override
-    public void parse(VarIntBuffer buffer) throws IOException {
+    public void decode(VarintBuffer buffer) throws IOException {
 <#if definitionType==3>
         int _id = buffer.readInt();
         if (_id != _ID) {
@@ -150,7 +150,7 @@ public class ${name} extends <#if definitionType ==2>ProtoObject<#elseif definit
             ${field.name}.add(buffer.read${field.valueType?cap_first}());
         <#else>
             ${field.valueType} ${field.name}Value = new ${field.valueType}();
-            ${field.name}Value.parse(buffer);
+            ${field.name}Value.decode(buffer);
             ${field.name}.add(${field.name}Value);
         </#if>
         }
@@ -162,7 +162,7 @@ public class ${name} extends <#if definitionType ==2>ProtoObject<#elseif definit
         <#else>
             ${field.basicKeyType} ${field.name}Key = buffer.read${field.keyType?cap_first}();
             ${field.basicValueType} ${field.name}Value = new ${field.valueType}();
-            ${field.name}Value.parse(buffer);
+            ${field.name}Value.decode(buffer);
             ${field.name}.put(${field.name}Key, ${field.name}Value);
         </#if>
         }
@@ -171,7 +171,7 @@ public class ${name} extends <#if definitionType ==2>ProtoObject<#elseif definit
     <#elseif field.enumType>
         ${field.name} = ${field.type}.valueOf(buffer.readInt());
     <#else>
-        ${field.name}.parse(buffer);
+        ${field.name}.decode(buffer);
     </#if>
 </#list>
     }

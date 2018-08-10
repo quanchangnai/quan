@@ -8,28 +8,28 @@ import java.io.UncheckedIOException;
  */
 public abstract class ProtoObject {
 
-    public byte[] serialize() {
+    public byte[] encode() {
         try {
             VarintBuffer buffer = new VarintBuffer();
-            serialize(buffer);
+            encode(buffer);
             return buffer.remainingBytes();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
     }
 
-    public abstract void serialize(VarintBuffer buffer) throws IOException;
+    public abstract void encode(VarintBuffer buffer) throws IOException;
 
-    public void parse(byte[] bytes) {
+    public void decode(byte[] bytes) {
         try {
             VarintBuffer buffer = new VarintBuffer(bytes);
-            parse(buffer);
+            decode(buffer);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
     }
 
-    public abstract void parse(VarintBuffer buffer) throws IOException;
+    public abstract void decode(VarintBuffer buffer) throws IOException;
 
 
 }

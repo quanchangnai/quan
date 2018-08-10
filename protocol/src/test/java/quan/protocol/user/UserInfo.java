@@ -117,7 +117,7 @@ public class UserInfo extends ProtoObject {
 
 
     @Override
-    public void serialize(VarintBuffer buffer) throws IOException {
+    public void encode(VarintBuffer buffer) throws IOException {
         buffer.writeString(name);
         buffer.writeInt(level);
         buffer.writeInt(experience);
@@ -132,7 +132,7 @@ public class UserInfo extends ProtoObject {
     }
 
     @Override
-    public void parse(VarintBuffer buffer) throws IOException {
+    public void decode(VarintBuffer buffer) throws IOException {
         name = buffer.readString();
         level = buffer.readInt();
         experience = buffer.readInt();

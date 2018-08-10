@@ -64,14 +64,14 @@ public class ProtocolTest {
 
         VarintBuffer buffer = new VarintBuffer();
 
-        sRoleLogin1.serialize(buffer);
+        sRoleLogin1.encode(buffer);
 
         byte[] bytes = buffer.availableBytes();
         System.err.println("字节数:" + bytes.length);
 
 
         SRoleLogin sRoleLogin2 = new SRoleLogin();
-        sRoleLogin2.parse(buffer);
+        sRoleLogin2.decode(buffer);
         System.err.println("sRoleLogin2=" + sRoleLogin2);
         System.err.println("sRoleLogin2.getRoleInfo().getData()=" + new String(sRoleLogin2.getRoleInfo().getData()));
 
@@ -94,16 +94,16 @@ public class ProtocolTest {
         userInfo1.setBuyPowerCount(5345);
 
         VarintBuffer buffer = new VarintBuffer();
-        userInfo1.serialize(buffer);
+        userInfo1.encode(buffer);
         System.err.println("实际占用字节:" + buffer.availableBytes().length);
 
         long start = System.nanoTime();
         long end = 0;
         int n = 1000000;
         for (int i = 1; i <= n; i++) {
-            byte[] bytes = userInfo1.serialize();
+            byte[] bytes = userInfo1.encode();
             UserInfo userInfo2 = new UserInfo();
-            userInfo2.parse(bytes);
+            userInfo2.decode(bytes);
             if (i == n) {
                 end = System.nanoTime();
 //                System.err.println("userInfo2:" + userInfo2);

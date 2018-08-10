@@ -33,13 +33,13 @@ public class Test extends Protocol {
 
 
     @Override
-    public void serialize(VarintBuffer buffer) throws IOException {
+    public void encode(VarintBuffer buffer) throws IOException {
         buffer.writeInt(_ID);
         buffer.writeLong(testId);
     }
 
     @Override
-    public void parse(VarintBuffer buffer) throws IOException {
+    public void decode(VarintBuffer buffer) throws IOException {
         int _id = buffer.readInt();
         if (_id != _ID) {
             throw new IOException("协议ID不匹配,目标值：" + _ID + "，实际值：" + _id);

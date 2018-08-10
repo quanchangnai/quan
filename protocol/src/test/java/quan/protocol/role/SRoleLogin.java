@@ -75,54 +75,54 @@ public class SRoleLogin extends Protocol {
 
 
     @Override
-    public void serialize(VarintBuffer buffer) throws IOException {
+    public void encode(VarintBuffer buffer) throws IOException {
         buffer.writeInt(_ID);
         buffer.writeLong(roleId);
-        roleInfo.serialize(buffer);
+        roleInfo.encode(buffer);
         buffer.writeInt(roleInfoList.size());
         for (RoleInfo roleInfoListValue : roleInfoList) {
-            roleInfoListValue.serialize(buffer);
+            roleInfoListValue.encode(buffer);
         }
         buffer.writeInt(roleInfoSet.size());
         for (RoleInfo roleInfoSetValue : roleInfoSet) {
-            roleInfoSetValue.serialize(buffer);
+            roleInfoSetValue.encode(buffer);
         }
         buffer.writeInt(roleInfoMap.size());
         for (long roleInfoMapKey : roleInfoMap.keySet()) {
             buffer.writeLong(roleInfoMapKey);
-            roleInfoMap.get(roleInfoMapKey).serialize(buffer);
+            roleInfoMap.get(roleInfoMapKey).encode(buffer);
         }
-        userInfo.serialize(buffer);
+        userInfo.encode(buffer);
     }
 
     @Override
-    public void parse(VarintBuffer buffer) throws IOException {
+    public void decode(VarintBuffer buffer) throws IOException {
         int _id = buffer.readInt();
         if (_id != _ID) {
             throw new IOException("协议ID不匹配,目标值：" + _ID + "，实际值：" + _id);
         }
         roleId = buffer.readLong();
-        roleInfo.parse(buffer);
+        roleInfo.decode(buffer);
         int roleInfoListSize = buffer.readInt();
         for (int i = 0; i < roleInfoListSize; i++) {
             RoleInfo roleInfoListValue = new RoleInfo();
-            roleInfoListValue.parse(buffer);
+            roleInfoListValue.decode(buffer);
             roleInfoList.add(roleInfoListValue);
         }
         int roleInfoSetSize = buffer.readInt();
         for (int i = 0; i < roleInfoSetSize; i++) {
             RoleInfo roleInfoSetValue = new RoleInfo();
-            roleInfoSetValue.parse(buffer);
+            roleInfoSetValue.decode(buffer);
             roleInfoSet.add(roleInfoSetValue);
         }
         int roleInfoMapSize = buffer.readInt();
         for (int i = 0; i < roleInfoMapSize; i++) {
             long roleInfoMapKey = buffer.readLong();
             RoleInfo roleInfoMapValue = new RoleInfo();
-            roleInfoMapValue.parse(buffer);
+            roleInfoMapValue.decode(buffer);
             roleInfoMap.put(roleInfoMapKey, roleInfoMapValue);
         }
-        userInfo.parse(buffer);
+        userInfo.decode(buffer);
     }
 
     @Override

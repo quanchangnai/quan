@@ -138,7 +138,7 @@ public class RoleInfo extends ProtoObject {
 
 
     @Override
-    public void serialize(VarintBuffer buffer) throws IOException {
+    public void encode(VarintBuffer buffer) throws IOException {
         buffer.writeLong(roleId);
         buffer.writeBool(bo);
         buffer.writeByte(by);
@@ -165,7 +165,7 @@ public class RoleInfo extends ProtoObject {
     }
 
     @Override
-    public void parse(VarintBuffer buffer) throws IOException {
+    public void decode(VarintBuffer buffer) throws IOException {
         roleId = buffer.readLong();
         bo = buffer.readBool();
         by = buffer.readByte();
