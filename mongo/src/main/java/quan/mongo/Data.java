@@ -42,7 +42,7 @@ public abstract class Data {
             }
         }
         //交给事务管理
-        transaction.manageData(getOwner());
+        transaction.manage(getOwner());
     }
 
     /**

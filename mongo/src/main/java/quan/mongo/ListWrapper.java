@@ -119,11 +119,11 @@ public class ListWrapper<E> extends AbstractList<E> implements Container {
         //替换数据
         E old = current.set(index, e);
 
-        if (e instanceof Container) {
-            ((Container) e).setOwner(getOwner());
+        if (e instanceof ReferenceData) {
+            ((ReferenceData) e).setOwner(getOwner());
         }
-        if (old instanceof Container) {
-            ((Container) e).setOwner(null);
+        if (old instanceof ReferenceData) {
+            ((ReferenceData) e).setOwner(null);
         }
         return old;
     }
@@ -142,8 +142,8 @@ public class ListWrapper<E> extends AbstractList<E> implements Container {
 
         //删除数据
         E value = current.remove(index);
-        if (value instanceof Container) {
-            ((Container) value).setOwner(null);
+        if (value instanceof ReferenceData) {
+            ((ReferenceData) value).setOwner(null);
         }
         return value;
     }

@@ -14,8 +14,8 @@ public class Role {
     private RoleData roleData = new RoleData(1000);
 
     public Role() {
-//        Transaction.execute(this::init);
-        init();
+        Transaction.execute(this::init);
+//        init();
     }
 
     @Override
@@ -76,8 +76,8 @@ public class Role {
             ItemData itemData = roleData.getItems().remove(1);
             System.err.println("itemData=" + itemData.toDebugString());
         }
-//        throw new RuntimeException("update exception");
+        throw new RuntimeException("update exception");
 
-        return "update2";
+//        return "update2";
     }
 }

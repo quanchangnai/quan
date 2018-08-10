@@ -47,12 +47,12 @@ public class Transaction {
     /**
      * 当前事务管理的MappingData
      */
-    private Set<MappingData> managedDatas = new HashSet();
+    private Set<MappingData> managed = new HashSet();
 
     /**
      * 事务提交后需要执行的任务
      */
-    private List<Runnable> afterCommitTasks = new ArrayList<>();
+    private List<Runnable> afterTasks = new ArrayList<>();
 
     private Transaction() {
     }
@@ -149,7 +149,7 @@ public class Transaction {
      * 执行成功时提交事务
      */
     private void commit() {
-        for (MappingData data : managedDatas) {
+        for (MappingData data : managed) {
             data.commit();
             if (data.isNewState()) {
                 //异步插入
@@ -162,10 +162,10 @@ public class Transaction {
             }
         }
 
-        managedDatas.clear();
+        managed.clear();
         threadLocal.set(null);
 
-        for (Runnable task : afterCommitTasks) {
+        for (Runnable task : afterTasks) {
             try {
                 task.run();
             } catch (Exception e) {
@@ -179,10 +179,10 @@ public class Transaction {
      */
     private void rollback() {
         System.err.println("rollback==================");
-        for (MappingData data : managedDatas) {
+        for (MappingData data : managed) {
             data.rollback();
         }
-        managedDatas.clear();
+        managed.clear();
         threadLocal.set(null);
     }
 
@@ -191,11 +191,11 @@ public class Transaction {
      *
      * @param data
      */
-    void manageData(MappingData data) {
+    void manage(MappingData data) {
         if (data == null) {
             return;
         }
-        managedDatas.add(data);
+        managed.add(data);
     }
 
     public boolean isFailed() {
