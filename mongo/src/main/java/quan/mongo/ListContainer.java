@@ -3,10 +3,10 @@ package quan.mongo;
 import java.util.*;
 
 /**
- * List包装器
+ * List容器
  * Created by quanchangnai on 2017/5/23.
  */
-public class ListWrapper<E> extends AbstractList<E> implements Container {
+public class ListContainer<E> extends AbstractList<E> implements Container {
 
     //当前数据
     private List<E> current = new ArrayList<>();
@@ -24,7 +24,7 @@ public class ListWrapper<E> extends AbstractList<E> implements Container {
      */
     private MappingData originOwner;
 
-    public ListWrapper(MappingData owner) {
+    public ListContainer(MappingData owner) {
         this.currentOwner = owner;
         this.originOwner = owner;
     }
@@ -207,7 +207,7 @@ public class ListWrapper<E> extends AbstractList<E> implements Container {
             checkForComodification();
 
             try {
-                ListWrapper.this.remove(lastRet);
+                ListContainer.this.remove(lastRet);
                 if (lastRet < cursor)
                     cursor--;
                 lastRet = -1;
@@ -259,7 +259,7 @@ public class ListWrapper<E> extends AbstractList<E> implements Container {
             checkForComodification();
 
             try {
-                ListWrapper.this.set(lastRet, e);
+                ListContainer.this.set(lastRet, e);
                 expectedModCount = modCount;
             } catch (IndexOutOfBoundsException ex) {
                 throw new ConcurrentModificationException();
@@ -271,7 +271,7 @@ public class ListWrapper<E> extends AbstractList<E> implements Container {
 
             try {
                 int i = cursor;
-                ListWrapper.this.add(i, e);
+                ListContainer.this.add(i, e);
                 lastRet = -1;
                 cursor = i + 1;
                 expectedModCount = modCount;

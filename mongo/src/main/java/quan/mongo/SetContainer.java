@@ -6,10 +6,10 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * Set包装器
+ * Set容器
  * Created by quanchangnai on 2017/5/23.
  */
-public class SetWrapper<E> extends AbstractSet<E> implements Container {
+public class SetContainer<E> extends AbstractSet<E> implements Container {
 
     //当前数据
     private Set<E> current = new HashSet<>();
@@ -30,7 +30,7 @@ public class SetWrapper<E> extends AbstractSet<E> implements Container {
      */
     private MappingData originOwner;
 
-    public SetWrapper(MappingData owner) {
+    public SetContainer(MappingData owner) {
         this.currentOwner = owner;
         this.originOwner = owner;
     }

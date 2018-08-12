@@ -55,7 +55,7 @@ public class Role {
             roleData.setItem(null);
         }
 
-        roleData.getList2().add(roleData.getList2().size() + 1);
+        roleData.getSet().add(roleData.getSet().size() + 1);
 
         try {
             String s = Transaction.execute(this::update2);//495857386
@@ -76,8 +76,8 @@ public class Role {
             ItemData itemData = roleData.getItems().remove(1);
             System.err.println("itemData=" + itemData.toDebugString());
         }
-        throw new RuntimeException("update exception");
+//        throw new RuntimeException("update exception");
 
-//        return "update2";
+        return "update2";
     }
 }

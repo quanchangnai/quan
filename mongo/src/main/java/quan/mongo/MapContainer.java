@@ -4,10 +4,10 @@ import java.util.*;
 import java.util.function.Consumer;
 
 /**
- * Map包装器
+ * Map容器
  * Created by quanchangnai on 2017/5/23.
  */
-public class MapWrapper<K, V> extends AbstractMap<K, V> implements Container {
+public class MapContainer<K, V> extends AbstractMap<K, V> implements Container {
 
     //当前数据
     private Map<K, V> current = new HashMap<>();
@@ -31,7 +31,7 @@ public class MapWrapper<K, V> extends AbstractMap<K, V> implements Container {
      */
     private MappingData originOwner;
 
-    public MapWrapper(MappingData owner) {
+    public MapContainer(MappingData owner) {
         this.currentOwner = owner;
         this.originOwner = owner;
     }
@@ -222,7 +222,7 @@ public class MapWrapper<K, V> extends AbstractMap<K, V> implements Container {
         private Entry<K, V> currentEntry;
 
         public InnerIterator() {
-            this.it = MapWrapper.this.current.entrySet().iterator();
+            this.it = MapContainer.this.current.entrySet().iterator();
         }
 
         @Override
@@ -243,11 +243,11 @@ public class MapWrapper<K, V> extends AbstractMap<K, V> implements Container {
 
     private class EntrySet extends AbstractSet<Entry<K, V>> {
         public int size() {
-            return MapWrapper.this.size();
+            return MapContainer.this.size();
         }
 
         public void clear() {
-            MapWrapper.this.clear();
+            MapContainer.this.clear();
         }
 
         public Iterator<Entry<K, V>> iterator() {
@@ -260,7 +260,7 @@ public class MapWrapper<K, V> extends AbstractMap<K, V> implements Container {
         }
 
         public boolean contains(Object o) {
-            return MapWrapper.this.current.entrySet().contains(o);
+            return MapContainer.this.current.entrySet().contains(o);
         }
 
         public boolean remove(Object o) {
@@ -273,17 +273,17 @@ public class MapWrapper<K, V> extends AbstractMap<K, V> implements Container {
         }
 
         public void forEach(Consumer<? super Entry<K, V>> action) {
-            MapWrapper.this.current.entrySet().forEach(action);
+            MapContainer.this.current.entrySet().forEach(action);
         }
     }
 
     private class KeySet extends AbstractSet<K> {
         public int size() {
-            return MapWrapper.this.size();
+            return MapContainer.this.size();
         }
 
         public void clear() {
-            MapWrapper.this.clear();
+            MapContainer.this.clear();
         }
 
         public Iterator<K> iterator() {
@@ -300,7 +300,7 @@ public class MapWrapper<K, V> extends AbstractMap<K, V> implements Container {
         }
 
         public boolean remove(Object key) {
-            return MapWrapper.this.remove(key) != null;
+            return MapContainer.this.remove(key) != null;
         }
 
         public Spliterator<K> spliterator() {
@@ -314,11 +314,11 @@ public class MapWrapper<K, V> extends AbstractMap<K, V> implements Container {
 
     private class Values extends AbstractCollection<V> {
         public int size() {
-            return MapWrapper.this.size();
+            return MapContainer.this.size();
         }
 
         public void clear() {
-            MapWrapper.this.clear();
+            MapContainer.this.clear();
         }
 
         public Iterator<V> iterator() {
@@ -331,7 +331,7 @@ public class MapWrapper<K, V> extends AbstractMap<K, V> implements Container {
         }
 
         public boolean contains(Object o) {
-            return MapWrapper.this.containsValue(o);
+            return MapContainer.this.containsValue(o);
         }
 
         public Spliterator<V> spliterator() {
@@ -339,7 +339,7 @@ public class MapWrapper<K, V> extends AbstractMap<K, V> implements Container {
         }
 
         public final void forEach(Consumer<? super V> action) {
-            MapWrapper.this.current.values().forEach(action);
+            MapContainer.this.current.values().forEach(action);
         }
     }
 
