@@ -1,14 +1,16 @@
 package quan.network.handler;
 
 /**
+ * 处理器配置器
+ *
  * @author quanchangnai
  */
-public abstract class HandlerInitializer implements InboundHandler {
+public abstract class HandlerConfigurer implements Handler {
 
     @Override
     public void onConnected(HandlerContext handlerContext) throws Exception {
         try {
-            initHandler(handlerContext.getHandlerChain());
+            configureHandler(handlerContext.getHandlerChain());
             handlerContext.triggerConnected();
         } catch (Exception e) {
             handlerContext.triggerExceptionCaught(e);
@@ -17,6 +19,6 @@ public abstract class HandlerInitializer implements InboundHandler {
         }
     }
 
-    public abstract void initHandler(HandlerChain handlerChain) throws Exception;
+    protected abstract void configureHandler(HandlerChain handlerChain) throws Exception;
 
 }

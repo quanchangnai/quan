@@ -1,8 +1,7 @@
 package quan.network.handler.codec;
 
+import quan.network.handler.Handler;
 import quan.network.handler.HandlerContext;
-import quan.network.handler.InboundHandler;
-import quan.network.handler.OutboundHandler;
 
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -14,7 +13,7 @@ import java.nio.charset.CharsetDecoder;
  *
  * @author quanchangnai
  */
-public class StringCodec implements InboundHandler, OutboundHandler {
+public class StringCodec implements Handler<Object> {
 
     private final String charsetName;
 

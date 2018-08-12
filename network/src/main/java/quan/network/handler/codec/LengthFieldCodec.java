@@ -1,8 +1,7 @@
 package quan.network.handler.codec;
 
+import quan.network.handler.Handler;
 import quan.network.handler.HandlerContext;
-import quan.network.handler.InboundHandler;
-import quan.network.handler.OutboundHandler;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -14,7 +13,7 @@ import java.util.List;
  *
  * @author quanchangnai
  */
-public class LengthFieldCodec implements InboundHandler, OutboundHandler {
+public class LengthFieldCodec implements Handler<Object> {
     /**
      * 长度字段本身占多长
      */

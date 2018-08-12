@@ -46,11 +46,6 @@ public class HandlerChain {
         handlerContext.next = tail;
         handlerContext.prev.next = handlerContext;
         tail.prev = handlerContext;
-        try {
-            handler.onHandlerAdded(handlerContext);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public void addFirst(Handler handler) {
@@ -60,11 +55,6 @@ public class HandlerChain {
         handlerContext.next = head.next;
         head.next = handlerContext;
         handlerContext.next.prev = handlerContext;
-        try {
-            handler.onHandlerAdded(handlerContext);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public void remove(Handler handler) {
@@ -87,7 +77,6 @@ public class HandlerChain {
             handlerContext.next.prev = handlerContext.prev;
             handlerContext.prev = null;
             handlerContext.next = null;
-            handlerContext.getHandler().onHandlerRemoved(handlerContext);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -119,7 +108,7 @@ public class HandlerChain {
         head.triggerExceptionCaught(cause);
     }
 
-    private class HeadHandlerContext extends HandlerContext implements OutboundHandler, InboundHandler {
+    private class HeadHandlerContext extends HandlerContext implements Handler {
 
         public HeadHandlerContext(Handler handler, HandlerChain chain) {
             super(handler, chain);
@@ -146,7 +135,7 @@ public class HandlerChain {
         }
     }
 
-    private class TailHandlerContext extends HandlerContext implements InboundHandler {
+    private class TailHandlerContext extends HandlerContext implements Handler {
 
         public TailHandlerContext(Handler handler, HandlerChain chain) {
             super(handler, chain);

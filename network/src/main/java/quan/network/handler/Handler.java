@@ -5,24 +5,68 @@ package quan.network.handler;
  *
  * @author quanchangnai
  */
-public interface Handler {
+public interface Handler<M> {
 
     /**
-     * 当前处理器被加进到处理器链中了
+     * 连接建立了
      *
-     * @param handlerContext 当前处理器上下文
+     * @param handlerContext
      * @throws Exception
      */
-    default void onHandlerAdded(HandlerContext handlerContext) throws Exception {
+    default void onConnected(HandlerContext handlerContext) throws Exception {
+        handlerContext.triggerConnected();
     }
 
     /**
-     * 当前处理器被从处理器链中移除了
+     * 连接断开了
      *
-     * @param handlerContext 当前处理器上下文
+     * @param handlerContext
      * @throws Exception
      */
-    default void onHandlerRemoved(HandlerContext handlerContext) throws Exception {
+    default void onDisconnected(HandlerContext handlerContext) throws Exception {
+        handlerContext.triggerDisconnected();
     }
 
+    /**
+     * 收到消息了
+     *
+     * @param handlerContext
+     * @param msg
+     * @throws Exception
+     */
+    default void onReceived(HandlerContext handlerContext, M msg) throws Exception {
+        handlerContext.triggerReceived(msg);
+    }
+
+    /**
+     * 捕获异常了
+     *
+     * @param handlerContext
+     * @param cause
+     * @throws Exception
+     */
+    default void onExceptionCaught(HandlerContext handlerContext, Throwable cause) throws Exception {
+        handlerContext.triggerExceptionCaught(cause);
+    }
+
+    /**
+     * 发送消息
+     *
+     * @param handlerContext
+     * @param msg
+     * @throws Exception
+     */
+    default void onSend(HandlerContext handlerContext, Object msg) throws Exception {
+        handlerContext.send(msg);
+    }
+
+    /**
+     * 关闭连接
+     *
+     * @param handlerContext
+     * @throws Exception
+     */
+    default void onClose(HandlerContext handlerContext) throws Exception {
+        handlerContext.close();
+    }
 }

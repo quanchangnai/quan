@@ -39,36 +39,6 @@ public class HandlerContext {
         return chain.getExecutor();
     }
 
-    private static boolean isInbound(Handler handler) {
-        return handler instanceof InboundHandler;
-    }
-
-    private static boolean isOutbound(Handler handler) {
-        return handler instanceof OutboundHandler;
-    }
-
-    private HandlerContext findNextInboundHandlerContext() {
-        HandlerContext context = this.next;
-        while (context != null && context.getHandler() != null) {
-            if (isInbound(context.getHandler())) {
-                break;
-            }
-            context = context.next;
-        }
-        return context;
-    }
-
-    private HandlerContext findPrevOutboundHandlerContext() {
-        HandlerContext context = this.prev;
-        while (context != null && context.getHandler() != null) {
-            if (context.getHandler() != null && isOutbound(context.getHandler())) {
-                break;
-            }
-            context = context.prev;
-        }
-        return context;
-    }
-
     public void triggerConnected() {
         if (getExecutor().isInMyThread()) {
             triggerNextHandlerConnected();
@@ -79,12 +49,11 @@ public class HandlerContext {
 
     private void triggerNextHandlerConnected() {
         try {
-            HandlerContext nextInboundHandleContext = findNextInboundHandlerContext();
-            if (nextInboundHandleContext != null && nextInboundHandleContext.getHandler() != null) {
-                ((InboundHandler) nextInboundHandleContext.getHandler()).onConnected(nextInboundHandleContext);
+            if (next != null && next.getHandler() != null) {
+                next.getHandler().onConnected(next);
             }
         } catch (Exception e) {
-            triggerNextHandlerEexceptionCaught(e);
+            triggerNextHandlerExceptionCaught(e);
         }
     }
 
@@ -98,12 +67,11 @@ public class HandlerContext {
 
     private void triggerNextHandlerDisconnected() {
         try {
-            HandlerContext nextInboundHandleContext = findNextInboundHandlerContext();
-            if (nextInboundHandleContext != null && nextInboundHandleContext.getHandler() != null) {
-                ((InboundHandler) nextInboundHandleContext.getHandler()).onDisconnected(nextInboundHandleContext);
+            if (next != null && next.getHandler() != null) {
+                next.getHandler().onDisconnected(next);
             }
         } catch (Exception e) {
-            triggerNextHandlerEexceptionCaught(e);
+            triggerNextHandlerExceptionCaught(e);
         }
     }
 
@@ -117,31 +85,29 @@ public class HandlerContext {
 
     private void triggerNextHandlerReceived(Object msg) {
         try {
-            HandlerContext nextInboundHandleContext = findNextInboundHandlerContext();
-            if (nextInboundHandleContext != null && nextInboundHandleContext.getHandler() != null) {
-                ((InboundHandler) nextInboundHandleContext.getHandler()).onReceived(nextInboundHandleContext, msg);
+            if (next != null && next.getHandler() != null) {
+                next.getHandler().onReceived(next, msg);
             }
         } catch (Exception e) {
-            triggerNextHandlerEexceptionCaught(e);
+            triggerNextHandlerExceptionCaught(e);
         }
     }
 
     public void triggerExceptionCaught(Throwable cause) {
         if (getExecutor().isInMyThread()) {
-            triggerNextHandlerEexceptionCaught(cause);
+            triggerNextHandlerExceptionCaught(cause);
         } else {
-            getExecutor().submit(() -> triggerNextHandlerEexceptionCaught(cause));
+            getExecutor().submit(() -> triggerNextHandlerExceptionCaught(cause));
         }
     }
 
-    private void triggerNextHandlerEexceptionCaught(Throwable cause) {
-        HandlerContext nextInboundHandleContext = findNextInboundHandlerContext();
+    private void triggerNextHandlerExceptionCaught(Throwable cause) {
         try {
-            if (nextInboundHandleContext != null && nextInboundHandleContext.getHandler() != null) {
-                ((InboundHandler) nextInboundHandleContext.getHandler()).onExceptionCaught(nextInboundHandleContext, cause);
+            if (next != null && next.getHandler() != null) {
+                next.getHandler().onExceptionCaught(next, cause);
             }
         } catch (Exception e) {
-            nextInboundHandleContext.triggerExceptionCaught(e);
+            next.triggerExceptionCaught(e);
         }
     }
 
@@ -154,13 +120,12 @@ public class HandlerContext {
     }
 
     private void triggerPrevHandlerSend(Object msg) {
-        HandlerContext prevOutboundHandlerContext = findPrevOutboundHandlerContext();
         try {
-            if (prevOutboundHandlerContext != null && prevOutboundHandlerContext.getHandler() != null) {
-                ((OutboundHandler) prevOutboundHandlerContext.getHandler()).onSend(prevOutboundHandlerContext, msg);
+            if (prev != null && prev.getHandler() != null) {
+                prev.getHandler().onSend(prev, msg);
             }
         } catch (Exception e) {
-            triggerNextHandlerEexceptionCaught(e);
+            triggerNextHandlerExceptionCaught(e);
         }
     }
 
@@ -173,13 +138,12 @@ public class HandlerContext {
     }
 
     private void triggerPrevHandlerClose() {
-        HandlerContext prevOutboundHandlerContext = findPrevOutboundHandlerContext();
         try {
-            if (prevOutboundHandlerContext != null && prevOutboundHandlerContext.getHandler() != null) {
-                ((OutboundHandler) prevOutboundHandlerContext.getHandler()).onClose(prevOutboundHandlerContext);
+            if (prev != null && prev.getHandler() != null) {
+                (prev.getHandler()).onClose(prev);
             }
         } catch (Exception e) {
-            triggerNextHandlerEexceptionCaught(e);
+            triggerNextHandlerExceptionCaught(e);
         }
     }
 

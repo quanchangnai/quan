@@ -3,10 +3,10 @@ package quan.network.test;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import quan.network.bootstrap.ServerBootstrap;
+import quan.network.handler.Handler;
 import quan.network.handler.HandlerChain;
 import quan.network.handler.HandlerContext;
-import quan.network.handler.HandlerInitializer;
-import quan.network.handler.InboundHandler;
+import quan.network.handler.HandlerConfigurer;
 import quan.network.handler.codec.LengthFieldCodec;
 import quan.network.handler.codec.StringCodec;
 
@@ -23,9 +23,9 @@ public class NioServerTest {
         server.setSocketOption(StandardSocketOptions.TCP_NODELAY, true);
         server.setSocketOption(StandardSocketOptions.SO_RCVBUF, 1024);
         server.setSocketOption(StandardSocketOptions.SO_SNDBUF, 128);
-        server.setHandler(new HandlerInitializer() {
+        server.setHandler(new HandlerConfigurer() {
             @Override
-            public void initHandler(HandlerChain handlerChain) throws Exception {
+            public void configureHandler(HandlerChain handlerChain) throws Exception {
                 handlerChain.addLast(new LengthFieldCodec(1, true));
                 handlerChain.addLast(new StringCodec());
                 handlerChain.addLast(new TestServerInboundHandler());
@@ -46,12 +46,8 @@ public class NioServerTest {
     }
 
 
-    private static class TestServerInboundHandler implements InboundHandler<String> {
+    private static class TestServerInboundHandler implements Handler<String> {
 
-        @Override
-        public void onHandlerAdded(HandlerContext handlerContext) throws Exception {
-            System.err.println("onHandlerAdded");
-        }
 
         @Override
         public void onConnected(HandlerContext handlerContext) throws Exception {
@@ -81,21 +77,13 @@ public class NioServerTest {
             handlerContext.triggerExceptionCaught(cause);
         }
 
-        @Override
-        public void onHandlerRemoved(HandlerContext handlerContext) throws Exception {
-            System.err.println("onHandlerRemoved");
-        }
     }
 
 
-    private static class TestServerInboundHandler2 implements InboundHandler<String> {
+    private static class TestServerInboundHandler2 implements Handler<String> {
 
         private static final Logger logger = LogManager.getLogger(TestServerInboundHandler2.class);
 
-        @Override
-        public void onHandlerAdded(HandlerContext handlerContext) throws Exception {
-            System.err.println("onHandlerAdded2");
-        }
 
         @Override
         public void onConnected(HandlerContext handlerContext) throws Exception {
@@ -124,11 +112,6 @@ public class NioServerTest {
             handlerContext.close();
         }
 
-        @Override
-        public void onHandlerRemoved(HandlerContext handlerContext) throws Exception {
-            System.err.println("onHandlerRemoved2");
-
-        }
     }
 
 }
