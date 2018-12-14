@@ -5,8 +5,8 @@ import org.apache.logging.log4j.Logger;
 import quan.network.bootstrap.ServerBootstrap;
 import quan.network.handler.Handler;
 import quan.network.handler.HandlerChain;
-import quan.network.handler.HandlerContext;
 import quan.network.handler.HandlerConfigurer;
+import quan.network.handler.HandlerContext;
 import quan.network.handler.codec.LengthFieldCodec;
 import quan.network.handler.codec.StringCodec;
 
@@ -52,8 +52,8 @@ public class NioServerTest {
         @Override
         public void onConnected(HandlerContext handlerContext) throws Exception {
             System.err.println("onConnected");
-//		handlerContext.onSend(ByteBuffer.wrap("hello".getBytes()));
-//		handlerContext.onSend("hello");
+//            handlerContext.send(ByteBuffer.wrap("hello".getBytes()));
+//            handlerContext.send("hello");
             handlerContext.triggerConnected();
         }
 
@@ -66,8 +66,9 @@ public class NioServerTest {
         @Override
         public void onReceived(HandlerContext handlerContext, String msg) throws Exception {
             System.err.println("onReceived:" + msg);
-//		handlerContext.onSend(msg);
-            handlerContext.triggerReceived(msg);
+//            handlerContext.send(msg);
+//            handlerContext.triggerReceived(msg);
+            handlerContext.triggerEvent(msg);
         }
 
         @Override
@@ -88,8 +89,8 @@ public class NioServerTest {
         @Override
         public void onConnected(HandlerContext handlerContext) throws Exception {
             System.err.println("onConnected2");
-            handlerContext.send("aaa:" +System.currentTimeMillis());
-            handlerContext.send("bbb:" +System.currentTimeMillis());
+            handlerContext.send("aaa:" + System.currentTimeMillis());
+            handlerContext.send("bbb:" + System.currentTimeMillis());
             handlerContext.send("ccc");
         }
 
@@ -112,6 +113,10 @@ public class NioServerTest {
             handlerContext.close();
         }
 
+        @Override
+        public void onEventTriggered(HandlerContext handlerContext, Object event) {
+            System.err.println("onEventTriggered:" + event);
+        }
     }
 
 }

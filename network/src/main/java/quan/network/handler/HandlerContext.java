@@ -111,6 +111,21 @@ public class HandlerContext {
         }
     }
 
+    /**
+     * 触发自定义事件
+     *
+     * @param event
+     */
+    public void triggerEvent(Object event) {
+        try {
+            if (next != null && next.getHandler() != null) {
+                next.getHandler().onEventTriggered(next, event);
+            }
+        } catch (Exception e) {
+            next.triggerExceptionCaught(e);
+        }
+    }
+
     public void send(Object msg) {
         if (getExecutor().isInMyThread()) {
             triggerPrevHandlerSend(msg);

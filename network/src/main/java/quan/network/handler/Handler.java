@@ -50,6 +50,16 @@ public interface Handler<M> {
     }
 
     /**
+     * 触发了自定义事件
+     *
+     * @param handlerContext
+     * @param event
+     */
+    default void onEventTriggered(HandlerContext handlerContext, Object event) {
+        handlerContext.triggerEvent(event);
+    }
+
+    /**
      * 发送消息
      *
      * @param handlerContext
