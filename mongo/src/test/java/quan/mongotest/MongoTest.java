@@ -8,7 +8,8 @@ import quan.mongo.Transaction;
 public class MongoTest {
 
     public static void main(String[] args) throws Exception {
-        Transaction.declarative();
+
+        Transaction.enable();
 
         Role role = new Role();
         while (true) {

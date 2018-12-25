@@ -35,14 +35,14 @@ public class Role {
     public void update() {
         System.err.println("update=================");
 
-//        Runnable runnable1=()->{
-//            System.err.println("runnable1");
-//            Runnable runnable2=()->{
-//                System.err.println("runnable2");
-//            };
-//            runnable2.run();
-//        };
-//        runnable1.run();
+        Runnable runnable1=()->{
+            System.err.println("runnable1");
+            Runnable runnable2=()->{
+                System.err.println("runnable2");
+            };
+            runnable2.run();
+        };
+        runnable1.run();
 
         System.err.println("roleData1:" + roleData.toDebugString());
         if (roleData.getItems().isEmpty()) {
