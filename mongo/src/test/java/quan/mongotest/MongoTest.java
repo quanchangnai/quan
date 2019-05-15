@@ -1,6 +1,7 @@
 package quan.mongotest;
 
 import quan.mongo.Transaction;
+import quan.mongo.Transactional;
 
 /**
  * Created by quanchangnai on 2018/8/6.
@@ -12,11 +13,13 @@ public class MongoTest {
         Transaction.enable();
 
         Role role = new Role();
-        while (true) {
-            test(role);
-            Thread.sleep(5000);
-            System.err.println();
-        }
+//        while (true) {
+//            test(role);
+//            Thread.sleep(5000);
+//            System.err.println();
+//        }
+
+        role.update3();
     }
 
     private static void test(Role role) {

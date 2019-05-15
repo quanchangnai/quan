@@ -29,12 +29,13 @@ public class ReferenceWrapper<V extends ReferenceData> {
         current = origin;
     }
 
-    public V set(V value) {
+    public V set(V value,MappingData owner) {
         if (value == null && current != null) {
             current.setOwner(null);
         }
         V ret = current;
         current = value;
+        current.setOwner(owner);
         return ret;
     }
 

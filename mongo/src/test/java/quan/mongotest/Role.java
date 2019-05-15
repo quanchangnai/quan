@@ -80,4 +80,11 @@ public class Role {
 
         return "update2";
     }
+
+    @Transactional
+    public void update3() {
+        ItemData itemData = new ItemData(1, 5);
+        roleData.setItem(itemData);
+        System.err.println("update3:"+itemData.toDebugString());
+    }
 }

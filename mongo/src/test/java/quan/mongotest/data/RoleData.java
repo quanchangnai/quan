@@ -40,7 +40,6 @@ public class RoleData extends MappingData {
     }
 
 
-
     public Long getRoleId() {
         return roleId.get();
     }
@@ -56,7 +55,7 @@ public class RoleData extends MappingData {
 
     public ItemData setItem(ItemData item) {
         checkSetData(item);
-        return this.item.set(item);
+        return this.item.set(item, getOwner());
     }
 
     public Set<Integer> getSet() {
