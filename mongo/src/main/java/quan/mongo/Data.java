@@ -26,23 +26,23 @@ public abstract class Data {
     protected abstract void rollback();
 
     /**
-     * 校验设置数据
+     * 写数据回调
      *
-     * @param setData 设置的引用数据
+     * @param refData 设置的引用数据，不是引用数据传null
      */
-    protected void checkSetData(ReferenceData setData) {
+    protected void onWriteData(ReferenceData refData) {
         Transaction transaction = Transaction.current();
         if (transaction == null && !getOwner().isDecodingState()) {
             throw new UnsupportedOperationException("当前不在事务中，禁止修改数据");
         }
-        if (setData != null) {
-            MappingData setDataOwner = setData.getOwner();
-            if (setDataOwner != null && setDataOwner != getOwner()) {
-                throw new UnsupportedOperationException("设置的数据当前正受到其它" + MappingData.class.getSimpleName() + "管理:" + setDataOwner);
+        if (refData != null) {
+            MappingData refDataOwner = refData.getOwner();
+            if (refDataOwner != null && refDataOwner != getOwner()) {
+                throw new UnsupportedOperationException("设置的引用数据当前正受到其它" + MappingData.class.getSimpleName() + "管理:" + refDataOwner);
             }
         }
         //交给事务管理
-        transaction.manage(getOwner());
+        transaction.addWriteData(getOwner());
     }
 
     /**

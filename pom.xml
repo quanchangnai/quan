@@ -13,6 +13,7 @@
         <module>network</module>
         <module>protocol</module>
         <module>mongo</module>
+        <module>transaction</module>
     </modules>
 
     <properties>

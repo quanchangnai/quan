@@ -37,7 +37,7 @@ public class ItemData extends ReferenceData {
     @Override
     protected void setOwner(MappingData owner) {
         super.setOwner(owner);
-        //其他
+        //给引用的对象设置owner
     }
 
     public int getItemId() {
@@ -45,7 +45,7 @@ public class ItemData extends ReferenceData {
     }
 
     public int setItemId(int itemId) {
-        checkSetData(null);
+        onWriteData(null);
         return this.itemId.set(itemId);
     }
 
@@ -54,7 +54,7 @@ public class ItemData extends ReferenceData {
     }
 
     public int setItemNum(int itemNum) {
-        checkSetData(null);
+        onWriteData(null);
         return this.itemNum.set(itemNum);
     }
 

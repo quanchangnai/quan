@@ -11,7 +11,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.lang.instrument.Instrumentation;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -50,9 +49,9 @@ public final class Transaction {
     private int enterCount;
 
     /**
-     * 当前事务管理的MappingData
+     * 当前事务修改过的MappingData
      */
-    private Set<MappingData> managedData = new HashSet();
+    private Set<MappingData> writeData = new HashSet();
 
     /**
      * 后置任务，事务提交后需要执行的任务，事务回滚不会执行
@@ -187,7 +186,7 @@ public final class Transaction {
      * 执行成功时提交事务
      */
     private void commit() {
-        for (MappingData data : managedData) {
+        for (MappingData data : writeData) {
             data.commit();
             if (data.isNewState()) {
                 //异步插入
@@ -208,7 +207,7 @@ public final class Transaction {
             }
         }
 
-        managedData.clear();
+        writeData.clear();
         postTasks.clear();
         threadLocal.set(null);
     }
@@ -218,10 +217,10 @@ public final class Transaction {
      */
     private void rollback() {
         System.err.println("rollback==================");
-        for (MappingData data : managedData) {
+        for (MappingData data : writeData) {
             data.rollback();
         }
-        managedData.clear();
+        writeData.clear();
         postTasks.clear();
         threadLocal.set(null);
     }
@@ -231,14 +230,14 @@ public final class Transaction {
      *
      * @param data
      */
-    void manage(MappingData data) {
+    void addWriteData(MappingData data) {
         if (!checkEnabled()) {
             return;
         }
         if (data == null) {
             return;
         }
-        managedData.add(data);
+        writeData.add(data);
     }
 
     public boolean isFailed() {

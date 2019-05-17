@@ -83,6 +83,7 @@ public class Role {
 
     @Transactional
     public void update3() {
+        System.err.println("roleData:"+roleData);
         ItemData itemData = new ItemData(1, 5);
         roleData.setItem(itemData);
         System.err.println("update3:"+itemData.toDebugString());

@@ -20,6 +20,7 @@ public class RoleData extends MappingData {
 
     private SetContainer<Integer> set = new SetContainer<>(getOwner());
 
+
     public RoleData(long roleId) {
         this.roleId.set(roleId);
     }
@@ -54,7 +55,7 @@ public class RoleData extends MappingData {
 
 
     public ItemData setItem(ItemData item) {
-        checkSetData(item);
+        onWriteData(item);
         return this.item.set(item, getOwner());
     }
 

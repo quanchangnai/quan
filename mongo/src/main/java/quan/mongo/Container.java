@@ -54,7 +54,7 @@ public interface Container {
         }
 
         //交给事务管理
-        transaction.manage(getOwner());
+        transaction.addWriteData(getOwner());
     }
 
     /**

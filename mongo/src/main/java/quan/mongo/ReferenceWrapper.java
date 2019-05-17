@@ -30,6 +30,9 @@ public class ReferenceWrapper<V extends ReferenceData> {
     }
 
     public V set(V value,MappingData owner) {
+        if (current == value) {
+            return current;
+        }
         if (value == null && current != null) {
             current.setOwner(null);
         }
