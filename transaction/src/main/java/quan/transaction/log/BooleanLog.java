@@ -1,31 +1,31 @@
 package quan.transaction.log;
 
-import quan.transaction.field.ByteField;
+import quan.transaction.field.BooleanField;
 
 /**
  * Created by quanchangnai on 2019/5/16.
  */
-public class ByteFieldLog implements FieldLog {
+public class BooleanLog implements FieldLog {
 
-    private ByteField field;
+    private BooleanField field;
 
-    private byte value;
+    private boolean value;
 
-    public ByteFieldLog(ByteField field, byte value) {
+    public BooleanLog(BooleanField field, boolean value) {
         this.field = field;
         this.value = value;
     }
 
-    public void setValue(byte value) {
+    public void setValue(boolean value) {
         this.value = value;
     }
 
-    public byte getValue() {
+    public boolean isValue() {
         return value;
     }
 
     @Override
-    public ByteField getField() {
+    public BooleanField getField() {
         return field;
     }
 

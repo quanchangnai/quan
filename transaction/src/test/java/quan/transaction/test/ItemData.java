@@ -4,7 +4,7 @@ import quan.transaction.BeanData;
 import quan.transaction.MappingData;
 import quan.transaction.Transaction;
 import quan.transaction.field.IntField;
-import quan.transaction.log.IntFieldLog;
+import quan.transaction.log.IntLog;
 
 /**
  * Created by quanchangnai on 2019/5/17.
@@ -16,9 +16,9 @@ public class ItemData extends BeanData {
     public int getId() {
         Transaction transaction = Transaction.current();
         if (transaction != null) {
-            IntFieldLog fieldLog = (IntFieldLog) transaction.getFieldLog(this.id);
-            if (fieldLog != null) {
-                return fieldLog.getValue();
+            IntLog log = (IntLog) transaction.getFieldLog(this.id);
+            if (log != null) {
+                return log.getValue();
             }
         }
 
@@ -28,11 +28,11 @@ public class ItemData extends BeanData {
     public ItemData setId(int id) {
         onWriteData(null);
         Transaction transaction = Transaction.current();
-        IntFieldLog fieldLog = (IntFieldLog) transaction.getFieldLog(this.id);
-        if (fieldLog != null) {
-            fieldLog.setValue(id);
+        IntLog log = (IntLog) transaction.getFieldLog(this.id);
+        if (log != null) {
+            log.setValue(id);
         } else {
-            transaction.addFieldLog(new IntFieldLog(this.id, id));
+            transaction.addFieldLog(new IntLog(this.id, id));
         }
         return this;
     }

@@ -5,13 +5,13 @@ import quan.transaction.field.DoubleField;
 /**
  * Created by quanchangnai on 2019/5/16.
  */
-public class DoubleFieldLog implements FieldLog {
+public class DoubleLog implements FieldLog {
 
     private DoubleField field;
 
     private double value;
 
-    public DoubleFieldLog(DoubleField field, double value) {
+    public DoubleLog(DoubleField field, double value) {
         this.field = field;
         this.value = value;
     }

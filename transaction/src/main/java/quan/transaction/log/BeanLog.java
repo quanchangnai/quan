@@ -7,14 +7,14 @@ import quan.transaction.field.BeanField;
 /**
  * Created by quanchangnai on 2019/5/16.
  */
-public class BeanFieldLog<T extends BeanData> implements FieldLog {
+public class BeanLog<T extends BeanData> implements FieldLog {
 
 
     private BeanField<T> field;
 
     private T value;
 
-    public BeanFieldLog(BeanField<T> field, T value) {
+    public BeanLog(BeanField<T> field, T value) {
         this.field = field;
         this.value = value;
     }

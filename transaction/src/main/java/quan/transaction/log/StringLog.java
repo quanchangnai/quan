@@ -1,31 +1,31 @@
 package quan.transaction.log;
 
-import quan.transaction.field.IntField;
+import quan.transaction.field.StringField;
 
 /**
  * Created by quanchangnai on 2019/5/16.
  */
-public class IntFieldLog implements FieldLog {
+public class StringLog implements FieldLog {
 
-    private IntField field;
+    private StringField field;
 
-    private int value;
+    private String value;
 
-    public IntFieldLog(IntField field, int value) {
+    public StringLog(StringField field, String value) {
         this.field = field;
         this.value = value;
     }
 
-    public void setValue(int value) {
+    public void setValue(String value) {
         this.value = value;
     }
 
-    public int getValue() {
+    public String getValue() {
         return value;
     }
 
     @Override
-    public IntField getField() {
+    public StringField getField() {
         return field;
     }
 

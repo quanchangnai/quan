@@ -1,31 +1,31 @@
 package quan.transaction.log;
 
-import quan.transaction.field.LongField;
+import quan.transaction.field.IntField;
 
 /**
  * Created by quanchangnai on 2019/5/16.
  */
-public class LongFieldLog implements FieldLog {
+public class IntLog implements FieldLog {
 
-    private LongField field;
+    private IntField field;
 
-    private long value;
+    private int value;
 
-    public LongFieldLog(LongField field, long value) {
+    public IntLog(IntField field, int value) {
         this.field = field;
         this.value = value;
     }
 
-    public void setValue(long value) {
+    public void setValue(int value) {
         this.value = value;
     }
 
-    public long getValue() {
+    public int getValue() {
         return value;
     }
 
     @Override
-    public LongField getField() {
+    public IntField getField() {
         return field;
     }
 

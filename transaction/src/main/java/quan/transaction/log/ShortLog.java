@@ -1,31 +1,31 @@
 package quan.transaction.log;
 
-import quan.transaction.field.BooleanField;
+import quan.transaction.field.ShortField;
 
 /**
  * Created by quanchangnai on 2019/5/16.
  */
-public class BooleanFieldLog implements FieldLog {
+public class ShortLog implements FieldLog {
 
-    private BooleanField field;
+    private ShortField field;
 
-    private boolean value;
+    private short value;
 
-    public BooleanFieldLog(BooleanField field, boolean value) {
+    public ShortLog(ShortField field, short value) {
         this.field = field;
         this.value = value;
     }
 
-    public void setValue(boolean value) {
+    public void setValue(short value) {
         this.value = value;
     }
 
-    public boolean isValue() {
+    public short getValue() {
         return value;
     }
 
     @Override
-    public BooleanField getField() {
+    public ShortField getField() {
         return field;
     }
 

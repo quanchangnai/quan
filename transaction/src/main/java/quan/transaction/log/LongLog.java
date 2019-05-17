@@ -1,31 +1,31 @@
 package quan.transaction.log;
 
-import quan.transaction.field.ShortField;
+import quan.transaction.field.LongField;
 
 /**
  * Created by quanchangnai on 2019/5/16.
  */
-public class ShortFieldLog implements FieldLog {
+public class LongLog implements FieldLog {
 
-    private ShortField field;
+    private LongField field;
 
-    private short value;
+    private long value;
 
-    public ShortFieldLog(ShortField field, short value) {
+    public LongLog(LongField field, long value) {
         this.field = field;
         this.value = value;
     }
 
-    public void setValue(short value) {
+    public void setValue(long value) {
         this.value = value;
     }
 
-    public short getValue() {
+    public long getValue() {
         return value;
     }
 
     @Override
-    public ShortField getField() {
+    public LongField getField() {
         return field;
     }
 

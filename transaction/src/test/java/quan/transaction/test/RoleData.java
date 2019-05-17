@@ -5,9 +5,9 @@ import quan.transaction.Transaction;
 import quan.transaction.field.BeanField;
 import quan.transaction.field.IntField;
 import quan.transaction.field.StringField;
-import quan.transaction.log.BeanFieldLog;
-import quan.transaction.log.IntFieldLog;
-import quan.transaction.log.StringFieldLog;
+import quan.transaction.log.BeanLog;
+import quan.transaction.log.IntLog;
+import quan.transaction.log.StringLog;
 
 /**
  * Created by quanchangnai on 2019/5/16.
@@ -23,9 +23,9 @@ public class RoleData extends MappingData {
     public int getId() {
         Transaction transaction = Transaction.current();
         if (transaction != null) {
-            IntFieldLog fieldLog = (IntFieldLog) transaction.getFieldLog(this.id);
-            if (fieldLog != null) {
-                return fieldLog.getValue();
+            IntLog log = (IntLog) transaction.getFieldLog(this.id);
+            if (log != null) {
+                return log.getValue();
             }
         }
 
@@ -35,11 +35,11 @@ public class RoleData extends MappingData {
     public RoleData setId(int id) {
         onWriteData(null);
         Transaction transaction = Transaction.current();
-        IntFieldLog fieldLog = (IntFieldLog) transaction.getFieldLog(this.id);
-        if (fieldLog != null) {
-            fieldLog.setValue(id);
+        IntLog log = (IntLog) transaction.getFieldLog(this.id);
+        if (log != null) {
+            log.setValue(id);
         } else {
-            transaction.addFieldLog(new IntFieldLog(this.id, id));
+            transaction.addFieldLog(new IntLog(this.id, id));
         }
         return this;
     }
@@ -47,9 +47,9 @@ public class RoleData extends MappingData {
     public String getName() {
         Transaction transaction = Transaction.current();
         if (transaction != null) {
-            StringFieldLog fieldLog = (StringFieldLog) transaction.getFieldLog(this.name);
-            if (fieldLog != null) {
-                return fieldLog.getValue();
+            StringLog log = (StringLog) transaction.getFieldLog(this.name);
+            if (log != null) {
+                return log.getValue();
             }
         }
         return name.getValue();
@@ -58,11 +58,11 @@ public class RoleData extends MappingData {
     public RoleData setName(String name) {
         onWriteData(null);
         Transaction transaction = Transaction.current();
-        StringFieldLog fieldLog = (StringFieldLog) transaction.getFieldLog(this.name);
-        if (fieldLog != null) {
-            fieldLog.setValue(name);
+        StringLog log = (StringLog) transaction.getFieldLog(this.name);
+        if (log != null) {
+            log.setValue(name);
         } else {
-            transaction.addFieldLog( new StringFieldLog(this.name, name));
+            transaction.addFieldLog( new StringLog(this.name, name));
         }
         return this;
     }
@@ -70,9 +70,9 @@ public class RoleData extends MappingData {
     public ItemData getItemData() {
         Transaction transaction = Transaction.current();
         if (transaction != null) {
-            BeanFieldLog<ItemData> fieldLog = (BeanFieldLog<ItemData>) transaction.getFieldLog(this.itemData);
-            if (fieldLog != null) {
-                return fieldLog.getValue();
+            BeanLog<ItemData> log = (BeanLog<ItemData>) transaction.getFieldLog(this.itemData);
+            if (log != null) {
+                return log.getValue();
             }
         }
         return itemData.getValue();
@@ -81,11 +81,11 @@ public class RoleData extends MappingData {
     public RoleData setItemData(ItemData itemData) {
         onWriteData(itemData);
         Transaction transaction = Transaction.current();
-        BeanFieldLog<ItemData> fieldLog = (BeanFieldLog<ItemData>) transaction.getFieldLog(this.itemData);
-        if (fieldLog != null) {
-            fieldLog.setValue(itemData);
+        BeanLog<ItemData> log = (BeanLog<ItemData>) transaction.getFieldLog(this.itemData);
+        if (log != null) {
+            log.setValue(itemData);
         } else {
-            transaction.addFieldLog(new BeanFieldLog<>(this.itemData, itemData));
+            transaction.addFieldLog(new BeanLog<>(this.itemData, itemData));
         }
 
         itemData.addRootLog(getRoot());
