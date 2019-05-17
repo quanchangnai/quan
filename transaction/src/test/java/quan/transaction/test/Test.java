@@ -12,7 +12,9 @@ public class Test {
     private static final Logger logger = LogManager.getLogger(Test.class);
 
     public static void main(String[] args) {
+        Transaction.enable();
         test1();
+//        test2();
     }
 
 
@@ -26,7 +28,8 @@ public class Test {
                 @Override
                 public void run() {
                     try {
-                        Transaction.execute(role::test1);
+//                        Transaction.execute(role::test1);
+                        role.test1();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -40,6 +43,14 @@ public class Test {
             e.printStackTrace();
         }
 
+        logger.error(role.getRoleData());
+    }
+
+    private static void test2() {
+        Role role = new Role();
+        role.test1();
+        logger.error(role.getRoleData());
+        role.test2();
         logger.error(role.getRoleData());
     }
 

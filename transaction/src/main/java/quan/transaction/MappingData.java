@@ -24,29 +24,30 @@ public abstract class MappingData extends Data implements Comparable<MappingData
         lockIndex = lockIndexGenerator.incrementAndGet();
     }
 
-    public Lock getLock() {
+    public final Lock getLock() {
         return lock;
     }
 
-    public long getLockIndex() {
-        return lockIndex;
-    }
-
     @Override
-    public MappingData getRoot() {
+    public final MappingData getRoot() {
         return this;
     }
 
-    public long getVersion() {
+    @Override
+    protected final void onWriteData(BeanData beanData) {
+        super.onWriteData(beanData);
+    }
+
+    public final long getVersion() {
         return version;
     }
 
-    public void versionUp() {
+    public final void versionUp() {
         version++;
     }
 
     @Override
-    public int compareTo(MappingData o) {
+    public final int compareTo(MappingData o) {
         return this.lockIndex - o.lockIndex;
     }
 }

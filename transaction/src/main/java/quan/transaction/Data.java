@@ -11,20 +11,22 @@ public abstract class Data {
     /**
      * 更新数据回调
      *
-     * @param refData
+     * @param beanData
      */
-    protected void onWriteData(ReferenceData refData) {
+    protected void onWriteData(BeanData beanData) {
         Transaction transaction = Transaction.current();
         if (transaction == null) {
             throw new UnsupportedOperationException("当前不在事务中，禁止修改数据");
         }
-        if (refData != null) {
-            MappingData refDataOwner = refData.getRoot();
-            if (refDataOwner != null && refDataOwner != getRoot()) {
-                throw new UnsupportedOperationException("设置的引用数据当前正受到其它" + MappingData.class.getSimpleName() + "管理:" + refDataOwner);
+        if (beanData != null) {
+            MappingData root = beanData.getRoot();
+            if (root != null && root != getRoot()) {
+                throw new UnsupportedOperationException("设置的BeanData当前正受到其它" + MappingData.class.getSimpleName() + "管理:" + root);
             }
         }
         //交给事务管理
-        transaction.addDataLog(getRoot());
+        if (getRoot() != null) {
+            transaction.addVersionLog(getRoot());
+        }
     }
 }

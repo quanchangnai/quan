@@ -6,6 +6,7 @@ import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.dynamic.DynamicType;
 import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.matcher.ElementMatchers;
+import quan.mongo.Transaction;
 import quan.mongo.Transactional;
 
 import java.io.File;
@@ -34,15 +35,17 @@ public class Test {
 
         MemoryDatabase loggingDatabase = new MemoryDatabase();
 
-        List<String> loadResult = loggingDatabase.load("aaa");
-        System.err.println("loadResult:"+loadResult);
+//        List<String> loadResult =
+                loggingDatabase.load("aaa");
+//        System.err.println("loadResult:"+loadResult);
     }
 
     private static void test2()throws Exception{
 
         DynamicType.Loaded<MemoryDatabase> loaded = new ByteBuddy()
-                .rebase(MemoryDatabase.class)
-                .method(ElementMatchers.named("load")).intercept(MethodDelegation.to(TransactionInterceptor.class))
+                .subclass(MemoryDatabase.class)
+                .method(ElementMatchers.isAnnotatedWith(Transactional.class))
+                .intercept(MethodDelegation.to(TransactionInterceptor.class))
                 .make()
                 .load(Test.class.getClassLoader());
 
@@ -52,8 +55,8 @@ public class Test {
                 .getLoaded()
                 .newInstance();
 
-        List<String> loadResult = loggingDatabase.load("aaa");
-        System.err.println("loadResult:"+loadResult);
+//        List<String> loadResult = loggingDatabase.load("aaa");
+//        System.err.println("loadResult:"+loadResult);
     }
 
 }

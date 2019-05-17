@@ -5,13 +5,13 @@ import quan.transaction.MappingData;
 /**
  * Created by quanchangnai on 2019/5/17.
  */
-public class DataLog implements Log {
+public class VersionLog implements Log {
 
     private long version;
 
     private MappingData data;
 
-    public DataLog(MappingData data) {
+    public VersionLog(MappingData data) {
         this.data = data;
         this.version = data.getVersion();
     }

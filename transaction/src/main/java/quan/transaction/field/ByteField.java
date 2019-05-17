@@ -3,7 +3,7 @@ package quan.transaction.field;
 /**
  * Created by quanchangnai on 2019/5/16.
  */
-public class ByteField implements TypeField {
+public class ByteField implements Field {
 
     private byte value;
 
