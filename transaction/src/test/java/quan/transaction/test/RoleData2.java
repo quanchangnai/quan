@@ -18,49 +18,20 @@ public class RoleData2 extends MappingData {
 
 
     public int getId() {
-        Transaction transaction = Transaction.current();
-        if (transaction != null) {
-            IntLog fieldLog = (IntLog) transaction.getFieldLog(this.id);
-            if (fieldLog != null) {
-                return fieldLog.getValue();
-            }
-        }
-
         return id.getValue();
     }
 
     public RoleData2 setId(int id) {
-        onWriteData(null);
-        Transaction transaction = Transaction.current();
-        IntLog log = (IntLog) transaction.getFieldLog(this.id);
-        if (log != null) {
-            log.setValue(id);
-        } else {
-            transaction.addFieldLog(new IntLog(this.id, id));
-        }
+        this.id.setLogValue(id,getRoot());
         return this;
     }
 
     public String getName() {
-        Transaction transaction = Transaction.current();
-        if (transaction != null) {
-            StringLog log = (StringLog) transaction.getFieldLog(this.name);
-            if (log != null) {
-                return log.getValue();
-            }
-        }
         return name.getValue();
     }
 
     public RoleData2 setName(String name) {
-        onWriteData(null);
-        Transaction transaction = Transaction.current();
-        StringLog log = (StringLog) transaction.getFieldLog(this.name);
-        if (log != null) {
-            log.setValue(name);
-        } else {
-            transaction.addFieldLog(new StringLog(this.name, name));
-        }
+        this.name.setLogValue(name,getRoot());
         return this;
     }
 

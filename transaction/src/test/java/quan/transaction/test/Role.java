@@ -29,7 +29,7 @@ public class Role {
         }
         logger.error("事务开始{}:{}", tid, roleData);
 
-        roleData2.setName("bbb");
+        roleData2.setName("bbb"+tid);
 
         roleData.setId(roleData.getId() + 10);
 
@@ -39,7 +39,7 @@ public class Role {
 //            e.printStackTrace();
 //        }
 
-        roleData.setName("aaa");
+        roleData.setName("aaa"+roleData.getId());
 
         roleData2.setId(roleData2.getId() + 1);
 
@@ -49,6 +49,10 @@ public class Role {
             roleData.setItemData(itemData);
         } else {
             roleData.getItemData().setId(roleData.getItemData().getId() + 1);
+        }
+
+        if (roleData.getId() == 10) {
+            roleData.setItemData(null);
         }
 
         logger.error("事务结束{}:{}", tid, roleData);

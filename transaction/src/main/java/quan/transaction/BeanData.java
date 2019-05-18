@@ -30,7 +30,7 @@ public abstract class BeanData extends Data {
         Transaction transaction = Transaction.current();
         RootLog rootLog = transaction.getRootLog(this);
         if (rootLog != null) {
-            rootLog.setRoot(getRoot());
+            rootLog.setRoot(root);
         } else {
             transaction.addRootLog(new RootLog(this, root));
         }

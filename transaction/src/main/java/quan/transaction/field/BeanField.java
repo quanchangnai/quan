@@ -1,6 +1,9 @@
 package quan.transaction.field;
 
 import quan.transaction.BeanData;
+import quan.transaction.MappingData;
+import quan.transaction.Transaction;
+import quan.transaction.log.BeanLog;
 
 /**
  * Created by quanchangnai on 2019/5/16.
@@ -17,10 +20,41 @@ public class BeanField<T extends BeanData> implements Field {
     }
 
     public T getValue() {
+        Transaction transaction = Transaction.current();
+        if (transaction != null) {
+            BeanLog<T> log = (BeanLog<T>) transaction.getFieldLog(this);
+            if (log != null) {
+                return log.getValue();
+            }
+        }
         return value;
     }
 
     public void setValue(T value) {
         this.value = value;
+    }
+
+    public void setLogValue(T value, MappingData root) {
+        if (value != null && value.getRoot() != null && value.getRoot() != root) {
+            throw new UnsupportedOperationException("设置的" + value.getClass().getSimpleName() + "当前正受到其它" + MappingData.class.getSimpleName() + "管理:" + root);
+        }
+        Transaction transaction = Transaction.current();
+        if (root != null) {
+            transaction.addVersionLog(root);
+        }
+
+        BeanLog<T> log = (BeanLog<T>) transaction.getFieldLog(this);
+        if (log != null) {
+            log.setValue(value);
+        } else {
+            transaction.addFieldLog(new BeanLog<>(this, value));
+        }
+
+        if (value != null) {
+            value.addRootLog(root);
+        }
+        if (value == null && this.getValue() != null) {
+            this.getValue().addRootLog(null);
+        }
     }
 }

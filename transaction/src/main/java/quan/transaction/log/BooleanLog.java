@@ -20,7 +20,7 @@ public class BooleanLog implements FieldLog {
         this.value = value;
     }
 
-    public boolean isValue() {
+    public boolean getValue() {
         return value;
     }
 

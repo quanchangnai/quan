@@ -33,11 +33,6 @@ public abstract class MappingData extends Data implements Comparable<MappingData
         return this;
     }
 
-    @Override
-    protected final void onWriteData(BeanData beanData) {
-        super.onWriteData(beanData);
-    }
-
     public final long getVersion() {
         return version;
     }

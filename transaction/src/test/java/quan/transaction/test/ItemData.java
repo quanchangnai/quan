@@ -14,26 +14,11 @@ public class ItemData extends BeanData {
     private IntField id = new IntField();
 
     public int getId() {
-        Transaction transaction = Transaction.current();
-        if (transaction != null) {
-            IntLog log = (IntLog) transaction.getFieldLog(this.id);
-            if (log != null) {
-                return log.getValue();
-            }
-        }
-
         return id.getValue();
     }
 
     public ItemData setId(int id) {
-        onWriteData(null);
-        Transaction transaction = Transaction.current();
-        IntLog log = (IntLog) transaction.getFieldLog(this.id);
-        if (log != null) {
-            log.setValue(id);
-        } else {
-            transaction.addFieldLog(new IntLog(this.id, id));
-        }
+        this.id.setLogValue(id,getRoot());
         return this;
     }
 
