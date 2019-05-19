@@ -48,4 +48,9 @@ public class ShortField implements Field {
         }
     }
 
+    @Override
+    public String toString() {
+        return String.valueOf(getValue());
+    }
+
 }

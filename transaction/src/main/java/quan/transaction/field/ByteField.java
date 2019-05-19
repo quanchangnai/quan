@@ -48,5 +48,9 @@ public class ByteField implements Field {
         }
     }
 
+    @Override
+    public String toString() {
+        return String.valueOf(getValue());
+    }
 
 }

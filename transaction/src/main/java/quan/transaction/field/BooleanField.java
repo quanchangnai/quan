@@ -47,4 +47,9 @@ public class BooleanField implements Field {
         }
     }
 
+    @Override
+    public String toString() {
+        return String.valueOf(getValue());
+    }
+
 }

@@ -57,4 +57,9 @@ public class BeanField<T extends BeanData> implements Field {
             this.getValue().addRootLog(null);
         }
     }
+
+    @Override
+    public String toString() {
+        return String.valueOf(getValue());
+    }
 }

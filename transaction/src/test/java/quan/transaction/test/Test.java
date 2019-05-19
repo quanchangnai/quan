@@ -23,7 +23,7 @@ public class Test {
 
         Role role = new Role();
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 100; i++) {
             new Thread() {
                 @Override
                 public void run() {
@@ -34,7 +34,7 @@ public class Test {
                         e.printStackTrace();
                     }
                 }
-            }.start();
+            }.run();
         }
 
         try {

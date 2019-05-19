@@ -47,9 +47,9 @@ public class RoleData extends MappingData {
     public String toString() {
         return "RoleData{" +
                 "version=" + getVersion() +
-                ",id=" + getId() +
-                ", name=" + getName() +
-                ", itemData=" + getItemData() +
+                ",id=" + id +
+                ", name=" + name +
+                ", itemData=" + itemData +
                 '}';
     }
 }

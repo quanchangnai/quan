@@ -40,8 +40,8 @@ public class RoleData2 extends MappingData {
     public String toString() {
         return "RoleData2{" +
                 "version=" + getVersion() +
-                ",id=" + getId() +
-                ", name=" + getName() +
+                ",id=" + id +
+                ", name=" + name +
                 '}';
     }
 }

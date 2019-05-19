@@ -1,8 +1,12 @@
 package quan.transaction;
 
+import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.NamingStrategy;
 import net.bytebuddy.agent.ByteBuddyAgent;
 import net.bytebuddy.agent.builder.AgentBuilder;
+import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.implementation.MethodDelegation;
+import net.bytebuddy.implementation.auxiliary.AuxiliaryType;
 import net.bytebuddy.matcher.ElementMatchers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -129,9 +133,9 @@ public class Transaction {
     /**
      * 开始事务
      */
-    private static void begin() {
+    private static Transaction begin() {
         if (!checkEnabled()) {
-            return;
+            return null;
         }
 
         Transaction current = current();
@@ -141,6 +145,7 @@ public class Transaction {
         } else {
             throw new RuntimeException("当前已经在事务中了");
         }
+        return current;
     }
 
     /**
@@ -161,7 +166,7 @@ public class Transaction {
         current.failed = current.failed || fail;
 
         if (current.isFailed()) {
-            current.rollback();
+            current.rollback(true);
         } else {
             current.commit();
         }
@@ -189,17 +194,16 @@ public class Transaction {
         //开启事务再执行任务
         boolean fail = false;
         int count = 0;
-        begin();
-        Transaction current = current();
+        Transaction current = begin();
         try {
             while (true) {
                 count++;
                 logger.debug("当前第{}次执行事务{}", count, current.getId());
                 task.run();
                 current.lock();
-                if (current.checkConflict()) {
+                if (current.conflict()) {
                     //有冲突，其他事务也修改了数据
-                    current.rollback();
+                    current.rollback(false);
                 } else {
                     return;
                 }
@@ -238,16 +242,13 @@ public class Transaction {
     }
 
 
-    private boolean checkConflict() {
-        boolean conflict = false;
+    private boolean conflict() {
         for (VersionLog versionLog : versionLogs.values()) {
-            if (versionLog.getData().getVersion() != versionLog.getVersion()) {
-                conflict = true;
-                break;
+            if (versionLog.conflict()) {
+                return true;
             }
         }
-
-        return conflict;
+        return false;
     }
 
 
@@ -259,7 +260,7 @@ public class Transaction {
             for (RootLog rootLog : rootLogs.values()) {
                 rootLog.commit();
             }
-            for ( FieldLog fieldLog : fieldLogs.values()) {
+            for (FieldLog fieldLog : fieldLogs.values()) {
                 fieldLog.commit();
             }
 
@@ -276,8 +277,10 @@ public class Transaction {
 
     /**
      * 执行失败或者和其他事务冲突时回滚事务
+     *
+     * @param end 是不是结束事务的回滚
      */
-    private void rollback() {
+    private void rollback(boolean end) {
         try {
             versionLogs.clear();
             fieldLogs.clear();
@@ -307,16 +310,19 @@ public class Transaction {
             return;
         }
 
-        AgentBuilder.Transformer transformer = (builder, typeDescription, classLoader, module) -> builder
-                .method(ElementMatchers.isAnnotatedWith(Transactional.class))
-                .intercept(MethodDelegation.to(TransactionInterceptor.class));
-
-        new AgentBuilder.Default()
-                .with(AgentBuilder.LambdaInstrumentationStrategy.ENABLED)
-                .enableNativeMethodPrefix("original$")
-                .type(ElementMatchers.isAnnotatedWith(Transactional.class))
-                .transform(transformer)
-                .installOn(ByteBuddyAgent.install());
+//        ByteBuddy byteBuddy = new ByteBuddy();
+//        byteBuddy.with(new AuxiliaryTypeNamingStrategySuffixingFix("auxiliary"));
+//
+//        AgentBuilder.Transformer transformer = (builder, typeDescription, classLoader, module) -> builder
+//                .method(ElementMatchers.isAnnotatedWith(Transactional.class))
+//                .intercept(MethodDelegation.to(TransactionInterceptor.class));
+//
+//        new AgentBuilder.Default(byteBuddy)
+//                .with(AgentBuilder.LambdaInstrumentationStrategy.ENABLED)
+//                .enableNativeMethodPrefix("original$")
+//                .type(ElementMatchers.isAnnotatedWith(Transactional.class))
+//                .transform(transformer)
+//                .installOn(ByteBuddyAgent.install());
 
         enabled = true;
     }

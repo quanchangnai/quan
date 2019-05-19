@@ -47,4 +47,10 @@ public class DoubleField implements Field {
             transaction.addFieldLog(new DoubleLog(this, value));
         }
     }
+
+    @Override
+    public String toString() {
+        return String.valueOf(getValue());
+    }
+
 }

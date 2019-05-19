@@ -27,17 +27,19 @@ public class Role {
         if (current != null) {
             tid += current.getId();
         }
+
         logger.error("事务开始{}:{}", tid, roleData);
 
         roleData2.setName("bbb"+tid);
 
         roleData.setId(roleData.getId() + 10);
 
-//        try {
-//            Thread.sleep(10);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            Thread.sleep(1000);
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         roleData.setName("aaa"+roleData.getId());
 

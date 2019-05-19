@@ -24,6 +24,10 @@ public class VersionLog implements Log {
         return data;
     }
 
+    public boolean conflict() {
+        return version != data.getVersion();
+    }
+
     @Override
     public void commit() {
         data.versionUp();

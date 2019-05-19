@@ -31,7 +31,7 @@ public class ItemData extends BeanData {
     @Override
     public String toString() {
         return "ItemData{" +
-                "id=" + getId() +
+                "id=" + id +
                 '}';
     }
 }
