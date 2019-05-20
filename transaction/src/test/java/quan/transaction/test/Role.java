@@ -20,6 +20,7 @@ public class Role {
         return roleData;
     }
 
+
     @Transactional
     public void test1() {
         String tid = "";
@@ -30,18 +31,19 @@ public class Role {
 
         logger.error("事务开始{}:{}", tid, roleData);
 
-        roleData2.setName("bbb"+tid);
+        roleData2.setName("bbb" + tid);
+
 
         roleData.setId(roleData.getId() + 10);
 
-        try {
-            Thread.sleep(1000);
+//        try {
+//            Thread.sleep(1000);
+//
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        roleData.setName("aaa"+roleData.getId());
+        roleData.setName("aaa" + roleData.getId());
 
         roleData2.setId(roleData2.getId() + 1);
 
@@ -56,6 +58,8 @@ public class Role {
         if (roleData.getId() == 10) {
             roleData.setItemData(null);
         }
+
+        roleData.getMaps().put(roleData.getId(), roleData.getId());
 
         logger.error("事务结束{}:{}", tid, roleData);
 

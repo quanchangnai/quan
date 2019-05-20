@@ -38,11 +38,15 @@ public class BeanField<T extends BeanData> implements Field {
         if (value != null && value.getRoot() != null && value.getRoot() != root) {
             throw new UnsupportedOperationException("设置的" + value.getClass().getSimpleName() + "当前正受到其它" + MappingData.class.getSimpleName() + "管理:" + root);
         }
+
+        if (getValue() == value) {
+            return;
+        }
+
         Transaction transaction = Transaction.current();
         if (root != null) {
             transaction.addVersionLog(root);
         }
-
         BeanLog<T> log = (BeanLog<T>) transaction.getFieldLog(this);
         if (log != null) {
             log.setValue(value);
@@ -51,10 +55,10 @@ public class BeanField<T extends BeanData> implements Field {
         }
 
         if (value != null) {
-            value.addRootLog(root);
+            value.setLogRoot(root);
         }
-        if (value == null && this.getValue() != null) {
-            this.getValue().addRootLog(null);
+        if (this.getValue() != null) {
+            this.getValue().setLogRoot(null);
         }
     }
 

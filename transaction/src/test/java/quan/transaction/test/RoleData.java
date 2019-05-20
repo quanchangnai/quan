@@ -3,7 +3,10 @@ package quan.transaction.test;
 import quan.transaction.MappingData;
 import quan.transaction.field.BeanField;
 import quan.transaction.field.IntField;
+import quan.transaction.field.MapField;
 import quan.transaction.field.StringField;
+
+import java.util.Map;
 
 /**
  * Created by quanchangnai on 2019/5/16.
@@ -15,6 +18,8 @@ public class RoleData extends MappingData {
     private StringField name = new StringField();
 
     private BeanField<ItemData> itemData = new BeanField<>();
+
+    private MapField<Integer, Integer> maps = new MapField<>();
 
     public int getId() {
         return id.getValue();
@@ -43,6 +48,10 @@ public class RoleData extends MappingData {
         return this;
     }
 
+    public Map<Integer, Integer> getMaps() {
+        return maps;
+    }
+
     @Override
     public String toString() {
         return "RoleData{" +
@@ -50,6 +59,7 @@ public class RoleData extends MappingData {
                 ",id=" + id +
                 ", name=" + name +
                 ", itemData=" + itemData +
+                ", maps=" + maps +
                 '}';
     }
 }

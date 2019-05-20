@@ -26,7 +26,7 @@ public abstract class BeanData extends Data {
         return this;
     }
 
-    public final void addRootLog(MappingData root) {
+    public final void setLogRoot(MappingData root) {
         Transaction transaction = Transaction.current();
         RootLog rootLog = transaction.getRootLog(this);
         if (rootLog != null) {
@@ -35,8 +35,8 @@ public abstract class BeanData extends Data {
             transaction.addRootLog(new RootLog(this, root));
         }
 
-        addChildrenRootLog(root);
+        setChildrenLogRoot(root);
     }
 
-    protected abstract void addChildrenRootLog(MappingData root);
+    protected abstract void setChildrenLogRoot(MappingData root);
 }

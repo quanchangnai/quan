@@ -23,7 +23,7 @@ public class ItemData extends BeanData {
     }
 
     @Override
-    protected void addChildrenRootLog(MappingData root) {
+    protected void setChildrenLogRoot(MappingData root) {
         //字段里面有bean需要添加RootLog
     }
 

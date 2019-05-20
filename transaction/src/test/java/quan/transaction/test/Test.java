@@ -2,6 +2,8 @@ package quan.transaction.test;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.pcollections.Empty;
+import org.pcollections.PMap;
 import quan.transaction.Transaction;
 
 /**
@@ -11,10 +13,13 @@ public class Test {
 
     private static final Logger logger = LogManager.getLogger(Test.class);
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         Transaction.enable();
         test1();
 //        test2();
+//
+//        test3();
+
     }
 
 
@@ -23,7 +28,7 @@ public class Test {
 
         Role role = new Role();
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 3; i++) {
             new Thread() {
                 @Override
                 public void run() {
@@ -34,7 +39,7 @@ public class Test {
                         e.printStackTrace();
                     }
                 }
-            }.run();
+            }.start();
         }
 
         try {
@@ -52,6 +57,13 @@ public class Test {
         logger.error(role.getRoleData());
         role.test2();
         logger.error(role.getRoleData());
+    }
+
+
+    private static void test3() {
+        PMap<String, String> map = Empty.map();
+        map = map.plus("aaa", "bbb");
+        map.keySet().remove("aaa");
     }
 
 }
