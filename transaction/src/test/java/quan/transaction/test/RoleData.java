@@ -1,12 +1,11 @@
 package quan.transaction.test;
 
 import quan.transaction.MappingData;
-import quan.transaction.field.BeanField;
-import quan.transaction.field.IntField;
-import quan.transaction.field.MapField;
-import quan.transaction.field.StringField;
+import quan.transaction.field.*;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by quanchangnai on 2019/5/16.
@@ -19,7 +18,13 @@ public class RoleData extends MappingData {
 
     private BeanField<ItemData> itemData = new BeanField<>();
 
-    private MapField<Integer, Integer> maps = new MapField<>();
+    private MapField<Integer, ItemData> map = new MapField<>(getRoot());
+
+    private SetField<Integer> set = new SetField<>(getRoot());
+
+    private ListField<Integer> list = new ListField<>(getRoot());
+
+
 
     public int getId() {
         return id.getValue();
@@ -48,8 +53,16 @@ public class RoleData extends MappingData {
         return this;
     }
 
-    public Map<Integer, Integer> getMaps() {
-        return maps;
+    public Map<Integer, ItemData> getMap() {
+        return map;
+    }
+
+    public Set<Integer> getSet() {
+        return set;
+    }
+
+    public List<Integer> getList() {
+        return list;
     }
 
     @Override
@@ -59,7 +72,9 @@ public class RoleData extends MappingData {
                 ",id=" + id +
                 ", name=" + name +
                 ", itemData=" + itemData +
-                ", maps=" + maps +
+                ", map=" + map +
+                ", set=" + set +
+                ", list=" + list +
                 '}';
     }
 }

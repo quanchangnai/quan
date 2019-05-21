@@ -59,7 +59,16 @@ public class Role {
             roleData.setItemData(null);
         }
 
-        roleData.getMaps().put(roleData.getId(), roleData.getId());
+        if (roleData.getMap().isEmpty()) {
+            ItemData itemData = new ItemData();
+            itemData.setId(2);
+            roleData.getMap().put(itemData.getId(), itemData);
+        } else {
+            roleData.getMap().get(2).setId(roleData.getMap().get(2).getId() + 1);
+        }
+
+        roleData.getSet().add(roleData.getId());
+        roleData.getList().add(roleData.getId());
 
         logger.error("事务结束{}:{}", tid, roleData);
 
@@ -71,12 +80,20 @@ public class Role {
 
     @Transactional
     public void test2() {
-        if (roleData.getItemData() == null) {
-            roleData.setItemData(new ItemData());
-        } else {
-            roleData.getItemData().setId(20);
+        String tid = "";
+        Transaction current = Transaction.current();
+        if (current != null) {
+            tid += current.getId();
         }
+        logger.error("事务开始{}:{}", tid, roleData);
 
+        roleData.getMap().clear();
+//        ItemData itemData = roleData.getMap().get(2);
+//        itemData.setId(1000);
+//        logger.error("itemData.getRoot():{}", itemData.getRoot());
+
+
+        throw new RuntimeException();
     }
 
 }

@@ -15,18 +15,18 @@ public class Test {
 
     public static void main(String[] args) throws Exception {
         Transaction.enable();
-        test1();
-//        test2();
+        Role role = new Role();
+        test1(role);
+        test2(role);
 //
 //        test3();
 
     }
 
 
-    private static void test1() {
+    private static void test1(Role role) {
         logger.error("测试3个线程开启事务同时修改数据");
 
-        Role role = new Role();
 
         for (int i = 0; i < 3; i++) {
             new Thread() {
@@ -51,11 +51,13 @@ public class Test {
         logger.error(role.getRoleData());
     }
 
-    private static void test2() {
-        Role role = new Role();
-        role.test1();
+    private static void test2(Role role) {
         logger.error(role.getRoleData());
-        role.test2();
+        try {
+            role.test2();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         logger.error(role.getRoleData());
     }
 

@@ -1,33 +1,37 @@
 package quan.transaction.log;
 
 import org.pcollections.PMap;
+import org.pcollections.PSet;
 import quan.transaction.field.MapField;
+import quan.transaction.field.SetField;
+
+import java.util.Set;
 
 /**
  * Created by quanchangnai on 2019/5/20.
  */
-public class MapLog<K, V> implements FieldLog {
+public class SetLog<E> implements FieldLog {
 
 
-    private MapField<K, V> field;
+    private SetField<E> field;
 
-    private PMap<K, V> data;
+    private PSet<E> data;
 
-    public MapLog(MapField<K, V> field) {
+    public SetLog(SetField<E> field) {
         this.field = field;
-        this.data = (PMap<K, V>) field.getData();
+        this.data =  field.getData();
     }
 
     @Override
-    public MapField<K, V> getField() {
+    public SetField<E> getField() {
         return field;
     }
 
-    public PMap<K, V> getData() {
+    public PSet<E> getData() {
         return data;
     }
 
-    public MapLog<K, V> setData(PMap<K, V> data) {
+    public SetLog<E> setData(PSet<E> data) {
         this.data = data;
         return this;
     }
