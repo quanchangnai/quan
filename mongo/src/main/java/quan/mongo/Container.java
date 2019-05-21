@@ -42,7 +42,7 @@ public interface Container {
         if (insert) {
             Objects.requireNonNull(insertedData, "不允许添加空数据");
             Class<?> insertedClass = insertedData.getClass();
-            if (!allowedClasses.contains(insertedClass) && insertedClass.isAssignableFrom(ReferenceData.class)) {
+            if (!allowedClasses.contains(insertedClass) && ReferenceData.class.isAssignableFrom(insertedClass)) {
                 throw new IllegalArgumentException("不允许添加该数据类型：" + insertedClass);
             }
             if (insertedData instanceof ReferenceData) {

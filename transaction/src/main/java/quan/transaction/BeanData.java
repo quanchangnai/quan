@@ -3,7 +3,6 @@ package quan.transaction;
 import quan.transaction.log.RootLog;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -46,8 +45,8 @@ public abstract class BeanData extends Data {
 
     protected void validValue(Object value) {
         List<Class<?>> allowedClasses = Arrays.asList(Byte.class, Boolean.class, Short.class, Integer.class, Long.class, Double.class, String.class);
-        if (!allowedClasses.contains(value.getClass()) && value.getClass().isAssignableFrom(BeanData.class)) {
-            throw new IllegalArgumentException("不允许添加该数据类型：" + value.getClass());
+        if (!allowedClasses.contains(value.getClass()) && !BeanData.class.isAssignableFrom(value.getClass())) {
+            throw new IllegalArgumentException("不允许添加该数据类型：" + value.getClass() + "，允许的类型:" + BeanData.class + " " + allowedClasses);
         }
         if (value instanceof BeanData) {
             MappingData valueRoot = ((BeanData) value).getRoot();

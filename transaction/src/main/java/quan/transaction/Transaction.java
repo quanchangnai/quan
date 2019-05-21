@@ -86,6 +86,11 @@ public class Transaction {
         }
     }
 
+    public static void breakdown() {
+        fail();
+        throw new RuntimeException("事务被标记为失败状态");
+    }
+
     public void addVersionLog(MappingData data) {
         if (versionLogs.containsKey(data)) {
             return;
@@ -204,7 +209,7 @@ public class Transaction {
             dataList.add(data);
         }
 
-        //排序加锁，保证解锁顺序一致
+        //排序加锁，保证不同事务按照同一顺序竞争锁，防止死锁
         Collections.sort(dataList);
         for (MappingData data : dataList) {
             locks.add(data.getLock());
@@ -235,8 +240,10 @@ public class Transaction {
 
     private void commit() {
         try {
+            Set<MappingData> writes = new HashSet<>();
             for (VersionLog versionLog : versionLogs.values()) {
                 versionLog.commit();
+                writes.add(versionLog.getData());
             }
             for (RootLog rootLog : rootLogs.values()) {
                 rootLog.commit();

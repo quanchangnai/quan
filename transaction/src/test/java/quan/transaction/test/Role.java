@@ -29,7 +29,7 @@ public class Role {
             tid += current.getId();
         }
 
-        logger.error("事务开始{}:{}", tid, roleData);
+        logger.error("test1开始,事务ID,{},{}", tid, roleData);
 
         roleData2.setName("bbb" + tid);
 
@@ -70,10 +70,10 @@ public class Role {
         roleData.getSet().add(roleData.getId());
         roleData.getList().add(roleData.getId());
 
-        logger.error("事务结束{}:{}", tid, roleData);
+        logger.error("test1结束,事务ID:{},{}", tid, roleData);
 
         if (roleData.getId() > 20) {
-            throw new RuntimeException();
+//            Transaction.breakdown();
         }
 
     }
@@ -85,7 +85,7 @@ public class Role {
         if (current != null) {
             tid += current.getId();
         }
-        logger.error("事务开始{}:{}", tid, roleData);
+        logger.error("test2开始，事务ID:{},{}", tid, roleData);
 
         roleData.getMap().clear();
 //        ItemData itemData = roleData.getMap().get(2);
@@ -93,7 +93,8 @@ public class Role {
 //        logger.error("itemData.getRoot():{}", itemData.getRoot());
 
 
-        throw new RuntimeException();
+        logger.error("test2结束，事务ID:{},{}", tid, roleData);
+        Transaction.breakdown();
     }
 
 }

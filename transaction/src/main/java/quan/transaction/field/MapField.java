@@ -85,7 +85,7 @@ public class MapField<K, V> extends BeanData implements Map<K, V>, Field {
     private void validKey(K key) {
         List<Class<?>> allowedClasses = Arrays.asList(Byte.class, Boolean.class, Short.class, Integer.class, Long.class, Double.class, String.class);
         if (!allowedClasses.contains(key.getClass())) {
-            throw new IllegalArgumentException("不允许该类型作为Key:" + key.getClass());
+            throw new IllegalArgumentException("不允许该类型作为Key:" + key.getClass() + "，允许的类型:" + allowedClasses);
         }
     }
 

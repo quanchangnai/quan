@@ -18,7 +18,7 @@ public class Test {
         Role role = new Role();
         test1(role);
         test2(role);
-//
+
 //        test3();
 
     }
@@ -28,7 +28,7 @@ public class Test {
         logger.error("测试3个线程开启事务同时修改数据");
 
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 100; i++) {
             new Thread() {
                 @Override
                 public void run() {
