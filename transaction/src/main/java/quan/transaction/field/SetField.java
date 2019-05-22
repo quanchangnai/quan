@@ -77,10 +77,11 @@ public class SetField<E> extends BeanData implements Set<E>, Field {
 
 
     private SetLog<E> getOrAddLog() {
+        checkTransaction();
         Transaction transaction = Transaction.current();
         SetLog<E> log = (SetLog<E>) transaction.getFieldLog(this);
         if (log == null) {
-            log = new SetLog<E>(this);
+            log = new SetLog<>(this);
             transaction.addFieldLog(log);
         }
         return log;
@@ -113,14 +114,13 @@ public class SetField<E> extends BeanData implements Set<E>, Field {
         SetLog<E> log = getOrAddLog();
 
         PSet<E> oldData = log.getData();
+        PSet<E> newData = oldData.minus(o);
 
         for (E e : oldData) {
             if (e.equals(o) && e instanceof BeanData) {
                 ((BeanData) e).setLogRoot(null);
             }
         }
-
-        PSet<E> newData = oldData.minus(o);
 
         if (oldData != newData) {
             log.setData(newData);
@@ -143,6 +143,7 @@ public class SetField<E> extends BeanData implements Set<E>, Field {
         SetLog<E> log = getOrAddLog();
 
         PSet<E> oldData = log.getData();
+        PSet<E> newData = oldData.plusAll(c);
 
         for (E e : c) {
             if (e instanceof BeanData) {
@@ -150,7 +151,6 @@ public class SetField<E> extends BeanData implements Set<E>, Field {
             }
         }
 
-        PSet<E> newData = oldData.plusAll(c);
         if (oldData != newData) {
             log.setData(newData);
             return true;
@@ -168,17 +168,14 @@ public class SetField<E> extends BeanData implements Set<E>, Field {
         SetLog<E> log = getOrAddLog();
 
         PSet<E> oldData = log.getData();
+        PSet<E> newData = oldData.minusAll(c);
 
-        for (Object o : c) {
+        if (oldData != newData) {
             for (E e : oldData) {
-                if (e.equals(o) && e instanceof BeanData) {
+                if (!newData.contains(e) && e instanceof BeanData) {
                     ((BeanData) e).setLogRoot(null);
                 }
             }
-        }
-
-        PSet<E> newData = oldData.minusAll(c);
-        if (oldData != newData) {
             log.setData(newData);
             return true;
         }

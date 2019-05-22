@@ -6,6 +6,11 @@ import org.pcollections.Empty;
 import org.pcollections.PMap;
 import quan.transaction.Transaction;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * Created by quanchangnai on 2019/5/16.
  */
@@ -21,6 +26,14 @@ public class Test {
 
 //        test3();
 
+
+        List<String> list = new ArrayList<>();
+        list.add("aaa");
+        list.add("bbb");
+        list.add(1, "ccc");
+        System.err.println(list);
+        list.remove("aaa");
+        System.err.println(list);
     }
 
 

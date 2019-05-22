@@ -83,6 +83,8 @@ public class Transaction {
         Transaction current = current();
         if (current != null) {
             current.failed = true;
+        } else {
+            throw new RuntimeException("当前不在事务中");
         }
     }
 

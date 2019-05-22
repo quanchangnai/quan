@@ -2,10 +2,7 @@ package quan.transaction.field;
 
 import quan.transaction.MappingData;
 import quan.transaction.Transaction;
-import quan.transaction.log.DoubleLog;
-import quan.transaction.log.FieldLog;
 import quan.transaction.log.FloatLog;
-import quan.transaction.log.IntLog;
 
 /**
  * Created by quanchangnai on 2019/5/16.
@@ -37,6 +34,7 @@ public class FloatField implements Field {
     }
 
     public void setLogValue(float value, MappingData root) {
+        checkTransaction();
         Transaction transaction = Transaction.current();
         if (root != null) {
             transaction.addVersionLog(root);

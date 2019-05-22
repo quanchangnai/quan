@@ -70,6 +70,7 @@ public class MapField<K, V> extends BeanData implements Map<K, V>, Field {
     }
 
     private MapLog<K, V> getOrAddLog() {
+        checkTransaction();
         Transaction transaction = Transaction.current();
         if (getRoot() != null) {
             transaction.addVersionLog(getRoot());
@@ -83,6 +84,9 @@ public class MapField<K, V> extends BeanData implements Map<K, V>, Field {
     }
 
     private void validKey(K key) {
+        if (key == null) {
+            throw new IllegalArgumentException("不允许null作为Key");
+        }
         List<Class<?>> allowedClasses = Arrays.asList(Byte.class, Boolean.class, Short.class, Integer.class, Long.class, Double.class, String.class);
         if (!allowedClasses.contains(key.getClass())) {
             throw new IllegalArgumentException("不允许该类型作为Key:" + key.getClass() + "，允许的类型:" + allowedClasses);
@@ -109,8 +113,10 @@ public class MapField<K, V> extends BeanData implements Map<K, V>, Field {
     @Override
     public V remove(Object key) {
         MapLog<K, V> log = getOrAddLog();
+
         V value = log.getData().get(key);
         log.setData(log.getData().minus(key));
+
         if (value instanceof BeanData) {
             ((BeanData) value).setLogRoot(null);
         }
@@ -122,12 +128,19 @@ public class MapField<K, V> extends BeanData implements Map<K, V>, Field {
         for (K key : m.keySet()) {
             validKey(key);
         }
+
         for (V value : m.values()) {
             validValue(value);
         }
+
         MapLog<K, V> log = getOrAddLog();
         log.setData(log.getData().plusAll(m));
-        setChildrenLogRoot(getRoot());
+
+        for (V value : m.values()) {
+            if (value instanceof BeanData) {
+                ((BeanData) value).setLogRoot(getRoot());
+            }
+        }
     }
 
     @Override

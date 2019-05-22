@@ -44,6 +44,9 @@ public abstract class BeanData extends Data {
     protected abstract void setChildrenLogRoot(MappingData root);
 
     protected void validValue(Object value) {
+        if (value == null) {
+            throw new IllegalArgumentException("不允许添加null");
+        }
         List<Class<?>> allowedClasses = Arrays.asList(Byte.class, Boolean.class, Short.class, Integer.class, Long.class, Double.class, String.class);
         if (!allowedClasses.contains(value.getClass()) && !BeanData.class.isAssignableFrom(value.getClass())) {
             throw new IllegalArgumentException("不允许添加该数据类型：" + value.getClass() + "，允许的类型:" + BeanData.class + " " + allowedClasses);

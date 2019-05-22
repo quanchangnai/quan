@@ -7,7 +7,10 @@ import quan.transaction.MappingData;
 import quan.transaction.Transaction;
 import quan.transaction.log.ListLog;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 /**
  * Created by quanchangnai on 2019/5/21.
@@ -76,6 +79,7 @@ public class ListField<E> extends BeanData implements List<E>, Field {
     }
 
     private ListLog<E> getOrAddLog() {
+        checkTransaction();
         Transaction transaction = Transaction.current();
         if (getRoot() != null) {
             transaction.addVersionLog(getRoot());
@@ -186,17 +190,14 @@ public class ListField<E> extends BeanData implements List<E>, Field {
         ListLog<E> log = getOrAddLog();
 
         PVector<E> oldData = log.getData();
+        PVector<E> newData = log.getData().minusAll(c);
 
-        for (Object o : c) {
+        if (oldData != newData) {
             for (E e : oldData) {
-                if (e.equals(o) && e instanceof BeanData) {
+                if (!newData.contains(e) && e instanceof BeanData) {
                     ((BeanData) e).setLogRoot(null);
                 }
             }
-        }
-
-        PVector<E> newData = log.getData().minusAll(c);
-        if (oldData != newData) {
             log.setData(newData);
             return true;
         }
@@ -235,7 +236,17 @@ public class ListField<E> extends BeanData implements List<E>, Field {
         if (oldData != newData) {
             log.setData(newData);
         }
-        return oldData.get(index);
+
+        if (element instanceof BeanData) {
+            ((BeanData) element).setLogRoot(getRoot());
+        }
+
+        E oldElement = oldData.get(index);
+        if (oldElement instanceof BeanData) {
+            ((BeanData) oldElement).setLogRoot(null);
+        }
+
+        return oldElement;
     }
 
     @Override
@@ -250,17 +261,34 @@ public class ListField<E> extends BeanData implements List<E>, Field {
         if (oldData != newData) {
             log.setData(newData);
         }
+
+        if (element instanceof BeanData) {
+            ((BeanData) element).setLogRoot(getRoot());
+        }
+
+        E oldElement = oldData.get(index);
+        if (oldElement instanceof BeanData) {
+            ((BeanData) oldElement).setLogRoot(null);
+        }
     }
 
     @Override
     public E remove(int index) {
         ListLog<E> log = getOrAddLog();
+
         PVector<E> oldData = log.getData();
         PVector<E> newData = log.getData().minus(index);
+
         if (oldData != newData) {
             log.setData(newData);
         }
-        return oldData.get(index);
+
+        E oldElement = oldData.get(index);
+        if (oldElement instanceof BeanData) {
+            ((BeanData) oldElement).setLogRoot(null);
+        }
+
+        return oldElement;
     }
 
     @Override

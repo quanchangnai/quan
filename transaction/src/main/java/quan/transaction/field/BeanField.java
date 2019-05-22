@@ -35,6 +35,7 @@ public class BeanField<T extends BeanData> implements Field {
     }
 
     public void setLogValue(T value, MappingData root) {
+        checkTransaction();
         if (value != null && value.getRoot() != null && value.getRoot() != root) {
             throw new UnsupportedOperationException("设置的" + value.getClass().getSimpleName() + "当前正受到其它" + MappingData.class.getSimpleName() + "管理:" + value.getRoot());
         }

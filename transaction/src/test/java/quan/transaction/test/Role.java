@@ -87,10 +87,12 @@ public class Role {
         }
         logger.error("test2开始，事务ID:{},{}", tid, roleData);
 
+        ItemData itemData = roleData.getMap().get(2);
+
         roleData.getMap().clear();
-//        ItemData itemData = roleData.getMap().get(2);
-//        itemData.setId(1000);
-//        logger.error("itemData.getRoot():{}", itemData.getRoot());
+
+        itemData.setId(1000);
+        logger.error("itemData.getRoot():{}", itemData.getRoot());
 
 
         logger.error("test2结束，事务ID:{},{}", tid, roleData);

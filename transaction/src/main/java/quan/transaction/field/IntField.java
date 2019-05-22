@@ -34,6 +34,7 @@ public class IntField implements Field {
     }
 
     public void setLogValue(int value, MappingData root) {
+        checkTransaction();
         Transaction transaction = Transaction.current();
         if (root != null) {
             transaction.addVersionLog(root);

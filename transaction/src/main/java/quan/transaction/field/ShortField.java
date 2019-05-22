@@ -2,8 +2,6 @@ package quan.transaction.field;
 
 import quan.transaction.MappingData;
 import quan.transaction.Transaction;
-import quan.transaction.log.IntLog;
-import quan.transaction.log.LongLog;
 import quan.transaction.log.ShortLog;
 
 /**
@@ -36,6 +34,7 @@ public class ShortField implements Field {
     }
 
     public void setLogValue(short value, MappingData root) {
+        checkTransaction();
         Transaction transaction = Transaction.current();
         if (root != null) {
             transaction.addVersionLog(root);

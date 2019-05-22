@@ -3,7 +3,6 @@ package quan.transaction.field;
 import quan.transaction.MappingData;
 import quan.transaction.Transaction;
 import quan.transaction.log.BooleanLog;
-import quan.transaction.log.IntLog;
 
 /**
  * Created by quanchangnai on 2019/5/16.
@@ -35,6 +34,7 @@ public class BooleanField implements Field {
     }
 
     public void setLogValue(boolean value, MappingData root) {
+        checkTransaction();
         Transaction transaction = Transaction.current();
         if (root != null) {
             transaction.addVersionLog(root);
