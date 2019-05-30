@@ -70,12 +70,12 @@ public class ListField<E> extends BeanData implements List<E>, Field {
 
     @Override
     public Object[] toArray() {
-        throw new UnsupportedOperationException();
+        return getData().toArray();
     }
 
     @Override
     public <T> T[] toArray(T[] a) {
-        throw new UnsupportedOperationException();
+        return getData().toArray(a);
     }
 
     private ListLog<E> getOrAddLog() {
@@ -121,6 +121,7 @@ public class ListField<E> extends BeanData implements List<E>, Field {
         for (E e : oldData) {
             if (e.equals(o) && e instanceof BeanData) {
                 ((BeanData) e).setLogRoot(null);
+                break;
             }
         }
         PVector<E> newData = log.getData().minus(o);
@@ -205,11 +206,6 @@ public class ListField<E> extends BeanData implements List<E>, Field {
     }
 
     @Override
-    public boolean retainAll(Collection<?> c) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public void clear() {
         ListLog<E> log = getOrAddLog();
         if (log.getData().isEmpty()) {
@@ -222,6 +218,11 @@ public class ListField<E> extends BeanData implements List<E>, Field {
     @Override
     public E get(int index) {
         return getData().get(index);
+    }
+
+    @Override
+    public boolean retainAll(Collection<?> c) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -313,7 +314,7 @@ public class ListField<E> extends BeanData implements List<E>, Field {
 
     @Override
     public List<E> subList(int fromIndex, int toIndex) {
-        throw new UnsupportedOperationException();
+        return getData().subList(fromIndex, toIndex);
     }
 
     @Override

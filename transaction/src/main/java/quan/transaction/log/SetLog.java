@@ -12,7 +12,6 @@ import java.util.Set;
  */
 public class SetLog<E> implements FieldLog {
 
-
     private SetField<E> field;
 
     private PSet<E> data;

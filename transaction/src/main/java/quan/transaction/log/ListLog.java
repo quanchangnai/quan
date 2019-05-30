@@ -12,7 +12,6 @@ import java.util.List;
  */
 public class ListLog<E> implements FieldLog {
 
-
     private ListField<E> field;
 
     private PVector<E> data;

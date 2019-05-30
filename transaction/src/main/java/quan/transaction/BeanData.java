@@ -47,15 +47,19 @@ public abstract class BeanData extends Data {
         if (value == null) {
             throw new IllegalArgumentException("不允许添加null");
         }
+
         List<Class<?>> allowedClasses = Arrays.asList(Byte.class, Boolean.class, Short.class, Integer.class, Long.class, Double.class, String.class);
         if (!allowedClasses.contains(value.getClass()) && !BeanData.class.isAssignableFrom(value.getClass())) {
             throw new IllegalArgumentException("不允许添加该数据类型：" + value.getClass() + "，允许的类型:" + BeanData.class + " " + allowedClasses);
         }
+
         if (value instanceof BeanData) {
             MappingData valueRoot = ((BeanData) value).getRoot();
             if (valueRoot != null && valueRoot != getRoot()) {
-                throw new UnsupportedOperationException("添加的" + value.getClass().getSimpleName() + "当前正受到其它" + MappingData.class.getSimpleName() + "管理:" + valueRoot);
+                throw new IllegalArgumentException("添加的" + value.getClass().getSimpleName() + "当前正受到其它" + MappingData.class.getSimpleName() + "管理:" + valueRoot);
             }
         }
+
     }
+
 }

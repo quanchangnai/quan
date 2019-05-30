@@ -67,14 +67,13 @@ public class SetField<E> extends BeanData implements Set<E>, Field {
 
     @Override
     public Object[] toArray() {
-        throw new UnsupportedOperationException();
+        return getData().toArray();
     }
 
     @Override
     public <T> T[] toArray(T[] a) {
-        throw new UnsupportedOperationException();
+        return getData().toArray(a);
     }
-
 
     private SetLog<E> getOrAddLog() {
         checkTransaction();

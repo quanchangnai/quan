@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 
 /**
- * Varint缓冲区，使用了Varint和ZigZag编码，字节流采用大端模式
+ * Varint缓冲区，使用了Varint和ZigZag编码
  * Created by quanchangnai on 2018/7/2.
  */
 public class VarintBuffer {

@@ -5,6 +5,8 @@ import org.apache.logging.log4j.Logger;
 import quan.transaction.Transaction;
 import quan.transaction.Transactional;
 
+import java.util.List;
+
 /**
  * Created by quanchangnai on 2019/5/17.
  */
@@ -73,6 +75,7 @@ public class Role {
         logger.error("test1结束,事务ID:{},{}", tid, roleData);
 
         if (roleData.getId() > 20) {
+            List<Integer> subList = roleData.getList().subList(0, 2);
 //            Transaction.breakdown();
         }
 

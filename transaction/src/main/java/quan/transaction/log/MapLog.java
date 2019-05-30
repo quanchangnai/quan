@@ -8,7 +8,6 @@ import quan.transaction.field.MapField;
  */
 public class MapLog<K, V> implements FieldLog {
 
-
     private MapField<K, V> field;
 
     private PMap<K, V> data;
