@@ -70,8 +70,7 @@ public class MapField<K, V> extends BeanData implements Map<K, V>, Field {
     }
 
     private MapLog<K, V> getOrAddLog() {
-        checkTransaction();
-        Transaction transaction = Transaction.current();
+        Transaction transaction = checkTransaction();
         if (getRoot() != null) {
             transaction.addVersionLog(getRoot());
         }
@@ -107,6 +106,11 @@ public class MapField<K, V> extends BeanData implements Map<K, V>, Field {
         if (value instanceof BeanData) {
             ((BeanData) value).setLogRoot(getRoot());
         }
+
+        if (oldValue instanceof BeanData) {
+            ((BeanData) value).setLogRoot(null);
+        }
+
         return oldValue;
     }
 
@@ -134,11 +138,17 @@ public class MapField<K, V> extends BeanData implements Map<K, V>, Field {
         }
 
         MapLog<K, V> log = getOrAddLog();
-        log.setData(log.getData().plusAll(m));
+        PMap<K, V> oldData = log.getData();
+        log.setData(oldData.plusAll(m));
 
-        for (V value : m.values()) {
-            if (value instanceof BeanData) {
-                ((BeanData) value).setLogRoot(getRoot());
+        for (K key : m.keySet()) {
+            V newValue = m.get(key);
+            if (newValue instanceof BeanData) {
+                ((BeanData) newValue).setLogRoot(getRoot());
+            }
+            V oldValue = oldData.get(key);
+            if (oldValue instanceof BeanData) {
+                ((BeanData) oldValue).setLogRoot(null);
             }
         }
     }

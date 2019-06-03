@@ -34,8 +34,7 @@ public class FloatField implements Field {
     }
 
     public void setLogValue(float value, MappingData root) {
-        checkTransaction();
-        Transaction transaction = Transaction.current();
+        Transaction transaction = checkTransaction();
         if (root != null) {
             transaction.addVersionLog(root);
         }

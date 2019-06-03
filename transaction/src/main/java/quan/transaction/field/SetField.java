@@ -7,7 +7,9 @@ import quan.transaction.MappingData;
 import quan.transaction.Transaction;
 import quan.transaction.log.SetLog;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * Created by quanchangnai on 2019/5/21.
@@ -76,8 +78,7 @@ public class SetField<E> extends BeanData implements Set<E>, Field {
     }
 
     private SetLog<E> getOrAddLog() {
-        checkTransaction();
-        Transaction transaction = Transaction.current();
+        Transaction transaction = checkTransaction();
         SetLog<E> log = (SetLog<E>) transaction.getFieldLog(this);
         if (log == null) {
             log = new SetLog<>(this);
@@ -85,7 +86,6 @@ public class SetField<E> extends BeanData implements Set<E>, Field {
         }
         return log;
     }
-
 
 
     @Override

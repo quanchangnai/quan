@@ -34,8 +34,7 @@ public class DoubleField implements Field {
     }
 
     public void setLogValue(double value, MappingData root) {
-        checkTransaction();
-        Transaction transaction = Transaction.current();
+        Transaction transaction = checkTransaction();
         if (root != null) {
             transaction.addVersionLog(root);
         }

@@ -79,8 +79,7 @@ public class ListField<E> extends BeanData implements List<E>, Field {
     }
 
     private ListLog<E> getOrAddLog() {
-        checkTransaction();
-        Transaction transaction = Transaction.current();
+        Transaction transaction = checkTransaction();
         if (getRoot() != null) {
             transaction.addVersionLog(getRoot());
         }

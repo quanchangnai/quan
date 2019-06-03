@@ -34,8 +34,7 @@ public class LongField implements Field {
     }
 
     public void setLogValue(long value, MappingData root) {
-        checkTransaction();
-        Transaction transaction = Transaction.current();
+        Transaction transaction = checkTransaction();
         if (root != null) {
             transaction.addVersionLog(root);
         }

@@ -34,8 +34,7 @@ public class BooleanField implements Field {
     }
 
     public void setLogValue(boolean value, MappingData root) {
-        checkTransaction();
-        Transaction transaction = Transaction.current();
+        Transaction transaction = checkTransaction();
         if (root != null) {
             transaction.addVersionLog(root);
         }

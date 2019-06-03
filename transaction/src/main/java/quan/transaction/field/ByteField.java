@@ -34,8 +34,7 @@ public class ByteField implements Field {
     }
 
     public void setLogValue(byte value, MappingData root) {
-        checkTransaction();
-        Transaction transaction = Transaction.current();
+        Transaction transaction = checkTransaction();
         if (root != null) {
             transaction.addVersionLog(root);
         }

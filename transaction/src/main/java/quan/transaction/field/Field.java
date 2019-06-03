@@ -7,10 +7,12 @@ import quan.transaction.Transaction;
  */
 public interface Field {
 
-    default void checkTransaction() {
-        if (Transaction.current() == null) {
+    default Transaction checkTransaction() {
+        Transaction transaction = Transaction.current();
+        if (transaction == null) {
             throw new UnsupportedOperationException("当前不在事务中，禁止修改数据");
         }
+        return transaction;
     }
 
 }
