@@ -5,6 +5,7 @@ import quan.network.handler.Handler;
 import quan.network.handler.HandlerChain;
 import quan.network.handler.HandlerConfigurer;
 import quan.network.handler.HandlerContext;
+import quan.network.handler.codec.LengthFieldCodec;
 import quan.network.handler.codec.StringCodec;
 
 import java.net.StandardSocketOptions;
@@ -17,7 +18,7 @@ public class NioClientTest {
         client.setHandler(new HandlerConfigurer() {
             @Override
             public void configureHandler(HandlerChain handlerChain) throws Exception {
-//                handlerChain.addLast(new LengthFieldCodec(1, true));
+                handlerChain.addLast(new LengthFieldCodec(4, true));
                 handlerChain.addLast(new StringCodec());
                 handlerChain.addLast(new TestClientInboundHandler());
 

@@ -26,7 +26,7 @@ public class NioServerTest {
         server.setHandler(new HandlerConfigurer() {
             @Override
             public void configureHandler(HandlerChain handlerChain) throws Exception {
-                handlerChain.addLast(new LengthFieldCodec(1, true));
+                handlerChain.addLast(new LengthFieldCodec(4, true));
                 handlerChain.addLast(new StringCodec());
                 handlerChain.addLast(new TestServerInboundHandler());
                 handlerChain.addLast(new TestServerInboundHandler2());
@@ -109,13 +109,12 @@ public class NioServerTest {
         public void onExceptionCaught(HandlerContext handlerContext, Throwable cause) throws Exception {
             System.err.println("onExceptionCaught2");
             cause.printStackTrace();
-            // handlerContext.postExceptionCaught(cause);
-            handlerContext.close();
         }
 
         @Override
         public void onEventTriggered(HandlerContext handlerContext, Object event) {
             System.err.println("onEventTriggered:" + event);
+            handlerContext.send("aaa:"+System.nanoTime());
         }
     }
 

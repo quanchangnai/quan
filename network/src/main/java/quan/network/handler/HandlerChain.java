@@ -58,9 +58,7 @@ public class HandlerChain {
     }
 
     public void remove(Handler handler) {
-        if (handler == null) {
-            throw new NullPointerException("handler");
-        }
+        Objects.requireNonNull(handler, "参数handler不能为空");
         HandlerContext handlerContext = head;
         while (handlerContext != tail) {
             if (handlerContext.getHandler() == handler) {
@@ -72,22 +70,13 @@ public class HandlerChain {
             return;
         }
 
-        try {
-            handlerContext.prev.next = handlerContext.next;
-            handlerContext.next.prev = handlerContext.prev;
-            handlerContext.prev = null;
-            handlerContext.next = null;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        handlerContext.prev.next = handlerContext.next;
+        handlerContext.next.prev = handlerContext.prev;
+        handlerContext.prev = null;
+        handlerContext.next = null;
     }
 
     public void removeAll() {
-        HandlerContext handlerContext = head.next;
-        while (handlerContext != tail) {
-            remove(handlerContext.getHandler());
-            handlerContext = head.next;
-        }
         head.next = tail;
         tail.prev = head;
     }
@@ -123,8 +112,10 @@ public class HandlerChain {
         public void onSend(HandlerContext handlerContext, Object msg) {
             if (msg instanceof ByteBuffer) {
                 connection.send((ByteBuffer) msg);
+            } else if (msg instanceof byte[]) {
+                connection.send(ByteBuffer.wrap((byte[]) msg));
             } else {
-                Exception exception = new IllegalArgumentException("发送的消息经过OutboundHandler链处理后的最终结果必须是ByteBuffer类型");
+                Exception exception = new IllegalArgumentException("发送的消息经过OutboundHandler链处理后的最终结果必须是ByteBuffer或者byte[]类型");
                 handlerContext.triggerExceptionCaught(exception);
             }
         }
