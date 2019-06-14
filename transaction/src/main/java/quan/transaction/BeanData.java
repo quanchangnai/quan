@@ -55,7 +55,7 @@ public abstract class BeanData extends Data {
 
         if (value instanceof BeanData) {
             MappingData valueRoot = ((BeanData) value).getRoot();
-            if (valueRoot != null && valueRoot != getRoot()) {
+            if (valueRoot != null) {
                 throw new IllegalArgumentException("添加的" + value.getClass().getSimpleName() + "当前正受到其它" + MappingData.class.getSimpleName() + "管理:" + valueRoot);
             }
         }

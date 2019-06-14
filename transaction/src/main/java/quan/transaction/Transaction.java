@@ -35,7 +35,7 @@ public class Transaction {
     /**
      * 事务ID
      */
-    private long id;
+    private long id = idGenerator.incrementAndGet();
 
     /**
      * 是否已经开启事务支持
@@ -63,10 +63,6 @@ public class Transaction {
      * 字段日志，记录字段值的变化
      */
     private Map<Field, FieldLog> fieldLogs = new HashMap<>();
-
-    {
-        this.id = idGenerator.incrementAndGet();
-    }
 
     public long getId() {
         return id;
