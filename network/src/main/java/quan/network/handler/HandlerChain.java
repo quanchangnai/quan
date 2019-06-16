@@ -115,7 +115,7 @@ public class HandlerChain {
             } else if (msg instanceof byte[]) {
                 connection.send(ByteBuffer.wrap((byte[]) msg));
             } else {
-                Exception exception = new IllegalArgumentException("发送的消息经过OutboundHandler链处理后的最终结果必须是ByteBuffer或者byte[]类型");
+                Exception exception = new IllegalArgumentException("发送的消息经过处理器链后的最终结果必须是ByteBuffer或者byte[]类型");
                 handlerContext.triggerExceptionCaught(exception);
             }
         }
