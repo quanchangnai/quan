@@ -20,7 +20,7 @@ public class NioClientTest {
             public void configureHandler(HandlerChain handlerChain) throws Exception {
                 handlerChain.addLast(new LengthFieldCodec(4, true));
                 handlerChain.addLast(new StringCodec());
-                handlerChain.addLast(new TestClientInboundHandler());
+                handlerChain.addLast(new TestClientHandler());
 
             }
         });
@@ -30,8 +30,7 @@ public class NioClientTest {
 
     }
 
-    private static class TestClientInboundHandler implements Handler<String> {
-
+    private static class TestClientHandler implements Handler<String> {
 
         @Override
         public void onConnected(HandlerContext handlerContext) throws Exception {

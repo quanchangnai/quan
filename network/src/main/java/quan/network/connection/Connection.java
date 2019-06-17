@@ -39,15 +39,11 @@ public class Connection {
 
     private ByteBuffer writeBuffer;
 
-    private int readBufferSize = 1024;
-
-    private int writeBufferSize = 1024;
-
     private Queue<ByteBuffer> msgQueue = new LinkedList<>();
 
     private Map<Object, Object> attrs = new HashMap<>();
 
-    public Connection(SelectionKey selectionKey, TaskExecutor executor) {
+    public Connection(SelectionKey selectionKey, TaskExecutor executor, int readBufferSize, int writeBufferSize) {
         this.executor = executor;
         this.selectionKey = selectionKey;
         this.socketChannel = (SocketChannel) selectionKey.channel();
@@ -58,30 +54,6 @@ public class Connection {
 
     public HandlerChain getHandlerChain() {
         return handlerChain;
-    }
-
-    public int getReadBufferSize() {
-        return readBufferSize;
-    }
-
-    public void setReadBufferSize(int readBufferSize) {
-        if (readBufferSize == this.readBufferSize) {
-            return;
-        }
-        this.readBufferSize = readBufferSize;
-        this.readBuffer = ByteBuffer.allocate(readBufferSize);
-    }
-
-    public int getWriteBufferSize() {
-        return writeBufferSize;
-    }
-
-    public void setWriteBufferSize(int writeBufferSize) {
-        if (writeBufferSize == this.writeBufferSize) {
-            return;
-        }
-        this.writeBufferSize = writeBufferSize;
-        this.writeBuffer = ByteBuffer.allocate(writeBufferSize);
     }
 
     public TaskExecutor getExecutor() {
@@ -119,29 +91,22 @@ public class Connection {
      * @return 读取的字节数，负数表示连接已断开
      */
     public int read() {
-        int readedCount;
+        int readCount;
         try {
-            readedCount = doRead(readBuffer);
-            if (readedCount < 0) {
-                close();
-                return -1;
-            } else {
+            readCount = socketChannel.read(readBuffer);
+            if (readCount > 0) {
                 readBuffer.flip();
                 triggerReceived(readBuffer);
             }
+            readBuffer.clear();
         } catch (IOException e) {
             triggerExceptionCaught(e);
             close();
-            readedCount = -1;
-        } finally {
-            readBuffer.clear();
+            readCount = -1;
         }
-        return readedCount;
+        return readCount;
     }
 
-    protected int doRead(ByteBuffer readBuffer) throws IOException {
-        return socketChannel.read(readBuffer);
-    }
 
     /**
      * 写数据
@@ -158,10 +123,10 @@ public class Connection {
         }
 
         writeBuffer.clear();
-        int writedCount = 0;
+        int writeCount = 0;
 
         for (ByteBuffer msgBuffer = msgQueue.poll(); msgBuffer != null; msgBuffer = msgQueue.poll()) {
-            if (writeBuffer.remaining() > msgBuffer.remaining()) {
+            if (writeBuffer.remaining() >= msgBuffer.remaining()) {
                 // 缓冲区剩余空间充足,完整写入消息
                 writeBuffer.put(msgBuffer);
             } else {// 缓冲区剩余空间不足,拆分消息
@@ -174,14 +139,14 @@ public class Connection {
                     msgBuffer.get(writeBytes);
                     writeBuffer.put(writeBytes);
                     if (!writeBuffer.hasRemaining()) {
-                        //缓冲区填满了
+                        //缓冲区满了，写入通道
                         writeBuffer.flip();
-                        int doWritedCount = doWrite(writeBuffer);
+                        int doWriteCount = doWrite(writeBuffer);
                         writeBuffer.clear();
-                        if (doWritedCount < 0) {
-                            return doWritedCount;
+                        if (doWriteCount < 0) {
+                            return -1;
                         } else {
-                            writedCount += doWritedCount;
+                            writeCount += doWriteCount;
                         }
                     }
                 }
@@ -191,26 +156,26 @@ public class Connection {
         writeBuffer.flip();
         if (writeBuffer.hasRemaining()) {
             //缓冲区还有数据没有写入通道
-            int doWritedCount = doWrite(writeBuffer);
-            if (doWritedCount < 0) {
+            int doWriteCount = doWrite(writeBuffer);
+            if (doWriteCount < 0) {
                 return -1;
             } else {
-                writedCount += doWritedCount;
+                writeCount += doWriteCount;
             }
         }
-        return writedCount;
+        return writeCount;
     }
 
     protected int doWrite(ByteBuffer writeBuffer) {
-        int writedCount;
+        int writeCount;
         try {
-            writedCount = socketChannel.write(writeBuffer);
+            writeCount = socketChannel.write(writeBuffer);
         } catch (IOException e) {
             triggerExceptionCaught(e);
             close();
-            writedCount = -1;
+            writeCount = -1;
         }
-        return writedCount;
+        return writeCount;
     }
 
     /**
@@ -254,6 +219,14 @@ public class Connection {
      * @param msg
      */
     public void send(ByteBuffer msg) {
+        if (executor.isInMyThread()) {
+            send0(msg);
+        } else {
+            executor.submit(() -> send0(msg));
+        }
+    }
+
+    private void send0(ByteBuffer msg) {
         if (!selectionKey.isValid()) {
             return;
         }

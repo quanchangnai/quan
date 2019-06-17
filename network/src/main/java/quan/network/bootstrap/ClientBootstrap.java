@@ -199,9 +199,7 @@ public class ClientBootstrap extends Bootstrap {
                             break;
                         }
                         socketChannel.register(selector, SelectionKey.OP_READ);
-                        Connection connection = new Connection(selectedKey, this);
-                        connection.setReadBufferSize(client.getReadBufferSize());
-                        connection.setWriteBufferSize(client.getWriteBufferSize());
+                        Connection connection = new Connection(selectedKey, this,client.getReadBufferSize(),client.getWriteBufferSize());
                         connection.getHandlerChain().addLast(client.getHandler());
                         selectedKey.attach(connection);
                         connection.triggerConnected();
@@ -210,8 +208,8 @@ public class ClientBootstrap extends Bootstrap {
 
                 if (selectedKey.isValid() && selectedKey.isReadable()) {
                     Connection connection = (Connection) selectedKey.attachment();
-                    int readedNum = connection.read();
-                    if (readedNum < 0) {
+                    int readCount = connection.read();
+                    if (readCount < 0) {
                         tryReconnect();
                         break;
                     }
@@ -219,8 +217,8 @@ public class ClientBootstrap extends Bootstrap {
 
                 if (selectedKey.isValid() && selectedKey.isWritable()) {
                     Connection connection = (Connection) selectedKey.attachment();
-                    int writedNum = connection.write();
-                    if (writedNum < 0) {
+                    int writeCount = connection.write();
+                    if (writeCount < 0) {
                         tryReconnect();
                         break;
                     }

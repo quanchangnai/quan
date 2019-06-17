@@ -282,11 +282,11 @@ public class ServerBootstrap extends Bootstrap {
                     break;
                 }
                 SelectionKey selectionKey = socketChannel.register(selector, SelectionKey.OP_READ);
-                Connection connection = new Connection(selectionKey, this);
-                connection.setReadBufferSize(server.getReadBufferSize());
-                connection.setWriteBufferSize(server.getWriteBufferSize());
+
+                Connection connection = new Connection(selectionKey, this,server.getReadBufferSize(),server.getWriteBufferSize());
                 connection.getHandlerChain().addLast(server.getHandler());
                 selectionKey.attach(connection);
+
                 connection.triggerConnected();
             }
         }

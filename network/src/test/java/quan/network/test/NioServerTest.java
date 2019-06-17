@@ -28,8 +28,8 @@ public class NioServerTest {
             public void configureHandler(HandlerChain handlerChain) throws Exception {
                 handlerChain.addLast(new LengthFieldCodec(4, true));
                 handlerChain.addLast(new StringCodec());
-                handlerChain.addLast(new TestServerInboundHandler());
-                handlerChain.addLast(new TestServerInboundHandler2());
+                handlerChain.addLast(new TestServerHandler());
+                handlerChain.addLast(new TestServerHandler2());
             }
         });
 
@@ -46,7 +46,7 @@ public class NioServerTest {
     }
 
 
-    private static class TestServerInboundHandler implements Handler<String> {
+    private static class TestServerHandler implements Handler<String> {
 
 
         @Override
@@ -81,9 +81,9 @@ public class NioServerTest {
     }
 
 
-    private static class TestServerInboundHandler2 implements Handler<String> {
+    private static class TestServerHandler2 implements Handler<String> {
 
-        private static final Logger logger = LogManager.getLogger(TestServerInboundHandler2.class);
+        private static final Logger logger = LogManager.getLogger(TestServerHandler2.class);
 
 
         @Override
