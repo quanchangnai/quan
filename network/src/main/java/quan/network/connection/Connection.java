@@ -35,9 +35,21 @@ public class Connection {
 
     protected HandlerChain handlerChain;
 
+    /**
+     * 读缓冲区里
+     */
     private ByteBuffer readBuffer;
 
+    /**
+     * 写缓冲区里
+     */
     private ByteBuffer writeBuffer;
+
+    /**
+     * 写缓冲区里的数据是否已经全部写进了Socket写缓冲区里
+     */
+    private boolean writeFinished = true;
+
 
     private Queue<ByteBuffer> msgQueue = new LinkedList<>();
 
@@ -114,7 +126,7 @@ public class Connection {
      * @return 写入的字节数，负数表示连接已断开
      */
     public int write() {
-        if (msgQueue.isEmpty()) {
+        if (writeFinished && msgQueue.isEmpty()) {
             int interestOps = selectionKey.interestOps();
             if ((interestOps & SelectionKey.OP_WRITE) != 0) {
                 selectionKey.interestOps(interestOps & ~SelectionKey.OP_WRITE);
@@ -122,14 +134,32 @@ public class Connection {
             return 0;
         }
 
-        writeBuffer.clear();
         int writeCount = 0;
 
-        for (ByteBuffer msgBuffer = msgQueue.poll(); msgBuffer != null; msgBuffer = msgQueue.poll()) {
+        if (!writeFinished) {
+            //缓冲区还有数据没有写入通道
+            int remaining = writeBuffer.remaining();
+            int doWriteCount = doWrite(writeBuffer);
+            if (doWriteCount < 0) {
+                return -1;
+            } else if (doWriteCount < remaining) {
+                //Socket缓冲区满了，下次再写
+                writeCount += doWriteCount;
+                return writeCount;
+            } else {
+                writeCount += doWriteCount;
+            }
+        }
+
+        writeBuffer.clear();
+
+        ByteBuffer msgBuffer = msgQueue.peek();
+        while (msgBuffer != null) {
             if (writeBuffer.remaining() >= msgBuffer.remaining()) {
                 // 缓冲区剩余空间充足,完整写入消息
                 writeBuffer.put(msgBuffer);
-            } else {// 缓冲区剩余空间不足,拆分消息
+            } else {
+                // 缓冲区剩余空间不足,拆分消息
                 while (msgBuffer.hasRemaining()) {
                     int writeBytesLength = writeBuffer.remaining();
                     if (msgBuffer.remaining() < writeBytesLength) {
@@ -141,28 +171,46 @@ public class Connection {
                     if (!writeBuffer.hasRemaining()) {
                         //缓冲区满了，写入通道
                         writeBuffer.flip();
+                        int remaining = writeBuffer.remaining();
                         int doWriteCount = doWrite(writeBuffer);
-                        writeBuffer.clear();
                         if (doWriteCount < 0) {
                             return -1;
+                        } else if (doWriteCount < remaining) {
+                            //Socket写缓冲区满了，下次再写
+                            writeFinished = false;
+                            writeCount += doWriteCount;
+                            return writeCount;
                         } else {
+                            writeBuffer.clear();
                             writeCount += doWriteCount;
                         }
                     }
                 }
+
             }
+
+            msgQueue.poll();
+            msgBuffer = msgQueue.peek();
+
         }
 
         writeBuffer.flip();
         if (writeBuffer.hasRemaining()) {
             //缓冲区还有数据没有写入通道
+            int remaining = writeBuffer.remaining();
             int doWriteCount = doWrite(writeBuffer);
             if (doWriteCount < 0) {
                 return -1;
+            } else if (doWriteCount < remaining) {
+                //Socket缓冲区满了，下次再写
+                writeFinished = false;
+                writeCount += doWriteCount;
+                return writeCount;
             } else {
                 writeCount += doWriteCount;
             }
         }
+        writeFinished = true;
         return writeCount;
     }
 
