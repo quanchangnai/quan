@@ -26,9 +26,9 @@ public abstract class Bootstrap {
 
     protected Map<SocketOption<?>, Object> socketOptions = new LinkedHashMap<>();
 
-    protected int readBufferSize = 1024;
+    protected int readBufferSize = 8096;
 
-    protected int writeBufferSize = 1024;
+    protected int writeBufferSize = 8096;
 
     public String getIp() {
         return ip;

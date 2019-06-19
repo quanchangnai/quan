@@ -14,15 +14,14 @@ import java.net.StandardSocketOptions;
 
 public class NioServerTest {
 
+    protected static final Logger logger = LogManager.getLogger(NioServerTest.class);
+
     public static void main(String[] args) throws Exception {
         ServerBootstrap server = new ServerBootstrap(8007);
-//        server.setReadBufferSize(1);
-        server.setWriteBufferSize(30);
-        server.setSocketOption(StandardSocketOptions.SO_KEEPALIVE, true);
-        server.setSocketOption(StandardSocketOptions.SO_REUSEADDR, true);
-        server.setSocketOption(StandardSocketOptions.TCP_NODELAY, true);
-        server.setSocketOption(StandardSocketOptions.SO_RCVBUF, 1024);
-        server.setSocketOption(StandardSocketOptions.SO_SNDBUF, 128);
+        server.setReadBufferSize(20);
+        server.setWriteBufferSize(20);
+        server.setSocketOption(StandardSocketOptions.SO_RCVBUF, 1000);
+        server.setSocketOption(StandardSocketOptions.SO_SNDBUF, 2);
         server.setHandler(new HandlerConfigurer() {
             @Override
             public void configureHandler(HandlerChain handlerChain) throws Exception {
@@ -35,6 +34,7 @@ public class NioServerTest {
 
 
         server.start();
+
 
 //		 Thread.sleep(5 * 1000);
 //		
@@ -67,8 +67,8 @@ public class NioServerTest {
         public void onReceived(HandlerContext handlerContext, String msg) throws Exception {
             System.err.println("onReceived:" + msg);
 //            handlerContext.send(msg);
-//            handlerContext.triggerReceived(msg);
-            handlerContext.triggerEvent(msg);
+            handlerContext.triggerReceived(msg);
+//            handlerContext.triggerEvent(msg);
         }
 
         @Override
@@ -89,9 +89,23 @@ public class NioServerTest {
         @Override
         public void onConnected(HandlerContext handlerContext) throws Exception {
             System.err.println("onConnected2");
-            handlerContext.send("aaa:" + System.currentTimeMillis());
-            handlerContext.send("bbb:" + System.currentTimeMillis());
-            handlerContext.send("ccc");
+
+            new Thread() {
+                public void run() {
+                    while (true) {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        handlerContext.send("aaa:" + System.currentTimeMillis()+":aaa");
+                        handlerContext.send("bbb:" + System.currentTimeMillis()+":bbb");
+                        handlerContext.send("ccc:" + System.currentTimeMillis()+":ccc");
+                    }
+
+                }
+
+            }.start();
         }
 
         @Override

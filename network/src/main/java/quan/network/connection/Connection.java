@@ -143,7 +143,7 @@ public class Connection {
             if (doWriteCount < 0) {
                 return -1;
             } else if (doWriteCount < remaining) {
-                //Socket缓冲区满了，下次再写
+                //Socket发送缓冲区满了，下次再写
                 writeCount += doWriteCount;
                 return writeCount;
             } else {
@@ -162,12 +162,15 @@ public class Connection {
                 // 缓冲区剩余空间不足,拆分消息
                 while (msgBuffer.hasRemaining()) {
                     int writeBytesLength = writeBuffer.remaining();
-                    if (msgBuffer.remaining() < writeBytesLength) {
-                        writeBytesLength = msgBuffer.remaining();
+                    if (writeBytesLength > 0) {
+                        if (msgBuffer.remaining() < writeBytesLength) {
+                            writeBytesLength = msgBuffer.remaining();
+                        }
+                        byte[] writeBytes = new byte[writeBytesLength];
+                        msgBuffer.get(writeBytes);
+                        writeBuffer.put(writeBytes);
                     }
-                    byte[] writeBytes = new byte[writeBytesLength];
-                    msgBuffer.get(writeBytes);
-                    writeBuffer.put(writeBytes);
+
                     if (!writeBuffer.hasRemaining()) {
                         //缓冲区满了，写入通道
                         writeBuffer.flip();
@@ -176,7 +179,7 @@ public class Connection {
                         if (doWriteCount < 0) {
                             return -1;
                         } else if (doWriteCount < remaining) {
-                            //Socket写缓冲区满了，下次再写
+                            //Socket发送缓冲区满了，下次再写
                             writeFinished = false;
                             writeCount += doWriteCount;
                             return writeCount;
@@ -202,7 +205,7 @@ public class Connection {
             if (doWriteCount < 0) {
                 return -1;
             } else if (doWriteCount < remaining) {
-                //Socket缓冲区满了，下次再写
+                //Socket发送缓冲区满了，下次再写
                 writeFinished = false;
                 writeCount += doWriteCount;
                 return writeCount;
@@ -210,6 +213,7 @@ public class Connection {
                 writeCount += doWriteCount;
             }
         }
+
         writeFinished = true;
         return writeCount;
     }
@@ -270,7 +274,7 @@ public class Connection {
         if (executor.isInMyThread()) {
             send0(msg);
         } else {
-            executor.submit(() -> send0(msg));
+            executor.execute(() -> send0(msg));
         }
     }
 

@@ -77,7 +77,7 @@ public class ClientBootstrap extends Bootstrap {
         setRunning(true);
         readWriteExecutor.start();
 
-        readWriteExecutor.submit(this::connect);
+        readWriteExecutor.execute(this::connect);
     }
 
 
@@ -228,7 +228,7 @@ public class ClientBootstrap extends Bootstrap {
 
         private void tryReconnect() {
             if (client.isAutoReconnect()) {
-                submit(client::reconnect);
+                execute(client::reconnect);
             }
         }
 

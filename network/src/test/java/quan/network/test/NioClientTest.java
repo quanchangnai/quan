@@ -15,6 +15,8 @@ public class NioClientTest {
     public static void main(String[] args) throws Exception {
         ClientBootstrap client = new ClientBootstrap("127.0.0.1", 8007);
         client.setSocketOption(StandardSocketOptions.SO_KEEPALIVE, true);
+        client.setSocketOption(StandardSocketOptions.SO_RCVBUF, 2);
+        client.setSocketOption(StandardSocketOptions.SO_SNDBUF, 2);
         client.setHandler(new HandlerConfigurer() {
             @Override
             public void configureHandler(HandlerChain handlerChain) throws Exception {
@@ -46,17 +48,17 @@ public class NioClientTest {
         public void onReceived(final HandlerContext handlerContext, final String msg) throws Exception {
             System.err.println("onReceived:" + msg);
 
-            new Thread() {
-                public void run() {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    handlerContext.send(msg);
-                }
-
-            }.start();
+//            new Thread() {
+//                public void run() {
+//                    try {
+//                        Thread.sleep(1000);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                    handlerContext.send(msg);
+//                }
+//
+//            }.start();
         }
 
         @Override

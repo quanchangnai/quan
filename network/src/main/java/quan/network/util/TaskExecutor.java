@@ -3,7 +3,9 @@ package quan.network.util;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.concurrent.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Executor;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * 基于单线程的任务执行器
@@ -22,12 +24,6 @@ public class TaskExecutor implements Executor, Runnable {
 
     public boolean isInMyThread() {
         return Thread.currentThread().getId() == thread.getId();
-    }
-
-    public Future<Void> submit(Runnable task) {
-        FutureTask<Void> futureTask = new FutureTask<>(task, null);
-        execute(futureTask);
-        return futureTask;
     }
 
     @Override

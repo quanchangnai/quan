@@ -43,7 +43,7 @@ public class HandlerContext {
         if (getExecutor().isInMyThread()) {
             triggerNextHandlerConnected();
         } else {
-            getExecutor().submit(this::triggerNextHandlerConnected);
+            getExecutor().execute(this::triggerNextHandlerConnected);
         }
     }
 
@@ -61,7 +61,7 @@ public class HandlerContext {
         if (getExecutor().isInMyThread()) {
             triggerNextHandlerDisconnected();
         } else {
-            getExecutor().submit(this::triggerNextHandlerDisconnected);
+            getExecutor().execute(this::triggerNextHandlerDisconnected);
         }
     }
 
@@ -79,7 +79,7 @@ public class HandlerContext {
         if (getExecutor().isInMyThread()) {
             triggerNextHandlerReceived(msg);
         } else {
-            getExecutor().submit(() -> triggerNextHandlerReceived(msg));
+            getExecutor().execute(() -> triggerNextHandlerReceived(msg));
         }
     }
 
@@ -97,7 +97,7 @@ public class HandlerContext {
         if (getExecutor().isInMyThread()) {
             triggerNextHandlerExceptionCaught(cause);
         } else {
-            getExecutor().submit(() -> triggerNextHandlerExceptionCaught(cause));
+            getExecutor().execute(() -> triggerNextHandlerExceptionCaught(cause));
         }
     }
 
@@ -130,7 +130,7 @@ public class HandlerContext {
         if (getExecutor().isInMyThread()) {
             triggerPrevHandlerSend(msg);
         } else {
-            getExecutor().submit(() -> triggerPrevHandlerSend(msg));
+            getExecutor().execute(() -> triggerPrevHandlerSend(msg));
         }
     }
 
@@ -148,7 +148,7 @@ public class HandlerContext {
         if (getExecutor().isInMyThread()) {
             triggerPrevHandlerClose();
         } else {
-            getExecutor().submit(this::triggerPrevHandlerClose);
+            getExecutor().execute(this::triggerPrevHandlerClose);
         }
     }
 

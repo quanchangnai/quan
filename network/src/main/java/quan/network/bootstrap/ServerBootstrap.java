@@ -80,35 +80,31 @@ public class ServerBootstrap extends Bootstrap {
             for (int i = 0; i < readWriteThreadNum; i++) {
                 readWriteExecutors[i] = new ReadWriteExecutor(this);
             }
-        } catch (IOException e) {
+
+            setRunning(true);
+
+            acceptExecutor.start();
+            for (int i = 0; i < readWriteExecutors.length; i++) {
+                readWriteExecutors[i].start();
+            }
+
+            ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
+            serverSocketChannel.configureBlocking(false);
+            for (SocketOption<?> socketOption : getServerSocketOptions().keySet()) {
+                Object optionValue = getServerSocketOptions().get(socketOption);
+                if (optionValue instanceof Integer) {
+                    serverSocketChannel.setOption((SocketOption<Integer>) socketOption, (Integer) optionValue);
+                } else if (optionValue instanceof Boolean) {
+                    serverSocketChannel.setOption((SocketOption<Boolean>) socketOption, (Boolean) optionValue);
+                }
+            }
+            serverSocketChannel.socket().bind(new InetSocketAddress(getIp(), getPort()));
+            acceptExecutor.registerChannel(serverSocketChannel);
+
+        } catch (Exception e) {
+            stop();
             throw new RuntimeException(e);
         }
-
-        setRunning(true);
-
-        acceptExecutor.start();
-        for (int i = 0; i < readWriteExecutors.length; i++) {
-            readWriteExecutors[i].start();
-        }
-
-        acceptExecutor.submit(() -> {
-            try {
-                ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
-                serverSocketChannel.configureBlocking(false);
-                for (SocketOption<?> socketOption : getServerSocketOptions().keySet()) {
-                    Object optionValue = getServerSocketOptions().get(socketOption);
-                    if (optionValue instanceof Integer) {
-                        serverSocketChannel.setOption((SocketOption<Integer>) socketOption, (Integer) optionValue);
-                    } else if (optionValue instanceof Boolean) {
-                        serverSocketChannel.setOption((SocketOption<Boolean>) socketOption, (Boolean) optionValue);
-                    }
-                }
-                serverSocketChannel.socket().bind(new InetSocketAddress(getIp(), getPort()));
-                acceptExecutor.registerChannel(serverSocketChannel);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
     }
 
     @Override
@@ -283,7 +279,7 @@ public class ServerBootstrap extends Bootstrap {
                 }
                 SelectionKey selectionKey = socketChannel.register(selector, SelectionKey.OP_READ);
 
-                Connection connection = new Connection(selectionKey, this,server.getReadBufferSize(),server.getWriteBufferSize());
+                Connection connection = new Connection(selectionKey, this, server.getReadBufferSize(), server.getWriteBufferSize());
                 connection.getHandlerChain().addLast(server.getHandler());
                 selectionKey.attach(connection);
 
