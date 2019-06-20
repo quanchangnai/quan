@@ -1,7 +1,7 @@
 package quan.network.connection;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import quan.network.handler.HandlerChain;
 import quan.network.handler.HandlerContext;
 import quan.network.util.TaskExecutor;
@@ -23,7 +23,7 @@ import java.util.Queue;
  */
 public class Connection {
 
-    protected final Logger logger = LogManager.getLogger(getClass());
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     private boolean connected;
 
@@ -49,7 +49,6 @@ public class Connection {
      * 写缓冲区里的数据是否已经全部写进了Socket写缓冲区里
      */
     private boolean writeFinished = true;
-
 
     private Queue<ByteBuffer> msgQueue = new LinkedList<>();
 
@@ -92,7 +91,7 @@ public class Connection {
         try {
             return (InetSocketAddress) socketChannel.getRemoteAddress();
         } catch (IOException e) {
-            logger.error(e);
+            logger.error("获取地址失败", e);
         }
         return null;
     }
@@ -161,14 +160,14 @@ public class Connection {
             } else {
                 // 缓冲区剩余空间不足,拆分消息
                 while (msgBuffer.hasRemaining()) {
-                    int writeBytesLength = writeBuffer.remaining();
-                    if (writeBytesLength > 0) {
-                        if (msgBuffer.remaining() < writeBytesLength) {
-                            writeBytesLength = msgBuffer.remaining();
+                    if (writeBuffer.hasRemaining()) {
+                        if (msgBuffer.remaining() <= writeBuffer.remaining()) {
+                            writeBuffer.put(msgBuffer);
+                        } else {
+                            byte[] writeBytes = new byte[writeBuffer.remaining()];
+                            msgBuffer.get(writeBytes);
+                            writeBuffer.put(writeBytes);
                         }
-                        byte[] writeBytes = new byte[writeBytesLength];
-                        msgBuffer.get(writeBytes);
-                        writeBuffer.put(writeBytes);
                     }
 
                     if (!writeBuffer.hasRemaining()) {

@@ -160,7 +160,7 @@ public class ServerBootstrap extends Bootstrap {
             try {
                 select();
             } catch (IOException e) {
-                logger.error(e);
+                logger.error("", e);
             }
         }
 
@@ -201,7 +201,7 @@ public class ServerBootstrap extends Bootstrap {
                 }
                 selector.close();
             } catch (IOException e) {
-                logger.error(e);
+                logger.error("", e);
             } finally {
                 if (server.isRunning()) {
                     server.stop();
@@ -230,7 +230,7 @@ public class ServerBootstrap extends Bootstrap {
                 acceptedChannels.put(socketChannel);
                 selector.wakeup();
             } catch (InterruptedException e) {
-                logger.error(e);
+                logger.error("", e);
             }
         }
 
@@ -252,7 +252,7 @@ public class ServerBootstrap extends Bootstrap {
                 select();
                 doRegisterChannels();
             } catch (IOException e) {
-                logger.error(e);
+                logger.error("", e);
             }
 
         }
@@ -267,7 +267,7 @@ public class ServerBootstrap extends Bootstrap {
                 }
                 selector.close();
             } catch (IOException e) {
-                logger.error(e);
+                logger.error("", e);
             }
         }
 

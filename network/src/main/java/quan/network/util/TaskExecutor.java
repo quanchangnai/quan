@@ -1,7 +1,7 @@
 package quan.network.util;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
@@ -14,7 +14,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class TaskExecutor implements Executor, Runnable {
 
-    protected final Logger logger = LogManager.getLogger(getClass());
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     private volatile boolean running;
 
@@ -31,7 +31,7 @@ public class TaskExecutor implements Executor, Runnable {
         try {
             taskQueue.put(task);
         } catch (InterruptedException e) {
-            logger.error(e);
+            logger.error("", e);
         }
     }
 
@@ -42,7 +42,7 @@ public class TaskExecutor implements Executor, Runnable {
                 try {
                     task.run();
                 } catch (Throwable e) {
-                    logger.error(e);
+                    logger.error("", e);
                 }
             }
             after();

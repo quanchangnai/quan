@@ -11,8 +11,7 @@
 
     <modules>
         <module>network</module>
-        <module>protocol</module>
-        <module>mongo</module>
+        <module>generator</module>
         <module>transaction</module>
     </modules>
 
@@ -27,6 +26,12 @@
             <version>4.12</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.26</version>
+        </dependency>
+
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>

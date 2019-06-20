@@ -60,7 +60,7 @@ public class LengthFieldCodec implements Handler<Object> {
             handlerContext.send(encode(msgBuffer));
         } else if (msg instanceof byte[]) {
             ByteBuffer msgBuffer = ByteBuffer.wrap((byte[]) msg);
-            handlerContext.send(encode(msgBuffer).array());
+            handlerContext.send(encode(msgBuffer));
         } else {
             handlerContext.send(msg);
         }

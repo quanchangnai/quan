@@ -1,7 +1,7 @@
 package quan.network.handler;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import quan.network.connection.Connection;
 import quan.network.util.TaskExecutor;
 
@@ -15,7 +15,7 @@ import java.util.Objects;
  */
 public class HandlerChain {
 
-    protected final Logger logger = LogManager.getLogger(getClass());
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     private Connection connection;
 
@@ -140,7 +140,7 @@ public class HandlerChain {
         @Override
         public void onExceptionCaught(HandlerContext handlerContext, Throwable cause) {
             handlerContext.close();
-            logger.error(cause);
+            logger.error("", cause);
         }
 
     }

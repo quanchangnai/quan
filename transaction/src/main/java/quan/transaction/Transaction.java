@@ -4,8 +4,8 @@ import net.bytebuddy.agent.ByteBuddyAgent;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.matcher.ElementMatchers;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import quan.transaction.field.Field;
 import quan.transaction.log.FieldLog;
 import quan.transaction.log.RootLog;
@@ -23,7 +23,7 @@ public class Transaction {
     /**
      * 日志
      */
-    private static final Logger logger = LogManager.getLogger(Transaction.class);
+    private static final Logger logger = LoggerFactory.getLogger(Transaction.class);
 
     /**
      * 保存事务为线程本地变量

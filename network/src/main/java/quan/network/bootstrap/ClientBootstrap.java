@@ -118,7 +118,7 @@ public class ClientBootstrap extends Bootstrap {
         try {
             Thread.sleep(getReconnectTime());
         } catch (InterruptedException e) {
-            logger.error(e);
+            logger.error("", e);
         }
 
         connect();
@@ -156,7 +156,7 @@ public class ClientBootstrap extends Bootstrap {
             try {
                 select();
             } catch (IOException e) {
-                logger.error(e);
+                logger.error("", e);
             }
         }
 
@@ -170,7 +170,7 @@ public class ClientBootstrap extends Bootstrap {
                 }
                 selector.close();
             } catch (IOException e) {
-                logger.error(e);
+                logger.error("", e);
             } finally {
                 if (client.isRunning()) {
                     client.stop();
@@ -194,12 +194,12 @@ public class ClientBootstrap extends Bootstrap {
                         try {
                             socketChannel.finishConnect();
                         } catch (Exception e) {
-                            logger.error(e);
+                            logger.error("", e);
                             tryReconnect();
                             break;
                         }
                         socketChannel.register(selector, SelectionKey.OP_READ);
-                        Connection connection = new Connection(selectedKey, this,client.getReadBufferSize(),client.getWriteBufferSize());
+                        Connection connection = new Connection(selectedKey, this, client.getReadBufferSize(), client.getWriteBufferSize());
                         connection.getHandlerChain().addLast(client.getHandler());
                         selectedKey.attach(connection);
                         connection.triggerConnected();
