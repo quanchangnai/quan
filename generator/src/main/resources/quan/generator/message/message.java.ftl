@@ -134,7 +134,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         buffer.writeInt(${field.name}.getValue());
     <#elseif field.optional>
         buffer.writeBool(${field.name} != null);
-        if (${field.name} != null){
+        if (${field.name} != null) {
             ${field.name}.encode(buffer);
         }
     <#else>
@@ -175,8 +175,8 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     <#elseif field.enumType>
         ${field.name} = ${field.type}.valueOf(buffer.readInt());
     <#elseif field.optional>
-        if (buffer.readBool()){
-            if (${field.name} == null){
+        if (buffer.readBool()) {
+            if (${field.name} == null) {
                 ${field.name} = new ${field.type}();
             }
             ${field.name}.decode(buffer);
@@ -196,7 +196,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
                 <#lt>,<#rt>
             </#if>
             <#if field.type == "string">
-                <#lt>${field.name}='" + ${field.name}+ '\'' +
+                <#lt>${field.name}='" + ${field.name} + '\'' +
             <#elseif field.type == "bytes">
                 <#lt>${field.name}=" + Arrays.toString(${field.name}) +
             <#else>

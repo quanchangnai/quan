@@ -1,12 +1,13 @@
 package quan.generator.message.role;
 
-import java.util.HashSet;
-import java.util.Arrays;
-import quan.network.message.Buffer;
-import java.io.IOException;
-import java.util.HashMap;
 import quan.network.message.Bean;
+import quan.network.message.Buffer;
+
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * 角色信息
@@ -105,7 +106,7 @@ public class RoleInfo extends Bean {
     }
 
     public void setRoleName(String roleName) {
-        if (roleName == null){
+        if (roleName == null) {
             throw new NullPointerException();
         }
         this.roleName = roleName;
@@ -116,7 +117,7 @@ public class RoleInfo extends Bean {
     }
 
     public void setRoleType(RoleType roleType) {
-        if (roleType == null){
+        if (roleType == null) {
             throw new NullPointerException();
         }
         this.roleType = roleType;
@@ -127,7 +128,7 @@ public class RoleInfo extends Bean {
     }
 
     public void setData(byte[] data) {
-        if (data == null){
+        if (data == null) {
             throw new NullPointerException();
         }
         this.data = data;
@@ -211,7 +212,7 @@ public class RoleInfo extends Bean {
                 ",i=" + i +
                 ",f=" + f +
                 ",d=" + d +
-                ",roleName='" + roleName+ '\'' +
+                ",roleName='" + roleName + '\'' +
                 ",roleType=" + roleType +
                 ",data=" + Arrays.toString(data) +
                 ",list=" + list +

@@ -12,7 +12,7 @@
     <modules>
         <module>network</module>
         <module>generator</module>
-        <module>transaction</module>
+        <module>database</module>
     </modules>
 
     <properties>

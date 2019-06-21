@@ -160,14 +160,14 @@ public class UserInfo extends Bean {
     @Override
     public String toString() {
         return "UserInfo{" +
-                "name='" + name+ '\'' +
+                "name='" + name + '\'' +
                 ",level=" + level +
                 ",experience=" + experience +
                 ",icon=" + icon +
                 ",power=" + power +
                 ",modifyNameCount=" + modifyNameCount +
-                ",eventState='" + eventState+ '\'' +
-                ",functionState='" + functionState+ '\'' +
+                ",eventState='" + eventState + '\'' +
+                ",functionState='" + functionState + '\'' +
                 ",lucky=" + lucky +
                 ",currentState=" + currentState +
                 ",buyPowerCount=" + buyPowerCount +
