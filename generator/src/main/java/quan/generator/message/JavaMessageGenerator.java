@@ -5,14 +5,13 @@ import quan.network.message.Buffer;
 import quan.network.message.Message;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * Created by quanchangnai on 2017/7/6.
  */
-public class JavaGenerator extends Generator {
+public class JavaMessageGenerator extends MessageGenerator {
 
-    public JavaGenerator(String srcPath, String destPath) throws Exception {
+    public JavaMessageGenerator(String srcPath, String destPath) throws Exception {
         super(srcPath, destPath);
     }
 
@@ -22,8 +21,8 @@ public class JavaGenerator extends Generator {
     }
 
     @Override
-    protected void preprocess(List<Definition> definitions) {
-        for (Definition definition : definitions) {
+    protected void process() {
+        for (ClassDefinition definition : definitions) {
             if (definition instanceof BeanDefinition) {
                 BeanDefinition beanDefinition = (BeanDefinition) definition;
                 processBean(beanDefinition);
@@ -46,6 +45,7 @@ public class JavaGenerator extends Generator {
 
     private void processField(FieldDefinition fieldDefinition) {
         BeanDefinition beanDefinition = fieldDefinition.getBeanDefinition();
+
         String type = fieldDefinition.getType();
         if (FieldDefinition.BUILT_IN_TYPES.contains(type)) {
             if (type.equals("bool")) {
@@ -59,8 +59,8 @@ public class JavaGenerator extends Generator {
                 fieldDefinition.setClassType("byte[]");
                 beanDefinition.getImports().add("java.util.Arrays");
             } else if (type.equals("string")) {
-                fieldDefinition.setBasicType(type.substring(0, 1).toUpperCase() + type.substring(1));
-                fieldDefinition.setClassType(type.substring(0, 1).toUpperCase() + type.substring(1));
+                fieldDefinition.setBasicType("String");
+                fieldDefinition.setClassType("String");
             } else if (type.equals("set")) {
                 fieldDefinition.setBasicType("HashSet");
                 fieldDefinition.setClassType("HashSet");
@@ -73,11 +73,6 @@ public class JavaGenerator extends Generator {
             } else {
                 fieldDefinition.setBasicType(type);
                 fieldDefinition.setClassType(type.substring(0, 1).toUpperCase() + type.substring(1));
-            }
-        } else {
-            if (type.contains(".")) {
-                beanDefinition.getImports().add(type);
-                fieldDefinition.setType(type.substring(type.lastIndexOf(".") + 1));
             }
         }
 
@@ -97,6 +92,7 @@ public class JavaGenerator extends Generator {
             } else {
                 beanDefinition.getImports().add("java.util.ArrayList");
             }
+
             String valueType = fieldDefinition.getValueType();
             if (FieldDefinition.BUILT_IN_TYPES.contains(valueType)) {
                 if (valueType.equals("int")) {
@@ -112,4 +108,5 @@ public class JavaGenerator extends Generator {
             }
         }
     }
+
 }

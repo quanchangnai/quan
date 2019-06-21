@@ -9,7 +9,7 @@ public class MessageDefinition extends BeanDefinition {
 
     @Override
     public int getDefinitionType() {
-        return DEFINITION_TYPE_MESSAGE;
+        return TYPE_MESSAGE;
     }
 
     public String getId() {

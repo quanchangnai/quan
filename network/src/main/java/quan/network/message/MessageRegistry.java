@@ -1,7 +1,7 @@
 package quan.network.message;
 
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,6 +17,9 @@ public class MessageRegistry {
     private Map<Integer, Message> messages = new HashMap<>();
 
     public void registerMessage(Message message) {
+        if (messages.containsKey(message.getId())) {
+            throw new RuntimeException("消息ID重复:" + message.getId());
+        }
         messages.put(message.getId(), message);
     }
 

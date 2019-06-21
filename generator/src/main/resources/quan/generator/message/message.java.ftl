@@ -64,7 +64,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         <#if field.value??>
         ${field.name} = ${field.type}.${field.value};
         </#if>
-    <#else>
+    <#elseif !field.optional>
         ${field.name} = new ${field.type}();
     </#if>
 </#list>
@@ -87,6 +87,11 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     }
 
     public void set${field.name?cap_first}(${field.basicType} ${field.name}) {
+        <#if (!field.builtInType && !field.optional) || field.type == "string" || field.type == "bytes">
+        if (${field.name} == null){
+            throw new NullPointerException();
+        }
+        </#if>
         this.${field.name} = ${field.name};
     }
 
@@ -98,8 +103,8 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     public ${name} create() {
         return new ${name}();
     }
-</#if>
 
+</#if>
     @Override
     public void encode(Buffer buffer) throws IOException {
         super.encode(buffer);
@@ -127,6 +132,11 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         buffer.write${field.type?cap_first}(${field.name});
     <#elseif field.enumType>
         buffer.writeInt(${field.name}.getValue());
+    <#elseif field.optional>
+        buffer.writeBool(${field.name} != null);
+        if (${field.name} != null){
+            ${field.name}.encode(buffer);
+        }
     <#else>
         ${field.name}.encode(buffer);
     </#if>
@@ -135,7 +145,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 
     @Override
     public void decode(Buffer buffer) throws IOException {
-        super.encode(buffer);
+        super.decode(buffer);
 <#list fields as field>
     <#if field.type=="set" || field.type=="list">
         int ${field.name}Size = buffer.readInt();
@@ -164,6 +174,13 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         ${field.name} = buffer.read${field.type?cap_first}();
     <#elseif field.enumType>
         ${field.name} = ${field.type}.valueOf(buffer.readInt());
+    <#elseif field.optional>
+        if (buffer.readBool()){
+            if (${field.name} == null){
+                ${field.name} = new ${field.type}();
+            }
+            ${field.name}.decode(buffer);
+        }
     <#else>
         ${field.name}.decode(buffer);
     </#if>

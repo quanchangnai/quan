@@ -12,11 +12,11 @@ import java.util.List;
 /**
  * Created by quanchangnai on 2017/7/6.
  */
-public abstract class Generator {
+public abstract class MessageGenerator {
 
     public static void main(String[] args) throws Exception {
         String language = "java";
-        String srcPath = "generator\\src\\test\\java\\quan\\generator";
+        String srcPath = "generator\\src\\test\\java\\quan\\generator\\message";
         String destPath = "generator\\src\\test\\java";
 
         for (int i = 0; i < args.length; i++) {
@@ -34,10 +34,10 @@ public abstract class Generator {
             System.exit(0);
         }
 
-        Generator generator = null;
+        MessageGenerator generator = null;
         switch (language) {
             case "java":
-                generator = new JavaGenerator(srcPath, destPath);
+                generator = new JavaMessageGenerator(srcPath, destPath);
                 break;
             default:
                 break;
@@ -47,42 +47,43 @@ public abstract class Generator {
 
     public static void usage() {
         System.err.println("-language 生成语言");
-        System.err.println("-srcPath 消息描述xml的目录");
-        System.err.println("-destPath 生成代目标代码的目录");
+        System.err.println("-srcPath 消息描述文件的目录");
+        System.err.println("-destPath 生成目标代码的目录");
     }
+
 
     protected String srcPath;
     protected String destPath;
     protected Configuration freemarkerCfg;
-    protected List<Definition> definitions;
+    protected List<ClassDefinition> definitions;
 
 
-    public Generator(String srcPath, String destPath) throws Exception {
+    public MessageGenerator(String srcPath, String destPath) throws Exception {
 
         Configuration freemarkerCfg = new Configuration(Configuration.VERSION_2_3_23);
-        freemarkerCfg.setClassForTemplateLoading(JavaGenerator.class, "");
+        freemarkerCfg.setClassForTemplateLoading(JavaMessageGenerator.class, "");
         freemarkerCfg.setDefaultEncoding("UTF-8");
         freemarkerCfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
 
         this.srcPath = srcPath;
         this.destPath = destPath;
         this.freemarkerCfg = freemarkerCfg;
-        this.definitions = new Parser(srcPath).parse();
+        this.definitions = new MessageParser(srcPath).parse();
 
     }
 
     protected abstract String getLanguage();
 
-    protected void preprocess(List<Definition> definitions) {
+    protected void process() {
     }
 
     protected void generate() throws Exception {
         Template messageTemplate = freemarkerCfg.getTemplate("message." + getLanguage() + ".ftl");
         Template enumTemplate = freemarkerCfg.getTemplate("enum." + getLanguage() + ".ftl");
 
-        preprocess(definitions);
+        process();
 
-        for (Definition definition : definitions) {
+        for (ClassDefinition definition : definitions) {
             Template template;
             String packageName;
             if (definition instanceof BeanDefinition) {
@@ -98,10 +99,11 @@ public abstract class Generator {
             String packagePath = packageName.replace(".", "\\");
             File destFilePath = new File(destPath + "\\" + packagePath);
             if (!destFilePath.exists()) {
-                destFilePath.mkdir();
+                destFilePath.mkdirs();
             }
-            Writer file = new FileWriter(new File(destFilePath, definition.getName() + "." + getLanguage()));
-            template.process(definition, file);
+
+            Writer writer = new FileWriter(new File(destFilePath, definition.getName() + "." + getLanguage()));
+            template.process(definition, writer);
         }
     }
 

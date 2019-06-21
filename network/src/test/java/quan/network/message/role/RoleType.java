@@ -1,4 +1,4 @@
-package quan.generator.role;
+package quan.network.message.role;
 
 /**
  * 角色类型

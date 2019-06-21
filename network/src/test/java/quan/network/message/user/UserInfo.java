@@ -1,4 +1,4 @@
-package quan.generator.user;
+package quan.network.message.user;
 
 import quan.network.message.Buffer;
 import java.io.IOException;
@@ -32,6 +32,9 @@ public class UserInfo extends Bean {
     }
 
     public void setName(String name) {
+        if(name == null){
+            throw new NullPointerException();
+        }
         this.name = name;
     }
 
@@ -80,6 +83,9 @@ public class UserInfo extends Bean {
     }
 
     public void setEventState(String eventState) {
+        if(eventState == null){
+            throw new NullPointerException();
+        }
         this.eventState = eventState;
     }
 
@@ -88,6 +94,9 @@ public class UserInfo extends Bean {
     }
 
     public void setFunctionState(String functionState) {
+        if(functionState == null){
+            throw new NullPointerException();
+        }
         this.functionState = functionState;
     }
 
@@ -116,7 +125,6 @@ public class UserInfo extends Bean {
     }
 
 
-
     @Override
     public void encode(Buffer buffer) throws IOException {
         super.encode(buffer);
@@ -135,7 +143,7 @@ public class UserInfo extends Bean {
 
     @Override
     public void decode(Buffer buffer) throws IOException {
-        super.encode(buffer);
+        super.decode(buffer);
         name = buffer.readString();
         level = buffer.readInt();
         experience = buffer.readInt();

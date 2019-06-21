@@ -5,13 +5,17 @@ package quan.generator.message;
  */
 public abstract class Definition {
 
-    public static final int DEFINITION_TYPE_ENUM = 1;
-    public static final int DEFINITION_TYPE_BEAN = 2;
-    public static final int DEFINITION_TYPE_MESSAGE = 3;
-    public static final int DEFINITION_TYPE_FIELD = 4;
+    public static final int TYPE_ENUM = 1;
+
+    public static final int TYPE_BEAN = 2;
+
+    public static final int TYPE_MESSAGE = 3;
+
+    public static final int TYPE_FIELD = 4;
 
     private String name;
-    private String  comment="";
+
+    private String comment = "";
 
     public String getName() {
         return name;
@@ -31,7 +35,11 @@ public abstract class Definition {
 
     public abstract int getDefinitionType();
 
-
-
+    @Override
+    public String toString() {
+        return getClass().getName() + "{" +
+                "name='" + name + '\'' +
+                '}';
+    }
 }
 

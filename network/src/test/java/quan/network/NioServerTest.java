@@ -9,6 +9,9 @@ import quan.network.handler.HandlerConfigurer;
 import quan.network.handler.HandlerContext;
 import quan.network.handler.codec.LengthFieldCodec;
 import quan.network.handler.codec.MessageCodec;
+import quan.network.message.role.RoleInfo;
+import quan.network.message.role.SRoleLogin;
+import quan.network.message.user.UserInfo;
 
 import java.net.StandardSocketOptions;
 
@@ -57,6 +60,10 @@ public class NioServerTest {
                         SRoleLogin sRoleLogin = new SRoleLogin();
                         sRoleLogin.setRoleId(123);
                         sRoleLogin.setRoleName("张三");
+                        sRoleLogin.setRoleInfo(new RoleInfo());
+                        UserInfo userInfo = new UserInfo();
+                        userInfo.setName("张三");
+                        sRoleLogin.setUserInfo(userInfo);
                         handlerContext.send(sRoleLogin);
                     }
                 }

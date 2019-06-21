@@ -1,7 +1,7 @@
-package quan.generator.role;
+package quan.network.message.role;
 
 import java.util.HashSet;
-import quan.generator.user.UserInfo;
+import quan.network.message.user.UserInfo;
 import quan.network.message.Buffer;
 import java.io.IOException;
 import java.util.HashMap;
@@ -15,6 +15,7 @@ import java.util.ArrayList;
 public class SRoleLogin extends Message {
 
     private long roleId;//角色id
+    private String roleName;//角色名
     private RoleInfo roleInfo;//角色信息
     private ArrayList<RoleInfo> roleInfoList;//角色信息
     private HashSet<RoleInfo> roleInfoSet;//角色信息
@@ -24,7 +25,7 @@ public class SRoleLogin extends Message {
     public SRoleLogin() {
         super(2222);
         roleId = 111L;
-        roleInfo = new RoleInfo();
+        roleName = "zhangsan";
         roleInfoList = new ArrayList<>();
         roleInfoSet = new HashSet<>();
         roleInfoMap = new HashMap<>();
@@ -37,6 +38,17 @@ public class SRoleLogin extends Message {
 
     public void setRoleId(long roleId) {
         this.roleId = roleId;
+    }
+
+    public String getRoleName() {
+        return roleName;
+    }
+
+    public void setRoleName(String roleName) {
+        if(roleName == null){
+            throw new NullPointerException();
+        }
+        this.roleName = roleName;
     }
 
     public RoleInfo getRoleInfo() {
@@ -64,6 +76,9 @@ public class SRoleLogin extends Message {
     }
 
     public void setUserInfo(UserInfo userInfo) {
+        if(userInfo == null){
+            throw new NullPointerException();
+        }
         this.userInfo = userInfo;
     }
 
@@ -77,7 +92,11 @@ public class SRoleLogin extends Message {
     public void encode(Buffer buffer) throws IOException {
         super.encode(buffer);
         buffer.writeLong(roleId);
-        roleInfo.encode(buffer);
+        buffer.writeString(roleName);
+        buffer.writeBool(roleInfo != null);
+        if(roleInfo != null){
+            roleInfo.encode(buffer);
+        }
         buffer.writeInt(roleInfoList.size());
         for (RoleInfo roleInfoListValue : roleInfoList) {
             roleInfoListValue.encode(buffer);
@@ -96,9 +115,15 @@ public class SRoleLogin extends Message {
 
     @Override
     public void decode(Buffer buffer) throws IOException {
-        super.encode(buffer);
+        super.decode(buffer);
         roleId = buffer.readLong();
-        roleInfo.decode(buffer);
+        roleName = buffer.readString();
+        if(buffer.readBool()){
+            if(roleInfo == null){
+                roleInfo = new RoleInfo();
+            }
+            roleInfo.decode(buffer);
+        }
         int roleInfoListSize = buffer.readInt();
         for (int i = 0; i < roleInfoListSize; i++) {
             RoleInfo roleInfoListValue = new RoleInfo();
@@ -125,6 +150,7 @@ public class SRoleLogin extends Message {
     public String toString() {
         return "SRoleLogin{" +
                 "roleId=" + roleId +
+                ",roleName='" + roleName+ '\'' +
                 ",roleInfo=" + roleInfo +
                 ",roleInfoList=" + roleInfoList +
                 ",roleInfoSet=" + roleInfoSet +

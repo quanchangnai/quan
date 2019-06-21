@@ -10,13 +10,19 @@ public class FieldDefinition extends Definition {
 
     private String type;
     private String value;
+
+    private boolean optional;
+
     private String keyType;
     private String valueType;
+
     //内建类型对应的具体语言实现类型
     private String basicType;//基本类型
     private String basicKeyType;
     private String basicValueType;
-    private String classType;//类
+
+    //内建类型对应的具体语言Class类型
+    private String classType;
     private String classKeyType;
     private String classValueType;
 
@@ -25,12 +31,12 @@ public class FieldDefinition extends Definition {
     private BeanDefinition beanDefinition;
 
 
-    public static final List<String> BUILT_IN_TYPES = Arrays.asList("bool","byte", "short", "int", "long", "float", "double", "bytes", "string", "list", "set", "map");
+    public static final List<String> BUILT_IN_TYPES = Arrays.asList("bool", "byte", "short", "int", "long", "float", "double", "bytes", "string", "list", "set", "map");
 
 
     @Override
     public int getDefinitionType() {
-        return DEFINITION_TYPE_FIELD;
+        return TYPE_FIELD;
     }
 
     public String getType() {
@@ -59,6 +65,15 @@ public class FieldDefinition extends Definition {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public boolean isOptional() {
+        return optional;
+    }
+
+    public FieldDefinition setOptional(boolean optional) {
+        this.optional = optional;
+        return this;
     }
 
     public String getKeyType() {

@@ -11,19 +11,19 @@ public abstract class Message extends Bean {
     /**
      * 消息ID
      */
-    private final int _id;
+    private final int id;
 
     /**
      * 消息序号
      */
     private long sn;
 
-    protected Message(int _id) {
-        this._id = _id;
+    protected Message(int id) {
+        this.id = id;
     }
 
     public final int getId() {
-        return _id;
+        return id;
     }
 
     public final long getSn() {
@@ -38,15 +38,15 @@ public abstract class Message extends Bean {
 
     @Override
     public void encode(Buffer buffer) throws IOException {
-        buffer.writeInt(getId());
+        buffer.writeInt(id);
         buffer.writeLong(sn);
     }
 
     @Override
     public void decode(Buffer buffer) throws IOException {
         int msgId = buffer.readInt();
-        if (msgId != _id) {
-            throw new IOException("消息ID不匹配,目标值：" + _id + "，实际值：" + msgId);
+        if (msgId != id) {
+            throw new IOException("消息ID不匹配,目标值：" + id + "，实际值：" + msgId);
         }
         sn = buffer.readLong();
     }
