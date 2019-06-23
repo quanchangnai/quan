@@ -12,9 +12,9 @@ import quan.network.handler.codec.StringCodec;
 
 import java.net.StandardSocketOptions;
 
-public class NioServerTest {
+public class NetworkServerTest {
 
-    protected static final Logger logger = LoggerFactory.getLogger(NioServerTest.class);
+    protected static final Logger logger = LoggerFactory.getLogger(NetworkServerTest.class);
 
     public static void main(String[] args) throws Exception {
         ServerBootstrap server = new ServerBootstrap(8007);

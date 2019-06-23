@@ -37,7 +37,6 @@ public class RoleInfo extends Bean {
 
     private HashMap<Integer, Integer> map;
 
-
     public RoleInfo() {
         roleId = 111L;
         bo = true;
@@ -154,7 +153,6 @@ public class RoleInfo extends Bean {
     public HashMap<Integer, Integer> getMap() {
         return map;
     }
-
 
     @Override
     public void encode(Buffer buffer) throws IOException {

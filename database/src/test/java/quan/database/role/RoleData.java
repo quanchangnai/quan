@@ -1,9 +1,12 @@
-package quan.generator.database.role;
+package quan.database.role;
 
 import quan.database.Data;
-import quan.generator.database.item.ItemBean;
-import java.util.*;
 import quan.database.field.*;
+import quan.database.item.ItemBean;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 角色

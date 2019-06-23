@@ -10,7 +10,7 @@ import quan.network.handler.codec.StringCodec;
 
 import java.net.StandardSocketOptions;
 
-public class NioClientTest {
+public class NetworkClientTest {
 
     public static void main(String[] args) throws Exception {
         ClientBootstrap client = new ClientBootstrap("127.0.0.1", 8007);

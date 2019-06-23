@@ -25,7 +25,6 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     </#if>
 
 </#list>
-
     public ${name}() {
 <#if definitionType ==3>
         super(${id});
@@ -98,7 +97,6 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 
     </#if>
 </#list>
-
 <#if definitionType ==3>
     @Override
     public ${name} create() {

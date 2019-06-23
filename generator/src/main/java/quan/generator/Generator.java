@@ -19,6 +19,7 @@ import java.util.Map;
 public abstract class Generator {
 
     protected Map<String, String> basicTypes = new HashMap<>();
+
     protected Map<String, String> classTypes = new HashMap<>();
 
     {

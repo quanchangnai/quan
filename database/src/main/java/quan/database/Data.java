@@ -7,7 +7,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Created by quanchangnai on 2019/5/16.
  */
-public abstract class Data<K> extends Bean implements Comparable<Data> {
+public abstract class Data<K> extends Bean implements Comparable<Data<K>> {
 
     /**
      * 版本号，用于实现乐观锁
@@ -29,7 +29,7 @@ public abstract class Data<K> extends Bean implements Comparable<Data> {
     }
 
     @Override
-    public final Data getRoot() {
+    public final Data<K> getRoot() {
         return this;
     }
 
@@ -42,8 +42,8 @@ public abstract class Data<K> extends Bean implements Comparable<Data> {
     }
 
     @Override
-    public final int compareTo(Data o) {
-        return this.lockIndex - o.lockIndex;
+    public final int compareTo(Data<K> other) {
+        return this.lockIndex - other.lockIndex;
     }
 
     public abstract K primaryKey();

@@ -26,7 +26,6 @@ public class SRoleLogin extends Message {
 
     private UserInfo userInfo;//用户信息
 
-
     public SRoleLogin() {
         super(2222);
         roleId = 111L;
@@ -86,7 +85,6 @@ public class SRoleLogin extends Message {
         }
         this.userInfo = userInfo;
     }
-
 
     @Override
     public SRoleLogin create() {

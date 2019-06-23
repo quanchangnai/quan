@@ -32,7 +32,6 @@ public class UserInfo extends Bean {
 
     private int buyPowerCount;
 
-
     public UserInfo() {
         name = "";
         eventState = "";
@@ -135,7 +134,6 @@ public class UserInfo extends Bean {
     public void setBuyPowerCount(int buyPowerCount) {
         this.buyPowerCount = buyPowerCount;
     }
-
 
     @Override
     public void encode(Buffer buffer) throws IOException {

@@ -12,7 +12,7 @@ public class BaseField<V> implements Field<V> {
 
     private V value;
 
-    public BaseField() {
+    protected BaseField() {
     }
 
     public BaseField(V value) {

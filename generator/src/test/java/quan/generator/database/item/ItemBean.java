@@ -10,11 +10,9 @@ import quan.database.field.*;
  */
 public class ItemBean extends Bean {
 
-    private BaseField<Integer> id = new BaseField<>();
+    private BaseField<Integer> id = new BaseField<>(0);
 
-    private BaseField<String> name = new BaseField<>();
-
-
+    private BaseField<String> name = new BaseField<>("");
 
     public int getId() {
         return id.getValue();
@@ -31,7 +29,6 @@ public class ItemBean extends Bean {
     public void setName(String name) {
         this.name.setLogValue(name, getRoot());
     }
-
 
     @Override
     public String toString() {

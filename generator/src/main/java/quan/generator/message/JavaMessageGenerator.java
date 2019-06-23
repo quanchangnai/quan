@@ -12,13 +12,12 @@ import java.io.IOException;
  */
 public class JavaMessageGenerator extends MessageGenerator {
 
-    {
-        basicTypes.put("bytes", "byte[]");
-        classTypes.put("bytes", "byte[]");
-    }
-
     public JavaMessageGenerator(String srcPath, String destPath) throws Exception {
         super(srcPath, destPath);
+
+        basicTypes.put("bytes", "byte[]");
+        classTypes.put("bytes", "byte[]");
+
     }
 
     @Override

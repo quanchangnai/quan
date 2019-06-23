@@ -11,10 +11,6 @@ public class FieldLog<V> {
 
     private V value;
 
-    public FieldLog(Field<V> field) {
-        this.field = field;
-    }
-
     public FieldLog(Field field, V value) {
         this.field = field;
         this.value = value;

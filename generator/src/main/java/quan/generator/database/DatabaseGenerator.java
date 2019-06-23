@@ -16,27 +16,30 @@ import quan.generator.Generator;
 public class DatabaseGenerator extends Generator {
 
     public static void main(String[] args) throws Exception {
-        String srcPath = "generator\\src\\test\\java\\quan\\generator\\database";
-        String destPath = "generator\\src\\test\\java";
+
+//        String srcPath = "generator\\src\\test\\java\\quan\\generator\\database";
+//        String destPath = "generator\\src\\test\\java";
+
+        String srcPath = "database\\src\\test\\java\\quan\\database";
+        String destPath = "database\\src\\test\\java";
 
         DatabaseGenerator generator = new DatabaseGenerator(srcPath, destPath);
         generator.generate();
     }
 
 
-    {
+    public DatabaseGenerator(String srcPath, String destPath) throws Exception {
+        super(srcPath, destPath);
+
         classTypes.put("set", SetField.class.getSimpleName());
         classTypes.put("list", ListField.class.getSimpleName());
         classTypes.put("map", MapField.class.getSimpleName());
-    }
-
-    public DatabaseGenerator(String srcPath, String destPath) throws Exception {
-        super(srcPath, destPath);
 
         Template dataTemplate = freemarkerCfg.getTemplate("data.ftl");
 
         templates.put(DataDefinition.class, dataTemplate);
         templates.put(BeanDefinition.class, dataTemplate);
+
     }
 
     @Override
@@ -46,6 +49,7 @@ public class DatabaseGenerator extends Generator {
 
     protected void processBean(BeanDefinition beanDefinition) {
         super.processBean(beanDefinition);
+
         if (beanDefinition instanceof DataDefinition) {
             DataDefinition dataDefinition = (DataDefinition) beanDefinition;
             dataDefinition.setPrimaryKeyType(classTypes.get(dataDefinition.getPrimaryKeyType()));

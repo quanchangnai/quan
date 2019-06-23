@@ -1,9 +1,12 @@
-package quan.database;
+package quan.database.item;
 
-import quan.database.field.BaseField;
+import quan.database.Bean;
+import java.util.*;
+import quan.database.field.*;
 
 /**
- * Created by quanchangnai on 2019/6/22.
+ * 道具
+ * Created by 自动生成
  */
 public class ItemBean extends Bean {
 
@@ -15,25 +18,25 @@ public class ItemBean extends Bean {
         return id.getValue();
     }
 
-    public ItemBean setId(int id) {
+    public void setId(int id) {
         this.id.setLogValue(id, getRoot());
-        return this;
     }
 
     public String getName() {
         return name.getValue();
     }
 
-    public ItemBean setName(String name) {
+    public void setName(String name) {
         this.name.setLogValue(name, getRoot());
-        return this;
     }
 
     @Override
     public String toString() {
         return "ItemBean{" +
                 "id=" + id +
-                ", name=" + name +
+                ",name='" + name + '\'' +
                 '}';
+
     }
+
 }
