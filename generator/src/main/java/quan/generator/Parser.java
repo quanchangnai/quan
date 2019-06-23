@@ -24,12 +24,15 @@ public class Parser {
 
     protected Map<String, ClassDefinition> results = new HashMap<>();
 
-    public Parser(String srcPath) {
+    private String packagePrefix;
+
+    public Parser(String srcPath, String packagePrefix) {
         File file = new File(srcPath);
         File[] files = file.listFiles((File dir, String name) -> name.endsWith(".xml"));
         if (files != null) {
             srcFiles = Arrays.asList(files);
         }
+        this.packagePrefix = packagePrefix;
     }
 
 
@@ -49,10 +52,13 @@ public class Parser {
     protected void parseClasses(File srcFile) throws Exception {
         Document document = new SAXReader().read(srcFile);
         Element root = document.getRootElement();
+        if (!root.getName().equals("package")) {
+            return;
+        }
 
-        String packageName = root.attributeValue("package");
-        if (packageName == null) {
-            packageName = ".";
+        String packageName = srcFile.getName().substring(0, srcFile.getName().lastIndexOf("."));
+        if (packagePrefix != null) {
+            packageName = packagePrefix + "." + packageName;
         }
 
         for (int i = 0; i < root.nodeCount(); i++) {

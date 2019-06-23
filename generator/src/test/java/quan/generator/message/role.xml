@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<messages package="quan.generator.message.role">
+<package>
 
     <enum name="RoleType">角色类型
         <field name="type1" value="1"/>角色类型1
@@ -32,4 +32,4 @@
         <field name="userInfo" type="quan.network.quan.message.user.UserInfo"/>用户信息
     </message>
 
-</messages>
+</package>

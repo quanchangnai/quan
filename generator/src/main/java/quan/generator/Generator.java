@@ -54,6 +54,8 @@ public abstract class Generator {
 
     protected String destPath;
 
+    protected String packagePrefix;
+
     protected List<ClassDefinition> definitions;
 
     protected Configuration freemarkerCfg;
@@ -69,12 +71,25 @@ public abstract class Generator {
         this.srcPath = srcPath;
         this.destPath = destPath;
         this.freemarkerCfg = freemarkerCfg;
-        this.definitions = new Parser(srcPath).parse();
+    }
+
+    public String getPackagePrefix() {
+        return packagePrefix;
+    }
+
+    public Generator setPackagePrefix(String packagePrefix) {
+        if (packagePrefix == null && packagePrefix.trim().equals("")) {
+            return this;
+        }
+        this.packagePrefix = packagePrefix;
+        return this;
     }
 
     protected abstract String getLanguage();
 
     protected void generate() throws Exception {
+        this.definitions = new Parser(srcPath, packagePrefix).parse();
+
         for (ClassDefinition definition : definitions) {
             if (definition instanceof BeanDefinition) {
                 BeanDefinition beanDefinition = (BeanDefinition) definition;
@@ -96,7 +111,7 @@ public abstract class Generator {
             Writer writer = new FileWriter(new File(destFilePath, fileName));
             template.process(definition, writer);
 
-            logger.error("生成[{}]成功", fileName);
+            logger.info("生成[{}]成功", fileName);
         }
 
     }

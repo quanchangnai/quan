@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<database package="quan.generator.database.role">
+<package>
 
     <data name="RoleData">角色
         <field name="id" type="long" primary-key="true"/>角色ID
@@ -16,4 +16,4 @@
         <field name="map" type="map" key-type="int" value-type="int"/>
     </data>
 
-</database>
+</package>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<messages package="quan.message.user">
+<package>
 
     <bean name="UserInfo">
         <field name="name" type="string"/>名字
@@ -15,4 +15,4 @@
         <field name="buyPowerCount" type="int"/>
     </bean>
 
-</messages>
+</package>
