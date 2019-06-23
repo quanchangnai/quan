@@ -22,6 +22,11 @@
         <field name="map" type="map" key-type="int" value-type="int"/>
     </bean>
 
+    <message id="1111" name="CRoleLogin">角色登录
+        <field name="roleId" type="long"/>
+        <field name="roleName" type="string"/>
+    </message>
+
     <message id="2222" name="SRoleLogin">角色登录
         <field name="roleId" type="long" value="111"/>角色id
         <field name="roleName" type="string" value="zhangsan"/>角色名
@@ -29,7 +34,7 @@
         <field name="roleInfoList" type="list" value-type="RoleInfo"/>角色信息
         <field name="roleInfoSet" type="set" value-type="RoleInfo"/>角色信息
         <field name="roleInfoMap" type="map" key-type="long" value-type="RoleInfo"/>角色信息
-        <field name="userInfo" type="quan.network.quan.message.user.UserInfo"/>用户信息
+        <field name="userInfo" type="UserInfo"/>用户信息
     </message>
 
 </package>

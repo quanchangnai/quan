@@ -29,7 +29,7 @@
         <field name="roleInfoList" type="list" value-type="RoleInfo"/>角色信息
         <field name="roleInfoSet" type="set" value-type="RoleInfo"/>角色信息
         <field name="roleInfoMap" type="map" key-type="long" value-type="RoleInfo"/>角色信息
-        <field name="userInfo" type="quan.network.quan.message.user.UserInfo"/>用户信息
+        <field name="userInfo" type="UserInfo"/>用户信息
     </message>
 
 </package>
