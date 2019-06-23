@@ -6,8 +6,7 @@ import quan.network.handler.HandlerChain;
 import quan.network.handler.HandlerConfigurer;
 import quan.network.handler.HandlerContext;
 import quan.network.handler.codec.LengthFieldCodec;
-import quan.network.handler.codec.MessageCodec;
-import quan.network.message.Message;
+import quan.network.handler.codec.StringCodec;
 
 import java.net.StandardSocketOptions;
 
@@ -22,7 +21,7 @@ public class NioClientTest {
             @Override
             public void configureHandler(HandlerChain handlerChain) throws Exception {
                 handlerChain.addLast(new LengthFieldCodec(4, true));
-                handlerChain.addLast(new MessageCodec(NetworkTest.messageRegistry));
+                handlerChain.addLast(new StringCodec());
                 handlerChain.addLast(new TestClientHandler());
 
             }
@@ -33,7 +32,7 @@ public class NioClientTest {
 
     }
 
-    private static class TestClientHandler implements Handler<Message> {
+    private static class TestClientHandler implements Handler<String> {
 
         @Override
         public void onConnected(HandlerContext handlerContext) throws Exception {
@@ -46,7 +45,7 @@ public class NioClientTest {
         }
 
         @Override
-        public void onReceived(final HandlerContext handlerContext, final Message msg) throws Exception {
+        public void onReceived(final HandlerContext handlerContext, final String msg) throws Exception {
             System.err.println("onReceived:" + msg);
         }
 

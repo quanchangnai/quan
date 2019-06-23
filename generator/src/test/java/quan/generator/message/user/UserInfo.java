@@ -1,8 +1,9 @@
 package quan.generator.message.user;
 
-import quan.network.message.Buffer;
+import quan.message.Buffer;
+import java.util.*;
 import java.io.IOException;
-import quan.network.message.Bean;
+import quan.message.Bean;
 
 /**
  * Created by 自动生成
@@ -10,16 +11,27 @@ import quan.network.message.Bean;
 public class UserInfo extends Bean {
 
     private String name;//名字
+
     private int level;//等级
+
     private int experience;
+
     private int icon;
+
     private int power;
+
     private int modifyNameCount;
+
     private String eventState;
+
     private String functionState;
+
     private int lucky;
+
     private int currentState;
+
     private int buyPowerCount;
+
 
     public UserInfo() {
         name = "";

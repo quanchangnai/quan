@@ -8,10 +8,7 @@ import quan.network.handler.HandlerChain;
 import quan.network.handler.HandlerConfigurer;
 import quan.network.handler.HandlerContext;
 import quan.network.handler.codec.LengthFieldCodec;
-import quan.network.handler.codec.MessageCodec;
-import quan.network.message.role.RoleInfo;
-import quan.network.message.role.SRoleLogin;
-import quan.network.message.user.UserInfo;
+import quan.network.handler.codec.StringCodec;
 
 import java.net.StandardSocketOptions;
 
@@ -29,7 +26,7 @@ public class NioServerTest {
             @Override
             public void configureHandler(HandlerChain handlerChain) throws Exception {
                 handlerChain.addLast(new LengthFieldCodec(4, true));
-                handlerChain.addLast(new MessageCodec(NetworkTest.messageRegistry));
+                handlerChain.addLast(new StringCodec());
                 handlerChain.addLast(new TestServerHandler());
             }
         });
@@ -37,6 +34,7 @@ public class NioServerTest {
 
         server.start();
 
+        logger.error("服务器启动成功");
     }
 
 
@@ -57,14 +55,7 @@ public class NioServerTest {
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        SRoleLogin sRoleLogin = new SRoleLogin();
-                        sRoleLogin.setRoleId(123);
-                        sRoleLogin.setRoleName("张三");
-                        sRoleLogin.setRoleInfo(new RoleInfo());
-                        UserInfo userInfo = new UserInfo();
-                        userInfo.setName("张三");
-                        sRoleLogin.setUserInfo(userInfo);
-                        handlerContext.send(sRoleLogin);
+                        handlerContext.send("aaa:" + System.nanoTime());
                     }
                 }
             }.start();

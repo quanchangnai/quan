@@ -2,68 +2,32 @@ package quan.database.field;
 
 import quan.database.Bean;
 import quan.database.Data;
-import quan.database.Transaction;
-import quan.database.log.BeanLog;
+import quan.database.util.Validations;
 
 /**
  * Created by quanchangnai on 2019/5/16.
  */
-public class BeanField<T extends Bean> implements Field {
-
-    private T value;
+public class BeanField<T extends Bean> extends BaseField<T> {
 
     public BeanField() {
     }
 
     public BeanField(T value) {
-        this.value = value;
-    }
-
-    public T getValue() {
-        Transaction transaction = Transaction.current();
-        if (transaction != null) {
-            BeanLog<T> log = (BeanLog<T>) transaction.getFieldLog(this);
-            if (log != null) {
-                return log.getValue();
-            }
-        }
-        return value;
-    }
-
-    public void setValue(T value) {
-        this.value = value;
+        super(value);
     }
 
     public void setLogValue(T value, Data root) {
-        Transaction transaction = checkTransaction();
-
-        if (value != null && value.getRoot() != null && value.getRoot() != root) {
-            throw new UnsupportedOperationException("设置的" + value.getClass().getSimpleName() + "当前正受到其它" + Data.class.getSimpleName() + "管理:" + value.getRoot());
-        }
+        Validations.validFieldValue(value);
 
         T oldValue = getValue();
-        if (oldValue == value) {
-            return;
-        }
-
-        if (root != null) {
-            transaction.addVersionLog(root);
-        }
-
         if (oldValue != null) {
             oldValue.setLogRoot(null);
         }
-
-        BeanLog<T> log = (BeanLog<T>) transaction.getFieldLog(this);
-        if (log != null) {
-            log.setValue(value);
-        } else {
-            transaction.addFieldLog(new BeanLog<>(this, value));
-        }
-
         if (value != null) {
             value.setLogRoot(root);
         }
+
+        super.setLogValue(value, root);
 
     }
 

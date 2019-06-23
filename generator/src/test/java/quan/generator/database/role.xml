@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database package="quan.generator.database.item">
+
+    <bean name="ItemBean">道具
+        <field name="id" type="int"/>
+        <field name="name" type="string"/>
+    </bean>
+
+</database>

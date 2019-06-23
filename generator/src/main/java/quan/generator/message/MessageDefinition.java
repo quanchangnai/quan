@@ -1,5 +1,7 @@
 package quan.generator.message;
 
+import quan.generator.BeanDefinition;
+
 /**
  * Created by quanchangnai on 2017/7/6.
  */
@@ -9,7 +11,7 @@ public class MessageDefinition extends BeanDefinition {
 
     @Override
     public int getDefinitionType() {
-        return TYPE_MESSAGE;
+        return 3;
     }
 
     public String getId() {

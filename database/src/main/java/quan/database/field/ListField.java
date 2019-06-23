@@ -5,7 +5,8 @@ import org.pcollections.PVector;
 import quan.database.Bean;
 import quan.database.Data;
 import quan.database.Transaction;
-import quan.database.log.ListLog;
+import quan.database.log.FieldLog;
+import quan.database.util.Validations;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -15,7 +16,7 @@ import java.util.ListIterator;
 /**
  * Created by quanchangnai on 2019/5/21.
  */
-public class ListField<E> extends Bean implements List<E>, Field {
+public class ListField<E> extends Bean implements List<E>, Field<PVector<E>> {
 
     private PVector<E> data = Empty.vector();
 
@@ -24,25 +25,26 @@ public class ListField<E> extends Bean implements List<E>, Field {
     }
 
     @Override
-    protected void setChildrenLogRoot(Data root) {
-        for (E e : getData()) {
+    public void setChildrenLogRoot(Data root) {
+        for (E e : getValue()) {
             if (e instanceof Bean) {
                 ((Bean) e).setLogRoot(root);
             }
         }
     }
 
-    public ListField<E> setData(PVector<E> data) {
+    @Override
+    public void setValue(PVector<E> data) {
         this.data = data;
-        return this;
     }
 
-    public PVector<E> getData() {
+    @Override
+    public PVector<E> getValue() {
         Transaction transaction = Transaction.current();
         if (transaction != null) {
-            ListLog<E> log = (ListLog<E>) transaction.getFieldLog(this);
+            FieldLog<PVector<E>> log = (FieldLog<PVector<E>>) transaction.getFieldLog(this);
             if (log != null) {
-                return log.getData();
+                return log.getValue();
             }
         }
         return data;
@@ -50,42 +52,42 @@ public class ListField<E> extends Bean implements List<E>, Field {
 
     @Override
     public int size() {
-        return getData().size();
+        return getValue().size();
     }
 
     @Override
     public boolean isEmpty() {
-        return getData().isEmpty();
+        return getValue().isEmpty();
     }
 
     @Override
     public boolean contains(Object o) {
-        return getData().contains(o);
+        return getValue().contains(o);
     }
 
     @Override
     public Iterator<E> iterator() {
-        return getData().iterator();
+        return getValue().iterator();
     }
 
     @Override
     public Object[] toArray() {
-        return getData().toArray();
+        return getValue().toArray();
     }
 
     @Override
     public <T> T[] toArray(T[] a) {
-        return getData().toArray(a);
+        return getValue().toArray(a);
     }
 
-    private ListLog<E> getOrAddLog() {
-        Transaction transaction = checkTransaction();
+    private FieldLog<PVector<E>> getOrAddLog() {
+        Transaction transaction = Validations.validTransaction();
         if (getRoot() != null) {
-            transaction.addVersionLog(getRoot());
+            transaction.addDataLog(getRoot());
         }
-        ListLog<E> log = (ListLog<E>) transaction.getFieldLog(this);
+        FieldLog<PVector<E>> log = (FieldLog<PVector<E>>) transaction.getFieldLog(this);
         if (log == null) {
-            log = new ListLog<>(this);
+            log = new FieldLog<>(this, data);
             transaction.addFieldLog(log);
         }
         return log;
@@ -94,19 +96,19 @@ public class ListField<E> extends Bean implements List<E>, Field {
 
     @Override
     public boolean add(E e) {
-        validValue(e);
+        Validations.validCollectionValue(e);
 
-        ListLog<E> log = getOrAddLog();
+        FieldLog<PVector<E>> log = getOrAddLog();
 
-        PVector<E> oldData = log.getData();
-        PVector<E> newData = log.getData().plus(e);
+        PVector<E> oldData = log.getValue();
+        PVector<E> newData = log.getValue().plus(e);
 
         if (e instanceof Bean) {
             ((Bean) e).setLogRoot(getRoot());
         }
 
         if (oldData != newData) {
-            log.setData(newData);
+            log.setValue(newData);
             return true;
         }
         return false;
@@ -114,19 +116,19 @@ public class ListField<E> extends Bean implements List<E>, Field {
 
     @Override
     public boolean remove(Object o) {
-        ListLog<E> log = getOrAddLog();
+        FieldLog<PVector<E>> log = getOrAddLog();
 
-        PVector<E> oldData = log.getData();
+        PVector<E> oldData = log.getValue();
         for (E e : oldData) {
             if (e.equals(o) && e instanceof Bean) {
                 ((Bean) e).setLogRoot(null);
                 break;
             }
         }
-        PVector<E> newData = log.getData().minus(o);
+        PVector<E> newData = log.getValue().minus(o);
 
         if (oldData != newData) {
-            log.setData(newData);
+            log.setValue(newData);
             return true;
         }
         return false;
@@ -134,19 +136,19 @@ public class ListField<E> extends Bean implements List<E>, Field {
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        return getData().containsAll(c);
+        return getValue().containsAll(c);
     }
 
     @Override
     public boolean addAll(Collection<? extends E> c) {
         for (E e : c) {
-            validValue(e);
+            Validations.validCollectionValue(e);
         }
 
-        ListLog<E> log = getOrAddLog();
+        FieldLog<PVector<E>> log = getOrAddLog();
 
-        PVector<E> oldData = log.getData();
-        PVector<E> newData = log.getData().plusAll(c);
+        PVector<E> oldData = log.getValue();
+        PVector<E> newData = log.getValue().plusAll(c);
 
         for (E e : c) {
             if (e instanceof Bean) {
@@ -155,7 +157,7 @@ public class ListField<E> extends Bean implements List<E>, Field {
         }
 
         if (oldData != newData) {
-            log.setData(newData);
+            log.setValue(newData);
             return true;
         }
         return false;
@@ -164,13 +166,13 @@ public class ListField<E> extends Bean implements List<E>, Field {
     @Override
     public boolean addAll(int index, Collection<? extends E> c) {
         for (E e : c) {
-            validValue(e);
+            Validations.validCollectionValue(e);
         }
 
-        ListLog<E> log = getOrAddLog();
+        FieldLog<PVector<E>> log = getOrAddLog();
 
-        PVector<E> oldData = log.getData();
-        PVector<E> newData = log.getData().plusAll(index, c);
+        PVector<E> oldData = log.getValue();
+        PVector<E> newData = log.getValue().plusAll(index, c);
 
         for (E e : c) {
             if (e instanceof Bean) {
@@ -179,7 +181,7 @@ public class ListField<E> extends Bean implements List<E>, Field {
         }
 
         if (oldData != newData) {
-            log.setData(newData);
+            log.setValue(newData);
             return true;
         }
         return false;
@@ -187,10 +189,10 @@ public class ListField<E> extends Bean implements List<E>, Field {
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        ListLog<E> log = getOrAddLog();
+        FieldLog<PVector<E>> log = getOrAddLog();
 
-        PVector<E> oldData = log.getData();
-        PVector<E> newData = log.getData().minusAll(c);
+        PVector<E> oldData = log.getValue();
+        PVector<E> newData = log.getValue().minusAll(c);
 
         if (oldData != newData) {
             for (E e : oldData) {
@@ -198,7 +200,7 @@ public class ListField<E> extends Bean implements List<E>, Field {
                     ((Bean) e).setLogRoot(null);
                 }
             }
-            log.setData(newData);
+            log.setValue(newData);
             return true;
         }
         return false;
@@ -206,17 +208,17 @@ public class ListField<E> extends Bean implements List<E>, Field {
 
     @Override
     public void clear() {
-        ListLog<E> log = getOrAddLog();
-        if (log.getData().isEmpty()) {
+        FieldLog<PVector<E>> log = getOrAddLog();
+        if (log.getValue().isEmpty()) {
             return;
         }
         setChildrenLogRoot(null);
-        log.setData(Empty.vector());
+        log.setValue(Empty.vector());
     }
 
     @Override
     public E get(int index) {
-        return getData().get(index);
+        return getValue().get(index);
     }
 
     @Override
@@ -226,15 +228,15 @@ public class ListField<E> extends Bean implements List<E>, Field {
 
     @Override
     public E set(int index, E element) {
-        validValue(element);
+        Validations.validCollectionValue(element);
 
-        ListLog<E> log = getOrAddLog();
+        FieldLog<PVector<E>> log = getOrAddLog();
 
-        PVector<E> oldData = log.getData();
-        PVector<E> newData = log.getData().with(index, element);
+        PVector<E> oldData = log.getValue();
+        PVector<E> newData = log.getValue().with(index, element);
 
         if (oldData != newData) {
-            log.setData(newData);
+            log.setValue(newData);
         }
 
         if (element instanceof Bean) {
@@ -251,15 +253,15 @@ public class ListField<E> extends Bean implements List<E>, Field {
 
     @Override
     public void add(int index, E element) {
-        validValue(element);
+        Validations.validCollectionValue(element);
 
-        ListLog<E> log = getOrAddLog();
+        FieldLog<PVector<E>> log = getOrAddLog();
 
-        PVector<E> oldData = log.getData();
-        PVector<E> newData = log.getData().plus(index, element);
+        PVector<E> oldData = log.getValue();
+        PVector<E> newData = log.getValue().plus(index, element);
 
         if (oldData != newData) {
-            log.setData(newData);
+            log.setValue(newData);
         }
 
         if (element instanceof Bean) {
@@ -274,13 +276,13 @@ public class ListField<E> extends Bean implements List<E>, Field {
 
     @Override
     public E remove(int index) {
-        ListLog<E> log = getOrAddLog();
+        FieldLog<PVector<E>> log = getOrAddLog();
 
-        PVector<E> oldData = log.getData();
-        PVector<E> newData = log.getData().minus(index);
+        PVector<E> oldData = log.getValue();
+        PVector<E> newData = log.getValue().minus(index);
 
         if (oldData != newData) {
-            log.setData(newData);
+            log.setValue(newData);
         }
 
         E oldElement = oldData.get(index);
@@ -293,31 +295,31 @@ public class ListField<E> extends Bean implements List<E>, Field {
 
     @Override
     public int indexOf(Object o) {
-        return getData().indexOf(o);
+        return getValue().indexOf(o);
     }
 
     @Override
     public int lastIndexOf(Object o) {
-        return getData().lastIndexOf(o);
+        return getValue().lastIndexOf(o);
     }
 
     @Override
     public ListIterator<E> listIterator() {
-        return getData().listIterator();
+        return getValue().listIterator();
     }
 
     @Override
     public ListIterator<E> listIterator(int index) {
-        return getData().listIterator(index);
+        return getValue().listIterator(index);
     }
 
     @Override
     public List<E> subList(int fromIndex, int toIndex) {
-        return getData().subList(fromIndex, toIndex);
+        return getValue().subList(fromIndex, toIndex);
     }
 
     @Override
     public String toString() {
-        return getData().toString();
+        return getValue().toString();
     }
 }

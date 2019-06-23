@@ -5,14 +5,15 @@ import org.pcollections.PMap;
 import quan.database.Bean;
 import quan.database.Data;
 import quan.database.Transaction;
-import quan.database.log.MapLog;
+import quan.database.log.FieldLog;
+import quan.database.util.Validations;
 
 import java.util.*;
 
 /**
  * Created by quanchangnai on 2019/5/20.
  */
-public class MapField<K, V> extends Bean implements Map<K, V>, Field {
+public class MapField<K, V> extends Bean implements Map<K, V>, Field<PMap<K, V>> {
 
     private PMap<K, V> data = Empty.map();
 
@@ -20,25 +21,25 @@ public class MapField<K, V> extends Bean implements Map<K, V>, Field {
         setRoot(root);
     }
 
-    protected void setChildrenLogRoot(Data root) {
-        for (V value : getData().values()) {
+    public void setChildrenLogRoot(Data root) {
+        for (V value : getValue().values()) {
             if (value instanceof Bean) {
                 ((Bean) value).setLogRoot(root);
             }
         }
     }
 
-    public MapField<K, V> setData(PMap<K, V> data) {
+    public void setValue(PMap<K, V> data) {
         this.data = data;
-        return this;
     }
 
-    public Map<K, V> getData() {
+    @Override
+    public PMap<K, V> getValue() {
         Transaction transaction = Transaction.current();
         if (transaction != null) {
-            MapLog<K, V> log = (MapLog<K, V>) transaction.getFieldLog(this);
+            FieldLog<PMap<K, V>> log = (FieldLog<PMap<K, V>>) transaction.getFieldLog(this);
             if (log != null) {
-                return log.getData();
+                return log.getValue();
             }
         }
         return data;
@@ -46,62 +47,51 @@ public class MapField<K, V> extends Bean implements Map<K, V>, Field {
 
     @Override
     public int size() {
-        return getData().size();
+        return getValue().size();
     }
 
     @Override
     public boolean isEmpty() {
-        return getData().isEmpty();
+        return getValue().isEmpty();
     }
 
     @Override
     public boolean containsKey(Object key) {
-        return getData().containsKey(key);
+        return getValue().containsKey(key);
     }
 
     @Override
     public boolean containsValue(Object value) {
-        return getData().containsValue(value);
+        return getValue().containsValue(value);
     }
 
     @Override
     public V get(Object key) {
-        return getData().get(key);
+        return getValue().get(key);
     }
 
-    private MapLog<K, V> getOrAddLog() {
-        Transaction transaction = checkTransaction();
+    private FieldLog<PMap<K, V>> getOrAddLog() {
+        Transaction transaction = Validations.validTransaction();
         if (getRoot() != null) {
-            transaction.addVersionLog(getRoot());
+            transaction.addDataLog(getRoot());
         }
-        MapLog<K, V> log = (MapLog<K, V>) transaction.getFieldLog(this);
+        FieldLog<PMap<K, V>> log = (FieldLog<PMap<K, V>>) transaction.getFieldLog(this);
         if (log == null) {
-            log = new MapLog<>(this);
+            log = new FieldLog<>(this,data);
             transaction.addFieldLog(log);
         }
         return log;
     }
 
-    private void validKey(K key) {
-        if (key == null) {
-            throw new IllegalArgumentException("不允许null作为Key");
-        }
-        List<Class<?>> allowedClasses = Arrays.asList(Byte.class, Boolean.class, Short.class, Integer.class, Long.class, Double.class, String.class);
-        if (!allowedClasses.contains(key.getClass())) {
-            throw new IllegalArgumentException("不允许该类型作为Key:" + key.getClass() + "，允许的类型:" + allowedClasses);
-        }
-    }
-
-
     @Override
     public V put(K key, V value) {
-        validKey(key);
-        validValue(value);
+        Validations.validMapKey(key);
+        Validations.validCollectionValue(value);
 
-        MapLog<K, V> log = getOrAddLog();
+        FieldLog<PMap<K, V>> log = getOrAddLog();
 
-        V oldValue = log.getData().get(key);
-        log.setData(log.getData().plus(key, value));
+        V oldValue = log.getValue().get(key);
+        log.setValue(log.getValue().plus(key, value));
 
         if (value instanceof Bean) {
             ((Bean) value).setLogRoot(getRoot());
@@ -116,10 +106,10 @@ public class MapField<K, V> extends Bean implements Map<K, V>, Field {
 
     @Override
     public V remove(Object key) {
-        MapLog<K, V> log = getOrAddLog();
+        FieldLog<PMap<K, V>> log = getOrAddLog();
 
-        V value = log.getData().get(key);
-        log.setData(log.getData().minus(key));
+        V value = log.getValue().get(key);
+        log.setValue(log.getValue().minus(key));
 
         if (value instanceof Bean) {
             ((Bean) value).setLogRoot(null);
@@ -130,16 +120,16 @@ public class MapField<K, V> extends Bean implements Map<K, V>, Field {
     @Override
     public void putAll(Map<? extends K, ? extends V> m) {
         for (K key : m.keySet()) {
-            validKey(key);
+            Validations.validMapKey(key);
         }
 
         for (V value : m.values()) {
-            validValue(value);
+            Validations.validCollectionValue(value);
         }
 
-        MapLog<K, V> log = getOrAddLog();
-        PMap<K, V> oldData = log.getData();
-        log.setData(oldData.plusAll(m));
+        FieldLog<PMap<K, V>> log = getOrAddLog();
+        PMap<K, V> oldData = log.getValue();
+        log.setValue(oldData.plusAll(m));
 
         for (K key : m.keySet()) {
             V newValue = m.get(key);
@@ -155,31 +145,31 @@ public class MapField<K, V> extends Bean implements Map<K, V>, Field {
 
     @Override
     public void clear() {
-        MapLog<K, V> log = getOrAddLog();
-        if (log.getData().isEmpty()) {
+        FieldLog<PMap<K, V>> log = getOrAddLog();
+        if (log.getValue().isEmpty()) {
             return;
         }
         setChildrenLogRoot(null);
-        log.setData(Empty.map());
+        log.setValue(Empty.map());
     }
 
     @Override
     public Set<K> keySet() {
-        return getData().keySet();
+        return getValue().keySet();
     }
 
     @Override
     public Collection<V> values() {
-        return getData().values();
+        return getValue().values();
     }
 
     @Override
     public Set<Entry<K, V>> entrySet() {
-        return getData().entrySet();
+        return getValue().entrySet();
     }
 
     @Override
     public String toString() {
-        return getData().toString();
+        return getValue().toString();
     }
 }

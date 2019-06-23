@@ -46,5 +46,5 @@ public abstract class Data<K> extends Bean implements Comparable<Data> {
         return this.lockIndex - o.lockIndex;
     }
 
-    public abstract K getKey();
+    public abstract K primaryKey();
 }

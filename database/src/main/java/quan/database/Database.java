@@ -11,14 +11,14 @@ public abstract class Database {
     protected Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
-     * 缓存最大数量
+     * 缓存记录最大数量
      */
-    private int cacheSize = 1000;
+    private int cacheSize = 5000;
 
     /**
-     * 缓存过期秒数
+     * 缓存过期时间秒
      */
-    private int cacheExpire = 60;
+    private int cacheExpire = 600;
 
     public int getCacheSize() {
         return cacheSize;
@@ -28,18 +28,15 @@ public abstract class Database {
         return cacheExpire;
     }
 
-    public void open() {
 
-    }
+    public abstract void open();
 
-    public void close() {
+    public abstract void close();
 
-    }
+    protected abstract <K, V extends Data<K>> V get(Cache<K, V> cache, K key);
 
-    protected abstract <K, V extends Data<K>> V get(TableCache<K, V> tableCache, K key);
+    protected abstract <K, V extends Data<K>> V remove(Cache<K, V> cache, K key);
 
-    protected abstract <K, V extends Data<K>> V remove(TableCache<K, V> tableCache, K key);
-
-    protected abstract <K, V extends Data<K>> V put(TableCache<K, V> tableCache, V data);
+    protected abstract <K, V extends Data<K>> V put(Cache<K, V> cache, V data);
 
 }

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<messages package="quan.message.role">
+
+    <enum name="RoleType">角色类型
+        <field name="type1" value="1"/>角色类型1
+        <field name="type2" value="2"/>角色类型2
+    </enum>
+
+    <bean name="RoleInfo">角色信息
+        <field name="roleId" type="long" value="111"/>角色id
+        <field name="bo" type="bool" value="true"/>
+        <field name="by" type="byte" value="22"/>
+        <field name="s" type="short" value="22"/>
+        <field name="i" type="int" value="11"/>
+        <field name="f" type="float" value="22.33332"/>
+        <field name="d" type="double" value="33.332432"/>
+        <field name="roleName" type="string"/>角色名
+        <field name="roleType" type="RoleType" value="type1"/>
+        <field name="data" type="bytes"/>
+        <field name="list" type="list" value-type="int"/>
+        <field name="set" type="set" value-type="int"/>
+        <field name="map" type="map" key-type="int" value-type="int"/>
+    </bean>
+
+    <message id="2222" name="SRoleLogin">角色登录
+        <field name="roleId" type="long" value="111"/>角色id
+        <field name="roleName" type="string" value="zhangsan"/>角色名
+        <field name="roleInfo" type="RoleInfo" optional="true"/>角色信息
+        <field name="roleInfoList" type="list" value-type="RoleInfo"/>角色信息
+        <field name="roleInfoSet" type="set" value-type="RoleInfo"/>角色信息
+        <field name="roleInfoMap" type="map" key-type="long" value-type="RoleInfo"/>角色信息
+        <field name="userInfo" type="quan.network.quan.message.user.UserInfo"/>用户信息
+    </message>
+
+</messages>

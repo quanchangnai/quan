@@ -4,9 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.database.exception.TransactionException;
 import quan.database.field.Field;
+import quan.database.log.DataLog;
 import quan.database.log.FieldLog;
 import quan.database.log.RootLog;
-import quan.database.log.VersionLog;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
@@ -43,17 +43,17 @@ public class Transaction {
     private List<Lock> locks = new ArrayList<>();
 
     /**
-     * 版本日志，记录版本号的变化
+     * Data日志，记录Data的版本号
      */
-    private Map<Data, VersionLog> versionLogs = new HashMap<>();
+    private Map<Data, DataLog> dataLogs = new HashMap<>();
 
     /**
-     * Root日志，记录Root的变化
+     * Root日志，记录Bean的根对象
      */
     private Map<Bean, RootLog> rootLogs = new HashMap<>();
 
     /**
-     * 字段日志，记录字段值的变化
+     * 字段日志，记录字段值
      */
     private Map<Field, FieldLog> fieldLogs = new HashMap<>();
 
@@ -72,26 +72,27 @@ public class Transaction {
         Transaction current = current();
         if (current != null) {
             current.failed = true;
-        } else {
-            throw new RuntimeException("当前不在事务中");
         }
     }
 
     public static void breakdown() {
-        fail();
-        throw new TransactionException("事务被标记为失败状态");
+        Transaction current = current();
+        if (current != null) {
+            current.failed = true;
+            throw new TransactionException("事务被打断");
+        }
     }
 
-    public void addVersionLog(Data data) {
-        if (versionLogs.containsKey(data)) {
+    public void addDataLog(Data data) {
+        if (dataLogs.containsKey(data)) {
             return;
         }
-        VersionLog versionLog = new VersionLog(data);
-        versionLogs.put(versionLog.getData(), versionLog);
+        DataLog dataLog = new DataLog(data);
+        dataLogs.put(dataLog.getData(), dataLog);
     }
 
-    public VersionLog getVersionLog(Data data) {
-        return versionLogs.get(data);
+    public DataLog getDataLog(Data data) {
+        return dataLogs.get(data);
     }
 
     public void addFieldLog(FieldLog fieldLog) {
@@ -196,7 +197,7 @@ public class Transaction {
 
     private void lock() {
         List<Data> dataList = new ArrayList<>();
-        for (Data data : versionLogs.keySet()) {
+        for (Data data : dataLogs.keySet()) {
             dataList.add(data);
         }
 
@@ -220,8 +221,8 @@ public class Transaction {
 
 
     private boolean conflict() {
-        for (VersionLog versionLog : versionLogs.values()) {
-            if (versionLog.conflict()) {
+        for (DataLog dataLog : dataLogs.values()) {
+            if (dataLog.isConflict()) {
                 return true;
             }
         }
@@ -232,9 +233,9 @@ public class Transaction {
     private void commit() {
         try {
             Set<Data> writes = new HashSet<>();
-            for (VersionLog versionLog : versionLogs.values()) {
-                versionLog.commit();
-                writes.add(versionLog.getData());
+            for (DataLog dataLog : dataLogs.values()) {
+                dataLog.commit();
+                writes.add(dataLog.getData());
             }
             for (RootLog rootLog : rootLogs.values()) {
                 rootLog.commit();
@@ -243,7 +244,7 @@ public class Transaction {
                 fieldLog.commit();
             }
 
-            versionLogs.clear();
+            dataLogs.clear();
             fieldLogs.clear();
             rootLogs.clear();
             failed = false;
@@ -261,7 +262,7 @@ public class Transaction {
      */
     private void rollback(boolean end) {
         try {
-            versionLogs.clear();
+            dataLogs.clear();
             fieldLogs.clear();
             rootLogs.clear();
             failed = false;

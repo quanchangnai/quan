@@ -1,13 +1,10 @@
 package quan.generator.message.role;
 
+import quan.message.Buffer;
+import java.util.*;
 import quan.generator.message.user.UserInfo;
-import quan.network.message.Buffer;
-import quan.network.message.Message;
-
+import quan.message.Message;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 
 /**
  * 角色登录
@@ -16,12 +13,19 @@ import java.util.HashSet;
 public class SRoleLogin extends Message {
 
     private long roleId;//角色id
+
     private String roleName;//角色名
+
     private RoleInfo roleInfo;//角色信息
+
     private ArrayList<RoleInfo> roleInfoList;//角色信息
+
     private HashSet<RoleInfo> roleInfoSet;//角色信息
+
     private HashMap<Long, RoleInfo> roleInfoMap;//角色信息
+
     private UserInfo userInfo;//用户信息
+
 
     public SRoleLogin() {
         super(2222);
@@ -46,7 +50,7 @@ public class SRoleLogin extends Message {
     }
 
     public void setRoleName(String roleName) {
-        if (roleName == null) {
+        if (roleName == null){
             throw new NullPointerException();
         }
         this.roleName = roleName;
@@ -77,7 +81,7 @@ public class SRoleLogin extends Message {
     }
 
     public void setUserInfo(UserInfo userInfo) {
-        if (userInfo == null) {
+        if (userInfo == null){
             throw new NullPointerException();
         }
         this.userInfo = userInfo;

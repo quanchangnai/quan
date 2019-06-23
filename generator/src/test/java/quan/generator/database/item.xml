@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database package="quan.generator.database.role">
+
+    <data name="RoleData">角色
+        <field name="roleId" type="long" primary-key="true"/>角色ID
+        <field name="roleName" type="string"/>
+        <field name="itemBean" type="ItemBean"/>
+        <field name="items" type="map" key-type="int" value-type="int"/>
+    </data>
+
+</database>

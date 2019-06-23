@@ -23,6 +23,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     <#else>
     private ${field.basicType} ${field.name};<#if field.comment !="">//${field.comment}</#if>
     </#if>
+
 </#list>
 
     public ${name}() {

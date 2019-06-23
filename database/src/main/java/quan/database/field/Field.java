@@ -3,16 +3,12 @@ package quan.database.field;
 import quan.database.Transaction;
 
 /**
- * Created by quanchangnai on 2019/5/16.
+ * Created by quanchangnai on 2019/6/22.
  */
-public interface Field {
+public interface Field<V> {
 
-    default Transaction checkTransaction() {
-        Transaction transaction = Transaction.current();
-        if (transaction == null) {
-            throw new UnsupportedOperationException("当前不在事务中，禁止修改数据");
-        }
-        return transaction;
-    }
+    V getValue();
+
+    void setValue(V value);
 
 }
