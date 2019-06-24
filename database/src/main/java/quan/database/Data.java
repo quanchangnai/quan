@@ -16,13 +16,10 @@ public abstract class Data<K> extends Bean implements Comparable<Data<K>> {
 
     private static final AtomicInteger lockIndexGenerator = new AtomicInteger();
 
-    private int lockIndex;
+    private int lockIndex = lockIndexGenerator.incrementAndGet();
 
     private Lock lock = new ReentrantLock();
 
-    {
-        lockIndex = lockIndexGenerator.incrementAndGet();
-    }
 
     public final Lock getLock() {
         return lock;
@@ -39,6 +36,9 @@ public abstract class Data<K> extends Bean implements Comparable<Data<K>> {
 
     public final void versionUp() {
         version++;
+        if (version < 0) {
+            version = 1;
+        }
     }
 
     @Override
@@ -46,5 +46,13 @@ public abstract class Data<K> extends Bean implements Comparable<Data<K>> {
         return this.lockIndex - other.lockIndex;
     }
 
-    public abstract K primaryKey();
+    public final String dataName() {
+        return getClass().getName();
+    }
+
+    public abstract K getKey();
+
+    public abstract void setKey(K key);
+
+    public abstract Cache cache();
 }

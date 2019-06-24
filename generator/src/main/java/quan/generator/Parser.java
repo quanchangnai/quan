@@ -206,9 +206,9 @@ public class Parser {
                         DataDefinition dataDefinition = (DataDefinition) beanDefinition;
                         String primaryKey = child.attributeValue("primary-key");
                         if (primaryKey != null && primaryKey.equals("true")) {
-                            if (dataDefinition.getPrimaryKeyName() == null) {
-                                dataDefinition.setPrimaryKeyType(fieldDefinition.getType());
-                                dataDefinition.setPrimaryKeyName(fieldDefinition.getName());
+                            if (dataDefinition.getKeyName() == null) {
+                                dataDefinition.setKeyType(fieldDefinition.getType());
+                                dataDefinition.setKeyName(fieldDefinition.getName());
                             } else {
                                 logger.error("忽略{}多余的主键", dataDefinition.getName());
                             }

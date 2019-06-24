@@ -1,10 +1,9 @@
 package quan.database.store;
 
-import com.sleepycat.je.Environment;
-import com.sleepycat.je.EnvironmentConfig;
+import com.sleepycat.je.*;
+import quan.database.Cache;
 import quan.database.Data;
 import quan.database.Database;
-import quan.database.Cache;
 
 import java.io.File;
 import java.util.HashMap;
@@ -17,57 +16,78 @@ public class BerkeleyDB extends Database {
 
     private Environment environment;
 
-    private File path;
+    private File dir;
 
     private Map<String, com.sleepycat.je.Database> dbs = new HashMap<>();
 
-    public BerkeleyDB(File path) {
-        this.path = path;
+    public BerkeleyDB(File dir) {
+        super();
+        this.dir = dir;
     }
 
-    public BerkeleyDB(String path) {
-        this.path = new File(path);
+    public BerkeleyDB(String dir) {
+        super();
+        this.dir = new File(dir);
+    }
+
+    public BerkeleyDB(File dir, int cacheSize, int cacheExpire) {
+        super(cacheSize, cacheExpire);
+        this.dir = dir;
     }
 
     @Override
     public void open() {
-        if (!path.exists()) {
-            path.mkdirs();
+        if (!dir.exists()) {
+            dir.mkdirs();
         }
         EnvironmentConfig envConfig = new EnvironmentConfig();
         envConfig.setAllowCreate(true);
-        environment = new Environment(path, envConfig);
-//        environment.openDatabase(null)
+        environment = new Environment(dir, envConfig);
+
+        for (Cache cache : getCaches().values()) {
+            DatabaseConfig databaseConfig = new DatabaseConfig();
+            databaseConfig.setAllowCreate(true);
+            com.sleepycat.je.Database db = environment.openDatabase(null, cache.getName(), databaseConfig);
+            dbs.put(db.getDatabaseName(), db);
+        }
     }
 
     @Override
     public void close() {
+        for (com.sleepycat.je.Database db : dbs.values()) {
+            db.close();
+        }
         environment.close();
     }
 
     @Override
-    protected <K, V extends Data<K>> V get(Cache<K, V> cache, K key) {
-        return null;
+    protected <K, V extends Data<K>> String doGet(String cacheName, String key) {
+        DatabaseEntry keyEntry = new DatabaseEntry(key.getBytes());
+        DatabaseEntry dataEntry = new DatabaseEntry();
+
+        dbs.get(cacheName).get(null, keyEntry, dataEntry, LockMode.DEFAULT);
+
+        if (dataEntry.getData() == null) {
+            return null;
+        }
+        return new String(dataEntry.getData());
     }
 
     @Override
-    protected <K, V extends Data<K>> V remove(Cache<K, V> cache, K key) {
-        return null;
+    protected <K, V extends Data<K>> void put(V data) {
+        String json = data.encode().toJSONString();
+
+        DatabaseEntry keyEntry = new DatabaseEntry(data.getKey().toString().getBytes());
+        DatabaseEntry dataEntry = new DatabaseEntry(json.getBytes());
+
+        dbs.get(data.cache().getName()).put(null, keyEntry, dataEntry);
     }
+
 
     @Override
-    protected <K, V extends Data<K>> V put(Cache<K, V> cache, V data) {
-        return null;
+    protected <K, V extends Data<K>> void remove(String cacheName, K key) {
+        DatabaseEntry keyEntry = new DatabaseEntry(key.toString().getBytes());
+        dbs.get(cacheName).delete(null, keyEntry);
     }
 
-    private void test() {
-
-    }
-
-    public static void main(String[] args) {
-        BerkeleyDB db = new BerkeleyDB(".temp/bdb");
-        db.open();
-        db.test();
-        db.close();
-    }
 }

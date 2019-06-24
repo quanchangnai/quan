@@ -7,6 +7,7 @@ import quan.database.field.Field;
 import quan.database.log.DataLog;
 import quan.database.log.FieldLog;
 import quan.database.log.RootLog;
+import quan.database.log.VersionLog;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
@@ -43,19 +44,24 @@ public class Transaction {
     private List<Lock> locks = new ArrayList<>();
 
     /**
-     * Data日志，记录Data的版本号
+     * 记录Data的版本号
      */
-    private Map<Data, DataLog> dataLogs = new HashMap<>();
+    private Map<Data, VersionLog> versionLogs = new HashMap<>();
 
     /**
-     * Root日志，记录Bean的根对象
+     * 记录Bean的根对象
      */
-    private Map<Bean, RootLog> rootLogs = new HashMap<>();
+    private Map<Node, RootLog> rootLogs = new HashMap<>();
 
     /**
-     * 字段日志，记录字段值
+     * 记录字段值
      */
     private Map<Field, FieldLog> fieldLogs = new HashMap<>();
+
+    /**
+     * 记录Data的创建删除和版本号
+     */
+    private Map<DataLog.Key, DataLog> dataLogs = new HashMap<>();
 
     public long getId() {
         return id;
@@ -83,16 +89,16 @@ public class Transaction {
         }
     }
 
-    public void addDataLog(Data data) {
-        if (dataLogs.containsKey(data)) {
+    public void addVersionLog(Data data) {
+        if (versionLogs.containsKey(data)) {
             return;
         }
-        DataLog dataLog = new DataLog(data);
-        dataLogs.put(dataLog.getData(), dataLog);
+        VersionLog versionLog = new VersionLog(data);
+        versionLogs.put(versionLog.getData(), versionLog);
     }
 
-    public DataLog getDataLog(Data data) {
-        return dataLogs.get(data);
+    public VersionLog getVersionLog(Data data) {
+        return versionLogs.get(data);
     }
 
     public void addFieldLog(FieldLog fieldLog) {
@@ -104,11 +110,22 @@ public class Transaction {
     }
 
     public void addRootLog(RootLog rootLog) {
-        rootLogs.put(rootLog.getBean(), rootLog);
+        rootLogs.put(rootLog.getNode(), rootLog);
     }
 
-    public RootLog getRootLog(Bean bean) {
-        return rootLogs.get(bean);
+    public RootLog getRootLog(Node node) {
+        return rootLogs.get(node);
+    }
+
+    public DataLog getDataLog(Object key) {
+        return dataLogs.get(key);
+    }
+
+    public void addDataLog(DataLog dataLog) {
+        if (dataLogs.containsKey(dataLog.getKey())) {
+            return;
+        }
+        dataLogs.put(dataLog.getKey(), dataLog);
     }
 
     /**
@@ -179,7 +196,7 @@ public class Transaction {
                 logger.debug("当前第{}次执行事务{}", count, current.getId());
                 task.run();
                 current.lock();
-                if (current.conflict()) {
+                if (current.isConflict()) {
                     //有冲突，其他事务也修改了数据
                     current.rollback(false);
                 } else {
@@ -197,7 +214,7 @@ public class Transaction {
 
     private void lock() {
         List<Data> dataList = new ArrayList<>();
-        for (Data data : dataLogs.keySet()) {
+        for (Data data : versionLogs.keySet()) {
             dataList.add(data);
         }
 
@@ -220,7 +237,12 @@ public class Transaction {
     }
 
 
-    private boolean conflict() {
+    private boolean isConflict() {
+        for (VersionLog versionLog : versionLogs.values()) {
+            if (versionLog.isConflict()) {
+                return true;
+            }
+        }
         for (DataLog dataLog : dataLogs.values()) {
             if (dataLog.isConflict()) {
                 return true;
@@ -232,10 +254,8 @@ public class Transaction {
 
     private void commit() {
         try {
-            Set<Data> writes = new HashSet<>();
-            for (DataLog dataLog : dataLogs.values()) {
-                dataLog.commit();
-                writes.add(dataLog.getData());
+            for (VersionLog versionLog : versionLogs.values()) {
+                versionLog.commit();
             }
             for (RootLog rootLog : rootLogs.values()) {
                 rootLog.commit();
@@ -244,7 +264,7 @@ public class Transaction {
                 fieldLog.commit();
             }
 
-            dataLogs.clear();
+            versionLogs.clear();
             fieldLogs.clear();
             rootLogs.clear();
             failed = false;
@@ -262,7 +282,7 @@ public class Transaction {
      */
     private void rollback(boolean end) {
         try {
-            dataLogs.clear();
+            versionLogs.clear();
             fieldLogs.clear();
             rootLogs.clear();
             failed = false;

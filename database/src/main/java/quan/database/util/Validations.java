@@ -14,7 +14,7 @@ public class Validations {
     public static Transaction validTransaction() {
         Transaction transaction = Transaction.current();
         if (transaction == null) {
-            throw new UnsupportedOperationException("当前不在事务中，禁止修改数据");
+            throw new UnsupportedOperationException("当前不在事务中");
         }
         return transaction;
     }

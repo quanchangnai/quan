@@ -4,6 +4,7 @@ import org.pcollections.Empty;
 import org.pcollections.PVector;
 import quan.database.Bean;
 import quan.database.Data;
+import quan.database.Node;
 import quan.database.Transaction;
 import quan.database.log.FieldLog;
 import quan.database.util.Validations;
@@ -16,7 +17,7 @@ import java.util.ListIterator;
 /**
  * Created by quanchangnai on 2019/5/21.
  */
-public class ListField<E> extends Bean implements List<E>, Field<PVector<E>> {
+public class ListField<E> extends Node implements List<E>, Field<PVector<E>> {
 
     private PVector<E> data = Empty.vector();
 
@@ -83,7 +84,7 @@ public class ListField<E> extends Bean implements List<E>, Field<PVector<E>> {
     private FieldLog<PVector<E>> getOrAddLog() {
         Transaction transaction = Validations.validTransaction();
         if (getRoot() != null) {
-            transaction.addDataLog(getRoot());
+            transaction.addVersionLog(getRoot());
         }
         FieldLog<PVector<E>> log = (FieldLog<PVector<E>>) transaction.getFieldLog(this);
         if (log == null) {
@@ -317,6 +318,7 @@ public class ListField<E> extends Bean implements List<E>, Field<PVector<E>> {
     public List<E> subList(int fromIndex, int toIndex) {
         return getValue().subList(fromIndex, toIndex);
     }
+
 
     @Override
     public String toString() {

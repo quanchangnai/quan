@@ -4,16 +4,19 @@ import org.pcollections.Empty;
 import org.pcollections.PMap;
 import quan.database.Bean;
 import quan.database.Data;
+import quan.database.Node;
 import quan.database.Transaction;
 import quan.database.log.FieldLog;
 import quan.database.util.Validations;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by quanchangnai on 2019/5/20.
  */
-public class MapField<K, V> extends Bean implements Map<K, V>, Field<PMap<K, V>> {
+public class MapField<K, V> extends Node implements Map<K, V>, Field<PMap<K, V>> {
 
     private PMap<K, V> data = Empty.map();
 
@@ -73,11 +76,11 @@ public class MapField<K, V> extends Bean implements Map<K, V>, Field<PMap<K, V>>
     private FieldLog<PMap<K, V>> getOrAddLog() {
         Transaction transaction = Validations.validTransaction();
         if (getRoot() != null) {
-            transaction.addDataLog(getRoot());
+            transaction.addVersionLog(getRoot());
         }
         FieldLog<PMap<K, V>> log = (FieldLog<PMap<K, V>>) transaction.getFieldLog(this);
         if (log == null) {
-            log = new FieldLog<>(this,data);
+            log = new FieldLog<>(this, data);
             transaction.addFieldLog(log);
         }
         return log;
@@ -167,6 +170,7 @@ public class MapField<K, V> extends Bean implements Map<K, V>, Field<PMap<K, V>>
     public Set<Entry<K, V>> entrySet() {
         return getValue().entrySet();
     }
+
 
     @Override
     public String toString() {

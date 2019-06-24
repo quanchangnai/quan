@@ -1,8 +1,9 @@
 package quan.database.item;
 
+import com.alibaba.fastjson.JSONObject;
 import quan.database.Bean;
-import java.util.*;
-import quan.database.field.*;
+import quan.database.Data;
+import quan.database.field.BaseField;
 
 /**
  * 道具
@@ -28,6 +29,25 @@ public class ItemBean extends Bean {
 
     public void setName(String name) {
         this.name.setLogValue(name, getRoot());
+    }
+
+    @Override
+    public void setChildrenLogRoot(Data root) {
+
+    }
+
+    @Override
+    public JSONObject encode() {
+        JSONObject object = new JSONObject();
+        object.put("id", getId());
+        object.put("name", getName());
+        return object;
+    }
+
+    @Override
+    public void decode(JSONObject object) {
+        id.setValue(object.getIntValue("id"));
+        name.setValue(object.getString("name"));
     }
 
     @Override

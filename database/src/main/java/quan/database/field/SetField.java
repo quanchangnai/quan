@@ -4,6 +4,7 @@ import org.pcollections.Empty;
 import org.pcollections.PSet;
 import quan.database.Bean;
 import quan.database.Data;
+import quan.database.Node;
 import quan.database.Transaction;
 import quan.database.log.FieldLog;
 import quan.database.util.Validations;
@@ -15,7 +16,7 @@ import java.util.Set;
 /**
  * Created by quanchangnai on 2019/5/21.
  */
-public class SetField<E> extends Bean implements Set<E>, Field<PSet<E>> {
+public class SetField<E> extends Node implements Set<E>, Field<PSet<E>> {
 
     private PSet<E> data = Empty.set();
 
@@ -83,7 +84,7 @@ public class SetField<E> extends Bean implements Set<E>, Field<PSet<E>> {
         Transaction transaction = Validations.validTransaction();
         FieldLog<PSet<E>> log = (FieldLog<PSet<E>>) transaction.getFieldLog(this);
         if (log == null) {
-            log = new FieldLog<>(this,data);
+            log = new FieldLog<>(this, data);
             transaction.addFieldLog(log);
         }
         return log;

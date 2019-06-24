@@ -7,25 +7,25 @@ import quan.generator.BeanDefinition;
  */
 public class DataDefinition extends BeanDefinition {
 
-    private String primaryKeyType;
+    private String keyType;
 
-    private String primaryKeyName;
+    private String keyName;
 
-    public String getPrimaryKeyType() {
-        return primaryKeyType;
+    public String getKeyType() {
+        return keyType;
     }
 
-    public DataDefinition setPrimaryKeyType(String primaryKeyType) {
-        this.primaryKeyType = primaryKeyType;
+    public DataDefinition setKeyType(String keyType) {
+        this.keyType = keyType;
         return this;
     }
 
-    public String getPrimaryKeyName() {
-        return primaryKeyName;
+    public String getKeyName() {
+        return keyName;
     }
 
-    public DataDefinition setPrimaryKeyName(String primaryKeyName) {
-        this.primaryKeyName = primaryKeyName;
+    public DataDefinition setKeyName(String keyName) {
+        this.keyName = keyName;
         return this;
     }
 

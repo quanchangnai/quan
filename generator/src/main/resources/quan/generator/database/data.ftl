@@ -13,7 +13,7 @@ import ${import};
 </#if>
  * Created by 自动生成
  */
-public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType ==5>Data<${primaryKeyType}></#if> {
+public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType ==5>Data<${keyType}></#if> {
 
 <#list fields as field>
     <#if field.type == "set" || field.type == "list">
@@ -43,8 +43,13 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 </#list>
 <#if definitionType ==5>
     @Override
-    public ${primaryKeyType} primaryKey() {
-        return get${primaryKeyName?cap_first}();
+    public ${keyType} getKey() {
+        return get${keyName?cap_first}();
+    }
+
+    @Override
+    public void setKey(${keyType} key) {
+        set${keyName?cap_first}(key);
     }
 
 </#if>

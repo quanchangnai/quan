@@ -1,20 +1,20 @@
 package quan.database.log;
 
-import quan.database.Bean;
 import quan.database.Data;
+import quan.database.Node;
 
 /**
  * Created by quanchangnai on 2019/5/17.
  */
 public class RootLog implements Log {
 
-    private Bean bean;
+    private Node node;
 
     private Data root;
 
-    public RootLog(Bean bean, Data root) {
+    public RootLog(Node node, Data root) {
         this.root = root;
-        this.bean = bean;
+        this.node = node;
     }
 
     public Data getRoot() {
@@ -26,12 +26,12 @@ public class RootLog implements Log {
         return this;
     }
 
-    public Bean getBean() {
-        return bean;
+    public Node getNode() {
+        return node;
     }
 
     @Override
     public void commit() {
-        bean.setRoot(root);
+        node.setRoot(root);
     }
 }

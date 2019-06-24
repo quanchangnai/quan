@@ -39,7 +39,7 @@ public class BaseField<V> implements Field<V> {
 
         Transaction transaction = Validations.validTransaction();
         if (root != null) {
-            transaction.addDataLog(root);
+            transaction.addVersionLog(root);
         }
 
         FieldLog<V> log = (FieldLog<V>) transaction.getFieldLog(this);

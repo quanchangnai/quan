@@ -15,10 +15,10 @@ public class MessageCodec implements Handler<Object> {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private MessageRegistry messageRegistry;
+    private MessageFactory messageFactory;
 
-    public MessageCodec(MessageRegistry messageRegistry) {
-        this.messageRegistry = messageRegistry;
+    public MessageCodec(MessageFactory messageFactory) {
+        this.messageFactory = messageFactory;
     }
 
     @Override
@@ -38,7 +38,7 @@ public class MessageCodec implements Handler<Object> {
         int msgId = buffer.readInt();
         buffer.reset();
 
-        Message message = messageRegistry.createMessage(msgId);
+        Message message = messageFactory.create(msgId);
         if (message == null) {
             logger.error("消息{}创建失败", msgId);
             return;
