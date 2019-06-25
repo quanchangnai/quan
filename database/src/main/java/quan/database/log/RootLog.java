@@ -34,4 +34,5 @@ public class RootLog implements Log {
     public void commit() {
         node.setRoot(root);
     }
+
 }

@@ -37,9 +37,14 @@ public class BerkeleyDB extends Database {
 
     @Override
     public void open() {
+        if (environment != null) {
+            throw new IllegalStateException("数据库已经打开了");
+        }
+
         if (!dir.exists()) {
             dir.mkdirs();
         }
+
         EnvironmentConfig envConfig = new EnvironmentConfig();
         envConfig.setAllowCreate(true);
         environment = new Environment(dir, envConfig);
@@ -50,22 +55,36 @@ public class BerkeleyDB extends Database {
             com.sleepycat.je.Database db = environment.openDatabase(null, cache.getName(), databaseConfig);
             dbs.put(db.getDatabaseName(), db);
         }
+
     }
 
     @Override
     public void close() {
+        if (environment == null) {
+            throw new IllegalStateException("数据库已经关闭了");
+        }
+
+        environment.sync();
         for (com.sleepycat.je.Database db : dbs.values()) {
             db.close();
         }
         environment.close();
+
+        dbs.clear();
+        environment = null;
+
     }
 
     @Override
-    protected <K, V extends Data<K>> String doGet(String cacheName, String key) {
+    protected <K, V extends Data<K>> String doGet(Cache<K, V> cache, String key) {
+        if (environment == null) {
+            throw new IllegalStateException("数据库没有打开");
+        }
+
         DatabaseEntry keyEntry = new DatabaseEntry(key.getBytes());
         DatabaseEntry dataEntry = new DatabaseEntry();
 
-        dbs.get(cacheName).get(null, keyEntry, dataEntry, LockMode.DEFAULT);
+        dbs.get(cache.getName()).get(null, keyEntry, dataEntry, LockMode.DEFAULT);
 
         if (dataEntry.getData() == null) {
             return null;
@@ -75,19 +94,28 @@ public class BerkeleyDB extends Database {
 
     @Override
     protected <K, V extends Data<K>> void put(V data) {
+        if (environment == null) {
+            throw new IllegalStateException("数据库没有打开");
+        }
+
         String json = data.encode().toJSONString();
 
         DatabaseEntry keyEntry = new DatabaseEntry(data.getKey().toString().getBytes());
         DatabaseEntry dataEntry = new DatabaseEntry(json.getBytes());
 
-        dbs.get(data.cache().getName()).put(null, keyEntry, dataEntry);
+        dbs.get(data.getCache().getName()).put(null, keyEntry, dataEntry);
     }
 
 
     @Override
-    protected <K, V extends Data<K>> void remove(String cacheName, K key) {
+    protected <K, V extends Data<K>> void delete(Cache<K, V> cache, K key) {
+        if (environment == null) {
+            throw new IllegalStateException("数据库没有打开");
+        }
+
         DatabaseEntry keyEntry = new DatabaseEntry(key.toString().getBytes());
-        dbs.get(cacheName).delete(null, keyEntry);
+        dbs.get(cache.getName()).delete(null, keyEntry);
+
     }
 
 }

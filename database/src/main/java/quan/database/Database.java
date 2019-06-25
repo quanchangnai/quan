@@ -59,25 +59,24 @@ public abstract class Database {
 
     public abstract void close();
 
-    protected <K, V extends Data<K>> V get(String cacheName, K key) {
-        String json = doGet(cacheName, key.toString());
+    protected <K, V extends Data<K>> V get(Cache<K, V> cache, K key) {
+        String json = doGet(cache, key.toString());
         if (json == null) {
             return null;
         }
 
-        Cache cache = caches.get(cacheName);
-        V data = (V) cache.createData(key);
+        V data = cache.getDataFactory().get();
 
         data.decode(JSON.parseObject(json));
         return data;
     }
 
-    protected abstract <K, V extends Data<K>> String doGet(String cacheName, String key);
+    protected abstract <K, V extends Data<K>> String doGet(Cache<K, V> cache, String key);
 
 
     protected abstract <K, V extends Data<K>> void put(V data);
 
 
-    protected abstract <K, V extends Data<K>> void remove(String cacheName, K key);
+    protected abstract <K, V extends Data<K>> void delete(Cache<K, V> cache, K key);
 
 }

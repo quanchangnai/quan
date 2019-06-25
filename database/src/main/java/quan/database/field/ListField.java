@@ -17,7 +17,7 @@ import java.util.ListIterator;
 /**
  * Created by quanchangnai on 2019/5/21.
  */
-public class ListField<E> extends Node implements List<E>, Field<PVector<E>> {
+public final class ListField<E> extends Node implements List<E>, Field<PVector<E>> {
 
     private PVector<E> data = Empty.vector();
 
@@ -82,10 +82,13 @@ public class ListField<E> extends Node implements List<E>, Field<PVector<E>> {
     }
 
     private FieldLog<PVector<E>> getOrAddLog() {
-        Transaction transaction = Validations.validTransaction();
-        if (getRoot() != null) {
-            transaction.addVersionLog(getRoot());
+        Transaction transaction = Transaction.get();
+
+        Data root = getRoot();
+        if (root != null) {
+            transaction.addVersionLog(root);
         }
+
         FieldLog<PVector<E>> log = (FieldLog<PVector<E>>) transaction.getFieldLog(this);
         if (log == null) {
             log = new FieldLog<>(this, data);
@@ -322,6 +325,6 @@ public class ListField<E> extends Node implements List<E>, Field<PVector<E>> {
 
     @Override
     public String toString() {
-        return getValue().toString();
+        return String.valueOf(getValue());
     }
 }

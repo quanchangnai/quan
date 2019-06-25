@@ -62,13 +62,13 @@ public class Buffer {
      * @return
      */
     public byte[] availableBytes() {
-        byte[] bytes = new byte[available()];
+        byte[] availableBytes = new byte[available()];
         if (reading) {
-            System.arraycopy(this.bytes, position, bytes, 0, bytes.length);
+            System.arraycopy(this.bytes, position, availableBytes, 0, availableBytes.length);
         } else {
-            System.arraycopy(this.bytes, 0, bytes, 0, bytes.length);
+            System.arraycopy(this.bytes, 0, availableBytes, 0, availableBytes.length);
         }
-        return bytes;
+        return availableBytes;
     }
 
     /**
@@ -93,13 +93,13 @@ public class Buffer {
      * @return
      */
     public byte[] remainingBytes() {
-        byte[] bytes = new byte[remaining()];
+        byte[] remainingBytes = new byte[remaining()];
         if (reading) {
-            System.arraycopy(this.bytes, position, bytes, 0, bytes.length);
+            System.arraycopy(this.bytes, position, remainingBytes, 0, remainingBytes.length);
         } else {
-            System.arraycopy(this.bytes, 0, bytes, 0, bytes.length);
+            System.arraycopy(this.bytes, 0, remainingBytes, 0, remainingBytes.length);
         }
-        return bytes;
+        return remainingBytes;
     }
 
     /**
@@ -242,20 +242,20 @@ public class Buffer {
     /**
      * 检测并增加缓冲区容量
      *
-     * @param needValue 需要增加的容量
+     * @param minAddValue 最少增加的容量
      */
-    protected void checkCapacity(int needValue) {
+    protected void checkCapacity(int minAddValue) {
         int capacity = capacity();
         int position = reading ? 0 : this.position;
-        if (position + needValue >= capacity) {
+        if (position + minAddValue >= capacity) {
             int newCapacity = capacity;
-            while (needValue > 0) {
+            while (minAddValue > 0) {
                 newCapacity += capacity;
-                needValue -= capacity;
+                minAddValue -= capacity;
             }
-            byte[] buffer = new byte[newCapacity];
-            System.arraycopy(this.bytes, 0, buffer, 0, capacity);
-            this.bytes = buffer;
+            byte[] newBytes = new byte[newCapacity];
+            System.arraycopy(this.bytes, 0, newBytes, 0, capacity);
+            this.bytes = newBytes;
             if (!reading) {
                 end = capacity - 1;
             }
@@ -362,7 +362,7 @@ public class Buffer {
             if (n >= -threshold && n <= threshold) {
                 writeLong((long) Math.floor(n * times));
             } else {
-                throw new IllegalArgumentException("参数n超出了限定范围[" + -threshold + "," + threshold + "]中，无法转换为指定精度的定点型数据");
+                throw new IllegalArgumentException("参数n超出了限定范围[" + -threshold + "," + threshold + "]，无法转换为指定精度的定点型数据");
             }
         }
     }

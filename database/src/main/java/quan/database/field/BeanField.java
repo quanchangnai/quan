@@ -2,34 +2,46 @@ package quan.database.field;
 
 import quan.database.Bean;
 import quan.database.Data;
+import quan.database.Transaction;
+import quan.database.log.FieldLog;
+import quan.database.util.Validations;
 
 /**
  * Created by quanchangnai on 2019/5/16.
  */
-public class BeanField<T extends Bean> extends BaseField<T> {
+public final class BeanField<V extends Bean> extends BaseField<V> {
 
     public BeanField() {
     }
 
-    public BeanField(T value) {
+    public BeanField(V value) {
         super(value);
     }
 
-    public void setLogValue(T value, Data root) {
-        T oldValue = getValue();
+    public void setLogValue(V value, Data root) {
+        Validations.validBeanRoot(value);
 
-        super.setLogValue(value, root);
+        Transaction transaction = Transaction.get();
+        if (root != null) {
+            transaction.addVersionLog(root);
+        }
 
+        V oldValue = getValue();
         if (oldValue != null) {
             oldValue.setLogRoot(null);
         }
+
+        FieldLog<V> log = (FieldLog<V>) transaction.getFieldLog(this);
+        if (log != null) {
+            log.setValue(value);
+        } else {
+            transaction.addFieldLog(new FieldLog<>(this, value));
+        }
+
         if (value != null) {
             value.setLogRoot(root);
         }
+
     }
 
-    @Override
-    public String toString() {
-        return String.valueOf(getValue());
-    }
 }

@@ -18,9 +18,6 @@ import java.util.concurrent.locks.Lock;
  */
 public class Transaction {
 
-    /**
-     * 日志
-     */
     private static final Logger logger = LoggerFactory.getLogger(Transaction.class);
 
     /**
@@ -28,12 +25,12 @@ public class Transaction {
      */
     private static ThreadLocal<Transaction> threadLocal = new ThreadLocal<>();
 
-    private static final AtomicLong idGenerator = new AtomicLong();
+    private static final AtomicLong nextId = new AtomicLong();
 
     /**
      * 事务ID
      */
-    private long id = idGenerator.incrementAndGet();
+    private long id = nextId.incrementAndGet();
 
 
     /**
@@ -59,9 +56,10 @@ public class Transaction {
     private Map<Field, FieldLog> fieldLogs = new HashMap<>();
 
     /**
-     * 记录Data的创建删除和版本号
+     * 记录Data的缓存和创建删除
      */
     private Map<DataLog.Key, DataLog> dataLogs = new HashMap<>();
+
 
     public long getId() {
         return id;
@@ -75,14 +73,14 @@ public class Transaction {
      * 标记当前事务为失败状态
      */
     public static void fail() {
-        Transaction current = current();
+        Transaction current = get();
         if (current != null) {
             current.failed = true;
         }
     }
 
     public static void breakdown() {
-        Transaction current = current();
+        Transaction current = get();
         if (current != null) {
             current.failed = true;
             throw new TransactionException("事务被打断");
@@ -122,9 +120,6 @@ public class Transaction {
     }
 
     public void addDataLog(DataLog dataLog) {
-        if (dataLogs.containsKey(dataLog.getKey())) {
-            return;
-        }
         dataLogs.put(dataLog.getKey(), dataLog);
     }
 
@@ -137,6 +132,14 @@ public class Transaction {
         return threadLocal.get();
     }
 
+    public static Transaction get() {
+        Transaction current = threadLocal.get();
+        if (current == null) {
+            throw new UnsupportedOperationException("当前不在事务中");
+        }
+        return current;
+    }
+
     /**
      * 开始事务
      */
@@ -146,7 +149,7 @@ public class Transaction {
             current = new Transaction();
             threadLocal.set(current);
         } else {
-            throw new RuntimeException("当前已经在事务中了");
+            throw new UnsupportedOperationException("当前已经在事务中了");
         }
         return current;
     }
@@ -157,10 +160,7 @@ public class Transaction {
      * @param fail 事务是否失败
      */
     private static void end(boolean fail) {
-        Transaction current = current();
-        if (current == null) {
-            throw new RuntimeException("当前不在事务中");
-        }
+        Transaction current = get();
 
         current.failed = current.failed || fail;
 
@@ -238,22 +238,27 @@ public class Transaction {
 
 
     private boolean isConflict() {
-        for (VersionLog versionLog : versionLogs.values()) {
-            if (versionLog.isConflict()) {
-                return true;
-            }
-        }
         for (DataLog dataLog : dataLogs.values()) {
             if (dataLog.isConflict()) {
                 return true;
             }
         }
+
+        for (VersionLog versionLog : versionLogs.values()) {
+            if (versionLog.isConflict()) {
+                return true;
+            }
+        }
+
         return false;
     }
 
 
     private void commit() {
         try {
+            for (DataLog dataLog : dataLogs.values()) {
+                dataLog.commit();
+            }
             for (VersionLog versionLog : versionLogs.values()) {
                 versionLog.commit();
             }
@@ -264,6 +269,7 @@ public class Transaction {
                 fieldLog.commit();
             }
 
+            dataLogs.clear();
             versionLogs.clear();
             fieldLogs.clear();
             rootLogs.clear();
@@ -282,6 +288,7 @@ public class Transaction {
      */
     private void rollback(boolean end) {
         try {
+            dataLogs.clear();
             versionLogs.clear();
             fieldLogs.clear();
             rootLogs.clear();

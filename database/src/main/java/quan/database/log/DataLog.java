@@ -14,18 +14,14 @@ public class DataLog implements Log {
 
     private Data data;
 
-    private long version;
-
-    private boolean removed;
+    private Data cacheData;
 
     public DataLog(Data data, Cache cache, Object key) {
         this.key = new Key(cache, key);
         this.data = data;
-        if (data != null) {
-            this.version = data.getVersion();
-            if (data.cache() != cache || !data.getKey().equals(key)) {
-                throw new IllegalArgumentException();
-            }
+        this.cacheData = cache.getRecord(key);
+        if (data != null && (data.getCache() != key || !data.getKey().equals(key))) {
+            throw new IllegalArgumentException();
         }
     }
 
@@ -38,34 +34,26 @@ public class DataLog implements Log {
         return data;
     }
 
-    public boolean isRemoved() {
-        return removed;
-    }
 
     public DataLog setData(Data data) {
         this.data = data;
-        if (data != null && (data.cache() != key.cache || !data.getKey().equals(key.key))) {
+        if (data != null && (data.getCache() != key.cache || !data.getKey().equals(key.key))) {
             throw new IllegalArgumentException();
         }
         return this;
     }
 
-    public DataLog setRemoved(boolean removed) {
-        this.removed = removed;
-        return this;
-    }
 
     public boolean isConflict() {
         //冲突情况
 
-        //1.和缓存里现有的数据不一致
-        Data cacheRecord = key.cache.getRecord(key.key);
-        if (cacheRecord != data) {
+        //1.缓存里的数据变了
+        if (cacheData != key.cache.getRecord(key.key)) {
             return true;
         }
 
-        //2.版本号不一致
-        if (data != null && version != data.getVersion()) {
+        //2.缓存里的数据没变，日志里的数据变了
+        if (cacheData != data) {
             return true;
         }
 
@@ -75,18 +63,15 @@ public class DataLog implements Log {
 
     @Override
     public void commit() {
-        if (data != null) {
-            data.versionUp();
-        }
-        if (removed) {
-            key.cache.putRecord(key.key, null);
-        } else {
-            Data cacheRecord = key.cache.getRecord(key.key);
-            if (cacheRecord != data) {
-                key.cache.putRecord(key.key, data);
-            }
-        }
 
+        if (data == null) {
+            if (cacheData != null) {
+                //delete
+            }
+        } else {
+            //put
+        }
+        key.cache.putRecord(key.key, data);
     }
 
     public static class Key {

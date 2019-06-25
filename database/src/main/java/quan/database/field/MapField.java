@@ -16,7 +16,7 @@ import java.util.Set;
 /**
  * Created by quanchangnai on 2019/5/20.
  */
-public class MapField<K, V> extends Node implements Map<K, V>, Field<PMap<K, V>> {
+public final class MapField<K, V> extends Node implements Map<K, V>, Field<PMap<K, V>> {
 
     private PMap<K, V> data = Empty.map();
 
@@ -74,10 +74,13 @@ public class MapField<K, V> extends Node implements Map<K, V>, Field<PMap<K, V>>
     }
 
     private FieldLog<PMap<K, V>> getOrAddLog() {
-        Transaction transaction = Validations.validTransaction();
-        if (getRoot() != null) {
-            transaction.addVersionLog(getRoot());
+        Transaction transaction = Transaction.get();
+
+        Data root = getRoot();
+        if (root != null) {
+            transaction.addVersionLog(root);
         }
+
         FieldLog<PMap<K, V>> log = (FieldLog<PMap<K, V>>) transaction.getFieldLog(this);
         if (log == null) {
             log = new FieldLog<>(this, data);
@@ -174,6 +177,6 @@ public class MapField<K, V> extends Node implements Map<K, V>, Field<PMap<K, V>>
 
     @Override
     public String toString() {
-        return getValue().toString();
+        return String.valueOf(getValue());
     }
 }

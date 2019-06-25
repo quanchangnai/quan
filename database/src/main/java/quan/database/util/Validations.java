@@ -2,7 +2,6 @@ package quan.database.util;
 
 import quan.database.Bean;
 import quan.database.Data;
-import quan.database.Transaction;
 
 import java.util.Objects;
 
@@ -11,39 +10,29 @@ import java.util.Objects;
  */
 public class Validations {
 
-    public static Transaction validTransaction() {
-        Transaction transaction = Transaction.current();
-        if (transaction == null) {
-            throw new UnsupportedOperationException("当前不在事务中");
-        }
-        return transaction;
-    }
-
     public static void validMapKey(Object key) {
         Objects.requireNonNull(key);
     }
 
     public static void validCollectionValue(Object value) {
         Objects.requireNonNull(value);
-
         if (value instanceof Bean) {
-            Data valueRoot = ((Bean) value).getRoot();
-            if (valueRoot != null) {
-                throw new IllegalArgumentException("添加的" + value.getClass().getSimpleName() + "当前正受到" + Data.class.getSimpleName() + "管理:" + valueRoot);
-            }
+            validBeanRoot((Bean) value);
         }
+    }
 
+    public static void validBeanRoot(Bean bean) {
+        if (bean == null) {
+            return;
+        }
+        Data root = bean.getRoot();
+        if (root != null) {
+            throw new IllegalArgumentException("非法参数，当前已经受到了" + root.getClass().getSimpleName() + "管理");
+        }
     }
 
     public static void validFieldValue(Object value) {
-        if (value instanceof Bean) {
-            Bean bean = (Bean) value;
-            if (bean != null && bean.getRoot() != null) {
-                throw new UnsupportedOperationException("设置的" + value.getClass().getSimpleName() + "当前正受到其它" + Data.class.getSimpleName() + "管理:" + bean.getRoot());
-            }
-        } else {
-            Objects.requireNonNull(value);
-        }
-
+        Objects.requireNonNull(value);
     }
+
 }

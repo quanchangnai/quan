@@ -35,11 +35,11 @@ public class RoleData extends Data<Long> {
 
     public static final Cache<Long, RoleData> cache = new Cache<>(RoleData.class.getSimpleName(), RoleData::new);
 
-    private RoleData() {
+    public RoleData() {
     }
 
     @Override
-    public Cache<Long, RoleData> cache() {
+    public Cache<Long, RoleData> getCache() {
         return cache;
     }
 
@@ -95,14 +95,14 @@ public class RoleData extends Data<Long> {
 
     @Override
     public void setChildrenLogRoot(Data root) {
-        ItemBean itemBeanValue = itemBean.getValue();
+        ItemBean itemBeanValue = this.itemBean.getValue();
         if (itemBeanValue != null) {
             itemBeanValue.setLogRoot(root);
         }
-        set.setLogRoot(root);
-        list.setLogRoot(root);
-        map.setLogRoot(root);
-        items.setLogRoot(root);
+        this.set.setLogRoot(root);
+        this.list.setLogRoot(root);
+        this.map.setLogRoot(root);
+        this.items.setLogRoot(root);
     }
 
     @Override
@@ -112,33 +112,34 @@ public class RoleData extends Data<Long> {
         object.put("id", getId());
         object.put("name", getName());
 
-        if (itemBean.getValue() != null) {
-            object.put("itemBean", itemBean.getValue().encode());
+        ItemBean itemBean = this.itemBean.getValue();
+        if (itemBean != null) {
+            object.put("itemBean", itemBean.encode());
         }
 
-        JSONArray setArray = new JSONArray();
-        for (Boolean setValue : set) {
-            setArray.add(setValue);
+        JSONArray set = new JSONArray();
+        for (Boolean setValue : this.set) {
+            set.add(setValue);
         }
-        object.put("set", setArray);
+        object.put("set", set);
 
-        JSONArray listArray = new JSONArray();
-        for (String listValue : list) {
-            listArray.add(listValue);
+        JSONArray list = new JSONArray();
+        for (String listValue : this.list) {
+            list.add(listValue);
         }
-        object.put("list", listArray);
+        object.put("list", list);
 
-        JSONObject mapObject = new JSONObject();
-        for (Integer mapKey : map.keySet()) {
-            mapObject.put(String.valueOf(mapKey), map.get(mapKey));
+        JSONObject map = new JSONObject();
+        for (Integer mapKey : this.map.keySet()) {
+            map.put(String.valueOf(mapKey), this.map.get(mapKey));
         }
-        object.put("map", mapObject);
+        object.put("map", map);
 
-        JSONObject itemsObject = new JSONObject();
-        for (Integer itemsKey : items.keySet()) {
-            itemsObject.put(String.valueOf(itemsKey), items.get(itemsKey).encode());
+        JSONObject items = new JSONObject();
+        for (Integer itemsKey : this.items.keySet()) {
+            items.put(String.valueOf(itemsKey), this.items.get(itemsKey).encode());
         }
-        object.put("items", itemsObject);
+        object.put("items", items);
 
         return object;
     }
@@ -149,54 +150,54 @@ public class RoleData extends Data<Long> {
         this.id.setValue(object.getLongValue("id"));
         this.name.setValue(object.getString("name"));
 
-        JSONObject itemBeanObject = object.getJSONObject("itemBean");
-        if (itemBeanObject != null) {
+        JSONObject itemBean = object.getJSONObject("itemBean");
+        if (itemBean != null) {
             if (this.itemBean.getValue() == null) {
                 this.itemBean.setValue(new ItemBean());
             }
-            this.itemBean.getValue().decode(itemBeanObject);
+            this.itemBean.getValue().decode(itemBean);
         }
 
-        JSONArray setArray = object.getJSONArray("set");
-        if (setArray != null) {
-            Set<Boolean> set = new HashSet<>();
-            for (int i = 0; i < setArray.size(); i++) {
-                set.add(setArray.getBoolean(i));
+        JSONArray set = object.getJSONArray("set");
+        if (set != null) {
+            Set<Boolean> set1 = new HashSet<>();
+            for (int i = 0; i < set.size(); i++) {
+                set1.add(set.getBoolean(i));
             }
-            PSet<Boolean> pSet = Empty.set();
-            this.set.setValue(pSet.plusAll(set));
+            PSet<Boolean> set2 = Empty.set();
+            this.set.setValue(set2.plusAll(set1));
         }
 
-        JSONArray listArray = object.getJSONArray("list");
-        if (listArray != null) {
-            List<String> list = new ArrayList<>();
-            for (int i = 0; i < listArray.size(); i++) {
-                list.add(listArray.getString(i));
+        JSONArray list = object.getJSONArray("list");
+        if (list != null) {
+            List<String> list1 = new ArrayList<>();
+            for (int i = 0; i < list.size(); i++) {
+                list1.add(list.getString(i));
             }
-            PVector<String> pVector = Empty.vector();
-            this.list.setValue(pVector.plusAll(list));
+            PVector<String> list2 = Empty.vector();
+            this.list.setValue(list2.plusAll(list1));
         }
 
-        JSONObject mapObject = object.getJSONObject("map");
-        if (mapObject != null) {
-            Map<Integer, Integer> map = new HashMap<>();
-            for (String mapKey : mapObject.keySet()) {
-                map.put(Integer.valueOf(mapKey), mapObject.getInteger(mapKey));
+        JSONObject map = object.getJSONObject("map");
+        if (map != null) {
+            Map<Integer, Integer> map1 = new HashMap<>();
+            for (String mapKey : map.keySet()) {
+                map1.put(Integer.valueOf(mapKey), map.getInteger(mapKey));
             }
-            PMap<Integer, Integer> pMap = Empty.map();
-            this.map.setValue(pMap.plusAll(map));
+            PMap<Integer, Integer> map2 = Empty.map();
+            this.map.setValue(map2.plusAll(map1));
         }
 
-        JSONObject itemsObject = object.getJSONObject("items");
-        if (itemsObject != null) {
-            Map<Integer, ItemBean> map = new HashMap<>();
-            for (String itemsKey : itemsObject.keySet()) {
-                ItemBean itemBean = new ItemBean();
-                itemBean.decode(itemsObject.getJSONObject(itemsKey));
-                map.put(Integer.valueOf(itemsKey), itemBean);
+        JSONObject items = object.getJSONObject("items");
+        if (items != null) {
+            Map<Integer, ItemBean> items1 = new HashMap<>();
+            for (String itemsKey : items.keySet()) {
+                ItemBean items1Value = new ItemBean();
+                items1Value.decode(items.getJSONObject(itemsKey));
+                items1.put(Integer.valueOf(itemsKey), items1Value);
             }
-            PMap<Integer, ItemBean> pMap = Empty.map();
-            this.items.setValue(pMap.plusAll(map));
+            PMap<Integer, ItemBean> items2 = Empty.map();
+            this.items.setValue(items2.plusAll(items1));
         }
 
     }

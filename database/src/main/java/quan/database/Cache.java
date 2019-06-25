@@ -3,10 +3,11 @@ package quan.database;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.database.log.DataLog;
-import quan.database.util.Validations;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Supplier;
 
 /**
@@ -37,6 +38,8 @@ public class Cache<K, V extends Data<K>> {
      */
     private Map<K, V> records;
 
+    private ReadWriteLock lock = new ReentrantReadWriteLock();
+
 
     public Cache(String name, Supplier<V> dataFactory) {
         this.name = name;
@@ -51,11 +54,19 @@ public class Cache<K, V extends Data<K>> {
         return database;
     }
 
+    Supplier<V> getDataFactory() {
+        return dataFactory;
+    }
+
     void init(Database database) {
         this.database = database;
         this.cacheSize = database.getCacheSize();
         this.cacheExpire = database.getCacheExpire();
         this.records = new HashMap<>(cacheSize);
+    }
+
+    public ReadWriteLock getLock() {
+        return lock;
     }
 
     public V getRecord(K key) {
@@ -70,64 +81,45 @@ public class Cache<K, V extends Data<K>> {
         }
     }
 
-    V createData(K key) {
-        V data = dataFactory.get();
-        data.setKey(key);
-        return data;
-    }
-
-
     public V get(K key) {
-        Transaction transaction = Validations.validTransaction();
+        Transaction transaction = Transaction.get();
 
         DataLog log = transaction.getDataLog(new DataLog.Key(this, key));
         if (log != null) {
-            if (log.isRemoved()) {
-                return null;
-            }
             return (V) log.getData();
         }
 
         V data = records.get(key);
         if (data == null) {
-            data = database.get(name, key);
-
-            if (data == null) {
-                data = createData(key);
+            data = database.get(this, key);
+            if (data != null) {
+                records.put(key, data);
             }
-
-            //缓存里没有数据要记录日志
-            log = new DataLog(data, this, data.getKey());
-            transaction.addDataLog(log);
-
         }
 
         return data;
 
     }
 
-    public void remove(K key) {
-        Transaction transaction = Validations.validTransaction();
+    public void delete(K key) {
+        Transaction transaction = Transaction.get();
 
         DataLog log = transaction.getDataLog(new DataLog.Key(this, key));
         if (log == null) {
             log = new DataLog(null, this, key);
+            transaction.addDataLog(log);
+        } else {
+            log.setData(null);
         }
-
-        log.setRemoved(true);
 
     }
 
-    public void put(Data<K> data) {
-        Transaction transaction = Validations.validTransaction();
+    public void insert(V data) {
+        Transaction transaction = Transaction.get();
 
         DataLog log = transaction.getDataLog(new DataLog.Key(this, data.getKey()));
-        if (log == null) {
-            log = new DataLog(data, this, data.getKey());
-            transaction.addDataLog(log);
-        } else {
-            log.setData(data);
-            log.setRemoved(false);
+        if (log != null) {
+
         }
 
     }

@@ -16,7 +16,7 @@ import java.util.Set;
 /**
  * Created by quanchangnai on 2019/5/21.
  */
-public class SetField<E> extends Node implements Set<E>, Field<PSet<E>> {
+public final class SetField<E> extends Node implements Set<E>, Field<PSet<E>> {
 
     private PSet<E> data = Empty.set();
 
@@ -81,7 +81,7 @@ public class SetField<E> extends Node implements Set<E>, Field<PSet<E>> {
     }
 
     private FieldLog<PSet<E>> getOrAddLog() {
-        Transaction transaction = Validations.validTransaction();
+        Transaction transaction = Transaction.get();
         FieldLog<PSet<E>> log = (FieldLog<PSet<E>>) transaction.getFieldLog(this);
         if (log == null) {
             log = new FieldLog<>(this, data);
@@ -196,6 +196,6 @@ public class SetField<E> extends Node implements Set<E>, Field<PSet<E>> {
 
     @Override
     public String toString() {
-        return getValue().toString();
+        return String.valueOf(getValue());
     }
 }

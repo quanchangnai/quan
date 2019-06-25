@@ -46,13 +46,10 @@ public abstract class Data<K> extends Bean implements Comparable<Data<K>> {
         return this.lockIndex - other.lockIndex;
     }
 
-    public final String dataName() {
-        return getClass().getName();
-    }
-
     public abstract K getKey();
 
     public abstract void setKey(K key);
 
-    public abstract Cache cache();
+    public abstract Cache<K, ? extends Data<K>> getCache();
+
 }

@@ -24,11 +24,11 @@ public abstract class Node {
         return root;
     }
 
-    public final void setRoot(Data root) {
+    public void setRoot(Data root) {
         this.root = root;
     }
 
-    public final void setLogRoot(Data root) {
+    public void setLogRoot(Data root) {
         Transaction transaction = Transaction.current();
         RootLog rootLog = transaction.getRootLog(this);
         if (rootLog != null) {
