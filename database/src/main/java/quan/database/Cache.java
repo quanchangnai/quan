@@ -12,8 +12,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
 /**
@@ -57,7 +57,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
 
     private Set<K> deletes = new HashSet<>();
 
-    private ReadWriteLock lock = new ReentrantReadWriteLock();
+    private Lock lock = new ReentrantLock();
 
 
     public Cache(String name, Supplier<V> dataFactory) {
@@ -115,7 +115,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
     }
 
 
-    public ReadWriteLock getLock() {
+    public Lock getLock() {
         CallerUtil.validCallerClass(Transaction.class);
         return lock;
     }
@@ -127,10 +127,10 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
 
     private V getOnLock(K key) {
         try {
-            lock.readLock().lock();
+            lock.lock();
             return all.get(key);
         } finally {
-            lock.readLock().unlock();
+            lock.unlock();
         }
     }
 
@@ -157,23 +157,21 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
 
     }
 
-    public void setUpdate(K key) {
+    public void setUpdate(V data) {
         CallerUtil.validCallerClass(VersionLog.class);
 
-        if (!all.containsKey(key)) {
+        V value = all.get(data.getKey());
+        if (value == null || value != data) {
+            //数据已被删除或者不受缓存管理
             return;
         }
 
-        if (inserts.contains(key)) {
+        if (inserts.contains(data.getKey())) {
             //新插入的数据无需记录更新
             return;
         }
 
-        if (deletes.contains(key)) {
-            //被删除的数据无需记录更新
-            return;
-        }
-        updates.add(key);
+        updates.add(data.getKey());
     }
 
     public V get(K key) {
@@ -187,7 +185,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
         V data;
 
         try {
-            lock.writeLock().lock();
+            lock.lock();
 
             data = all.get(key);
             if (data == null) {
@@ -198,7 +196,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
             }
 
         } finally {
-            lock.writeLock().unlock();
+            lock.unlock();
         }
 
         log = new DataLog(data, data, this, key);
@@ -237,33 +235,45 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
      * 存档数据
      */
     public void store() {
+        Set<V> puts = new HashSet<>();
+        Set<K> deletes = new HashSet<>();
+
         try {
-            lock.readLock().lock();
+            lock.lock();
 
             for (K key : inserts) {
                 V data = all.get(key);
-                database.put(data);
+                puts.add(data);
             }
 
 
             for (K key : updates) {
                 V data = all.get(key);
-                database.put(data);
+                puts.add(data);
             }
 
+            deletes.addAll(this.deletes);
+
+            logger.debug("缓存[{}]存档，插入：{}，更新：{}，删除：{}", name, inserts, updates, deletes);
+
+            this.inserts.clear();
+            this.updates.clear();
+            this.deletes.clear();
+
+        } finally {
+            lock.unlock();
+        }
+
+        synchronized (this) {
+            //定时存档的间隔很长，应该不需要加锁
+            //这里加锁是为了防止上次存档还没完成下一次存档又开始了的极端情况
+            for (V data : puts) {
+                database.put(data);
+            }
 
             for (K key : deletes) {
                 database.delete(this, key);
             }
-
-            logger.debug("缓存[{}]存档，插入：{}，更新：{}，删除：{}", name, inserts, updates, deletes);
-
-            inserts.clear();
-            updates.clear();
-            deletes.clear();
-
-        } finally {
-            lock.readLock().unlock();
         }
     }
 

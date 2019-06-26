@@ -28,19 +28,19 @@ public class CallerUtil {
 
     }
 
-    private static void validCallerClass(Collection<Class> allowClasses, int startDepth) {
+    private static void validCallerClass(Collection<Class> allowClasses, int calleeIndex) {
         if (!valid) {
             return;
         }
 
         StackTraceElement[] stackTrace = new Exception().getStackTrace();
-        if (stackTrace.length <= startDepth + 2) {
+        if (stackTrace.length < calleeIndex + 2) {
             return;
         }
 
-        String calleeClassName = stackTrace[startDepth + 1].getClassName();
-        String calleeMethodName = stackTrace[startDepth + 1].getMethodName();
-        String callerClassName = stackTrace[startDepth + 2].getClassName();
+        String calleeClassName = stackTrace[calleeIndex].getClassName();
+        String calleeMethodName = stackTrace[calleeIndex].getMethodName();
+        String callerClassName = stackTrace[calleeIndex + 1].getClassName();
 
         if (calleeClassName.equals(callerClassName)) {
             return;
@@ -59,19 +59,19 @@ public class CallerUtil {
     }
 
 
-    private static void validCallerPackage(Collection<Package> allowPackages, int startDepth) {
+    private static void validCallerPackage(Collection<Package> allowPackages, int calleeIndex) {
         if (!valid) {
             return;
         }
 
         StackTraceElement[] stackTrace = new Exception().getStackTrace();
-        if (stackTrace.length <= startDepth + 2) {
+        if (stackTrace.length < calleeIndex + 2) {
             return;
         }
 
-        String calleeClassName = stackTrace[startDepth + 1].getClassName();
-        String calleeMethodName = stackTrace[startDepth + 1].getMethodName();
-        String callerClassName = stackTrace[startDepth + 2].getClassName();
+        String calleeClassName = stackTrace[calleeIndex].getClassName();
+        String calleeMethodName = stackTrace[calleeIndex].getMethodName();
+        String callerClassName = stackTrace[calleeIndex + 1].getClassName();
 
         Class<?> calleeClass;
         Class<?> callerClass;
@@ -99,19 +99,19 @@ public class CallerUtil {
     }
 
     public static void validCallerClass(Collection<Class> allowClasses) {
-        validCallerClass(allowClasses, 1);
+        validCallerClass(allowClasses, 2);
     }
 
     public static void validCallerClass(Class allowClass) {
-        validCallerClass(Arrays.asList(allowClass), 1);
+        validCallerClass(Arrays.asList(allowClass), 2);
     }
 
     public static void validCallerPackage(Collection<Package> allowPackages) {
-        validCallerPackage(allowPackages, 1);
+        validCallerPackage(allowPackages, 2);
     }
 
     public static void validCallerPackage(Package allowPackage) {
-        validCallerPackage(Arrays.asList(allowPackage), 1);
+        validCallerPackage(Arrays.asList(allowPackage), 2);
     }
 
 }

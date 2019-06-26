@@ -39,7 +39,7 @@ public class Transaction {
      */
     private boolean failed;
 
-    private List<ReadWriteLock> cacheLocks = new ArrayList<>();
+    private List<Lock> cacheLocks = new ArrayList<>();
 
     private List<Lock> dataLocks = new ArrayList<>();
 
@@ -235,8 +235,8 @@ public class Transaction {
             dataLocks.add(data.getLock());
         }
 
-        for (ReadWriteLock lock : cacheLocks) {
-            lock.writeLock().lock();
+        for (Lock lock : cacheLocks) {
+            lock.lock();
         }
 
         for (Lock lock : dataLocks) {
@@ -246,8 +246,8 @@ public class Transaction {
     }
 
     private void unlock() {
-        for (ReadWriteLock lock : cacheLocks) {
-            lock.writeLock().unlock();
+        for (Lock lock : cacheLocks) {
+            lock.unlock();
         }
         cacheLocks.clear();
 
