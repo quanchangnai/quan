@@ -57,6 +57,9 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
 
     private Set<K> deletes = new HashSet<>();
 
+    /**
+     * 表级锁
+     */
     private Lock lock = new ReentrantLock();
 
 
