@@ -1,5 +1,6 @@
 package quan.database.store;
 
+import com.alibaba.fastjson.JSON;
 import com.sleepycat.je.*;
 import quan.database.Cache;
 import quan.database.Data;
@@ -76,12 +77,12 @@ public class BerkeleyDB extends Database {
     }
 
     @Override
-    protected <K, V extends Data<K>> String doGet(Cache<K, V> cache, String key) {
+    protected <K, V extends Data<K>> V get(Cache<K, V> cache, K key) {
         if (environment == null) {
             throw new IllegalStateException("数据库没有打开");
         }
 
-        DatabaseEntry keyEntry = new DatabaseEntry(key.getBytes());
+        DatabaseEntry keyEntry = new DatabaseEntry(key.toString().getBytes());
         DatabaseEntry dataEntry = new DatabaseEntry();
 
         dbs.get(cache.getName()).get(null, keyEntry, dataEntry, LockMode.DEFAULT);
@@ -89,7 +90,13 @@ public class BerkeleyDB extends Database {
         if (dataEntry.getData() == null) {
             return null;
         }
-        return new String(dataEntry.getData());
+
+        String jsonStr = new String(dataEntry.getData());
+
+        V data = cache.getDataFactory().get();
+        data.decode(JSON.parseObject(jsonStr));
+
+        return data;
     }
 
     @Override
@@ -98,10 +105,10 @@ public class BerkeleyDB extends Database {
             throw new IllegalStateException("数据库没有打开");
         }
 
-        String json = data.encode().toJSONString();
+        String jsonStr = data.encode().toJSONString();
 
         DatabaseEntry keyEntry = new DatabaseEntry(data.getKey().toString().getBytes());
-        DatabaseEntry dataEntry = new DatabaseEntry(json.getBytes());
+        DatabaseEntry dataEntry = new DatabaseEntry(jsonStr.getBytes());
 
         dbs.get(data.getCache().getName()).put(null, keyEntry, dataEntry);
     }

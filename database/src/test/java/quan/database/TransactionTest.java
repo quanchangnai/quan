@@ -13,6 +13,7 @@ public class TransactionTest {
 
     public static void main(String[] args) {
 
+
         Transaction.execute(TransactionTest::update1);
         System.err.println("update1:" + roleData1);
 
@@ -30,6 +31,7 @@ public class TransactionTest {
         RoleData roleData2 = new RoleData();
         roleData2.decode(jsonObject);
         System.err.println("roleData2:" + roleData2);
+
     }
 
     private static void update1() {

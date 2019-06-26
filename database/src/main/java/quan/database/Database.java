@@ -1,6 +1,5 @@
 package quan.database;
 
-import com.alibaba.fastjson.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,19 +58,7 @@ public abstract class Database {
 
     public abstract void close();
 
-    protected <K, V extends Data<K>> V get(Cache<K, V> cache, K key) {
-        String json = doGet(cache, key.toString());
-        if (json == null) {
-            return null;
-        }
-
-        V data = cache.getDataFactory().get();
-
-        data.decode(JSON.parseObject(json));
-        return data;
-    }
-
-    protected abstract <K, V extends Data<K>> String doGet(Cache<K, V> cache, String key);
+    protected abstract <K, V extends Data<K>> V get(Cache<K, V> cache, K key);
 
 
     protected abstract <K, V extends Data<K>> void put(V data);

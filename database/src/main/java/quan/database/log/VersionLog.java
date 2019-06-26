@@ -31,5 +31,6 @@ public class VersionLog implements Log {
     @Override
     public void commit() {
         data.versionUp();
+        data.getCache().setUpdate(data.getKey());
     }
 }

@@ -12,17 +12,14 @@ public class DataLog implements Log {
 
     private Key key;
 
-    private Data data;
+    private Data current;
 
-    private Data cacheData;
+    private Data origin;
 
-    public DataLog(Data data, Cache cache, Object key) {
+    public DataLog(Data current, Data origin, Cache cache, Object key) {
         this.key = new Key(cache, key);
-        this.data = data;
-        this.cacheData = cache.getRecord(key);
-        if (data != null && (data.getCache() != key || !data.getKey().equals(key))) {
-            throw new IllegalArgumentException();
-        }
+        this.current = current;
+        this.origin = origin;
     }
 
     public Key getKey() {
@@ -30,48 +27,42 @@ public class DataLog implements Log {
     }
 
 
-    public Data getData() {
-        return data;
+    public Data getCurrent() {
+        return current;
     }
 
+    public Data getOrigin() {
+        return origin;
+    }
 
-    public DataLog setData(Data data) {
-        this.data = data;
-        if (data != null && (data.getCache() != key.cache || !data.getKey().equals(key.key))) {
-            throw new IllegalArgumentException();
-        }
+    public DataLog setCurrent(Data current) {
+        this.current = current;
         return this;
     }
 
+    public Cache getCache() {
+        return key.cache;
+    }
 
     public boolean isConflict() {
-        //冲突情况
-
-        //1.缓存里的数据变了
-        if (cacheData != key.cache.getRecord(key.key)) {
+        //缓存里的数据变了
+        if (origin != key.cache.getNoLock(key.key)) {
             return true;
         }
-
-        //2.缓存里的数据没变，日志里的数据变了
-        if (cacheData != data) {
-            return true;
-        }
-
         return false;
 
     }
 
     @Override
     public void commit() {
-
-        if (data == null) {
-            if (cacheData != null) {
-                //delete
-            }
-        } else {
-            //put
+        if (current == null && origin != null) {
+            //delete
+            key.cache.setDelete(key.key);
         }
-        key.cache.putRecord(key.key, data);
+        if (current != null && origin == null) {
+            //insert
+            key.cache.setInsert(current);
+        }
     }
 
     public static class Key {

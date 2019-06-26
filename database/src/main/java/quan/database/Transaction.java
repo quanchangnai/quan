@@ -12,6 +12,7 @@ import quan.database.log.VersionLog;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
 
 /**
  * Created by quanchangnai on 2019/5/16.
@@ -38,7 +39,9 @@ public class Transaction {
      */
     private boolean failed;
 
-    private List<Lock> locks = new ArrayList<>();
+    private List<ReadWriteLock> cacheLocks = new ArrayList<>();
+
+    private List<Lock> dataLocks = new ArrayList<>();
 
     /**
      * 记录Data的版本号
@@ -60,6 +63,7 @@ public class Transaction {
      */
     private Map<DataLog.Key, DataLog> dataLogs = new HashMap<>();
 
+    private long startTime = System.currentTimeMillis();
 
     public long getId() {
         return id;
@@ -212,28 +216,45 @@ public class Transaction {
     }
 
 
+    /**
+     * 排序加锁，保证不同事务按照同一顺序竞争锁，防止死锁
+     */
     private void lock() {
-        List<Data> dataList = new ArrayList<>();
-        for (Data data : versionLogs.keySet()) {
-            dataList.add(data);
+        TreeSet<Cache> caches = new TreeSet<>();
+        for (DataLog dataLog : dataLogs.values()) {
+            caches.add(dataLog.getCache());
+        }
+        for (Cache cache : caches) {
+            cacheLocks.add(cache.getLock());
         }
 
-        //排序加锁，保证不同事务按照同一顺序竞争锁，防止死锁
-        Collections.sort(dataList);
-        for (Data data : dataList) {
-            locks.add(data.getLock());
+        TreeSet<Data> datas = new TreeSet<>();
+        datas.addAll(versionLogs.keySet());
+
+        for (Data data : datas) {
+            dataLocks.add(data.getLock());
         }
 
-        for (Lock lock : locks) {
+        for (ReadWriteLock lock : cacheLocks) {
+            lock.writeLock().lock();
+        }
+
+        for (Lock lock : dataLocks) {
             lock.lock();
         }
+
     }
 
     private void unlock() {
-        for (Lock lock : locks) {
+        for (ReadWriteLock lock : cacheLocks) {
+            lock.writeLock().unlock();
+        }
+        cacheLocks.clear();
+
+        for (Lock lock : dataLocks) {
             lock.unlock();
         }
-        locks.clear();
+        dataLocks.clear();
     }
 
 
@@ -278,7 +299,8 @@ public class Transaction {
             unlock();
         }
 
-        logger.debug("提交事务{}", getId());
+        long costTime = System.currentTimeMillis() - startTime;
+        logger.debug("提交事务{}，执行耗时{}ms", getId(), costTime);
     }
 
     /**
