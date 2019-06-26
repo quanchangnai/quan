@@ -47,9 +47,9 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
     private Supplier<V> dataFactory;
 
     /**
-     * 缓存数据
+     * 缓存的所有数据行
      */
-    private Map<K, V> all;
+    private Map<K, V> rows;
 
     private Set<K> inserts = new HashSet<>();
 
@@ -91,7 +91,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
         this.database = database;
         this.cacheSize = database.getCacheSize();
         this.cacheExpire = database.getCacheExpire();
-        this.all = new HashMap<>(cacheSize);
+        this.rows = new HashMap<>(cacheSize);
         inserts = new HashSet<>();
         updates = new HashSet<>();
         deletes = new HashSet<>();
@@ -125,13 +125,13 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
 
     public V getNoLock(K key) {
         CallerUtil.validCallerClass(DataLog.class);
-        return all.get(key);
+        return rows.get(key);
     }
 
     private V getOnLock(K key) {
         try {
             lock.lock();
-            return all.get(key);
+            return rows.get(key);
         } finally {
             lock.unlock();
         }
@@ -141,7 +141,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
     public void setDelete(K key) {
         CallerUtil.validCallerClass(DataLog.class);
 
-        all.remove(key);
+        rows.remove(key);
         if (inserts.remove(key)) {
             //新插入的数据被删除时清除插入记录就行
             return;
@@ -154,7 +154,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
     public void setInsert(V data) {
         CallerUtil.validCallerClass(DataLog.class);
 
-        all.put(data.getKey(), data);
+        rows.put(data.getKey(), data);
         inserts.add(data.getKey());
         deletes.remove(data.getKey());
 
@@ -163,7 +163,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
     public void setUpdate(V data) {
         CallerUtil.validCallerClass(VersionLog.class);
 
-        V value = all.get(data.getKey());
+        V value = rows.get(data.getKey());
         if (value == null || value != data) {
             //数据已被删除或者不受缓存管理
             return;
@@ -190,11 +190,11 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
         try {
             lock.lock();
 
-            data = all.get(key);
+            data = rows.get(key);
             if (data == null) {
                 data = database.get(this, key);
                 if (data != null) {
-                    all.put(key, data);
+                    rows.put(key, data);
                 }
             }
 
@@ -245,13 +245,13 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
             lock.lock();
 
             for (K key : inserts) {
-                V data = all.get(key);
+                V data = rows.get(key);
                 puts.add(data);
             }
 
 
             for (K key : updates) {
-                V data = all.get(key);
+                V data = rows.get(key);
                 puts.add(data);
             }
 
