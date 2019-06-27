@@ -12,7 +12,6 @@ import quan.database.log.VersionLog;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
 
 /**
  * Created by quanchangnai on 2019/5/16.
@@ -39,9 +38,15 @@ public class Transaction {
      */
     private boolean failed;
 
-    private List<ReadWriteLock> cacheLocks = new ArrayList<>();
+    /**
+     * 表级锁
+     */
+    private List<Lock> tableLocks = new ArrayList<>();
 
-    private List<Lock> dataLocks = new ArrayList<>();
+    /**
+     * 行级锁
+     */
+    private List<Lock> rowLocks = new ArrayList<>();
 
     /**
      * 记录Data的版本号
@@ -238,44 +243,43 @@ public class Transaction {
 
 
     /**
-     * 排序加锁，保证不同事务按照同一顺序竞争锁，防止死锁
+     * 排序加锁，保证不同线程按照同一顺序竞争锁，防止死锁
      */
     private void lock() {
-        TreeSet<Cache> caches = new TreeSet<>();
+        TreeSet<Cache> tables = new TreeSet<>();
         for (DataLog dataLog : dataLogs.values()) {
-            caches.add(dataLog.getCache());
+            tables.add(dataLog.getCache());
         }
-        for (Cache cache : caches) {
-            cacheLocks.add(cache.getLock());
-        }
-
-        TreeSet<Data> datas = new TreeSet<>();
-        datas.addAll(versionLogs.keySet());
-
-        for (Data data : datas) {
-            dataLocks.add(data.getLock());
+        for (Cache cache : tables) {
+            tableLocks.add(cache.getLock());
         }
 
-        for (ReadWriteLock lock : cacheLocks) {
-            lock.writeLock().lock();
+        TreeSet<Data> rows = new TreeSet<>();
+        rows.addAll(versionLogs.keySet());
+        for (Data data : rows) {
+            rowLocks.add(data.getLock());
         }
 
-        for (Lock lock : dataLocks) {
+        for (Lock lock : tableLocks) {
+            lock.lock();
+        }
+
+        for (Lock lock : rowLocks) {
             lock.lock();
         }
 
     }
 
     private void unlock() {
-        for (ReadWriteLock lock : cacheLocks) {
-            lock.writeLock().unlock();
-        }
-        cacheLocks.clear();
-
-        for (Lock lock : dataLocks) {
+        for (Lock lock : tableLocks) {
             lock.unlock();
         }
-        dataLocks.clear();
+        tableLocks.clear();
+
+        for (Lock lock : rowLocks) {
+            lock.unlock();
+        }
+        rowLocks.clear();
     }
 
 

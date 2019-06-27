@@ -18,6 +18,9 @@ public abstract class Data<K> extends Bean implements Comparable<Data<K>> {
 
     private int lockIndex = lockIndexGenerator.incrementAndGet();
 
+    /**
+     * 行级锁
+     */
     private Lock lock = new ReentrantLock();
 
 
