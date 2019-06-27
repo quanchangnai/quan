@@ -5,14 +5,12 @@ import org.slf4j.LoggerFactory;
 import quan.database.role.RoleData;
 import quan.database.store.BerkeleyDB;
 
-import java.util.Arrays;
-
 /**
  * Created by quanchangnai on 2019/6/24.
  */
-public class DatabaseTest {
+public class DatabaseTest1 {
 
-    private static Logger logger = LoggerFactory.getLogger(DatabaseTest.class);
+    private static Logger logger = LoggerFactory.getLogger(DatabaseTest1.class);
 
     private static Database database = null;
 
@@ -20,16 +18,12 @@ public class DatabaseTest {
 
         database = new BerkeleyDB(".temp/bdb");
 
-        database.registerCaches(Arrays.asList(RoleData.cache));
-        database.open();
-
-
         for (int i = 0; i < 100; i++) {
             new Thread() {
                 @Override
                 public void run() {
                     while (true) {
-                        Transaction.execute(DatabaseTest::test1);
+                        Transaction.execute(DatabaseTest1::test1);
                         try {
                             Thread.sleep(2000);
                         } catch (InterruptedException e) {
@@ -53,7 +47,7 @@ public class DatabaseTest {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    Transaction.execute(DatabaseTest::test2);
+                    Transaction.execute(DatabaseTest1::test2);
                 }
 
             }
@@ -63,11 +57,11 @@ public class DatabaseTest {
     }
 
     private static void test1() {
-        RoleData roleData = RoleData.cache.get(1L);
+        RoleData roleData = RoleData.get(1L);
         if (roleData == null) {
             roleData = new RoleData();
             roleData.setId(1);
-            RoleData.cache.insert(roleData);
+            RoleData.insert(roleData);
         }
         roleData.setName("aaa" + System.currentTimeMillis());
         if (roleData.getList().size() > 10 && roleData.getList().size() / 2 == 0) {
@@ -80,7 +74,7 @@ public class DatabaseTest {
     }
 
     private static void test2() {
-        RoleData.cache.delete(1L);
+        RoleData.delete(1L);
     }
 
 }

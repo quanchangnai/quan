@@ -24,24 +24,28 @@ public class BerkeleyDB extends Database {
     public BerkeleyDB(File dir) {
         super();
         this.dir = dir;
+        open();
     }
 
     public BerkeleyDB(String dir) {
         super();
         this.dir = new File(dir);
+        open();
     }
 
-    public BerkeleyDB(File dir, int cacheSize, int cacheExpire) {
-        super(cacheSize, cacheExpire);
+    public BerkeleyDB(String dir, int cacheSize, int cacheExpire, int storePeriod) {
+        super(cacheSize, cacheExpire, storePeriod);
+        this.dir = new File(dir);
+        open();
+    }
+
+    public BerkeleyDB(File dir, int cacheSize, int cacheExpire, int storePeriod) {
+        super(cacheSize, cacheExpire, storePeriod);
         this.dir = dir;
+        open();
     }
 
-    @Override
-    public void open() {
-        if (environment != null) {
-            throw new IllegalStateException("数据库已经打开了");
-        }
-
+    private void open() {
         if (!dir.exists()) {
             dir.mkdirs();
         }
@@ -50,12 +54,20 @@ public class BerkeleyDB extends Database {
         envConfig.setAllowCreate(true);
         environment = new Environment(dir, envConfig);
 
-        for (Cache cache : getCaches().values()) {
-            DatabaseConfig databaseConfig = new DatabaseConfig();
-            databaseConfig.setAllowCreate(true);
-            com.sleepycat.je.Database db = environment.openDatabase(null, cache.getName(), databaseConfig);
-            dbs.put(db.getDatabaseName(), db);
+    }
+
+    @Override
+    public synchronized void registerCache(Cache cache) {
+        if (dbs.containsKey(cache.getName())) {
+            return;
         }
+
+        super.registerCache(cache);
+
+        DatabaseConfig databaseConfig = new DatabaseConfig();
+        databaseConfig.setAllowCreate(true);
+        com.sleepycat.je.Database db = environment.openDatabase(null, cache.getName(), databaseConfig);
+        dbs.put(db.getDatabaseName(), db);
 
     }
 
@@ -74,12 +86,13 @@ public class BerkeleyDB extends Database {
         dbs.clear();
         environment = null;
 
+        super.close();
     }
 
     @Override
     protected <K, V extends Data<K>> V get(Cache<K, V> cache, K key) {
         if (environment == null) {
-            throw new IllegalStateException("数据库没有打开");
+            throw new IllegalStateException("数据库已经关闭了");
         }
 
         DatabaseEntry keyEntry = new DatabaseEntry(key.toString().getBytes());
@@ -102,7 +115,7 @@ public class BerkeleyDB extends Database {
     @Override
     protected <K, V extends Data<K>> void put(V data) {
         if (environment == null) {
-            throw new IllegalStateException("数据库没有打开");
+            throw new IllegalStateException("数据库已经关闭了");
         }
 
         String jsonStr = data.encode().toJSONString();
@@ -117,7 +130,7 @@ public class BerkeleyDB extends Database {
     @Override
     protected <K, V extends Data<K>> void delete(Cache<K, V> cache, K key) {
         if (environment == null) {
-            throw new IllegalStateException("数据库没有打开");
+            throw new IllegalStateException("数据库已经关闭了");
         }
 
         DatabaseEntry keyEntry = new DatabaseEntry(key.toString().getBytes());

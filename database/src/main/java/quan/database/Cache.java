@@ -2,15 +2,13 @@ package quan.database;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import quan.common.tuple.Two;
 import quan.common.util.CallerUtil;
 import quan.database.exception.DbException;
 import quan.database.log.DataLog;
 import quan.database.log.VersionLog;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -33,12 +31,12 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
     private String name;
 
     /**
-     * 缓存大小
+     * 缓存大小，缓存的数据行数超过此值时，要把过期的缓存清除
      */
     private int cacheSize;
 
     /**
-     * 缓存过期秒数
+     * 缓存过期时间(秒)
      */
     private int cacheExpire;
 
@@ -91,25 +89,11 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
         this.database = database;
         this.cacheSize = database.getCacheSize();
         this.cacheExpire = database.getCacheExpire();
+
         this.rows = new HashMap<>(cacheSize);
         inserts = new HashSet<>();
         updates = new HashSet<>();
         deletes = new HashSet<>();
-
-        //临时
-        new Thread() {
-            @Override
-            public void run() {
-                while (true) {
-                    try {
-                        Thread.sleep(10000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    store();
-                }
-            }
-        }.start();
     }
 
     @Override
@@ -137,27 +121,13 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
         }
     }
 
-
-    public void setDelete(K key) {
-        CallerUtil.validCallerClass(DataLog.class);
-
-        rows.remove(key);
-        if (inserts.remove(key)) {
-            //新插入的数据被删除时清除插入记录就行
-            return;
-        }
-
-        deletes.add(key);
-        updates.remove(key);
-    }
-
     public void setInsert(V data) {
         CallerUtil.validCallerClass(DataLog.class);
 
         rows.put(data.getKey(), data);
         inserts.add(data.getKey());
         deletes.remove(data.getKey());
-
+        updates.remove(data.getKey());
     }
 
     public void setUpdate(V data) {
@@ -177,7 +147,22 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
         updates.add(data.getKey());
     }
 
+    public void setDelete(K key) {
+        CallerUtil.validCallerClass(DataLog.class);
+
+        rows.remove(key);
+        if (inserts.remove(key)) {
+            //新插入的数据被删除时清除插入记录就行
+            return;
+        }
+
+        deletes.add(key);
+        updates.remove(key);
+    }
+
     public V get(K key) {
+        Objects.requireNonNull(key, "主键不能为空");
+
         Transaction transaction = Transaction.get();
 
         DataLog log = transaction.getDataLog(new DataLog.Key(this, key));
@@ -205,11 +190,13 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
         log = new DataLog(data, data, this, key);
         transaction.addDataLog(log);
 
-        return data;
+        return (V) log.getCurrent();
 
     }
 
     public void delete(K key) {
+        Objects.requireNonNull(key, "主键不能为空");
+
         Transaction transaction = Transaction.get();
 
         DataLog log = transaction.getDataLog(new DataLog.Key(this, key));
@@ -223,6 +210,9 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
     }
 
     public void insert(V data) {
+        Objects.requireNonNull(data, "数据不能为空");
+        Objects.requireNonNull(data.getKey(), "主键不能为空");
+
         if (get(data.getKey()) != null) {
             throw new DbException("数据已存在");
         }
@@ -231,57 +221,86 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
 
         DataLog log = transaction.getDataLog(new DataLog.Key(this, data.getKey()));
         log.setCurrent(data);
+    }
 
+    private Two<Set<V>, Set<K>> getPutsAndDeletes() {
+        Two<Set<V>, Set<K>> putsAndDeletes = new Two<>(new HashSet<>(), new HashSet<>());
+
+        for (K key : inserts) {
+            V data = rows.get(key);
+            putsAndDeletes.getOne().add(data);
+        }
+
+        for (K key : updates) {
+            V data = rows.get(key);
+            putsAndDeletes.getOne().add(data);
+        }
+
+        putsAndDeletes.getTwo().addAll(this.deletes);
+
+        this.inserts.clear();
+        this.updates.clear();
+        this.deletes.clear();
+
+        return putsAndDeletes;
+    }
+
+    /***
+     * 定时存档的间隔很长，应该不需要加锁
+     * 极端情况下有可能出现上次存档还没完成下一次存档又开始了，所以还是要加一下锁
+     * @param puts
+     * @param deletes
+     */
+    private synchronized void store(Set<V> puts, Set<K> deletes) {
+        for (V data : puts) {
+            database.put(data);
+        }
+
+        for (K key : deletes) {
+            database.delete(this, key);
+        }
     }
 
     /**
-     * 存档数据
+     * 存档同时清除过期数据
      */
     public void store() {
-        Set<V> puts = new HashSet<>();
-        Set<K> deletes = new HashSet<>();
-
+        Two<Set<V>, Set<K>> putsAndDeletes;
         try {
             lock.lock();
 
-            for (K key : inserts) {
-                V data = rows.get(key);
-                puts.add(data);
-            }
+            logger.debug("[{}]存档,inserts:{},updates:{},deletes:{}", name, inserts, updates, deletes);
+            putsAndDeletes = getPutsAndDeletes();
 
-
-            for (K key : updates) {
-                V data = rows.get(key);
-                puts.add(data);
-            }
-
-            deletes.addAll(this.deletes);
-
-//            logger.debug("缓存[{}]存档，插入：{}，更新：{}，删除：{}", name, inserts, updates, deletes);
-
-            this.inserts.clear();
-            this.updates.clear();
-            this.deletes.clear();
-
+            checkExpireAndRemove();
         } finally {
             lock.unlock();
         }
 
-        synchronized (this) {
-            //定时存档的间隔很长，应该不需要加锁
-            //这里加锁是为了防止上次存档还没完成下一次存档又开始了的极端情况
-            for (V data : puts) {
-                database.put(data);
-            }
-
-            for (K key : deletes) {
-                database.delete(this, key);
-            }
+        if (putsAndDeletes != null) {
+            store(putsAndDeletes.getOne(), putsAndDeletes.getTwo());
         }
+
     }
 
-    public void expire(K key) {
+    private void checkExpireAndRemove() {
+        long now = System.currentTimeMillis();
+        if (rows.size() <= cacheSize) {
+            return;
+        }
 
+        Set<K> removes = new HashSet<>();
+
+        Iterator<V> iterator = rows.values().iterator();
+        while (iterator.hasNext()) {
+            V data = iterator.next();
+            if (now - data.getTouchTime() > cacheExpire * 1000) {
+                iterator.remove();
+                removes.add(data.getKey());
+            }
+        }
+
+        logger.debug("[{}]过期缓存清除，rows:{},removes:{}", name, rows.size(), removes);
     }
 
 }

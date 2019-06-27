@@ -8,6 +8,7 @@ import org.pcollections.PSet;
 import org.pcollections.PVector;
 import quan.database.Cache;
 import quan.database.Data;
+import quan.database.Database;
 import quan.database.field.*;
 import quan.database.item.ItemBean;
 
@@ -33,7 +34,7 @@ public class RoleData extends Data<Long> {
 
     private MapField<Integer, ItemBean> items = new MapField<>(getRoot());
 
-    public static final Cache<Long, RoleData> cache = new Cache<>(RoleData.class.getSimpleName(), RoleData::new);
+    private static Cache<Long, RoleData> cache;
 
     public RoleData() {
     }
@@ -200,6 +201,33 @@ public class RoleData extends Data<Long> {
             this.items.setValue(items2.plusAll(items1));
         }
 
+    }
+
+    private synchronized static void checkCache() {
+        if (cache == null) {
+            Database database = Database.getInstance();
+            if (database == null) {
+                throw new IllegalStateException("数据库未创建");
+            }
+
+            cache = new Cache<>(RoleData.class.getName(), RoleData::new);
+            database.registerCache(cache);
+        }
+    }
+
+    public static RoleData get(Long key) {
+        checkCache();
+        return cache.get(key);
+    }
+
+    public static void delete(Long key) {
+        checkCache();
+        cache.delete(key);
+    }
+
+    public static void insert(RoleData data) {
+        checkCache();
+        cache.insert(data);
     }
 
     @Override

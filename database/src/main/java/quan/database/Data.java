@@ -23,6 +23,8 @@ public abstract class Data<K> extends Bean implements Comparable<Data<K>> {
      */
     private Lock lock = new ReentrantLock();
 
+    private volatile long touchTime = System.currentTimeMillis();
+
 
     public final Lock getLock() {
         return lock;
@@ -42,6 +44,14 @@ public abstract class Data<K> extends Bean implements Comparable<Data<K>> {
         if (version < 0) {
             version = 1;
         }
+    }
+
+    public final long getTouchTime() {
+        return touchTime;
+    }
+
+    public final void touch() {
+        touchTime = System.currentTimeMillis();
     }
 
     @Override

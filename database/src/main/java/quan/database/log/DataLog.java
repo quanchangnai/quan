@@ -28,6 +28,9 @@ public class DataLog implements Log {
 
 
     public Data getCurrent() {
+        if (current != null) {
+            current.touch();
+        }
         return current;
     }
 
@@ -37,6 +40,9 @@ public class DataLog implements Log {
 
     public DataLog setCurrent(Data current) {
         this.current = current;
+        if (current != null) {
+            current.touch();
+        }
         return this;
     }
 
