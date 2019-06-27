@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by quanchangnai on 2019/6/21.
@@ -91,8 +92,7 @@ public abstract class Database {
         }
         cache.init(this);
 
-        StoreThread storeThread = storeThreads.get(storeThreadIndex);
-        storeThread.caches.add(cache);
+        storeThreads.get(storeThreadIndex).caches.add(cache);
 
         storeThreadIndex++;
         if (storeThreadIndex == storeThreads.size() - 1) {
@@ -131,14 +131,10 @@ public abstract class Database {
 
         private int storePeriod;
 
-        private List<Cache> caches = new ArrayList<>();
+        private List<Cache> caches = new CopyOnWriteArrayList<>();
 
         public StoreThread(int storePeriod) {
             this.storePeriod = storePeriod;
-        }
-
-        public void registerCache(Cache cache) {
-            caches.add(cache);
         }
 
         @Override
