@@ -256,7 +256,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
                 database.delete(this, key);
             }
 
-            logger.debug("缓存[{}]存档，插入：{}，更新：{}，删除：{}", name, inserts, updates, deletes);
+//            logger.debug("缓存[{}]存档，插入：{}，更新：{}，删除：{}", name, inserts, updates, deletes);
 
             inserts.clear();
             updates.clear();

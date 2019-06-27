@@ -63,6 +63,21 @@ public class Transaction {
      */
     private Map<DataLog.Key, DataLog> dataLogs = new HashMap<>();
 
+    /**
+     * 事务总执行次数
+     */
+    private static long totalCount;
+
+    /**
+     * 慢事务执行次数
+     */
+    private static long slowCount;
+
+    /**
+     * 执行时间大于这个时间(ms)的事务定义为慢事务
+     */
+    private static int slowTime = 2;
+
     private long startTime = System.currentTimeMillis();
 
     public long getId() {
@@ -176,6 +191,12 @@ public class Transaction {
 
         threadLocal.set(null);
 
+        totalCount++;
+        long costTime = System.currentTimeMillis() - current.startTime;
+        if (costTime >= slowTime) {
+            slowCount++;
+            logger.debug("事务执行耗时{}ms,慢事务比例:{}/{}", costTime, slowCount, totalCount);
+        }
     }
 
     /**
@@ -197,7 +218,7 @@ public class Transaction {
         try {
             while (true) {
                 count++;
-                logger.debug("当前第{}次执行事务{}", count, current.getId());
+//                logger.debug("当前第{}次执行事务{}", count, current.getId());
                 task.run();
                 current.lock();
                 if (current.isConflict()) {
@@ -299,8 +320,6 @@ public class Transaction {
             unlock();
         }
 
-        long costTime = System.currentTimeMillis() - startTime;
-        logger.debug("提交事务{}，执行耗时{}ms", getId(), costTime);
     }
 
     /**
@@ -319,7 +338,7 @@ public class Transaction {
             unlock();
         }
 
-        logger.debug("回滚事务{}", getId());
+//        logger.debug("回滚事务{}", getId());
     }
 
 }
