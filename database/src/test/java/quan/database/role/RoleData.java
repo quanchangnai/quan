@@ -20,6 +20,69 @@ import java.util.*;
  */
 public class RoleData extends Data<Long> {
 
+    private static Cache<Long, RoleData> cache;
+
+    public RoleData() {
+    }
+
+    @Override
+    public Long getKey() {
+        return getId();
+    }
+
+    @Override
+    public void setKey(Long key) {
+        setId(key);
+    }
+
+    public static void setCache(Cache<Long, RoleData> cache) {
+        if (RoleData.cache != null) {
+            throw new IllegalStateException("缓存已存在");
+        }
+        RoleData.cache = cache;
+    }
+
+    @Override
+    public Cache<Long, RoleData> getCache() {
+        return cache;
+    }
+
+
+    private synchronized static void checkCache() {
+        if (cache != null && cache.getDatabase() != null) {
+            return;
+        }
+
+        Database database = Database.getDefault();
+        if (database == null) {
+            throw new IllegalStateException("默认数据库不存在");
+        }
+
+        if (cache == null) {
+            cache = new Cache<>(RoleData.class.getName(), RoleData::new);
+            database.registerCache(cache);
+        } else if (cache.getDatabase() == null) {
+            database.registerCache(cache);
+        }
+
+    }
+
+    public static RoleData get(Long key) {
+        checkCache();
+        return cache.get(key);
+    }
+
+    public static void delete(Long key) {
+        checkCache();
+        cache.delete(key);
+    }
+
+    public static void insert(RoleData data) {
+        checkCache();
+        cache.insert(data);
+    }
+
+
     private BaseField<Long> id = new BaseField<>(0L);//角色ID
 
     private BaseField<String> name = new BaseField<>("");
@@ -34,25 +97,6 @@ public class RoleData extends Data<Long> {
 
     private MapField<Integer, ItemBean> items = new MapField<>(getRoot());
 
-    private static Cache<Long, RoleData> cache;
-
-    public RoleData() {
-    }
-
-    @Override
-    public Cache<Long, RoleData> getCache() {
-        return cache;
-    }
-
-    @Override
-    public Long getKey() {
-        return getId();
-    }
-
-    @Override
-    public void setKey(Long key) {
-        setId(key);
-    }
 
     public long getId() {
         return id.getValue();
@@ -94,6 +138,7 @@ public class RoleData extends Data<Long> {
         return items;
     }
 
+
     @Override
     public void setChildrenLogRoot(Data root) {
         ItemBean itemBeanValue = this.itemBean.getValue();
@@ -105,6 +150,7 @@ public class RoleData extends Data<Long> {
         this.map.setLogRoot(root);
         this.items.setLogRoot(root);
     }
+
 
     @Override
     public JSONObject encode() {
@@ -147,7 +193,6 @@ public class RoleData extends Data<Long> {
 
     @Override
     public void decode(JSONObject object) {
-
         this.id.setValue(object.getLongValue("id"));
         this.name.setValue(object.getString("name"));
 
@@ -203,32 +248,6 @@ public class RoleData extends Data<Long> {
 
     }
 
-    private synchronized static void checkCache() {
-        if (cache == null) {
-            Database database = Database.getInstance();
-            if (database == null) {
-                throw new IllegalStateException("数据库未创建");
-            }
-
-            cache = new Cache<>(RoleData.class.getName(), RoleData::new);
-            database.registerCache(cache);
-        }
-    }
-
-    public static RoleData get(Long key) {
-        checkCache();
-        return cache.get(key);
-    }
-
-    public static void delete(Long key) {
-        checkCache();
-        cache.delete(key);
-    }
-
-    public static void insert(RoleData data) {
-        checkCache();
-        cache.insert(data);
-    }
 
     @Override
     public String toString() {

@@ -2,7 +2,6 @@ package quan.database;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import quan.common.tuple.Two;
 import quan.common.util.CallerUtil;
 import quan.database.exception.DbException;
 import quan.database.log.DataLog;
@@ -24,7 +23,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
     private static final AtomicInteger nextId = new AtomicInteger();
 
     /**
-     * 自增的ID
+     * 自增长的ID
      */
     private int id = nextId.incrementAndGet();
 
@@ -49,11 +48,11 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
      */
     private Map<K, V> rows;
 
-    private Set<K> inserts = new HashSet<>();
+    private Set<K> inserts;
 
-    private Set<K> updates = new HashSet<>();
+    private Set<K> updates;
 
-    private Set<K> deletes = new HashSet<>();
+    private Set<K> deletes;
 
     /**
      * 表级锁
@@ -91,10 +90,10 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
             return;
         }
         this.database = database;
-        this.cacheSize = database.getCacheSize();
-        this.cacheExpire = database.getCacheExpire();
+        cacheSize = database.getCacheSize();
+        cacheExpire = database.getCacheExpire();
 
-        this.rows = new HashMap<>(cacheSize);
+        rows = new HashMap<>(cacheSize);
         inserts = new HashSet<>();
         updates = new HashSet<>();
         deletes = new HashSet<>();
@@ -227,30 +226,8 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
         log.setCurrent(data);
     }
 
-    private Two<Set<V>, Set<K>> getPutsAndDeletes() {
-        Two<Set<V>, Set<K>> putsAndDeletes = new Two<>(new HashSet<>(), new HashSet<>());
-
-        for (K key : inserts) {
-            V data = rows.get(key);
-            putsAndDeletes.getOne().add(data);
-        }
-
-        for (K key : updates) {
-            V data = rows.get(key);
-            putsAndDeletes.getOne().add(data);
-        }
-
-        putsAndDeletes.getTwo().addAll(this.deletes);
-
-        this.inserts.clear();
-        this.updates.clear();
-        this.deletes.clear();
-
-        return putsAndDeletes;
-    }
-
     /**
-     * 存档同时清除过期数据
+     * 存档数据，并且当缓存数据数量达到上限时清理过期缓存
      */
     public void store() {
         lock.lock();
@@ -285,7 +262,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
             }
 
             if (rows.size() > cacheSize) {
-                checkExpireAndRemove();
+                checkExpireAndClear();
             }
 
         } finally {
@@ -294,7 +271,10 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
 
     }
 
-    private void checkExpireAndRemove() {
+    /**
+     * 检测过期缓存并清理
+     */
+    private void checkExpireAndClear() {
         long now = System.currentTimeMillis();
         Set<K> removes = new HashSet<>();
 

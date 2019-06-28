@@ -28,19 +28,15 @@ public class BerkeleyDB extends Database {
     }
 
     public BerkeleyDB(String dir) {
-        super();
-        this.dir = new File(dir);
-        open();
+        this(new File(dir));
     }
 
-    public BerkeleyDB(String dir, int cacheSize, int cacheExpire, int storePeriod) {
-        super(cacheSize, cacheExpire, storePeriod);
-        this.dir = new File(dir);
-        open();
+    public BerkeleyDB(String dir, int cacheSize, int cacheExpire, int storePeriod, int storeThreadNum) {
+        this(new File(dir), cacheSize, cacheExpire, storePeriod, storeThreadNum);
     }
 
-    public BerkeleyDB(File dir, int cacheSize, int cacheExpire, int storePeriod) {
-        super(cacheSize, cacheExpire, storePeriod);
+    public BerkeleyDB(File dir, int cacheSize, int cacheExpire, int storePeriod, int storeThreadNum) {
+        super(cacheSize, cacheExpire, storePeriod, storeThreadNum);
         this.dir = dir;
         open();
     }
@@ -77,16 +73,16 @@ public class BerkeleyDB extends Database {
             throw new IllegalStateException("数据库已经关闭了");
         }
 
+        super.close();
+
         environment.sync();
         for (com.sleepycat.je.Database db : dbs.values()) {
             db.close();
         }
+
         environment.close();
-
-        dbs.clear();
         environment = null;
-
-        super.close();
+        dbs.clear();
     }
 
     @Override

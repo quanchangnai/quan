@@ -14,6 +14,9 @@ public abstract class Database {
 
     protected Logger logger = LoggerFactory.getLogger(getClass());
 
+    /**
+     * 默认数据库实例
+     */
     private static Database instance;
 
     /**
@@ -41,29 +44,48 @@ public abstract class Database {
     private int storeThreadIndex;
 
     public Database() {
-        if (instance != null) {
-            throw new IllegalStateException("只能打开一个数据库实例");
+        //默认数据库实例为空时自动设置，不为空时需要手动更改
+        if (instance == null) {
+            instance = this;
         }
-        instance = this;
 
         startStoreThread();
     }
 
-    public Database(int cacheSize, int cacheExpire, int storePeriod) {
-        if (instance != null) {
-            throw new IllegalStateException("只能打开一个数据库实例");
+    /**
+     * 参数设置小于0时采用默认值
+     *
+     * @param cacheSize
+     * @param cacheExpire
+     * @param storePeriod
+     * @param storeThreadNum
+     */
+    public Database(int cacheSize, int cacheExpire, int storePeriod, int storeThreadNum) {
+        if (instance == null) {
+            instance = this;
         }
-        instance = this;
-
-        this.cacheSize = cacheSize;
-        this.cacheExpire = cacheExpire;
-        this.storePeriod = storePeriod;
+        if (cacheSize > 0) {
+            this.cacheSize = cacheSize;
+        }
+        if (cacheExpire > 0) {
+            this.cacheExpire = cacheExpire;
+        }
+        if (storePeriod > 0) {
+            this.storePeriod = storePeriod;
+        }
+        if (storeThreadNum > 0) {
+            this.storeThreadIndex = storeThreadNum;
+        }
 
         startStoreThread();
     }
 
-    public static Database getInstance() {
+    public static Database getDefault() {
         return instance;
+    }
+
+    public static void setDefault(Database database) {
+        Database.instance = instance;
     }
 
     public int getCacheSize() {
@@ -110,7 +132,9 @@ public abstract class Database {
     }
 
     public void close() {
-        instance = null;
+        if (instance == this) {
+            instance = null;
+        }
         for (StoreThread storeThread : storeThreads) {
             storeThread.running = false;
         }
@@ -149,6 +173,7 @@ public abstract class Database {
                     cache.store();
                 }
             }
+            caches.clear();
         }
 
     }

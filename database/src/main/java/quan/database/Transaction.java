@@ -68,6 +68,17 @@ public class Transaction {
      */
     private Map<DataLog.Key, DataLog> dataLogs = new HashMap<>();
 
+
+    /**
+     * 事务开始时间
+     */
+    private long startTime = System.currentTimeMillis();
+
+    /**
+     * 事务的开始执行时间，如果事务冲突回滚，需要重新计时
+     */
+    private long startExecutionTime;
+
     /**
      * 事务总执行次数
      */
@@ -79,14 +90,9 @@ public class Transaction {
     private static long slowCount;
 
     /**
-     * 执行时间大于这个时间(ms)的事务定义为慢事务
+     * 执行时间大于等于此值(ms)的事务定义为慢事务
      */
     private static int slowTime = 2;
-
-    /**
-     * 事务的开始执行时间，如果事务冲突回滚，需要重新计时
-     */
-    private long startTime;
 
     public long getId() {
         return id;
@@ -96,8 +102,8 @@ public class Transaction {
         return failed;
     }
 
-    public long getStartTime() {
-        return startTime;
+    public long getStartExecutionTime() {
+        return startExecutionTime;
     }
 
     /**
@@ -207,7 +213,7 @@ public class Transaction {
         long costTime = System.currentTimeMillis() - current.startTime;
         if (costTime >= slowTime) {
             slowCount++;
-            logger.debug("事务执行耗时{}ms,慢事务比例:{}/{}", costTime, slowCount, totalCount);
+            logger.debug("事务结束,执行成功:{},耗时:{}ms,慢事务比例:{}/{}", !current.failed, costTime, slowCount, totalCount);
         }
     }
 
@@ -229,11 +235,13 @@ public class Transaction {
         Transaction current = begin();
         try {
             while (true) {
-                current.startTime = System.currentTimeMillis();
                 count++;
+                current.startExecutionTime = System.currentTimeMillis();
 //                logger.debug("当前第{}次执行事务{}", count, current.getId());
+
                 task.run();
                 current.lock();
+
                 if (current.isConflict()) {
                     //有冲突，其他事务也修改了数据
                     current.rollback(false);
@@ -265,7 +273,10 @@ public class Transaction {
         TreeSet<Data> rows = new TreeSet<>();
         rows.addAll(versionLogs.keySet());
         for (Data data : rows) {
-            rowLocks.add(data.getLock());
+            //受缓存管理的数据肯定会加表级锁就没必要加行级锁了，不受缓存管理的数据才会加行级锁
+            if (!tables.contains(data.getCache())) {
+                rowLocks.add(data.getLock());
+            }
         }
 
         for (Lock lock : tableLocks) {

@@ -15,7 +15,7 @@ public class DatabaseTest2 {
     private static Logger logger = LoggerFactory.getLogger(DatabaseTest1.class);
 
     public static void main(String[] args) throws Exception {
-        Database database = new BerkeleyDB(".temp/bdb", 5, 30, 5);
+        Database database = new BerkeleyDB(".temp/bdb", 5, 30, 5, 0);
 
         while (true) {
             Transaction.execute(DatabaseTest2::test1);

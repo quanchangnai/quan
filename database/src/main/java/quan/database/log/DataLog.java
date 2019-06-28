@@ -52,14 +52,14 @@ public class DataLog implements Log {
     }
 
     public boolean isConflict() {
-        //缓存里的数据变了
-        if (origin != key.cache.getNoLock(key.key)) {
+        //有可能出现事务执行时间比缓存的过期时间还长的极端情况
+        long costTime = System.currentTimeMillis() - Transaction.get().getStartExecutionTime();
+        if (costTime > getCache().getCacheExpire() * 1000) {
             return true;
         }
 
-        //有可能出现事务执行时间比缓存的过期时间还长的极端情况
-        long costTime = System.currentTimeMillis() - Transaction.get().getStartTime();
-        if (costTime > getCache().getCacheExpire() * 1000) {
+        //缓存里的数据变了
+        if (origin != key.cache.getNoLock(key.key)) {
             return true;
         }
 
