@@ -12,6 +12,7 @@ import quan.database.log.VersionLog;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
 
 /**
  * Created by quanchangnai on 2019/5/16.
@@ -41,7 +42,7 @@ public class Transaction {
     /**
      * 表级锁
      */
-    private List<Lock> tableLocks = new ArrayList<>();
+    private List<ReadWriteLock> tableLocks = new ArrayList<>();
 
     /**
      * 行级锁
@@ -273,14 +274,11 @@ public class Transaction {
         TreeSet<Data> rows = new TreeSet<>();
         rows.addAll(versionLogs.keySet());
         for (Data data : rows) {
-            //受缓存管理的数据肯定会加表级锁就没必要加行级锁了，不受缓存管理的数据才会加行级锁
-            if (!tables.contains(data.getCache())) {
-                rowLocks.add(data.getLock());
-            }
+            rowLocks.add(data.getLock());
         }
 
-        for (Lock lock : tableLocks) {
-            lock.lock();
+        for (ReadWriteLock lock : tableLocks) {
+            lock.readLock().lock();
         }
 
         for (Lock lock : rowLocks) {
@@ -290,8 +288,8 @@ public class Transaction {
     }
 
     private void unlock() {
-        for (Lock lock : tableLocks) {
-            lock.unlock();
+        for (ReadWriteLock lock : tableLocks) {
+            lock.readLock().unlock();
         }
         tableLocks.clear();
 

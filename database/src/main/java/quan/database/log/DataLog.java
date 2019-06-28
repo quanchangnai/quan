@@ -13,14 +13,32 @@ public class DataLog implements Log {
 
     private Key key;
 
+    /**
+     * 事务里的当前数据
+     */
     private Data current;
 
+
+    private Cache.Row originRow;
+
+    /**
+     * 缓存里的原始数据
+     */
     private Data origin;
 
-    public DataLog(Data current, Data origin, Cache cache, Object key) {
+    /**
+     * 原始数据的状态
+     */
+    private int originState;
+
+    public DataLog(Data current, Cache.Row row, Cache cache, Object key) {
         this.key = new Key(cache, key);
         this.current = current;
-        this.origin = origin;
+        this.originRow = row;
+        if (row != null) {
+            this.origin = (Data) row.getData();
+            this.originState = row.getState();
+        }
     }
 
     public Key getKey() {
@@ -33,10 +51,6 @@ public class DataLog implements Log {
             current.touch();
         }
         return current;
-    }
-
-    public Data getOrigin() {
-        return origin;
     }
 
     public DataLog setCurrent(Data current) {
@@ -58,8 +72,12 @@ public class DataLog implements Log {
             return true;
         }
 
+        Cache.Row row = key.cache.getRow(key.key);
+        if (originRow != row) {
+            return true;
+        }
         //缓存里的数据变了
-        if (origin != key.cache.getNoLock(key.key)) {
+        if (origin != row.getData() || originState != row.getState()) {
             return true;
         }
 

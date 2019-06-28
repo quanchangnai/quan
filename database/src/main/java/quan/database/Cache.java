@@ -7,10 +7,14 @@ import quan.database.exception.DbException;
 import quan.database.log.DataLog;
 import quan.database.log.VersionLog;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Supplier;
 
 /**
@@ -46,7 +50,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
     /**
      * 缓存的所有数据行
      */
-    private Map<K, V> rows;
+    private Map<K, Row<V>> rows;
 
     private Set<K> inserts;
 
@@ -55,9 +59,9 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
     private Set<K> deletes;
 
     /**
-     * 表级锁
+     * 表级锁，存档时加写锁，其他地方加读锁
      */
-    private Lock lock = new ReentrantLock();
+    private ReadWriteLock lock = new ReentrantReadWriteLock();
 
 
     public Cache(String name, Supplier<V> dataFactory) {
@@ -93,7 +97,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
         cacheSize = database.getCacheSize();
         cacheExpire = database.getCacheExpire();
 
-        rows = new HashMap<>(cacheSize);
+        rows = new ConcurrentHashMap<>(cacheSize);
         inserts = new HashSet<>();
         updates = new HashSet<>();
         deletes = new HashSet<>();
@@ -105,63 +109,31 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
     }
 
 
-    public Lock getLock() {
+    public ReadWriteLock getLock() {
         CallerUtil.validCallerClass(Transaction.class);
         return lock;
     }
 
-    public V getNoLock(K key) {
+    public Row<V> getRow(K key) {
         CallerUtil.validCallerClass(DataLog.class);
         return rows.get(key);
     }
 
-    private V getOnLock(K key) {
-        try {
-            lock.lock();
-            return rows.get(key);
-        } finally {
-            lock.unlock();
-        }
-    }
-
     public void setInsert(V data) {
         CallerUtil.validCallerClass(DataLog.class);
-
-        rows.put(data.getKey(), data);
-        inserts.add(data.getKey());
-        deletes.remove(data.getKey());
-        updates.remove(data.getKey());
+        rows.get(data.getKey()).state = Row.INSERT;
     }
 
     public void setUpdate(V data) {
         CallerUtil.validCallerClass(VersionLog.class);
-
-        V value = rows.get(data.getKey());
-        if (value == null || value != data) {
-            //数据已被删除或者不受缓存管理
-            return;
-        }
-
-        if (inserts.contains(data.getKey())) {
-            //新插入的数据无需记录更新
-            return;
-        }
-
-        updates.add(data.getKey());
+        rows.get(data.getKey()).state = Row.UPDATE;
     }
 
     public void setDelete(K key) {
         CallerUtil.validCallerClass(DataLog.class);
-
-        rows.remove(key);
-        if (inserts.remove(key)) {
-            //新插入的数据被删除时清除插入记录就行
-            return;
-        }
-
-        deletes.add(key);
-        updates.remove(key);
+        rows.get(key).state = Row.DELETE;
     }
+
 
     public V get(K key) {
         Objects.requireNonNull(key, "主键不能为空");
@@ -173,24 +145,32 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
             return (V) log.getCurrent();
         }
 
-        V data;
+        Row<V> row = null;
+        V data = null;
 
         try {
-            lock.lock();
+            //存档时阻塞
+            lock.readLock().lock();
 
-            data = rows.get(key);
-            if (data == null) {
+            row = rows.get(key);
+            if (row == null) {
                 data = database.get(this, key);
                 if (data != null) {
-                    rows.put(key, data);
+                    row = new Row<>(data);
+                    Row<V> oldRow = rows.putIfAbsent(key, row);
+                    if (oldRow != null) {
+                        row = oldRow;
+                    }
                 }
             }
-
+            if (row != null) {
+                data = row.data;
+            }
         } finally {
-            lock.unlock();
+            lock.readLock().lock();
         }
 
-        log = new DataLog(data, data, this, key);
+        log = new DataLog(data, row, this, key);
         transaction.addDataLog(log);
 
         return (V) log.getCurrent();
@@ -204,7 +184,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
 
         DataLog log = transaction.getDataLog(new DataLog.Key(this, key));
         if (log == null) {
-            log = new DataLog(null, getOnLock(key), this, key);
+            log = new DataLog(null, rows.get(key), this, key);
             transaction.addDataLog(log);
             return;
         }
@@ -230,28 +210,11 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
      * 存档数据，并且当缓存数据数量达到上限时清理过期缓存
      */
     public void store() {
-        lock.lock();
+        lock.writeLock().lock();
         try {
             Set<V> puts = new HashSet<>();
             Set<K> deletes = new HashSet<>();
 
-            for (K key : inserts) {
-                V data = rows.get(key);
-                puts.add(data);
-            }
-
-            for (K key : updates) {
-                V data = rows.get(key);
-                puts.add(data);
-            }
-
-            deletes.addAll(this.deletes);
-
-            logger.debug("[{}]存档,inserts:{},updates:{},deletes:{}", name, inserts, updates, deletes);
-
-            this.inserts.clear();
-            this.updates.clear();
-            this.deletes.clear();
 
             for (V data : puts) {
                 database.put(data);
@@ -266,7 +229,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
             }
 
         } finally {
-            lock.unlock();
+            lock.writeLock().lock();
         }
 
     }
@@ -278,16 +241,44 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
         long now = System.currentTimeMillis();
         Set<K> removes = new HashSet<>();
 
-        Iterator<V> iterator = rows.values().iterator();
-        while (iterator.hasNext()) {
-            V data = iterator.next();
-            if (now - data.getTouchTime() > cacheExpire * 1000) {
-                iterator.remove();
-                removes.add(data.getKey());
-            }
-        }
+//        Iterator<V> iterator = rows.values().iterator();
+//        while (iterator.hasNext()) {
+//            V data = iterator.next();
+//            if (now - data.getTouchTime() > cacheExpire * 1000) {
+//                iterator.remove();
+//                removes.add(data.getKey());
+//            }
+//        }
 
         logger.debug("[{}]过期缓存清除，rows:{},removes:{}", name, rows.size(), removes);
     }
 
+
+    public static class Row<V> {
+        //正常状态
+        static final int NORMAL = 0;
+        //插入状态
+        static final int INSERT = 1;
+        //更新状态
+        static final int UPDATE = 2;
+        //删除状态
+        static final int DELETE = 3;
+
+
+        private V data;
+
+        private int state;
+
+        public Row(V data) {
+            this.data = data;
+        }
+
+        public V getData() {
+            return data;
+        }
+
+        public int getState() {
+            return state;
+        }
+    }
 }
