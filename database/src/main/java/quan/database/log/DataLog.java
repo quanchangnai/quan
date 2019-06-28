@@ -19,7 +19,7 @@ public class DataLog implements Log {
     private Data current;
 
 
-    private Cache.Row originRow;
+    private boolean existsCache;
 
     /**
      * 缓存里的原始数据
@@ -34,8 +34,8 @@ public class DataLog implements Log {
     public DataLog(Data current, Cache.Row row, Cache cache, Object key) {
         this.key = new Key(cache, key);
         this.current = current;
-        this.originRow = row;
         if (row != null) {
+            this.existsCache = true;
             this.origin = (Data) row.getData();
             this.originState = row.getState();
         }
@@ -72,10 +72,11 @@ public class DataLog implements Log {
             return true;
         }
 
-        Cache.Row row = key.cache.getRow(key.key);
-        if (originRow != row) {
-            return true;
+        if (existsCache) {
+
         }
+        Cache.Row row = key.cache.getRow(key.key);
+
         //缓存里的数据变了
         if (origin != row.getData() || originState != row.getState()) {
             return true;

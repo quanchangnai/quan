@@ -145,7 +145,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
             return (V) log.getCurrent();
         }
 
-        Row<V> row = null;
+        Row<V> row;
         V data = null;
 
         try {
