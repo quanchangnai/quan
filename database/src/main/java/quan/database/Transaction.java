@@ -83,7 +83,10 @@ public class Transaction {
      */
     private static int slowTime = 2;
 
-    private long startTime = System.currentTimeMillis();
+    /**
+     * 事务的开始执行时间，如果事务冲突回滚，需要重新计时
+     */
+    private long startTime;
 
     public long getId() {
         return id;
@@ -91,6 +94,10 @@ public class Transaction {
 
     public boolean isFailed() {
         return failed;
+    }
+
+    public long getStartTime() {
+        return startTime;
     }
 
     /**
@@ -222,6 +229,7 @@ public class Transaction {
         Transaction current = begin();
         try {
             while (true) {
+                current.startTime = System.currentTimeMillis();
                 count++;
 //                logger.debug("当前第{}次执行事务{}", count, current.getId());
                 task.run();

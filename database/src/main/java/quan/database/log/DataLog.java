@@ -2,6 +2,7 @@ package quan.database.log;
 
 import quan.database.Cache;
 import quan.database.Data;
+import quan.database.Transaction;
 
 import java.util.Objects;
 
@@ -55,6 +56,13 @@ public class DataLog implements Log {
         if (origin != key.cache.getNoLock(key.key)) {
             return true;
         }
+
+        //有可能出现事务执行时间比缓存的过期时间还长的极端情况
+        long costTime = System.currentTimeMillis() - Transaction.get().getStartTime();
+        if (costTime > getCache().getCacheExpire() * 1000) {
+            return true;
+        }
+
         return false;
 
     }

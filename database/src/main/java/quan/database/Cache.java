@@ -82,6 +82,10 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
         return dataFactory;
     }
 
+    public int getCacheExpire() {
+        return cacheExpire;
+    }
+
     void init(Database database) {
         if (this.database != null) {
             return;
