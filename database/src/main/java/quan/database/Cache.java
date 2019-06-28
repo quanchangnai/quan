@@ -249,50 +249,53 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
         return putsAndDeletes;
     }
 
-    /***
-     * 定时存档的间隔很长，应该不需要加锁
-     * 极端情况下有可能出现上次存档还没完成下一次存档又开始了，所以还是要加一下锁
-     * @param puts
-     * @param deletes
-     */
-    private synchronized void store(Set<V> puts, Set<K> deletes) {
-        for (V data : puts) {
-            database.put(data);
-        }
-
-        for (K key : deletes) {
-            database.delete(this, key);
-        }
-    }
-
     /**
      * 存档同时清除过期数据
      */
     public void store() {
-        Two<Set<V>, Set<K>> putsAndDeletes;
+        lock.lock();
         try {
-            lock.lock();
+            Set<V> puts = new HashSet<>();
+            Set<K> deletes = new HashSet<>();
+
+            for (K key : inserts) {
+                V data = rows.get(key);
+                puts.add(data);
+            }
+
+            for (K key : updates) {
+                V data = rows.get(key);
+                puts.add(data);
+            }
+
+            deletes.addAll(this.deletes);
 
             logger.debug("[{}]存档,inserts:{},updates:{},deletes:{}", name, inserts, updates, deletes);
-            putsAndDeletes = getPutsAndDeletes();
 
-            checkExpireAndRemove();
+            this.inserts.clear();
+            this.updates.clear();
+            this.deletes.clear();
+
+            for (V data : puts) {
+                database.put(data);
+            }
+
+            for (K key : deletes) {
+                database.delete(this, key);
+            }
+
+            if (rows.size() > cacheSize) {
+                checkExpireAndRemove();
+            }
+
         } finally {
             lock.unlock();
-        }
-
-        if (putsAndDeletes != null) {
-            store(putsAndDeletes.getOne(), putsAndDeletes.getTwo());
         }
 
     }
 
     private void checkExpireAndRemove() {
         long now = System.currentTimeMillis();
-        if (rows.size() <= cacheSize) {
-            return;
-        }
-
         Set<K> removes = new HashSet<>();
 
         Iterator<V> iterator = rows.values().iterator();

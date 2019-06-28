@@ -44,6 +44,9 @@ public class DatabaseTest2 {
         System.err.println("i:" + i);
 
         roleData = RoleData.get(i);
-        logger.error("roleId:{},touchTime:{}", roleData.getId(), roleData.getTouchTime());
+        if (roleData != null) {
+            logger.error("roleId:{},touchTime:{}", roleData.getId(), roleData.getTouchTime());
+        }
+
     }
 }
