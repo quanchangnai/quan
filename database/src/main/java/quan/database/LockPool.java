@@ -46,27 +46,25 @@ public class LockPool {
     }
 
 
-    public static ReadWriteLock getLock(Cache cache, Object key) {
-        return locks.get(getLockIndex(cache, key));
+    static ReadWriteLock getLock(Cache cache, Object key) {
+        return getLock(getLockIndex(cache, key));
     }
 
-    public static ReadWriteLock getLock(Data data) {
+    static ReadWriteLock getLock(Data data) {
         return locks.get(getLockIndex(data));
     }
 
-    public static ReadWriteLock getLock(int lockIndex) {
+    static ReadWriteLock getLock(int lockIndex) {
         return locks.get(lockIndex);
     }
 
 
-    public static int getLockIndex(Cache cache, Object key) {
-        int hash = Objects.hash(cache, key) >>> 16;
-        return hash % locks.size();
+    static int getLockIndex(Cache cache, Object key) {
+        return Objects.hash(cache, key) % locks.size();
     }
 
-    public static int getLockIndex(Data data) {
-        int hash = Objects.hash(data) >>> 16;
-        return hash % locks.size();
+    static int getLockIndex(Data data) {
+        return data.hashCode() % locks.size();
     }
 
 }

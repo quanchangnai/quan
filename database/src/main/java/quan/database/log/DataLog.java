@@ -72,7 +72,7 @@ public class DataLog implements Log {
             return true;
         }
 
-        Cache.Row row = key.cache.getRow(key.key);
+        Cache.Row row = key.cache.getRow(key.k);
         if (originRow != row) {
             return true;
         }
@@ -94,7 +94,7 @@ public class DataLog implements Log {
     public void commit() {
         if (current == null && originData != null && originState != Cache.Row.DELETE) {
             //delete
-            key.cache.setDelete(key.key);
+            key.cache.setDelete(key.k);
         }
         if (current != null && (originRow == null || originState == Cache.Row.DELETE)) {
             //insert
@@ -106,11 +106,15 @@ public class DataLog implements Log {
 
         private Cache cache;
 
-        private Object key;
+        private Object k;
 
-        public Key(Cache cache, Object key) {
+        public Key(Cache cache, Object k) {
             this.cache = cache;
-            this.key = key;
+            this.k = k;
+        }
+
+        public Object getK() {
+            return k;
         }
 
         @Override
@@ -119,12 +123,12 @@ public class DataLog implements Log {
             if (o == null || getClass() != o.getClass()) return false;
             Key key1 = (Key) o;
             return Objects.equals(cache, key1.cache) &&
-                    Objects.equals(key, key1.key);
+                    Objects.equals(k, key1.k);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(cache, key);
+            return Objects.hash(cache, k);
         }
 
     }

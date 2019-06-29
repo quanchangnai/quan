@@ -303,7 +303,7 @@ public class Transaction {
         TreeSet<Cache> caches = new TreeSet<>();
         for (DataLog dataLog : dataLogs.values()) {
             caches.add(dataLog.getCache());
-            rowLocks.add(LockPool.getLock(dataLog.getCache(), dataLog.getKey()));
+            rowLocks.add(LockPool.getLock(dataLog.getCache(), dataLog.getKey().getK()));
 
         }
         for (Cache cache : caches) {
