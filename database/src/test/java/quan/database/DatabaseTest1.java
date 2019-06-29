@@ -27,7 +27,7 @@ public class DatabaseTest1 {
 
         Transaction.setConflictNumThreshold(1);
 
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 200; i++) {
             new Thread() {
                 @Override
                 public void run() {
@@ -47,7 +47,7 @@ public class DatabaseTest1 {
 
         Thread.sleep(2000);
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 100; i++) {
             new Thread() {
                 @Override
                 public void run() {
@@ -66,7 +66,7 @@ public class DatabaseTest1 {
 
         Thread.sleep(2000);
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 100; i++) {
             new Thread() {
                 @Override
                 public void run() {
@@ -89,14 +89,10 @@ public class DatabaseTest1 {
 
     private static Random random = new SecureRandom();
 
-    private static long randomLong() {
-        return random.nextInt(100);
-    }
-
     private static void test1() {
         long startTime = System.currentTimeMillis();
 
-        long roleId = randomLong();
+        long roleId = random.nextInt(10);
         RoleData roleData = RoleData.get(roleId);
         if (roleData == null) {
             roleData = new RoleData();
@@ -127,7 +123,7 @@ public class DatabaseTest1 {
     }
 
     private static void test2() {
-        long roleId = randomLong();
+        long roleId = random.nextInt(10);
         RoleData roleData = RoleData.get(roleId);
         if (roleData != null) {
             roleData.setName("test2-" + System.currentTimeMillis());
@@ -135,7 +131,7 @@ public class DatabaseTest1 {
     }
 
     private static void test3() {
-        long roleId = randomLong();
+        long roleId = random.nextInt(10);
         RoleData.delete(roleId);
     }
 }
