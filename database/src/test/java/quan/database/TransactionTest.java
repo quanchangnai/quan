@@ -51,6 +51,6 @@ public class TransactionTest {
     private static void update2() {
         roleData1.setId(222);
         roleData1.getMap().put(111, 222);
-        Transaction.breakdown();
+//        Transaction.breakdown();
     }
 }

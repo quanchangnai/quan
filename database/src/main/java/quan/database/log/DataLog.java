@@ -18,27 +18,27 @@ public class DataLog implements Log {
      */
     private Data current;
 
-
+    /**
+     * 缓存里的原始数据行
+     */
     private Cache.Row originRow;
 
     /**
      * 缓存里的原始数据
      */
-    private Data origin;
+    private Data originData;
 
     /**
      * 原始数据的状态
      */
     private int originState;
 
-    public DataLog(Data current, Cache.Row row, Cache cache, Object key) {
+    public DataLog(Data current, Cache.Row originRow, Data originData, int originState, Cache cache, Object key) {
         this.key = new Key(cache, key);
         this.current = current;
-        this.originRow = row;
-        if (row != null) {
-            this.origin = (Data) row.getData();
-            this.originState = row.getState();
-        }
+        this.originRow = originRow;
+        this.originData = originData;
+        this.originState = originState;
     }
 
     public Key getKey() {
@@ -67,7 +67,7 @@ public class DataLog implements Log {
 
     public boolean isConflict() {
         //有可能出现事务执行时间比缓存的过期时间还长的极端情况
-        long costTime = System.currentTimeMillis() - Transaction.get().getStartExecutionTime();
+        long costTime = System.currentTimeMillis() - Transaction.get().getTaskStartTime();
         if (costTime > getCache().getCacheExpire() * 1000) {
             return true;
         }
@@ -76,9 +76,14 @@ public class DataLog implements Log {
         if (originRow != row) {
             return true;
         }
-        //缓存里的数据变了
-        if (origin != row.getData() || originState != row.getState()) {
-            return true;
+
+        if (row != null) {
+            if (originData != row.getData()) {
+                return true;
+            }
+            if (originState != row.getState()) {
+                return true;
+            }
         }
 
         return false;
@@ -87,11 +92,11 @@ public class DataLog implements Log {
 
     @Override
     public void commit() {
-        if (current == null && origin != null) {
+        if (current == null && originData != null && originState != Cache.Row.DELETE) {
             //delete
             key.cache.setDelete(key.key);
         }
-        if (current != null && origin == null) {
+        if (current != null && (originRow == null || originState == Cache.Row.DELETE)) {
             //insert
             key.cache.setInsert(current);
         }

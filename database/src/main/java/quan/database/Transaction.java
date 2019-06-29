@@ -11,7 +11,6 @@ import quan.database.log.VersionLog;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 
 /**
@@ -29,10 +28,49 @@ public class Transaction {
     private static final AtomicLong nextId = new AtomicLong();
 
     /**
+     * 执行总次数(事务本身为单位)
+     */
+    private static AtomicLong totalCount = new AtomicLong();
+
+    /**
+     * 事务本身执行时间阈值(ms)，大于等于此值为慢事务
+     */
+    private static int slowTimeThreshold;
+
+    /**
+     * 慢事务执行次数(事务本身为单位)
+     */
+    private static AtomicLong slowCount = new AtomicLong();
+
+    /**
+     * 事务中的逻辑执行冲突次数阈值,大于等于此值
+     */
+    private static int conflictNumThreshold;
+
+    /**
+     * 频繁冲突的事务执行次数(事务本身为单位)
+     */
+    private static AtomicLong frequentCount = new AtomicLong();
+
+    /**
+     * 事务本身的开始时间
+     */
+    private long startTime = System.currentTimeMillis();
+
+    /**
+     * 事务逻辑的开始时间，如果事务冲突回滚，需要重新计时
+     */
+    private long taskStartTime;
+
+    /**
+     * 当前事务的逻辑冲突次数
+     */
+    private int conflictCount;
+
+    /**
      * 事务ID
      */
     private long id = nextId.incrementAndGet();
-
 
     /**
      * 事务是否失败
@@ -47,7 +85,7 @@ public class Transaction {
     /**
      * 行级锁
      */
-    private List<Lock> rowLocks = new ArrayList<>();
+    private List<ReadWriteLock> rowLocks = new ArrayList<>();
 
     /**
      * 记录Data的版本号
@@ -70,31 +108,6 @@ public class Transaction {
     private Map<DataLog.Key, DataLog> dataLogs = new HashMap<>();
 
 
-    /**
-     * 事务开始时间
-     */
-    private long startTime = System.currentTimeMillis();
-
-    /**
-     * 事务的开始执行时间，如果事务冲突回滚，需要重新计时
-     */
-    private long startExecutionTime;
-
-    /**
-     * 事务总执行次数
-     */
-    private static long totalCount;
-
-    /**
-     * 慢事务执行次数
-     */
-    private static long slowCount;
-
-    /**
-     * 执行时间大于等于此值(ms)的事务定义为慢事务
-     */
-    private static int slowTime = 2;
-
     public long getId() {
         return id;
     }
@@ -103,8 +116,16 @@ public class Transaction {
         return failed;
     }
 
-    public long getStartExecutionTime() {
-        return startExecutionTime;
+    public long getTaskStartTime() {
+        return taskStartTime;
+    }
+
+    public static void setSlowTimeThreshold(int slowTimeThreshold) {
+        Transaction.slowTimeThreshold = slowTimeThreshold;
+    }
+
+    public static void setConflictNumThreshold(int conflictNumThreshold) {
+        Transaction.conflictNumThreshold = conflictNumThreshold;
     }
 
     /**
@@ -210,12 +231,24 @@ public class Transaction {
 
         threadLocal.set(null);
 
-        totalCount++;
+        totalCount.incrementAndGet();
         long costTime = System.currentTimeMillis() - current.startTime;
-        if (costTime >= slowTime) {
-            slowCount++;
-            logger.debug("事务结束,执行成功:{},耗时:{}ms,慢事务比例:{}/{}", !current.failed, costTime, slowCount, totalCount);
+
+        boolean slow = false;
+        if (slowTimeThreshold > 0 && costTime >= slowTimeThreshold) {
+            slowCount.incrementAndGet();
+            slow = true;
         }
+        boolean conflict = false;
+        if (conflictNumThreshold > 0 && current.conflictCount > conflictNumThreshold) {
+            frequentCount.incrementAndGet();
+            conflict = true;
+        }
+        if (slow || conflict) {
+            logger.debug("事务{}结束,执行成功:{},耗时:{}ms,逻辑冲突次数:{} | 事务执行总次数:{},慢事务次数:{},频繁冲突事务次数:{}",
+                    current.id, !current.failed, costTime, current.conflictCount, totalCount, slowCount, frequentCount);
+        }
+
     }
 
     /**
@@ -232,19 +265,23 @@ public class Transaction {
 
         //开启事务再执行任务
         boolean fail = false;
-        int count = 0;
         Transaction current = begin();
+        int count = 0;
         try {
             while (true) {
                 count++;
-                current.startExecutionTime = System.currentTimeMillis();
-//                logger.debug("当前第{}次执行事务{}", count, current.getId());
+                if (current.conflictCount > 2) {
+//                    logger.debug("当前第{}次执行事务{}", count, current.getId());
+                }
+
+                current.taskStartTime = System.currentTimeMillis();
 
                 task.run();
                 current.lock();
 
                 if (current.isConflict()) {
                     //有冲突，其他事务也修改了数据
+                    current.conflictCount++;
                     current.rollback(false);
                 } else {
                     return;
@@ -263,38 +300,48 @@ public class Transaction {
      * 排序加锁，保证不同线程按照同一顺序竞争锁，防止死锁
      */
     private void lock() {
-        TreeSet<Cache> tables = new TreeSet<>();
+        TreeSet<Cache> caches = new TreeSet<>();
         for (DataLog dataLog : dataLogs.values()) {
-            tables.add(dataLog.getCache());
+            caches.add(dataLog.getCache());
+            rowLocks.add(LockPool.getLock(dataLog.getCache(), dataLog.getKey()));
+
         }
-        for (Cache cache : tables) {
+        for (Cache cache : caches) {
             tableLocks.add(cache.getLock());
         }
-
-        TreeSet<Data> rows = new TreeSet<>();
-        rows.addAll(versionLogs.keySet());
-        for (Data data : rows) {
-            rowLocks.add(data.getLock());
+        TreeSet<Integer> rowLockIndexes = new TreeSet<>();
+        for (Data data : versionLogs.keySet()) {
+            Cache cache = data.getCache();
+            if (cache != null) {
+                rowLockIndexes.add(LockPool.getLockIndex(cache, data.getKey()));
+            } else {
+                //没有注册缓存
+                rowLockIndexes.add(LockPool.getLockIndex(data));
+            }
+        }
+        for (Integer rowLockIndex : rowLockIndexes) {
+            rowLocks.add(LockPool.getLock(rowLockIndex));
         }
 
-        for (ReadWriteLock lock : tableLocks) {
-            lock.readLock().lock();
+        //存档时要阻塞
+        for (ReadWriteLock tableLock : tableLocks) {
+            tableLock.readLock().lock();
         }
 
-        for (Lock lock : rowLocks) {
-            lock.lock();
+        for (ReadWriteLock rowLock : rowLocks) {
+            rowLock.writeLock().lock();
         }
 
     }
 
     private void unlock() {
-        for (ReadWriteLock lock : tableLocks) {
-            lock.readLock().unlock();
+        for (ReadWriteLock tableLock : tableLocks) {
+            tableLock.readLock().unlock();
         }
         tableLocks.clear();
 
-        for (Lock lock : rowLocks) {
-            lock.unlock();
+        for (ReadWriteLock rowLock : rowLocks) {
+            rowLock.writeLock().unlock();
         }
         rowLocks.clear();
     }

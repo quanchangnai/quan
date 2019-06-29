@@ -16,37 +16,47 @@ public class DatabaseTest2 {
 
     public static void main(String[] args) throws Exception {
         Database database = new BerkeleyDB(".temp/bdb", 5, 30, 5, 0);
-
         while (true) {
             Transaction.execute(DatabaseTest2::test1);
             Thread.sleep(20000);
         }
-
+//        database.close();
     }
 
     private static Random random = new Random();
     private static long roleId = 1;
 
     private static void test1() {
+
+        System.err.println("roleId:" + roleId);
+
         RoleData roleData = RoleData.get(roleId);
+        System.err.println("RoleData.get(" + roleId + "):" + roleData);
+
         if (roleData == null) {
             roleData = new RoleData();
             roleData.setId(roleId);
             RoleData.insert(roleData);
+            System.err.println("RoleData.insert():" + roleData);
         }
 
-        if (roleId < 100) {
+        long rand1 = random.nextInt((int) roleId) + 1;
+        System.err.println("rand1:" + rand1);
+
+        roleData = RoleData.get(rand1);
+        if (roleData != null) {
+            roleData.setName("name-" + System.currentTimeMillis());
+        }
+        System.err.println("RoleData.get(" + rand1 + "):" + roleData);
+
+        long rand2 = random.nextInt((int) roleId) + 1;
+        System.err.println("rand2:" + rand2);
+
+        RoleData.delete(rand2);
+        System.err.println("RoleData.delete(" + rand2 + ")");
+
+        if (roleId < 20) {
             roleId++;
         }
-
-        long i = random.nextInt((int) roleId);
-
-        System.err.println("i:" + i);
-
-        roleData = RoleData.get(i);
-        if (roleData != null) {
-            logger.error("roleId:{},touchTime:{}", roleData.getId(), roleData.getTouchTime());
-        }
-
     }
 }
