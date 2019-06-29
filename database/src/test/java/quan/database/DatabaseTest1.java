@@ -54,7 +54,7 @@ public class DatabaseTest1 {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-//                    Transaction.execute(DatabaseTest1::test2);
+                    Transaction.execute(DatabaseTest1::test2);
                 }
 
             }
