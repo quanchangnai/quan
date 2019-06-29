@@ -73,12 +73,20 @@ public class LockPool {
 
     static int getLockIndex(Cache cache, Object key) {
         used = true;
-        return Objects.hash(cache, key) % locks.size();
+        int hashCode = Objects.hash(cache, key);
+        if (hashCode < 0) {
+            hashCode = -hashCode;
+        }
+        return hashCode % locks.size();
     }
 
     static int getLockIndex(Data data) {
         used = true;
-        return data.hashCode() % locks.size();
+        int hashCode = data.hashCode();
+        if (hashCode < 0) {
+            hashCode = -hashCode;
+        }
+        return hashCode % locks.size();
     }
 
 }

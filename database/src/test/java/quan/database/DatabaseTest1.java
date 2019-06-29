@@ -5,7 +5,9 @@ import org.slf4j.LoggerFactory;
 import quan.database.role.RoleData;
 import quan.database.store.BerkeleyDB;
 
+import java.security.SecureRandom;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
 /**
@@ -43,38 +45,68 @@ public class DatabaseTest1 {
             Thread.sleep(500);
         }
 
-        Thread.sleep(5000);
+        Thread.sleep(2000);
 
-        new Thread() {
-            @Override
-            public void run() {
-                while (true) {
-                    try {
-                        Thread.sleep(5000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+        for (int i = 0; i < 10; i++) {
+            new Thread() {
+                @Override
+                public void run() {
+                    while (true) {
+                        try {
+                            Thread.sleep(5000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        Transaction.execute(DatabaseTest1::test2);
                     }
-                    Transaction.execute(DatabaseTest1::test2);
-                }
 
-            }
-        }.start();
+                }
+            }.start();
+        }
+
+        Thread.sleep(2000);
+
+        for (int i = 0; i < 10; i++) {
+            new Thread() {
+                @Override
+                public void run() {
+                    while (true) {
+                        try {
+                            Thread.sleep(5000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        Transaction.execute(DatabaseTest1::test3);
+                    }
+
+                }
+            }.start();
+        }
+
 
 //        database.close();
     }
 
+    private static Random random = new SecureRandom();
+
+    private static long randomLong() {
+        return random.nextInt(100);
+    }
+
     private static void test1() {
         long startTime = System.currentTimeMillis();
-        RoleData roleData = RoleData.get(1L);
+
+        long roleId = randomLong();
+        RoleData roleData = RoleData.get(roleId);
         if (roleData == null) {
             roleData = new RoleData();
-            roleData.setId(1);
+            roleData.setId(roleId);
             RoleData.insert(roleData);
         }
 
         int s = 0;
         for (int i = 0; i < 20; i++) {
-            roleData.setName("aaa" + System.currentTimeMillis());
+            roleData.setName("test1-" + System.currentTimeMillis());
             if (roleData.getList().size() > 200) {
                 roleData.getList().clear();
             }
@@ -95,8 +127,15 @@ public class DatabaseTest1 {
     }
 
     private static void test2() {
-        RoleData.get(c);
-        RoleData.delete(1L);
+        long roleId = randomLong();
+        RoleData roleData = RoleData.get(roleId);
+        if (roleData != null) {
+            roleData.setName("test2-" + System.currentTimeMillis());
+        }
     }
 
+    private static void test3() {
+        long roleId = randomLong();
+        RoleData.delete(roleId);
+    }
 }
