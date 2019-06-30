@@ -171,6 +171,9 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
                 row.state = Row.DELETE;
                 dirty.put(key, row);
             }
+            if (row.data != null) {
+                row.data.setExpired(true);
+            }
         } else {
             //设置删除记录即可
             row = new Row<>(null, Row.DELETE);
@@ -306,9 +309,6 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
                     updates.put(key, row.data);
                 }
                 if (row.state == Row.DELETE) {
-                    if (row.data != null) {
-                        row.data.setExpired(true);
-                    }
                     deletes.add(key);
                 }
             }
