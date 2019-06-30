@@ -153,6 +153,9 @@ public class Transaction {
     }
 
     public void addVersionLog(Data data) {
+        if (data.isExpired()) {
+            throw new IllegalStateException("数据已过期");
+        }
         if (versionLogs.containsKey(data)) {
             return;
         }

@@ -115,6 +115,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
         CallerUtil.validCallerClass(DataLog.class);
 //        logger.debug("[{}],Cache.setInsert({}),rows:{}", name, data.getKey(), rows);
 
+        data.setExpired(false);
         Row<V> row = rows.get(data.getKey());
         //row有可能为空(新插入时)
         //可能状态:delete:(被删除过)
@@ -305,6 +306,9 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
                     updates.put(key, row.data);
                 }
                 if (row.state == Row.DELETE) {
+                    if (row.data != null) {
+                        row.data.setExpired(true);
+                    }
                     deletes.add(key);
                 }
             }
@@ -345,6 +349,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
         while (iterator.hasNext()) {
             V data = iterator.next().data;
             if (now - data.getTouchTime() > cacheExpire * 1000) {
+                data.setExpired(true);
                 iterator.remove();
                 cleans.add(data.getKey());
             }

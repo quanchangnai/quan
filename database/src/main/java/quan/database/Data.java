@@ -27,6 +27,8 @@ public abstract class Data<K> extends Bean implements Comparable<Data<K>> {
      */
     private Lock lock;
 
+    private volatile boolean expired;
+
     public Data(Cache<K, ? extends Data<K>> cache) {
         this.cache = cache;
         if (cache == null) {
@@ -65,6 +67,14 @@ public abstract class Data<K> extends Bean implements Comparable<Data<K>> {
 
     public final void touch() {
         touchTime = System.currentTimeMillis();
+    }
+
+    final boolean isExpired() {
+        return expired;
+    }
+
+    final void setExpired(boolean expired) {
+        this.expired = expired;
     }
 
     @Override
