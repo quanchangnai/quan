@@ -86,7 +86,7 @@ public class Transaction {
     /**
      * 行级锁，数据受缓存管理时
      */
-    private List<ReadWriteLock> rowLocks = new ArrayList<>();
+    private List<Lock> rowLocks = new ArrayList<>();
 
     /**
      * 行级锁，数据不受缓存管理时
@@ -334,8 +334,8 @@ public class Transaction {
             tableLock.readLock().lock();
         }
 
-        for (ReadWriteLock rowLock : rowLocks) {
-            rowLock.writeLock().lock();
+        for (Lock rowLock : rowLocks) {
+            rowLock.lock();
         }
 
         for (Lock lock : rowLocks2) {
@@ -349,8 +349,8 @@ public class Transaction {
         }
         tableLocks.clear();
 
-        for (ReadWriteLock rowLock : rowLocks) {
-            rowLock.writeLock().unlock();
+        for (Lock rowLock : rowLocks) {
+            rowLock.unlock();
         }
         rowLocks.clear();
 

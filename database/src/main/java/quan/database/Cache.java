@@ -2,6 +2,7 @@ package quan.database;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import quan.common.tuple.Two;
 import quan.common.util.CallerUtil;
 import quan.database.exception.DbException;
 import quan.database.log.DataLog;
@@ -122,8 +123,8 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
             if (row.state == Row.INSERT || row.state == Row.UPDATE || row.state == Row.NORMAL) {
                 throw new IllegalStateException("row(" + data.getKey() + "+不可能出现此状态:" + row.state + "，请检查代码逻辑");
             } else {
-                row.state = Row.INSERT;
-                row.data = data;//之前有可能没有查询直接删除了
+                //之前有可能没有查询直接删除了
+                row.setDataAndState(data, Row.INSERT);
             }
 
         } else {
@@ -188,20 +189,20 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
             return (V) log.getCurrent();
         }
 
-        Row<V> originRow;
+        Row<V> row;
 
         try {
             //存档时阻塞
             lock.readLock().lock();
 
-            originRow = rows.get(key);
-            if (originRow == null) {
+            row = rows.get(key);
+            if (row == null) {
                 V data = database.get(this, key);
                 if (data != null) {
-                    originRow = new Row<>(data);
-                    Row<V> oldRow = rows.putIfAbsent(key, originRow);
+                    row = new Row<>(data);
+                    Row<V> oldRow = rows.putIfAbsent(key, row);
                     if (oldRow != null) {
-                        originRow = oldRow;
+                        row = oldRow;
                     }
                 }
             }
@@ -209,26 +210,14 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
             lock.readLock().unlock();
         }
 
-        Data<K> currentData = null;
-        Data<K> originData = null;
-        int originState = 0;
+        Two<V, Integer> rowDataAndState = row == null ? null : row.getDataAndState();
 
-        if (originRow != null) {
-            ReadWriteLock rowLock = LockPool.getLock(this, key);
-            rowLock.readLock().lock();
-            try {
-                //加行级锁
-                originData = originRow.data;
-                originState = originRow.state;
-                if (originRow.state != Row.DELETE) {
-                    currentData = originRow.data;
-                }
-            } finally {
-                rowLock.readLock().unlock();
-            }
+        Data<K> data = null;
+        if (rowDataAndState != null && rowDataAndState.getTwo() != Row.DELETE) {
+            data = rowDataAndState.getOne();
         }
 
-        log = new DataLog(currentData, originRow, originData, originState, this, key);
+        log = new DataLog(data, row, rowDataAndState.getOne(), rowDataAndState.getTwo(), this, key);
         transaction.addDataLog(log);
 
         return (V) log.getCurrent();
@@ -246,24 +235,12 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
             return;
         }
 
-        Row<V> originRow = rows.get(key);
+        Row<V> row = rows.get(key);
 
-        Data<K> originData = null;
-        int originState = 0;
-        if (originRow != null) {
-            ReadWriteLock rowLock = LockPool.getLock(this, key);
-            rowLock.readLock().lock();
-            try {
-                //加行级锁
-                originData = originRow.data;
-                originState = originRow.state;
-            } finally {
-                rowLock.readLock().unlock();
-            }
-        }
+        Two<V, Integer> rowDataAndState = row == null ? null : row.getDataAndState();
 
         //不确定数据是否存在，增加一条删除日志，这样如果存在数据就一点会被删掉
-        log = new DataLog(null, originRow, originData, originState, this, key);
+        log = new DataLog(null, row, rowDataAndState.getOne(), rowDataAndState.getTwo(), this, key);
         transaction.addDataLog(log);
 
     }
@@ -380,6 +357,8 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
 
         private int state;
 
+        private ReadWriteLock lock = new ReentrantReadWriteLock();
+
         public Row(V data) {
             this.data = data;
         }
@@ -395,6 +374,26 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
 
         public int getState() {
             return state;
+        }
+
+        void setDataAndState(V data, int state) {
+            lock.writeLock().lock();
+            try {
+                this.data = data;
+                this.state = state;
+            } finally {
+                lock.writeLock().unlock();
+            }
+        }
+
+        public Two<V, Integer> getDataAndState() {
+            lock.readLock().lock();
+            try {
+                return new Two<>(data, state);
+            } finally {
+                lock.readLock().unlock();
+            }
+
         }
 
         @Override

@@ -3,7 +3,9 @@ package quan.database;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -17,13 +19,13 @@ public class LockPool {
 
     private static int size = 10000;
 
-    private static List<ReadWriteLock> locks = new ArrayList<>();
+    private static List<Lock> locks = new ArrayList<>();
 
     private volatile static boolean used = false;
 
     static {
         for (int i = 0; i < size; i++) {
-            locks.add(new ReentrantReadWriteLock());
+            locks.add(new ReentrantLock());
         }
     }
 
@@ -37,14 +39,14 @@ public class LockPool {
         }
         int changeSize = size - LockPool.size;
         if (changeSize > 0) {
-            List<ReadWriteLock> addLocks = new ArrayList<>();
+            List<Lock> addLocks = new ArrayList<>();
             for (int i = 0; i < changeSize; i++) {
-                addLocks.add(new ReentrantReadWriteLock());
+                addLocks.add(new ReentrantLock());
             }
             locks.addAll(addLocks);
         }
         if (changeSize < 0) {
-            List<ReadWriteLock> removeLocks = locks.subList(size, LockPool.size);
+            List<Lock> removeLocks = locks.subList(size, LockPool.size);
             locks.removeAll(removeLocks);
         }
         LockPool.size = size;
@@ -55,12 +57,12 @@ public class LockPool {
     }
 
 
-    static ReadWriteLock getLock(Cache cache, Object key) {
+    static Lock getLock(Cache cache, Object key) {
         used = true;
         return getLock(getLockIndex(cache, key));
     }
 
-    static ReadWriteLock getLock(int lockIndex) {
+    static Lock getLock(int lockIndex) {
         used = true;
         return locks.get(lockIndex);
     }

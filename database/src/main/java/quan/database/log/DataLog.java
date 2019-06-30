@@ -78,6 +78,7 @@ public class DataLog implements Log {
         }
 
         if (row != null) {
+            //这里同时读row的data和state不需要加锁，是因为已经加上了行级锁
             if (originData != row.getData()) {
                 return true;
             }
