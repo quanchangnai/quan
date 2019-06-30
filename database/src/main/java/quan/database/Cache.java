@@ -212,15 +212,21 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
 
         Two<V, Integer> rowDataAndState = row == null ? null : row.getDataAndState();
 
-        Data<K> data = null;
-        if (rowDataAndState != null && rowDataAndState.getTwo() != Row.DELETE) {
-            data = rowDataAndState.getOne();
+        V data = null;
+        V rowData = null;
+        int rowState = 0;
+        if (rowDataAndState != null) {
+            if (rowDataAndState.getTwo() != Row.DELETE) {
+                data = rowDataAndState.getOne();
+            }
+            rowData = rowDataAndState.getOne();
+            rowState = rowDataAndState.getTwo();
         }
 
-        log = new DataLog(data, row, rowDataAndState.getOne(), rowDataAndState.getTwo(), this, key);
+        log = new DataLog(data, row, rowData, rowState, this, key);
         transaction.addDataLog(log);
 
-        return (V) log.getCurrent();
+        return data;
 
     }
 
@@ -236,11 +242,17 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
         }
 
         Row<V> row = rows.get(key);
-
         Two<V, Integer> rowDataAndState = row == null ? null : row.getDataAndState();
 
+        V rowData = null;
+        int rowState = 0;
+        if (rowDataAndState != null) {
+            rowData = rowDataAndState.getOne();
+            rowState = rowDataAndState.getTwo();
+        }
+
         //不确定数据是否存在，增加一条删除日志，这样如果存在数据就一点会被删掉
-        log = new DataLog(null, row, rowDataAndState.getOne(), rowDataAndState.getTwo(), this, key);
+        log = new DataLog(null, row, rowData, rowState, this, key);
         transaction.addDataLog(log);
 
     }
