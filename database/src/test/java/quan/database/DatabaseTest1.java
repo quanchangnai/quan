@@ -95,8 +95,7 @@ public class DatabaseTest1 {
         long roleId = random.nextInt(10);
         RoleData roleData = RoleData.get(roleId);
         if (roleData == null) {
-            roleData = new RoleData();
-            roleData.setId(roleId);
+            roleData = new RoleData(roleId);
             RoleData.insert(roleData);
         }
 

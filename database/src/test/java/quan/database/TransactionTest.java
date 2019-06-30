@@ -9,7 +9,7 @@ import quan.database.role.RoleData;
  */
 public class TransactionTest {
 
-    private static RoleData roleData1 = new RoleData();
+    private static RoleData roleData1 = new RoleData(1L);
 
     public static void main(String[] args) {
 
@@ -28,14 +28,13 @@ public class TransactionTest {
         JSONObject jsonObject = roleData1.encode();
         System.err.println("roleData1:" + jsonObject);
 
-        RoleData roleData2 = new RoleData();
+        RoleData roleData2 = new RoleData(0L);
         roleData2.decode(jsonObject);
         System.err.println("roleData2:" + roleData2);
 
     }
 
     private static void update1() {
-        roleData1.setId(111);
         roleData1.setName("aaa");
         ItemBean itemBean1 = new ItemBean();
         itemBean1.setId(1);
@@ -49,7 +48,6 @@ public class TransactionTest {
     }
 
     private static void update2() {
-        roleData1.setId(222);
         roleData1.getMap().put(111, 222);
 //        Transaction.breakdown();
     }

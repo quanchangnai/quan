@@ -34,8 +34,7 @@ public class DatabaseTest2 {
         System.err.println("RoleData.get(" + roleId + "):" + roleData);
 
         if (roleData == null) {
-            roleData = new RoleData();
-            roleData.setId(roleId);
+            roleData = new RoleData(roleId);
             RoleData.insert(roleData);
             System.err.println("RoleData.insert():" + roleData);
         }

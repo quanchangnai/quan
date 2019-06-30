@@ -11,6 +11,7 @@ import quan.database.log.VersionLog;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 
 /**
@@ -83,9 +84,14 @@ public class Transaction {
     private List<ReadWriteLock> tableLocks = new ArrayList<>();
 
     /**
-     * 行级锁
+     * 行级锁，数据受缓存管理时
      */
     private List<ReadWriteLock> rowLocks = new ArrayList<>();
+
+    /**
+     * 行级锁，数据不受缓存管理时
+     */
+    private TreeSet<Lock> rowLocks2 = new TreeSet<>();
 
     /**
      * 记录Data的版本号
@@ -316,7 +322,7 @@ public class Transaction {
                 rowLockIndexes.add(LockPool.getLockIndex(cache, data.getKey()));
             } else {
                 //没有注册缓存
-                rowLockIndexes.add(LockPool.getLockIndex(data));
+                rowLocks2.add(data.getLock());
             }
         }
         for (Integer rowLockIndex : rowLockIndexes) {
@@ -332,6 +338,9 @@ public class Transaction {
             rowLock.writeLock().lock();
         }
 
+        for (Lock lock : rowLocks2) {
+            lock.lock();
+        }
     }
 
     private void unlock() {
@@ -344,6 +353,11 @@ public class Transaction {
             rowLock.writeLock().unlock();
         }
         rowLocks.clear();
+
+        for (Lock lock : rowLocks2) {
+            lock.unlock();
+        }
+        rowLocks2.clear();
     }
 
 

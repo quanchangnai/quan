@@ -20,9 +20,11 @@ import java.util.*;
  */
 public class RoleData extends Data<Long> {
 
-    private static Cache<Long, RoleData> cache;
+    private static Cache<Long, RoleData> CACHE;
 
-    public RoleData() {
+    public RoleData(Long id) {
+        super(CACHE);
+        this.id.setLogValue(id, getRoot());
     }
 
     @Override
@@ -30,26 +32,16 @@ public class RoleData extends Data<Long> {
         return getId();
     }
 
-    @Override
-    public void setKey(Long key) {
-        setId(key);
-    }
-
     public static void setCache(Cache<Long, RoleData> cache) {
-        if (RoleData.cache != null) {
+        if (RoleData.CACHE != null) {
             throw new IllegalStateException("缓存已存在");
         }
-        RoleData.cache = cache;
-    }
-
-    @Override
-    public Cache<Long, RoleData> getCache() {
-        return cache;
+        RoleData.CACHE = cache;
     }
 
 
     private synchronized static void checkCache() {
-        if (cache != null && cache.getDatabase() != null) {
+        if (CACHE != null && CACHE.getDatabase() != null) {
             return;
         }
 
@@ -58,28 +50,28 @@ public class RoleData extends Data<Long> {
             throw new IllegalStateException("默认数据库不存在");
         }
 
-        if (cache == null) {
-            cache = new Cache<>(RoleData.class.getName(), RoleData::new);
-            database.registerCache(cache);
-        } else if (cache.getDatabase() == null) {
-            database.registerCache(cache);
+        if (CACHE == null) {
+            CACHE = new Cache<>(RoleData.class.getName(), RoleData::new);
+            database.registerCache(CACHE);
+        } else if (CACHE.getDatabase() == null) {
+            database.registerCache(CACHE);
         }
 
     }
 
     public static RoleData get(Long key) {
         checkCache();
-        return cache.get(key);
+        return CACHE.get(key);
     }
 
     public static void delete(Long key) {
         checkCache();
-        cache.delete(key);
+        CACHE.delete(key);
     }
 
     public static void insert(RoleData data) {
         checkCache();
-        cache.insert(data);
+        CACHE.insert(data);
     }
 
 
@@ -100,10 +92,6 @@ public class RoleData extends Data<Long> {
 
     public long getId() {
         return id.getValue();
-    }
-
-    public void setId(long id) {
-        this.id.setLogValue(id, getRoot());
     }
 
     public String getName() {

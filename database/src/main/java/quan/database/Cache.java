@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 /**
  * Created by quanchangnai on 2019/6/21.
@@ -42,7 +42,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
 
     private Database database;
 
-    private Supplier<V> dataFactory;
+    private Function<K, V> dataFactory;
 
     /**
      * 缓存的所有数据行
@@ -57,7 +57,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
     private ReadWriteLock lock = new ReentrantReadWriteLock();
 
 
-    public Cache(String name, Supplier<V> dataFactory) {
+    public Cache(String name, Function<K, V> dataFactory) {
         this.name = name;
         this.dataFactory = dataFactory;
     }
@@ -74,7 +74,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
         return database;
     }
 
-    public Supplier<V> getDataFactory() {
+    public Function<K, V> getDataFactory() {
         return dataFactory;
     }
 
@@ -271,15 +271,28 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
     public void insert(V data) {
         Objects.requireNonNull(data, "数据不能为空");
         Objects.requireNonNull(data.getKey(), "主键不能为空");
+        Objects.requireNonNull(data.getCache(), "数据不受缓存管理");
 
         if (get(data.getKey()) != null) {
             throw new DbException("数据已存在");
         }
 
-        Transaction transaction = Transaction.get();
-
-        DataLog log = transaction.getDataLog(new DataLog.Key(this, data.getKey()));
+        DataLog log = Transaction.get().getDataLog(new DataLog.Key(this, data.getKey()));
         log.setCurrent(data);
+    }
+
+    public V getOrInsert(K key) {
+        V data = get(key);
+        if (data != null) {
+            return data;
+        }
+
+        data = dataFactory.apply(key);
+
+        DataLog log = Transaction.get().getDataLog(new DataLog.Key(this, data.getKey()));
+        log.setCurrent(data);
+
+        return data;
     }
 
     /**

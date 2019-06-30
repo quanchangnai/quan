@@ -48,6 +48,8 @@ public class BerkeleyDB extends Database {
 
         EnvironmentConfig envConfig = new EnvironmentConfig();
         envConfig.setAllowCreate(true);
+        envConfig.setDurability(Durability.COMMIT_WRITE_NO_SYNC);
+
         environment = new Environment(dir, envConfig);
 
     }
@@ -75,10 +77,8 @@ public class BerkeleyDB extends Database {
 
         super.close();
 
-        environment.sync();
-        for (com.sleepycat.je.Database db : dbs.values()) {
-            db.close();
-        }
+        environment.flushLog(true);
+        dbs.values().forEach(com.sleepycat.je.Database::close);
 
         environment.close();
         environment = null;
@@ -102,7 +102,7 @@ public class BerkeleyDB extends Database {
 
         String jsonStr = new String(dataEntry.getData());
 
-        V data = cache.getDataFactory().get();
+        V data = cache.getDataFactory().apply(key);
         data.decode(JSON.parseObject(jsonStr));
 
         return data;

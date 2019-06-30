@@ -14,20 +14,33 @@ public abstract class Data<K> extends Bean implements Comparable<Data<K>> {
      */
     private volatile long version;
 
-    private static final AtomicInteger lockIndexGenerator = new AtomicInteger();
-
-    private int lockIndex = lockIndexGenerator.incrementAndGet();
-
-    /**
-     * 行级锁
-     */
-    private Lock lock = new ReentrantLock();
-
     private volatile long touchTime = System.currentTimeMillis();
 
+    private Cache<K, ? extends Data<K>> cache;
 
-    public final Lock getLock() {
+    private static final AtomicInteger lockIndexGenerator = new AtomicInteger();
+
+    private int lockIndex;
+
+    /**
+     * 行级锁，当数据不受缓存管理时使用，受缓存管理时使用锁池
+     */
+    private Lock lock;
+
+    public Data(Cache<K, ? extends Data<K>> cache) {
+        this.cache = cache;
+        if (cache == null) {
+            lock = new ReentrantLock();
+            lockIndex = lockIndexGenerator.incrementAndGet();
+        }
+    }
+
+    final Lock getLock() {
         return lock;
+    }
+
+    public final Cache<K, ? extends Data<K>> getCache() {
+        return cache;
     }
 
     @Override
@@ -61,8 +74,5 @@ public abstract class Data<K> extends Bean implements Comparable<Data<K>> {
 
     public abstract K getKey();
 
-    public abstract void setKey(K key);
-
-    public abstract Cache<K, ? extends Data<K>> getCache();
 
 }

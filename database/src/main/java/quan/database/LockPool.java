@@ -60,11 +60,6 @@ public class LockPool {
         return getLock(getLockIndex(cache, key));
     }
 
-    static ReadWriteLock getLock(Data data) {
-        used = true;
-        return locks.get(getLockIndex(data));
-    }
-
     static ReadWriteLock getLock(int lockIndex) {
         used = true;
         return locks.get(lockIndex);
@@ -74,15 +69,6 @@ public class LockPool {
     static int getLockIndex(Cache cache, Object key) {
         used = true;
         int hashCode = Objects.hash(cache, key);
-        if (hashCode < 0) {
-            hashCode = -hashCode;
-        }
-        return hashCode % locks.size();
-    }
-
-    static int getLockIndex(Data data) {
-        used = true;
-        int hashCode = data.hashCode();
         if (hashCode < 0) {
             hashCode = -hashCode;
         }

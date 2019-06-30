@@ -136,7 +136,7 @@ public abstract class Database {
             instance = null;
         }
         for (StoreThread storeThread : storeThreads) {
-            storeThread.running = false;
+            storeThread.finalStore();
         }
     }
 
@@ -164,9 +164,20 @@ public abstract class Database {
         @Override
         public void run() {
             while (running) {
-                try {
-                    Thread.sleep(storePeriod * 1000);
-                } catch (InterruptedException e) {
+                long sleepTime = 0;
+                while (sleepTime < storePeriod * 1000) {
+                    try {
+                        sleepTime = sleepTime + 1;
+                        Thread.sleep(1);
+                        if (!running) {
+                            break;
+                        }
+                    } catch (InterruptedException e) {
+                    }
+                }
+
+                if (!running) {
+                    break;
                 }
 
                 for (Cache cache : caches) {
@@ -176,6 +187,12 @@ public abstract class Database {
             caches.clear();
         }
 
+        void finalStore() {
+            running = false;
+            for (Cache cache : caches) {
+                cache.store();
+            }
+        }
     }
 
 }
