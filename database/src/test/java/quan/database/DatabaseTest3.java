@@ -25,25 +25,23 @@ public class DatabaseTest3 {
 
         database = new BerkeleyDB(".temp/bdb");
 
-        Transaction.execute(DatabaseTest3::test1);
+        for (int i = 0; i < 10; i++) {
+            Transaction.execute(DatabaseTest3::test1);
+        }
 
         database.close();
     }
 
     private static Random random = new SecureRandom();
 
-    private static void test1() {
+    private static boolean test1() {
         long startTime = System.currentTimeMillis();
 
-        long roleId = random.nextInt(10);
-        roleId = 1L;
-        RoleData roleData = RoleData.get(roleId);
+        long roleId = random.nextInt(3);
+//        roleId = 1L;
+        RoleData roleData = RoleData.getOrInsert(roleId);
         System.err.println("RoleData.get(roleId):" + roleData);
 
-        if (roleData == null) {
-            roleData = new RoleData(roleId);
-            RoleData.insert(roleData);
-        }
 
         int s = 0;
         for (int i = 0; i < 20; i++) {
@@ -65,6 +63,8 @@ public class DatabaseTest3 {
 //        if (costTime > 2) {
         logger.debug("事务:{},单次执行test1()耗时:{},roleData.getList():{}", Transaction.current().getId(), costTime, roleData.getList().size());
 //        }
+
+        return true;
     }
 
 }

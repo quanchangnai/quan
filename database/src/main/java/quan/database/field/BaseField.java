@@ -3,7 +3,7 @@ package quan.database.field;
 import quan.database.Data;
 import quan.database.Transaction;
 import quan.database.log.FieldLog;
-import quan.database.util.Validations;
+import quan.database.Validations;
 
 /**
  * Created by quanchangnai on 2019/6/22.

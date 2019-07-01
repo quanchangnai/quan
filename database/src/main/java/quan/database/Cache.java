@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.common.tuple.Two;
 import quan.common.util.CallerUtil;
-import quan.database.exception.DbException;
 import quan.database.log.DataLog;
 import quan.database.log.VersionLog;
 
@@ -171,9 +170,6 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
                 row.state = Row.DELETE;
                 dirty.put(key, row);
             }
-            if (row.data != null) {
-                row.data.setExpired(true);
-            }
         } else {
             //设置删除记录即可
             row = new Row<>(null, Row.DELETE);
@@ -219,6 +215,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
         V data = null;
         V rowData = null;
         int rowState = 0;
+
         if (rowDataAndState != null) {
             if (rowDataAndState.getTwo() != Row.DELETE) {
                 data = rowDataAndState.getOne();
@@ -250,12 +247,13 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
 
         V rowData = null;
         int rowState = 0;
+
         if (rowDataAndState != null) {
             rowData = rowDataAndState.getOne();
             rowState = rowDataAndState.getTwo();
         }
 
-        //不确定数据是否存在，增加一条删除日志，这样如果存在数据就一点会被删掉
+        //数据不一定存在，增加删除日志，这样如果存在数据就一点会被删掉
         log = new DataLog(null, row, rowData, rowState, this, key);
         transaction.addDataLog(log);
 
@@ -310,6 +308,9 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
                 }
                 if (row.state == Row.DELETE) {
                     deletes.add(key);
+                    if (row.data != null) {
+                        row.data.setExpired(true);
+                    }
                 }
             }
 

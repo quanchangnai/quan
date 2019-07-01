@@ -18,9 +18,9 @@ public abstract class Data<K> extends Bean implements Comparable<Data<K>> {
 
     private Cache<K, ? extends Data<K>> cache;
 
-    private static final AtomicInteger lockIndexGenerator = new AtomicInteger();
+    private static final AtomicInteger nextLockId = new AtomicInteger();
 
-    private int lockIndex;
+    private int lockId;
 
     /**
      * 行级锁，当数据不受缓存管理时使用，受缓存管理时使用锁池
@@ -33,7 +33,7 @@ public abstract class Data<K> extends Bean implements Comparable<Data<K>> {
         this.cache = cache;
         if (cache == null) {
             lock = new ReentrantLock();
-            lockIndex = lockIndexGenerator.incrementAndGet();
+            lockId = nextLockId.incrementAndGet();
         }
     }
 
@@ -79,7 +79,7 @@ public abstract class Data<K> extends Bean implements Comparable<Data<K>> {
 
     @Override
     public final int compareTo(Data<K> other) {
-        return this.lockIndex - other.lockIndex;
+        return this.lockId - other.lockId;
     }
 
     public abstract K getKey();

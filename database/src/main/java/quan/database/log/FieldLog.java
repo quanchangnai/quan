@@ -5,7 +5,7 @@ import quan.database.field.Field;
 /**
  * Created by quanchangnai on 2019/5/16.
  */
-public class FieldLog<V> {
+public class FieldLog<V> implements Log {
 
     private Field<V> field;
 

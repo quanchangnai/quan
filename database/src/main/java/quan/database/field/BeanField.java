@@ -4,7 +4,7 @@ import quan.database.Bean;
 import quan.database.Data;
 import quan.database.Transaction;
 import quan.database.log.FieldLog;
-import quan.database.util.Validations;
+import quan.database.Validations;
 
 /**
  * Created by quanchangnai on 2019/5/16.

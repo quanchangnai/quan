@@ -1,4 +1,4 @@
-package quan.database.exception;
+package quan.database;
 
 /**
  * Created by quanchangnai on 2019/6/21.

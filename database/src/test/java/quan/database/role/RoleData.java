@@ -32,7 +32,7 @@ public class RoleData extends Data<Long> {
         return getId();
     }
 
-    public static void setCache(Cache<Long, RoleData> cache) {
+    public synchronized static void setCache(Cache<Long, RoleData> cache) {
         if (RoleData.CACHE != null) {
             throw new IllegalStateException("缓存已存在");
         }
@@ -59,19 +59,24 @@ public class RoleData extends Data<Long> {
 
     }
 
-    public static RoleData get(Long key) {
+    public static RoleData get(Long id) {
         checkCache();
-        return CACHE.get(key);
+        return CACHE.get(id);
     }
 
-    public static void delete(Long key) {
+    public static void delete(Long id) {
         checkCache();
-        CACHE.delete(key);
+        CACHE.delete(id);
     }
 
     public static void insert(RoleData data) {
         checkCache();
         CACHE.insert(data);
+    }
+
+    public static RoleData getOrInsert(Long id) {
+        checkCache();
+        return CACHE.getOrInsert(id);
     }
 
 

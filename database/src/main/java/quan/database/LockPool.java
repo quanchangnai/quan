@@ -4,20 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * 锁池
+ * 锁池，会默认创建一批锁
  * 使用之前才能设置大小，
- * 可以不设置而采用默认大小,
  * 设置大小和获取锁不能并发执行
  * Created by quanchangnai on 2019/6/29.
  */
 public class LockPool {
 
-    private static int size = 10000;
+    private static int size = 1 << 16;
 
     private static List<Lock> locks = new ArrayList<>();
 
@@ -30,13 +27,15 @@ public class LockPool {
     }
 
     public static void setSize(int size) {
+        if (size < 1) {
+            throw new IllegalArgumentException("参数size必须大于0");
+        }
+
         if (used) {
-            //这里不能保证安全，只是简单校验一下
+            //这里简单校验一下，不能百分之百保证安全
             throw new IllegalStateException("锁池已经在使用了，不能修改大小");
         }
-        if (size < 1) {
-            return;
-        }
+
         int changeSize = size - LockPool.size;
         if (changeSize > 0) {
             List<Lock> addLocks = new ArrayList<>();
@@ -49,6 +48,7 @@ public class LockPool {
             List<Lock> removeLocks = locks.subList(size, LockPool.size);
             locks.removeAll(removeLocks);
         }
+
         LockPool.size = size;
     }
 
@@ -70,11 +70,8 @@ public class LockPool {
 
     static int getLockIndex(Cache cache, Object key) {
         used = true;
-        int hashCode = Objects.hash(cache, key);
-        if (hashCode < 0) {
-            hashCode = -hashCode;
-        }
-        return hashCode % locks.size();
+        int hash = Objects.hash(cache, key);
+        return (hash & 0x7FFFFFFF) % locks.size();
     }
 
 }

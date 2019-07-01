@@ -7,7 +7,7 @@ import quan.database.Data;
 import quan.database.Node;
 import quan.database.Transaction;
 import quan.database.log.FieldLog;
-import quan.database.util.Validations;
+import quan.database.Validations;
 
 import java.util.Collection;
 import java.util.Map;

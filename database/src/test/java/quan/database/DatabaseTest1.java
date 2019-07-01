@@ -25,7 +25,7 @@ public class DatabaseTest1 {
 
         database = new BerkeleyDB(".temp/bdb");
 
-        Transaction.setConflictNumThreshold(1);
+        Transaction.setConflictThreshold(1);
 
         for (int i = 0; i < 200; i++) {
             new Thread() {
@@ -89,7 +89,7 @@ public class DatabaseTest1 {
 
     private static Random random = new SecureRandom();
 
-    private static void test1() {
+    private static boolean test1() {
         long startTime = System.currentTimeMillis();
 
         long roleId = random.nextInt(10);
@@ -119,18 +119,24 @@ public class DatabaseTest1 {
 //        if (costTime > 2) {
 //            logger.debug("事务:{},单次执行test1()耗时:{},roleData.getList():{}", Transaction.current().getId(), costTime, roleData.getList().size());
 //        }
+
+        return true;
     }
 
-    private static void test2() {
+    private static boolean test2() {
         long roleId = random.nextInt(10);
         RoleData roleData = RoleData.get(roleId);
         if (roleData != null) {
             roleData.setName("test2-" + System.currentTimeMillis());
         }
+
+        return true;
     }
 
-    private static void test3() {
+    private static boolean test3() {
         long roleId = random.nextInt(10);
         RoleData.delete(roleId);
+
+        return true;
     }
 }

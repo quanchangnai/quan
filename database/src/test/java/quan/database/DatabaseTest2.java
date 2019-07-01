@@ -26,7 +26,7 @@ public class DatabaseTest2 {
     private static Random random = new Random();
     private static long roleId = 1;
 
-    private static void test1() {
+    private static boolean test1() {
 
         System.err.println("roleId:" + roleId);
 
@@ -57,5 +57,8 @@ public class DatabaseTest2 {
         if (roleId < 20) {
             roleId++;
         }
+
+        return true;
+
     }
 }

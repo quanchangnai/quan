@@ -2,7 +2,6 @@ package quan.database;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import quan.database.exception.TransactionException;
 import quan.database.field.Field;
 import quan.database.log.DataLog;
 import quan.database.log.FieldLog;
@@ -44,14 +43,14 @@ public class Transaction {
     private static AtomicLong slowCount = new AtomicLong();
 
     /**
-     * 事务中的逻辑执行冲突次数阈值,大于等于此值
+     * 事务中的逻辑执行冲突次数阈值
      */
-    private static int conflictNumThreshold;
+    private static int conflictThreshold;
 
     /**
-     * 频繁冲突的事务执行次数(事务本身为单位)
+     * 事务逻辑冲突次数大于等于[conflictThreshold]的事务执行次数(以事务为单位)
      */
-    private static AtomicLong frequentCount = new AtomicLong();
+    private static AtomicLong conflictCount = new AtomicLong();
 
     /**
      * 事务本身的开始时间
@@ -59,14 +58,14 @@ public class Transaction {
     private long startTime = System.currentTimeMillis();
 
     /**
-     * 事务逻辑的开始时间，如果事务冲突回滚，需要重新计时
+     * 当前事务逻辑的开始时间，如果事务冲突重试，需要重新计时
      */
     private long taskStartTime;
 
     /**
      * 当前事务的逻辑冲突次数
      */
-    private int conflictCount;
+    private int taskConflictCount;
 
     /**
      * 事务ID
@@ -86,12 +85,12 @@ public class Transaction {
     /**
      * 行级锁，数据受缓存管理时
      */
-    private List<Lock> rowLocks = new ArrayList<>();
+    private List<Lock> cachedRowLocks = new ArrayList<>();
 
     /**
      * 行级锁，数据不受缓存管理时
      */
-    private TreeSet<Lock> rowLocks2 = new TreeSet<>();
+    private TreeSet<Lock> notCachedRowLocks = new TreeSet<>();
 
     /**
      * 记录Data的版本号
@@ -99,7 +98,7 @@ public class Transaction {
     private Map<Data, VersionLog> versionLogs = new HashMap<>();
 
     /**
-     * 记录Bean的根对象
+     * 记录节点(Bean和集合)的根对象
      */
     private Map<Node, RootLog> rootLogs = new HashMap<>();
 
@@ -112,6 +111,16 @@ public class Transaction {
      * 记录Data的缓存和创建删除
      */
     private Map<DataLog.Key, DataLog> dataLogs = new HashMap<>();
+
+    /**
+     * 事务提交之后需要执行的任务
+     */
+    private List<AfterTask> commitAfterTasks = new ArrayList<>();
+
+    /**
+     * 事务回滚之后需要执行的任务
+     */
+    private List<AfterTask> rollbackAfterTasks = new ArrayList<>();
 
 
     public long getId() {
@@ -130,26 +139,8 @@ public class Transaction {
         Transaction.slowTimeThreshold = slowTimeThreshold;
     }
 
-    public static void setConflictNumThreshold(int conflictNumThreshold) {
-        Transaction.conflictNumThreshold = conflictNumThreshold;
-    }
-
-    /**
-     * 标记当前事务为失败状态
-     */
-    public static void fail() {
-        Transaction current = get();
-        if (current != null) {
-            current.failed = true;
-        }
-    }
-
-    public static void breakdown() {
-        Transaction current = get();
-        if (current != null) {
-            current.failed = true;
-            throw new TransactionException("事务被打断");
-        }
+    public static void setConflictThreshold(int conflictThreshold) {
+        Transaction.conflictThreshold = conflictThreshold;
     }
 
     public void addVersionLog(Data data) {
@@ -163,9 +154,6 @@ public class Transaction {
         versionLogs.put(versionLog.getData(), versionLog);
     }
 
-    public VersionLog getVersionLog(Data data) {
-        return versionLogs.get(data);
-    }
 
     public void addFieldLog(FieldLog fieldLog) {
         fieldLogs.put(fieldLog.getField(), fieldLog);
@@ -175,19 +163,19 @@ public class Transaction {
         return fieldLogs.get(field);
     }
 
-    public void addRootLog(RootLog rootLog) {
+    void addRootLog(RootLog rootLog) {
         rootLogs.put(rootLog.getNode(), rootLog);
     }
 
-    public RootLog getRootLog(Node node) {
+    RootLog getRootLog(Node node) {
         return rootLogs.get(node);
     }
 
-    public DataLog getDataLog(Object key) {
+    DataLog getDataLog(Object key) {
         return dataLogs.get(key);
     }
 
-    public void addDataLog(DataLog dataLog) {
+    void addDataLog(DataLog dataLog) {
         dataLogs.put(dataLog.getKey(), dataLog);
     }
 
@@ -203,7 +191,7 @@ public class Transaction {
     public static Transaction get() {
         Transaction current = threadLocal.get();
         if (current == null) {
-            throw new UnsupportedOperationException("当前不在事务中");
+            throw new IllegalStateException("当前不在事务中");
         }
         return current;
     }
@@ -217,30 +205,42 @@ public class Transaction {
             current = new Transaction();
             threadLocal.set(current);
         } else {
-            throw new UnsupportedOperationException("当前已经在事务中了");
+            throw new IllegalStateException("当前已经在事务中了");
         }
         return current;
     }
 
     /**
      * 结束当前事务
-     *
-     * @param fail 事务是否失败
      */
-    private static void end(boolean fail) {
+    private static void end(boolean failed) {
+        Transaction current = get();
+        try {
+            current.failed = current.failed || failed;
+            if (current.isFailed()) {
+                current.rollback();
+            } else {
+                current.commit();
+            }
+            count();
+        } finally {
+            threadLocal.set(null);
+        }
+    }
+
+    /**
+     * 统计事务执行次数，慢事务次数，冲突次数
+     */
+    private static void count() {
         Transaction current = get();
 
-        current.failed = current.failed || fail;
-
-        if (current.isFailed()) {
-            current.rollback(true);
-        } else {
-            current.commit();
+        long _totalCount = totalCount.incrementAndGet();
+        if (_totalCount <= 0) {
+            totalCount.set(1);
+            slowCount.set(0);
+            conflictCount.set(0);
         }
 
-        threadLocal.set(null);
-
-        totalCount.incrementAndGet();
         long costTime = System.currentTimeMillis() - current.startTime;
 
         boolean slow = false;
@@ -248,14 +248,16 @@ public class Transaction {
             slowCount.incrementAndGet();
             slow = true;
         }
+
         boolean conflict = false;
-        if (conflictNumThreshold > 0 && current.conflictCount > conflictNumThreshold) {
-            frequentCount.incrementAndGet();
+        if (conflictThreshold > 0 && current.taskConflictCount > conflictThreshold) {
+            conflictCount.incrementAndGet();
             conflict = true;
         }
+
         if (slow || conflict) {
             logger.debug("事务{}结束,执行成功:{},耗时:{}ms,逻辑冲突次数:{} | 事务执行总次数:{},慢事务次数:{},频繁冲突事务次数:{}",
-                    current.id, !current.failed, costTime, current.conflictCount, totalCount, slowCount, frequentCount);
+                    current.id, !current.failed, costTime, current.taskConflictCount, totalCount, slowCount, conflictCount);
         }
 
     }
@@ -265,43 +267,69 @@ public class Transaction {
      *
      * @param task
      */
-    public static void execute(Runnable task) {
-        if (current() != null) {
-            //当前已经在事务中了，直接执行任务
-            task.run();
-            return;
+    public static void execute(Task task) {
+        Transaction current = current();
+        if (current != null) {
+            execute0(task);
+        } else {
+            execute1(task);
+        }
+    }
+
+    /**
+     * 当前已经在事务之中了，直接执行
+     *
+     * @param task
+     */
+    public static void execute0(Task task) {
+        Transaction transaction = get();
+        boolean result = task.run();
+        if (!result) {
+            transaction.failed = true;
+        }
+    }
+
+
+    /**
+     * 当前已经不在事务之中，开启新事务再执行
+     *
+     * @param task
+     */
+    public static void execute1(Task task) {
+        Transaction transaction = Transaction.current();
+        if (transaction != null) {
+            throw new IllegalStateException("当前已经在事务中了");
         }
 
-        //开启事务再执行任务
-        boolean fail = false;
-        Transaction current = begin();
-        int count = 0;
+        transaction = Transaction.begin();
+        boolean failed = false;
+
         try {
             while (true) {
-                count++;
-                if (current.conflictCount > 2) {
-//                    logger.debug("当前第{}次执行事务{}", count, current.getId());
+                transaction.taskStartTime = System.currentTimeMillis();
+
+                boolean result = task.run();
+                if (!result) {
+                    failed = true;
+                    return;
                 }
 
-                current.taskStartTime = System.currentTimeMillis();
-
-                task.run();
-                current.lock();
-
-                if (current.isConflict()) {
-                    //有冲突，其他事务也修改了数据
-                    current.conflictCount++;
-                    current.rollback(false);
+                transaction.lock();
+                if (transaction.isConflict()) {
+                    //有冲突，清空日志，重新执行
+                    transaction.taskConflictCount++;
+                    transaction.clearLogs();
                 } else {
                     return;
                 }
             }
         } catch (Throwable e) {
-            fail = true;
+            failed = true;
             throw e;
         } finally {
-            end(fail);
+            end(failed);
         }
+
     }
 
 
@@ -312,12 +340,13 @@ public class Transaction {
         TreeSet<Cache> caches = new TreeSet<>();
         for (DataLog dataLog : dataLogs.values()) {
             caches.add(dataLog.getCache());
-            rowLocks.add(LockPool.getLock(dataLog.getCache(), dataLog.getKey().getK()));
+            cachedRowLocks.add(LockPool.getLock(dataLog.getCache(), dataLog.getKey().getK()));
 
         }
         for (Cache cache : caches) {
             tableLocks.add(cache.getLock());
         }
+
         TreeSet<Integer> rowLockIndexes = new TreeSet<>();
         for (Data data : versionLogs.keySet()) {
             Cache cache = data.getCache();
@@ -325,11 +354,12 @@ public class Transaction {
                 rowLockIndexes.add(LockPool.getLockIndex(cache, data.getKey()));
             } else {
                 //没有注册缓存
-                rowLocks2.add(data.getLock());
+                notCachedRowLocks.add(data.getLock());
             }
         }
+
         for (Integer rowLockIndex : rowLockIndexes) {
-            rowLocks.add(LockPool.getLock(rowLockIndex));
+            cachedRowLocks.add(LockPool.getLock(rowLockIndex));
         }
 
         //存档时要阻塞
@@ -337,12 +367,12 @@ public class Transaction {
             tableLock.readLock().lock();
         }
 
-        for (Lock rowLock : rowLocks) {
+        for (Lock rowLock : cachedRowLocks) {
             rowLock.lock();
         }
 
-        for (Lock lock : rowLocks2) {
-            lock.lock();
+        for (Lock rowLock : notCachedRowLocks) {
+            rowLock.lock();
         }
     }
 
@@ -352,15 +382,15 @@ public class Transaction {
         }
         tableLocks.clear();
 
-        for (Lock rowLock : rowLocks) {
+        for (Lock rowLock : cachedRowLocks) {
             rowLock.unlock();
         }
-        rowLocks.clear();
+        cachedRowLocks.clear();
 
-        for (Lock lock : rowLocks2) {
-            lock.unlock();
+        for (Lock rowLock : notCachedRowLocks) {
+            rowLock.unlock();
         }
-        rowLocks2.clear();
+        notCachedRowLocks.clear();
     }
 
 
@@ -380,22 +410,11 @@ public class Transaction {
         return false;
     }
 
-
-    private void commit() {
+    /**
+     * 清空当前事务日志，事务执行结束或者事务逻辑发生冲突时需要
+     */
+    private void clearLogs() {
         try {
-            for (DataLog dataLog : dataLogs.values()) {
-                dataLog.commit();
-            }
-            for (VersionLog versionLog : versionLogs.values()) {
-                versionLog.commit();
-            }
-            for (RootLog rootLog : rootLogs.values()) {
-                rootLog.commit();
-            }
-            for (FieldLog fieldLog : fieldLogs.values()) {
-                fieldLog.commit();
-            }
-
             dataLogs.clear();
             versionLogs.clear();
             fieldLogs.clear();
@@ -404,26 +423,62 @@ public class Transaction {
         } finally {
             unlock();
         }
-
     }
 
     /**
-     * 执行失败或者和其他事务冲突时回滚事务
-     *
-     * @param end 是不是结束事务的回滚
+     * 事务提交
      */
-    private void rollback(boolean end) {
-        try {
-            dataLogs.clear();
-            versionLogs.clear();
-            fieldLogs.clear();
-            rootLogs.clear();
-            failed = false;
-        } finally {
-            unlock();
+    private void commit() {
+        for (DataLog dataLog : dataLogs.values()) {
+            dataLog.commit();
+        }
+        for (VersionLog versionLog : versionLogs.values()) {
+            versionLog.commit();
+        }
+        for (RootLog rootLog : rootLogs.values()) {
+            rootLog.commit();
+        }
+        for (FieldLog fieldLog : fieldLogs.values()) {
+            fieldLog.commit();
         }
 
-//        logger.debug("回滚事务{}", getId());
+        clearLogs();
+
+        runAfterTasks(commitAfterTasks);
+    }
+
+    /**
+     * 事务回滚
+     */
+    private void rollback() {
+        clearLogs();
+        runAfterTasks(rollbackAfterTasks);
+    }
+
+    private static void runAfterTasks(List<AfterTask> afterTasks) {
+        for (AfterTask afterTask : afterTasks) {
+            try {
+                afterTask.run();
+            } catch (Exception e) {
+                afterTask.onException(e);
+            }
+        }
+        afterTasks.clear();
+    }
+
+    /**
+     * 在事务提交或者回滚之后执行任务
+     *
+     * @param task
+     * @param committed true:提交执行,false:滚之后执行
+     */
+    public static void execute(AfterTask task, boolean committed) {
+        Transaction transaction = Transaction.get();
+        if (committed) {
+            transaction.commitAfterTasks.add(task);
+        } else {
+            transaction.rollbackAfterTasks.add(task);
+        }
     }
 
 }

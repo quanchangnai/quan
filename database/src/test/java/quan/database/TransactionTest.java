@@ -34,7 +34,7 @@ public class TransactionTest {
 
     }
 
-    private static void update1() {
+    private static boolean update1() {
         roleData1.setName("aaa");
         ItemBean itemBean1 = new ItemBean();
         itemBean1.setId(1);
@@ -45,10 +45,12 @@ public class TransactionTest {
         itemBean2.setId(100);
         itemBean2.setName("111");
         roleData1.getItems().put(itemBean2.getId(), itemBean2);
+
+        return true;
     }
 
-    private static void update2() {
+    private static boolean update2() {
         roleData1.getMap().put(111, 222);
-//        Transaction.breakdown();
+        return true;
     }
 }

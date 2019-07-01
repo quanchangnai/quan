@@ -38,23 +38,29 @@ public class CallerUtil {
             return;
         }
 
-        String calleeClassName = stackTrace[calleeIndex].getClassName();
-        String calleeMethodName = stackTrace[calleeIndex].getMethodName();
-        String callerClassName = stackTrace[calleeIndex + 1].getClassName();
+        Class<?> calleeClass;
+        Class<?> callerClass;
+        try {
+            calleeClass = Class.forName(stackTrace[calleeIndex].getClassName());
+            callerClass = Class.forName(stackTrace[calleeIndex + 1].getClassName());
+        } catch (ClassNotFoundException e) {
+            return;
+        }
 
-        if (calleeClassName.equals(callerClassName)) {
+        if (calleeClass.isAssignableFrom(callerClass)) {
             return;
         }
 
         boolean allowCall = false;
         for (Class allowClass : allowClasses) {
-            if (allowClass.getName().equals(callerClassName)) {
+            if (allowClass.isAssignableFrom(callerClass)) {
                 allowCall = true;
             }
         }
 
         if (!allowCall) {
-            throw new UnsupportedOperationException("方法[" + calleeClassName + "." + calleeMethodName + "()]不允许被类[" + callerClassName + "]调用");
+            String calleeMethodName = stackTrace[calleeIndex].getMethodName();
+            throw new UnsupportedOperationException("方法[" + calleeClass.getName() + "." + calleeMethodName + "()]不允许被类[" + callerClass.getName() + "]调用");
         }
     }
 
@@ -70,7 +76,6 @@ public class CallerUtil {
         }
 
         String calleeClassName = stackTrace[calleeIndex].getClassName();
-        String calleeMethodName = stackTrace[calleeIndex].getMethodName();
         String callerClassName = stackTrace[calleeIndex + 1].getClassName();
 
         Class<?> calleeClass;
@@ -94,6 +99,7 @@ public class CallerUtil {
         }
 
         if (!allowCall) {
+            String calleeMethodName = stackTrace[calleeIndex].getMethodName();
             throw new UnsupportedOperationException("方法[" + calleeClassName + "." + calleeMethodName + "()]不允许被类[" + callerClassName + "]调用");
         }
     }
