@@ -43,6 +43,8 @@ public abstract class Database {
 
     private int storeThreadIndex;
 
+    private volatile boolean closed;
+
     public Database() {
         //默认数据库实例为空时自动设置，不为空时需要手动更改
         if (instance == null) {
@@ -131,14 +133,31 @@ public abstract class Database {
         }
     }
 
+    public boolean isClosed() {
+        return closed;
+    }
+
+    protected void checkClosed() {
+        if (closed) {
+            throw new IllegalStateException("数据库已经关闭了");
+        }
+    }
+
     public void close() {
+        checkClosed();
         if (instance == this) {
             instance = null;
         }
         for (StoreThread storeThread : storeThreads) {
             storeThread.finalStore();
         }
+        storeThreads.clear();
+        closed = true;
+
+        close0();
     }
+
+    protected abstract void close0();
 
     protected abstract <K, V extends Data<K>> V get(Cache<K, V> cache, K key);
 

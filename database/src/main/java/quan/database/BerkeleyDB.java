@@ -1,10 +1,7 @@
-package quan.database.store;
+package quan.database;
 
 import com.alibaba.fastjson.JSON;
 import com.sleepycat.je.*;
-import quan.database.Cache;
-import quan.database.Data;
-import quan.database.Database;
 
 import java.io.File;
 import java.util.HashMap;
@@ -70,13 +67,7 @@ public class BerkeleyDB extends Database {
     }
 
     @Override
-    public void close() {
-        if (environment == null) {
-            throw new IllegalStateException("数据库已经关闭了");
-        }
-
-        super.close();
-
+    protected void close0() {
         environment.flushLog(true);
         dbs.values().forEach(com.sleepycat.je.Database::close);
 
@@ -87,9 +78,7 @@ public class BerkeleyDB extends Database {
 
     @Override
     protected <K, V extends Data<K>> V get(Cache<K, V> cache, K key) {
-        if (environment == null) {
-            throw new IllegalStateException("数据库已经关闭了");
-        }
+        checkClosed();
 
         DatabaseEntry keyEntry = new DatabaseEntry(key.toString().getBytes());
         DatabaseEntry dataEntry = new DatabaseEntry();
@@ -110,9 +99,7 @@ public class BerkeleyDB extends Database {
 
     @Override
     protected <K, V extends Data<K>> void put(V data) {
-        if (environment == null) {
-            throw new IllegalStateException("数据库已经关闭了");
-        }
+        checkClosed();
 
         String jsonStr = data.encode().toJSONString();
 
@@ -125,9 +112,7 @@ public class BerkeleyDB extends Database {
 
     @Override
     protected <K, V extends Data<K>> void delete(Cache<K, V> cache, K key) {
-        if (environment == null) {
-            throw new IllegalStateException("数据库已经关闭了");
-        }
+        checkClosed();
 
         DatabaseEntry keyEntry = new DatabaseEntry(key.toString().getBytes());
         dbs.get(cache.getName()).delete(null, keyEntry);

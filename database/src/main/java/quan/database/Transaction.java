@@ -115,12 +115,12 @@ public class Transaction {
     /**
      * 事务提交之后需要执行的任务
      */
-    private List<AfterTask> commitAfterTasks = new ArrayList<>();
+    private List<Runnable> commitAfterTasks = new ArrayList<>();
 
     /**
      * 事务回滚之后需要执行的任务
      */
-    private List<AfterTask> rollbackAfterTasks = new ArrayList<>();
+    private List<Runnable> rollbackAfterTasks = new ArrayList<>();
 
 
     public long getId() {
@@ -455,29 +455,35 @@ public class Transaction {
         runAfterTasks(rollbackAfterTasks);
     }
 
-    private static void runAfterTasks(List<AfterTask> afterTasks) {
-        for (AfterTask afterTask : afterTasks) {
+    private static void runAfterTasks(List<Runnable> afterTasks) {
+        for (Runnable afterTask : afterTasks) {
             try {
                 afterTask.run();
             } catch (Exception e) {
-                afterTask.onException(e);
+                if (afterTask instanceof AfterTask) {
+                    ((AfterTask) afterTask).onException(e);
+                } else {
+                    logger.error("", e);
+                }
             }
         }
         afterTasks.clear();
     }
 
     /**
-     * 在事务提交或者回滚之后执行任务
-     *
      * @param task
      * @param committed true:提交执行,false:滚之后执行
      */
-    public static void execute(AfterTask task, boolean committed) {
+    public static void addAfterTask(Runnable task, boolean committed) {
+        addAfterTasks(Arrays.asList(task), committed);
+    }
+
+    public static void addAfterTasks(List<Runnable> tasks, boolean committed) {
         Transaction transaction = Transaction.get();
         if (committed) {
-            transaction.commitAfterTasks.add(task);
+            transaction.commitAfterTasks.addAll(tasks);
         } else {
-            transaction.rollbackAfterTasks.add(task);
+            transaction.rollbackAfterTasks.addAll(tasks);
         }
     }
 

@@ -5,9 +5,7 @@ package quan.database;
  * Created by quanchangnai on 2019/7/1.
  */
 @FunctionalInterface
-public interface AfterTask {
-
-    void run();
+public interface AfterTask extends Runnable {
 
     default void onException(Exception e) {
         e.printStackTrace();
