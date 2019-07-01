@@ -459,11 +459,15 @@ public class Transaction {
         for (Runnable afterTask : afterTasks) {
             try {
                 afterTask.run();
-            } catch (Exception e) {
+            } catch (Exception e1) {
                 if (afterTask instanceof AfterTask) {
-                    ((AfterTask) afterTask).onException(e);
+                    try {
+                        ((AfterTask) afterTask).onException(e1);
+                    } catch (Exception e2) {
+                        logger.error("", e2);
+                    }
                 } else {
-                    logger.error("", e);
+                    logger.error("", e1);
                 }
             }
         }
