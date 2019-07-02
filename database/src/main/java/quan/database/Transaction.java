@@ -266,25 +266,25 @@ public class Transaction {
     }
 
     /**
-     * 在事务中执行任务
+     * 在事务中执行任务，执行线程为调用方法的当前线程
      *
      * @param task
      */
     public static void execute(Task task) {
         Transaction current = current();
         if (current != null) {
-            execute0(task);
+            executeInside(task);
         } else {
-            execute1(task);
+            executeOutside(task);
         }
     }
 
     /**
-     * 当前已经在事务之中了，直接执行
+     * 在事务内部执行
      *
      * @param task
      */
-    public static void execute0(Task task) {
+    public static void executeInside(Task task) {
         Transaction transaction = get();
         boolean result = task.run();
         if (!result) {
@@ -294,11 +294,11 @@ public class Transaction {
 
 
     /**
-     * 当前已经不在事务之中，开启新事务再执行
+     * 在事务外部执行，需要开启新事务
      *
      * @param task
      */
-    public static void execute1(Task task) {
+    public static void executeOutside(Task task) {
         Transaction transaction = Transaction.current();
         if (transaction != null) {
             throw new IllegalStateException("当前已经在事务中了");
