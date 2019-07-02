@@ -34,13 +34,11 @@ public class Transactions {
         } else {
             TransactionDelegation.executor = null;
         }
-
+        MethodDelegation methodDelegation = MethodDelegation.to(TransactionDelegation.class);
 
         ElementMatcher.Junction<MethodDescription> methodMatcher =
                 ElementMatchers.isAnnotatedWith(Transactional.class).
                         and(ElementMatchers.returns(void.class).or(ElementMatchers.returns(boolean.class)));
-
-        MethodDelegation methodDelegation = MethodDelegation.to(TransactionDelegation.class);
 
         return new ByteBuddy()
                 .subclass(superclass)
@@ -70,18 +68,15 @@ public class Transactions {
         } else {
             TransactionDelegation.executor = null;
         }
+        MethodDelegation methodDelegation = MethodDelegation.to(TransactionDelegation.class);
 
         Instrumentation instrumentation = ByteBuddyAgent.install();
-
-        MethodDelegation methodDelegation = MethodDelegation.to(TransactionDelegation.class);
 
         AgentBuilder.Transformer transformer = (builder, typeDescription, classLoader, module) ->
                 builder.method(ElementMatchers.isAnnotatedWith(Transactional.class)).intercept(methodDelegation);
 
-
         new AgentBuilder.Default()
                 .with(AgentBuilder.TypeStrategy.Default.REBASE)
-                .enableNativeMethodPrefix("original$")
                 .type(ElementMatchers.hasAnnotation(ElementMatchers.annotationType(Transactional.class)))
                 .transform(transformer)
                 .installOn(instrumentation);

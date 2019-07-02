@@ -8,6 +8,9 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.Callable;
 
 
+/**
+ * 声明式事务代理
+ */
 public class TransactionDelegation {
 
     private static final Logger logger = LoggerFactory.getLogger(TransactionDelegation.class);
