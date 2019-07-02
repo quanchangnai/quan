@@ -4,7 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -33,6 +35,8 @@ public abstract class Database {
      * 存档间隔(秒)
      */
     private int storePeriod = 10;
+
+    private Map<String, Cache> caches = new HashMap<>();
 
     /**
      * 存档线程数量
@@ -111,10 +115,15 @@ public abstract class Database {
     }
 
     public synchronized void registerCache(Cache cache) {
+        if (caches.containsKey(cache.getName())) {
+            throw new IllegalStateException("缓存已经被注册了");
+        }
         if (cache.getDatabase() != null) {
-            return;
+            throw new IllegalStateException("缓存已经被注册到其他数据库");
         }
         cache.init(this);
+
+        caches.put(cache.getName(), cache);
 
         storeThreads.get(storeThreadIndex).caches.add(cache);
 
@@ -123,7 +132,11 @@ public abstract class Database {
             storeThreadIndex = 0;
         }
 
+        registerCache0(cache);
     }
+
+    protected abstract void registerCache0(Cache cache);
+
 
     private void startStoreThread() {
         for (int i = 0; i < storeThreadNum; i++) {
@@ -139,22 +152,27 @@ public abstract class Database {
 
     protected void checkClosed() {
         if (closed) {
-            throw new IllegalStateException("数据库已经关闭了");
+            throw new IllegalStateException("数据库已关闭");
         }
     }
 
-    public void close() {
+    /**
+     * 关闭数据库时会存档后清空缓存，但未结束的事务会执行失败
+     */
+    public synchronized void close() {
         checkClosed();
         if (instance == this) {
             instance = null;
         }
+        caches.clear();
         for (StoreThread storeThread : storeThreads) {
-            storeThread.finalStore();
+            storeThread.close();
         }
         storeThreads.clear();
-        closed = true;
 
         close0();
+
+        closed = true;
     }
 
     protected abstract void close0();
@@ -170,7 +188,7 @@ public abstract class Database {
 
     private static class StoreThread extends Thread {
 
-        private volatile boolean running = true;
+        private volatile boolean running;
 
         private int storePeriod;
 
@@ -182,6 +200,8 @@ public abstract class Database {
 
         @Override
         public void run() {
+            running = true;
+
             while (running) {
                 long sleepTime = 0;
                 while (sleepTime < storePeriod * 1000) {
@@ -206,10 +226,10 @@ public abstract class Database {
             caches.clear();
         }
 
-        void finalStore() {
+        void close() {
             running = false;
             for (Cache cache : caches) {
-                cache.store();
+                cache.close();
             }
         }
     }

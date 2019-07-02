@@ -6,7 +6,7 @@ import quan.database.Node;
 /**
  * Created by quanchangnai on 2019/5/17.
  */
-public class RootLog implements Log {
+public class RootLog {
 
     private Node node;
 
@@ -30,7 +30,6 @@ public class RootLog implements Log {
         return node;
     }
 
-    @Override
     public void commit() {
         node.setRoot(root);
     }

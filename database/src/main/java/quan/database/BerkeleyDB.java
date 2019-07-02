@@ -52,13 +52,7 @@ public class BerkeleyDB extends Database {
     }
 
     @Override
-    public synchronized void registerCache(Cache cache) {
-        if (dbs.containsKey(cache.getName())) {
-            return;
-        }
-
-        super.registerCache(cache);
-
+    protected void registerCache0(Cache cache) {
         DatabaseConfig databaseConfig = new DatabaseConfig();
         databaseConfig.setAllowCreate(true);
         com.sleepycat.je.Database db = environment.openDatabase(null, cache.getName(), databaseConfig);

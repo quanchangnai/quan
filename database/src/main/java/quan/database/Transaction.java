@@ -144,6 +144,9 @@ public class Transaction {
     }
 
     public void addVersionLog(Data data) {
+        if (data.getCache() != null) {
+            data.getCache().checkClosed();
+        }
         if (data.isExpired()) {
             throw new IllegalStateException("数据已过期");
         }
@@ -337,10 +340,16 @@ public class Transaction {
      * 排序加锁，保证不同线程按照同一顺序竞争锁，防止死锁
      */
     private void lock() {
+        tableLocks.clear();
+        cachedRowLocks.clear();
+        notCachedRowLocks.clear();
+
         TreeSet<Cache> caches = new TreeSet<>();
         for (DataLog dataLog : dataLogs.values()) {
-            caches.add(dataLog.getCache());
-            cachedRowLocks.add(LockPool.getLock(dataLog.getCache(), dataLog.getKey().getK()));
+            Cache cache = dataLog.getCache();
+            cache.checkClosed();
+            caches.add(cache);
+            cachedRowLocks.add(LockPool.getLock(cache, dataLog.getKey().getK()));
 
         }
         for (Cache cache : caches) {
@@ -351,6 +360,7 @@ public class Transaction {
         for (Data data : versionLogs.keySet()) {
             Cache cache = data.getCache();
             if (cache != null) {
+                cache.checkClosed();
                 rowLockIndexes.add(LockPool.getLockIndex(cache, data.getKey()));
             } else {
                 //没有注册缓存

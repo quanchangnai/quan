@@ -6,7 +6,7 @@ import quan.database.Data;
 /**
  * Created by quanchangnai on 2019/5/17.
  */
-public class VersionLog implements Log {
+public class VersionLog {
 
     private long version;
 
@@ -26,10 +26,13 @@ public class VersionLog implements Log {
     }
 
     public boolean isConflict() {
+        Cache cache = data.getCache();
+        if (cache != null) {
+            cache.checkClosed();
+        }
         return version != data.getVersion();
     }
 
-    @Override
     public void commit() {
         data.versionUp();
         Cache cache = data.getCache();

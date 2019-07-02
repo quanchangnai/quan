@@ -33,8 +33,9 @@ public class RoleData extends Data<Long> {
     }
 
     public synchronized static void setCache(Cache<Long, RoleData> cache) {
+        cache.checkClosed();
         if (RoleData.CACHE != null) {
-            throw new IllegalStateException("缓存已存在");
+            throw new IllegalStateException("数据已设置缓存");
         }
         RoleData.CACHE = cache;
     }
@@ -47,7 +48,7 @@ public class RoleData extends Data<Long> {
 
         Database database = Database.getDefault();
         if (database == null) {
-            throw new IllegalStateException("默认数据库不存在");
+            throw new IllegalStateException("没有默认数据库");
         }
 
         if (CACHE == null) {

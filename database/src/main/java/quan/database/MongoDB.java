@@ -11,6 +11,11 @@ public class MongoDB extends Database {
     }
 
     @Override
+    protected void registerCache0(Cache cache) {
+
+    }
+
+    @Override
     protected <K, V extends Data<K>> V get(Cache<K, V> cache, K key) {
         return null;
     }

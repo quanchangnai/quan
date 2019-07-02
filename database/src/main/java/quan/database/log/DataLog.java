@@ -9,7 +9,7 @@ import java.util.Objects;
 /**
  * Created by quanchangnai on 2019/6/24.
  */
-public class DataLog implements Log {
+public class DataLog {
 
     private Key key;
 
@@ -66,6 +66,8 @@ public class DataLog implements Log {
     }
 
     public boolean isConflict() {
+        key.cache.checkClosed();
+
         //有可能出现事务执行时间比缓存的过期时间还长的极端情况
         long costTime = System.currentTimeMillis() - Transaction.get().getTaskStartTime();
         if (costTime > getCache().getCacheExpire() * 1000) {
@@ -91,7 +93,6 @@ public class DataLog implements Log {
 
     }
 
-    @Override
     public void commit() {
         if (current == null && originData != null && originState != Cache.Row.DELETE) {
             //delete

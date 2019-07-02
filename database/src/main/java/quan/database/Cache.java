@@ -56,6 +56,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
      */
     private ReadWriteLock lock = new ReentrantReadWriteLock();
 
+    private boolean closed;
 
     public Cache(String name, Function<K, V> dataFactory) {
         this.name = name;
@@ -83,15 +84,21 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
     }
 
     void init(Database database) {
-        if (this.database != null) {
-            return;
-        }
-        this.database = database;
-        cacheSize = database.getCacheSize();
-        cacheExpire = database.getCacheExpire();
+        lock.writeLock().lock();
+        try {
+            if (this.database != null) {
+                return;
+            }
+            this.database = database;
+            cacheSize = database.getCacheSize();
+            cacheExpire = database.getCacheExpire();
 
-        rows = new ConcurrentHashMap<>(cacheSize);
-        dirty = new ConcurrentHashMap<>();
+            rows = new ConcurrentHashMap<>(cacheSize);
+            dirty = new ConcurrentHashMap<>();
+            closed = false;
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 
     @Override
@@ -292,42 +299,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
     public void store() {
         lock.writeLock().lock();
         try {
-            Map<K, V> inserts = new HashMap();
-            Map<K, V> updates = new HashMap();
-            Set<K> deletes = new HashSet<>();
-
-            for (K key : dirty.keySet()) {
-                Row<V> row = rows.get(key);
-                if (row.state == Row.INSERT) {
-                    row.state = Row.NORMAL;
-                    inserts.put(key, row.data);
-                }
-                if (row.state == Row.UPDATE) {
-                    row.state = Row.NORMAL;
-                    updates.put(key, row.data);
-                }
-                if (row.state == Row.DELETE) {
-                    deletes.add(key);
-                    if (row.data != null) {
-                        row.data.setExpired(true);
-                    }
-                }
-            }
-
-            for (V data : inserts.values()) {
-                database.put(data);
-            }
-            for (V data : updates.values()) {
-                database.put(data);
-            }
-            for (K key : deletes) {
-                rows.remove(key);
-                database.delete(this, key);
-            }
-
-            dirty.clear();
-
-            logger.debug("[{}]存档,rows:{},inserts:{},updates:{},deletes:{}", name, rows.size(), inserts.keySet(), updates.keySet(), deletes);
+            store0();
 
             if (rows.size() > cacheSize) {
                 checkExpireAndClean();
@@ -337,6 +309,71 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
             lock.writeLock().unlock();
         }
 
+    }
+
+    private void store0() {
+        Map<K, V> inserts = new HashMap();
+        Map<K, V> updates = new HashMap();
+        Set<K> deletes = new HashSet<>();
+
+        for (K key : dirty.keySet()) {
+            Row<V> row = rows.get(key);
+            if (row.state == Row.INSERT) {
+                row.state = Row.NORMAL;
+                inserts.put(key, row.data);
+            }
+            if (row.state == Row.UPDATE) {
+                row.state = Row.NORMAL;
+                updates.put(key, row.data);
+            }
+            if (row.state == Row.DELETE) {
+                deletes.add(key);
+                if (row.data != null) {
+                    row.data.setExpired(true);
+                }
+            }
+        }
+
+        for (V data : inserts.values()) {
+            database.put(data);
+        }
+        for (V data : updates.values()) {
+            database.put(data);
+        }
+        for (K key : deletes) {
+            rows.remove(key);
+            database.delete(this, key);
+        }
+
+        dirty.clear();
+
+        logger.debug("[{}]存档,rows:{},inserts:{},updates:{},deletes:{}", name, rows.size(), inserts.keySet(), updates.keySet(), deletes);
+    }
+
+    void close() {
+        lock.writeLock().lock();
+        try {
+            store0();
+            for (Row<V> row : rows.values()) {
+                if (row.data != null) {
+                    row.data.setExpired(true);
+                }
+            }
+            rows.clear();
+            database = null;
+            closed = true;
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
+
+    public void checkClosed() {
+        if (closed) {
+            throw new DbException("数据库已关闭");
+        }
+        if (database == null) {
+            throw new DbException("缓存未注册到数据库");
+        }
     }
 
     /**
