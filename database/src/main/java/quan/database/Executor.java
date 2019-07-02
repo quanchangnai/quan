@@ -26,7 +26,7 @@ public class Executor implements ExecutorService {
      * @param task
      */
     public final void execute(Task task) {
-        Objects.requireNonNull(task, "参数task不能为空");
+        Objects.requireNonNull(task);
         if (Transaction.current() != null) {
             Transaction.execute0(task);
         } else {
