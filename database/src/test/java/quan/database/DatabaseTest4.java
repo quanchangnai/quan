@@ -25,14 +25,14 @@ public class DatabaseTest4 {
 //        test1(executor);
 //        System.err.println("======================================================");
 
-//        test1(null);
-//        System.err.println("======================================================");
+        test1(null);
+        System.err.println("======================================================");
 
-        test2(executor);
+//        test2(executor);
 //        System.err.println("=================="====================================);
 
 //        test2(null);
-        System.err.println("======================================================");
+//        System.err.println("======================================================");
     }
 
 
@@ -40,7 +40,11 @@ public class DatabaseTest4 {
         Role role = Transactions.subclass(Role.class, executor);
         logger.error("role.getClass:{}", role.getClass());
 
-        role.login();
+        Object result = role.login();
+        System.err.println("role.login():" + result);
+
+        result = role.login("123456");
+        System.err.println("role.login(123456):" + result);
 
         Thread.sleep(1000);
 

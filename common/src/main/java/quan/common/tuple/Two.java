@@ -6,34 +6,24 @@ import java.util.Objects;
  * 二元组
  * Created by quanchangnai on 2019/6/27.
  */
-public class Two<T1, T2> {
+public class Two<V1, V2> extends One<V1> {
 
-    private T1 one;
-
-    private T2 two;
+    private V2 two;
 
     public Two() {
+        super();
     }
 
-    public Two(T1 one, T2 two) {
-        this.one = one;
+    public Two(V1 one, V2 two) {
+        super(one);
         this.two = two;
     }
 
-    public T1 getOne() {
-        return one;
-    }
-
-    public Two<T1, T2> setOne(T1 one) {
-        this.one = one;
-        return this;
-    }
-
-    public T2 getTwo() {
+    public V2 getTwo() {
         return two;
     }
 
-    public Two<T1, T2> setTwo(T2 two) {
+    public Two<V1, V2> setTwo(V2 two) {
         this.two = two;
         return this;
     }
@@ -42,14 +32,13 @@ public class Two<T1, T2> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Two<?, ?> two = (Two<?, ?>) o;
-        return Objects.equals(one, two.one) &&
-                Objects.equals(this.two, two.two);
+        if (!super.equals(o)) return false;
+        Two<?, ?> two1 = (Two<?, ?>) o;
+        return two.equals(two1.two);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(one, two);
+        return Objects.hash(super.hashCode(), two);
     }
-
 }

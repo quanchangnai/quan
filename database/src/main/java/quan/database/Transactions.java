@@ -36,9 +36,7 @@ public class Transactions {
         }
         MethodDelegation methodDelegation = MethodDelegation.to(TransactionDelegation.class);
 
-        ElementMatcher.Junction<MethodDescription> methodMatcher =
-                ElementMatchers.isAnnotatedWith(Transactional.class).
-                        and(ElementMatchers.returns(void.class).or(ElementMatchers.returns(boolean.class)));
+        ElementMatcher.Junction<MethodDescription> methodMatcher = ElementMatchers.isAnnotatedWith(Transactional.class);
 
         return new ByteBuddy()
                 .subclass(superclass)

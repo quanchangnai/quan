@@ -4,10 +4,9 @@ import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 import net.bytebuddy.implementation.bind.annotation.SuperCall;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import quan.common.tuple.One;
 
-import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 
 /**
@@ -22,13 +21,12 @@ public class TransactionDelegation {
     @RuntimeType
     public static Object delegate(@SuperCall Callable<?> callable) {
         //被代理的方法的返回结果，同步调用一定能返回，异步调用结果会丢失
-        List<Object> delegateResult = new CopyOnWriteArrayList<>();
+        One<Object> delegateResult = new One<>();
 
         Task task = () -> {
             try {
                 Object callableResult = callable.call();
-                delegateResult.clear();
-                delegateResult.add(callableResult);
+                delegateResult.setOne(callableResult);
                 if (callableResult instanceof Boolean) {
                     return (boolean) callableResult;
                 }
@@ -45,11 +43,7 @@ public class TransactionDelegation {
             Transaction.execute(task);
         }
 
-        if (!delegateResult.isEmpty()) {
-            return delegateResult.get(0);
-        }
-
-        return null;
+        return delegateResult.getOne();
     }
 
 }

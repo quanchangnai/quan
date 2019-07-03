@@ -18,7 +18,7 @@ public class Role {
         logger.error("currentThread:{}", Thread.currentThread());
         String result = login("1111");
         System.err.println("login(1111):" + result);
-        return result;
+        return result+":xxxxxxx";
     }
 
     @Transactional

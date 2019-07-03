@@ -6,23 +6,23 @@ import java.util.Objects;
  * 三元组
  * Created by quanchangnai on 2019/6/27.
  */
-public class Three<T1, T2, T3> extends Two<T1, T2> {
+public class Three<V1, V2, V3> extends Two<V1, V2> {
 
-    private T3 three;
+    private V3 three;
 
     public Three() {
     }
 
-    public Three(T1 one, T2 two, T3 three) {
+    public Three(V1 one, V2 two, V3 three) {
         super(one, two);
         this.three = three;
     }
 
-    public T3 getThree() {
+    public V3 getThree() {
         return three;
     }
 
-    public Three<T1, T2, T3> setThree(T3 three) {
+    public Three<V1, V2, V3> setThree(V3 three) {
         this.three = three;
         return this;
     }
