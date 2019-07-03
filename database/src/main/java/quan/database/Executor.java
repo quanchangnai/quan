@@ -28,9 +28,9 @@ public class Executor implements ExecutorService {
     public final void execute(Task task) {
         Objects.requireNonNull(task);
         if (Transaction.current() != null) {
-            Transaction.executeInside(task);
+            Transaction.insideExecute(task);
         } else {
-            executorService.execute(() -> Transaction.executeOutside(task));
+            executorService.execute(() -> Transaction.outsideExecute(task));
         }
     }
 

@@ -273,9 +273,9 @@ public class Transaction {
     public static void execute(Task task) {
         Transaction current = current();
         if (current != null) {
-            executeInside(task);
+            insideExecute(task);
         } else {
-            executeOutside(task);
+            outsideExecute(task);
         }
     }
 
@@ -284,10 +284,9 @@ public class Transaction {
      *
      * @param task
      */
-    public static void executeInside(Task task) {
+    public static void insideExecute(Task task) {
         Transaction transaction = get();
-        boolean result = task.run();
-        if (!result) {
+        if (!task.run()) {
             transaction.failed = true;
         }
     }
@@ -298,7 +297,7 @@ public class Transaction {
      *
      * @param task
      */
-    public static void executeOutside(Task task) {
+    public static void outsideExecute(Task task) {
         Transaction transaction = Transaction.current();
         if (transaction != null) {
             throw new IllegalStateException("当前已经在事务中了");
@@ -429,7 +428,6 @@ public class Transaction {
             versionLogs.clear();
             fieldLogs.clear();
             rootLogs.clear();
-            failed = false;
         } finally {
             unlock();
         }

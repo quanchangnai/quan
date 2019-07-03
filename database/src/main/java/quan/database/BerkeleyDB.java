@@ -18,37 +18,34 @@ public class BerkeleyDB extends Database {
 
     private Map<String, com.sleepycat.je.Database> dbs = new HashMap<>();
 
-    public BerkeleyDB(File dir) {
-        super();
-        this.dir = dir;
-        open();
-    }
 
     public BerkeleyDB(String dir) {
-        this(new File(dir));
+        super(new Config().setDir(dir));
     }
 
-    public BerkeleyDB(String dir, int cacheSize, int cacheExpire, int storePeriod, int storeThreadNum) {
-        this(new File(dir), cacheSize, cacheExpire, storePeriod, storeThreadNum);
+    public BerkeleyDB(Config config) {
+        super(config);
     }
 
-    public BerkeleyDB(File dir, int cacheSize, int cacheExpire, int storePeriod, int storeThreadNum) {
-        super(cacheSize, cacheExpire, storePeriod, storeThreadNum);
-        this.dir = dir;
-        open();
-    }
-
-    private void open() {
+    @Override
+    protected void open() {
+        dir = new File(getConfig().dir);
         if (!dir.exists()) {
             dir.mkdirs();
         }
 
         EnvironmentConfig envConfig = new EnvironmentConfig();
         envConfig.setAllowCreate(true);
+        envConfig.setTransactional(true);
         envConfig.setDurability(Durability.COMMIT_WRITE_NO_SYNC);
 
         environment = new Environment(dir, envConfig);
 
+    }
+
+    @Override
+    public Config getConfig() {
+        return (Config) super.getConfig();
     }
 
     @Override
@@ -111,6 +108,23 @@ public class BerkeleyDB extends Database {
         DatabaseEntry keyEntry = new DatabaseEntry(key.toString().getBytes());
         dbs.get(cache.getName()).delete(null, keyEntry);
 
+    }
+
+
+    public static class Config extends Database.Config {
+        /**
+         * 数据库文件目录
+         */
+        private String dir;
+
+        public String getDir() {
+            return dir;
+        }
+
+        public Config setDir(String dir) {
+            this.dir = dir;
+            return this;
+        }
     }
 
 }

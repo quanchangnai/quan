@@ -81,6 +81,7 @@ public class Parser {
                 }
 
                 if (classDefinition != null) {
+                    classDefinition.setFileName(srcFile.getName());
                     classDefinition.setPackageName(packageName);
                     classDefinition.setName(element.attributeValue("name"));
 
@@ -93,7 +94,10 @@ public class Parser {
                     classDefinition.setComment(comment);
 
                     if (results.containsKey(classDefinition.getName())) {
-                        throw new RuntimeException("类名不能重复：" + classDefinition.getName());
+                        String errorStr = "定义文件[" + results.get(classDefinition.getName()).getFileName() +
+                                "]和[" + classDefinition.getFileName() +
+                                "]有同名类[" + classDefinition.getName() + "]";
+                        throw new RuntimeException(errorStr);
                     }
 
                     results.put(classDefinition.getName(), classDefinition);

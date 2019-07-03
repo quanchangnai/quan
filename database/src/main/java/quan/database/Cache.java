@@ -90,8 +90,8 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
                 return;
             }
             this.database = database;
-            cacheSize = database.getCacheSize();
-            cacheExpire = database.getCacheExpire();
+            cacheSize = database.getConfig().getCacheSize();
+            cacheExpire = database.getConfig().getCacheExpire();
 
             rows = new ConcurrentHashMap<>(cacheSize);
             dirty = new ConcurrentHashMap<>();

@@ -10,6 +10,11 @@ public abstract class ClassDefinition extends Definition {
 
     private String packageName;
 
+    /**
+     * 类定义所在的文件
+     */
+    private String fileName;
+
     private List<FieldDefinition> fields = new ArrayList<>();
 
     public String getPackageName() {
@@ -28,9 +33,18 @@ public abstract class ClassDefinition extends Definition {
         return packageName + "." + getName();
     }
 
+    public String getFileName() {
+        return fileName;
+    }
+
+    public ClassDefinition setFileName(String fileName) {
+        this.fileName = fileName;
+        return this;
+    }
+
     @Override
     public String toString() {
-        return getClass().getName()+"{" +
+        return getClass().getName() + "{" +
                 "name=" + getName() +
                 ",packageName=" + getPackageName() +
                 ",fields=" + getFields() +

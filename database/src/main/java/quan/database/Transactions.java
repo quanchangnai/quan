@@ -21,7 +21,7 @@ public class Transactions {
      * 创建子类代理对象方式实现声明式事务，支持父类热加载
      *
      * @param superclass 父类型
-     * @param executor   不为空时在线程池中异步执行，为空时在被转换方法调用的当前线程同步执行
+     * @param executor   不为空时在线程池中异步执行（最外层原始方法返回值将会丢失），为空时在被转换方法调用的当前线程同步执行
      * @param <T>
      * @return
      * @throws Exception
@@ -60,9 +60,13 @@ public class Transactions {
      * 转换字节码方式实现声明式事务
      * 必须要在被转换的类加载之前调用，不支持热加载
      *
-     * @param executor 不为空时在线程池中异步执行，为空时在被转换方法调用的当前线程同步执行
+     * @param classNamePrefix 全类名的前缀，一般传包名就行
+     * @param executor        不为空时在线程池中异步执行（最外层原始方法返回值将会丢失），为空时在被转换方法调用的当前线程同步执行
      */
-    public synchronized static void transform(Executor executor) {
+    public synchronized static void transform(String classNamePrefix, Executor executor) {
+        if (classNamePrefix == null || classNamePrefix.trim().equals("")) {
+            throw new IllegalArgumentException("类名前缀不能为空");
+        }
         if (executor != null) {
             TransactionDelegation.executor = executor;
         } else {
@@ -77,14 +81,14 @@ public class Transactions {
 
         new AgentBuilder.Default()
                 .with(AgentBuilder.TypeStrategy.Default.REBASE)
-                .type(ElementMatchers.hasAnnotation(ElementMatchers.annotationType(Transactional.class)))
+                .type(ElementMatchers.nameStartsWith(classNamePrefix))
                 .transform(transformer)
                 .installOn(instrumentation);
 
     }
 
-    public static void transform() {
-        transform(null);
+    public synchronized static void transform(String classNamePrefix) {
+        transform(classNamePrefix, null);
     }
 
 

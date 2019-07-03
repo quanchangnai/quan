@@ -14,7 +14,12 @@ public class DatabaseTest2 {
     private static Logger logger = LoggerFactory.getLogger(DatabaseTest1.class);
 
     public static void main(String[] args) throws Exception {
-        Database database = new BerkeleyDB(".temp/bdb", 5, 30, 5, 0);
+        BerkeleyDB.Config config = new BerkeleyDB.Config();
+        config.setDir(".temp/bdb")
+                .setCacheSize(5)
+                .setCacheExpire(30)
+                .setStorePeriod(5);
+        Database database = new BerkeleyDB(config);
         while (true) {
             Transaction.execute(DatabaseTest2::test1);
             Thread.sleep(20000);

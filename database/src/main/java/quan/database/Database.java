@@ -22,20 +22,13 @@ public abstract class Database {
     private static Database instance;
 
     /**
-     * 缓存大小
+     * 数据库配置
      */
-    private int cacheSize = 5000;
+    private Config config;
 
     /**
-     * 缓存过期时间(秒)
+     * 管理的所有缓存
      */
-    private int cacheExpire = 600;
-
-    /***
-     * 存档间隔(秒)
-     */
-    private int storePeriod = 10;
-
     private Map<String, Cache> caches = new HashMap<>();
 
     /**
@@ -43,48 +36,27 @@ public abstract class Database {
      */
     private int storeThreadNum = Runtime.getRuntime().availableProcessors();
 
+    /**
+     * 所有的存档线程
+     */
     private List<StoreThread> storeThreads = new ArrayList<>();
 
     private int storeThreadIndex;
 
     private volatile boolean closed;
 
-    public Database() {
+
+    public Database(Config config) {
         //默认数据库实例为空时自动设置，不为空时需要手动更改
         if (instance == null) {
             instance = this;
         }
-
+        this.config = config;
         startStoreThread();
+        open();
     }
 
-    /**
-     * 参数设置小于0时采用默认值
-     *
-     * @param cacheSize
-     * @param cacheExpire
-     * @param storePeriod
-     * @param storeThreadNum
-     */
-    public Database(int cacheSize, int cacheExpire, int storePeriod, int storeThreadNum) {
-        if (instance == null) {
-            instance = this;
-        }
-        if (cacheSize > 0) {
-            this.cacheSize = cacheSize;
-        }
-        if (cacheExpire > 0) {
-            this.cacheExpire = cacheExpire;
-        }
-        if (storePeriod > 0) {
-            this.storePeriod = storePeriod;
-        }
-        if (storeThreadNum > 0) {
-            this.storeThreadIndex = storeThreadNum;
-        }
-
-        startStoreThread();
-    }
+    protected abstract void open();
 
     public static Database getDefault() {
         return instance;
@@ -94,25 +66,10 @@ public abstract class Database {
         Database.instance = instance;
     }
 
-    public int getCacheSize() {
-        return cacheSize;
+    public Config getConfig() {
+        return config;
     }
 
-    public int getCacheExpire() {
-        return cacheExpire;
-    }
-
-    public int getStorePeriod() {
-        return storePeriod;
-    }
-
-    public Database setStoreThreadNum(int storeThreadNum) {
-        if (storeThreadNum < 1) {
-            return this;
-        }
-        this.storeThreadNum = storeThreadNum;
-        return this;
-    }
 
     public synchronized void registerCache(Cache cache) {
         if (caches.containsKey(cache.getName())) {
@@ -140,7 +97,7 @@ public abstract class Database {
 
     private void startStoreThread() {
         for (int i = 0; i < storeThreadNum; i++) {
-            StoreThread storeThread = new StoreThread(storePeriod);
+            StoreThread storeThread = new StoreThread(config.storePeriod);
             storeThreads.add(storeThread);
             storeThread.start();
         }
@@ -231,6 +188,64 @@ public abstract class Database {
             for (Cache cache : caches) {
                 cache.close();
             }
+        }
+    }
+
+    public abstract static class Config {
+
+        /**
+         * 缓存大小
+         */
+        private int cacheSize = 5000;
+
+        /**
+         * 缓存过期时间(秒)
+         */
+        private int cacheExpire = 600;
+
+        /***
+         * 存档间隔(秒)
+         */
+        private int storePeriod = 10;
+        /**
+         * 存档线程数量
+         */
+        private int storeThreadNum = Runtime.getRuntime().availableProcessors();
+
+        public int getCacheSize() {
+            return cacheSize;
+        }
+
+        public Config setCacheSize(int cacheSize) {
+            this.cacheSize = cacheSize;
+            return this;
+        }
+
+        public int getCacheExpire() {
+            return cacheExpire;
+        }
+
+        public Config setCacheExpire(int cacheExpire) {
+            this.cacheExpire = cacheExpire;
+            return this;
+        }
+
+        public int getStorePeriod() {
+            return storePeriod;
+        }
+
+        public Config setStorePeriod(int storePeriod) {
+            this.storePeriod = storePeriod;
+            return this;
+        }
+
+        public int getStoreThreadNum() {
+            return storeThreadNum;
+        }
+
+        public Config setStoreThreadNum(int storeThreadNum) {
+            this.storeThreadNum = storeThreadNum;
+            return this;
         }
     }
 
