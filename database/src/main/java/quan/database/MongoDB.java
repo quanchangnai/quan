@@ -63,6 +63,7 @@ public class MongoDB extends Database {
 
     @Override
     protected <K, V extends Data<K>> V get(Cache<K, V> cache, K key) {
+        checkClosed();
         Document filter = new Document(_ID, key);
         Document document = (Document) collections.get(cache.getName()).find(filter).first();
         if (document == null) {
@@ -75,6 +76,7 @@ public class MongoDB extends Database {
 
     @Override
     protected <K, V extends Data<K>> void put(V data) {
+        checkClosed();
         K key = data.getKey();
         Document filter = new Document(_ID, key);
         Document updates = new Document($SET, data.encode());
@@ -83,6 +85,7 @@ public class MongoDB extends Database {
 
     @Override
     protected <K, V extends Data<K>> void delete(Cache<K, V> cache, K key) {
+        checkClosed();
         Document filter = new Document(_ID, key);
         collections.get(cache.getName()).deleteOne(filter);
     }
@@ -101,7 +104,7 @@ public class MongoDB extends Database {
         private String databaseName;
 
         /**
-         * 连接数据量
+         * 连接数
          */
         private int connectionsNum = 5;
 
@@ -128,7 +131,9 @@ public class MongoDB extends Database {
         }
 
         public Config setConnectionsNum(int connectionsNum) {
-            this.connectionsNum = connectionsNum;
+            if (connectionsNum > 0) {
+                this.connectionsNum = connectionsNum;
+            }
             return this;
         }
     }

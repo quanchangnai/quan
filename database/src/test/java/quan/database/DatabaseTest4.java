@@ -14,8 +14,8 @@ public class DatabaseTest4 {
     static Database database;
 
     static {
-//        database = new BerkeleyDB(".temp/bdb");
-        database = new MongoDB(new MongoDB.Config().setClientUri("mongodb://127.0.0.1:27017").setDatabaseName("mdb"));
+        database = new BerkeleyDB(".temp/bdb");
+//        database = new MongoDB(new MongoDB.Config().setClientUri("mongodb://127.0.0.1:27017").setDatabaseName("mdb"));
     }
 
     static Executor executor = new Executor();
@@ -33,6 +33,8 @@ public class DatabaseTest4 {
 
 //        test2(null);
 //        System.err.println("======================================================");
+
+        database.close();
     }
 
 

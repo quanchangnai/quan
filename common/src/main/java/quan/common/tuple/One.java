@@ -3,6 +3,7 @@ package quan.common.tuple;
 import java.util.Objects;
 
 /**
+ * 一元组
  * Created by quanchangnai on 2019/7/3.
  */
 public class One<V1> {

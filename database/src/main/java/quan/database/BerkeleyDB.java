@@ -37,7 +37,6 @@ public class BerkeleyDB extends Database {
         EnvironmentConfig envConfig = new EnvironmentConfig();
         envConfig.setAllowCreate(true);
         envConfig.setTransactional(true);
-        envConfig.setDurability(Durability.COMMIT_WRITE_NO_SYNC);
 
         environment = new Environment(dir, envConfig);
 
@@ -91,9 +90,7 @@ public class BerkeleyDB extends Database {
     @Override
     protected <K, V extends Data<K>> void put(V data) {
         checkClosed();
-
         String jsonStr = data.encode().toJSONString();
-
         DatabaseEntry keyEntry = new DatabaseEntry(data.getKey().toString().getBytes());
         DatabaseEntry dataEntry = new DatabaseEntry(jsonStr.getBytes());
 
@@ -104,7 +101,6 @@ public class BerkeleyDB extends Database {
     @Override
     protected <K, V extends Data<K>> void delete(Cache<K, V> cache, K key) {
         checkClosed();
-
         DatabaseEntry keyEntry = new DatabaseEntry(key.toString().getBytes());
         dbs.get(cache.getName()).delete(null, keyEntry);
 
