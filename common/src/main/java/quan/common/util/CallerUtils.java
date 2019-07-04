@@ -6,12 +6,12 @@ import java.util.Collection;
 /**
  * Created by quanchangnai on 2019/6/26.
  */
-public class CallerUtil {
+public class CallerUtils {
 
     private static boolean valid = true;
 
     public static void setValid(boolean valid) {
-        CallerUtil.valid = valid;
+        CallerUtils.valid = valid;
     }
 
     public static Class getCallerClass() {

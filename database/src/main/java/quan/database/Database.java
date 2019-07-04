@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by quanchangnai on 2019/6/21.
@@ -20,6 +21,13 @@ public abstract class Database {
      * 默认数据库实例
      */
     private static Database instance;
+
+    private AtomicInteger nextId = new AtomicInteger();
+
+    /**
+     * 数据库实例ID，正常情况下只会有一个数据库实例
+     */
+    private int id;
 
     /**
      * 数据库配置
@@ -53,15 +61,31 @@ public abstract class Database {
         if (instance == null) {
             instance = this;
         }
+
+        this.id = nextId.incrementAndGet();
         this.config = config;
-        startStoreThread();
+
         open();
 
-        shutdownHookThread = new Thread(instance::close, "ShutdownHook");
+        shutdownHookThread = new Thread(instance::close, getName() + "shutdown-hook-thread");
         Runtime.getRuntime().addShutdownHook(shutdownHookThread);
     }
 
-    protected abstract void open();
+    private void open() {
+        for (int i = 0; i < storeThreadNum; i++) {
+            StoreThread storeThread = new StoreThread(config.storePeriod);
+            storeThread.setName(getName() + "-store-thread-" + (i + 1));
+            storeThreads.add(storeThread);
+            storeThread.start();
+        }
+
+        shutdownHookThread = new Thread(instance::close, getName() + "-shutdown-hook-thread");
+        Runtime.getRuntime().addShutdownHook(shutdownHookThread);
+
+        open0();
+    }
+
+    protected abstract void open0();
 
     public static Database getDefault() {
         return instance;
@@ -75,6 +99,13 @@ public abstract class Database {
         return config;
     }
 
+    public String getName() {
+        String name = config.getName();
+        if (name.equals("")) {
+            name = "database-" + id;
+        }
+        return name;
+    }
 
     public synchronized void registerCache(Cache cache) {
         if (caches.containsKey(cache.getName())) {
@@ -99,14 +130,6 @@ public abstract class Database {
 
     protected abstract void registerCache0(Cache cache);
 
-
-    private void startStoreThread() {
-        for (int i = 0; i < storeThreadNum; i++) {
-            StoreThread storeThread = new StoreThread(config.storePeriod);
-            storeThreads.add(storeThread);
-            storeThread.start();
-        }
-    }
 
     public boolean isClosed() {
         return closed;
@@ -201,6 +224,11 @@ public abstract class Database {
     public abstract static class Config {
 
         /**
+         * 数据库实例名字
+         */
+        private String name = "";
+
+        /**
          * 缓存大小
          */
         private int cacheSize = 5000;
@@ -218,6 +246,15 @@ public abstract class Database {
          * 存档线程数量
          */
         private int storeThreadNum = Runtime.getRuntime().availableProcessors();
+
+        public String getName() {
+            return name == null ? "" : name.trim();
+        }
+
+        public Config setName(String name) {
+            this.name = name;
+            return this;
+        }
 
         public int getCacheSize() {
             return cacheSize;

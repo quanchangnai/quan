@@ -7,6 +7,8 @@ import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.instrument.Instrumentation;
 import java.util.Objects;
@@ -17,6 +19,8 @@ import java.util.Objects;
  */
 public class Transactions {
 
+    private static final Logger logger = LoggerFactory.getLogger(Transactions.class);
+
     /**
      * 创建子类代理对象方式实现声明式事务，支持父类热加载
      *
@@ -26,7 +30,7 @@ public class Transactions {
      * @return
      * @throws Exception
      */
-    public synchronized static <T> T subclass(Class<T> superclass, Executor executor) throws Exception {
+    public synchronized static <T> T subclass(Class<T> superclass, Executor executor) {
         Objects.requireNonNull(superclass);
 
         if (executor != null) {
@@ -38,15 +42,20 @@ public class Transactions {
 
         ElementMatcher.Junction<MethodDescription> methodMatcher = ElementMatchers.isAnnotatedWith(Transactional.class);
 
-        return new ByteBuddy()
+        Class<? extends T> subclass = new ByteBuddy()
                 .subclass(superclass)
                 .method(methodMatcher)
                 .intercept(methodDelegation)
                 .make()
                 .load(superclass.getClassLoader())
-                .getLoaded()
-                .getDeclaredConstructor()
-                .newInstance();
+                .getLoaded();
+
+        try {
+            return subclass.getDeclaredConstructor().newInstance();
+        } catch (Exception e) {
+            logger.error("", e);
+            return null;
+        }
 
     }
 

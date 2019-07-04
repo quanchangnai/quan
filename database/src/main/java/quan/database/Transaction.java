@@ -27,6 +27,13 @@ public class Transaction {
 
     private static final AtomicLong nextId = new AtomicLong();
 
+    private static long lastPrintCountTime = System.currentTimeMillis();
+
+    /**
+     * 打印统计信息间隔(秒)
+     */
+    private static int printCountInterval = 3600;
+
     /**
      * 执行总次数(事务本身为单位)
      */
@@ -143,6 +150,10 @@ public class Transaction {
         Transaction.conflictThreshold = conflictThreshold;
     }
 
+    public static void setPrintCountInterval(int printCountInterval) {
+        Transaction.printCountInterval = printCountInterval;
+    }
+
     public void addVersionLog(Data data) {
         if (data.getCache() != null) {
             data.getCache().checkClosed();
@@ -189,6 +200,15 @@ public class Transaction {
      */
     public static Transaction current() {
         return threadLocal.get();
+    }
+
+    /**
+     * 当前是不是处于事务之中
+     *
+     * @return
+     */
+    public static boolean isInside() {
+        return threadLocal.get() != null;
     }
 
     public static Transaction get() {
@@ -258,11 +278,20 @@ public class Transaction {
             conflict = true;
         }
 
-        if (slow || conflict) {
-            logger.debug("事务{}结束,执行成功:{},耗时:{}ms,逻辑冲突次数:{} | 事务执行总次数:{},慢事务次数:{},频繁冲突事务次数:{}",
-                    current.id, !current.failed, costTime, current.taskConflictCount, totalCount, slowCount, conflictCount);
+        if (System.currentTimeMillis() - lastPrintCountTime >= printCountInterval * 1000) {
+            logger.info("事务执行总次数:{},慢事务次数:{},频繁冲突事务次数:{}", totalCount, slowCount, conflictCount);
         }
 
+        if (slow || conflict) {
+//            logger.debug("事务{}结束,执行成功:{},耗时:{}ms,逻辑冲突次数:{} | 事务执行总次数:{},慢事务次数:{},频繁冲突事务次数:{}",
+//                    current.id, !current.failed, costTime, current.taskConflictCount, totalCount, slowCount, conflictCount);
+        }
+
+    }
+
+    public static void breakdown() {
+        Transaction.get().failed = true;
+        throw new TransactionException("事务被打断");
     }
 
     /**
@@ -271,8 +300,7 @@ public class Transaction {
      * @param task
      */
     public static void execute(Task task) {
-        Transaction current = current();
-        if (current != null) {
+        if (isInside()) {
             insideExecute(task);
         } else {
             outsideExecute(task);

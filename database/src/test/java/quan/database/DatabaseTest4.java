@@ -22,11 +22,11 @@ public class DatabaseTest4 {
 
     public static void main(String[] args) throws Exception {
         System.err.println("======================================================");
-//        test1(executor);
-//        System.err.println("======================================================");
-
-        test1(null);
+        test1(executor);
         System.err.println("======================================================");
+
+//        test1(null);
+//        System.err.println("======================================================");
 
 //        test2(executor);
 //        System.err.println("=================="====================================);
@@ -34,7 +34,7 @@ public class DatabaseTest4 {
 //        test2(null);
 //        System.err.println("======================================================");
 
-        database.close();
+//        database.close();
     }
 
 

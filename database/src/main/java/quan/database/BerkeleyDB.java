@@ -28,7 +28,7 @@ public class BerkeleyDB extends Database {
     }
 
     @Override
-    protected void open() {
+    protected void open0() {
         dir = new File(getConfig().dir);
         if (!dir.exists()) {
             dir.mkdirs();

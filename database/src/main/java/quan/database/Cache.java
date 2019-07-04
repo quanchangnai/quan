@@ -3,7 +3,7 @@ package quan.database;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.common.tuple.Two;
-import quan.common.util.CallerUtil;
+import quan.common.util.CallerUtils;
 import quan.database.log.DataLog;
 import quan.database.log.VersionLog;
 
@@ -108,17 +108,17 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
 
 
     public ReadWriteLock getLock() {
-        CallerUtil.validCallerClass(Transaction.class);
+        CallerUtils.validCallerClass(Transaction.class);
         return lock;
     }
 
     public Row<V> getRow(K key) {
-        CallerUtil.validCallerClass(DataLog.class);
+        CallerUtils.validCallerClass(DataLog.class);
         return rows.get(key);
     }
 
     public void setInsert(V data) {
-        CallerUtil.validCallerClass(DataLog.class);
+        CallerUtils.validCallerClass(DataLog.class);
 //        logger.debug("[{}],Cache.setInsert({}),rows:{}", name, data.getKey(), rows);
 
         data.setExpired(false);
@@ -143,7 +143,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
     }
 
     public void setUpdate(V data) {
-        CallerUtil.validCallerClass(VersionLog.class);
+        CallerUtils.validCallerClass(VersionLog.class);
 //        logger.debug("[{}],Cache.setUpdate({}),rows:{}", name, data.getKey(), rows);
 
         Row<V> row = rows.get(data.getKey());
@@ -162,7 +162,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
     }
 
     public void setDelete(K key) {
-        CallerUtil.validCallerClass(DataLog.class);
+        CallerUtils.validCallerClass(DataLog.class);
 //        logger.debug("[{}],Cache.setDelete({}),rows:{}", name, key, rows);
 
         Row<V> row = rows.get(key);

@@ -33,7 +33,7 @@ public class MongoDB extends Database {
 
 
     @Override
-    protected void open() {
+    protected void open0() {
         MongoClientOptions.Builder optionsBuilder = MongoClientOptions.builder();
         optionsBuilder.minConnectionsPerHost(1);
         optionsBuilder.connectionsPerHost(getConfig().connectionsNum);
@@ -99,14 +99,14 @@ public class MongoDB extends Database {
         private String clientUri;
 
         /**
-         * 数据库名
+         * Mongo数据库名
          */
         private String databaseName;
 
         /**
          * 连接数
          */
-        private int connectionsNum = 5;
+        private int connectionsNum = Runtime.getRuntime().availableProcessors();
 
         public String getClientUri() {
             return clientUri;
