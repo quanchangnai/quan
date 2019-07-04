@@ -291,7 +291,7 @@ public class Transaction {
 
     public static void breakdown() {
         Transaction.get().failed = true;
-        throw new TransactionException("事务被打断");
+        throw new BreakdownException();
     }
 
     /**
@@ -355,7 +355,9 @@ public class Transaction {
             }
         } catch (Throwable e) {
             failed = true;
-            throw e;
+            if (!(e instanceof BreakdownException)) {
+                throw e;
+            }
         } finally {
             end(failed);
         }
@@ -526,5 +528,12 @@ public class Transaction {
             transaction.rollbackAfterTasks.addAll(tasks);
         }
     }
+
+    /**
+     * 打断事务异常，用于标记事务失败，不会往外抛出
+     */
+    static class BreakdownException extends RuntimeException {
+    }
+
 
 }

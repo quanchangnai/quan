@@ -19,6 +19,7 @@ public class Role {
         logger.error("currentThread:{}", Thread.currentThread());
         String result = login("1111");
         System.err.println("login(1111):" + result);
+        Transaction.breakdown();
         return result+":xxxxxxx";
     }
 
@@ -53,7 +54,7 @@ public class Role {
         itemBean4.setId(444);
         itemBean4.setName("444");
         roleData.getSet2().add(itemBean4);
-
+        Transaction.breakdown();
 
         ItemBean itemBean5 = new ItemBean();
         itemBean5.setId(555);

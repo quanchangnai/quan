@@ -32,7 +32,9 @@ public class TransactionDelegation {
                 }
                 return true;
             } catch (Exception e) {
-                logger.error("", e);
+                if (!(e instanceof Transaction.BreakdownException)) {
+                    logger.error("", e);
+                }
                 return false;
             }
         };
