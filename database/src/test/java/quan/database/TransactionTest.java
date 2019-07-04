@@ -39,7 +39,7 @@ public class TransactionTest {
         ItemBean itemBean1 = new ItemBean();
         itemBean1.setId(1);
         itemBean1.setName("1");
-        roleData1.setItemBean(itemBean1);
+        roleData1.setItem(itemBean1);
 
         ItemBean itemBean2 = new ItemBean();
         itemBean2.setId(100);

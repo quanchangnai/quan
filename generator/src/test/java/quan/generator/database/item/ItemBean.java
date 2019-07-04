@@ -1,8 +1,10 @@
-package quan.database.item;
+package quan.generator.database.item;
 
-import quan.database.*;
+import quan.database.Database;
+import quan.database.Cache;
 import com.alibaba.fastjson.JSONArray;
-
+import quan.database.Data;
+import quan.database.Bean;
 import java.util.*;
 import org.pcollections.PSet;
 import org.pcollections.PVector;
@@ -67,28 +69,4 @@ public class ItemBean extends Bean {
 
     }
 
-    public static void main(String[] args) {
-        Transaction.execute(ItemBean::test);
-    }
-
-    private static boolean test(){
-        JSONObject object = new JSONObject();
-
-        Set<ItemBean> set = new HashSet<>();
-        ItemBean itemBean = new ItemBean();
-        itemBean.setId(111);
-        itemBean.setName("111");
-        set.add(itemBean);
-
-        JSONArray _set = new JSONArray();
-        for (ItemBean _set_value : set) {
-            _set.add(_set_value);
-        }
-        object.put("set", _set);
-
-
-        System.err.println(object);
-
-        return true;
-    }
 }

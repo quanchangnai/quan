@@ -10,10 +10,14 @@
         <field name="i" type="int" value="11"/>
         <field name="f" type="float" value="22.33332"/>
         <field name="d" type="double" value="33.332432"/>
-        <field name="itemBean" type="ItemBean"/>
+        <field name="item" type="ItemBean"/>
+        <field name="items" type="map" key-type="int" value-type="ItemBean"/>
         <field name="set" type="set" value-type="bool"/>
         <field name="list" type="list" value-type="string"/>
         <field name="map" type="map" key-type="int" value-type="int"/>
+        <field name="set2" type="set" value-type="ItemBean"/>
+        <field name="list2" type="list" value-type="ItemBean"/>
+        <field name="map2" type="map" key-type="int" value-type="ItemBean"/>
     </data>
 
 </package>

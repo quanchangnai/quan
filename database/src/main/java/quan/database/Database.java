@@ -66,9 +66,6 @@ public abstract class Database {
         this.config = config;
 
         open();
-
-        shutdownHookThread = new Thread(instance::close, getName() + "shutdown-hook-thread");
-        Runtime.getRuntime().addShutdownHook(shutdownHookThread);
     }
 
     private void open() {

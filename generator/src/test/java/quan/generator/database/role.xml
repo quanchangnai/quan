@@ -14,6 +14,9 @@
         <field name="set" type="set" value-type="bool"/>
         <field name="list" type="list" value-type="string"/>
         <field name="map" type="map" key-type="int" value-type="int"/>
+        <field name="set2" type="set" value-type="ItemBean"/>
+        <field name="list2" type="list" value-type="ItemBean"/>
+        <field name="map2" type="map" key-type="int" value-type="ItemBean"/>
     </data>
 
 </package>

@@ -367,6 +367,10 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
         }
     }
 
+    public boolean isClosed() {
+        return closed;
+    }
+
     public void checkClosed() {
         if (closed) {
             throw new DbException("数据库已关闭");
