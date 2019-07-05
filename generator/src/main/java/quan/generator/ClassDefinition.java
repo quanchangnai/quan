@@ -42,6 +42,10 @@ public abstract class ClassDefinition extends Definition {
         return this;
     }
 
+    public String getErrorPosition() {
+        return "文件:" + getFileName() + "，类:" + getName();
+    }
+
     @Override
     public String toString() {
         return getClass().getName() + "{" +

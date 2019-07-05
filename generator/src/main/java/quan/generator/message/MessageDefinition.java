@@ -28,7 +28,7 @@ public class MessageDefinition extends BeanDefinition {
         try {
             Integer.parseInt(id);
         } catch (NumberFormatException e) {
-            throw new RuntimeException("消息ID必须是整数", e);
+            throw new RuntimeException("消息ID必须是整数，" + getErrorPosition());
         }
     }
 

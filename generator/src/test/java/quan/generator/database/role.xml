@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <package>
 
-    <data name="RoleData">角色
-        <field name="id" type="long" primary-key="true"/>角色ID
+    <data name="RoleData" key="id">角色
+        <field name="id" type="long"/>角色ID
         <field name="name" type="string"/>
-        <field name="bo" type="bool" value="true"/>
-        <field name="by" type="byte" value="22"/>
-        <field name="s" type="short" value="22"/>
-        <field name="i" type="int" value="11"/>
-        <field name="f" type="float" value="22.33332"/>
-        <field name="d" type="double" value="33.332432"/>
+        <field name="bo" type="bool"/>
+        <field name="by" type="byte"/>
+        <field name="s" type="short"/>
+        <field name="i" type="int"/>
+        <field name="f" type="float"/>
+        <field name="d" type="double"/>
         <field name="itemBean" type="ItemBean"/>
         <field name="set" type="set" value-type="bool"/>
         <field name="list" type="list" value-type="string"/>

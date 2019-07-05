@@ -214,7 +214,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     public void decode(JSONObject object) {
 <#list fields as field>
     <#if field.type == "list">
-        <#if field_index gt 0  && !fields[field_index-1].collectionType && >
+        <#if field_index gt 0 && fields[field_index-1].builtInType && !fields[field_index-1].collectionType>
 
         </#if>
         JSONArray _${field.name}_1 = object.getJSONArray("${field.name}");
