@@ -1,12 +1,9 @@
-package quan.database.log;
-
-import quan.database.Data;
-import quan.database.Node;
+package quan.database;
 
 /**
  * Created by quanchangnai on 2019/5/17.
  */
-public class RootLog {
+class RootLog {
 
     private Node node;
 

@@ -1,6 +1,4 @@
-package quan.database.field;
-
-import quan.database.Transaction;
+package quan.database;
 
 /**
  * Created by quanchangnai on 2019/6/22.

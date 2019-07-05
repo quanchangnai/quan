@@ -41,4 +41,12 @@ public class Two<V1, V2> extends One<V1> {
     public int hashCode() {
         return Objects.hash(super.hashCode(), two);
     }
+
+    @Override
+    public String toString() {
+        return "Two{" +
+                "one=" + getOne() +
+                "two=" + two +
+                '}';
+    }
 }

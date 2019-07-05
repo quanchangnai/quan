@@ -1,12 +1,9 @@
-package quan.database.log;
-
-import quan.database.Cache;
-import quan.database.Data;
+package quan.database;
 
 /**
  * Created by quanchangnai on 2019/5/17.
  */
-public class VersionLog {
+class VersionLog {
 
     private long version;
 

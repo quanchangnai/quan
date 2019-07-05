@@ -173,7 +173,6 @@ public class Parser {
                 if (child.getName().equals("field")) {
                     FieldDefinition fieldDefinition = new FieldDefinition();
                     fieldDefinition.setName(child.attributeValue("name"));
-                    fieldDefinition.setValue(child.attributeValue("value"));
                     fieldDefinition.setType(child.attributeValue("type"));
 
                     String optional = child.attributeValue("optional");
@@ -190,8 +189,12 @@ public class Parser {
                     comment = comment.replaceAll("\r|\n", "").trim();
                     fieldDefinition.setComment(comment);
 
-                    if (fieldDefinition.getType().contains(".")) {
-                        fieldDefinition.setType(fieldDefinition.getType().substring(fieldDefinition.getType().lastIndexOf(".") + 1));
+                    try {
+                        if (fieldDefinition.getType().contains(".")) {
+                            fieldDefinition.setType(fieldDefinition.getType().substring(fieldDefinition.getType().lastIndexOf(".") + 1));
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
 
                     ClassDefinition fieldTypeClassDefinition = results.get(fieldDefinition.getType());

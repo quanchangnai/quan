@@ -12,28 +12,22 @@ import java.io.IOException;
  */
 public class SRoleLogin extends Message {
 
-    private long roleId;//角色id
+    private long roleId = 0L;//角色id
 
-    private String roleName;//角色名
+    private String roleName = "";//角色名
 
-    private RoleInfo roleInfo;//角色信息
+    private RoleInfo roleInfo = new RoleInfo();//角色信息
 
-    private ArrayList<RoleInfo> roleInfoList;//角色信息
+    private ArrayList<RoleInfo> roleInfoList = new ArrayList<>();//角色信息
 
-    private HashSet<RoleInfo> roleInfoSet;//角色信息
+    private HashSet<RoleInfo> roleInfoSet = new HashSet<>();//角色信息
 
-    private HashMap<Long, RoleInfo> roleInfoMap;//角色信息
+    private HashMap<Long, RoleInfo> roleInfoMap = new HashMap<>();//角色信息
 
     private UserInfo userInfo;//用户信息
 
     public SRoleLogin() {
         super(2222);
-        roleId = 111L;
-        roleName = "zhangsan";
-        roleInfoList = new ArrayList<>();
-        roleInfoSet = new HashSet<>();
-        roleInfoMap = new HashMap<>();
-        userInfo = new UserInfo();
     }
 
     public long getRoleId() {
@@ -60,6 +54,9 @@ public class SRoleLogin extends Message {
     }
 
     public void setRoleInfo(RoleInfo roleInfo) {
+        if (roleInfo == null){
+            throw new NullPointerException();
+        }
         this.roleInfo = roleInfo;
     }
 
@@ -80,9 +77,6 @@ public class SRoleLogin extends Message {
     }
 
     public void setUserInfo(UserInfo userInfo) {
-        if (userInfo == null){
-            throw new NullPointerException();
-        }
         this.userInfo = userInfo;
     }
 
@@ -94,51 +88,56 @@ public class SRoleLogin extends Message {
     @Override
     public void encode(Buffer buffer) throws IOException {
         super.encode(buffer);
+
         buffer.writeLong(roleId);
         buffer.writeString(roleName);
-        buffer.writeBool(roleInfo != null);
-        if (roleInfo != null) {
-            roleInfo.encode(buffer);
-        }
+        roleInfo.encode(buffer);
+
         buffer.writeInt(roleInfoList.size());
         for (RoleInfo roleInfoListValue : roleInfoList) {
             roleInfoListValue.encode(buffer);
         }
+
         buffer.writeInt(roleInfoSet.size());
         for (RoleInfo roleInfoSetValue : roleInfoSet) {
             roleInfoSetValue.encode(buffer);
         }
+
         buffer.writeInt(roleInfoMap.size());
         for (long roleInfoMapKey : roleInfoMap.keySet()) {
             buffer.writeLong(roleInfoMapKey);
             roleInfoMap.get(roleInfoMapKey).encode(buffer);
         }
-        userInfo.encode(buffer);
+
+        buffer.writeBool(userInfo != null);
+        if (userInfo != null) {
+            userInfo.encode(buffer);
+        }
+
     }
 
     @Override
     public void decode(Buffer buffer) throws IOException {
         super.decode(buffer);
+
         roleId = buffer.readLong();
         roleName = buffer.readString();
-        if (buffer.readBool()) {
-            if (roleInfo == null) {
-                roleInfo = new RoleInfo();
-            }
-            roleInfo.decode(buffer);
-        }
+        roleInfo.decode(buffer);
+
         int roleInfoListSize = buffer.readInt();
         for (int i = 0; i < roleInfoListSize; i++) {
             RoleInfo roleInfoListValue = new RoleInfo();
             roleInfoListValue.decode(buffer);
             roleInfoList.add(roleInfoListValue);
         }
+
         int roleInfoSetSize = buffer.readInt();
         for (int i = 0; i < roleInfoSetSize; i++) {
             RoleInfo roleInfoSetValue = new RoleInfo();
             roleInfoSetValue.decode(buffer);
             roleInfoSet.add(roleInfoSetValue);
         }
+
         int roleInfoMapSize = buffer.readInt();
         for (int i = 0; i < roleInfoMapSize; i++) {
             long roleInfoMapKey = buffer.readLong();
@@ -146,7 +145,14 @@ public class SRoleLogin extends Message {
             roleInfoMapValue.decode(buffer);
             roleInfoMap.put(roleInfoMapKey, roleInfoMapValue);
         }
-        userInfo.decode(buffer);
+
+        if (buffer.readBool()) {
+            if (userInfo == null) {
+                userInfo = new UserInfo();
+            }
+            userInfo.decode(buffer);
+        }
+
     }
 
     @Override

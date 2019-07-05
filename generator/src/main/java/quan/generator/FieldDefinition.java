@@ -51,6 +51,10 @@ public class FieldDefinition extends Definition {
         return BUILT_IN_TYPES.contains(type);
     }
 
+    public boolean isCollectionType(){
+        return type.equals("list") || type.equals("set") || type.equals("map");
+    }
+
     public boolean isEnumType() {
         return enumType;
     }

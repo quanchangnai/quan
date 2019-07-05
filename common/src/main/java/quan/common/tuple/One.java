@@ -38,4 +38,11 @@ public class One<V1> {
     public int hashCode() {
         return Objects.hash(one);
     }
+
+    @Override
+    public String toString() {
+        return "One{" +
+                "one=" + one +
+                '}';
+    }
 }

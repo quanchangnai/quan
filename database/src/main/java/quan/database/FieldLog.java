@@ -1,11 +1,9 @@
-package quan.database.log;
-
-import quan.database.field.Field;
+package quan.database;
 
 /**
  * Created by quanchangnai on 2019/5/16.
  */
-public class FieldLog<V> {
+class FieldLog<V> {
 
     private Field<V> field;
 

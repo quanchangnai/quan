@@ -2,11 +2,6 @@ package quan.database;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import quan.database.field.Field;
-import quan.database.log.DataLog;
-import quan.database.log.FieldLog;
-import quan.database.log.RootLog;
-import quan.database.log.VersionLog;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
@@ -32,7 +27,7 @@ public class Transaction {
     /**
      * 打印统计信息间隔(秒)
      */
-    private static int printCountInterval = 3600;
+    static int printCountInterval = 3600;
 
     /**
      * 执行总次数(事务本身为单位)
@@ -42,7 +37,7 @@ public class Transaction {
     /**
      * 事务本身执行时间阈值(ms)，大于等于此值为慢事务
      */
-    private static int slowTimeThreshold;
+    static int slowTimeThreshold;
 
     /**
      * 慢事务执行次数(事务本身为单位)
@@ -52,7 +47,7 @@ public class Transaction {
     /**
      * 事务中的逻辑执行冲突次数阈值
      */
-    private static int conflictThreshold;
+    static int conflictThreshold;
 
     /**
      * 事务逻辑冲突次数大于等于[conflictThreshold]的事务执行次数(以事务为单位)
@@ -138,23 +133,12 @@ public class Transaction {
         return failed;
     }
 
-    public long getTaskStartTime() {
+    long getTaskStartTime() {
         return taskStartTime;
     }
 
-    public static void setSlowTimeThreshold(int slowTimeThreshold) {
-        Transaction.slowTimeThreshold = slowTimeThreshold;
-    }
 
-    public static void setConflictThreshold(int conflictThreshold) {
-        Transaction.conflictThreshold = conflictThreshold;
-    }
-
-    public static void setPrintCountInterval(int printCountInterval) {
-        Transaction.printCountInterval = printCountInterval;
-    }
-
-    public void addVersionLog(Data data) {
+    void addVersionLog(Data data) {
         if (data.getCache() != null) {
             data.getCache().checkClosed();
         }
@@ -169,11 +153,11 @@ public class Transaction {
     }
 
 
-    public void addFieldLog(FieldLog fieldLog) {
+    void addFieldLog(FieldLog fieldLog) {
         fieldLogs.put(fieldLog.getField(), fieldLog);
     }
 
-    public FieldLog getFieldLog(Field field) {
+    FieldLog getFieldLog(Field field) {
         return fieldLogs.get(field);
     }
 

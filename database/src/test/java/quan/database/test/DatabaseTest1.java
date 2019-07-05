@@ -1,7 +1,11 @@
-package quan.database;
+package quan.database.test;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import quan.database.BerkeleyDB;
+import quan.database.Database;
+import quan.database.Transaction;
+import quan.database.Transactions;
 import quan.database.role.RoleData;
 
 import java.security.SecureRandom;
@@ -24,7 +28,7 @@ public class DatabaseTest1 {
 
         database = new BerkeleyDB(".temp/bdb");
 
-        Transaction.setConflictThreshold(1);
+        Transactions.setConflictThreshold(1);
 
         for (int i = 0; i < 200; i++) {
             new Thread() {

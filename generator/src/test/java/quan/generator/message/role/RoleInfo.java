@@ -11,46 +11,33 @@ import quan.message.Bean;
  */
 public class RoleInfo extends Bean {
 
-    private long roleId;//角色id
+    private long roleId = 0L;//角色id
 
-    private boolean bo;
+    private boolean bo = false;
 
-    private byte by;
+    private byte by = (byte)0;
 
-    private short s;
+    private short s = (short)0;
 
-    private int i;
+    private int i = 0;
 
-    private float f;
+    private float f = 0F;
 
-    private double d;
+    private double d = 0D;
 
-    private String roleName;//角色名
+    private String roleName = "";//角色名
 
     private RoleType roleType;
 
-    private byte[] data;
+    private byte[] data = new byte[0];
 
-    private ArrayList<Integer> list;
+    private ArrayList<Integer> list = new ArrayList<>();
 
-    private HashSet<Integer> set;
+    private HashSet<Integer> set = new HashSet<>();
 
-    private HashMap<Integer, Integer> map;
+    private HashMap<Integer, Integer> map = new HashMap<>();
 
     public RoleInfo() {
-        roleId = 111L;
-        bo = true;
-        by = (byte) 22;
-        s = (short) 22;
-        i = 11;
-        f = 22.33332F;
-        d = 33.332432D;
-        roleName = "";
-        roleType = RoleType.type1;
-        data = new byte[0];
-        list = new ArrayList<>();
-        set = new HashSet<>();
-        map = new HashMap<>();
     }
 
     public long getRoleId() {
@@ -125,9 +112,6 @@ public class RoleInfo extends Bean {
     }
 
     public void setRoleType(RoleType roleType) {
-        if (roleType == null){
-            throw new NullPointerException();
-        }
         this.roleType = roleType;
     }
 
@@ -157,6 +141,7 @@ public class RoleInfo extends Bean {
     @Override
     public void encode(Buffer buffer) throws IOException {
         super.encode(buffer);
+
         buffer.writeLong(roleId);
         buffer.writeBool(bo);
         buffer.writeByte(by);
@@ -165,26 +150,37 @@ public class RoleInfo extends Bean {
         buffer.writeFloat(f);
         buffer.writeDouble(d);
         buffer.writeString(roleName);
-        buffer.writeInt(roleType.getValue());
+
+        if(roleType != null) {
+            buffer.writeInt(roleType.getValue());
+        }else {
+            buffer.writeInt(0);
+        }
+
         buffer.writeBytes(data);
+
         buffer.writeInt(list.size());
         for (int listValue : list) {
             buffer.writeInt(listValue);
         }
+
         buffer.writeInt(set.size());
         for (int setValue : set) {
             buffer.writeInt(setValue);
         }
+
         buffer.writeInt(map.size());
         for (int mapKey : map.keySet()) {
             buffer.writeInt(mapKey);
             buffer.writeInt(map.get(mapKey));
         }
+
     }
 
     @Override
     public void decode(Buffer buffer) throws IOException {
         super.decode(buffer);
+
         roleId = buffer.readLong();
         bo = buffer.readBool();
         by = buffer.readByte();
@@ -195,18 +191,22 @@ public class RoleInfo extends Bean {
         roleName = buffer.readString();
         roleType = RoleType.valueOf(buffer.readInt());
         data = buffer.readBytes();
+
         int listSize = buffer.readInt();
         for (int i = 0; i < listSize; i++) {
             list.add(buffer.readInt());
         }
+
         int setSize = buffer.readInt();
         for (int i = 0; i < setSize; i++) {
             set.add(buffer.readInt());
         }
+
         int mapSize = buffer.readInt();
         for (int i = 0; i < mapSize; i++) {
             map.put(buffer.readInt(), buffer.readInt());
         }
+
     }
 
     @Override

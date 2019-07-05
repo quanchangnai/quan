@@ -10,32 +10,29 @@ import quan.message.Bean;
  */
 public class UserInfo extends Bean {
 
-    private String name;//名字
+    private String name = "";//名字
 
-    private int level;//等级
+    private int level = 0;//等级
 
-    private int experience;
+    private int experience = 0;
 
-    private int icon;
+    private int icon = 0;
 
-    private int power;
+    private int power = 0;
 
-    private int modifyNameCount;
+    private int modifyNameCount = 0;
 
-    private String eventState;
+    private String eventState = "";
 
-    private String functionState;
+    private String functionState = "";
 
-    private int lucky;
+    private int lucky = 0;
 
-    private int currentState;
+    private int currentState = 0;
 
-    private int buyPowerCount;
+    private int buyPowerCount = 0;
 
     public UserInfo() {
-        name = "";
-        eventState = "";
-        functionState = "";
     }
 
     public String getName() {
@@ -138,6 +135,7 @@ public class UserInfo extends Bean {
     @Override
     public void encode(Buffer buffer) throws IOException {
         super.encode(buffer);
+
         buffer.writeString(name);
         buffer.writeInt(level);
         buffer.writeInt(experience);
@@ -154,6 +152,7 @@ public class UserInfo extends Bean {
     @Override
     public void decode(Buffer buffer) throws IOException {
         super.decode(buffer);
+
         name = buffer.readString();
         level = buffer.readInt();
         experience = buffer.readInt();

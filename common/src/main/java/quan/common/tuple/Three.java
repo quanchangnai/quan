@@ -40,4 +40,13 @@ public class Three<V1, V2, V3> extends Two<V1, V2> {
     public int hashCode() {
         return Objects.hash(super.hashCode(), three);
     }
+
+    @Override
+    public String toString() {
+        return "Three{" +
+                "one=" + getOne() +
+                "two=" + getTwo() +
+                "three=" + three +
+                '}';
+    }
 }

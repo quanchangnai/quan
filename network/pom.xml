@@ -11,4 +11,12 @@
 
     <artifactId>network</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>quan</groupId>
+            <artifactId>common</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
 </project>

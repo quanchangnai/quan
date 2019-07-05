@@ -146,10 +146,12 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     @Override
     public void setChildrenLogRoot(Data root) {
 <#list fields as field>
-    <#if field.type == "list" || field.type == "set" || field.type == "map">
+    <#if field.collectionType>
         ${field.name}.setLogRoot(root);
     <#elseif !field.builtInType>
+        <#if field_index gt 0 && fields[field_index-1].collectionType>
 
+        </#if>
         ${field.type} _${field.name} = this.${field.name}.getValue();
         if (_${field.name} != null) {
             _${field.name}.setLogRoot(root);
@@ -165,7 +167,9 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 
 <#list fields as field>
     <#if field.type == "list" || field.type == "set">
+        <#if field_index gt 0 && fields[field_index-1].builtInType && !fields[field_index-1].collectionType>
 
+        </#if>
         JSONArray _${field.name} = new JSONArray();
         for (${field.classValueType} _${field.name}_value : ${field.name}) {
         <#if !field.valueBuiltInType>
@@ -177,7 +181,9 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         object.put("${field.name}", _${field.name});
 
     <#elseif field.type == "map">
+        <#if field_index gt 0 && fields[field_index-1].builtInType && !fields[field_index-1].collectionType>
 
+        </#if>
         JSONObject _${field.name} = new JSONObject();
         for (${field.classKeyType} _${field.name}_key : ${field.name}.keySet()) {
         <#if !field.valueBuiltInType>
@@ -191,7 +197,9 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     <#elseif field.builtInType>
         object.put("${field.name}", ${field.name}.getValue());
     <#else>
+        <#if field_index gt 0 && fields[field_index-1].builtInType && !fields[field_index-1].collectionType>
 
+        </#if>
         ${field.type} _${field.name} = ${field.name}.getValue();
         if (_${field.name} != null) {
             object.put("${field.name}", _${field.name}.encode());
@@ -206,7 +214,9 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     public void decode(JSONObject object) {
 <#list fields as field>
     <#if field.type == "list">
+        <#if field_index gt 0  && !fields[field_index-1].collectionType && >
 
+        </#if>
         JSONArray _${field.name}_1 = object.getJSONArray("${field.name}");
         if (_${field.name}_1 != null) {
             List<${field.classValueType}> _${field.name}_2 = new ArrayList<>();
@@ -224,7 +234,9 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         }
 
     <#elseif field.type == "set">
+        <#if field_index gt 0 && fields[field_index-1].builtInType && !fields[field_index-1].collectionType>
 
+        </#if>
         JSONArray _${field.name}_1 = object.getJSONArray("${field.name}");
         if (_${field.name}_1 != null) {
             Set<${field.classValueType}> _${field.name}_2 = new HashSet<>();
@@ -242,7 +254,9 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         }
 
     <#elseif field.type == "map">
+        <#if field_index gt 0 && fields[field_index-1].builtInType && !fields[field_index-1].collectionType>
 
+        </#if>
         JSONObject _${field.name}_1 = object.getJSONObject("${field.name}");
         if (_${field.name}_1 != null) {
             Map<${field.classKeyType}, ${field.classValueType}> _${field.name}_2 = new HashMap<>();
@@ -262,6 +276,16 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     <#elseif field.builtInType>
         ${field.name}.setValue(object.get${field.classType}("${field.name}"));
     <#else>
+        <#if field_index gt 0 && fields[field_index-1].builtInType && !fields[field_index-1].collectionType>
+
+        </#if>
+        JSONObject _${field.name} = object.getJSONObject("${field.name}");
+        ${field.classType} _${field.name}_value = ${field.name}.getValue();
+        if (_${field.name}_value == null) {
+            _${field.name}_value = new ${field.classType}();
+            ${field.name}.setValue(_${field.name}_value);
+        }
+        _${field.name}_value.decode(_${field.name});
 
     </#if>
 </#list>

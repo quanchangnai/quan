@@ -3,9 +3,6 @@ package quan.database;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.common.tuple.Two;
-import quan.common.util.CallerUtils;
-import quan.database.log.DataLog;
-import quan.database.log.VersionLog;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -107,20 +104,16 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
     }
 
 
-    public ReadWriteLock getLock() {
-        CallerUtils.validCallerClass(Transaction.class);
+    ReadWriteLock getLock() {
         return lock;
     }
 
-    public Row<V> getRow(K key) {
-        CallerUtils.validCallerClass(DataLog.class);
+    Row<V> getRow(K key) {
         return rows.get(key);
     }
 
-    public void setInsert(V data) {
-        CallerUtils.validCallerClass(DataLog.class);
+    void setInsert(V data) {
 //        logger.debug("[{}],Cache.setInsert({}),rows:{}", name, data.getKey(), rows);
-
         data.setExpired(false);
         Row<V> row = rows.get(data.getKey());
         //row有可能为空(新插入时)
@@ -142,8 +135,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
         }
     }
 
-    public void setUpdate(V data) {
-        CallerUtils.validCallerClass(VersionLog.class);
+    void setUpdate(V data) {
 //        logger.debug("[{}],Cache.setUpdate({}),rows:{}", name, data.getKey(), rows);
 
         Row<V> row = rows.get(data.getKey());
@@ -161,8 +153,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
         }
     }
 
-    public void setDelete(K key) {
-        CallerUtils.validCallerClass(DataLog.class);
+    void setDelete(K key) {
 //        logger.debug("[{}],Cache.setDelete({}),rows:{}", name, key, rows);
 
         Row<V> row = rows.get(key);
@@ -300,11 +291,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
         lock.writeLock().lock();
         try {
             store0();
-
-            if (rows.size() > cacheSize) {
-                checkExpireAndClean();
-            }
-
+            cleanExpired();
         } finally {
             lock.writeLock().unlock();
         }
@@ -380,24 +367,38 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
         }
     }
 
+    private long nextCleanExpiredTime;
+
     /**
-     * 检测过期缓存并清理
+     * 清理过期缓存
      */
-    private void checkExpireAndClean() {
-        long now = System.currentTimeMillis();
+    private void cleanExpired() {
+        if (rows.size() < cacheSize) {
+            return;
+        }
+
+        long currentTime = System.currentTimeMillis();
+        if (currentTime < nextCleanExpiredTime) {
+            return;
+        }
+
         Set<K> cleans = new HashSet<>();
 
         Iterator<Row<V>> iterator = rows.values().iterator();
         while (iterator.hasNext()) {
             V data = iterator.next().data;
-            if (now - data.getTouchTime() > cacheExpire * 1000) {
+            if (currentTime - data.getTouchTime() > cacheExpire * 1000) {
                 data.setExpired(true);
                 iterator.remove();
                 cleans.add(data.getKey());
             }
         }
 
-        logger.debug("[{}]过期缓存清理, rows.size:{},clears.size:{},rows:{},clears:{}", name, rows.size(), cleans.size(), rows, cleans);
+        if (cleans.isEmpty()) {
+            nextCleanExpiredTime = currentTime + cacheExpire * 500;
+        }
+
+        logger.debug("[{}]清理过期缓存, rows.size:{},cleans.size:{},rows:{},cleans:{}", name, rows.size(), cleans.size(), rows, cleans);
     }
 
 

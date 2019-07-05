@@ -17,57 +17,53 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 
 <#list fields as field>
     <#if field.type == "set" || field.type == "list">
-    private ${field.classType}<${field.classValueType}> ${field.name};<#if field.comment !="">//${field.comment}</#if>
+    private ${field.classType}<${field.classValueType}> ${field.name} = new ${field.classType}<>();<#if field.comment !="">//${field.comment}</#if>
+
     <#elseif field.type == "map">
-    private ${field.classType}<${field.classKeyType}, ${field.classValueType}> ${field.name};<#if field.comment !="">//${field.comment}</#if>
+    private ${field.classType}<${field.classKeyType}, ${field.classValueType}> ${field.name} = new ${field.classType}<>();<#if field.comment !="">//${field.comment}</#if>
+
+    <#elseif field.type == "string">
+    private ${field.basicType} ${field.name} = "";<#if field.comment !="">//${field.comment}</#if>
+
+    <#elseif field.type == "bytes">
+    private ${field.basicType} ${field.name} = new byte[0];<#if field.comment !="">//${field.comment}</#if>
+
+    <#elseif field.type == "byte">
+    private ${field.basicType} ${field.name} = (byte)0;<#if field.comment !="">//${field.comment}</#if>
+
+    <#elseif field.type == "bool">
+    private ${field.basicType} ${field.name} = false;<#if field.comment !="">//${field.comment}</#if>
+
+    <#elseif field.type == "short">
+    private ${field.basicType} ${field.name} = (short)0;<#if field.comment !="">//${field.comment}</#if>
+
+    <#elseif field.type == "int">
+    private ${field.basicType} ${field.name} = 0;<#if field.comment !="">//${field.comment}</#if>
+
+    <#elseif field.type == "long">
+    private ${field.basicType} ${field.name} = 0L;<#if field.comment !="">//${field.comment}</#if>
+
+    <#elseif field.type == "float">
+    private ${field.basicType} ${field.name} = 0F;<#if field.comment !="">//${field.comment}</#if>
+
+    <#elseif field.type == "double">
+    private ${field.basicType} ${field.name} = 0D;<#if field.comment !="">//${field.comment}</#if>
+
+    <#elseif field.enumType>
+    private ${field.basicType} ${field.name};<#if field.comment !="">//${field.comment}</#if>
+
+    <#elseif !field.optional>
+    private ${field.basicType} ${field.name} = new ${field.type}();<#if field.comment !="">//${field.comment}</#if>
+
     <#else>
     private ${field.basicType} ${field.name};<#if field.comment !="">//${field.comment}</#if>
-    </#if>
 
+    </#if>
 </#list>
     public ${name}() {
 <#if definitionType ==3>
         super(${id});
 </#if>
-<#list fields as field>
-    <#if field.type == "list" || field.type == "set" ||field.type == "map" >
-        ${field.name} = new ${field.classType}<>();
-    <#elseif field.type == "string">
-        ${field.name} = <#if field.value?? && field.value!= "">"${field.value}"<#else>""</#if>;
-    <#elseif field.type == "bytes">
-        ${field.name} = new byte[0];
-    <#elseif field.type == "byte">
-        <#if field.value?? && field.value != "">
-        ${field.name} = (byte) ${field.value};
-        </#if>
-    <#elseif field.type == "short">
-        <#if field.value?? && field.value != "">
-        ${field.name} = (short) ${field.value};
-        </#if>
-    <#elseif field.type == "long">
-        <#if field.value?? && field.value != "">
-        ${field.name} = ${field.value}L;
-        </#if>
-    <#elseif field.type == "float">
-        <#if field.value?? && field.value != "">
-        ${field.name} = ${field.value}F;
-        </#if>
-    <#elseif field.type == "double">
-        <#if field.value?? && field.value != "">
-        ${field.name} = ${field.value}D;
-        </#if>
-    <#elseif field.builtInType>
-        <#if field.value?? && field.value != "">
-        ${field.name} = ${field.value};
-        </#if>
-    <#elseif field.enumType>
-        <#if field.value??>
-        ${field.name} = ${field.type}.${field.value};
-        </#if>
-    <#elseif !field.optional>
-        ${field.name} = new ${field.type}();
-    </#if>
-</#list>
     }
 
 <#list fields as field>
@@ -87,7 +83,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     }
 
     public void set${field.name?cap_first}(${field.basicType} ${field.name}) {
-        <#if (!field.builtInType && !field.optional) || field.type == "string" || field.type == "bytes">
+        <#if (!field.builtInType && !field.optional && !field.enumType) || field.type == "string" || field.type == "bytes">
         if (${field.name} == null){
             throw new NullPointerException();
         }
@@ -107,8 +103,12 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     @Override
     public void encode(Buffer buffer) throws IOException {
         super.encode(buffer);
+
 <#list fields as field>
     <#if field.type=="set" || field.type=="list">
+        <#if field_index gt 0 && !fields[field_index-1].optional && !fields[field_index-1].collectionType >
+
+        </#if>
         buffer.writeInt(${field.name}.size());
         for (${field.basicValueType} ${field.name}Value : ${field.name}) {
         <#if field.valueBuiltInType>
@@ -117,7 +117,11 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
             ${field.name}Value.encode(buffer);
         </#if>
         }
+
     <#elseif field.type=="map">
+        <#if field_index gt 0 && !fields[field_index-1].optional && !fields[field_index-1].collectionType >
+
+        </#if>
         buffer.writeInt(${field.name}.size());
         for (${field.basicKeyType} ${field.name}Key : ${field.name}.keySet()) {
             buffer.write${field.keyType?cap_first}(${field.name}Key);
@@ -127,15 +131,28 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
             ${field.name}.get(${field.name}Key).encode(buffer);
         </#if>
         }
+
     <#elseif field.builtInType>
         buffer.write${field.type?cap_first}(${field.name});
     <#elseif field.enumType>
-        buffer.writeInt(${field.name}.getValue());
+        <#if field_index gt 0 && !fields[field_index-1].optional && !fields[field_index-1].collectionType >
+
+        </#if>
+        if(${field.name} != null) {
+            buffer.writeInt(${field.name}.getValue());
+        }else {
+            buffer.writeInt(0);
+        }
+
     <#elseif field.optional>
+        <#if field_index gt 0 && !fields[field_index-1].optional && !fields[field_index-1].collectionType >
+
+        </#if>
         buffer.writeBool(${field.name} != null);
         if (${field.name} != null) {
             ${field.name}.encode(buffer);
         }
+
     <#else>
         ${field.name}.encode(buffer);
     </#if>
@@ -145,8 +162,12 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     @Override
     public void decode(Buffer buffer) throws IOException {
         super.decode(buffer);
+
 <#list fields as field>
     <#if field.type=="set" || field.type=="list">
+        <#if field_index gt 0 && !fields[field_index-1].optional && !fields[field_index-1].collectionType >
+
+        </#if>
         int ${field.name}Size = buffer.readInt();
         for (int i = 0; i < ${field.name}Size; i++) {
         <#if field.valueBuiltInType>
@@ -157,7 +178,11 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
             ${field.name}.add(${field.name}Value);
         </#if>
         }
+
     <#elseif field.type=="map">
+        <#if field_index gt 0 && !fields[field_index-1].optional && !fields[field_index-1].collectionType >
+
+        </#if>
         int ${field.name}Size = buffer.readInt();
         for (int i = 0; i < ${field.name}Size; i++) {
         <#if field.valueBuiltInType>
@@ -169,17 +194,22 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
             ${field.name}.put(${field.name}Key, ${field.name}Value);
         </#if>
         }
+
     <#elseif field.builtInType>
         ${field.name} = buffer.read${field.type?cap_first}();
     <#elseif field.enumType>
         ${field.name} = ${field.type}.valueOf(buffer.readInt());
     <#elseif field.optional>
+        <#if field_index gt 0 && !fields[field_index-1].optional && !fields[field_index-1].collectionType >
+
+        </#if>
         if (buffer.readBool()) {
             if (${field.name} == null) {
                 ${field.name} = new ${field.type}();
             }
             ${field.name}.decode(buffer);
         }
+
     <#else>
         ${field.name}.decode(buffer);
     </#if>

@@ -12,13 +12,13 @@ public abstract class MessageGenerator extends Generator {
     public static void main(String[] args) throws Exception {
         String language = "java";
 
-//        String srcPath = "generator\\src\\test\\java\\quan\\generator\\message";
-//        String destPath = "generator\\src\\test\\java";
-//        String packagePrefix = "quan.generator.message";
+        String srcPath = "generator\\src\\test\\java\\quan\\generator\\message";
+        String destPath = "generator\\src\\test\\java";
+        String packagePrefix = "quan.generator.message";
 
-        String srcPath = "message-java\\src\\test\\java\\quan\\message";
-        String destPath = "message-java\\src\\test\\java";
-        String packagePrefix = "quan.message";
+//        String srcPath = "message-java\\src\\test\\java\\quan\\message";
+//        String destPath = "message-java\\src\\test\\java";
+//        String packagePrefix = "quan.message";
 
         for (int i = 0; i < args.length; i++) {
             if (args[i].equals("-language")) {

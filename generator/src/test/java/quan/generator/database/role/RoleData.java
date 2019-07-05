@@ -1,5 +1,6 @@
 package quan.generator.database.role;
 
+import quan.database.*;
 import quan.database.Database;
 import quan.database.Cache;
 import com.alibaba.fastjson.JSONArray;
@@ -9,7 +10,6 @@ import java.util.*;
 import org.pcollections.PSet;
 import org.pcollections.PVector;
 import org.pcollections.Empty;
-import quan.database.field.*;
 import com.alibaba.fastjson.JSONObject;
 import org.pcollections.PMap;
 
@@ -206,7 +206,6 @@ public class RoleData extends Data<Long> {
 
     @Override
     public void setChildrenLogRoot(Data root) {
-
         ItemBean _itemBean = this.itemBean.getValue();
         if (_itemBean != null) {
             _itemBean.setLogRoot(root);
@@ -238,13 +237,11 @@ public class RoleData extends Data<Long> {
             object.put("itemBean", _itemBean.encode());
         }
 
-
         JSONArray _set = new JSONArray();
         for (Boolean _set_value : set) {
             _set.add(_set_value);
         }
         object.put("set", _set);
-
 
         JSONArray _list = new JSONArray();
         for (String _list_value : list) {
@@ -252,13 +249,11 @@ public class RoleData extends Data<Long> {
         }
         object.put("list", _list);
 
-
         JSONObject _map = new JSONObject();
         for (Integer _map_key : map.keySet()) {
             _map.put(String.valueOf(_map_key), map.get(_map_key));
         }
         object.put("map", _map);
-
 
         JSONArray _set2 = new JSONArray();
         for (ItemBean _set2_value : set2) {
@@ -266,13 +261,11 @@ public class RoleData extends Data<Long> {
         }
         object.put("set2", _set2);
 
-
         JSONArray _list2 = new JSONArray();
         for (ItemBean _list2_value : list2) {
             _list2.add(_list2_value.encode());
         }
         object.put("list2", _list2);
-
 
         JSONObject _map2 = new JSONObject();
         for (Integer _map2_key : map2.keySet()) {
@@ -294,6 +287,13 @@ public class RoleData extends Data<Long> {
         f.setValue(object.getFloat("f"));
         d.setValue(object.getDouble("d"));
 
+        JSONObject _itemBean = object.getJSONObject("itemBean");
+        ItemBean _itemBean_value = itemBean.getValue();
+        if (_itemBean_value == null) {
+            _itemBean_value = new ItemBean();
+            itemBean.setValue(_itemBean_value);
+        }
+        _itemBean_value.decode(_itemBean);
 
         JSONArray _set_1 = object.getJSONArray("set");
         if (_set_1 != null) {
@@ -305,7 +305,6 @@ public class RoleData extends Data<Long> {
             set.setValue(_set_3.plusAll(_set_2));
         }
 
-
         JSONArray _list_1 = object.getJSONArray("list");
         if (_list_1 != null) {
             List<String> _list_2 = new ArrayList<>();
@@ -316,7 +315,6 @@ public class RoleData extends Data<Long> {
             list.setValue(_list_3.plusAll(_list_2));
         }
 
-
         JSONObject _map_1 = object.getJSONObject("map");
         if (_map_1 != null) {
             Map<Integer, Integer> _map_2 = new HashMap<>();
@@ -326,7 +324,6 @@ public class RoleData extends Data<Long> {
             PMap<Integer, Integer> _map_3 = Empty.map();
             map.setValue(_map_3.plusAll(_map_2));
         }
-
 
         JSONArray _set2_1 = object.getJSONArray("set2");
         if (_set2_1 != null) {
@@ -340,7 +337,6 @@ public class RoleData extends Data<Long> {
             set2.setValue(_set2_3.plusAll(_set2_2));
         }
 
-
         JSONArray _list2_1 = object.getJSONArray("list2");
         if (_list2_1 != null) {
             List<ItemBean> _list2_2 = new ArrayList<>();
@@ -352,7 +348,6 @@ public class RoleData extends Data<Long> {
             PVector<ItemBean> _list2_3 = Empty.vector();
             list2.setValue(_list2_3.plusAll(_list2_2));
         }
-
 
         JSONObject _map2_1 = object.getJSONObject("map2");
         if (_map2_1 != null) {

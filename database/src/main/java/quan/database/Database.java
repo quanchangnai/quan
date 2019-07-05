@@ -185,16 +185,13 @@ public abstract class Database {
         @Override
         public void run() {
             running = true;
-
             while (running) {
-                long sleepTime = 0;
-                while (sleepTime < storePeriod * 1000) {
+                for (int i = 0; i < storePeriod; i++) {
+                    if (!running) {
+                        break;
+                    }
                     try {
-                        sleepTime = sleepTime + 1;
-                        Thread.sleep(1);
-                        if (!running) {
-                            break;
-                        }
+                        Thread.sleep(1000);
                     } catch (InterruptedException e) {
                     }
                 }
@@ -228,7 +225,7 @@ public abstract class Database {
         /**
          * 缓存大小
          */
-        private int cacheSize = 5000;
+        private int cacheSize = 2000;
 
         /**
          * 缓存过期时间(秒)
@@ -258,7 +255,7 @@ public abstract class Database {
         }
 
         public Config setCacheSize(int cacheSize) {
-            this.cacheSize = cacheSize;
+            this.cacheSize = Math.max(100, cacheSize);
             return this;
         }
 
@@ -267,7 +264,7 @@ public abstract class Database {
         }
 
         public Config setCacheExpire(int cacheExpire) {
-            this.cacheExpire = cacheExpire;
+            this.cacheExpire = Math.max(60, cacheExpire);
             return this;
         }
 
@@ -276,7 +273,7 @@ public abstract class Database {
         }
 
         public Config setStorePeriod(int storePeriod) {
-            this.storePeriod = storePeriod;
+            this.storePeriod = Math.max(60, storePeriod);
             return this;
         }
 
@@ -285,7 +282,7 @@ public abstract class Database {
         }
 
         public Config setStoreThreadNum(int storeThreadNum) {
-            this.storeThreadNum = storeThreadNum;
+            this.storeThreadNum = Math.max(1, storeThreadNum);
             return this;
         }
     }

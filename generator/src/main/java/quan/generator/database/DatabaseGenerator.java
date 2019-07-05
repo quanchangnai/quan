@@ -11,10 +11,10 @@ import quan.database.Bean;
 import quan.database.Cache;
 import quan.database.Data;
 import quan.database.Database;
-import quan.database.field.Field;
-import quan.database.field.ListField;
-import quan.database.field.MapField;
-import quan.database.field.SetField;
+import quan.database.Field;
+import quan.database.ListField;
+import quan.database.MapField;
+import quan.database.SetField;
 import quan.generator.BeanDefinition;
 import quan.generator.Generator;
 

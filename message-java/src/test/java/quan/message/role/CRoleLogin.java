@@ -11,13 +11,12 @@ import java.io.IOException;
  */
 public class CRoleLogin extends Message {
 
-    private long roleId;
+    private long roleId = 0L;
 
-    private String roleName;
+    private String roleName = "";
 
     public CRoleLogin() {
         super(1111);
-        roleName = "";
     }
 
     public long getRoleId() {
@@ -47,6 +46,7 @@ public class CRoleLogin extends Message {
     @Override
     public void encode(Buffer buffer) throws IOException {
         super.encode(buffer);
+
         buffer.writeLong(roleId);
         buffer.writeString(roleName);
     }
@@ -54,6 +54,7 @@ public class CRoleLogin extends Message {
     @Override
     public void decode(Buffer buffer) throws IOException {
         super.decode(buffer);
+
         roleId = buffer.readLong();
         roleName = buffer.readString();
     }

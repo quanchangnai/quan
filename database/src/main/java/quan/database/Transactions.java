@@ -21,23 +21,28 @@ public class Transactions {
 
     private static final Logger logger = LoggerFactory.getLogger(Transactions.class);
 
+
+    /**
+     * 设置声明式事务异步执行的线程池，不设置时或设置为空事务将同步执行<br/>
+     * 异步执行时，最外层原始方法返回值将会丢失，同步执行能返回正确结果
+     *
+     * @param executor
+     */
+    public static void setExecutor(Executor executor) {
+        TransactionDelegation.setExecutor(executor);
+    }
+
+
     /**
      * 创建子类代理对象方式实现声明式事务，支持父类热加载
      *
      * @param superclass 父类型
-     * @param executor   不为空时在线程池中异步执行（最外层原始方法返回值将会丢失），为空时在被转换方法调用的当前线程同步执行
      * @param <T>
      * @return
      * @throws Exception
      */
-    public synchronized static <T> T subclass(Class<T> superclass, Executor executor) {
+    public synchronized static <T> T subclass(Class<T> superclass) {
         Objects.requireNonNull(superclass);
-
-        if (executor != null) {
-            TransactionDelegation.executor = executor;
-        } else {
-            TransactionDelegation.executor = null;
-        }
         MethodDelegation methodDelegation = MethodDelegation.to(TransactionDelegation.class);
 
         ElementMatcher.Junction<MethodDescription> methodMatcher = ElementMatchers.isAnnotatedWith(Transactional.class);
@@ -59,26 +64,17 @@ public class Transactions {
 
     }
 
-    public static <T> T subclass(Class<T> superclass) throws Exception {
-        return subclass(superclass, null);
-    }
-
     /**
      * 转换字节码方式实现声明式事务
      * 必须要在被转换的类加载之前调用，不支持热加载
      *
      * @param classNamePrefix 全类名的前缀，一般传包名就行
-     * @param executor        不为空时在线程池中异步执行（最外层原始方法返回值将会丢失），为空时在被转换方法调用的当前线程同步执行
      */
-    public synchronized static void transform(String classNamePrefix, Executor executor) {
+    public synchronized static void transform(String classNamePrefix) {
         if (classNamePrefix == null || classNamePrefix.trim().equals("")) {
             throw new IllegalArgumentException("类名前缀不能为空");
         }
-        if (executor != null) {
-            TransactionDelegation.executor = executor;
-        } else {
-            TransactionDelegation.executor = null;
-        }
+
         MethodDelegation methodDelegation = MethodDelegation.to(TransactionDelegation.class);
 
         Instrumentation instrumentation = ByteBuddyAgent.install();
@@ -94,8 +90,16 @@ public class Transactions {
 
     }
 
-    public synchronized static void transform(String classNamePrefix) {
-        transform(classNamePrefix, null);
+    public static void setSlowTimeThreshold(int slowTimeThreshold) {
+        Transaction.slowTimeThreshold = Math.max(0, slowTimeThreshold);
+    }
+
+    public static void setConflictThreshold(int conflictThreshold) {
+        Transaction.conflictThreshold = Math.max(0, conflictThreshold);
+    }
+
+    public static void setPrintCountInterval(int printCountInterval) {
+        Transaction.printCountInterval = Math.max(30, printCountInterval);
     }
 
 

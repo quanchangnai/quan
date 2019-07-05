@@ -1,5 +1,6 @@
 package quan.generator.database.item;
 
+import quan.database.*;
 import quan.database.Database;
 import quan.database.Cache;
 import com.alibaba.fastjson.JSONArray;
@@ -9,7 +10,6 @@ import java.util.*;
 import org.pcollections.PSet;
 import org.pcollections.PVector;
 import org.pcollections.Empty;
-import quan.database.field.*;
 import com.alibaba.fastjson.JSONObject;
 import org.pcollections.PMap;
 

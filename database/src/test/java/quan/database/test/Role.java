@@ -1,7 +1,9 @@
-package quan.database;
+package quan.database.test;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import quan.database.Transaction;
+import quan.database.Transactional;
 import quan.database.item.ItemBean;
 import quan.database.role.RoleData;
 
@@ -15,19 +17,17 @@ public class Role {
     private RoleData roleData;
 
     @Transactional
-    public String login() {
+    public boolean login1() {
+        System.err.println("login1======================================================");
         logger.error("currentThread:{}", Thread.currentThread());
-        String result = login("1111");
-        System.err.println("login(1111):" + result);
-        Transaction.breakdown();
-        return result+":xxxxxxx";
+        return login2("1111");
     }
 
     @Transactional
-    public String login(String password) {
-        System.err.println("login======================================================");
+    public boolean login2(String password) {
+        System.err.println("login2======================================================");
         roleData = RoleData.getOrInsert(1L);
-        logger.error("RoleData.getOrInsert(1L):{}", roleData);
+        logger.error("roleData:{}", roleData);
 
         roleData.setName("role" + System.currentTimeMillis());//role1562131925281
         roleData.getList().add(System.currentTimeMillis() + "");
@@ -54,7 +54,6 @@ public class Role {
         itemBean4.setId(444);
         itemBean4.setName("444");
         roleData.getSet2().add(itemBean4);
-        Transaction.breakdown();
 
         ItemBean itemBean5 = new ItemBean();
         itemBean5.setId(555);
@@ -67,19 +66,26 @@ public class Role {
 
         logger.error("currentThread:{}", Thread.currentThread());
 
-        RuntimeException runtimeException = new RuntimeException();
 
         if (roleData.getId() == 1) {
-//            throw runtimeException;
+            Transaction.breakdown();
         }
 
-//        runtimeException.printStackTrace();
 
         if (roleData.getId() == 1) {
 //            return false;
         }
 
-        return "success";
+        return true;
+    }
+
+    @Transactional
+    public String login3() {
+        System.err.println("login3======================================================");
+        roleData = RoleData.getOrInsert(1L);
+        logger.error("roleData:{}", roleData);
+
+        return "login3";
     }
 
     @Override

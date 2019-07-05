@@ -1,7 +1,11 @@
-package quan.database;
+package quan.database.test;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import quan.database.Database;
+import quan.database.Executor;
+import quan.database.MongoDB;
+import quan.database.Transactions;
 
 /**
  * 声明式事务测试
@@ -22,31 +26,33 @@ public class DatabaseTest4 {
 
     public static void main(String[] args) throws Exception {
         System.err.println("======================================================");
-        test1(executor);
+        test1();
         System.err.println("======================================================");
 
-//        test1(null);
-//        System.err.println("======================================================");
-
-//        test2(executor);
+//        test2();
 //        System.err.println("=================="====================================);
 
-//        test2(null);
-//        System.err.println("======================================================");
 
 //        database.close();
     }
 
 
-    private static void test1(Executor executor) throws Exception {
-        Role role = Transactions.subclass(Role.class, executor);
+    private static void test1() throws Exception {
+        Transactions.setExecutor(executor);
+        Role role = Transactions.subclass(Role.class);
         logger.error("role.getClass:{}", role.getClass());
 
-        Object result = role.login();
-        System.err.println("role.login():" + result);
+        Transactions.setExecutor(executor);
 
-        result = role.login("123456");
-        System.err.println("role.login(123456):" + result);
+        Transactions.transform("quan.database.test.Role2");
+
+        Role2 role2 = new Role2();
+
+        role.login1();
+//        role.login2("123456");
+
+
+        role2.login();
 
         Thread.sleep(1000);
 
@@ -54,17 +60,13 @@ public class DatabaseTest4 {
     }
 
 
-    private static void test2(Executor executor) throws Exception {
-        Transactions.transform("quan.database.Role", executor);
+    private static void test2() throws Exception {
+        Transactions.transform("quan.database.test.Role");
 
         Role role = new Role();
-        Object result = role.login();
-        System.err.println("role.login():" + result);
+        role.login1();
 
-        result = role.login("123456");
-        System.err.println("role.login(123456):" + result);
-
-//        Transaction.execute(role::login);
+//        role.login1("123456");
 
         Thread.sleep(1000);
 

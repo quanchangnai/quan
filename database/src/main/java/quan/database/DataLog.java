@@ -1,15 +1,11 @@
-package quan.database.log;
-
-import quan.database.Cache;
-import quan.database.Data;
-import quan.database.Transaction;
+package quan.database;
 
 import java.util.Objects;
 
 /**
  * Created by quanchangnai on 2019/6/24.
  */
-public class DataLog {
+class DataLog {
 
     private Key key;
 
