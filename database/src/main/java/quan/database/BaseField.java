@@ -30,7 +30,7 @@ public class BaseField<V> implements Field<V> {
     }
 
     public void setLogValue(V value, Data root) {
-        Validations.validFieldValue(value);
+        Validations.validateFieldValue(value);
 
         Transaction transaction = Transaction.get();
         if (root != null) {

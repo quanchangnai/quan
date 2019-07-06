@@ -8,18 +8,18 @@ import java.util.Objects;
  */
 class Validations {
 
-    public static void validMapKey(Object key) {
+    public static void validateMapKey(Object key) {
         Objects.requireNonNull(key);
     }
 
-    public static void validCollectionValue(Object value) {
+    public static void validateCollectionValue(Object value) {
         Objects.requireNonNull(value);
         if (value instanceof Bean) {
-            validBeanRoot((Bean) value);
+            validateBeanRoot((Bean) value);
         }
     }
 
-    public static void validBeanRoot(Bean bean) {
+    public static void validateBeanRoot(Bean bean) {
         if (bean == null) {
             return;
         }
@@ -29,7 +29,7 @@ class Validations {
         }
     }
 
-    public static void validFieldValue(Object value) {
+    public static void validateFieldValue(Object value) {
         Objects.requireNonNull(value);
     }
 

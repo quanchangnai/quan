@@ -20,6 +20,27 @@ public class BeanDefinition extends ClassDefinition {
     }
 
     @Override
+    protected void validateField(FieldDefinition fieldDefinition) {
+        super.validateField(fieldDefinition);
+
+        //校验字段类型
+        if (fieldDefinition.getType() == null || fieldDefinition.getType().trim().equals("")) {
+            throwValidateError("字段[" + fieldDefinition.getName() + "]类型不能为空");
+        }
+
+        if (fieldDefinition.isCollectionType()) {
+            if (fieldDefinition.getValueType() == null || fieldDefinition.getValueType().trim().equals("")) {
+                throwValidateError(fieldDefinition.getType() + "类型字段[" + fieldDefinition.getName() + "]的值类型不能为空");
+            }
+
+            if (fieldDefinition.getType().equals("map") && (fieldDefinition.getKeyType() == null || fieldDefinition.getKeyType().trim().equals(""))) {
+                throwValidateError(fieldDefinition.getType() + "类型字段[" + fieldDefinition.getName() + "]的键类型不能为空");
+            }
+
+        }
+    }
+
+    @Override
     public String toString() {
         return getClass().getName() + "{" +
                 "name=" + getName() +

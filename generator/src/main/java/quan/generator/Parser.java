@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import quan.generator.database.DataDefinition;
 import quan.generator.message.EnumDefinition;
 import quan.generator.message.MessageDefinition;
-import quan.message.Message;
 
 import java.io.File;
 import java.util.*;
@@ -46,6 +45,9 @@ public class Parser {
         for (File srcFile : srcFiles) {
             parseFields(srcFile);
         }
+        for (ClassDefinition classDefinition : results.values()) {
+            classDefinition.validate();
+        }
 
         return new ArrayList<>(results.values());
     }
@@ -67,7 +69,6 @@ public class Parser {
             if (node instanceof Element) {
                 Element element = (Element) node;
                 ClassDefinition classDefinition = null;
-
                 if (element.getName().equals("enum")) {
                     classDefinition = new EnumDefinition();
                 } else if (element.getName().equals("bean")) {
@@ -82,28 +83,34 @@ public class Parser {
                     dataDefinition.setKeyName(element.attributeValue("key"));
                 }
 
-                if (classDefinition != null) {
-                    classDefinition.setFileName(srcFile.getName());
-                    classDefinition.setPackageName(packageName);
-                    classDefinition.setName(element.attributeValue("name"));
-
-                    String comment = root.node(i - 1).getText();
-                    comment = comment.replaceAll("\r|\n", "").trim();
-                    if (comment.equals("")) {
-                        comment = element.node(0).getText();
-                        comment = comment.replaceAll("\r|\n", "").trim();
-                    }
-                    classDefinition.setComment(comment);
-
-                    if (results.containsKey(classDefinition.getName())) {
-                        String errorStr = "定义文件[" + results.get(classDefinition.getName()).getFileName() +
-                                "]和[" + classDefinition.getFileName() +
-                                "]有同名类[" + classDefinition.getName() + "]";
-                        throw new RuntimeException(errorStr);
-                    }
-
-                    results.put(classDefinition.getName(), classDefinition);
+                if (classDefinition == null) {
+                    continue;
                 }
+
+
+                classDefinition.setDefinitionFile(srcFile.getName());
+                classDefinition.setDefinitionText(element.asXML());
+
+                classDefinition.setPackageName(packageName);
+                classDefinition.setName(element.attributeValue("name"));
+
+                String comment = root.node(i - 1).getText();
+                comment = comment.replaceAll("\r|\n", "").trim();
+                if (comment.equals("")) {
+                    comment = element.node(0).getText();
+                    comment = comment.replaceAll("\r|\n", "").trim();
+                }
+                classDefinition.setComment(comment);
+
+                if (results.containsKey(classDefinition.getName())) {
+                    String errorStr = "定义文件[" + results.get(classDefinition.getName()).getDefinitionFile() +
+                            "]和[" + classDefinition.getDefinitionFile() +
+                            "]有同名类[" + classDefinition.getName() + "]";
+                    throw new RuntimeException(errorStr);
+                }
+
+                results.put(classDefinition.getName(), classDefinition);
+
             }
         }
 
@@ -153,57 +160,10 @@ public class Parser {
                     comment = comment.replaceAll("\r|\n", "").trim();
                     fieldDefinition.setComment(comment);
 
-                    validField(enumDefinition, fieldDefinition);
-
                     enumDefinition.getFields().add(fieldDefinition);
                 }
             }
         }
-    }
-
-    private void validField(ClassDefinition classDefinition, FieldDefinition fieldDefinition) {
-        String errorPosition = "文件:" + classDefinition.getFileName() + "，类:" + classDefinition.getName();
-        //校验字段名
-        if (fieldDefinition.getName() == null || fieldDefinition.getName().trim().equals("")) {
-            throw new RuntimeException("字段名不能为空，" + errorPosition);
-        }
-        fieldDefinition.setName(fieldDefinition.getName().trim());
-
-        //校验枚举值
-        if (classDefinition instanceof EnumDefinition) {
-            try {
-                int enumValue = Integer.parseInt(fieldDefinition.getValue());
-                if (enumValue <= 0) {
-                    throw new NumberFormatException();
-                }
-            } catch (NumberFormatException e) {
-                throw new RuntimeException("枚举值必须为正整数，" + errorPosition);
-            }
-
-            fieldDefinition.setValue(fieldDefinition.getValue().trim());
-
-            for (FieldDefinition field : classDefinition.getFields()) {
-                if (field.getValue().equals(fieldDefinition.getValue())) {
-                    throw new RuntimeException("枚举值不能重复，" + errorPosition);
-                }
-            }
-            return;
-        }
-
-        //校验字段类型
-        if (fieldDefinition.getType() == null || fieldDefinition.getType().trim().equals("")) {
-            throw new RuntimeException("字段类型不能为空，" + errorPosition);
-        }
-        fieldDefinition.setType(fieldDefinition.getType().trim());
-        if (fieldDefinition.isCollectionType()) {
-            if (fieldDefinition.getValueType() == null || fieldDefinition.getValueType().trim().equals("")) {
-                throw new RuntimeException(fieldDefinition.getType() + "的值类型不能为空，" + errorPosition);
-            }
-            if (fieldDefinition.getType().equals("map") && (fieldDefinition.getKeyType() == null || fieldDefinition.getKeyType().trim().equals(""))) {
-                throw new RuntimeException(fieldDefinition.getType() + "的键类型不能为空，" + errorPosition);
-            }
-        }
-
     }
 
     private void parseBeanFields(Element element) {
@@ -239,8 +199,6 @@ public class Parser {
                     comment = comment.replaceAll("\r|\n", "").trim();
                     fieldDefinition.setComment(comment);
 
-                    validField(beanDefinition, fieldDefinition);
-
                     ClassDefinition fieldTypeClassDefinition = results.get(fieldDefinition.getType());
                     if (fieldTypeClassDefinition != null) {
                         if (!fieldTypeClassDefinition.getPackageName().equals(beanDefinition.getPackageName())) {
@@ -255,22 +213,12 @@ public class Parser {
 
                     if (beanDefinition instanceof DataDefinition) {
                         DataDefinition dataDefinition = (DataDefinition) beanDefinition;
-                        if (dataDefinition.getKeyName().equals(fieldDefinition.getName())) {
+                        if (dataDefinition.getKeyName() != null && dataDefinition.getKeyName().equals(fieldDefinition.getName())) {
                             dataDefinition.setKeyType(fieldDefinition.getType());
                         }
                     }
+
                 }
-            }
-        }
-        if (beanDefinition instanceof DataDefinition) {
-            DataDefinition dataDefinition = (DataDefinition) beanDefinition;
-            if (dataDefinition.getKeyName() == null || dataDefinition.getKeyName().trim().equals("")) {
-                String errorPosition = "文件:" + classDefinition.getFileName() + "，类:" + classDefinition.getName();
-                throw new RuntimeException("主键不能为空，" + errorPosition);
-            }
-            if (dataDefinition.getKeyType() == null || dataDefinition.getKeyType().trim().equals("")) {
-                String errorPosition = "文件:" + classDefinition.getFileName() + "，类:" + classDefinition.getName();
-                throw new RuntimeException("主键不存在，" + errorPosition);
             }
         }
 

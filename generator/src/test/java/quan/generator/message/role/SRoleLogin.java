@@ -27,7 +27,7 @@ public class SRoleLogin extends Message {
     private UserInfo userInfo;//用户信息
 
     public SRoleLogin() {
-        super(2222);
+        super(111);
     }
 
     public long getRoleId() {

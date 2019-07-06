@@ -94,7 +94,7 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
 
     @Override
     public boolean add(E e) {
-        Validations.validCollectionValue(e);
+        Validations.validateCollectionValue(e);
 
         FieldLog<PVector<E>> log = getOrAddLog();
 
@@ -140,7 +140,7 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
     @Override
     public boolean addAll(Collection<? extends E> c) {
         for (E e : c) {
-            Validations.validCollectionValue(e);
+            Validations.validateCollectionValue(e);
         }
 
         FieldLog<PVector<E>> log = getOrAddLog();
@@ -164,7 +164,7 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
     @Override
     public boolean addAll(int index, Collection<? extends E> c) {
         for (E e : c) {
-            Validations.validCollectionValue(e);
+            Validations.validateCollectionValue(e);
         }
 
         FieldLog<PVector<E>> log = getOrAddLog();
@@ -226,7 +226,7 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
 
     @Override
     public E set(int index, E element) {
-        Validations.validCollectionValue(element);
+        Validations.validateCollectionValue(element);
 
         FieldLog<PVector<E>> log = getOrAddLog();
 
@@ -251,7 +251,7 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
 
     @Override
     public void add(int index, E element) {
-        Validations.validCollectionValue(element);
+        Validations.validateCollectionValue(element);
 
         FieldLog<PVector<E>> log = getOrAddLog();
 

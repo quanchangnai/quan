@@ -22,7 +22,7 @@
         <field name="map" type="map" key-type="int" value-type="int"/>
     </bean>
 
-    <message id="aaa" name="SRoleLogin">角色登录
+    <message id="111" name="SRoleLogin">角色登录
         <field name="roleId" type="long"/>角色id
         <field name="roleName" type="string"/>角色名
         <field name="roleInfo" type="RoleInfo"/>角色信息

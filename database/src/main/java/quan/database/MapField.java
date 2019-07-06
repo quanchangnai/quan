@@ -85,8 +85,8 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field<PMap<
 
     @Override
     public V put(K key, V value) {
-        Validations.validMapKey(key);
-        Validations.validCollectionValue(value);
+        Validations.validateMapKey(key);
+        Validations.validateCollectionValue(value);
 
         FieldLog<PMap<K, V>> log = getOrAddLog();
 
@@ -120,11 +120,11 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field<PMap<
     @Override
     public void putAll(Map<? extends K, ? extends V> m) {
         for (K key : m.keySet()) {
-            Validations.validMapKey(key);
+            Validations.validateMapKey(key);
         }
 
         for (V value : m.values()) {
-            Validations.validCollectionValue(value);
+            Validations.validateCollectionValue(value);
         }
 
         FieldLog<PMap<K, V>> log = getOrAddLog();

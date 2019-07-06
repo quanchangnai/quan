@@ -13,7 +13,7 @@ public final class BeanField<V extends Bean> extends BaseField<V> {
     }
 
     public void setLogValue(V value, Data root) {
-        Validations.validBeanRoot(value);
+        Validations.validateBeanRoot(value);
 
         Transaction transaction = Transaction.get();
         if (root != null) {

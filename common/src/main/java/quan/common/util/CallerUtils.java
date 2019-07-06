@@ -8,10 +8,10 @@ import java.util.Collection;
  */
 public class CallerUtils {
 
-    private static boolean valid = true;
+    private static boolean validate = true;
 
-    public static void setValid(boolean valid) {
-        CallerUtils.valid = valid;
+    public static void setValidate(boolean validate) {
+        CallerUtils.validate = validate;
     }
 
     public static Class getCallerClass() {
@@ -28,8 +28,8 @@ public class CallerUtils {
 
     }
 
-    private static void validCallerClass(Collection<Class> allowClasses, int calleeIndex) {
-        if (!valid) {
+    private static void validateCallerClass(Collection<Class> allowClasses, int calleeIndex) {
+        if (!validate) {
             return;
         }
 
@@ -65,8 +65,8 @@ public class CallerUtils {
     }
 
 
-    private static void validCallerPackage(Collection<Package> allowPackages, int calleeIndex) {
-        if (!valid) {
+    private static void validateCallerPackage(Collection<Package> allowPackages, int calleeIndex) {
+        if (!validate) {
             return;
         }
 
@@ -104,20 +104,20 @@ public class CallerUtils {
         }
     }
 
-    public static void validCallerClass(Collection<Class> allowClasses) {
-        validCallerClass(allowClasses, 2);
+    public static void validateCallerClass(Collection<Class> allowClasses) {
+        validateCallerClass(allowClasses, 2);
     }
 
-    public static void validCallerClass(Class allowClass) {
-        validCallerClass(Arrays.asList(allowClass), 2);
+    public static void validateCallerClass(Class allowClass) {
+        validateCallerClass(Arrays.asList(allowClass), 2);
     }
 
-    public static void validCallerPackage(Collection<Package> allowPackages) {
-        validCallerPackage(allowPackages, 2);
+    public static void validateCallerPackage(Collection<Package> allowPackages) {
+        validateCallerPackage(allowPackages, 2);
     }
 
-    public static void validCallerPackage(Package allowPackage) {
-        validCallerPackage(Arrays.asList(allowPackage), 2);
+    public static void validateCallerPackage(Package allowPackage) {
+        validateCallerPackage(Arrays.asList(allowPackage), 2);
     }
 
 }

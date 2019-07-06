@@ -271,7 +271,7 @@ public class Connection {
      * @param msg
      */
     public void send(ByteBuffer msg) {
-        CallerUtils.validCallerClass(HandlerContext.class);
+        CallerUtils.validateCallerClass(HandlerContext.class);
         if (executor.isInMyThread()) {
             send0(msg);
         } else {
@@ -294,7 +294,7 @@ public class Connection {
      * 关闭连接，不能在具体逻辑中直接调用，具体逻辑中应该调用{@link HandlerContext#close()}
      */
     public void close() {
-        CallerUtils.validCallerClass(HandlerContext.class);
+        CallerUtils.validateCallerClass(HandlerContext.class);
         try {
             if (!this.isConnected()) {
                 return;

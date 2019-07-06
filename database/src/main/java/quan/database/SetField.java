@@ -87,7 +87,7 @@ public final class SetField<E> extends Node implements Set<E>, Field<PSet<E>> {
 
     @Override
     public boolean add(E e) {
-        Validations.validCollectionValue(e);
+        Validations.validateCollectionValue(e);
 
         FieldLog<PSet<E>> log = getOrAddLog();
 
@@ -133,7 +133,7 @@ public final class SetField<E> extends Node implements Set<E>, Field<PSet<E>> {
     @Override
     public boolean addAll(Collection<? extends E> c) {
         for (E e : c) {
-            Validations.validCollectionValue(e);
+            Validations.validateCollectionValue(e);
         }
 
         FieldLog<PSet<E>> log = getOrAddLog();
