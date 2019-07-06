@@ -38,10 +38,10 @@ public class DataDefinition extends BeanDefinition {
     public void validate() {
         super.validate();
         if (getKeyName() == null || getKeyName().trim().equals("")) {
-            throwValidateError("主键不能为空");
+            throwValidatedError("主键不能为空");
         }
         if (getKeyType() == null || getKeyType().trim().equals("")) {
-            throwValidateError("主键不存在");
+            throwValidatedError("主键不存在");
         }
     }
 }

@@ -32,16 +32,17 @@ public class MessageDefinition extends BeanDefinition {
         try {
             Integer.parseInt(id);
         } catch (NumberFormatException e) {
-            throwValidateError("消息ID必须是整数");
+            throwValidatedError("消息ID必须是整数");
         }
 
         MessageDefinition other = messages.get(id);
         if (other != null) {
-            throwValidateError("消息ID不能重复:" + id, other);
+            throwValidatedError("消息ID不能重复:" + id, other);
         }
 
         messages.put(id, this);
 
         super.validate();
+
     }
 }

@@ -58,7 +58,7 @@ public abstract class ClassDefinition extends Definition {
 
     public void validate() {
         if (getName() == null || getName().trim().equals("")) {
-            throwValidateError("类名不能为空");
+            throwValidatedError("类名不能为空");
         }
 
         for (FieldDefinition fieldDefinition : getFields()) {
@@ -69,16 +69,16 @@ public abstract class ClassDefinition extends Definition {
     protected void validateField(FieldDefinition fieldDefinition) {
         //校验字段名
         if (fieldDefinition.getName() == null || fieldDefinition.getName().trim().equals("")) {
-            throwValidateError("字段名不能为空");
+            throwValidatedError("字段名不能为空");
         }
     }
 
-    protected void throwValidateError(String err) {
-        throwValidateError(err, null);
+    protected void throwValidatedError(String error) {
+        throwValidatedError(error, null);
     }
 
-    protected void throwValidateError(String err, ClassDefinition other) {
-        String errorPosition = ",文件:" + getDefinitionFile();
+    protected void throwValidatedError(String error, ClassDefinition other) {
+        String errorPosition = ",所在定义文件:" + getDefinitionFile();
         if (getName() != null && !getName().trim().equals("")) {
             errorPosition += ",类:" + getName();
         }
@@ -92,7 +92,7 @@ public abstract class ClassDefinition extends Definition {
             errorPosition += "\r\n\t" + definitionText;
         }
 
-        throw new RuntimeException(err + errorPosition);
+        throw new RuntimeException(error + errorPosition);
     }
 
 

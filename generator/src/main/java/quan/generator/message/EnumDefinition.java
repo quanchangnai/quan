@@ -34,10 +34,10 @@ public class EnumDefinition extends ClassDefinition {
         } catch (NumberFormatException e) {
         }
         if (enumValue < 1) {
-            throwValidateError("枚举值必须为正整数");
+            throwValidatedError("枚举值必须为正整数");
         }
         if (enumValues.contains(enumValue)) {
-            throwValidateError("枚举值不能重复");
+            throwValidatedError("枚举值不能重复");
         }
 
         enumValues.add(enumValue);
