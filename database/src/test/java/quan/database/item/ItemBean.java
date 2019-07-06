@@ -1,8 +1,17 @@
 package quan.database.item;
 
 import quan.database.*;
-
+import quan.database.Database;
+import quan.database.Cache;
+import com.alibaba.fastjson.JSONArray;
+import quan.database.Data;
+import quan.database.Bean;
+import java.util.*;
+import org.pcollections.PSet;
+import org.pcollections.PVector;
+import org.pcollections.Empty;
 import com.alibaba.fastjson.JSONObject;
+import org.pcollections.PMap;
 
 /**
  * 道具
@@ -47,8 +56,9 @@ public class ItemBean extends Bean {
 
     @Override
     public void decode(JSONObject object) {
-        id.setValue(object.getInteger("id"));
-        name.setValue(object.getString("name"));
+        id.setValue(object.getIntValue("id"));
+        String _name = object.getString("name");
+        name.setValue(_name == null ? "" : _name);
     }
 
     @Override

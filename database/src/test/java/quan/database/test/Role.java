@@ -62,7 +62,7 @@ public class Role {
 
         logger.error("roleData.setName:{}", roleData);
 
-        System.err.println("roleData.encode():"+roleData.encode());
+        System.err.println("roleData.encode():" + roleData.encode());
 
         logger.error("currentThread:{}", Thread.currentThread());
 
@@ -86,6 +86,13 @@ public class Role {
         logger.error("roleData:{}", roleData);
 
         return "login3";
+    }
+
+    @Transactional
+    public static void login4() {
+        System.err.println("login4======================================================");
+        System.err.println("roleData:" + RoleData.getOrInsert(1L));
+
     }
 
     @Override

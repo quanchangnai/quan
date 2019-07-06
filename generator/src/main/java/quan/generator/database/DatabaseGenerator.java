@@ -25,13 +25,13 @@ public class DatabaseGenerator extends Generator {
 
     public static void main(String[] args) throws Exception {
 
-        String srcPath = "generator\\src\\test\\java\\quan\\generator\\database";
-        String destPath = "generator\\src\\test\\java";
-        String packagePrefix = "quan.generator.database";
+//        String srcPath = "generator\\src\\test\\java\\quan\\generator\\database";
+//        String destPath = "generator\\src\\test\\java";
+//        String packagePrefix = "quan.generator.database";
 
-//        String srcPath = "database\\src\\test\\java\\quan\\database";
-//        String destPath = "database\\src\\test\\java";
-//        String packagePrefix = "quan.database";
+        String srcPath = "database\\src\\test\\java\\quan\\database";
+        String destPath = "database\\src\\test\\java";
+        String packagePrefix = "quan.database";
 
         DatabaseGenerator generator = new DatabaseGenerator(srcPath, destPath);
         generator.setPackagePrefix(packagePrefix);

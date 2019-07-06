@@ -1,8 +1,10 @@
 package quan.database.role;
 
 import quan.database.*;
+import quan.database.Database;
+import quan.database.Cache;
 import com.alibaba.fastjson.JSONArray;
-
+import quan.database.Data;
 import java.util.*;
 import org.pcollections.PSet;
 import org.pcollections.PVector;
@@ -289,22 +291,25 @@ public class RoleData extends Data<Long> {
 
     @Override
     public void decode(JSONObject object) {
-        id.setValue(object.getLong("id"));
-        name.setValue(object.getString("name"));
-        bo.setValue(object.getBoolean("bo"));
-        by.setValue(object.getByte("by"));
-        s.setValue(object.getShort("s"));
-        i.setValue(object.getInteger("i"));
-        f.setValue(object.getFloat("f"));
-        d.setValue(object.getDouble("d"));
+        id.setValue(object.getLongValue("id"));
+        String _name = object.getString("name");
+        name.setValue(_name == null ? "" : _name);
+        bo.setValue(object.getBooleanValue("bo"));
+        by.setValue(object.getByteValue("by"));
+        s.setValue(object.getShortValue("s"));
+        i.setValue(object.getIntValue("i"));
+        f.setValue(object.getFloatValue("f"));
+        d.setValue(object.getDoubleValue("d"));
 
         JSONObject _item = object.getJSONObject("item");
-        ItemBean _item_value = item.getValue();
-        if (_item_value == null) {
-            _item_value = new ItemBean();
-            item.setValue(_item_value);
+        if (_item != null) {
+            ItemBean _item_value = item.getValue();
+            if (_item_value == null) {
+                _item_value = new ItemBean();
+                item.setValue(_item_value);
+            }
+            _item_value.decode(_item);
         }
-        _item_value.decode(_item);
 
         JSONObject _items_1 = object.getJSONObject("items");
         if (_items_1 != null) {

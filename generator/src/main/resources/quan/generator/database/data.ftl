@@ -273,19 +273,26 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
             ${field.name}.setValue(_${field.name}_3.plusAll(_${field.name}_2));
         }
 
+    <#elseif field.type=="int">
+        ${field.name}.setValue(object.getIntValue("${field.name}"));
+    <#elseif field.type=="string">
+        String _${field.name} = object.getString("${field.name}");
+        ${field.name}.setValue(_${field.name} == null ? "" : _${field.name});
     <#elseif field.builtInType>
-        ${field.name}.setValue(object.get${field.classType}("${field.name}"));
+        ${field.name}.setValue(object.get${field.classType}Value("${field.name}"));
     <#else>
         <#if field_index gt 0 && fields[field_index-1].builtInType && !fields[field_index-1].collectionType>
 
         </#if>
         JSONObject _${field.name} = object.getJSONObject("${field.name}");
-        ${field.classType} _${field.name}_value = ${field.name}.getValue();
-        if (_${field.name}_value == null) {
-            _${field.name}_value = new ${field.classType}();
-            ${field.name}.setValue(_${field.name}_value);
+        if (_${field.name} != null) {
+            ${field.classType} _${field.name}_value = ${field.name}.getValue();
+            if (_${field.name}_value == null) {
+                _${field.name}_value = new ${field.classType}();
+                ${field.name}.setValue(_${field.name}_value);
+            }
+            _${field.name}_value.decode(_${field.name});
         }
-        _${field.name}_value.decode(_${field.name});
 
     </#if>
 </#list>

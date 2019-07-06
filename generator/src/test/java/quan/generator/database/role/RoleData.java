@@ -278,22 +278,25 @@ public class RoleData extends Data<Long> {
 
     @Override
     public void decode(JSONObject object) {
-        id.setValue(object.getLong("id"));
-        name.setValue(object.getString("name"));
-        bo.setValue(object.getBoolean("bo"));
-        by.setValue(object.getByte("by"));
-        s.setValue(object.getShort("s"));
-        i.setValue(object.getInteger("i"));
-        f.setValue(object.getFloat("f"));
-        d.setValue(object.getDouble("d"));
+        id.setValue(object.getLongValue("id"));
+        String _name = object.getString("name");
+        name.setValue(_name == null ? "" : _name);
+        bo.setValue(object.getBooleanValue("bo"));
+        by.setValue(object.getByteValue("by"));
+        s.setValue(object.getShortValue("s"));
+        i.setValue(object.getIntValue("i"));
+        f.setValue(object.getFloatValue("f"));
+        d.setValue(object.getDoubleValue("d"));
 
         JSONObject _itemBean = object.getJSONObject("itemBean");
-        ItemBean _itemBean_value = itemBean.getValue();
-        if (_itemBean_value == null) {
-            _itemBean_value = new ItemBean();
-            itemBean.setValue(_itemBean_value);
+        if (_itemBean != null) {
+            ItemBean _itemBean_value = itemBean.getValue();
+            if (_itemBean_value == null) {
+                _itemBean_value = new ItemBean();
+                itemBean.setValue(_itemBean_value);
+            }
+            _itemBean_value.decode(_itemBean);
         }
-        _itemBean_value.decode(_itemBean);
 
         JSONArray _set_1 = object.getJSONArray("set");
         if (_set_1 != null) {

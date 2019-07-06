@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <package>
 
-    <data name="RoleData">角色
-        <field name="id" type="long" primary-key="true"/>角色ID
+    <data name="RoleData" key="id">角色
+        <field name="id" type="long"/>角色ID
         <field name="name" type="string"/>
         <field name="bo" type="bool" value="true"/>
         <field name="by" type="byte" value="22"/>
