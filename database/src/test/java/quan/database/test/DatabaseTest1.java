@@ -2,10 +2,7 @@ package quan.database.test;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import quan.database.BerkeleyDB;
-import quan.database.Database;
-import quan.database.Transaction;
-import quan.database.Transactions;
+import quan.database.*;
 import quan.database.role.RoleData;
 
 import java.security.SecureRandom;
@@ -26,7 +23,8 @@ public class DatabaseTest1 {
 
     public static void main(String[] args) throws Exception {
 
-        database = new BerkeleyDB(".temp/bdb");
+//        database = new BerkeleyDB(".temp/bdb");
+        database = new MongoDB(new MongoDB.Config().setClientUri("mongodb://127.0.0.1:27017").setDatabaseName("mdb"));
 
         Transactions.setConflictThreshold(1);
 
@@ -91,11 +89,12 @@ public class DatabaseTest1 {
     }
 
     private static Random random = new SecureRandom();
+    private static int bound = 100;
 
     private static boolean test1() {
         long startTime = System.currentTimeMillis();
 
-        long roleId = random.nextInt(10);
+        long roleId = random.nextInt(bound);
         RoleData roleData = RoleData.get(roleId);
         if (roleData == null) {
             roleData = new RoleData(roleId);
@@ -127,7 +126,7 @@ public class DatabaseTest1 {
     }
 
     private static boolean test2() {
-        long roleId = random.nextInt(10);
+        long roleId = random.nextInt(bound);
         RoleData roleData = RoleData.get(roleId);
         if (roleData != null) {
             roleData.setName("test2-" + System.currentTimeMillis());
@@ -137,7 +136,7 @@ public class DatabaseTest1 {
     }
 
     private static boolean test3() {
-        long roleId = random.nextInt(10);
+        long roleId = random.nextInt(bound);
         RoleData.delete(roleId);
 
         return true;

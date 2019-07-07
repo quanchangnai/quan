@@ -36,7 +36,10 @@ public class MongoDB extends Database {
     protected void open0() {
         MongoClientOptions.Builder optionsBuilder = MongoClientOptions.builder();
         optionsBuilder.minConnectionsPerHost(1);
-        optionsBuilder.connectionsPerHost(getConfig().connectionsNum);
+        int connectionsNum = getConfig().connectionsNum;
+        if (connectionsNum > 0) {
+            optionsBuilder.connectionsPerHost(connectionsNum);
+        }
 
         MongoClientURI clientURI = new MongoClientURI(getConfig().clientUri, optionsBuilder);
         client = new MongoClient(clientURI);
@@ -106,7 +109,7 @@ public class MongoDB extends Database {
         /**
          * 连接数
          */
-        private int connectionsNum = Runtime.getRuntime().availableProcessors();
+        private int connectionsNum;
 
         public String getClientUri() {
             return clientUri;
