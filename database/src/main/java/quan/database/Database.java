@@ -154,6 +154,7 @@ public abstract class Database {
 
         close0();
         closed = true;
+        logger.debug("数据库[{}]已关闭", getName());
     }
 
     protected abstract void close0();

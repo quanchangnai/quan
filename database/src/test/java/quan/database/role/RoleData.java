@@ -22,7 +22,7 @@ public class RoleData extends Data<Long> {
     private static Cache<Long, RoleData> cache;
 
     public RoleData(Long id) {
-        super(cache);
+	    super(cache);
         this.id.setLogValue(id, getRoot());
     }
 
@@ -38,7 +38,6 @@ public class RoleData extends Data<Long> {
         }
         RoleData.cache = cache;
     }
-
 
     private synchronized static void checkCache() {
         if (cache != null && !cache.isClosed()) {
@@ -56,7 +55,6 @@ public class RoleData extends Data<Long> {
         } else if (cache.isClosed()) {
             database.registerCache(cache);
         }
-
     }
 
     public static RoleData get(Long id) {

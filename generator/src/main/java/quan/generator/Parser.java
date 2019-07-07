@@ -81,6 +81,11 @@ public class Parser {
                     DataDefinition dataDefinition = new DataDefinition();
                     classDefinition = dataDefinition;
                     dataDefinition.setKeyName(element.attributeValue("key"));
+                    String persistent = element.attributeValue("persistent");
+                    if (persistent != null && persistent.equals("false")) {
+                        dataDefinition.setPersistent(false);
+                    }
+
                 }
 
                 if (classDefinition == null) {
