@@ -321,16 +321,11 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
             }
         }
 
-        for (V data : inserts.values()) {
-            database.put(data);
-        }
-        for (V data : updates.values()) {
-            database.put(data);
-        }
-        for (K key : deletes) {
-            rows.remove(key);
-            database.delete(this, key);
-        }
+        Set<V> puts = new HashSet<>();
+        puts.addAll(inserts.values());
+        puts.addAll(updates.values());
+
+        database.putAndDelete(this, puts, deletes);
 
         dirty.clear();
 

@@ -68,7 +68,7 @@ public class Role {
 
 
         if (roleData.getId() == 1) {
-            Transaction.breakdown();
+//            Transaction.breakdown();
         }
 
 

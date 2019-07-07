@@ -23,10 +23,10 @@ public class DatabaseTest4 {
 
     public static void main(String[] args) throws Exception {
         System.err.println("======================================================");
-//        test1();
-//        System.err.println("======================================================");
+        test1();
+        System.err.println("======================================================");
 
-        test2();
+//        test2();
 //        System.err.println("=================="====================================);
 
 
