@@ -65,7 +65,7 @@ class DataLog {
         key.cache.checkClosed();
 
         //有可能出现事务执行时间比缓存的过期时间还长的极端情况
-        long costTime = System.currentTimeMillis() - Transaction.get().getTaskStartTime();
+        long costTime = System.currentTimeMillis() - Transaction.get(true).getTaskStartTime();
         if (costTime > getCache().getCacheExpire() * 1000) {
             return true;
         }

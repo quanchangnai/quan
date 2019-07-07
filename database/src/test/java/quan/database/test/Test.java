@@ -8,7 +8,7 @@ import quan.database.Transaction;
 public class Test {
 
     public static void main(String[] args) {
-        Transaction transaction = Transaction.current();
+        Transaction transaction = Transaction.get();
     }
 
 }

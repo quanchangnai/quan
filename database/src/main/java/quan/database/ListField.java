@@ -35,7 +35,7 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
 
     @Override
     public PVector<E> getValue() {
-        Transaction transaction = Transaction.current();
+        Transaction transaction = Transaction.get();
         if (transaction != null) {
             FieldLog<PVector<E>> log = (FieldLog<PVector<E>>) transaction.getFieldLog(this);
             if (log != null) {
@@ -76,7 +76,7 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
     }
 
     private FieldLog<PVector<E>> getOrAddLog() {
-        Transaction transaction = Transaction.get();
+        Transaction transaction = Transaction.get(true);
 
         Data root = getRoot();
         if (root != null) {

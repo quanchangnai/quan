@@ -178,15 +178,6 @@ public class Transaction {
     }
 
     /**
-     * 当前事务
-     *
-     * @return
-     */
-    public static Transaction current() {
-        return threadLocal.get();
-    }
-
-    /**
      * 当前是不是处于事务之中
      *
      * @return
@@ -195,33 +186,49 @@ public class Transaction {
         return threadLocal.get() != null;
     }
 
-    public static Transaction get() {
-        Transaction current = threadLocal.get();
-        if (current == null) {
+
+    /**
+     * 获取当前事务
+     *
+     * @param check
+     * @return
+     */
+    public static Transaction get(boolean check) {
+        Transaction transaction = threadLocal.get();
+        if (check && transaction == null) {
             throw new IllegalStateException("当前不在事务中");
         }
-        return current;
+        return transaction;
+    }
+
+    /**
+     * 获取当前事务
+     *
+     * @return
+     */
+    public static Transaction get() {
+        return get(false);
     }
 
     /**
      * 开始事务
      */
     private static Transaction begin() {
-        Transaction current = current();
-        if (current == null) {
-            current = new Transaction();
-            threadLocal.set(current);
+        Transaction transaction = get();
+        if (transaction == null) {
+            transaction = new Transaction();
+            threadLocal.set(transaction);
         } else {
             throw new IllegalStateException("当前已经在事务中了");
         }
-        return current;
+        return transaction;
     }
 
     /**
      * 结束当前事务
      */
     private static void end(boolean failed) {
-        Transaction current = get();
+        Transaction current = get(true);
         try {
             current.failed = current.failed || failed;
             if (current.isFailed()) {
@@ -239,7 +246,7 @@ public class Transaction {
      * 统计事务执行次数，慢事务次数，冲突次数
      */
     private static void count() {
-        Transaction current = get();
+        Transaction current = get(true);
 
         long _totalCount = totalCount.incrementAndGet();
         if (_totalCount <= 0) {
@@ -274,7 +281,7 @@ public class Transaction {
     }
 
     public static void breakdown() {
-        Transaction.get().failed = true;
+        Transaction.get(true).failed = true;
         throw new BreakdownException();
     }
 
@@ -297,7 +304,7 @@ public class Transaction {
      * @param task
      */
     public static void insideExecute(Task task) {
-        Transaction transaction = get();
+        Transaction transaction = get(true);
         if (!task.run()) {
             transaction.failed = true;
         }
@@ -310,7 +317,7 @@ public class Transaction {
      * @param task
      */
     public static void outsideExecute(Task task) {
-        Transaction transaction = Transaction.current();
+        Transaction transaction = Transaction.get();
         if (transaction != null) {
             throw new IllegalStateException("当前已经在事务中了");
         }
@@ -505,7 +512,7 @@ public class Transaction {
     }
 
     public static void addAfterTasks(List<Runnable> tasks, boolean committed) {
-        Transaction transaction = Transaction.get();
+        Transaction transaction = Transaction.get(true);
         if (committed) {
             transaction.commitAfterTasks.addAll(tasks);
         } else {

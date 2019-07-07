@@ -292,8 +292,13 @@ public class RoleData extends Data<Long> {
     @Override
     public void decode(JSONObject object) {
         id.setValue(object.getLongValue("id"));
+
         String _name = object.getString("name");
-        name.setValue(_name == null ? "" : _name);
+        if (_name == null) {
+            _name = "";
+        }
+        name.setValue(_name);
+
         bo.setValue(object.getBooleanValue("bo"));
         by.setValue(object.getByteValue("by"));
         s.setValue(object.getShortValue("s"));

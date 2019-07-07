@@ -34,7 +34,7 @@ public final class SetField<E> extends Node implements Set<E>, Field<PSet<E>> {
 
     @Override
     public PSet<E> getValue() {
-        Transaction transaction = Transaction.current();
+        Transaction transaction = Transaction.get();
         if (transaction != null) {
             FieldLog<PSet<E>> log = (FieldLog<PSet<E>>) transaction.getFieldLog(this);
             if (log != null) {
@@ -75,7 +75,7 @@ public final class SetField<E> extends Node implements Set<E>, Field<PSet<E>> {
     }
 
     private FieldLog<PSet<E>> getOrAddLog() {
-        Transaction transaction = Transaction.get();
+        Transaction transaction = Transaction.get(true);
         FieldLog<PSet<E>> log = (FieldLog<PSet<E>>) transaction.getFieldLog(this);
         if (log == null) {
             log = new FieldLog<>(this, data);

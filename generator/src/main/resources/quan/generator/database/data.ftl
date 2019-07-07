@@ -214,7 +214,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     public void decode(JSONObject object) {
 <#list fields as field>
     <#if field.type == "list">
-        <#if field_index gt 0 && fields[field_index-1].builtInType && !fields[field_index-1].collectionType>
+        <#if field_index gt 0 && fields[field_index-1].builtInType && !fields[field_index-1].collectionType && fields[field_index-1].type!="string">
 
         </#if>
         JSONArray _${field.name}_1 = object.getJSONArray("${field.name}");
@@ -234,7 +234,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         }
 
     <#elseif field.type == "set">
-        <#if field_index gt 0 && fields[field_index-1].builtInType && !fields[field_index-1].collectionType>
+        <#if field_index gt 0 && fields[field_index-1].builtInType && !fields[field_index-1].collectionType && fields[field_index-1].type!="string">
 
         </#if>
         JSONArray _${field.name}_1 = object.getJSONArray("${field.name}");
@@ -254,7 +254,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         }
 
     <#elseif field.type == "map">
-        <#if field_index gt 0 && fields[field_index-1].builtInType && !fields[field_index-1].collectionType>
+        <#if field_index gt 0 && fields[field_index-1].builtInType && !fields[field_index-1].collectionType && fields[field_index-1].type!="string">
 
         </#if>
         JSONObject _${field.name}_1 = object.getJSONObject("${field.name}");
@@ -276,12 +276,19 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     <#elseif field.type=="int">
         ${field.name}.setValue(object.getIntValue("${field.name}"));
     <#elseif field.type=="string">
+        <#if field_index gt 0 && fields[field_index-1].builtInType && !fields[field_index-1].collectionType && fields[field_index-1].type!="string">
+
+        </#if>
         String _${field.name} = object.getString("${field.name}");
-        ${field.name}.setValue(_${field.name} == null ? "" : _${field.name});
+        if (_${field.name} == null) {
+            _${field.name} = "";
+        }
+        ${field.name}.setValue(_${field.name});
+
     <#elseif field.builtInType>
         ${field.name}.setValue(object.get${field.classType}Value("${field.name}"));
     <#else>
-        <#if field_index gt 0 && fields[field_index-1].builtInType && !fields[field_index-1].collectionType>
+        <#if field_index gt 0 && fields[field_index-1].builtInType && !fields[field_index-1].collectionType && fields[field_index-1].type!="string">
 
         </#if>
         JSONObject _${field.name} = object.getJSONObject("${field.name}");

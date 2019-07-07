@@ -120,7 +120,7 @@ public class DatabaseTest1 {
 
         long costTime = System.currentTimeMillis() - startTime;
 //        if (costTime > 2) {
-//            logger.debug("事务:{},单次执行test1()耗时:{},roleData.getList():{}", Transaction.current().getId(), costTime, roleData.getList().size());
+//            logger.debug("事务:{},单次执行test1()耗时:{},roleData.getList():{}", Transaction.get().getId(), costTime, roleData.getList().size());
 //        }
 
         return true;

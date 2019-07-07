@@ -15,7 +15,7 @@ public class BaseField<V> implements Field<V> {
     }
 
     public V getValue() {
-        Transaction transaction = Transaction.current();
+        Transaction transaction = Transaction.get();
         if (transaction != null) {
             FieldLog<V> log = (FieldLog<V>) transaction.getFieldLog(this);
             if (log != null) {
@@ -32,7 +32,7 @@ public class BaseField<V> implements Field<V> {
     public void setLogValue(V value, Data root) {
         Validations.validateFieldValue(value);
 
-        Transaction transaction = Transaction.get();
+        Transaction transaction = Transaction.get(true);
         if (root != null) {
             transaction.addVersionLog(root);
         }

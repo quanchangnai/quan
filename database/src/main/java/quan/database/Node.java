@@ -13,7 +13,7 @@ public abstract class Node {
     private Data root;
 
     public Data getRoot() {
-        Transaction transaction = Transaction.current();
+        Transaction transaction = Transaction.get();
         if (transaction != null) {
             RootLog rootLog = transaction.getRootLog(this);
             if (rootLog != null) {
@@ -28,7 +28,7 @@ public abstract class Node {
     }
 
     public void setLogRoot(Data root) {
-        Transaction transaction = Transaction.current();
+        Transaction transaction = Transaction.get();
         RootLog rootLog = transaction.getRootLog(this);
         if (rootLog != null) {
             rootLog.setRoot(root);

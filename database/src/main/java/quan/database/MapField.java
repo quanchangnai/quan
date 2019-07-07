@@ -32,7 +32,7 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field<PMap<
 
     @Override
     public PMap<K, V> getValue() {
-        Transaction transaction = Transaction.current();
+        Transaction transaction = Transaction.get();
         if (transaction != null) {
             FieldLog<PMap<K, V>> log = (FieldLog<PMap<K, V>>) transaction.getFieldLog(this);
             if (log != null) {
@@ -68,7 +68,7 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field<PMap<
     }
 
     private FieldLog<PMap<K, V>> getOrAddLog() {
-        Transaction transaction = Transaction.get();
+        Transaction transaction = Transaction.get(true);
 
         Data root = getRoot();
         if (root != null) {

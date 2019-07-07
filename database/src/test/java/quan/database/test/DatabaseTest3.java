@@ -63,7 +63,7 @@ public class DatabaseTest3 {
 
         long costTime = System.currentTimeMillis() - startTime;
 //        if (costTime > 2) {
-        logger.debug("事务:{},单次执行test1()耗时:{},roleData.getList():{}", Transaction.current().getId(), costTime, roleData.getList().size());
+        logger.debug("事务:{},单次执行test1()耗时:{},roleData.getList():{}", Transaction.get().getId(), costTime, roleData.getList().size());
 //        }
 
         Transaction.addAfterTask(() -> System.err.println("事务已提交"), true);

@@ -57,8 +57,13 @@ public class ItemBean extends Bean {
     @Override
     public void decode(JSONObject object) {
         id.setValue(object.getIntValue("id"));
+
         String _name = object.getString("name");
-        name.setValue(_name == null ? "" : _name);
+        if (_name == null) {
+            _name = "";
+        }
+        name.setValue(_name);
+
     }
 
     @Override

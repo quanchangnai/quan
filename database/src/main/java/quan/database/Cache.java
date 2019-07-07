@@ -180,7 +180,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
     public V get(K key) {
         Objects.requireNonNull(key, "主键不能为空");
 
-        Transaction transaction = Transaction.get();
+        Transaction transaction = Transaction.get(true);
 
         DataLog log = transaction.getDataLog(new DataLog.Key(this, key));
         if (log != null) {
@@ -232,7 +232,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
     public void delete(K key) {
         Objects.requireNonNull(key, "主键不能为空");
 
-        Transaction transaction = Transaction.get();
+        Transaction transaction = Transaction.get(true);
 
         DataLog log = transaction.getDataLog(new DataLog.Key(this, key));
         if (log != null) {
@@ -266,7 +266,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
             throw new DbException("数据已存在");
         }
 
-        DataLog log = Transaction.get().getDataLog(new DataLog.Key(this, data.getKey()));
+        DataLog log = Transaction.get(true).getDataLog(new DataLog.Key(this, data.getKey()));
         log.setCurrent(data);
     }
 
@@ -278,7 +278,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
 
         data = dataFactory.apply(key);
 
-        DataLog log = Transaction.get().getDataLog(new DataLog.Key(this, data.getKey()));
+        DataLog log = Transaction.get(true).getDataLog(new DataLog.Key(this, data.getKey()));
         log.setCurrent(data);
 
         return data;

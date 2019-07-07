@@ -15,7 +15,7 @@ public final class BeanField<V extends Bean> extends BaseField<V> {
     public void setLogValue(V value, Data root) {
         Validations.validateBeanRoot(value);
 
-        Transaction transaction = Transaction.get();
+        Transaction transaction = Transaction.get(true);
         if (root != null) {
             transaction.addVersionLog(root);
         }
