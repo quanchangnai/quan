@@ -166,7 +166,8 @@ public abstract class Database {
 
     protected abstract <K, V extends Data<K>> void delete(Cache<K, V> cache, K key);
 
-    protected <K, V extends Data<K>> void putAndDelete(Cache<K, V> cache, Set<V> puts, Set<K> deletes) {
+    protected <K, V extends Data<K>> void batchWrite(Cache<K, V> cache, Set<V> puts, Set<K> deletes) {
+        checkClosed();
         for (V data : puts) {
             put(data);
         }

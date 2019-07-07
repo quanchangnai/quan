@@ -1,6 +1,6 @@
 package quan.database;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -18,9 +18,9 @@ public abstract class Data<K> extends Bean implements Comparable<Data<K>> {
 
     private Cache<K, ? extends Data<K>> cache;
 
-    private static final AtomicInteger nextLockId = new AtomicInteger();
+    private static final AtomicLong nextId = new AtomicLong();
 
-    private int lockId;
+    private long _id = nextId.incrementAndGet();
 
     /**
      * 行级锁，当数据不受缓存管理时使用，受缓存管理时使用锁池
@@ -33,7 +33,6 @@ public abstract class Data<K> extends Bean implements Comparable<Data<K>> {
         this.cache = cache;
         if (cache == null) {
             lock = new ReentrantLock();
-            lockId = nextLockId.incrementAndGet();
         }
     }
 
@@ -79,7 +78,14 @@ public abstract class Data<K> extends Bean implements Comparable<Data<K>> {
 
     @Override
     public final int compareTo(Data<K> other) {
-        return this.lockId - other.lockId;
+        long compare = this._id - other._id;
+        if (compare > 0) {
+            return 1;
+        } else if (compare == 0) {
+            return 0;
+        } else {
+            return -1;
+        }
     }
 
     public abstract K getKey();

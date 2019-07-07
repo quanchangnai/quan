@@ -299,19 +299,24 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
     }
 
     private void store0() {
-        Map<K, V> inserts = new HashMap();
-        Map<K, V> updates = new HashMap();
+        long startTime = System.currentTimeMillis();
+
+        int insertNum = 0;
+        int updateNum = 0;
+        Set<V> puts = new HashSet<>();
         Set<K> deletes = new HashSet<>();
 
         for (K key : dirty.keySet()) {
             Row<V> row = rows.get(key);
             if (row.state == Row.INSERT) {
                 row.state = Row.NORMAL;
-                inserts.put(key, row.data);
+                puts.add(row.data);
+                insertNum++;
             }
             if (row.state == Row.UPDATE) {
                 row.state = Row.NORMAL;
-                updates.put(key, row.data);
+                puts.add(row.data);
+                updateNum++;
             }
             if (row.state == Row.DELETE) {
                 deletes.add(key);
@@ -321,15 +326,13 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
             }
         }
 
-        Set<V> puts = new HashSet<>();
-        puts.addAll(inserts.values());
-        puts.addAll(updates.values());
-
-        database.putAndDelete(this, puts, deletes);
+        database.batchWrite(this, puts, deletes);
 
         dirty.clear();
 
-        logger.debug("[{}]存档,rows:{},inserts:{},updates:{},deletes:{}", name, rows.size(), inserts.keySet(), updates.keySet(), deletes);
+        long costTime = System.currentTimeMillis() - startTime;
+
+        logger.debug("[{}]存档耗时:{}ms,当前缓存数量:{},插入数量:{},更新数量:{},删除数量:{}", name, costTime, rows.size(), insertNum, updateNum, deletes.size());
     }
 
     void close() {
