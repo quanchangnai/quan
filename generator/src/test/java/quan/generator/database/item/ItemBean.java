@@ -1,17 +1,9 @@
 package quan.generator.database.item;
 
 import quan.database.*;
-import quan.database.Database;
-import quan.database.Cache;
-import com.alibaba.fastjson.JSONArray;
-import quan.database.Data;
-import quan.database.Bean;
+import org.pcollections.*;
 import java.util.*;
-import org.pcollections.PSet;
-import org.pcollections.PVector;
-import org.pcollections.Empty;
-import com.alibaba.fastjson.JSONObject;
-import org.pcollections.PMap;
+import com.alibaba.fastjson.*;
 
 /**
  * 道具

@@ -1,17 +1,10 @@
 package quan.database.role;
 
 import quan.database.*;
-import quan.database.Database;
-import quan.database.Cache;
-import com.alibaba.fastjson.JSONArray;
-import quan.database.Data;
+import org.pcollections.*;
 import java.util.*;
-import org.pcollections.PSet;
-import org.pcollections.PVector;
-import org.pcollections.Empty;
-import com.alibaba.fastjson.JSONObject;
 import quan.database.item.ItemBean;
-import org.pcollections.PMap;
+import com.alibaba.fastjson.*;
 
 /**
  * 角色2
@@ -27,7 +20,7 @@ public class RoleData2 extends Data<Long> {
         super(null);
         this.id.setLogValue(id, getRoot());
     }
-        
+
     @Override
     public Long getKey() {
         return getId();
