@@ -2,7 +2,6 @@ package quan.database.test;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import quan.database.Transaction;
 import quan.database.Transactional;
 import quan.database.item.ItemBean;
 import quan.database.role.RoleData;
@@ -82,9 +81,9 @@ public class Role {
     @Transactional
     public String login3() {
         System.err.println("login3======================================================");
-        roleData = RoleData.getOrInsert(1L);
-        logger.error("roleData:{}", roleData);
-
+//        roleData = RoleData.getOrInsert(1L);
+//        logger.error("roleData:{}", roleData);
+        RoleData.delete(1L);
         return "login3";
     }
 

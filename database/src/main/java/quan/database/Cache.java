@@ -253,6 +253,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
 
         //数据不一定存在，增加删除日志，这样如果存在数据就一点会被删掉
         log = new DataLog(null, row, rowData, rowState, this, key);
+        log.setDeleted(true);
         transaction.addDataLog(log);
 
     }
@@ -267,6 +268,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
         }
 
         DataLog log = Transaction.get(true).getDataLog(new DataLog.Key(this, data.getKey()));
+        log.setDeleted(false);
         log.setCurrent(data);
     }
 
@@ -279,6 +281,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
         data = dataFactory.apply(key);
 
         DataLog log = Transaction.get(true).getDataLog(new DataLog.Key(this, data.getKey()));
+        log.setDeleted(false);
         log.setCurrent(data);
 
         return data;
@@ -320,15 +323,23 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
             }
             if (row.state == Row.DELETE) {
                 deletes.add(key);
-                if (row.data != null) {
-                    row.data.setExpired(true);
-                }
             }
         }
 
-        database.bulkWrite(this, puts, deletes);
+        try {
+            database.bulkWrite(this, puts, deletes);
 
-        dirty.clear();
+            for (K key : dirty.keySet()) {
+                Row<V> row = rows.get(key);
+                if (row.state == Row.DELETE && row.data != null) {
+                    row.data.setExpired(true);
+                }
+            }
+
+            dirty.clear();
+        } catch (Exception e) {
+            logger.error("存档发生异常", e);
+        }
 
         long costTime = System.currentTimeMillis() - startTime;
 

@@ -13,6 +13,10 @@ public class DbException extends RuntimeException {
         super(message);
     }
 
+    public DbException(Throwable cause) {
+        super(cause);
+    }
+
     public DbException(String message, Throwable cause) {
         super(message, cause);
     }

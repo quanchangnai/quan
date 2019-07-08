@@ -29,12 +29,22 @@ class DataLog {
      */
     private int originState;
 
+    /**
+     * 记录之前没有查询的空删除
+     */
+    private boolean deleted;
+
     public DataLog(Data current, Cache.Row originRow, Data originData, int originState, Cache cache, Object key) {
         this.key = new Key(cache, key);
         this.current = current;
         this.originRow = originRow;
         this.originData = originData;
         this.originState = originState;
+    }
+
+    public DataLog setDeleted(boolean deleted) {
+        this.deleted = deleted;
+        return this;
     }
 
     public Key getKey() {
@@ -90,7 +100,7 @@ class DataLog {
     }
 
     public void commit() {
-        if (current == null && originData != null && originState != Cache.Row.DELETE) {
+        if (current == null && originData != null && originState != Cache.Row.DELETE || deleted) {
             //delete
             key.cache.setDelete(key.k);
         }

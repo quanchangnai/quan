@@ -2,7 +2,10 @@ package quan.database.test;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import quan.database.*;
+import quan.database.Database;
+import quan.database.Executor;
+import quan.database.MysqlDB;
+import quan.database.Transactions;
 
 /**
  * 声明式事务测试
@@ -15,8 +18,9 @@ public class DatabaseTest4 {
     static Database database;
 
     static {
-        database = new BerkeleyDB(".temp/bdb");
+//        database = new BerkeleyDB(".temp/bdb");
 //        database = new MongoDB(new MongoDB.Config().setClientUri("mongodb://127.0.0.1:27017").setDatabaseName("mdb").setConnectionsNum(1));
+        database = new MysqlDB(new MysqlDB.Config());
     }
 
     static Executor executor = new Executor();
@@ -45,12 +49,12 @@ public class DatabaseTest4 {
 
         Role2 role2 = new Role2();
 
-        role.login1();
+//        role.login1();
 //        role.login2("123456");
-
+        role.login3();
 //        role.login4();
 
-        role2.login();
+//        role2.login();
 
         Thread.sleep(1000);
 
