@@ -50,9 +50,6 @@ public abstract class Database {
 
     private volatile boolean closed;
 
-    private Thread shutdownHookThread;
-
-
     public Database(Config config) {
         //默认数据库实例为空时自动设置，不为空时需要手动更改
         if (instance == null) {
@@ -72,9 +69,6 @@ public abstract class Database {
             storeThreads.add(storeThread);
             storeThread.start();
         }
-
-        shutdownHookThread = new Thread(instance::close, getName() + "-shutdown-hook-thread");
-        Runtime.getRuntime().addShutdownHook(shutdownHookThread);
 
         open0();
     }
@@ -139,9 +133,6 @@ public abstract class Database {
      * 关闭数据库时会存档后清空缓存，但未结束的事务会执行失败
      */
     public synchronized void close() {
-        if (closed && Thread.currentThread() == shutdownHookThread) {
-            return;
-        }
         checkClosed();
         if (instance == this) {
             instance = null;
