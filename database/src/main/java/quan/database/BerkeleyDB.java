@@ -108,7 +108,7 @@ public class BerkeleyDB extends Database {
     }
 
     @Override
-    protected <K, V extends Data<K>> void batchWrite(Cache<K, V> cache, Set<V> puts, Set<K> deletes) {
+    protected <K, V extends Data<K>> void bulkWrite(Cache<K, V> cache, Set<V> puts, Set<K> deletes) {
         checkClosed();
 
         TransactionConfig transactionConfig = new TransactionConfig();

@@ -34,27 +34,30 @@ public class SRoleLogin extends Message {
         return roleId;
     }
 
-    public void setRoleId(long roleId) {
+    public SRoleLogin setRoleId(long roleId) {
         this.roleId = roleId;
+        return this;
     }
 
     public String getRoleName() {
         return roleName;
     }
 
-    public void setRoleName(String roleName) {
+    public SRoleLogin setRoleName(String roleName) {
         if (roleName == null){
             throw new NullPointerException();
         }
         this.roleName = roleName;
+        return this;
     }
 
     public RoleInfo getRoleInfo() {
         return roleInfo;
     }
 
-    public void setRoleInfo(RoleInfo roleInfo) {
+    public SRoleLogin setRoleInfo(RoleInfo roleInfo) {
         this.roleInfo = roleInfo;
+        return this;
     }
 
     public ArrayList<RoleInfo> getRoleInfoList() {
@@ -73,11 +76,12 @@ public class SRoleLogin extends Message {
         return userInfo;
     }
 
-    public void setUserInfo(UserInfo userInfo) {
+    public SRoleLogin setUserInfo(UserInfo userInfo) {
         if (userInfo == null){
             throw new NullPointerException();
         }
         this.userInfo = userInfo;
+        return this;
     }
 
     @Override
@@ -130,26 +134,26 @@ public class SRoleLogin extends Message {
             roleInfo.decode(buffer);
         }
 
-        int roleInfoListSize = buffer.readInt();
-        for (int i = 0; i < roleInfoListSize; i++) {
-            RoleInfo roleInfoListValue = new RoleInfo();
-            roleInfoListValue.decode(buffer);
-            roleInfoList.add(roleInfoListValue);
+        int _roleInfoList_Size = buffer.readInt();
+        for (int i = 0; i < _roleInfoList_Size; i++) {
+            RoleInfo _roleInfoList_Value = new RoleInfo();
+            _roleInfoList_Value.decode(buffer);
+            roleInfoList.add(_roleInfoList_Value);
         }
 
-        int roleInfoSetSize = buffer.readInt();
-        for (int i = 0; i < roleInfoSetSize; i++) {
-            RoleInfo roleInfoSetValue = new RoleInfo();
-            roleInfoSetValue.decode(buffer);
-            roleInfoSet.add(roleInfoSetValue);
+        int _roleInfoSet_Size = buffer.readInt();
+        for (int i = 0; i < _roleInfoSet_Size; i++) {
+            RoleInfo _roleInfoSet_Value = new RoleInfo();
+            _roleInfoSet_Value.decode(buffer);
+            roleInfoSet.add(_roleInfoSet_Value);
         }
 
-        int roleInfoMapSize = buffer.readInt();
-        for (int i = 0; i < roleInfoMapSize; i++) {
-            long roleInfoMapKey = buffer.readLong();
-            RoleInfo roleInfoMapValue = new RoleInfo();
-            roleInfoMapValue.decode(buffer);
-            roleInfoMap.put(roleInfoMapKey, roleInfoMapValue);
+        int _roleInfoMap_Size = buffer.readInt();
+        for (int i = 0; i < _roleInfoMap_Size; i++) {
+            long _roleInfoMap_Key = buffer.readLong();
+            RoleInfo _roleInfoMap_Value = new RoleInfo();
+            _roleInfoMap_Value.decode(buffer);
+            roleInfoMap.put(_roleInfoMap_Key, _roleInfoMap_Value);
         }
 
         userInfo.decode(buffer);

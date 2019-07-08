@@ -64,68 +64,81 @@ public class RoleData2 extends Data<Long> {
         return id.getValue();
     }
 
+    public RoleData2 setId(long id) {
+        this.id.setLogValue(id, getRoot());
+        return this;
+    }
+
     public String getName() {
         return name.getValue();
     }
 
-    public void setName(String name) {
+    public RoleData2 setName(String name) {
         this.name.setLogValue(name, getRoot());
+        return this;
     }
 
     public boolean getBo() {
         return bo.getValue();
     }
 
-    public void setBo(boolean bo) {
+    public RoleData2 setBo(boolean bo) {
         this.bo.setLogValue(bo, getRoot());
+        return this;
     }
 
     public byte getBy() {
         return by.getValue();
     }
 
-    public void setBy(byte by) {
+    public RoleData2 setBy(byte by) {
         this.by.setLogValue(by, getRoot());
+        return this;
     }
 
     public short getS() {
         return s.getValue();
     }
 
-    public void setS(short s) {
+    public RoleData2 setS(short s) {
         this.s.setLogValue(s, getRoot());
+        return this;
     }
 
     public int getI() {
         return i.getValue();
     }
 
-    public void setI(int i) {
+    public RoleData2 setI(int i) {
         this.i.setLogValue(i, getRoot());
+        return this;
     }
 
     public float getF() {
         return f.getValue();
     }
 
-    public void setF(float f) {
+    public RoleData2 setF(float f) {
         this.f.setLogValue(f, getRoot());
+        return this;
     }
 
     public double getD() {
         return d.getValue();
     }
 
-    public void setD(double d) {
+    public RoleData2 setD(double d) {
         this.d.setLogValue(d, getRoot());
+        return this;
     }
 
     public ItemBean getItem() {
         return item.getValue();
     }
 
-    public void setItem(ItemBean item) {
+    public RoleData2 setItem(ItemBean item) {
         this.item.setLogValue(item, getRoot());
+        return this;
     }
 
     public Map<Integer, ItemBean> getItems() {
@@ -192,44 +205,44 @@ public class RoleData2 extends Data<Long> {
         }
 
         JSONObject _items = new JSONObject();
-        for (Integer _items_key : items.keySet()) {
-            _items.put(String.valueOf(_items_key), items.get(_items_key).encode());
+        for (Integer _items_Key : items.keySet()) {
+            _items.put(String.valueOf(_items_Key), items.get(_items_Key).encode());
         }
         object.put("items", _items);
 
         JSONArray _set = new JSONArray();
-        for (Boolean _set_value : set) {
-            _set.add(_set_value);
+        for (Boolean _set_Value : set) {
+            _set.add(_set_Value);
         }
         object.put("set", _set);
 
         JSONArray _list = new JSONArray();
-        for (String _list_value : list) {
-            _list.add(_list_value);
+        for (String _list_Value : list) {
+            _list.add(_list_Value);
         }
         object.put("list", _list);
 
         JSONObject _map = new JSONObject();
-        for (Integer _map_key : map.keySet()) {
-            _map.put(String.valueOf(_map_key), map.get(_map_key));
+        for (Integer _map_Key : map.keySet()) {
+            _map.put(String.valueOf(_map_Key), map.get(_map_Key));
         }
         object.put("map", _map);
 
         JSONArray _set2 = new JSONArray();
-        for (ItemBean _set2_value : set2) {
-            _set2.add(_set2_value.encode());
+        for (ItemBean _set2_Value : set2) {
+            _set2.add(_set2_Value.encode());
         }
         object.put("set2", _set2);
 
         JSONArray _list2 = new JSONArray();
-        for (ItemBean _list2_value : list2) {
-            _list2.add(_list2_value.encode());
+        for (ItemBean _list2_Value : list2) {
+            _list2.add(_list2_Value.encode());
         }
         object.put("list2", _list2);
 
         JSONObject _map2 = new JSONObject();
-        for (Integer _map2_key : map2.keySet()) {
-            _map2.put(String.valueOf(_map2_key), map2.get(_map2_key).encode());
+        for (Integer _map2_Key : map2.keySet()) {
+            _map2.put(String.valueOf(_map2_Key), map2.get(_map2_Key).encode());
         }
         object.put("map2", _map2);
 
@@ -255,21 +268,21 @@ public class RoleData2 extends Data<Long> {
 
         JSONObject _item = object.getJSONObject("item");
         if (_item != null) {
-            ItemBean _item_value = item.getValue();
-            if (_item_value == null) {
-                _item_value = new ItemBean();
-                item.setValue(_item_value);
+            ItemBean _item_Value = item.getValue();
+            if (_item_Value == null) {
+                _item_Value = new ItemBean();
+                item.setValue(_item_Value);
             }
-            _item_value.decode(_item);
+            _item_Value.decode(_item);
         }
 
         JSONObject _items_1 = object.getJSONObject("items");
         if (_items_1 != null) {
             Map<Integer, ItemBean> _items_2 = new HashMap<>();
-            for (String _items_1_key : _items_1.keySet()) {
-                ItemBean _items_value = new ItemBean();
-                _items_value.decode(_items_1.getJSONObject(_items_1_key));
-                _items_2.put(Integer.valueOf(_items_1_key), _items_value);
+            for (String _items_1_Key : _items_1.keySet()) {
+                ItemBean _items_Value = new ItemBean();
+                _items_Value.decode(_items_1.getJSONObject(_items_1_Key));
+                _items_2.put(Integer.valueOf(_items_1_Key), _items_Value);
             }
             PMap<Integer, ItemBean> _items_3 = Empty.map();
             items.setValue(_items_3.plusAll(_items_2));
@@ -298,8 +311,8 @@ public class RoleData2 extends Data<Long> {
         JSONObject _map_1 = object.getJSONObject("map");
         if (_map_1 != null) {
             Map<Integer, Integer> _map_2 = new HashMap<>();
-            for (String _map_1_key : _map_1.keySet()) {
-                _map_2.put(Integer.valueOf(_map_1_key), _map_1.getInteger(_map_1_key));
+            for (String _map_1_Key : _map_1.keySet()) {
+                _map_2.put(Integer.valueOf(_map_1_Key), _map_1.getInteger(_map_1_Key));
             }
             PMap<Integer, Integer> _map_3 = Empty.map();
             map.setValue(_map_3.plusAll(_map_2));
@@ -309,9 +322,9 @@ public class RoleData2 extends Data<Long> {
         if (_set2_1 != null) {
             Set<ItemBean> _set2_2 = new HashSet<>();
             for (int i = 0; i < _set2_1.size(); i++) {
-                ItemBean _set2_value = new ItemBean();
-                _set2_value.decode(_set2_1.getJSONObject(i));
-                _set2_2.add(_set2_value);
+                ItemBean _set2_Value = new ItemBean();
+                _set2_Value.decode(_set2_1.getJSONObject(i));
+                _set2_2.add(_set2_Value);
             }
             PSet<ItemBean> _set2_3 = Empty.set();
             set2.setValue(_set2_3.plusAll(_set2_2));
@@ -321,9 +334,9 @@ public class RoleData2 extends Data<Long> {
         if (_list2_1 != null) {
             List<ItemBean> _list2_2 = new ArrayList<>();
             for (int i = 0; i < _list2_1.size(); i++) {
-                ItemBean _list2_value = new ItemBean();
-                _list2_value.decode(_list2_1.getJSONObject(i));
-                _list2_2.add(_list2_value);
+                ItemBean _list2_Value = new ItemBean();
+                _list2_Value.decode(_list2_1.getJSONObject(i));
+                _list2_2.add(_list2_Value);
             }
             PVector<ItemBean> _list2_3 = Empty.vector();
             list2.setValue(_list2_3.plusAll(_list2_2));
@@ -332,10 +345,10 @@ public class RoleData2 extends Data<Long> {
         JSONObject _map2_1 = object.getJSONObject("map2");
         if (_map2_1 != null) {
             Map<Integer, ItemBean> _map2_2 = new HashMap<>();
-            for (String _map2_1_key : _map2_1.keySet()) {
-                ItemBean _map2_value = new ItemBean();
-                _map2_value.decode(_map2_1.getJSONObject(_map2_1_key));
-                _map2_2.put(Integer.valueOf(_map2_1_key), _map2_value);
+            for (String _map2_1_Key : _map2_1.keySet()) {
+                ItemBean _map2_Value = new ItemBean();
+                _map2_Value.decode(_map2_1.getJSONObject(_map2_1_Key));
+                _map2_2.put(Integer.valueOf(_map2_1_Key), _map2_Value);
             }
             PMap<Integer, ItemBean> _map2_3 = Empty.map();
             map2.setValue(_map2_3.plusAll(_map2_2));

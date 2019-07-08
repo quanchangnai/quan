@@ -23,8 +23,8 @@ public class DatabaseTest1 {
 
     public static void main(String[] args) throws Exception {
 
-//        database = new BerkeleyDB(".temp/bdb");
-        database = new MongoDB(new MongoDB.Config().setClientUri("mongodb://127.0.0.1:27017").setDatabaseName("mdb"));
+        database = new BerkeleyDB(".temp/bdb");
+//        database = new MongoDB(new MongoDB.Config().setClientUri("mongodb://127.0.0.1:27017").setDatabaseName("mdb"));
 
         Transactions.setConflictThreshold(1);
 
@@ -89,7 +89,7 @@ public class DatabaseTest1 {
     }
 
     private static Random random = new SecureRandom();
-    private static int bound = 100;
+    private static int bound = 1000;
 
     private static boolean test1() {
         long startTime = System.currentTimeMillis();

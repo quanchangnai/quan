@@ -20,16 +20,18 @@ public class ItemBean extends Bean {
         return id.getValue();
     }
 
-    public void setId(int id) {
+    public ItemBean setId(int id) {
         this.id.setLogValue(id, getRoot());
+        return this;
     }
 
     public String getName() {
         return name.getValue();
     }
 
-    public void setName(String name) {
+    public ItemBean setName(String name) {
         this.name.setLogValue(name, getRoot());
+        return this;
     }
 
 

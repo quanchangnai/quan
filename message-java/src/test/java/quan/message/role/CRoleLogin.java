@@ -23,19 +23,21 @@ public class CRoleLogin extends Message {
         return roleId;
     }
 
-    public void setRoleId(long roleId) {
+    public CRoleLogin setRoleId(long roleId) {
         this.roleId = roleId;
+        return this;
     }
 
     public String getRoleName() {
         return roleName;
     }
 
-    public void setRoleName(String roleName) {
+    public CRoleLogin setRoleName(String roleName) {
         if (roleName == null){
             throw new NullPointerException();
         }
         this.roleName = roleName;
+        return this;
     }
 
     @Override

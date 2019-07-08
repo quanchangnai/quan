@@ -6,11 +6,13 @@ import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.DeleteOneModel;
+import com.mongodb.client.model.UpdateOneModel;
 import com.mongodb.client.model.UpdateOptions;
+import com.mongodb.client.model.WriteModel;
 import org.bson.Document;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by quanchangnai on 2019/7/1.
@@ -20,6 +22,8 @@ public class MongoDB extends Database {
     private static final String _ID = "_id";
 
     private static final String $SET = "$set";
+
+    private static final UpdateOptions updateOptions = new UpdateOptions().upsert(true);
 
     private MongoClient client;
 
@@ -83,7 +87,7 @@ public class MongoDB extends Database {
         K key = data.getKey();
         Document filter = new Document(_ID, key);
         Document updates = new Document($SET, data.encode());
-        collections.get(data.getCache().getName()).updateOne(filter, updates, new UpdateOptions().upsert(true));
+        collections.get(data.getCache().getName()).updateOne(filter, updates, updateOptions);
     }
 
     @Override
@@ -93,6 +97,27 @@ public class MongoDB extends Database {
         collections.get(cache.getName()).deleteOne(filter);
     }
 
+    @Override
+    protected <K, V extends Data<K>> void bulkWrite(Cache<K, V> cache, Set<V> puts, Set<K> deletes) {
+        checkClosed();
+
+        List<WriteModel> writeModels = new ArrayList<>();
+
+        for (V putData : puts) {
+            Document filter = new Document(_ID, putData.getKey());
+            Document updates = new Document($SET, putData.encode());
+            UpdateOneModel updateOneModel = new UpdateOneModel(filter, updates, updateOptions);
+            writeModels.add(updateOneModel);
+        }
+
+        for (K deleteKey : deletes) {
+            Document filter = new Document(_ID, deleteKey);
+            DeleteOneModel deleteOneModel = new DeleteOneModel(filter);
+            writeModels.add(deleteOneModel);
+        }
+
+        collections.get(cache.getName()).bulkWrite(writeModels);
+    }
 
     public static class Config extends Database.Config {
 

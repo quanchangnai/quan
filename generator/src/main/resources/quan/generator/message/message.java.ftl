@@ -82,13 +82,14 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         return ${field.name};
     }
 
-    public void set${field.name?cap_first}(${field.basicType} ${field.name}) {
+    public ${name} set${field.name?cap_first}(${field.basicType} ${field.name}) {
         <#if (!field.builtInType && !field.optional && !field.enumType) || field.type == "string" || field.type == "bytes">
         if (${field.name} == null){
             throw new NullPointerException();
         }
         </#if>
         this.${field.name} = ${field.name};
+        return this;
     }
 
     </#if>
@@ -168,14 +169,14 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         <#if field_index gt 0 && !fields[field_index-1].optional && !fields[field_index-1].collectionType >
 
         </#if>
-        int ${field.name}Size = buffer.readInt();
-        for (int i = 0; i < ${field.name}Size; i++) {
+        int _${field.name}_Size = buffer.readInt();
+        for (int i = 0; i < _${field.name}_Size; i++) {
         <#if field.valueBuiltInType>
             ${field.name}.add(buffer.read${field.valueType?cap_first}());
         <#else>
-            ${field.valueType} ${field.name}Value = new ${field.valueType}();
-            ${field.name}Value.decode(buffer);
-            ${field.name}.add(${field.name}Value);
+            ${field.valueType} _${field.name}_Value = new ${field.valueType}();
+            _${field.name}_Value.decode(buffer);
+            ${field.name}.add(_${field.name}_Value);
         </#if>
         }
 
@@ -183,15 +184,15 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         <#if field_index gt 0 && !fields[field_index-1].optional && !fields[field_index-1].collectionType >
 
         </#if>
-        int ${field.name}Size = buffer.readInt();
-        for (int i = 0; i < ${field.name}Size; i++) {
+        int _${field.name}_Size = buffer.readInt();
+        for (int i = 0; i < _${field.name}_Size; i++) {
         <#if field.valueBuiltInType>
             ${field.name}.put(buffer.read${field.keyType?cap_first}(), buffer.read${field.valueType?cap_first}());
         <#else>
-            ${field.basicKeyType} ${field.name}Key = buffer.read${field.keyType?cap_first}();
-            ${field.basicValueType} ${field.name}Value = new ${field.valueType}();
-            ${field.name}Value.decode(buffer);
-            ${field.name}.put(${field.name}Key, ${field.name}Value);
+            ${field.basicKeyType} _${field.name}_Key = buffer.read${field.keyType?cap_first}();
+            ${field.basicValueType} _${field.name}_Value = new ${field.valueType}();
+            _${field.name}_Value.decode(buffer);
+            ${field.name}.put(_${field.name}_Key, _${field.name}_Value);
         </#if>
         }
 

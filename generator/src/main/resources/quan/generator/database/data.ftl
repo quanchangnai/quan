@@ -138,7 +138,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         return ${field.name};
     }
 
-    <#elseif definitionType ==5 && field.name == keyName>
+    <#elseif definitionType ==5 && persistent && field.name == keyName>
     public ${field.basicType} get${field.name?cap_first}() {
         return ${field.name}.getValue();
     }
@@ -148,8 +148,9 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         return ${field.name}.getValue();
     }
 
-    public void set${field.name?cap_first}(${field.basicType} ${field.name}) {
+    public ${name} set${field.name?cap_first}(${field.basicType} ${field.name}) {
         this.${field.name}.setLogValue(${field.name}, getRoot());
+        return this;
     }
 
     </#if>
@@ -183,11 +184,11 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 
         </#if>
         JSONArray _${field.name} = new JSONArray();
-        for (${field.classValueType} _${field.name}_value : ${field.name}) {
+        for (${field.classValueType} _${field.name}_Value : ${field.name}) {
         <#if !field.valueBuiltInType>
-            _${field.name}.add(_${field.name}_value.encode());
+            _${field.name}.add(_${field.name}_Value.encode());
         <#else>
-            _${field.name}.add(_${field.name}_value);
+            _${field.name}.add(_${field.name}_Value);
         </#if>
         }
         object.put("${field.name}", _${field.name});
@@ -197,11 +198,11 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 
         </#if>
         JSONObject _${field.name} = new JSONObject();
-        for (${field.classKeyType} _${field.name}_key : ${field.name}.keySet()) {
+        for (${field.classKeyType} _${field.name}_Key : ${field.name}.keySet()) {
         <#if !field.valueBuiltInType>
-            _${field.name}.put(String.valueOf(_${field.name}_key), ${field.name}.get(_${field.name}_key).encode());
+            _${field.name}.put(String.valueOf(_${field.name}_Key), ${field.name}.get(_${field.name}_Key).encode());
         <#else>
-            _${field.name}.put(String.valueOf(_${field.name}_key), ${field.name}.get(_${field.name}_key));
+            _${field.name}.put(String.valueOf(_${field.name}_Key), ${field.name}.get(_${field.name}_Key));
         </#if>
         }
         object.put("${field.name}", _${field.name});
@@ -234,9 +235,9 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
             List<${field.classValueType}> _${field.name}_2 = new ArrayList<>();
             for (int i = 0; i < _${field.name}_1.size(); i++) {
         <#if !field.valueBuiltInType>
-                ${field.classValueType} _${field.name}_value = new ${field.classValueType}();
-                _${field.name}_value.decode(_${field.name}_1.getJSONObject(i));
-                _${field.name}_2.add(_${field.name}_value);
+                ${field.classValueType} _${field.name}_Value = new ${field.classValueType}();
+                _${field.name}_Value.decode(_${field.name}_1.getJSONObject(i));
+                _${field.name}_2.add(_${field.name}_Value);
         <#else>
                 _${field.name}_2.add(_${field.name}_1.get${field.classValueType}(i));
         </#if>
@@ -254,9 +255,9 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
             Set<${field.classValueType}> _${field.name}_2 = new HashSet<>();
             for (int i = 0; i < _${field.name}_1.size(); i++) {
         <#if !field.valueBuiltInType>
-                ${field.classValueType} _${field.name}_value = new ${field.classValueType}();
-                _${field.name}_value.decode(_${field.name}_1.getJSONObject(i));
-                _${field.name}_2.add(_${field.name}_value);
+                ${field.classValueType} _${field.name}_Value = new ${field.classValueType}();
+                _${field.name}_Value.decode(_${field.name}_1.getJSONObject(i));
+                _${field.name}_2.add(_${field.name}_Value);
         <#else>
                 _${field.name}_2.add(_${field.name}_1.get${field.classValueType}(i));
         </#if>
@@ -272,13 +273,13 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         JSONObject _${field.name}_1 = object.getJSONObject("${field.name}");
         if (_${field.name}_1 != null) {
             Map<${field.classKeyType}, ${field.classValueType}> _${field.name}_2 = new HashMap<>();
-            for (String _${field.name}_1_key : _${field.name}_1.keySet()) {
+            for (String _${field.name}_1_Key : _${field.name}_1.keySet()) {
         <#if !field.valueBuiltInType>
-                ${field.classValueType} _${field.name}_value = new ${field.classValueType}();
-                _${field.name}_value.decode(_${field.name}_1.getJSONObject(_${field.name}_1_key));
-                _${field.name}_2.put(${field.classKeyType}.valueOf(_${field.name}_1_key), _${field.name}_value);
+                ${field.classValueType} _${field.name}_Value = new ${field.classValueType}();
+                _${field.name}_Value.decode(_${field.name}_1.getJSONObject(_${field.name}_1_Key));
+                _${field.name}_2.put(${field.classKeyType}.valueOf(_${field.name}_1_Key), _${field.name}_Value);
         <#else>
-                _${field.name}_2.put(${field.classKeyType}.valueOf(_${field.name}_1_key), _${field.name}_1.get${field.classValueType}(_${field.name}_1_key));
+                _${field.name}_2.put(${field.classKeyType}.valueOf(_${field.name}_1_Key), _${field.name}_1.get${field.classValueType}(_${field.name}_1_Key));
         </#if>
             }
             PMap<${field.classKeyType}, ${field.classValueType}> _${field.name}_3 = Empty.map();
@@ -305,12 +306,12 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         </#if>
         JSONObject _${field.name} = object.getJSONObject("${field.name}");
         if (_${field.name} != null) {
-            ${field.classType} _${field.name}_value = ${field.name}.getValue();
-            if (_${field.name}_value == null) {
-                _${field.name}_value = new ${field.classType}();
-                ${field.name}.setValue(_${field.name}_value);
+            ${field.classType} _${field.name}_Value = ${field.name}.getValue();
+            if (_${field.name}_Value == null) {
+                _${field.name}_Value = new ${field.classType}();
+                ${field.name}.setValue(_${field.name}_Value);
             }
-            _${field.name}_value.decode(_${field.name});
+            _${field.name}_Value.decode(_${field.name});
         }
 
     </#if>

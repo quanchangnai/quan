@@ -39,97 +39,108 @@ public class UserInfo extends Bean {
         return name;
     }
 
-    public void setName(String name) {
+    public UserInfo setName(String name) {
         if (name == null){
             throw new NullPointerException();
         }
         this.name = name;
+        return this;
     }
 
     public int getLevel() {
         return level;
     }
 
-    public void setLevel(int level) {
+    public UserInfo setLevel(int level) {
         this.level = level;
+        return this;
     }
 
     public int getExperience() {
         return experience;
     }
 
-    public void setExperience(int experience) {
+    public UserInfo setExperience(int experience) {
         this.experience = experience;
+        return this;
     }
 
     public int getIcon() {
         return icon;
     }
 
-    public void setIcon(int icon) {
+    public UserInfo setIcon(int icon) {
         this.icon = icon;
+        return this;
     }
 
     public int getPower() {
         return power;
     }
 
-    public void setPower(int power) {
+    public UserInfo setPower(int power) {
         this.power = power;
+        return this;
     }
 
     public int getModifyNameCount() {
         return modifyNameCount;
     }
 
-    public void setModifyNameCount(int modifyNameCount) {
+    public UserInfo setModifyNameCount(int modifyNameCount) {
         this.modifyNameCount = modifyNameCount;
+        return this;
     }
 
     public String getEventState() {
         return eventState;
     }
 
-    public void setEventState(String eventState) {
+    public UserInfo setEventState(String eventState) {
         if (eventState == null){
             throw new NullPointerException();
         }
         this.eventState = eventState;
+        return this;
     }
 
     public String getFunctionState() {
         return functionState;
     }
 
-    public void setFunctionState(String functionState) {
+    public UserInfo setFunctionState(String functionState) {
         if (functionState == null){
             throw new NullPointerException();
         }
         this.functionState = functionState;
+        return this;
     }
 
     public int getLucky() {
         return lucky;
     }
 
-    public void setLucky(int lucky) {
+    public UserInfo setLucky(int lucky) {
         this.lucky = lucky;
+        return this;
     }
 
     public int getCurrentState() {
         return currentState;
     }
 
-    public void setCurrentState(int currentState) {
+    public UserInfo setCurrentState(int currentState) {
         this.currentState = currentState;
+        return this;
     }
 
     public int getBuyPowerCount() {
         return buyPowerCount;
     }
 
-    public void setBuyPowerCount(int buyPowerCount) {
+    public UserInfo setBuyPowerCount(int buyPowerCount) {
         this.buyPowerCount = buyPowerCount;
+        return this;
     }
 
     @Override

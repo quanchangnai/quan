@@ -326,7 +326,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
             }
         }
 
-        database.batchWrite(this, puts, deletes);
+        database.bulkWrite(this, puts, deletes);
 
         dirty.clear();
 

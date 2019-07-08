@@ -44,86 +44,96 @@ public class RoleInfo extends Bean {
         return roleId;
     }
 
-    public void setRoleId(long roleId) {
+    public RoleInfo setRoleId(long roleId) {
         this.roleId = roleId;
+        return this;
     }
 
     public boolean getBo() {
         return bo;
     }
 
-    public void setBo(boolean bo) {
+    public RoleInfo setBo(boolean bo) {
         this.bo = bo;
+        return this;
     }
 
     public byte getBy() {
         return by;
     }
 
-    public void setBy(byte by) {
+    public RoleInfo setBy(byte by) {
         this.by = by;
+        return this;
     }
 
     public short getS() {
         return s;
     }
 
-    public void setS(short s) {
+    public RoleInfo setS(short s) {
         this.s = s;
+        return this;
     }
 
     public int getI() {
         return i;
     }
 
-    public void setI(int i) {
+    public RoleInfo setI(int i) {
         this.i = i;
+        return this;
     }
 
     public float getF() {
         return f;
     }
 
-    public void setF(float f) {
+    public RoleInfo setF(float f) {
         this.f = f;
+        return this;
     }
 
     public double getD() {
         return d;
     }
 
-    public void setD(double d) {
+    public RoleInfo setD(double d) {
         this.d = d;
+        return this;
     }
 
     public String getRoleName() {
         return roleName;
     }
 
-    public void setRoleName(String roleName) {
+    public RoleInfo setRoleName(String roleName) {
         if (roleName == null){
             throw new NullPointerException();
         }
         this.roleName = roleName;
+        return this;
     }
 
     public RoleType getRoleType() {
         return roleType;
     }
 
-    public void setRoleType(RoleType roleType) {
+    public RoleInfo setRoleType(RoleType roleType) {
         this.roleType = roleType;
+        return this;
     }
 
     public byte[] getData() {
         return data;
     }
 
-    public void setData(byte[] data) {
+    public RoleInfo setData(byte[] data) {
         if (data == null){
             throw new NullPointerException();
         }
         this.data = data;
+        return this;
     }
 
     public ArrayList<Integer> getList() {
@@ -192,18 +202,18 @@ public class RoleInfo extends Bean {
         roleType = RoleType.valueOf(buffer.readInt());
         data = buffer.readBytes();
 
-        int listSize = buffer.readInt();
-        for (int i = 0; i < listSize; i++) {
+        int _list_Size = buffer.readInt();
+        for (int i = 0; i < _list_Size; i++) {
             list.add(buffer.readInt());
         }
 
-        int setSize = buffer.readInt();
-        for (int i = 0; i < setSize; i++) {
+        int _set_Size = buffer.readInt();
+        for (int i = 0; i < _set_Size; i++) {
             set.add(buffer.readInt());
         }
 
-        int mapSize = buffer.readInt();
-        for (int i = 0; i < mapSize; i++) {
+        int _map_Size = buffer.readInt();
+        for (int i = 0; i < _map_Size; i++) {
             map.put(buffer.readInt(), buffer.readInt());
         }
 
