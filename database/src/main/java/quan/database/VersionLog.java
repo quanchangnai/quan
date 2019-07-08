@@ -25,7 +25,7 @@ class VersionLog {
     public boolean isConflict() {
         Cache cache = data.getCache();
         if (cache != null) {
-            cache.checkClosed();
+            cache.checkWorkable();
         }
         return version != data.getVersion();
     }

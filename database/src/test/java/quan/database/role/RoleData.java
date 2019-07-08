@@ -25,15 +25,15 @@ public class RoleData extends Data<Long> {
     }
 
     public synchronized static void setCache(Cache<Long, RoleData> cache) {
-        cache.checkClosed();
-        if (RoleData.cache != null) {
+        cache.checkWorkable();
+        if (RoleData.cache != null && RoleData.cache.isWorkable()) {
             throw new IllegalStateException("数据已设置缓存");
         }
         RoleData.cache = cache;
     }
 
     private synchronized static void checkCache() {
-        if (cache != null && !cache.isClosed()) {
+        if (cache != null && cache.isWorkable()) {
             return;
         }
 
@@ -45,7 +45,7 @@ public class RoleData extends Data<Long> {
         if (cache == null) {
             cache = new Cache<>("RoleData", RoleData::new);
             database.registerCache(cache);
-        } else if (cache.isClosed()) {
+        } else if (!cache.isWorkable()) {
             database.registerCache(cache);
         }
     }

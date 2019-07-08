@@ -53,8 +53,6 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
      */
     private ReadWriteLock lock = new ReentrantReadWriteLock();
 
-    private boolean closed;
-
     public Cache(String name, Function<K, V> dataFactory) {
         this.name = name;
         this.dataFactory = dataFactory;
@@ -83,7 +81,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
     void init(Database database) {
         lock.writeLock().lock();
         try {
-            if (this.database != null) {
+            if (isWorkable()) {
                 return;
             }
             this.database = database;
@@ -92,7 +90,6 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
 
             rows = new ConcurrentHashMap<>(cacheSize);
             dirty = new ConcurrentHashMap<>();
-            closed = false;
         } finally {
             lock.writeLock().unlock();
         }
@@ -347,7 +344,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
         logger.debug("[{}]存档耗时:{}ms,当前缓存数量:{},插入数量:{},更新数量:{},删除数量:{}", name, costTime, rows.size(), insertNum, updateNum, deletes.size());
     }
 
-    void close() {
+    void finalStore() {
         lock.writeLock().lock();
         try {
             store0();
@@ -357,23 +354,21 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
                 }
             }
             rows.clear();
-            database = null;
-            closed = true;
         } finally {
             lock.writeLock().unlock();
         }
     }
 
-    public boolean isClosed() {
-        return closed;
+    public boolean isWorkable() {
+        return database != null && !database.isClosed();
     }
 
-    public void checkClosed() {
-        if (closed) {
-            throw new DbException("数据库已关闭");
-        }
+    public void checkWorkable() {
         if (database == null) {
             throw new DbException("缓存未注册到数据库");
+        }
+        if (database.isClosed()) {
+            throw new DbException("数据库已关闭");
         }
     }
 

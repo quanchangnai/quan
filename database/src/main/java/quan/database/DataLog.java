@@ -72,7 +72,7 @@ class DataLog {
     }
 
     public boolean isConflict() {
-        key.cache.checkClosed();
+        key.cache.checkWorkable();
 
         //有可能出现事务执行时间比缓存的过期时间还长的极端情况
         long costTime = System.currentTimeMillis() - Transaction.get(true).getTaskStartTime();

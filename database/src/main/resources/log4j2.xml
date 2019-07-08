@@ -6,9 +6,9 @@
         </Console>
     </Appenders>
     <Loggers>
-        <logger name="quan" level="debug">
+        <Logger name="quan" level="debug" additivity="false">
             <AppenderRef ref="console"/>
-        </logger>
+        </Logger>
         <Root level="info">
             <AppenderRef ref="console"/>
         </Root>

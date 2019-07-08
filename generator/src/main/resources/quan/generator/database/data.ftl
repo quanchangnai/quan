@@ -42,15 +42,15 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 
     <#if persistent>
     public synchronized static void setCache(Cache<${keyType}, ${name}> cache) {
-        cache.checkClosed();
-        if (${name}.cache != null) {
+        cache.checkWorkable();
+        if (${name}.cache != null && RoleData.cache.isWorkable()) {
             throw new IllegalStateException("数据已设置缓存");
         }
         ${name}.cache = cache;
     }
 
     private synchronized static void checkCache() {
-        if (cache != null && !cache.isClosed()) {
+        if (cache != null && cache.isWorkable()) {
             return;
         }
 
@@ -62,7 +62,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         if (cache == null) {
             cache = new Cache<>("${name}", ${name}::new);
             database.registerCache(cache);
-        } else if (cache.isClosed()) {
+        } else if (!cache.isWorkable()) {
             database.registerCache(cache);
         }
     }

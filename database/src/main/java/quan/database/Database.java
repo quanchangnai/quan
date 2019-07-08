@@ -105,7 +105,7 @@ public abstract class Database {
         if (caches.containsKey(cache.getName())) {
             throw new IllegalStateException("缓存已经被注册了");
         }
-        if (cache.getDatabase() != null) {
+        if (cache.isWorkable()) {
             throw new IllegalStateException("缓存已经被注册到其他数据库");
         }
         cache.init(this);
@@ -146,6 +146,8 @@ public abstract class Database {
         if (instance == this) {
             instance = null;
         }
+        closed = true;
+
         caches.clear();
         for (StoreThread storeThread : storeThreads) {
             storeThread.close();
@@ -153,7 +155,6 @@ public abstract class Database {
         storeThreads.clear();
 
         close0();
-        closed = true;
         logger.debug("数据库[{}]已关闭", getName());
     }
 
@@ -217,7 +218,7 @@ public abstract class Database {
         void close() {
             running = false;
             for (Cache cache : caches) {
-                cache.close();
+                cache.finalStore();
             }
         }
     }

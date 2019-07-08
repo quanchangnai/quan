@@ -140,7 +140,7 @@ public class Transaction {
 
     void addVersionLog(Data data) {
         if (data.getCache() != null) {
-            data.getCache().checkClosed();
+            data.getCache().checkWorkable();
         }
         if (data.isExpired()) {
             throw new IllegalStateException("数据已过期");
@@ -369,7 +369,7 @@ public class Transaction {
         TreeSet<Cache> caches = new TreeSet<>();
         for (DataLog dataLog : dataLogs.values()) {
             Cache cache = dataLog.getCache();
-            cache.checkClosed();
+            cache.checkWorkable();
             caches.add(cache);
             cachedRowLocks.add(LockPool.getLock(cache, dataLog.getKey().getK()));
 
@@ -382,7 +382,7 @@ public class Transaction {
         for (Data data : versionLogs.keySet()) {
             Cache cache = data.getCache();
             if (cache != null) {
-                cache.checkClosed();
+                cache.checkWorkable();
                 rowLockIndexes.add(LockPool.getLockIndex(cache, data.getKey()));
             } else {
                 //没有注册缓存
