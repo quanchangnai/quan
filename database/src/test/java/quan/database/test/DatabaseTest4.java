@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.database.Database;
 import quan.database.Executor;
-import quan.database.MysqlDB;
+import quan.database.MySqlDB;
 import quan.database.Transactions;
 
 /**
@@ -20,7 +20,7 @@ public class DatabaseTest4 {
     static {
 //        database = new BerkeleyDB(".temp/bdb");
 //        database = new MongoDB(new MongoDB.Config().setClientUri("mongodb://127.0.0.1:27017").setDatabaseName("mdb").setConnectionsNum(1));
-        database = new MysqlDB(new MysqlDB.Config());
+        database = new MySqlDB(new MySqlDB.Config());
     }
 
     static Executor executor = new Executor();

@@ -280,7 +280,7 @@ public abstract class Database {
         }
 
         public Config setStorePeriod(int storePeriod) {
-            this.storePeriod = Math.max(60, storePeriod);
+            this.storePeriod = Math.max(1, storePeriod);
             return this;
         }
 

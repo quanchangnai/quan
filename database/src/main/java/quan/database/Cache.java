@@ -236,6 +236,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
 
         DataLog log = transaction.getDataLog(new DataLog.Key(this, key));
         if (log != null) {
+            log.setDeleted(true);
             log.setCurrent(null);
             return;
         }

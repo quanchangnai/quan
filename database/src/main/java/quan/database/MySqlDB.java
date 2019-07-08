@@ -14,17 +14,17 @@ import java.util.Set;
 /**
  * Created by quanchangnai on 2019/7/8.
  */
-public class MysqlDB extends Database {
+public class MySqlDB extends Database {
 
     private DataSource dataSource;
 
-    public MysqlDB(Config config) {
+    public MySqlDB(Config config) {
         super(config);
     }
 
     @Override
     protected void open0() {
-        MysqlDB.Config config = getConfig();
+        MySqlDB.Config config = getConfig();
         BasicDataSource basicDataSource = new BasicDataSource();
         basicDataSource.setDriverClassName(Driver.class.getName());
         basicDataSource.setUsername(config.username);
@@ -71,6 +71,7 @@ public class MysqlDB extends Database {
     protected void close0() {
         try {
             ((BasicDataSource) dataSource).close();
+            dataSource = null;
         } catch (SQLException e) {
             throw new DbException(e);
         }

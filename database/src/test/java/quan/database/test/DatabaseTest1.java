@@ -3,7 +3,7 @@ package quan.database.test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.database.Database;
-import quan.database.MysqlDB;
+import quan.database.MySqlDB;
 import quan.database.Transaction;
 import quan.database.Transactions;
 import quan.database.role.RoleData;
@@ -28,7 +28,7 @@ public class DatabaseTest1 {
 
 //        database = new BerkeleyDB(".temp/bdb");
 //        database = new MongoDB(new MongoDB.Config().setClientUri("mongodb://127.0.0.1:27017").setDatabaseName("mdb"));
-        database = new MysqlDB(new MysqlDB.Config());
+        database = new MySqlDB(new MySqlDB.Config());
 
         Transactions.setConflictThreshold(1);
 
