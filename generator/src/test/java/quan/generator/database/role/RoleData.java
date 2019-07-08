@@ -1,17 +1,10 @@
 package quan.generator.database.role;
 
 import quan.database.*;
-import quan.database.Database;
-import quan.database.Cache;
-import com.alibaba.fastjson.JSONArray;
-import quan.database.Data;
+import org.pcollections.*;
 import quan.generator.database.item.ItemBean;
 import java.util.*;
-import org.pcollections.PSet;
-import org.pcollections.PVector;
-import org.pcollections.Empty;
-import com.alibaba.fastjson.JSONObject;
-import org.pcollections.PMap;
+import com.alibaba.fastjson.*;
 
 /**
  * 角色
@@ -22,7 +15,7 @@ public class RoleData extends Data<Long> {
     private static Cache<Long, RoleData> cache;
 
     public RoleData(Long id) {
-        super(cache);
+	    super(cache);
         this.id.setLogValue(id, getRoot());
     }
 
@@ -38,7 +31,6 @@ public class RoleData extends Data<Long> {
         }
         RoleData.cache = cache;
     }
-
 
     private synchronized static void checkCache() {
         if (cache != null && !cache.isClosed()) {
@@ -56,7 +48,6 @@ public class RoleData extends Data<Long> {
         } else if (cache.isClosed()) {
             database.registerCache(cache);
         }
-
     }
 
     public static RoleData get(Long id) {
@@ -96,7 +87,9 @@ public class RoleData extends Data<Long> {
 
     private BaseField<Double> d = new BaseField<>(0D);
 
-    private BeanField<ItemBean> itemBean = new BeanField<>();
+    private BeanField<ItemBean> item = new BeanField<>();
+
+    private MapField<Integer, ItemBean> items = new MapField<>(getRoot());
 
     private SetField<Boolean> set = new SetField<>(getRoot());
 
@@ -171,12 +164,16 @@ public class RoleData extends Data<Long> {
         this.d.setLogValue(d, getRoot());
     }
 
-    public ItemBean getItemBean() {
-        return itemBean.getValue();
+    public ItemBean getItem() {
+        return item.getValue();
     }
 
-    public void setItemBean(ItemBean itemBean) {
-        this.itemBean.setLogValue(itemBean, getRoot());
+    public void setItem(ItemBean item) {
+        this.item.setLogValue(item, getRoot());
+    }
+
+    public Map<Integer, ItemBean> getItems() {
+        return items;
     }
 
     public Set<Boolean> getSet() {
@@ -206,11 +203,12 @@ public class RoleData extends Data<Long> {
 
     @Override
     public void setChildrenLogRoot(Data root) {
-        ItemBean _itemBean = this.itemBean.getValue();
-        if (_itemBean != null) {
-            _itemBean.setLogRoot(root);
+        ItemBean _item = this.item.getValue();
+        if (_item != null) {
+            _item.setLogRoot(root);
         }
 
+        items.setLogRoot(root);
         set.setLogRoot(root);
         list.setLogRoot(root);
         map.setLogRoot(root);
@@ -232,10 +230,16 @@ public class RoleData extends Data<Long> {
         object.put("f", f.getValue());
         object.put("d", d.getValue());
 
-        ItemBean _itemBean = itemBean.getValue();
-        if (_itemBean != null) {
-            object.put("itemBean", _itemBean.encode());
+        ItemBean _item = item.getValue();
+        if (_item != null) {
+            object.put("item", _item.encode());
         }
+
+        JSONObject _items = new JSONObject();
+        for (Integer _items_key : items.keySet()) {
+            _items.put(String.valueOf(_items_key), items.get(_items_key).encode());
+        }
+        object.put("items", _items);
 
         JSONArray _set = new JSONArray();
         for (Boolean _set_value : set) {
@@ -279,7 +283,13 @@ public class RoleData extends Data<Long> {
     @Override
     public void decode(JSONObject object) {
         id.setValue(object.getLongValue("id"));
-        name.setValue(object.getString("name"));
+
+        String _name = object.getString("name");
+        if (_name == null) {
+            _name = "";
+        }
+        name.setValue(_name);
+
         bo.setValue(object.getBooleanValue("bo"));
         by.setValue(object.getByteValue("by"));
         s.setValue(object.getShortValue("s"));
@@ -287,14 +297,26 @@ public class RoleData extends Data<Long> {
         f.setValue(object.getFloatValue("f"));
         d.setValue(object.getDoubleValue("d"));
 
-        JSONObject _itemBean = object.getJSONObject("itemBean");
-        if (_itemBean != null) {
-            ItemBean _itemBean_value = itemBean.getValue();
-            if (_itemBean_value == null) {
-                _itemBean_value = new ItemBean();
-                itemBean.setValue(_itemBean_value);
+        JSONObject _item = object.getJSONObject("item");
+        if (_item != null) {
+            ItemBean _item_value = item.getValue();
+            if (_item_value == null) {
+                _item_value = new ItemBean();
+                item.setValue(_item_value);
             }
-            _itemBean_value.decode(_itemBean);
+            _item_value.decode(_item);
+        }
+
+        JSONObject _items_1 = object.getJSONObject("items");
+        if (_items_1 != null) {
+            Map<Integer, ItemBean> _items_2 = new HashMap<>();
+            for (String _items_1_key : _items_1.keySet()) {
+                ItemBean _items_value = new ItemBean();
+                _items_value.decode(_items_1.getJSONObject(_items_1_key));
+                _items_2.put(Integer.valueOf(_items_1_key), _items_value);
+            }
+            PMap<Integer, ItemBean> _items_3 = Empty.map();
+            items.setValue(_items_3.plusAll(_items_2));
         }
 
         JSONArray _set_1 = object.getJSONArray("set");
@@ -376,7 +398,8 @@ public class RoleData extends Data<Long> {
                 ",i=" + i +
                 ",f=" + f +
                 ",d=" + d +
-                ",itemBean=" + itemBean +
+                ",item=" + item +
+                ",items=" + items +
                 ",set=" + set +
                 ",list=" + list +
                 ",map=" + map +

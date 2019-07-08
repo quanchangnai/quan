@@ -7,67 +7,23 @@ import quan.database.item.ItemBean;
 import com.alibaba.fastjson.*;
 
 /**
- * 角色
+ * 角色2
  * Created by 自动生成
  */
-public class RoleData extends Data<Long> {
+public class RoleData2 extends Data<Long> {
 
-    private static Cache<Long, RoleData> cache;
-
-    public RoleData(Long id) {
-	    super(cache);
+    public RoleData2() {
+        super(null);
+    }
+        
+    public RoleData2(Long id) {
+        super(null);
         this.id.setLogValue(id, getRoot());
     }
 
     @Override
     public Long getKey() {
         return getId();
-    }
-
-    public synchronized static void setCache(Cache<Long, RoleData> cache) {
-        cache.checkClosed();
-        if (RoleData.cache != null) {
-            throw new IllegalStateException("数据已设置缓存");
-        }
-        RoleData.cache = cache;
-    }
-
-    private synchronized static void checkCache() {
-        if (cache != null && !cache.isClosed()) {
-            return;
-        }
-
-        Database database = Database.getDefault();
-        if (database == null) {
-            throw new IllegalStateException("没有默认数据库");
-        }
-
-        if (cache == null) {
-            cache = new Cache<>("RoleData", RoleData::new);
-            database.registerCache(cache);
-        } else if (cache.isClosed()) {
-            database.registerCache(cache);
-        }
-    }
-
-    public static RoleData get(Long id) {
-        checkCache();
-        return cache.get(id);
-    }
-
-    public static void delete(Long id) {
-        checkCache();
-        cache.delete(id);
-    }
-
-    public static void insert(RoleData data) {
-        checkCache();
-        cache.insert(data);
-    }
-
-    public static RoleData getOrInsert(Long id) {
-        checkCache();
-        return cache.getOrInsert(id);
     }
 
 
@@ -389,7 +345,7 @@ public class RoleData extends Data<Long> {
 
     @Override
     public String toString() {
-        return "RoleData{" +
+        return "RoleData2{" +
                 "id=" + id +
                 ",name='" + name + '\'' +
                 ",bo=" + bo +

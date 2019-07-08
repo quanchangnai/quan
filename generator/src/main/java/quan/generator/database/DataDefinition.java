@@ -11,6 +11,8 @@ public class DataDefinition extends BeanDefinition {
 
     private String keyName;
 
+    private boolean persistent = true;
+
     public String getKeyType() {
         return keyType;
     }
@@ -32,6 +34,15 @@ public class DataDefinition extends BeanDefinition {
     @Override
     public int getDefinitionType() {
         return 5;
+    }
+
+    public boolean isPersistent() {
+        return persistent;
+    }
+
+    public DataDefinition setPersistent(boolean persistent) {
+        this.persistent = persistent;
+        return this;
     }
 
     @Override

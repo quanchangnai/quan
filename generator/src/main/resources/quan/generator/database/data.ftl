@@ -16,18 +16,31 @@ import ${import};
 public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType ==5>Data<${keyType}></#if> {
 <#if definitionType ==5>
 
+    <#if persistent>
     private static Cache<${keyType}, ${name}> cache;
 
     public ${name}(${keyType} ${keyName}) {
-        super(cache);
+	    super(cache);
         this.${keyName}.setLogValue(${keyName}, getRoot());
     }
 
+    <#else>
+    public ${name}() {
+        super(null);
+    }
+        
+    public ${name}(${keyType} ${keyName}) {
+        super(null);
+        this.${keyName}.setLogValue(${keyName}, getRoot());
+    }
+
+    </#if>
     @Override
     public ${keyType} getKey() {
         return get${keyName?cap_first}();
     }
 
+    <#if persistent>
     public synchronized static void setCache(Cache<${keyType}, ${name}> cache) {
         cache.checkClosed();
         if (${name}.cache != null) {
@@ -35,7 +48,6 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         }
         ${name}.cache = cache;
     }
-
 
     private synchronized static void checkCache() {
         if (cache != null && !cache.isClosed()) {
@@ -53,7 +65,6 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         } else if (cache.isClosed()) {
             database.registerCache(cache);
         }
-
     }
 
     public static ${name} get(${keyType} ${keyName}) {
@@ -76,6 +87,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         return cache.getOrInsert(${keyName});
     }
 
+    </#if>
 </#if>
 
 <#list fields as field>
