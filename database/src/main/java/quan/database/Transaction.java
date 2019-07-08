@@ -255,7 +255,8 @@ public class Transaction {
             conflictCount.set(0);
         }
 
-        long costTime = System.currentTimeMillis() - current.startTime;
+        long currentTime = System.currentTimeMillis();
+        long costTime = currentTime - current.startTime;
 
         boolean slow = false;
         if (slowTimeThreshold > 0 && costTime >= slowTimeThreshold) {
@@ -269,7 +270,8 @@ public class Transaction {
             conflict = true;
         }
 
-        if (System.currentTimeMillis() - lastPrintCountTime >= printCountInterval * 1000) {
+        if (currentTime - lastPrintCountTime >= printCountInterval * 1000) {
+            lastPrintCountTime = currentTime;
             logger.info("事务执行总次数:{},慢事务次数:{},频繁冲突事务次数:{}", totalCount, slowCount, conflictCount);
         }
 
