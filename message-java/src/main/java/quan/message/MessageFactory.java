@@ -2,9 +2,11 @@ package quan.message;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import quan.common.util.ClassUtils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 消息工厂
@@ -21,6 +23,18 @@ public class MessageFactory {
             throw new RuntimeException("消息ID重复:" + message.getId());
         }
         prototypes.put(message.getId(), message);
+    }
+
+    public void autoRegister() {
+        Set<Class<?>> messageClasses = ClassUtils.loadClasses(Message.class);
+        for (Class<?> messageClass : messageClasses) {
+            try {
+                Message message = (Message) messageClass.getDeclaredConstructor().newInstance();
+                register(message);
+            } catch (Exception e) {
+                logger.error("", e);
+            }
+        }
     }
 
     public Message create(int msgId) {

@@ -106,8 +106,8 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     <#elseif field.type = "short">
     private BaseField<${field.classType}> ${field.name} = new BaseField<>((short) 0);<#if field.comment !="">//${field.comment}</#if>
 
-    <#elseif field.type = "int">
-    private BaseField<${field.classType}> ${field.name} = new BaseField<>(0);<#if field.comment !="">//${field.comment}</#if>
+    <#elseif field.type = "int" || field.enumType>
+    private BaseField<Integer> ${field.name} = new BaseField<>(0);<#if field.comment !="">//${field.comment}</#if>
 
     <#elseif field.type = "long">
     private BaseField<${field.classType}> ${field.name} = new BaseField<>(0L);<#if field.comment !="">//${field.comment}</#if>
@@ -143,6 +143,16 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         return ${field.name}.getValue();
     }
 
+    <#elseif field.enumType>
+    public ${field.type} get${field.name?cap_first}() {
+        return ${field.type}.valueOf(${field.name}.getValue());
+    }
+
+    public ${name} set${field.name?cap_first}(${field.basicType} ${field.name}) {
+        this.${field.name}.setLogValue(${field.name}.getValue(), getRoot());
+	    return this;
+    }
+
     <#else>
     public ${field.basicType} get${field.name?cap_first}() {
         return ${field.name}.getValue();
@@ -161,7 +171,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 <#list fields as field>
     <#if field.collectionType>
         ${field.name}.setLogRoot(root);
-    <#elseif !field.builtInType>
+    <#elseif !field.builtInType && !field.enumType>
         <#if field_index gt 0 && fields[field_index-1].collectionType>
 
         </#if>
@@ -207,7 +217,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         }
         object.put("${field.name}", _${field.name});
 
-    <#elseif field.builtInType>
+    <#elseif field.builtInType || field.enumType>
         object.put("${field.name}", ${field.name}.getValue());
     <#else>
         <#if field_index gt 0 && fields[field_index-1].builtInType && !fields[field_index-1].collectionType>
@@ -286,7 +296,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
             ${field.name}.setValue(_${field.name}_3.plusAll(_${field.name}_2));
         }
 
-    <#elseif field.type=="int">
+    <#elseif field.type=="int" || field.enumType>
         ${field.name}.setValue(object.getIntValue("${field.name}"));
     <#elseif field.type=="string">
         <#if field_index gt 0 && fields[field_index-1].builtInType && !fields[field_index-1].collectionType && fields[field_index-1].type!="string">
@@ -328,6 +338,8 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
             </#if>
             <#if field.type == "string">
                 <#lt>${field.name}='" + ${field.name} + '\'' +
+            <#elseif field.enumType>
+                <#lt>${field.name}=" + ${field.type}.valueOf(${field.name}.getValue()) +
             <#else>
                 <#lt>${field.name}=" + ${field.name} +
             </#if>

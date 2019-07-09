@@ -62,16 +62,24 @@ public abstract class Generator {
 
     protected Map<Class<? extends ClassDefinition>, Template> templates = new HashMap<>();
 
+    protected Parser parser = new XmlParser();
+
     public Generator(String srcPath, String destPath) throws Exception {
         Configuration freemarkerCfg = new Configuration(Configuration.VERSION_2_3_23);
-        freemarkerCfg.setClassForTemplateLoading(getClass(), "");
+        freemarkerCfg.setClassForTemplateLoading(Generator.class, "");
         freemarkerCfg.setDefaultEncoding("UTF-8");
         freemarkerCfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
 
         this.srcPath = srcPath;
         this.destPath = destPath;
         this.freemarkerCfg = freemarkerCfg;
+
+        Template enumTemplate = freemarkerCfg.getTemplate("enum." + getLanguage() + ".ftl");
+        templates.put(EnumDefinition.class, enumTemplate);
+
+        freemarkerCfg.setClassForTemplateLoading(getClass(), "");
     }
+
 
     public String getPackagePrefix() {
         return packagePrefix;
@@ -85,21 +93,43 @@ public abstract class Generator {
         return this;
     }
 
+    public Generator setParser(Parser parser) {
+        this.parser = parser;
+        return this;
+    }
+
     protected abstract String getLanguage();
 
-    protected void generate() throws Exception {
-        this.definitions = new Parser(srcPath, packagePrefix).parse();
+    protected boolean support(ClassDefinition classDefinition) {
+        if (classDefinition instanceof BeanDefinition || classDefinition instanceof EnumDefinition) {
+            return true;
+        }
+        return false;
+    }
 
-        for (ClassDefinition definition : definitions) {
-            if (definition instanceof BeanDefinition) {
-                BeanDefinition beanDefinition = (BeanDefinition) definition;
+    public final void generate() throws Exception {
+        parser.setPackagePrefix(packagePrefix);
+        parser.setSrcPath(srcPath);
+
+        this.definitions = parser.parse();
+
+        for (ClassDefinition classDefinition : definitions) {
+            if (!support(classDefinition)) {
+                continue;
+            }
+            if (classDefinition instanceof BeanDefinition) {
+                BeanDefinition beanDefinition = (BeanDefinition) classDefinition;
                 processBean(beanDefinition);
             }
         }
 
-        for (ClassDefinition definition : definitions) {
-            Template template = templates.get(definition.getClass());
-            String packageName = definition.getPackageName();
+        for (ClassDefinition classDefinition : definitions) {
+            if (!support(classDefinition)) {
+                continue;
+            }
+
+            Template template = templates.get(classDefinition.getClass());
+            String packageName = classDefinition.getPackageName();
 
             String packagePath = packageName.replace(".", "\\");
             File destFilePath = new File(destPath + "\\" + packagePath);
@@ -107,9 +137,9 @@ public abstract class Generator {
                 destFilePath.mkdirs();
             }
 
-            String fileName = definition.getName() + "." + getLanguage();
+            String fileName = classDefinition.getName() + "." + getLanguage();
             Writer writer = new FileWriter(new File(destFilePath, fileName));
-            template.process(definition, writer);
+            template.process(classDefinition, writer);
 
             logger.info("生成[{}]成功", fileName);
         }

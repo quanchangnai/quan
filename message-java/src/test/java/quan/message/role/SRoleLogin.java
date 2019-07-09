@@ -16,7 +16,7 @@ public class SRoleLogin extends Message {
 
     private String roleName = "";//角色名
 
-    private RoleInfo roleInfo;//角色信息
+    private RoleInfo roleInfo = new RoleInfo();//角色信息
 
     private ArrayList<RoleInfo> roleInfoList = new ArrayList<>();//角色信息
 
@@ -24,10 +24,10 @@ public class SRoleLogin extends Message {
 
     private HashMap<Long, RoleInfo> roleInfoMap = new HashMap<>();//角色信息
 
-    private UserInfo userInfo = new UserInfo();//用户信息
+    private UserInfo userInfo;//用户信息
 
     public SRoleLogin() {
-        super(2222);
+        super(111);
     }
 
     public long getRoleId() {
@@ -56,6 +56,9 @@ public class SRoleLogin extends Message {
     }
 
     public SRoleLogin setRoleInfo(RoleInfo roleInfo) {
+        if (roleInfo == null){
+            throw new NullPointerException();
+        }
         this.roleInfo = roleInfo;
         return this;
     }
@@ -77,9 +80,6 @@ public class SRoleLogin extends Message {
     }
 
     public SRoleLogin setUserInfo(UserInfo userInfo) {
-        if (userInfo == null){
-            throw new NullPointerException();
-        }
         this.userInfo = userInfo;
         return this;
     }
@@ -95,11 +95,7 @@ public class SRoleLogin extends Message {
 
         buffer.writeLong(roleId);
         buffer.writeString(roleName);
-
-        buffer.writeBool(roleInfo != null);
-        if (roleInfo != null) {
-            roleInfo.encode(buffer);
-        }
+        roleInfo.encode(buffer);
 
         buffer.writeInt(roleInfoList.size());
         for (RoleInfo roleInfoListValue : roleInfoList) {
@@ -117,7 +113,11 @@ public class SRoleLogin extends Message {
             roleInfoMap.get(roleInfoMapKey).encode(buffer);
         }
 
-        userInfo.encode(buffer);
+        buffer.writeBool(userInfo != null);
+        if (userInfo != null) {
+            userInfo.encode(buffer);
+        }
+
     }
 
     @Override
@@ -126,13 +126,7 @@ public class SRoleLogin extends Message {
 
         roleId = buffer.readLong();
         roleName = buffer.readString();
-
-        if (buffer.readBool()) {
-            if (roleInfo == null) {
-                roleInfo = new RoleInfo();
-            }
-            roleInfo.decode(buffer);
-        }
+        roleInfo.decode(buffer);
 
         int _roleInfoList_Size = buffer.readInt();
         for (int i = 0; i < _roleInfoList_Size; i++) {
@@ -156,7 +150,13 @@ public class SRoleLogin extends Message {
             roleInfoMap.put(_roleInfoMap_Key, _roleInfoMap_Value);
         }
 
-        userInfo.decode(buffer);
+        if (buffer.readBool()) {
+            if (userInfo == null) {
+                userInfo = new UserInfo();
+            }
+            userInfo.decode(buffer);
+        }
+
     }
 
     @Override

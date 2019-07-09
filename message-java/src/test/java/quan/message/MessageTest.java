@@ -1,6 +1,7 @@
 package quan.message;
 
 import quan.message.role.RoleInfo;
+import quan.message.role.RoleType;
 import quan.message.role.SRoleLogin;
 
 /**
@@ -19,8 +20,9 @@ public class MessageTest {
 
         RoleInfo roleInfo = new RoleInfo();
         roleInfo.setRoleId(111111);
+        roleInfo.setRoleType(RoleType.type1);
         roleInfo.getSet().add(2213);
-        sRoleLogin1.getRoleInfoMap().put(roleInfo.getRoleId(),roleInfo);
+        sRoleLogin1.getRoleInfoMap().put(roleInfo.getRoleId(), roleInfo);
 
         System.err.println("sRoleLogin1:" + sRoleLogin1);
 
@@ -28,6 +30,7 @@ public class MessageTest {
         sRoleLogin2.decode(sRoleLogin1.encode());
 
         System.err.println("sRoleLogin2:" + sRoleLogin2);
+
     }
 
 }

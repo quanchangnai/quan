@@ -5,6 +5,7 @@ import org.pcollections.*;
 import java.util.*;
 import quan.database.item.ItemBean;
 import com.alibaba.fastjson.*;
+import quan.database.item.ItemType;
 
 /**
  * 角色2
@@ -44,6 +45,8 @@ public class RoleData2 extends Data<Long> {
     private BaseField<Double> d = new BaseField<>(0D);
 
     private BeanField<ItemBean> item = new BeanField<>();
+
+    private BaseField<Integer> itemType = new BaseField<>(0);
 
     private MapField<Integer, ItemBean> items = new MapField<>(getRoot());
 
@@ -141,6 +144,15 @@ public class RoleData2 extends Data<Long> {
         return this;
     }
 
+    public ItemType getItemType() {
+        return ItemType.valueOf(itemType.getValue());
+    }
+
+    public RoleData2 setItemType(ItemType itemType) {
+        this.itemType.setLogValue(itemType.getValue(), getRoot());
+	    return this;
+    }
+
     public Map<Integer, ItemBean> getItems() {
         return items;
     }
@@ -204,6 +216,7 @@ public class RoleData2 extends Data<Long> {
             object.put("item", _item.encode());
         }
 
+        object.put("itemType", itemType.getValue());
         JSONObject _items = new JSONObject();
         for (Integer _items_Key : items.keySet()) {
             _items.put(String.valueOf(_items_Key), items.get(_items_Key).encode());
@@ -276,6 +289,7 @@ public class RoleData2 extends Data<Long> {
             _item_Value.decode(_item);
         }
 
+        itemType.setValue(object.getIntValue("itemType"));
         JSONObject _items_1 = object.getJSONObject("items");
         if (_items_1 != null) {
             Map<Integer, ItemBean> _items_2 = new HashMap<>();
@@ -368,6 +382,7 @@ public class RoleData2 extends Data<Long> {
                 ",f=" + f +
                 ",d=" + d +
                 ",item=" + item +
+                ",itemType=" + ItemType.valueOf(itemType.getValue()) +
                 ",items=" + items +
                 ",set=" + set +
                 ",list=" + list +

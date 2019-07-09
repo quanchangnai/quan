@@ -49,9 +49,9 @@ public class DatabaseTest4 {
 
         Role2 role2 = new Role2();
 
-//        role.login1();
+        role.login1();
 //        role.login2("123456");
-        role.login3();
+//        role.login3();
 //        role.login4();
 
 //        role2.login();

@@ -2,6 +2,7 @@ package quan.generator.message;
 
 import freemarker.template.Template;
 import quan.generator.BeanDefinition;
+import quan.generator.ClassDefinition;
 import quan.generator.Generator;
 
 /**
@@ -13,12 +14,12 @@ public abstract class MessageGenerator extends Generator {
         String language = "java";
 
         String srcPath = "generator\\src\\test\\java\\quan\\generator\\message";
-        String destPath = "generator\\src\\test\\java";
-        String packagePrefix = "quan.generator.message";
 
-//        String srcPath = "message-java\\src\\test\\java\\quan\\message";
-//        String destPath = "message-java\\src\\test\\java";
-//        String packagePrefix = "quan.message";
+//        String destPath = "generator\\src\\test\\java";
+//        String packagePrefix = "quan.generator.message";
+
+        String destPath = "message-java\\src\\test\\java";
+        String packagePrefix = "quan.message";
 
         for (int i = 0; i < args.length; i++) {
             if (args[i].equals("-language")) {
@@ -58,11 +59,16 @@ public abstract class MessageGenerator extends Generator {
         super(srcPath, destPath);
 
         Template messageTemplate = freemarkerCfg.getTemplate("message." + getLanguage() + ".ftl");
-        Template enumTemplate = freemarkerCfg.getTemplate("enum." + getLanguage() + ".ftl");
 
         templates.put(MessageDefinition.class, messageTemplate);
         templates.put(BeanDefinition.class, messageTemplate);
-        templates.put(EnumDefinition.class, enumTemplate);
     }
 
+    @Override
+    protected boolean support(ClassDefinition classDefinition) {
+        if (classDefinition instanceof MessageDefinition) {
+            return true;
+        }
+        return super.support(classDefinition);
+    }
 }

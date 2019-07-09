@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import quan.database.Transactional;
 import quan.database.item.ItemBean;
 import quan.database.role.RoleData;
+import quan.database.role.RoleType;
 
 /**
  * Created by quanchangnai on 2019/7/2.
@@ -29,6 +30,8 @@ public class Role {
         logger.error("roleData:{}", roleData);
 
         roleData.setName("role" + System.currentTimeMillis());//role1562131925281
+        roleData.setRoleType(RoleType.type1);
+
         roleData.getList().add(System.currentTimeMillis() + "");
         roleData.getSet().add(true);
         roleData.getMap().put(1, 111);

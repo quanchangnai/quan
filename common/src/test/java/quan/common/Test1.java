@@ -3,6 +3,8 @@ package quan.common;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+
 /**
  * Created by quanchangnai on 2019/6/28.
  */
@@ -15,10 +17,9 @@ public class Test1 {
     }
 
     public static void test1() {
-        String url = "jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai";
-        String substring1 = url.substring(0, url.indexOf("?"));
-//        substring1.substring(0)
-        System.err.println(substring1);
+        String s1 = "1312:22;1312:433\\23";
+        String[] split = s1.split("\\:|\\;");
+        System.err.println(Arrays.toString(split));
     }
 
 

@@ -5,6 +5,7 @@ import freemarker.template.Template;
 import org.pcollections.PMap;
 import quan.database.*;
 import quan.generator.BeanDefinition;
+import quan.generator.ClassDefinition;
 import quan.generator.Generator;
 
 /**
@@ -14,11 +15,11 @@ public class DatabaseGenerator extends Generator {
 
     public static void main(String[] args) throws Exception {
 
-//        String srcPath = "generator\\src\\test\\java\\quan\\generator\\database";
+        String srcPath = "generator\\src\\test\\java\\quan\\generator\\database";
+
 //        String destPath = "generator\\src\\test\\java";
 //        String packagePrefix = "quan.generator.database";
 
-        String srcPath = "database\\src\\test\\java\\quan\\database";
         String destPath = "database\\src\\test\\java";
         String packagePrefix = "quan.database";
 
@@ -45,6 +46,14 @@ public class DatabaseGenerator extends Generator {
     @Override
     protected String getLanguage() {
         return "java";
+    }
+
+    @Override
+    protected boolean support(ClassDefinition classDefinition) {
+        if (classDefinition instanceof DataDefinition) {
+            return true;
+        }
+        return super.support(classDefinition);
     }
 
     protected void processBean(BeanDefinition beanDefinition) {

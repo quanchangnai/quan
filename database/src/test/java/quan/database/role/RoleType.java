@@ -1,4 +1,4 @@
-package quan.generator.message.role;
+package quan.database.role;
 
 /**
  * 角色类型
@@ -32,9 +32,6 @@ public enum RoleType {
 
     @Override
     public String toString() {
-        return "RoleType{" +
-                "name='" + name() + '\'' +
-                ",value=" + value +
-                '}';
+        return name();
     }
 }

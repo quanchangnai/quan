@@ -75,6 +75,8 @@ public class RoleData extends Data<Long> {
 
     private BaseField<String> name = new BaseField<>("");
 
+    private BaseField<Integer> roleType = new BaseField<>(0);
+
     private BaseField<Boolean> bo = new BaseField<>(false);
 
     private BaseField<Byte> by = new BaseField<>((byte) 0);
@@ -115,6 +117,15 @@ public class RoleData extends Data<Long> {
     public RoleData setName(String name) {
         this.name.setLogValue(name, getRoot());
         return this;
+    }
+
+    public RoleType getRoleType() {
+        return RoleType.valueOf(roleType.getValue());
+    }
+
+    public RoleData setRoleType(RoleType roleType) {
+        this.roleType.setLogValue(roleType.getValue(), getRoot());
+	    return this;
     }
 
     public boolean getBo() {
@@ -231,6 +242,7 @@ public class RoleData extends Data<Long> {
 
         object.put("id", id.getValue());
         object.put("name", name.getValue());
+        object.put("roleType", roleType.getValue());
         object.put("bo", bo.getValue());
         object.put("by", by.getValue());
         object.put("s", s.getValue());
@@ -298,6 +310,7 @@ public class RoleData extends Data<Long> {
         }
         name.setValue(_name);
 
+        roleType.setValue(object.getIntValue("roleType"));
         bo.setValue(object.getBooleanValue("bo"));
         by.setValue(object.getByteValue("by"));
         s.setValue(object.getShortValue("s"));
@@ -400,6 +413,7 @@ public class RoleData extends Data<Long> {
         return "RoleData{" +
                 "id=" + id +
                 ",name='" + name + '\'' +
+                ",roleType=" + RoleType.valueOf(roleType.getValue()) +
                 ",bo=" + bo +
                 ",by=" + by +
                 ",s=" + s +

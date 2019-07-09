@@ -1,4 +1,4 @@
-package quan.generator.message;
+package quan.generator;
 
 import quan.generator.ClassDefinition;
 import quan.generator.FieldDefinition;

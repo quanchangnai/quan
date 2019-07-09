@@ -1,17 +1,17 @@
-package quan.message.role;
+package quan.database.item;
 
 /**
- * 角色类型
+ * 道具类型
  * Created by 自动生成
  */
-public enum RoleType {
+public enum ItemType {
 
-    type1(1),//角色类型1
-    type2(2);//角色类型2
+    type1(1),//道具类型1
+    type2(2);//道具类型2
 
     private int value;
 
-    RoleType(int value) {
+    ItemType(int value) {
         this.value = value;
     }
 
@@ -19,7 +19,7 @@ public enum RoleType {
         return value;
     }
 
-    public static RoleType valueOf(int value) {
+    public static ItemType valueOf(int value) {
         switch (value) {
             case 1:
                 return type1;
