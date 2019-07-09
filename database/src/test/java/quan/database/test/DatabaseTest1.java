@@ -27,7 +27,7 @@ public class DatabaseTest1 {
     public static void main(String[] args) throws Exception {
 
 //        database = new BerkeleyDB(".temp/bdb");
-//        database = new MongoDB(new MongoDB.Config().setClientUri("mongodb://127.0.0.1:27017").setDatabaseName("mdb"));
+//        database = new MongoDB(new MongoDB.Config().setConnectionString("mongodb://127.0.0.1:27017").setDatabase("mdb"));
         database = new MySqlDB(new MySqlDB.Config());
 
         Transactions.setConflictThreshold(1);

@@ -121,7 +121,7 @@ public class ClassUtils {
                 logger.error("加载类[{}]失败", className, e);
                 continue;
             }
-            if (superClass == null || superClass.isAssignableFrom(clazz)) {
+            if (superClass == null || superClass.isAssignableFrom(clazz) && superClass != clazz) {
                 classes.add(clazz);
             }
         }
@@ -182,7 +182,4 @@ public class ClassUtils {
         }
     }
 
-
-    public static void main(String[] args) throws Exception {
-    }
 }

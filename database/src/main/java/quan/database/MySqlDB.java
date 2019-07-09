@@ -2,6 +2,7 @@ package quan.database;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.mysql.cj.conf.ConnectionUrlParser;
 import com.mysql.cj.jdbc.Driver;
 import org.apache.commons.dbcp2.BasicDataSource;
 
@@ -27,19 +28,17 @@ public class MySqlDB extends Database {
         MySqlDB.Config config = getConfig();
         BasicDataSource basicDataSource = new BasicDataSource();
         basicDataSource.setDriverClassName(Driver.class.getName());
-        basicDataSource.setUsername(config.username);
-        basicDataSource.setPassword(config.password);
-        basicDataSource.setUrl(config.url);
-        basicDataSource.setInitialSize(config.initialSize);
-        basicDataSource.setMaxTotal(config.maxTotal);
-        basicDataSource.setMaxIdle(config.maxIdle);
-        basicDataSource.setMaxWaitMillis(config.maxWaitMillis);
-        basicDataSource.setMinIdle(config.minIdle);
+        basicDataSource.setUrl(config.connectionString);
+        basicDataSource.setInitialSize(config.poolInitialSize);
+        basicDataSource.setMaxTotal(config.poolMaxTotal);
+        basicDataSource.setMaxIdle(config.poolMaxIdle);
+        basicDataSource.setMaxWaitMillis(config.poolMaxWaitMillis);
+        basicDataSource.setMinIdle(config.poolMinIdle);
         basicDataSource.setPoolPreparedStatements(true);
 
         List<String> initSqlList = new ArrayList<>();
-        initSqlList.add(String.format("CREATE DATABASE IF NOT EXISTS `%s` CHARACTER SET 'utf8mb4'", config.databaseName));
-        initSqlList.add(String.format("USE `%s`", config.databaseName));
+        initSqlList.add(String.format("CREATE DATABASE IF NOT EXISTS `%s` CHARACTER SET 'utf8mb4'", config.database));
+        initSqlList.add(String.format("USE `%s`", config.database));
         basicDataSource.setConnectionInitSqls(initSqlList);
         basicDataSource.setDefaultAutoCommit(true);
 
@@ -55,7 +54,7 @@ public class MySqlDB extends Database {
     @Override
     protected void registerCache0(Cache cache) {
         try (Connection conn = getConnection(); Statement statement = conn.createStatement()) {
-            String sql = String.format("CREATE TABLE IF NOT EXISTS `%s`( _key VARCHAR(%d) PRIMARY KEY,_data text ) ENGINE = INNODB DEFAULT charset = utf8mb4", cache.getName(), getConfig().keyLength);
+            String sql = String.format("CREATE TABLE IF NOT EXISTS `%s`( _key VARCHAR(%d) PRIMARY KEY,_data text ) ENGINE = INNODB DEFAULT charset = utf8mb4", cache.getName(), getConfig().tableKeyLength);
             statement.execute(sql);
         } catch (SQLException e) {
             throw new DbException(e);
@@ -80,7 +79,7 @@ public class MySqlDB extends Database {
     @Override
     protected <K, V extends Data<K>> V get(Cache<K, V> cache, K key) {
         checkClosed();
-        try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement("SELECT _data FROM `" + cache.getName() + "` WHERE _key=?")) {
+        try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement("SELECT _data FROM `" + cache.getName() + "` WHERE _key = ?")) {
             statement.setString(1, key.toString());
             ResultSet resultSet = statement.executeQuery();
             if (!resultSet.next()) {
@@ -99,7 +98,7 @@ public class MySqlDB extends Database {
     @Override
     protected <K, V extends Data<K>> void put(V data) {
         checkClosed();
-        try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement("INSERT INTO `" + data.getCache().getName() + "`(_key, _data) values(?, ?) ON DUPLICATE KEY UPDATE _data=values(_data)")) {
+        try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement("INSERT INTO `" + data.getCache().getName() + "`(_key, _data) values(?, ?) ON DUPLICATE KEY UPDATE _data = VALUES(_data)")) {
             statement.setString(1, data.getKey().toString());
             statement.setString(2, data.encode().toJSONString());
             statement.execute();
@@ -111,7 +110,7 @@ public class MySqlDB extends Database {
     @Override
     protected <K, V extends Data<K>> void delete(Cache<K, V> cache, K key) {
         checkClosed();
-        try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement("DELETE FROM `" + cache.getName() + "` WHERE _key=?")) {
+        try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement("DELETE FROM `" + cache.getName() + "` WHERE _key = ?")) {
             statement.setString(1, key.toString());
             statement.execute();
         } catch (Exception e) {
@@ -128,7 +127,7 @@ public class MySqlDB extends Database {
             try {
                 //插入或更新
                 if (!puts.isEmpty()) {
-                    try (PreparedStatement statement = connection.prepareStatement("INSERT INTO `" + cache.getName() + "`(_key, _data) values(?, ?) ON DUPLICATE KEY UPDATE _data=values(_data)")) {
+                    try (PreparedStatement statement = connection.prepareStatement("INSERT INTO `" + cache.getName() + "`(_key, _data) values(?, ?) ON DUPLICATE KEY UPDATE _data = values(_data)")) {
                         for (V putData : puts) {
                             statement.setString(1, putData.getKey().toString());
                             statement.setString(2, putData.encode().toJSONString());
@@ -140,7 +139,7 @@ public class MySqlDB extends Database {
 
                 //删除
                 if (!deletes.isEmpty()) {
-                    try (PreparedStatement statement = connection.prepareStatement("DELETE FROM `" + cache.getName() + "` WHERE _key=?")) {
+                    try (PreparedStatement statement = connection.prepareStatement("DELETE FROM `" + cache.getName() + "` WHERE _key = ?")) {
                         for (K deleteKey : deletes) {
                             statement.setString(1, deleteKey.toString());
                             statement.addBatch();
@@ -167,117 +166,97 @@ public class MySqlDB extends Database {
 
     public static class Config extends Database.Config {
 
-        private String username = "root";
+        /**
+         * 连接字符串,例如 jdbc:mysql://localhost:3306/test?user=root&password=123456&useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
+         */
+        private String connectionString;
 
-        private String password = "123456";
+        /**
+         * MySql数据库名
+         */
+        private String database;
 
-        private String databaseName = "test";
 
-        private String url = "jdbc:mysql://localhost:3306?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai";
+        private int poolInitialSize = 10;
 
-        private int initialSize = 10;
+        private int poolMaxTotal = 50;
 
-        private int maxTotal = 50;
+        private int poolMaxIdle = 60;
 
-        private int maxIdle = 60;
+        private long poolMaxWaitMillis = 10000;
 
-        private long maxWaitMillis = 10000;
-
-        private int minIdle = 30;
+        private int poolMinIdle = 30;
 
         /**
          * MySql表主键最大长度
          */
-        private int keyLength = 40;
+        private int tableKeyLength = 40;
 
 
-        public String getUsername() {
-            return username;
+        public String getConnectionString() {
+            return connectionString;
         }
 
-        public Config setUsername(String username) {
-            this.username = username;
+        public Config setConnectionString(String connectionString) {
+            database = ConnectionUrlParser.parseConnectionString(connectionString).getPath();
+            if (database == null) {
+                throw new IllegalArgumentException("必须指定连接数据库");
+            }
+            this.connectionString = connectionString.replace("/" + database + "?", "?");
             return this;
         }
 
-        public String getPassword() {
-            return password;
+        public int getPoolInitialSize() {
+            return poolInitialSize;
         }
 
-        public Config setPassword(String password) {
-            this.password = password;
+        public Config setPoolInitialSize(int poolInitialSize) {
+            this.poolInitialSize = poolInitialSize;
             return this;
         }
 
-        public String getDatabaseName() {
-            return databaseName;
+        public int getPoolMaxTotal() {
+            return poolMaxTotal;
         }
 
-        public Config setDatabaseName(String databaseName) {
-            this.databaseName = databaseName;
+        public Config setPoolMaxTotal(int poolMaxTotal) {
+            this.poolMaxTotal = poolMaxTotal;
             return this;
         }
 
-        public String getUrl() {
-            return url;
+        public int getPoolMaxIdle() {
+            return poolMaxIdle;
         }
 
-        public Config setUrl(String url) {
-            this.url = url;
+        public Config setPoolMaxIdle(int poolMaxIdle) {
+            this.poolMaxIdle = poolMaxIdle;
             return this;
         }
 
-        public int getInitialSize() {
-            return initialSize;
+        public long getPoolMaxWaitMillis() {
+            return poolMaxWaitMillis;
         }
 
-        public Config setInitialSize(int initialSize) {
-            this.initialSize = initialSize;
+        public Config setPoolMaxWaitMillis(long poolMaxWaitMillis) {
+            this.poolMaxWaitMillis = poolMaxWaitMillis;
             return this;
         }
 
-        public int getMaxTotal() {
-            return maxTotal;
+        public int getPoolMinIdle() {
+            return poolMinIdle;
         }
 
-        public Config setMaxTotal(int maxTotal) {
-            this.maxTotal = maxTotal;
+        public Config setPoolMinIdle(int poolMinIdle) {
+            this.poolMinIdle = poolMinIdle;
             return this;
         }
 
-        public int getMaxIdle() {
-            return maxIdle;
+        public int getTableKeyLength() {
+            return tableKeyLength;
         }
 
-        public Config setMaxIdle(int maxIdle) {
-            this.maxIdle = maxIdle;
-            return this;
-        }
-
-        public long getMaxWaitMillis() {
-            return maxWaitMillis;
-        }
-
-        public Config setMaxWaitMillis(long maxWaitMillis) {
-            this.maxWaitMillis = maxWaitMillis;
-            return this;
-        }
-
-        public int getMinIdle() {
-            return minIdle;
-        }
-
-        public Config setMinIdle(int minIdle) {
-            this.minIdle = minIdle;
-            return this;
-        }
-
-        public int getKeyLength() {
-            return keyLength;
-        }
-
-        public Config setKeyLength(int keyLength) {
-            this.keyLength = keyLength;
+        public Config setTableKeyLength(int tableKeyLength) {
+            this.tableKeyLength = tableKeyLength;
             return this;
         }
     }

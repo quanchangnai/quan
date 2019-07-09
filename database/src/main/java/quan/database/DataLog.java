@@ -42,8 +42,9 @@ class DataLog {
         this.originState = originState;
     }
 
-    public DataLog setDeleted(boolean deleted) {
-        this.deleted = deleted;
+    public DataLog setDeleted() {
+        deleted = true;
+        current = null;
         return this;
     }
 
@@ -60,10 +61,10 @@ class DataLog {
     }
 
     public DataLog setCurrent(Data current) {
+        current.touch();
         this.current = current;
-        if (current != null) {
-            current.touch();
-        }
+        this.deleted = false;
+
         return this;
     }
 
@@ -100,12 +101,10 @@ class DataLog {
     }
 
     public void commit() {
-        if (current == null && originData != null && originState != Cache.Row.DELETE || deleted) {
-            //delete
+        if (deleted && originState != Cache.Row.DELETE) {
             key.cache.setDelete(key.k);
         }
         if (current != null && (originRow == null || originState == Cache.Row.DELETE)) {
-            //insert
             key.cache.setInsert(current);
         }
     }

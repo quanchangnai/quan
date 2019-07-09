@@ -11,16 +11,14 @@ public class Test1 {
     private static Logger logger = LoggerFactory.getLogger(Test1.class);
 
     public static void main(String[] args) throws Exception {
-        try {
-            test1();
-        } catch (Exception e) {
-            logger.error("====", e);
-        }
+        test1();
     }
 
     public static void test1() {
-        System.err.println("test1");
-        throw new RuntimeException("test1");
+        String url = "jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai";
+        String substring1 = url.substring(0, url.indexOf("?"));
+//        substring1.substring(0)
+        System.err.println(substring1);
     }
 
 

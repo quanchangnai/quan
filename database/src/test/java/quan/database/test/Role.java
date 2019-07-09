@@ -81,9 +81,10 @@ public class Role {
     @Transactional
     public String login3() {
         System.err.println("login3======================================================");
-//        roleData = RoleData.getOrInsert(1L);
-//        logger.error("roleData:{}", roleData);
         RoleData.delete(1L);
+        roleData = RoleData.getOrInsert(1L);
+        logger.error("roleData:{}", roleData);
+
         return "login3";
     }
 

@@ -2,7 +2,6 @@ package quan.database;
 
 import com.alibaba.fastjson.JSONObject;
 import com.mongodb.MongoClient;
-import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -38,16 +37,9 @@ public class MongoDB extends Database {
 
     @Override
     protected void open0() {
-        MongoClientOptions.Builder optionsBuilder = MongoClientOptions.builder();
-        optionsBuilder.minConnectionsPerHost(1);
-        int connectionsNum = getConfig().connectionsNum;
-        if (connectionsNum > 0) {
-            optionsBuilder.connectionsPerHost(connectionsNum);
-        }
-
-        MongoClientURI clientURI = new MongoClientURI(getConfig().clientUri, optionsBuilder);
+        MongoClientURI clientURI = new MongoClientURI(getConfig().connectionString);
         client = new MongoClient(clientURI);
-        database = client.getDatabase(getConfig().databaseName);
+        database = client.getDatabase(clientURI.getDatabase());
     }
 
     @Override
@@ -116,53 +108,27 @@ public class MongoDB extends Database {
             writeModels.add(deleteOneModel);
         }
 
-        collections.get(cache.getName()).bulkWrite(writeModels);
+        if (!writeModels.isEmpty()) {
+            collections.get(cache.getName()).bulkWrite(writeModels);
+        }
     }
 
     public static class Config extends Database.Config {
 
         /**
-         * Mongo客户端连接URI
+         * 连接字符串，例如 mongodb://username:password@localhost:27017/test?maxPoolSize=5
          */
-        private String clientUri;
+        private String connectionString;
 
-        /**
-         * Mongo数据库名
-         */
-        private String databaseName;
 
-        /**
-         * 连接数
-         */
-        private int connectionsNum;
-
-        public String getClientUri() {
-            return clientUri;
+        public String getConnectionString() {
+            return connectionString;
         }
 
-        public Config setClientUri(String clientUri) {
-            this.clientUri = clientUri;
-            return this;
-        }
-
-        public String getDatabaseName() {
-            return databaseName;
-        }
-
-        public Config setDatabaseName(String databaseName) {
-            this.databaseName = databaseName;
-            return this;
-        }
-
-        public int getConnectionsNum() {
-            return connectionsNum;
-        }
-
-        public Config setConnectionsNum(int connectionsNum) {
-            if (connectionsNum > 0) {
-                this.connectionsNum = connectionsNum;
-            }
+        public Config setConnectionString(String connectionString) {
+            this.connectionString = connectionString;
             return this;
         }
     }
+
 }
