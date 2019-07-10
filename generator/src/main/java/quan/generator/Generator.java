@@ -95,7 +95,13 @@ public abstract class Generator {
         return this;
     }
 
+    public void validateDependence(boolean validate) {
+        BeanDefinition.setValidateDependence(validate);
+    }
+
+
     protected abstract String getLanguage();
+
 
     protected boolean support(ClassDefinition classDefinition) {
         if (classDefinition instanceof BeanDefinition || classDefinition instanceof EnumDefinition) {

@@ -15,6 +15,7 @@
         <module>database</module>
         <module>common</module>
         <module>message-java</module>
+        <module>test</module>
     </modules>
 
     <properties>
