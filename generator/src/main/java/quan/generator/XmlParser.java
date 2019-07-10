@@ -1,6 +1,5 @@
 package quan.generator;
 
-import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
@@ -8,9 +7,7 @@ import quan.generator.database.DataDefinition;
 import quan.generator.message.MessageDefinition;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * Created by quanchangnai on 2017/7/10.
@@ -18,37 +15,27 @@ import java.util.List;
 public class XmlParser extends Parser {
 
     @Override
-    public Parser setSrcPath(String srcPath) {
+    public void setSrcPath(String srcPath) {
         super.setSrcPath(srcPath);
         File file = new File(srcPath);
         File[] files = file.listFiles((File dir, String name) -> name.endsWith(".xml"));
         if (files != null) {
             srcFiles = Arrays.asList(files);
         }
-        return this;
+    }
+
+    private Element parseFile(File srcFile) throws Exception {
+        Element root = new SAXReader().read(srcFile).getRootElement();
+        if (!root.getName().equals("package")) {
+            return null;
+        }
+        return root;
     }
 
     @Override
-    public List<ClassDefinition> parse() throws Exception {
-
-        for (File srcFile : srcFiles) {
-            parseClasses(srcFile);
-        }
-
-        for (File srcFile : srcFiles) {
-            parseFields(srcFile);
-        }
-        for (ClassDefinition classDefinition : results.values()) {
-            classDefinition.validate();
-        }
-
-        return new ArrayList<>(results.values());
-    }
-
     protected void parseClasses(File srcFile) throws Exception {
-        Document document = new SAXReader().read(srcFile);
-        Element root = document.getRootElement();
-        if (!root.getName().equals("package")) {
+        Element root = parseFile(srcFile);
+        if (root == null) {
             return;
         }
 
@@ -59,165 +46,135 @@ public class XmlParser extends Parser {
 
         for (int i = 0; i < root.nodeCount(); i++) {
             Node node = root.node(i);
-            if (node instanceof Element) {
-                Element element = (Element) node;
-                ClassDefinition classDefinition = null;
-                if (element.getName().equals("enum")) {
-                    classDefinition = new EnumDefinition();
-                } else if (element.getName().equals("bean")) {
-                    classDefinition = new BeanDefinition();
-                } else if (element.getName().equals("message")) {
-                    MessageDefinition messageDefinition = new MessageDefinition();
-                    classDefinition = messageDefinition;
-                    messageDefinition.setId(element.attributeValue("id"));
-                } else if (element.getName().equals("data")) {
-                    DataDefinition dataDefinition = new DataDefinition();
-                    classDefinition = dataDefinition;
-                    dataDefinition.setKeyName(element.attributeValue("key"));
-                    String persistent = element.attributeValue("persistent");
-                    if (persistent != null && persistent.equals("false")) {
-                        dataDefinition.setPersistent(false);
-                    }
-
-                }
-
-                if (classDefinition == null) {
-                    continue;
-                }
-
-
-                classDefinition.setDefinitionFile(srcFile.getName());
-                classDefinition.setDefinitionText(element.asXML());
-
-                classDefinition.setPackageName(packageName);
-                classDefinition.setName(element.attributeValue("name"));
-
-                String comment = root.node(i - 1).getText();
-                comment = comment.replaceAll("\r|\n", "").trim();
-                if (comment.equals("")) {
-                    comment = element.node(0).getText();
-                    comment = comment.replaceAll("\r|\n", "").trim();
-                }
-                classDefinition.setComment(comment);
-
-                if (results.containsKey(classDefinition.getName())) {
-                    String errorStr = "定义文件[" + results.get(classDefinition.getName()).getDefinitionFile() +
-                            "]和[" + classDefinition.getDefinitionFile() +
-                            "]有同名类[" + classDefinition.getName() + "]";
-                    throw new RuntimeException(errorStr);
-                }
-
-                results.put(classDefinition.getName(), classDefinition);
-
+            if (!(node instanceof Element)) {
+                continue;
             }
-        }
 
+            Element element = (Element) node;
+            ClassDefinition classDefinition = null;
+
+            if (element.getName().equals("enum")) {
+                classDefinition = new EnumDefinition();
+            } else if (element.getName().equals("bean")) {
+                classDefinition = new BeanDefinition();
+            } else if (element.getName().equals("message")) {
+                MessageDefinition messageDefinition = new MessageDefinition();
+                messageDefinition.setId(element.attributeValue("id"));
+                classDefinition = messageDefinition;
+            } else if (element.getName().equals("data")) {
+                DataDefinition dataDefinition = new DataDefinition();
+                dataDefinition.setKeyName(element.attributeValue("key"));
+                String persistent = element.attributeValue("persistent");
+                if (persistent != null && persistent.equals("false")) {
+                    dataDefinition.setPersistent(false);
+                }
+                classDefinition = dataDefinition;
+            }
+
+            if (classDefinition == null) {
+                continue;
+            }
+
+            classDefinition.setDefinitionFile(srcFile.getName());
+            classDefinition.setDefinitionText(element.asXML());
+
+            classDefinition.setPackageName(packageName);
+            classDefinition.setName(element.attributeValue("name"));
+
+            String comment = root.node(i - 1).getText();
+            comment = comment.replaceAll("\r|\n", "").trim();
+            if (comment.equals("")) {
+                comment = element.node(0).getText();
+                comment = comment.replaceAll("\r|\n", "").trim();
+            }
+            classDefinition.setComment(comment);
+
+            addClassDefinition(classDefinition);
+
+        }
     }
 
+    @Override
     protected void parseFields(File srcFile) throws Exception {
-        Document document = new SAXReader().read(srcFile);
-        Element root = document.getRootElement();
+        Element root = parseFile(srcFile);
+        if (root == null) {
+            return;
+        }
 
         for (int i = 0; i < root.nodeCount(); i++) {
             Node node = root.node(i);
-            if (node instanceof Element) {
-                Element element = (Element) node;
-                if (element.getName().equals("enum")) {
-                    parseEnumFields(element);
-                } else if (element.getName().equals("bean")
-                        || element.getName().equals("message")
-                        || element.getName().equals("data")) {
-                    parseBeanFields(element);
-                }
+            if (!(node instanceof Element)) {
+                continue;
+            }
+
+            Element element = (Element) node;
+            if (element.getName().equals("enum")) {
+                parseEnumFields(element);
+            } else if (element.getName().equals("bean") || element.getName().equals("message") || element.getName().equals("data")) {
+                parseBeanFields(element);
             }
         }
     }
 
 
     private void parseEnumFields(Element element) {
-        EnumDefinition enumDefinition = null;
-        ClassDefinition classDefinition = results.get(element.attributeValue("name"));
-        if (classDefinition instanceof EnumDefinition) {
-            enumDefinition = (EnumDefinition) classDefinition;
-        }
-        if (enumDefinition == null) {
-            return;
-        }
+        EnumDefinition enumDefinition = (EnumDefinition) classDefinitions.get(element.attributeValue("name"));
 
         for (int i = 0; i < element.nodeCount(); i++) {
             Node node = element.node(i);
             if (node instanceof Element) {
                 Element child = (Element) node;
-                if (child.getName().equals("field")) {
-                    FieldDefinition fieldDefinition = new FieldDefinition();
-
-                    fieldDefinition.setName(child.attributeValue("name"));
-                    fieldDefinition.setValue(child.attributeValue("value"));
-
-                    String comment = element.node(i + 1).getText();
-                    comment = comment.replaceAll("\r|\n", "").trim();
-                    fieldDefinition.setComment(comment);
-
-                    enumDefinition.getFields().add(fieldDefinition);
+                if (!child.getName().equals("field")) {
+                    continue;
                 }
+
+                FieldDefinition fieldDefinition = new FieldDefinition();
+                enumDefinition.getFields().add(fieldDefinition);
+
+                fieldDefinition.setName(child.attributeValue("name"));
+                fieldDefinition.setValue(child.attributeValue("value"));
+
+                String comment = element.node(i + 1).getText();
+                comment = comment.replaceAll("\r|\n", "").trim();
+                fieldDefinition.setComment(comment);
+
             }
         }
     }
 
     private void parseBeanFields(Element element) {
-        BeanDefinition beanDefinition = null;
-        ClassDefinition classDefinition = results.get(element.attributeValue("name"));
-        if (classDefinition instanceof BeanDefinition) {
-            beanDefinition = (BeanDefinition) classDefinition;
-        }
-        if (beanDefinition == null) {
-            return;
-        }
+        BeanDefinition beanDefinition = (BeanDefinition) classDefinitions.get(element.attributeValue("name"));
 
         for (int i = 0; i < element.nodeCount(); i++) {
             Node node = element.node(i);
-            if (node instanceof Element) {
-                Element child = (Element) node;
-                if (child.getName().equals("field")) {
-                    FieldDefinition fieldDefinition = new FieldDefinition();
-                    fieldDefinition.setName(child.attributeValue("name"));
-                    fieldDefinition.setType(child.attributeValue("type"));
-
-                    String optional = child.attributeValue("optional");
-                    if (optional != null && optional.equals("true")) {
-                        fieldDefinition.setOptional(true);
-                    }
-
-                    fieldDefinition.setKeyType(child.attributeValue("key-type"));
-                    fieldDefinition.setValueType(child.attributeValue("value-type"));
-
-                    fieldDefinition.setBeanDefinition(beanDefinition);
-
-                    String comment = element.node(i + 1).getText();
-                    comment = comment.replaceAll("\r|\n", "").trim();
-                    fieldDefinition.setComment(comment);
-
-                    ClassDefinition fieldTypeClassDefinition = results.get(fieldDefinition.getType());
-                    if (fieldTypeClassDefinition != null) {
-                        if (!fieldTypeClassDefinition.getPackageName().equals(beanDefinition.getPackageName())) {
-                            beanDefinition.getImports().add(fieldTypeClassDefinition.getFullName());
-                        }
-                        if (fieldTypeClassDefinition instanceof EnumDefinition) {
-                            fieldDefinition.setEnumType(true);
-                        }
-                    }
-
-                    beanDefinition.getFields().add(fieldDefinition);
-
-                    if (beanDefinition instanceof DataDefinition) {
-                        DataDefinition dataDefinition = (DataDefinition) beanDefinition;
-                        if (dataDefinition.getKeyName() != null && dataDefinition.getKeyName().equals(fieldDefinition.getName())) {
-                            dataDefinition.setKeyType(fieldDefinition.getType());
-                        }
-                    }
-
-                }
+            if (!(node instanceof Element)) {
+                continue;
             }
+
+            Element child = (Element) node;
+            if (!child.getName().equals("field")) {
+                continue;
+            }
+
+            FieldDefinition fieldDefinition = new FieldDefinition();
+            beanDefinition.getFields().add(fieldDefinition);
+            fieldDefinition.setBeanDefinition(beanDefinition);
+
+            fieldDefinition.setName(child.attributeValue("name"));
+            fieldDefinition.setType(child.attributeValue("type"));
+
+            String optional = child.attributeValue("optional");
+            if (optional != null && optional.equals("true")) {
+                fieldDefinition.setOptional(true);
+            }
+
+            fieldDefinition.setKeyType(child.attributeValue("key-type"));
+            fieldDefinition.setValueType(child.attributeValue("value-type"));
+
+            String comment = element.node(i + 1).getText();
+            comment = comment.replaceAll("\r|\n", "").trim();
+            fieldDefinition.setComment(comment);
+
         }
 
     }

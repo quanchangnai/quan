@@ -51,7 +51,7 @@ public class DataDefinition extends BeanDefinition {
         if (getKeyName() == null || getKeyName().trim().equals("")) {
             throwValidatedError("主键不能为空");
         }
-        if (getKeyType() == null || getKeyType().trim().equals("")) {
+        if (getFields().stream().noneMatch(t -> t.getName().equals(getKeyName()))) {
             throwValidatedError("主键不存在");
         }
     }

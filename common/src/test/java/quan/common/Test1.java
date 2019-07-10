@@ -17,9 +17,7 @@ public class Test1 {
     }
 
     public static void test1() {
-        String s1 = "1312:22;1312:433\\23";
-        String[] split = s1.split("\\:|\\;");
-        System.err.println(Arrays.toString(split));
+
     }
 
 

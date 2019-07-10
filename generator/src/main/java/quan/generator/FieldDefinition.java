@@ -9,6 +9,7 @@ import java.util.List;
 public class FieldDefinition extends Definition {
 
     private String type;
+
     private String value;
 
     private boolean optional;
@@ -17,7 +18,7 @@ public class FieldDefinition extends Definition {
     private String valueType;
 
     //内建类型对应的具体语言实现类型
-    private String basicType;//基本类型
+    private String basicType;
     private String basicKeyType;
     private String basicValueType;
 
@@ -31,7 +32,9 @@ public class FieldDefinition extends Definition {
     private BeanDefinition beanDefinition;
 
 
-    public static final List<String> BUILT_IN_TYPES = Arrays.asList("bool", "byte", "short", "int", "long", "float", "double", "bytes", "string", "list", "set", "map");
+    public static final List<String> BUILT_IN_TYPES = Arrays.asList("bool", "byte", "short", "int", "long", "float", "double", "string", "bytes", "list", "set", "map");
+
+    public static final List<String> PRIMITIVE_TYPES = Arrays.asList("bool", "byte", "short", "int", "long", "float", "double", "string");
 
 
     @Override
@@ -51,8 +54,12 @@ public class FieldDefinition extends Definition {
         return BUILT_IN_TYPES.contains(type);
     }
 
-    public boolean isCollectionType(){
+    public boolean isCollectionType() {
         return type.equals("list") || type.equals("set") || type.equals("map");
+    }
+
+    public boolean isPrimitiveType() {
+        return PRIMITIVE_TYPES.contains(type);
     }
 
     public boolean isEnumType() {
@@ -88,6 +95,14 @@ public class FieldDefinition extends Definition {
         this.keyType = keyType;
     }
 
+    public boolean isKeyBuiltInType() {
+        return BUILT_IN_TYPES.contains(keyType);
+    }
+
+    public boolean isKeyPrimitiveType() {
+        return PRIMITIVE_TYPES.contains(keyType);
+    }
+
     public String getValueType() {
         return valueType;
     }
@@ -98,6 +113,10 @@ public class FieldDefinition extends Definition {
 
     public boolean isValueBuiltInType() {
         return BUILT_IN_TYPES.contains(valueType);
+    }
+
+    public boolean isValuePrimitiveType() {
+        return PRIMITIVE_TYPES.contains(valueType);
     }
 
     public String getBasicType() {

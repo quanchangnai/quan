@@ -1,8 +1,5 @@
 package quan.generator;
 
-import quan.generator.ClassDefinition;
-import quan.generator.FieldDefinition;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -42,5 +39,13 @@ public class EnumDefinition extends ClassDefinition {
 
         enumValues.add(enumValue);
         fieldDefinition.setValue(fieldDefinition.getValue());
+    }
+
+    public static boolean isEnumDefinition(String type) {
+        ClassDefinition classDefinition = ClassDefinition.getAll().get(type);
+        if (classDefinition instanceof EnumDefinition) {
+            return true;
+        }
+        return false;
     }
 }

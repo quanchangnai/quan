@@ -31,9 +31,9 @@ public class MySqlDB extends Database {
         basicDataSource.setUrl(config.connectionString);
         basicDataSource.setInitialSize(config.poolInitialSize);
         basicDataSource.setMaxTotal(config.poolMaxTotal);
+        basicDataSource.setMinIdle(config.poolMinIdle);
         basicDataSource.setMaxIdle(config.poolMaxIdle);
         basicDataSource.setMaxWaitMillis(config.poolMaxWaitMillis);
-        basicDataSource.setMinIdle(config.poolMinIdle);
         basicDataSource.setPoolPreparedStatements(true);
 
         List<String> initSqlList = new ArrayList<>();
@@ -161,7 +161,6 @@ public class MySqlDB extends Database {
             throw new DbException(e);
         }
 
-
     }
 
     public static class Config extends Database.Config {
@@ -176,16 +175,15 @@ public class MySqlDB extends Database {
          */
         private String database;
 
-
         private int poolInitialSize = 10;
 
         private int poolMaxTotal = 50;
 
-        private int poolMaxIdle = 60;
+        private int poolMinIdle = 10;
+
+        private int poolMaxIdle = 30;
 
         private long poolMaxWaitMillis = 10000;
-
-        private int poolMinIdle = 30;
 
         /**
          * MySql表主键最大长度
@@ -224,6 +222,15 @@ public class MySqlDB extends Database {
             return this;
         }
 
+        public int getPoolMinIdle() {
+            return poolMinIdle;
+        }
+
+        public Config setPoolMinIdle(int poolMinIdle) {
+            this.poolMinIdle = poolMinIdle;
+            return this;
+        }
+
         public int getPoolMaxIdle() {
             return poolMaxIdle;
         }
@@ -242,14 +249,6 @@ public class MySqlDB extends Database {
             return this;
         }
 
-        public int getPoolMinIdle() {
-            return poolMinIdle;
-        }
-
-        public Config setPoolMinIdle(int poolMinIdle) {
-            this.poolMinIdle = poolMinIdle;
-            return this;
-        }
 
         public int getTableKeyLength() {
             return tableKeyLength;

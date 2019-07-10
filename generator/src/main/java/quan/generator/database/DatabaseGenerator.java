@@ -3,9 +3,13 @@ package quan.generator.database;
 import com.alibaba.fastjson.JSONObject;
 import freemarker.template.Template;
 import org.pcollections.PMap;
-import quan.database.*;
+import quan.database.Data;
+import quan.database.ListField;
+import quan.database.MapField;
+import quan.database.SetField;
 import quan.generator.BeanDefinition;
 import quan.generator.ClassDefinition;
+import quan.generator.FieldDefinition;
 import quan.generator.Generator;
 
 /**
@@ -56,18 +60,20 @@ public class DatabaseGenerator extends Generator {
         return super.support(classDefinition);
     }
 
+    @Override
     protected void processBean(BeanDefinition beanDefinition) {
         super.processBean(beanDefinition);
-
-        if (beanDefinition instanceof DataDefinition) {
-            DataDefinition dataDefinition = (DataDefinition) beanDefinition;
-            dataDefinition.setKeyType(classTypes.get(dataDefinition.getKeyType()));
-        }
 
         beanDefinition.getImports().add("java.util.*");
         beanDefinition.getImports().add(Data.class.getPackage().getName() + ".*");
         beanDefinition.getImports().add(JSONObject.class.getPackage().getName() + ".*");
         beanDefinition.getImports().add(PMap.class.getPackage().getName() + ".*");
+
+        if (beanDefinition instanceof DataDefinition) {
+            DataDefinition dataDefinition = (DataDefinition) beanDefinition;
+            FieldDefinition keyFieldDefinition = beanDefinition.getFields().stream().filter(f -> f.getName().equals(dataDefinition.getKeyName())).findFirst().get();
+            dataDefinition.setKeyType(keyFieldDefinition.getClassType());
+        }
 
     }
 

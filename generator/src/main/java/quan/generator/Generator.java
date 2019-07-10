@@ -10,7 +10,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -55,8 +54,6 @@ public abstract class Generator {
     protected String destPath;
 
     protected String packagePrefix;
-
-    protected List<ClassDefinition> definitions;
 
     protected Configuration freemarkerCfg;
 
@@ -111,9 +108,9 @@ public abstract class Generator {
         parser.setPackagePrefix(packagePrefix);
         parser.setSrcPath(srcPath);
 
-        this.definitions = parser.parse();
+        parser.parse();
 
-        for (ClassDefinition classDefinition : definitions) {
+        for (ClassDefinition classDefinition : ClassDefinition.getAll().values()) {
             if (!support(classDefinition)) {
                 continue;
             }
@@ -123,7 +120,7 @@ public abstract class Generator {
             }
         }
 
-        for (ClassDefinition classDefinition : definitions) {
+        for (ClassDefinition classDefinition : ClassDefinition.getAll().values()) {
             if (!support(classDefinition)) {
                 continue;
             }
@@ -160,7 +157,7 @@ public abstract class Generator {
             fieldDefinition.setClassType(classTypes.get(fieldType));
         }
 
-        if (fieldType.equals("set") || fieldType.equals("list") || fieldType.equals("map")) {
+        if (fieldDefinition.isCollectionType()) {
             if (fieldType.equals("map")) {
                 String fieldKeyType = fieldDefinition.getKeyType();
                 fieldDefinition.setBasicKeyType(basicTypes.get(fieldKeyType));
@@ -173,6 +170,24 @@ public abstract class Generator {
                 fieldDefinition.setClassValueType(classTypes.get(fieldValueType));
             }
         }
+
+        BeanDefinition beanDefinition = fieldDefinition.getBeanDefinition();
+
+        ClassDefinition fieldTypeClassDefinition = ClassDefinition.getAll().get(fieldDefinition.getType());
+        if (fieldTypeClassDefinition != null) {
+            if (!fieldTypeClassDefinition.getPackageName().equals(beanDefinition.getPackageName())) {
+                beanDefinition.getImports().add(fieldTypeClassDefinition.getFullName());
+            }
+            if (fieldTypeClassDefinition instanceof EnumDefinition) {
+                fieldDefinition.setEnumType(true);
+            }
+        }
+
+        ClassDefinition fieldValueTypeClassDefinition = ClassDefinition.getAll().get(fieldDefinition.getValueType());
+        if (fieldValueTypeClassDefinition != null && !fieldValueTypeClassDefinition.getPackageName().equals(beanDefinition.getPackageName())) {
+            beanDefinition.getImports().add(fieldValueTypeClassDefinition.getFullName());
+        }
+
     }
 
 }

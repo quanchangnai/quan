@@ -18,11 +18,10 @@ public class TransactionDelegation {
 
     private static final Logger logger = LoggerFactory.getLogger(TransactionDelegation.class);
 
-    private volatile static Executor executor;
-
-    static void setExecutor(Executor executor) {
-        TransactionDelegation.executor = executor;
-    }
+    /**
+     * 事务异步执行的线程池
+     */
+    static Executor executor;
 
     @RuntimeType
     public static Object delegate(@SuperCall Callable<?> callable, @Origin Method originMethod) {

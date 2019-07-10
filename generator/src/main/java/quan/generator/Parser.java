@@ -20,29 +20,52 @@ public abstract class Parser {
 
     protected String packagePrefix;
 
-
     protected List<File> srcFiles = new ArrayList<>();
 
-    protected Map<String, ClassDefinition> results = new HashMap<>();
+    protected Map<String, ClassDefinition> classDefinitions = new HashMap<>();
 
-    public String getSrcPath() {
-        return srcPath;
-    }
-
-    public Parser setSrcPath(String srcPath) {
+    public void setSrcPath(String srcPath) {
         this.srcPath = srcPath;
-        return this;
     }
 
-    public String getPackagePrefix() {
-        return packagePrefix;
-    }
-
-    public Parser setPackagePrefix(String packagePrefix) {
+    public void setPackagePrefix(String packagePrefix) {
         this.packagePrefix = packagePrefix;
-        return this;
     }
 
-    public abstract List<ClassDefinition> parse() throws Exception;
+
+    public void parse() throws Exception {
+        for (File srcFile : srcFiles) {
+            parseClasses(srcFile);
+        }
+
+        ClassDefinition.getAll().putAll(classDefinitions);
+
+        for (File srcFile : srcFiles) {
+            parseFields(srcFile);
+        }
+
+        for (ClassDefinition classDefinition : classDefinitions.values()) {
+            classDefinition.validate();
+        }
+
+    }
+
+    protected abstract void parseClasses(File srcFile) throws Exception;
+
+    protected abstract void parseFields(File srcFile) throws Exception;
+
+    protected void addClassDefinition(ClassDefinition classDefinition) {
+        ClassDefinition existsClassDefinition = classDefinitions.get(classDefinition.getName());
+        if (existsClassDefinition != null) {
+            String errorStr = "定义文件[" + classDefinition.getDefinitionFile();
+            errorStr += "]和[" + existsClassDefinition.getDefinitionFile();
+            errorStr += "]有同名类[" + classDefinition.getName() + "]";
+
+            throw new RuntimeException(errorStr);
+
+        }
+
+        classDefinitions.put(classDefinition.getName(), classDefinition);
+    }
 
 }

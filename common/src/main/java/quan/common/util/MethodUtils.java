@@ -6,12 +6,12 @@ import java.util.Collection;
 /**
  * Created by quanchangnai on 2019/6/26.
  */
-public class CallerUtils {
+public class MethodUtils {
 
-    private static boolean validate = true;
+    private static boolean validateCaller = true;
 
-    public static void setValidate(boolean validate) {
-        CallerUtils.validate = validate;
+    public static void setValidateCaller(boolean validateCaller) {
+        MethodUtils.validateCaller = validateCaller;
     }
 
     public static Class getCallerClass() {
@@ -29,7 +29,7 @@ public class CallerUtils {
     }
 
     private static void validateCallerClass(Collection<Class> allowClasses, int calleeIndex) {
-        if (!validate) {
+        if (!validateCaller) {
             return;
         }
 
@@ -66,7 +66,7 @@ public class CallerUtils {
 
 
     private static void validateCallerPackage(Collection<Package> allowPackages, int calleeIndex) {
-        if (!validate) {
+        if (!validateCaller) {
             return;
         }
 

@@ -25,7 +25,7 @@ class Validations {
         }
         Data root = bean.getRoot();
         if (root != null) {
-            throw new IllegalArgumentException("非法参数，当前已经受到了" + root.getClass().getSimpleName() + "管理");
+            throw new IllegalStateException(bean.getClass().getSimpleName() + "已经受到了" + root.getClass().getSimpleName() + "管理");
         }
     }
 

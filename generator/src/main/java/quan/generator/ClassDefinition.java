@@ -1,17 +1,20 @@
 package quan.generator;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
+ * 类定义
  * Created by quanchangnai on 2019/6/21.
  */
 public abstract class ClassDefinition extends Definition {
 
+    /**
+     * 包名
+     */
     private String packageName;
 
     /**
-     * 类定义所在的文件
+     * 类定义文件
      */
     private String definitionFile;
 
@@ -21,6 +24,11 @@ public abstract class ClassDefinition extends Definition {
     private String definitionText;
 
     private List<FieldDefinition> fields = new ArrayList<>();
+
+    private Set<String> fieldNames = new HashSet<>();
+
+    private static Map<String, ClassDefinition> all = new HashMap<>();
+
 
     public String getPackageName() {
         return packageName;
@@ -56,6 +64,10 @@ public abstract class ClassDefinition extends Definition {
         return this;
     }
 
+    public static Map<String, ClassDefinition> getAll() {
+        return all;
+    }
+
     public void validate() {
         if (getName() == null || getName().trim().equals("")) {
             throwValidatedError("类名不能为空");
@@ -71,6 +83,10 @@ public abstract class ClassDefinition extends Definition {
         if (fieldDefinition.getName() == null || fieldDefinition.getName().trim().equals("")) {
             throwValidatedError("字段名不能为空");
         }
+        if (fieldNames.contains(fieldDefinition.getName())) {
+            throwValidatedError("字段名[" + fieldDefinition.getName() + "]重复");
+        }
+        fieldNames.add(fieldDefinition.getName());
     }
 
     protected void throwValidatedError(String error) {
@@ -78,7 +94,7 @@ public abstract class ClassDefinition extends Definition {
     }
 
     protected void throwValidatedError(String error, ClassDefinition other) {
-        String errorPosition = ",所在定义文件:" + getDefinitionFile();
+        String errorPosition = ",定义文件:" + getDefinitionFile();
         if (getName() != null && !getName().trim().equals("")) {
             errorPosition += ",类:" + getName();
         }

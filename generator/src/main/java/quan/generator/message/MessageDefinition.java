@@ -10,7 +10,7 @@ import java.util.Map;
  */
 public class MessageDefinition extends BeanDefinition {
 
-    private static Map<String, MessageDefinition> messages = new HashMap<>();
+    private static Map<String, MessageDefinition> all = new HashMap<>();
 
     private String id;
 
@@ -35,12 +35,12 @@ public class MessageDefinition extends BeanDefinition {
             throwValidatedError("消息ID必须是整数");
         }
 
-        MessageDefinition other = messages.get(id);
+        MessageDefinition other = all.get(id);
         if (other != null) {
             throwValidatedError("消息ID不能重复:" + id, other);
         }
 
-        messages.put(id, this);
+        all.put(id, this);
 
         super.validate();
 

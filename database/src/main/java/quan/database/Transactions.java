@@ -29,7 +29,7 @@ public class Transactions {
      * @param executor
      */
     public static void setExecutor(Executor executor) {
-        TransactionDelegation.setExecutor(executor);
+        TransactionDelegation.executor = executor;
     }
 
 
