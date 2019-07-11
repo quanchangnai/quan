@@ -8,6 +8,7 @@ import quan.generator.message.MessageDefinition;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by quanchangnai on 2017/7/10.
@@ -15,13 +16,8 @@ import java.util.Arrays;
 public class XmlParser extends Parser {
 
     @Override
-    public void setSrcPath(String srcPath) {
-        super.setSrcPath(srcPath);
-        File file = new File(srcPath);
-        File[] files = file.listFiles((File dir, String name) -> name.endsWith(".xml"));
-        if (files != null) {
-            srcFiles = Arrays.asList(files);
-        }
+    protected String getSrcFileType() {
+        return "xml";
     }
 
     private Element parseFile(File srcFile) throws Exception {
@@ -58,17 +54,9 @@ public class XmlParser extends Parser {
             } else if (element.getName().equals("bean")) {
                 classDefinition = new BeanDefinition();
             } else if (element.getName().equals("message")) {
-                MessageDefinition messageDefinition = new MessageDefinition();
-                messageDefinition.setId(element.attributeValue("id"));
-                classDefinition = messageDefinition;
+                classDefinition = new MessageDefinition(element.attributeValue("id"));
             } else if (element.getName().equals("data")) {
-                DataDefinition dataDefinition = new DataDefinition();
-                dataDefinition.setKeyName(element.attributeValue("key"));
-                String persistent = element.attributeValue("persistent");
-                if (persistent != null && persistent.equals("false")) {
-                    dataDefinition.setPersistent(false);
-                }
-                classDefinition = dataDefinition;
+                classDefinition = new DataDefinition(element.attributeValue("key"), element.attributeValue("persistent"));
             }
 
             if (classDefinition == null) {
@@ -106,44 +94,21 @@ public class XmlParser extends Parser {
             if (!(node instanceof Element)) {
                 continue;
             }
-
             Element element = (Element) node;
-            if (element.getName().equals("enum")) {
-                parseEnumFields(element);
-            } else if (element.getName().equals("bean") || element.getName().equals("message") || element.getName().equals("data")) {
-                parseBeanFields(element);
+
+            List<String> elementNames = Arrays.asList("enum", "bean", "message", "data");
+            if (!elementNames.contains(element.getName())) {
+                continue;
             }
+
+            parseFields(element);
+
         }
     }
 
 
-    private void parseEnumFields(Element element) {
-        EnumDefinition enumDefinition = (EnumDefinition) classDefinitions.get(element.attributeValue("name"));
-
-        for (int i = 0; i < element.nodeCount(); i++) {
-            Node node = element.node(i);
-            if (node instanceof Element) {
-                Element child = (Element) node;
-                if (!child.getName().equals("field")) {
-                    continue;
-                }
-
-                FieldDefinition fieldDefinition = new FieldDefinition();
-                enumDefinition.getFields().add(fieldDefinition);
-
-                fieldDefinition.setName(child.attributeValue("name"));
-                fieldDefinition.setValue(child.attributeValue("value"));
-
-                String comment = element.node(i + 1).getText();
-                comment = comment.replaceAll("\r|\n", "").trim();
-                fieldDefinition.setComment(comment);
-
-            }
-        }
-    }
-
-    private void parseBeanFields(Element element) {
-        BeanDefinition beanDefinition = (BeanDefinition) classDefinitions.get(element.attributeValue("name"));
+    private void parseFields(Element element) {
+        ClassDefinition classDefinition = classDefinitions.get(element.attributeValue("name"));
 
         for (int i = 0; i < element.nodeCount(); i++) {
             Node node = element.node(i);
@@ -157,16 +122,14 @@ public class XmlParser extends Parser {
             }
 
             FieldDefinition fieldDefinition = new FieldDefinition();
-            beanDefinition.getFields().add(fieldDefinition);
-            fieldDefinition.setBeanDefinition(beanDefinition);
+            classDefinition.getFields().add(fieldDefinition);
+            fieldDefinition.setClassDefinition(classDefinition);
 
             fieldDefinition.setName(child.attributeValue("name"));
             fieldDefinition.setType(child.attributeValue("type"));
+            fieldDefinition.setValue(child.attributeValue("value"));
 
-            String optional = child.attributeValue("optional");
-            if (optional != null && optional.equals("true")) {
-                fieldDefinition.setOptional(true);
-            }
+            fieldDefinition.setOptional(child.attributeValue("optional"));
 
             fieldDefinition.setKeyType(child.attributeValue("key-type"));
             fieldDefinition.setValueType(child.attributeValue("value-type"));

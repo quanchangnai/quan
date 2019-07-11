@@ -4,10 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by quanchangnai on 2019/7/9.
@@ -16,8 +13,6 @@ public abstract class Parser {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    protected String srcPath;
-
     protected String packagePrefix;
 
     protected List<File> srcFiles = new ArrayList<>();
@@ -25,13 +20,18 @@ public abstract class Parser {
     protected Map<String, ClassDefinition> classDefinitions = new HashMap<>();
 
     public void setSrcPath(String srcPath) {
-        this.srcPath = srcPath;
+        File file = new File(srcPath);
+        File[] files = file.listFiles((File dir, String name) -> name.endsWith("." + getSrcFileType()));
+        if (files != null) {
+            srcFiles = Arrays.asList(files);
+        }
     }
 
     public void setPackagePrefix(String packagePrefix) {
         this.packagePrefix = packagePrefix;
     }
 
+    protected abstract String getSrcFileType();
 
     public void parse() throws Exception {
         for (File srcFile : srcFiles) {

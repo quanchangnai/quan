@@ -14,6 +14,13 @@ public class MessageDefinition extends BeanDefinition {
 
     private String id;
 
+    public MessageDefinition() {
+    }
+
+    public MessageDefinition(String id) {
+        this.id = id;
+    }
+
     @Override
     public int getDefinitionType() {
         return 3;

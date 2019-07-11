@@ -29,7 +29,7 @@ public class FieldDefinition extends Definition {
 
     private boolean enumType;//是否是枚举
 
-    private BeanDefinition beanDefinition;
+    private ClassDefinition classDefinition;
 
 
     public static final List<String> BUILT_IN_TYPES = Arrays.asList("bool", "byte", "short", "int", "long", "float", "double", "string", "bytes", "list", "set", "map");
@@ -43,7 +43,28 @@ public class FieldDefinition extends Definition {
     }
 
     public String getType() {
+        if (isTypeWithPackage()) {
+            return type.substring(type.lastIndexOf(".") + 1);
+        }
         return type;
+    }
+
+    public boolean isTypeWithPackage() {
+        return type.contains(".");
+    }
+
+    public String getTypeWithPackage() {
+        if (!isTypeWithPackage()) {
+            return null;
+        }
+        return type;
+    }
+
+    public String getTypePackage() {
+        if (isTypeWithPackage()) {
+            return type.substring(0, type.lastIndexOf("."));
+        }
+        return null;
     }
 
     public void setType(String type) {
@@ -82,8 +103,10 @@ public class FieldDefinition extends Definition {
         return optional;
     }
 
-    public FieldDefinition setOptional(boolean optional) {
-        this.optional = optional;
+    public FieldDefinition setOptional(String optional) {
+        if (optional != null && optional.equals("true")) {
+            this.optional = true;
+        }
         return this;
     }
 
@@ -103,7 +126,31 @@ public class FieldDefinition extends Definition {
         return PRIMITIVE_TYPES.contains(keyType);
     }
 
+    public boolean isValueTypeWithPackage() {
+        if (valueType != null) {
+            return valueType.contains(".");
+        }
+        return false;
+    }
+
+    public String getsValueTypeWithPackage() {
+        if (!isValueTypeWithPackage()) {
+            return null;
+        }
+        return valueType;
+    }
+
+    public String getValueTypePackage() {
+        if (isValueTypeWithPackage()) {
+            return valueType.substring(0, valueType.lastIndexOf("."));
+        }
+        return null;
+    }
+
     public String getValueType() {
+        if (isTypeWithPackage()) {
+            return valueType.substring(valueType.lastIndexOf(".") + 1);
+        }
         return valueType;
     }
 
@@ -121,7 +168,7 @@ public class FieldDefinition extends Definition {
 
     public String getBasicType() {
         if (basicType == null) {
-            return type;
+            return getType();
         }
         return basicType;
     }
@@ -132,7 +179,7 @@ public class FieldDefinition extends Definition {
 
     public String getBasicKeyType() {
         if (basicKeyType == null) {
-            return keyType;
+            return getKeyType();
         }
         return basicKeyType;
     }
@@ -143,7 +190,7 @@ public class FieldDefinition extends Definition {
 
     public String getBasicValueType() {
         if (basicValueType == null) {
-            return valueType;
+            return getValueType();
         }
         return basicValueType;
     }
@@ -154,7 +201,7 @@ public class FieldDefinition extends Definition {
 
     public String getClassType() {
         if (classType == null) {
-            return type;
+            return getType();
         }
         return classType;
     }
@@ -165,7 +212,7 @@ public class FieldDefinition extends Definition {
 
     public String getClassKeyType() {
         if (classKeyType == null) {
-            return keyType;
+            return getKeyType();
         }
         return classKeyType;
     }
@@ -176,7 +223,7 @@ public class FieldDefinition extends Definition {
 
     public String getClassValueType() {
         if (classValueType == null) {
-            return valueType;
+            return getValueType();
         }
         return classValueType;
     }
@@ -185,11 +232,12 @@ public class FieldDefinition extends Definition {
         this.classValueType = classValueType;
     }
 
-    public BeanDefinition getBeanDefinition() {
-        return beanDefinition;
+    public ClassDefinition getClassDefinition() {
+        return classDefinition;
     }
 
-    public void setBeanDefinition(BeanDefinition beanDefinition) {
-        this.beanDefinition = beanDefinition;
+    public FieldDefinition setClassDefinition(ClassDefinition classDefinition) {
+        this.classDefinition = classDefinition;
+        return this;
     }
 }

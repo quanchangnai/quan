@@ -13,6 +13,16 @@ public class DataDefinition extends BeanDefinition {
 
     private boolean persistent = true;
 
+    public DataDefinition() {
+    }
+
+    public DataDefinition(String keyName, String persistent) {
+        this.keyName = keyName;
+        if (persistent != null && persistent.equals("false")) {
+            this.persistent = false;
+        }
+    }
+
     public String getKeyType() {
         return keyType;
     }

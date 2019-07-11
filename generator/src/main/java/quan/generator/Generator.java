@@ -95,11 +95,6 @@ public abstract class Generator {
         return this;
     }
 
-    public void validateDependence(boolean validate) {
-        BeanDefinition.setValidateDependence(validate);
-    }
-
-
     protected abstract String getLanguage();
 
 
@@ -152,13 +147,13 @@ public abstract class Generator {
 
     protected void processBean(BeanDefinition beanDefinition) {
         for (FieldDefinition fieldDefinition : beanDefinition.getFields()) {
-            processField(fieldDefinition);
+            processBeanField(fieldDefinition);
         }
     }
 
-    protected void processField(FieldDefinition fieldDefinition) {
+    protected void processBeanField(FieldDefinition fieldDefinition) {
         String fieldType = fieldDefinition.getType();
-        if (FieldDefinition.BUILT_IN_TYPES.contains(fieldType)) {
+        if (fieldDefinition.isBuiltInType()) {
             fieldDefinition.setBasicType(basicTypes.get(fieldType));
             fieldDefinition.setClassType(classTypes.get(fieldType));
         }
@@ -171,13 +166,14 @@ public abstract class Generator {
             }
 
             String fieldValueType = fieldDefinition.getValueType();
-            if (FieldDefinition.BUILT_IN_TYPES.contains(fieldValueType)) {
+            if (fieldDefinition.isValueBuiltInType()) {
                 fieldDefinition.setBasicValueType(basicTypes.get(fieldValueType));
                 fieldDefinition.setClassValueType(classTypes.get(fieldValueType));
             }
         }
 
-        BeanDefinition beanDefinition = fieldDefinition.getBeanDefinition();
+        BeanDefinition beanDefinition = (BeanDefinition) fieldDefinition.getClassDefinition();
+
 
         ClassDefinition fieldTypeClassDefinition = ClassDefinition.getAll().get(fieldDefinition.getType());
         if (fieldTypeClassDefinition != null) {
@@ -187,11 +183,16 @@ public abstract class Generator {
             if (fieldTypeClassDefinition instanceof EnumDefinition) {
                 fieldDefinition.setEnumType(true);
             }
+        } else if (fieldDefinition.isTypeWithPackage() && !fieldDefinition.getTypeWithPackage().equals(beanDefinition.getPackageName())) {
+            beanDefinition.getImports().add(fieldDefinition.getTypeWithPackage());
         }
 
         ClassDefinition fieldValueTypeClassDefinition = ClassDefinition.getAll().get(fieldDefinition.getValueType());
         if (fieldValueTypeClassDefinition != null && !fieldValueTypeClassDefinition.getPackageName().equals(beanDefinition.getPackageName())) {
             beanDefinition.getImports().add(fieldValueTypeClassDefinition.getFullName());
+        }
+        if (fieldValueTypeClassDefinition == null && fieldDefinition.isValueTypeWithPackage() && !fieldDefinition.getValueTypePackage().equals(beanDefinition.getPackageName())) {
+            beanDefinition.getImports().add(fieldDefinition.getsValueTypeWithPackage());
         }
 
     }
