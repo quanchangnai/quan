@@ -18,7 +18,7 @@ public abstract class MessageGenerator extends Generator {
 //        String destPath = "generator\\src\\test\\java";
 //        String packagePrefix = "quan.generator.message";
 
-        String destPath = "message-java\\src\\test\\java";
+        String destPath = "message\\message-java\\src\\test\\java";
         String packagePrefix = "quan.message";
 
         for (int i = 0; i < args.length; i++) {
