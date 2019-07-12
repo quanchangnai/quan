@@ -5,3 +5,5 @@
 .setting*
 target/
 .temp
+bin
+obj

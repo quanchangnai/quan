@@ -6,7 +6,10 @@
         </Console>
     </Appenders>
     <Loggers>
-        <Root level="debug">
+        <Logger name="quan" level="debug" additivity="false">
+            <AppenderRef ref="console"/>
+        </Logger>
+        <Root level="info">
             <AppenderRef ref="console"/>
         </Root>
     </Loggers>
