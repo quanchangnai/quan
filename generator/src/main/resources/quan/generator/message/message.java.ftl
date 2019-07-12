@@ -16,49 +16,23 @@ import ${import};
 public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType ==3>Message</#if> {
 
 <#list fields as field>
+    <#if field.comment !="">//${field.comment}</#if>
     <#if field.type == "set" || field.type == "list">
-    private ${field.classType}<${field.classValueType}> ${field.name} = new ${field.classType}<>();<#if field.comment !="">//${field.comment}</#if>
-
+    private ${field.classType}<${field.classValueType}> ${field.name} = new ${field.classType}<>();
     <#elseif field.type == "map">
-    private ${field.classType}<${field.classKeyType}, ${field.classValueType}> ${field.name} = new ${field.classType}<>();<#if field.comment !="">//${field.comment}</#if>
-
+    private ${field.classType}<${field.classKeyType}, ${field.classValueType}> ${field.name} = new ${field.classType}<>();
     <#elseif field.type == "string">
-    private ${field.basicType} ${field.name} = "";<#if field.comment !="">//${field.comment}</#if>
-
+    private ${field.basicType} ${field.name} = "";
     <#elseif field.type == "bytes">
-    private ${field.basicType} ${field.name} = new byte[0];<#if field.comment !="">//${field.comment}</#if>
-
-    <#elseif field.type == "byte">
-    private ${field.basicType} ${field.name} = (byte)0;<#if field.comment !="">//${field.comment}</#if>
-
-    <#elseif field.type == "bool">
-    private ${field.basicType} ${field.name} = false;<#if field.comment !="">//${field.comment}</#if>
-
-    <#elseif field.type == "short">
-    private ${field.basicType} ${field.name} = (short)0;<#if field.comment !="">//${field.comment}</#if>
-
-    <#elseif field.type == "int">
-    private ${field.basicType} ${field.name} = 0;<#if field.comment !="">//${field.comment}</#if>
-
-    <#elseif field.type == "long">
-    private ${field.basicType} ${field.name} = 0L;<#if field.comment !="">//${field.comment}</#if>
-
-    <#elseif field.type == "float">
-    private ${field.basicType} ${field.name} = 0F;<#if field.comment !="">//${field.comment}</#if>
-
-    <#elseif field.type == "double">
-    private ${field.basicType} ${field.name} = 0D;<#if field.comment !="">//${field.comment}</#if>
-
-    <#elseif field.enumType>
-    private ${field.basicType} ${field.name};<#if field.comment !="">//${field.comment}</#if>
-
+    private ${field.basicType} ${field.name} = new byte[0];
+    <#elseif field.builtInType || field.enumType>
+    private ${field.basicType} ${field.name};
     <#elseif !field.optional>
-    private ${field.basicType} ${field.name} = new ${field.type}();<#if field.comment !="">//${field.comment}</#if>
-
+    private ${field.basicType} ${field.name} = new ${field.type}();
     <#else>
-    private ${field.basicType} ${field.name};<#if field.comment !="">//${field.comment}</#if>
-
+    private ${field.basicType} ${field.name};
     </#if>
+
 </#list>
     public ${name}() {
 <#if definitionType ==3>
@@ -84,9 +58,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 
     public ${name} set${field.name?cap_first}(${field.basicType} ${field.name}) {
         <#if (!field.builtInType && !field.optional && !field.enumType) || field.type == "string" || field.type == "bytes">
-        if (${field.name} == null){
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(${field.name});
         </#if>
         this.${field.name} = ${field.name};
         return this;
@@ -124,12 +96,12 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 
         </#if>
         buffer.writeInt(${field.name}.size());
-        for (${field.basicKeyType} ${field.name}Key : ${field.name}.keySet()) {
-            buffer.write${field.keyType?cap_first}(${field.name}Key);
+        for (${field.basicKeyType} _${field.name}_Key : ${field.name}.keySet()) {
+            buffer.write${field.keyType?cap_first}(_${field.name}_Key);
         <#if field.valueBuiltInType>
-            buffer.write${field.valueType?cap_first}(${field.name}.get(${field.name}Key));
+            buffer.write${field.valueType?cap_first}(${field.name}.get(_${field.name}_Key));
         <#else>
-            ${field.name}.get(${field.name}Key).encode(buffer);
+            ${field.name}.get(_${field.name}_Key).encode(buffer);
         </#if>
         }
 

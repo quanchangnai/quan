@@ -11,30 +11,43 @@ import quan.message.Bean;
  */
 public class RoleInfo extends Bean {
 
-    private long roleId = 0L;//角色id
+    //角色id
+    private long roleId;
 
-    private boolean bo = false;
+    
+    private boolean bo;
 
-    private byte by = (byte)0;
+    
+    private byte by;
 
-    private short s = (short)0;
+    
+    private short s;
 
-    private int i = 0;
+    
+    private int i;
 
-    private float f = 0F;
+    
+    private float f;
 
-    private double d = 0D;
+    
+    private double d;
 
-    private String roleName = "";//角色名
+    //角色名
+    private String roleName = "";
 
+    
     private RoleType roleType;
 
+    
     private byte[] data = new byte[0];
 
+    
     private ArrayList<Integer> list = new ArrayList<>();
 
+    
     private HashSet<Integer> set = new HashSet<>();
 
+    
     private HashMap<Integer, Integer> map = new HashMap<>();
 
     public RoleInfo() {
@@ -108,9 +121,7 @@ public class RoleInfo extends Bean {
     }
 
     public RoleInfo setRoleName(String roleName) {
-        if (roleName == null){
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(roleName);
         this.roleName = roleName;
         return this;
     }
@@ -129,9 +140,7 @@ public class RoleInfo extends Bean {
     }
 
     public RoleInfo setData(byte[] data) {
-        if (data == null){
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(data);
         this.data = data;
         return this;
     }
@@ -180,9 +189,9 @@ public class RoleInfo extends Bean {
         }
 
         buffer.writeInt(map.size());
-        for (int mapKey : map.keySet()) {
-            buffer.writeInt(mapKey);
-            buffer.writeInt(map.get(mapKey));
+        for (int _map_Key : map.keySet()) {
+            buffer.writeInt(_map_Key);
+            buffer.writeInt(map.get(_map_Key));
         }
 
     }

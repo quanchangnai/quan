@@ -7,9 +7,9 @@ namespace quan.message
     /// </summary>
     public abstract class Message : Bean
     {
-        private int id;
+        public int id { get; }
 
-        private long sn;
+        public long sn { get; set; }
 
 
         protected Message(int id)
@@ -17,24 +17,16 @@ namespace quan.message
             this.id = id;
         }
 
-        public int Id => id;
-
-        public long Sn
-        {
-            get => sn;
-            set => sn = value;
-        }
-
         public abstract Message create();
 
 
-        public void encode(Buffer buffer)
+        public override void encode(Buffer buffer)
         {
             buffer.WriteInt(id);
             buffer.WriteLong(sn);
         }
 
-        public void decode(Buffer buffer)
+        public override void decode(Buffer buffer)
         {
             int msgId = buffer.ReadInt();
             if (msgId != id)

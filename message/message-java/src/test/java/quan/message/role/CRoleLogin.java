@@ -12,19 +12,26 @@ import java.io.IOException;
  */
 public class CRoleLogin extends Message {
 
-    private long roleId = 0L;//角色id
+    //角色id
+    private long roleId;
 
-    private String roleName = "";//角色名
+    //角色名
+    private String roleName = "";
 
-    private RoleInfo roleInfo = new RoleInfo();//角色信息
+    //角色信息
+    private RoleInfo roleInfo = new RoleInfo();
 
-    private ArrayList<RoleInfo> roleInfoList = new ArrayList<>();//角色信息
+    //角色信息
+    private ArrayList<RoleInfo> roleInfoList = new ArrayList<>();
 
-    private HashSet<RoleInfo> roleInfoSet = new HashSet<>();//角色信息
+    //角色信息
+    private HashSet<RoleInfo> roleInfoSet = new HashSet<>();
 
-    private HashMap<Long, RoleInfo> roleInfoMap = new HashMap<>();//角色信息
+    //角色信息
+    private HashMap<Long, RoleInfo> roleInfoMap = new HashMap<>();
 
-    private UserInfo userInfo;//用户信息
+    //用户信息
+    private UserInfo userInfo;
 
     public CRoleLogin() {
         super(111);
@@ -44,9 +51,7 @@ public class CRoleLogin extends Message {
     }
 
     public CRoleLogin setRoleName(String roleName) {
-        if (roleName == null){
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(roleName);
         this.roleName = roleName;
         return this;
     }
@@ -56,9 +61,7 @@ public class CRoleLogin extends Message {
     }
 
     public CRoleLogin setRoleInfo(RoleInfo roleInfo) {
-        if (roleInfo == null){
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(roleInfo);
         this.roleInfo = roleInfo;
         return this;
     }
@@ -108,9 +111,9 @@ public class CRoleLogin extends Message {
         }
 
         buffer.writeInt(roleInfoMap.size());
-        for (long roleInfoMapKey : roleInfoMap.keySet()) {
-            buffer.writeLong(roleInfoMapKey);
-            roleInfoMap.get(roleInfoMapKey).encode(buffer);
+        for (long _roleInfoMap_Key : roleInfoMap.keySet()) {
+            buffer.writeLong(_roleInfoMap_Key);
+            roleInfoMap.get(_roleInfoMap_Key).encode(buffer);
         }
 
         buffer.writeBool(userInfo != null);

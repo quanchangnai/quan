@@ -42,6 +42,8 @@
         <Compile Include="src\quan\message\Bean.cs" />
         <Compile Include="src\quan\message\Buffer.cs" />
         <Compile Include="src\quan\message\Message.cs" />
+        <Compile Include="src\quan\message\test\RoleInfo.cs" />
+        <Compile Include="src\quan\message\test\SRoleLogin.cs" />
         <Compile Include="src\quan\message\test\Test.cs" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

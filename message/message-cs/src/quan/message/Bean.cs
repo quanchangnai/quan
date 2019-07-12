@@ -9,7 +9,7 @@ namespace quan.message
             return buffer.RemainingBytes();
         }
 
-        public void encode(Buffer buffer)
+        public virtual void encode(Buffer buffer)
         {
         }
 
@@ -19,7 +19,7 @@ namespace quan.message
             decode(buffer);
         }
 
-        public void decode(Buffer buffer)
+        public virtual void decode(Buffer buffer)
         {
         }
     }

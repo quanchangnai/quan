@@ -4,6 +4,8 @@ import quan.message.role.RoleInfo;
 import quan.message.role.RoleType;
 import quan.message.role.SRoleLogin;
 
+import java.util.Objects;
+
 /**
  * Created by quanchangnai on 2019/6/23.
  */

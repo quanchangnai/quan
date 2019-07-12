@@ -237,11 +237,6 @@ public class Buffer {
         return new String(readBytes(), "UTF-8");
     }
 
-    public String readString(String charsetName) throws IOException {
-        return new String(readBytes(), charsetName);
-    }
-
-
     /**
      * 检测并增加缓冲区容量
      *
@@ -375,7 +370,4 @@ public class Buffer {
         writeBytes(s.getBytes("UTF-8"));
     }
 
-    public void writeString(String s, String charsetName) throws IOException {
-        writeBytes(s.getBytes(charsetName));
-    }
 }

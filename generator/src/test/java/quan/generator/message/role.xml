@@ -32,7 +32,7 @@
         <field name="userInfo" type="UserInfo" optional="true"/>用户信息
     </message>
 
-    <message id="111" name="SRoleLogin">角色登录
+    <message id="222" name="SRoleLogin">角色登录
         <field name="roleId" type="long"/>角色id
         <field name="roleName" type="string"/>角色名
         <field name="roleInfo" type="RoleInfo"/>角色信息

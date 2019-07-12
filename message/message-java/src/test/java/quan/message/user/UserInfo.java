@@ -10,27 +10,38 @@ import quan.message.Bean;
  */
 public class UserInfo extends Bean {
 
-    private String name = "";//名字
+    //名字
+    private String name = "";
 
-    private int level = 0;//等级
+    //等级
+    private int level;
 
-    private int experience = 0;
+    
+    private int experience;
 
-    private int icon = 0;
+    
+    private int icon;
 
-    private int power = 0;
+    
+    private int power;
 
-    private int modifyNameCount = 0;
+    
+    private int modifyNameCount;
 
+    
     private String eventState = "";
 
+    
     private String functionState = "";
 
-    private int lucky = 0;
+    
+    private int lucky;
 
-    private int currentState = 0;
+    
+    private int currentState;
 
-    private int buyPowerCount = 0;
+    
+    private int buyPowerCount;
 
     public UserInfo() {
     }
@@ -40,9 +51,7 @@ public class UserInfo extends Bean {
     }
 
     public UserInfo setName(String name) {
-        if (name == null){
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(name);
         this.name = name;
         return this;
     }
@@ -97,9 +106,7 @@ public class UserInfo extends Bean {
     }
 
     public UserInfo setEventState(String eventState) {
-        if (eventState == null){
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(eventState);
         this.eventState = eventState;
         return this;
     }
@@ -109,9 +116,7 @@ public class UserInfo extends Bean {
     }
 
     public UserInfo setFunctionState(String functionState) {
-        if (functionState == null){
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(functionState);
         this.functionState = functionState;
         return this;
     }
