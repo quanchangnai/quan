@@ -9,6 +9,12 @@ import quan.message.role.SRoleLogin;
  */
 public class MessageTest {
 
+    public static MessageFactory messageFactory = new MessageFactory();
+
+    static {
+        messageFactory.autoRegister();
+    }
+
     public static void main(String[] args) throws Exception {
         SRoleLogin sRoleLogin1 = new SRoleLogin();
         sRoleLogin1.setRoleId(1111);

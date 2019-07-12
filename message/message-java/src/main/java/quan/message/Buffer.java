@@ -14,14 +14,17 @@ public class Buffer {
      * 字节缓冲区
      */
     private byte[] bytes;
+
     /**
      * 当前位置
      */
     private int position;
+
     /**
      * 当前是在读数据还是在写数据，true：读，false：写
      */
     private boolean reading;
+
     /**
      * 结束位置，后面的是无效数据
      */
@@ -263,9 +266,9 @@ public class Buffer {
     }
 
     protected void writeVarInt(long n) throws IOException {
+        checkCapacity(10);
         //ZigZag编码
         n = (n << 1) ^ (n >> 63);
-        checkCapacity(10);
         int position = reading ? 0 : this.position;
         while (true) {
             if ((n & ~0b1111111) == 0) {

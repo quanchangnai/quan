@@ -11,13 +11,13 @@ import java.nio.ByteBuffer;
 /**
  * 消息编解码器
  */
-public class MessageCodec implements Handler<Object> {
+public class NetworkMessageCodec implements Handler<Object> {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     private MessageFactory messageFactory;
 
-    public MessageCodec(MessageFactory messageFactory) {
+    public NetworkMessageCodec(MessageFactory messageFactory) {
         this.messageFactory = messageFactory;
     }
 
