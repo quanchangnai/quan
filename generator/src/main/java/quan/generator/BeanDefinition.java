@@ -19,9 +19,6 @@ public class BeanDefinition extends ClassDefinition {
         return imports;
     }
 
-    public void addImport(String fullName) {
-
-    }
 
     public static boolean isBeanDefinition(String type) {
         ClassDefinition classDefinition = ClassDefinition.getAll().get(type);

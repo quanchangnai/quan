@@ -94,18 +94,16 @@ public abstract class ClassDefinition extends Definition {
     }
 
     protected void throwValidatedError(String error, ClassDefinition other) {
-        String errorPosition = ",定义文件:" + getDefinitionFile();
+        String errorPosition = "。定义文件[" + getDefinitionFile() + "]";
         if (getName() != null && !getName().trim().equals("")) {
-            errorPosition += ",类:" + getName();
+            errorPosition += "，类[" + getName() + "]。";
         }
-        errorPosition += "\r\n\t" + definitionText;
 
         if (other != null) {
-            errorPosition = ",文件:" + other.getDefinitionFile();
+            errorPosition += "定义文件[" + other.getDefinitionFile() + "]";
             if (getName() != null && !getName().trim().equals("")) {
-                errorPosition += ",类:" + other.getName();
+                errorPosition += "，类[" + other.getName() + "]。";
             }
-            errorPosition += "\r\n\t" + definitionText;
         }
 
         throw new RuntimeException(error + errorPosition);

@@ -10,14 +10,29 @@ import quan.generator.Generator;
  */
 public abstract class MessageGenerator extends Generator {
 
+    public MessageGenerator(String srcPath, String destPath) throws Exception {
+        super(srcPath, destPath);
+
+        Template messageTemplate = freemarkerCfg.getTemplate("message." + getLanguage() + ".ftl");
+
+        templates.put(MessageDefinition.class, messageTemplate);
+        templates.put(BeanDefinition.class, messageTemplate);
+
+    }
+
+    @Override
+    protected boolean support(ClassDefinition classDefinition) {
+        if (classDefinition instanceof MessageDefinition) {
+            return true;
+        }
+        return super.support(classDefinition);
+    }
+
+
     public static void main(String[] args) throws Exception {
         String language = "java";
 
         String srcPath = "generator\\src\\test\\java\\quan\\generator\\message";
-
-//        String destPath = "generator\\src\\test\\java";
-//        String packagePrefix = "quan.generator.message";
-
         String destPath = "message\\message-java\\src\\test\\java";
         String packagePrefix = "quan.message";
 
@@ -52,23 +67,5 @@ public abstract class MessageGenerator extends Generator {
         System.err.println("-language 生成语言");
         System.err.println("-srcPath 描述文件的目录");
         System.err.println("-destPath 生成目标代码的目录");
-    }
-
-
-    public MessageGenerator(String srcPath, String destPath) throws Exception {
-        super(srcPath, destPath);
-
-        Template messageTemplate = freemarkerCfg.getTemplate("message." + getLanguage() + ".ftl");
-
-        templates.put(MessageDefinition.class, messageTemplate);
-        templates.put(BeanDefinition.class, messageTemplate);
-    }
-
-    @Override
-    protected boolean support(ClassDefinition classDefinition) {
-        if (classDefinition instanceof MessageDefinition) {
-            return true;
-        }
-        return super.support(classDefinition);
     }
 }

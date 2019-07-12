@@ -17,22 +17,6 @@ import quan.generator.Generator;
  */
 public class DatabaseGenerator extends Generator {
 
-    public static void main(String[] args) throws Exception {
-
-        String srcPath = "generator\\src\\test\\java\\quan\\generator\\database";
-
-//        String destPath = "generator\\src\\test\\java";
-//        String packagePrefix = "quan.generator.database";
-
-        String destPath = "database\\src\\test\\java";
-        String packagePrefix = "quan.database";
-
-        DatabaseGenerator generator = new DatabaseGenerator(srcPath, destPath);
-        generator.setPackagePrefix(packagePrefix);
-        generator.generate();
-    }
-
-
     public DatabaseGenerator(String srcPath, String destPath) throws Exception {
         super(srcPath, destPath);
 
@@ -75,6 +59,18 @@ public class DatabaseGenerator extends Generator {
             dataDefinition.setKeyType(keyFieldDefinition.getClassType());
         }
 
+    }
+
+
+    public static void main(String[] args) throws Exception {
+
+        String srcPath = "generator\\src\\test\\java\\quan\\generator\\database";
+        String destPath = "database\\src\\test\\java";
+        String packagePrefix = "quan.database";
+
+        DatabaseGenerator generator = new DatabaseGenerator(srcPath, destPath);
+        generator.setPackagePrefix(packagePrefix);
+        generator.generate();
     }
 
 }

@@ -14,6 +14,8 @@ public class FieldDefinition extends Definition {
 
     private boolean optional;
 
+    private String source;
+
     private String keyType;
     private String valueType;
 
@@ -231,6 +233,17 @@ public class FieldDefinition extends Definition {
     public void setClassValueType(String classValueType) {
         this.classValueType = classValueType;
     }
+
+
+    public String getSource() {
+        return source;
+    }
+
+    public FieldDefinition setSource(String source) {
+        this.source = source;
+        return this;
+    }
+
 
     public ClassDefinition getClassDefinition() {
         return classDefinition;

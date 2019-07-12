@@ -3,6 +3,7 @@ package quan.generator;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
+import quan.generator.config.ConfigDefinition;
 import quan.generator.database.DataDefinition;
 import quan.generator.message.MessageDefinition;
 
@@ -47,7 +48,7 @@ public class XmlParser extends Parser {
             }
 
             Element element = (Element) node;
-            ClassDefinition classDefinition = null;
+            ClassDefinition classDefinition;
 
             if (element.getName().equals("enum")) {
                 classDefinition = new EnumDefinition();
@@ -57,9 +58,9 @@ public class XmlParser extends Parser {
                 classDefinition = new MessageDefinition(element.attributeValue("id"));
             } else if (element.getName().equals("data")) {
                 classDefinition = new DataDefinition(element.attributeValue("key"), element.attributeValue("persistent"));
-            }
-
-            if (classDefinition == null) {
+            } else if (element.getName().equals("config")) {
+                classDefinition = new ConfigDefinition(element.attributeValue("source"));
+            } else {
                 continue;
             }
 
@@ -96,7 +97,7 @@ public class XmlParser extends Parser {
             }
             Element element = (Element) node;
 
-            List<String> elementNames = Arrays.asList("enum", "bean", "message", "data");
+            List<String> elementNames = Arrays.asList("enum", "bean", "message", "data", "config");
             if (!elementNames.contains(element.getName())) {
                 continue;
             }
@@ -128,9 +129,8 @@ public class XmlParser extends Parser {
             fieldDefinition.setName(child.attributeValue("name"));
             fieldDefinition.setType(child.attributeValue("type"));
             fieldDefinition.setValue(child.attributeValue("value"));
-
+            fieldDefinition.setSource(child.attributeValue("source"));
             fieldDefinition.setOptional(child.attributeValue("optional"));
-
             fieldDefinition.setKeyType(child.attributeValue("key-type"));
             fieldDefinition.setValueType(child.attributeValue("value-type"));
 

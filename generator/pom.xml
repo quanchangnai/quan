@@ -24,12 +24,22 @@
         </dependency>
         <dependency>
             <groupId>quan</groupId>
-            <artifactId>message-java</artifactId>
+            <artifactId>common</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>quan</groupId>
             <artifactId>database</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>quan</groupId>
+            <artifactId>message-java</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>quan</groupId>
+            <artifactId>config-java</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
