@@ -28,18 +28,18 @@ namespace quan.message.test
 
         static void test2()
         {
-            SRoleLogin sRoleLogin1 = new SRoleLogin();
+            SRoleLogin1 sRoleLogin1 = new SRoleLogin1();
             sRoleLogin1.sn = 31312L;
             sRoleLogin1.roleId = 111;
             sRoleLogin1.roleName = "aaa";
 
-            RoleInfo roleInfo1 = new RoleInfo();
+            RoleInfo1 roleInfo1 = new RoleInfo1();
             roleInfo1.roleId = 222;
             roleInfo1.roleName = "bbb";
 
             sRoleLogin1.roleInfo = roleInfo1;
 
-            RoleInfo roleInfo2 = new RoleInfo();
+            RoleInfo1 roleInfo2 = new RoleInfo1();
             roleInfo2.roleId = 222;
             roleInfo2.roleName = "bbb";
 
@@ -47,10 +47,10 @@ namespace quan.message.test
             sRoleLogin1.roleInfoSet.Add(roleInfo2);
             sRoleLogin1.roleInfoMap.Add(roleInfo2.roleId, roleInfo2);
 
-            byte[] bytes = sRoleLogin1.encode();
+            byte[] bytes = sRoleLogin1.Encode();
 
-            SRoleLogin sRoleLogin2 = new SRoleLogin();
-            sRoleLogin2.decode(bytes);
+            SRoleLogin1 sRoleLogin2 = new SRoleLogin1();
+            sRoleLogin2.Decode(bytes);
 
 
             Console.WriteLine("sRoleLogin1:" + sRoleLogin1);

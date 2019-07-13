@@ -30,10 +30,11 @@ public abstract class MessageGenerator extends Generator {
 
 
     public static void main(String[] args) throws Exception {
-        String language = "java";
+        String language = "cs";
 
         String srcPath = "generator\\src\\test\\java\\quan\\generator\\message";
-        String destPath = "message\\message-java\\src\\test\\java";
+//        String destPath = "message\\message-java\\src\\test\\java";
+        String destPath = "message\\message-cs\\src";
         String packagePrefix = "quan.message";
 
         for (int i = 0; i < args.length; i++) {
@@ -55,6 +56,9 @@ public abstract class MessageGenerator extends Generator {
         switch (language) {
             case "java":
                 generator = new JavaMessageGenerator(srcPath, destPath);
+                break;
+            case "cs":
+                generator = new CSharpMessageGenerator(srcPath, destPath);
                 break;
             default:
                 break;

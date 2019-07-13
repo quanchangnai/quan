@@ -172,8 +172,12 @@ public abstract class Generator {
             }
         }
 
-        BeanDefinition beanDefinition = (BeanDefinition) fieldDefinition.getClassDefinition();
+        processBeanImports(fieldDefinition);
 
+    }
+
+    protected void processBeanImports(FieldDefinition fieldDefinition) {
+        BeanDefinition beanDefinition = (BeanDefinition) fieldDefinition.getClassDefinition();
 
         ClassDefinition fieldTypeClassDefinition = ClassDefinition.getAll().get(fieldDefinition.getType());
         if (fieldTypeClassDefinition != null) {
@@ -192,9 +196,8 @@ public abstract class Generator {
             beanDefinition.getImports().add(fieldValueTypeClassDefinition.getFullName());
         }
         if (fieldValueTypeClassDefinition == null && fieldDefinition.isValueTypeWithPackage() && !fieldDefinition.getValueTypePackage().equals(beanDefinition.getPackageName())) {
-            beanDefinition.getImports().add(fieldDefinition.getsValueTypeWithPackage());
+            beanDefinition.getImports().add(fieldDefinition.getValueTypeWithPackage());
         }
-
     }
 
 }

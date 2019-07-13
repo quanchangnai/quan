@@ -101,13 +101,13 @@ public class CRoleLogin extends Message {
         roleInfo.encode(buffer);
 
         buffer.writeInt(roleInfoList.size());
-        for (RoleInfo roleInfoListValue : roleInfoList) {
-            roleInfoListValue.encode(buffer);
+        for (RoleInfo _roleInfoList_Value : roleInfoList) {
+            _roleInfoList_Value.encode(buffer);
         }
 
         buffer.writeInt(roleInfoSet.size());
-        for (RoleInfo roleInfoSetValue : roleInfoSet) {
-            roleInfoSetValue.encode(buffer);
+        for (RoleInfo _roleInfoSet_Value : roleInfoSet) {
+            _roleInfoSet_Value.encode(buffer);
         }
 
         buffer.writeInt(roleInfoMap.size());

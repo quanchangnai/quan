@@ -2,24 +2,24 @@ namespace quan.message
 {
     public abstract class Bean
     {
-        public byte[] encode()
+        public byte[] Encode()
         {
             Buffer buffer = new Buffer();
-            encode(buffer);
+            Encode(buffer);
             return buffer.RemainingBytes();
         }
 
-        public virtual void encode(Buffer buffer)
+        public virtual void Encode(Buffer buffer)
         {
         }
 
-        public void decode(byte[] bytes)
+        public void Decode(byte[] bytes)
         {
             Buffer buffer = new Buffer(bytes);
-            decode(buffer);
+            Decode(buffer);
         }
 
-        public virtual void decode(Buffer buffer)
+        public virtual void Decode(Buffer buffer)
         {
         }
     }

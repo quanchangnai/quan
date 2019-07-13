@@ -83,11 +83,11 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 
         </#if>
         buffer.writeInt(${field.name}.size());
-        for (${field.basicValueType} ${field.name}Value : ${field.name}) {
+        for (${field.basicValueType} _${field.name}_Value : ${field.name}) {
         <#if field.valueBuiltInType>
-            buffer.write${field.valueType?cap_first}(${field.name}Value);
+            buffer.write${field.valueType?cap_first}(_${field.name}_Value);
         <#else>
-            ${field.name}Value.encode(buffer);
+            _${field.name}_Value.encode(buffer);
         </#if>
         }
 

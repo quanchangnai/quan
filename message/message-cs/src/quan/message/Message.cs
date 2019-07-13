@@ -20,13 +20,13 @@ namespace quan.message
         public abstract Message create();
 
 
-        public override void encode(Buffer buffer)
+        public override void Encode(Buffer buffer)
         {
             buffer.WriteInt(id);
             buffer.WriteLong(sn);
         }
 
-        public override void decode(Buffer buffer)
+        public override void Decode(Buffer buffer)
         {
             int msgId = buffer.ReadInt();
             if (msgId != id)

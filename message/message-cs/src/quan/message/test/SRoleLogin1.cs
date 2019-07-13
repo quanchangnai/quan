@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace quan.message.test
 {
-    public class SRoleLogin : Message
+    public class SRoleLogin1 : Message
     {
         //角色id
         public long roleId { get; set; }
@@ -18,94 +18,94 @@ namespace quan.message.test
         }
 
         //角色信息
-        private RoleInfo _roleInfo = new RoleInfo();
+        private RoleInfo1 _roleInfo = new RoleInfo1();
 
-        public RoleInfo roleInfo
+        public RoleInfo1 roleInfo
         {
             get => _roleInfo;
             set => _roleInfo = value ?? throw new NullReferenceException();
         }
 
         //角色信息2
-        public RoleInfo roleInfo2 { get; set; }
+        public RoleInfo1 roleInfo2 { get; set; }
 
-        public List<RoleInfo> roleInfoList { get; } = new List<RoleInfo>(); //角色信息
+        public List<RoleInfo1> roleInfoList { get; } = new List<RoleInfo1>(); //角色信息
 
-        public HashSet<RoleInfo> roleInfoSet { get; } = new HashSet<RoleInfo>(); //角色信息
+        public HashSet<RoleInfo1> roleInfoSet { get; } = new HashSet<RoleInfo1>(); //角色信息
 
-        public Dictionary<long, RoleInfo> roleInfoMap { get; } = new Dictionary<long, RoleInfo>(); //角色信息
+        public Dictionary<long, RoleInfo1> roleInfoMap { get; } = new Dictionary<long, RoleInfo1>(); //角色信息
 
-        public SRoleLogin() : base(111)
+        public SRoleLogin1() : base(111)
         {
         }
 
         public override Message create()
         {
-            return new SRoleLogin();
+            return new SRoleLogin1();
         }
 
 
-        public override void encode(Buffer buffer)
+        public override void Encode(Buffer buffer)
         {
-            base.encode(buffer);
+            base.Encode(buffer);
             buffer.WriteLong(roleId);
             buffer.WriteString(roleName);
 
-            roleInfo.encode(buffer);
+            roleInfo.Encode(buffer);
 
             buffer.WriteBool(roleInfo2 != null);
-            roleInfo2?.encode(buffer);
+            roleInfo2?.Encode(buffer);
 
             buffer.WriteInt(roleInfoList.Count);
             foreach (var _roleInfoList_Value in roleInfoList)
             {
-                _roleInfoList_Value.encode(buffer);
+                _roleInfoList_Value.Encode(buffer);
             }
 
             buffer.WriteInt(roleInfoSet.Count);
             foreach (var _roleInfoSet_Value in roleInfoSet)
             {
-                _roleInfoSet_Value.encode(buffer);
+                _roleInfoSet_Value.Encode(buffer);
             }
 
             buffer.WriteInt(roleInfoMap.Count);
             foreach (var _roleInfoMap_Key in roleInfoMap.Keys)
             {
                 buffer.WriteLong(_roleInfoMap_Key);
-                roleInfoMap[_roleInfoMap_Key].encode(buffer);
+                roleInfoMap[_roleInfoMap_Key].Encode(buffer);
             }
         }
 
-        public override void decode(Buffer buffer)
+        public override void Decode(Buffer buffer)
         {
-            base.decode(buffer);
+            base.Decode(buffer);
             roleId = buffer.ReadLong();
             roleName = buffer.ReadString();
-            roleInfo.decode(buffer);
+            roleInfo.Decode(buffer);
 
             if (buffer.ReadBool())
             {
                 if (roleInfo2 == null)
                 {
-                    roleInfo2 = new RoleInfo();
+                    roleInfo2 = new RoleInfo1();
                 }
 
-                roleInfo2.decode(buffer);
+                roleInfo2.Decode(buffer);
             }
 
             int _roleInfoList_Size = buffer.ReadInt();
             for (int i = 0; i < _roleInfoList_Size; i++)
             {
-                RoleInfo _roleInfoList_Value = new RoleInfo();
-                _roleInfoList_Value.decode(buffer);
+                RoleInfo1 _roleInfoList_Value = new RoleInfo1();
+                _roleInfoList_Value.Decode(buffer);
                 roleInfoList.Add(_roleInfoList_Value);
             }
 
             int _roleInfoSet_Size = buffer.ReadInt();
             for (int i = 0; i < _roleInfoSet_Size; i++)
             {
-                RoleInfo _roleInfoSet_Value = new RoleInfo();
-                _roleInfoSet_Value.decode(buffer);
+                RoleInfo1 _roleInfoSet_Value = new RoleInfo1();
+                _roleInfoSet_Value.Decode(buffer);
                 roleInfoSet.Add(_roleInfoSet_Value);
             }
 
@@ -113,8 +113,8 @@ namespace quan.message.test
             for (int i = 0; i < _roleInfoMap_Size; i++)
             {
                 long _roleInfoMap_Key = buffer.ReadLong();
-                RoleInfo _roleInfoMap_Value = new RoleInfo();
-                _roleInfoMap_Value.decode(buffer);
+                RoleInfo1 _roleInfoMap_Value = new RoleInfo1();
+                _roleInfoMap_Value.Decode(buffer);
                 roleInfoMap.Add(_roleInfoMap_Key, _roleInfoMap_Value);
             }
         }

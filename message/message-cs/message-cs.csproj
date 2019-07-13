@@ -9,7 +9,7 @@
         <AppDesignerFolder>Properties</AppDesignerFolder>
         <RootNamespace>message_cs</RootNamespace>
         <AssemblyName>message_cs</AssemblyName>
-        <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+        <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
         <FileAlignment>512</FileAlignment>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -42,9 +42,13 @@
         <Compile Include="src\quan\message\Bean.cs" />
         <Compile Include="src\quan\message\Buffer.cs" />
         <Compile Include="src\quan\message\Message.cs" />
-        <Compile Include="src\quan\message\test\RoleInfo.cs" />
-        <Compile Include="src\quan\message\test\SRoleLogin.cs" />
+        <Compile Include="src\quan\message\role\CRoleLogin.cs" />
+        <Compile Include="src\quan\message\role\RoleInfo.cs" />
+        <Compile Include="src\quan\message\role\SRoleLogin.cs" />
+        <Compile Include="src\quan\message\test\RoleInfo1.cs" />
+        <Compile Include="src\quan\message\test\SRoleLogin1.cs" />
         <Compile Include="src\quan\message\test\Test.cs" />
+        <Compile Include="src\quan\message\user\UserInfo.cs" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

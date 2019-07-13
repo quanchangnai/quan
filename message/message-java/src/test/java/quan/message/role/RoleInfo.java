@@ -179,13 +179,13 @@ public class RoleInfo extends Bean {
         buffer.writeBytes(data);
 
         buffer.writeInt(list.size());
-        for (int listValue : list) {
-            buffer.writeInt(listValue);
+        for (int _list_Value : list) {
+            buffer.writeInt(_list_Value);
         }
 
         buffer.writeInt(set.size());
-        for (int setValue : set) {
-            buffer.writeInt(setValue);
+        for (int _set_Value : set) {
+            buffer.writeInt(_set_Value);
         }
 
         buffer.writeInt(map.size());

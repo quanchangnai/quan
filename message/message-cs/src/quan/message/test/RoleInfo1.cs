@@ -2,7 +2,7 @@ using System;
 
 namespace quan.message.test
 {
-    public class RoleInfo : Bean
+    public class RoleInfo1 : Bean
     {
         public long roleId { get; set; } = 0L; //角色id
 
@@ -15,16 +15,16 @@ namespace quan.message.test
         }
 
 
-        public override void encode(Buffer buffer)
+        public override void Encode(Buffer buffer)
         {
-            base.encode(buffer);
+            base.Encode(buffer);
             buffer.WriteLong(roleId);
             buffer.WriteString(roleName);
         }
 
-        public override void decode(Buffer buffer)
+        public override void Decode(Buffer buffer)
         {
-            base.decode(buffer);
+            base.Decode(buffer);
             roleId = buffer.ReadLong();
             roleName = buffer.ReadString();
         }

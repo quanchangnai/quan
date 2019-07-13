@@ -135,7 +135,7 @@ public class FieldDefinition extends Definition {
         return false;
     }
 
-    public String getsValueTypeWithPackage() {
+    public String getValueTypeWithPackage() {
         if (!isValueTypeWithPackage()) {
             return null;
         }
