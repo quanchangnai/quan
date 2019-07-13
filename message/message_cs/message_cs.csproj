@@ -38,17 +38,16 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="Bean.cs" />
+        <Compile Include="Buffer.cs" />
+        <Compile Include="Message.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
-        <Compile Include="src\quan\message\Bean.cs" />
-        <Compile Include="src\quan\message\Buffer.cs" />
-        <Compile Include="src\quan\message\Message.cs" />
-        <Compile Include="src\quan\message\role\CRoleLogin.cs" />
-        <Compile Include="src\quan\message\role\RoleInfo.cs" />
-        <Compile Include="src\quan\message\role\SRoleLogin.cs" />
-        <Compile Include="src\quan\message\test\RoleInfo1.cs" />
-        <Compile Include="src\quan\message\test\SRoleLogin1.cs" />
-        <Compile Include="src\quan\message\test\Test.cs" />
-        <Compile Include="src\quan\message\user\UserInfo.cs" />
+        <Compile Include="test\role\CRoleLogin.cs" />
+        <Compile Include="test\role\RoleInfo.cs" />
+        <Compile Include="test\role\RoleType.cs" />
+        <Compile Include="test\role\SRoleLogin.cs" />
+        <Compile Include="test\Test.cs" />
+        <Compile Include="test\user\UserInfo.cs" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

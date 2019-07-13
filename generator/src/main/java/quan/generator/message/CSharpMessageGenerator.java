@@ -63,4 +63,16 @@ public class CSharpMessageGenerator extends MessageGenerator {
             beanDefinition.getImports().add(fieldDefinition.getValueTypePackage());
         }
     }
+
+    public static void main(String[] args) throws Exception {
+
+        String srcPath = "generator\\src\\test\\java\\quan\\generator\\message";
+        String destPath = "message";
+        String packagePrefix = "message_cs.test";
+
+        CSharpMessageGenerator messageGenerator = new CSharpMessageGenerator(srcPath, destPath);
+        messageGenerator.setPackagePrefix(packagePrefix);
+        messageGenerator.generate();
+
+    }
 }

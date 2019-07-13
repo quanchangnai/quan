@@ -1,12 +1,19 @@
 using System;
 using System.Collections.Generic;
-using quan.message;
+using message_cs;
+using Buffer = message_cs.Buffer;
 <#list imports as import>
 using ${import};
 </#list>
 
 namespace ${packageName}
 {
+	/// <summary>
+	<#if comment !="">
+	/// ${comment}<br/>
+	</#if>
+	/// Created by 自动生成
+	/// </summary>
     public class ${name} : <#if definitionType ==2>Bean<#elseif definitionType ==3>Message</#if>
     {
 <#list fields as field>
@@ -47,7 +54,7 @@ namespace ${packageName}
 		}
 
     <#else>
-		private ${field.basicType} ${field.name};
+		private ${field.basicType} ${field.name} { get; set; }
 
     </#if>
 </#list>
@@ -57,7 +64,7 @@ namespace ${packageName}
 		}
 <#if definitionType ==3>
 
-		public override Message create()
+		public override Message Create()
 		{
 			return new ${name}();
 		}
@@ -98,23 +105,13 @@ namespace ${packageName}
 	<#elseif field.builtInType>
 		    buffer.Write${field.type?cap_first}(${field.name});
 	<#elseif field.enumType>
-		<#if field_index gt 0 && !fields[field_index-1].optional && !fields[field_index-1].collectionType >
-
-		</#if>
-		    if(${field.name} != null) {
-		        buffer.WriteInt(${field.name}.getValue());
-		    }else {
-		        buffer.WriteInt(0);
-		    }
-
+			buffer.WriteInt((int)${field.name});
 	<#elseif field.optional>
 		<#if field_index gt 0 && !fields[field_index-1].optional && !fields[field_index-1].collectionType >
 
 		</#if>
 		    buffer.WriteBool(${field.name} != null);
-		    if (${field.name} != null) {
-		        ${field.name}.Encode(buffer);
-		    }
+		    ${field.name}?.Encode(buffer);
 
 	<#else>
 		    ${field.name}.Encode(buffer);
@@ -131,12 +128,12 @@ namespace ${packageName}
 		<#if field_index gt 0 && !fields[field_index-1].optional && !fields[field_index-1].collectionType >
 
 		</#if>
-		    int _${field.name}_Size = buffer.ReadInt();
-		    for (int i = 0; i < _${field.name}_Size; i++) {
+		    var _${field.name}_Size = buffer.ReadInt();
+		    for (var _index_ = 0; _index_ < _${field.name}_Size; _index_++) {
 		<#if field.valueBuiltInType>
 			    ${field.name}.Add(buffer.Read${field.valueType?cap_first}());
 		<#else>
-			    ${field.valueType} _${field.name}_Value = new ${field.valueType}();
+			    var _${field.name}_Value = new ${field.valueType}();
 			    _${field.name}_Value.Decode(buffer);
 			    ${field.name}.Add(_${field.name}_Value);
 		</#if>
@@ -146,13 +143,13 @@ namespace ${packageName}
 		<#if field_index gt 0 && !fields[field_index-1].optional && !fields[field_index-1].collectionType >
 
 		</#if>
-		    int _${field.name}_Size = buffer.ReadInt();
-		    for (int i = 0; i < _${field.name}_Size; i++) {
+		    var _${field.name}_Size = buffer.ReadInt();
+		    for (var _index_ = 0; _index_ < _${field.name}_Size; _index_++) {
 		<#if field.valueBuiltInType>
 			    ${field.name}.Add(buffer.Read${field.keyType?cap_first}(), buffer.Read${field.valueType?cap_first}());
 		<#else>
-			    ${field.basicKeyType} _${field.name}_Key = buffer.Read${field.keyType?cap_first}();
-			    ${field.basicValueType} _${field.name}_Value = new ${field.valueType}();
+			    var _${field.name}_Key = buffer.Read${field.keyType?cap_first}();
+			    var _${field.name}_Value = new ${field.valueType}();
 			    _${field.name}_Value.Decode(buffer);
 			    ${field.name}.Add(_${field.name}_Key, _${field.name}_Value);
 		</#if>
@@ -161,7 +158,7 @@ namespace ${packageName}
 	<#elseif field.builtInType>
 		    ${field.name} = buffer.Read${field.type?cap_first}();
 	<#elseif field.enumType>
-		    ${field.name} = ${field.type}.valueOf(buffer.ReadInt());
+		    ${field.name} = (${field.type})buffer.ReadInt();
 	<#elseif field.optional>
 		<#if field_index gt 0 && !fields[field_index-1].optional && !fields[field_index-1].collectionType >
 
@@ -177,6 +174,27 @@ namespace ${packageName}
 		    ${field.name}.Decode(buffer);
 	</#if>
 </#list>
+		}
+
+		public override string ToString()
+		{
+			return "${name}{" +
+			<#list fields as field>
+					"<#rt>
+				<#if field_index gt 0>
+					<#lt>,<#rt>
+				</#if>
+				<#if field.type == "string">
+					<#lt>${field.name}='" + ${field.name} + '\'' +
+				<#elseif field.type == "bytes">
+					<#lt>${field.name}=" + Convert.ToBase64String(${field.name}) +
+				<#elseif field.collectionType>
+					<#lt>${field.name}=" + ToString(${field.name}) +
+				<#else>
+					<#lt>${field.name}=" + ${field.name} +
+				</#if>
+			</#list>
+					'}';
 		}
     }
 }

@@ -6,7 +6,7 @@ import java.io.IOException;
 import quan.message.Bean;
 
 /**
- * 角色信息
+ * 角色信息<br/>
  * Created by 自动生成
  */
 public class RoleInfo extends Bean {

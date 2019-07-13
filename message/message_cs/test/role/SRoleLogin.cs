@@ -1,13 +1,18 @@
 using System;
 using System.Collections.Generic;
-using quan.message;
-using quan.message.user;
+using message_cs;
+using Buffer = message_cs.Buffer;
+using message_cs.test.user;
 
-namespace quan.message.role
+namespace message_cs.test.role
 {
+	/// <summary>
+	/// 角色登录<br/>
+	/// Created by 自动生成
+	/// </summary>
     public class SRoleLogin : Message
     {
-		public long roleId{ get; set; }
+		public long roleId { get; set; }
 
 		private string _roleName = "";
 
@@ -31,18 +36,17 @@ namespace quan.message.role
 
 		public Dictionary<long, RoleInfo> roleInfoMap { get; } = new Dictionary<long, RoleInfo>();
 
-		private UserInfo userInfo;
+		private UserInfo userInfo { get; set; }
 
 
 		public SRoleLogin(): base(222)
 		{
 		}
 
-		public override Message create()
+		public override Message Create()
 		{
 			return new SRoleLogin();
 		}
-
 
 		public override void Encode(Buffer buffer)
 		{
@@ -69,9 +73,7 @@ namespace quan.message.role
 		    }
 
 		    buffer.WriteBool(userInfo != null);
-		    if (userInfo != null) {
-		        userInfo.Encode(buffer);
-		    }
+		    userInfo?.Encode(buffer);
 
 		}
 
@@ -83,24 +85,24 @@ namespace quan.message.role
 		    roleName = buffer.ReadString();
 		    roleInfo.Decode(buffer);
 
-		    int _roleInfoList_Size = buffer.ReadInt();
-		    for (int i = 0; i < _roleInfoList_Size; i++) {
-			    RoleInfo _roleInfoList_Value = new RoleInfo();
+		    var _roleInfoList_Size = buffer.ReadInt();
+		    for (var _index_ = 0; _index_ < _roleInfoList_Size; _index_++) {
+			    var _roleInfoList_Value = new RoleInfo();
 			    _roleInfoList_Value.Decode(buffer);
 			    roleInfoList.Add(_roleInfoList_Value);
 		    }
 
-		    int _roleInfoSet_Size = buffer.ReadInt();
-		    for (int i = 0; i < _roleInfoSet_Size; i++) {
-			    RoleInfo _roleInfoSet_Value = new RoleInfo();
+		    var _roleInfoSet_Size = buffer.ReadInt();
+		    for (var _index_ = 0; _index_ < _roleInfoSet_Size; _index_++) {
+			    var _roleInfoSet_Value = new RoleInfo();
 			    _roleInfoSet_Value.Decode(buffer);
 			    roleInfoSet.Add(_roleInfoSet_Value);
 		    }
 
-		    int _roleInfoMap_Size = buffer.ReadInt();
-		    for (int i = 0; i < _roleInfoMap_Size; i++) {
-			    long _roleInfoMap_Key = buffer.ReadLong();
-			    RoleInfo _roleInfoMap_Value = new RoleInfo();
+		    var _roleInfoMap_Size = buffer.ReadInt();
+		    for (var _index_ = 0; _index_ < _roleInfoMap_Size; _index_++) {
+			    var _roleInfoMap_Key = buffer.ReadLong();
+			    var _roleInfoMap_Value = new RoleInfo();
 			    _roleInfoMap_Value.Decode(buffer);
 			    roleInfoMap.Add(_roleInfoMap_Key, _roleInfoMap_Value);
 		    }
@@ -112,6 +114,19 @@ namespace quan.message.role
 		        userInfo.Decode(buffer);
             }
 
+		}
+
+		public override string ToString()
+		{
+			return "SRoleLogin{" +
+					"roleId=" + roleId +
+					",roleName='" + roleName + '\'' +
+					",roleInfo=" + roleInfo +
+					",roleInfoList=" + ToString(roleInfoList) +
+					",roleInfoSet=" + ToString(roleInfoSet) +
+					",roleInfoMap=" + ToString(roleInfoMap) +
+					",userInfo=" + userInfo +
+					'}';
 		}
     }
 }

@@ -7,7 +7,7 @@ import quan.message.user.UserInfo;
 import java.io.IOException;
 
 /**
- * 角色登录
+ * 角色登录<br/>
  * Created by 自动生成
  */
 public class CRoleLogin extends Message {

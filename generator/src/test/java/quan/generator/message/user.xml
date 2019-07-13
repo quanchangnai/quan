@@ -2,17 +2,9 @@
 <package>
 
     <bean name="UserInfo">
+        <field name="id" type="long"/>ID
         <field name="name" type="string"/>名字
         <field name="level" type="int"/>等级
-        <field name="experience" type="int"/>
-        <field name="icon" type="int"/>
-        <field name="power" type="int"/>
-        <field name="modifyNameCount" type="int"/>
-        <field name="eventState" type="string"/>
-        <field name="functionState" type="string"/>
-        <field name="lucky" type="int"/>
-        <field name="currentState" type="int"/>
-        <field name="buyPowerCount" type="int"/>
     </bean>
 
 </package>

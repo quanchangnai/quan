@@ -4,7 +4,7 @@ package ${packageName};
 </#if>
 /**
 <#if comment !="">
- * ${comment}
+ * ${comment}<br/>
 </#if>
  * Created by 自动生成
  */

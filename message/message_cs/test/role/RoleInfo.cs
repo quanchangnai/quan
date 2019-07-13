@@ -1,9 +1,14 @@
 using System;
 using System.Collections.Generic;
-using quan.message;
+using message_cs;
+using Buffer = message_cs.Buffer;
 
-namespace quan.message.role
+namespace message_cs.test.role
 {
+	/// <summary>
+	/// 角色信息<br/>
+	/// Created by 自动生成
+	/// </summary>
     public class RoleInfo : Bean
     {
 		public long roleId { get; set; }
@@ -28,6 +33,7 @@ namespace quan.message.role
 	    	set => _roleName = value ?? throw new NullReferenceException();
 		}
 
+		public RoleType roleType { get; set; }
 
 		private byte[] _data = new byte[0];
         
@@ -48,7 +54,6 @@ namespace quan.message.role
 		{
 		}
 
-
 		public override void Encode(Buffer buffer)
 		{
 	    	base.Encode(buffer);
@@ -61,7 +66,7 @@ namespace quan.message.role
 		    buffer.WriteFloat(f);
 		    buffer.WriteDouble(d);
 		    buffer.WriteString(roleName);
-
+			buffer.WriteInt((int)roleType);
 		    buffer.WriteBytes(data);
 
 		    buffer.WriteInt(list.Count);
@@ -94,23 +99,43 @@ namespace quan.message.role
 		    f = buffer.ReadFloat();
 		    d = buffer.ReadDouble();
 		    roleName = buffer.ReadString();
+		    roleType = (RoleType)buffer.ReadInt();
 		    data = buffer.ReadBytes();
 
-		    int _list_Size = buffer.ReadInt();
-		    for (int i = 0; i < _list_Size; i++) {
+		    var _list_Size = buffer.ReadInt();
+		    for (var _index_ = 0; _index_ < _list_Size; _index_++) {
 			    list.Add(buffer.ReadInt());
 		    }
 
-		    int _set_Size = buffer.ReadInt();
-		    for (int i = 0; i < _set_Size; i++) {
+		    var _set_Size = buffer.ReadInt();
+		    for (var _index_ = 0; _index_ < _set_Size; _index_++) {
 			    set.Add(buffer.ReadInt());
 		    }
 
-		    int _map_Size = buffer.ReadInt();
-		    for (int i = 0; i < _map_Size; i++) {
+		    var _map_Size = buffer.ReadInt();
+		    for (var _index_ = 0; _index_ < _map_Size; _index_++) {
 			    map.Add(buffer.ReadInt(), buffer.ReadInt());
 		    }
 
+		}
+
+		public override string ToString()
+		{
+			return "RoleInfo{" +
+					"roleId=" + roleId +
+					",bo=" + bo +
+					",by=" + by +
+					",s=" + s +
+					",i=" + i +
+					",f=" + f +
+					",d=" + d +
+					",roleName='" + roleName + '\'' +
+					",roleType=" + roleType +
+					",data=" + Convert.ToBase64String(data) +
+					",list=" + ToString(list) +
+					",set=" + ToString(set) +
+					",map=" + ToString(map) +
+					'}';
 		}
     }
 }

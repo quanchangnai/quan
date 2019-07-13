@@ -28,48 +28,4 @@ public abstract class MessageGenerator extends Generator {
         return super.support(classDefinition);
     }
 
-
-    public static void main(String[] args) throws Exception {
-        String language = "cs";
-
-        String srcPath = "generator\\src\\test\\java\\quan\\generator\\message";
-//        String destPath = "message\\message-java\\src\\test\\java";
-        String destPath = "message\\message-cs\\src";
-        String packagePrefix = "quan.message";
-
-        for (int i = 0; i < args.length; i++) {
-            if (args[i].equals("-language")) {
-                language = args[++i];
-            } else if (args[i].equals("-srcPath")) {
-                srcPath = args[++i];
-            } else if (args[i].equals("-destPath")) {
-                destPath = args[++i];
-            }
-        }
-
-        if (language == null || srcPath == null || destPath == null) {
-            usage();
-            System.exit(0);
-        }
-
-        MessageGenerator generator = null;
-        switch (language) {
-            case "java":
-                generator = new JavaMessageGenerator(srcPath, destPath);
-                break;
-            case "cs":
-                generator = new CSharpMessageGenerator(srcPath, destPath);
-                break;
-            default:
-                break;
-        }
-        generator.setPackagePrefix(packagePrefix);
-        generator.generate();
-    }
-
-    public static void usage() {
-        System.err.println("-language 生成语言");
-        System.err.println("-srcPath 描述文件的目录");
-        System.err.println("-destPath 生成目标代码的目录");
-    }
 }

@@ -39,4 +39,14 @@ public class JavaMessageGenerator extends MessageGenerator {
         beanDefinition.getImports().add(Buffer.class.getName());
     }
 
+
+    public static void main(String[] args) throws Exception {
+        String srcPath = "generator\\src\\test\\java\\quan\\generator\\message";
+        String destPath = "message\\message-java\\src\\test\\java";
+        String packagePrefix = "quan.message";
+
+        JavaMessageGenerator messageGenerator = new JavaMessageGenerator(srcPath, destPath);
+        messageGenerator.setPackagePrefix(packagePrefix);
+        messageGenerator.generate();
+    }
 }

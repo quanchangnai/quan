@@ -3,7 +3,7 @@ package quan.message;
 import java.io.IOException;
 
 /**
- * 消息
+ * 基于VarInt和ZigZag编码的消息<br/>
  * Created by quanchangnai on 2019/6/20.
  */
 public abstract class Message extends Bean {

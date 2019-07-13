@@ -9,7 +9,7 @@ import ${import};
 </#list>
 /**
 <#if comment !="">
- * ${comment}
+ * ${comment}<br/>
 </#if>
  * Created by 自动生成
  */

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <package>
 
-    <enum name="RoleType">角色类型
+   <enum name="RoleType">角色类型
         <field name="type1" value="1"/>角色类型1
         <field name="type2" value="2"/>角色类型2
     </enum>

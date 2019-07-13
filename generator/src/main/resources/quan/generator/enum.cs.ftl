@@ -1,46 +1,22 @@
-<#if packageName !=".">
-package ${packageName};
-
-</#if>
-/**
-<#if comment !="">
- * ${comment}
-</#if>
- * Created by 自动生成
- */
-public enum ${name} {
-
-<#list fields as field>
-    <#if field_has_next>
-    ${field.name}(${field.value}),<#if field.comment !="">//${field.comment}</#if>
-    <#else>
-    ${field.name}(${field.value});<#if field.comment !="">//${field.comment}</#if>
+namespace ${packageName}
+{
+    /// <summary>
+    <#if comment !="">
+    /// ${comment}<br/>
     </#if>
-</#list>
+    /// Created by 自动生成
+    /// </summary>
+    public enum ${name} {
 
-    private int value;
+    <#list fields as field>
+        <#if field.comment !="">//${field.comment}</#if>
+        <#if field_has_next>
+        ${field.name}=${field.value},
+        <#else>
+        ${field.name}=${field.value}
+        </#if>
+    </#list>
 
-    ${name}(int value) {
-        this.value = value;
-    }
 
-    public int getValue() {
-        return value;
-    }
-
-    public static ${name} valueOf(int value) {
-        switch (value) {
-        <#list fields  as field>
-            case ${field.value}:
-                return ${field.name};
-        </#list>
-            default:
-                return null;
-        }
-    }
-
-    @Override
-    public String toString() {
-        return name();
     }
 }

@@ -4,7 +4,10 @@ import quan.message.role.RoleInfo;
 import quan.message.role.RoleType;
 import quan.message.role.SRoleLogin;
 
-import java.util.Objects;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by quanchangnai on 2019/6/23.
@@ -38,6 +41,20 @@ public class MessageTest {
         sRoleLogin2.decode(sRoleLogin1.encode());
 
         System.err.println("sRoleLogin2:" + sRoleLogin2);
+
+
+
+        List<Integer> list = new ArrayList<>();
+        list.add(1);
+        list.add(2);
+        list.add(3);
+        System.err.println(list);
+
+        Map<Integer, Integer> map = new HashMap<>();
+        map.put(1, 1);
+        map.put(2, 2);
+        map.put(3, 3);
+        System.err.println(map);
 
     }
 
