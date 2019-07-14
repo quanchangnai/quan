@@ -53,14 +53,20 @@ public class DatabaseGenerator extends Generator {
         beanDefinition.getImports().add(JSONObject.class.getPackage().getName() + ".*");
         beanDefinition.getImports().add(PMap.class.getPackage().getName() + ".*");
 
-        if (beanDefinition instanceof DataDefinition) {
-            DataDefinition dataDefinition = (DataDefinition) beanDefinition;
-            FieldDefinition keyFieldDefinition = beanDefinition.getFields().stream().filter(f -> f.getName().equals(dataDefinition.getKeyName())).findFirst().get();
-            dataDefinition.setKeyType(keyFieldDefinition.getClassType());
-        }
-
     }
 
+    @Override
+    protected void processBeanField(FieldDefinition fieldDefinition) {
+        super.processBeanField(fieldDefinition);
+
+        ClassDefinition classDefinition = fieldDefinition.getClassDefinition();
+        if (classDefinition instanceof DataDefinition) {
+            DataDefinition dataDefinition = (DataDefinition) classDefinition;
+            if (fieldDefinition.getName().equals(dataDefinition.getKeyName())) {
+                dataDefinition.setKeyType(classTypes.get(fieldDefinition.getType()));
+            }
+        }
+    }
 
     public static void main(String[] args) throws Exception {
 

@@ -179,19 +179,19 @@ public class RoleInfo extends Bean {
         buffer.writeBytes(data);
 
         buffer.writeInt(list.size());
-        for (int _list_Value : list) {
-            buffer.writeInt(_list_Value);
+        for (int $list$Value : list) {
+            buffer.writeInt($list$Value);
         }
 
         buffer.writeInt(set.size());
-        for (int _set_Value : set) {
-            buffer.writeInt(_set_Value);
+        for (int $set$Value : set) {
+            buffer.writeInt($set$Value);
         }
 
         buffer.writeInt(map.size());
-        for (int _map_Key : map.keySet()) {
-            buffer.writeInt(_map_Key);
-            buffer.writeInt(map.get(_map_Key));
+        for (int $map$Key : map.keySet()) {
+            buffer.writeInt($map$Key);
+            buffer.writeInt(map.get($map$Key));
         }
 
     }
@@ -211,18 +211,18 @@ public class RoleInfo extends Bean {
         roleType = RoleType.valueOf(buffer.readInt());
         data = buffer.readBytes();
 
-        int _list_Size = buffer.readInt();
-        for (int i = 0; i < _list_Size; i++) {
+        int $list$Size = buffer.readInt();
+        for (int i = 0; i < $list$Size; i++) {
             list.add(buffer.readInt());
         }
 
-        int _set_Size = buffer.readInt();
-        for (int i = 0; i < _set_Size; i++) {
+        int $set$Size = buffer.readInt();
+        for (int i = 0; i < $set$Size; i++) {
             set.add(buffer.readInt());
         }
 
-        int _map_Size = buffer.readInt();
-        for (int i = 0; i < _map_Size; i++) {
+        int $map$Size = buffer.readInt();
+        for (int i = 0; i < $map$Size; i++) {
             map.put(buffer.readInt(), buffer.readInt());
         }
 

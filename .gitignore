@@ -7,3 +7,5 @@ target/
 .temp
 bin
 obj
+.vs
+.DotSettings.user

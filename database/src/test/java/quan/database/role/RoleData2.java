@@ -8,7 +8,7 @@ import com.alibaba.fastjson.*;
 import quan.database.item.ItemType;
 
 /**
- * 角色2
+ * 角色2<br/>
  * Created by 自动生成
  */
 public class RoleData2 extends Data<Long> {
@@ -184,9 +184,9 @@ public class RoleData2 extends Data<Long> {
 
     @Override
     public void setChildrenLogRoot(Data root) {
-        ItemBean _item = this.item.getValue();
-        if (_item != null) {
-            _item.setLogRoot(root);
+        ItemBean $item = this.item.getValue();
+        if ($item != null) {
+            $item.setLogRoot(root);
         }
 
         items.setLogRoot(root);
@@ -211,53 +211,53 @@ public class RoleData2 extends Data<Long> {
         object.put("f", f.getValue());
         object.put("d", d.getValue());
 
-        ItemBean _item = item.getValue();
-        if (_item != null) {
-            object.put("item", _item.encode());
+        ItemBean $item = item.getValue();
+        if ($item != null) {
+            object.put("item", $item.encode());
         }
 
         object.put("itemType", itemType.getValue());
-        JSONObject _items = new JSONObject();
-        for (Integer _items_Key : items.keySet()) {
-            _items.put(String.valueOf(_items_Key), items.get(_items_Key).encode());
+        JSONObject $items = new JSONObject();
+        for (Integer $items$Key : items.keySet()) {
+            $items.put(String.valueOf($items$Key), items.get($items$Key).encode());
         }
-        object.put("items", _items);
+        object.put("items", $items);
 
-        JSONArray _set = new JSONArray();
-        for (Boolean _set_Value : set) {
-            _set.add(_set_Value);
+        JSONArray $set = new JSONArray();
+        for (Boolean $set$Value : set) {
+            $set.add($set$Value);
         }
-        object.put("set", _set);
+        object.put("set", $set);
 
-        JSONArray _list = new JSONArray();
-        for (String _list_Value : list) {
-            _list.add(_list_Value);
+        JSONArray $list = new JSONArray();
+        for (String $list$Value : list) {
+            $list.add($list$Value);
         }
-        object.put("list", _list);
+        object.put("list", $list);
 
-        JSONObject _map = new JSONObject();
-        for (Integer _map_Key : map.keySet()) {
-            _map.put(String.valueOf(_map_Key), map.get(_map_Key));
+        JSONObject $map = new JSONObject();
+        for (Integer $map$Key : map.keySet()) {
+            $map.put(String.valueOf($map$Key), map.get($map$Key));
         }
-        object.put("map", _map);
+        object.put("map", $map);
 
-        JSONArray _set2 = new JSONArray();
-        for (ItemBean _set2_Value : set2) {
-            _set2.add(_set2_Value.encode());
+        JSONArray $set2 = new JSONArray();
+        for (ItemBean $set2$Value : set2) {
+            $set2.add($set2$Value.encode());
         }
-        object.put("set2", _set2);
+        object.put("set2", $set2);
 
-        JSONArray _list2 = new JSONArray();
-        for (ItemBean _list2_Value : list2) {
-            _list2.add(_list2_Value.encode());
+        JSONArray $list2 = new JSONArray();
+        for (ItemBean $list2$Value : list2) {
+            $list2.add($list2$Value.encode());
         }
-        object.put("list2", _list2);
+        object.put("list2", $list2);
 
-        JSONObject _map2 = new JSONObject();
-        for (Integer _map2_Key : map2.keySet()) {
-            _map2.put(String.valueOf(_map2_Key), map2.get(_map2_Key).encode());
+        JSONObject $map2 = new JSONObject();
+        for (Integer $map2$Key : map2.keySet()) {
+            $map2.put(String.valueOf($map2$Key), map2.get($map2$Key).encode());
         }
-        object.put("map2", _map2);
+        object.put("map2", $map2);
 
         return object;
     }
@@ -266,11 +266,11 @@ public class RoleData2 extends Data<Long> {
     public void decode(JSONObject object) {
         id.setValue(object.getLongValue("id"));
 
-        String _name = object.getString("name");
-        if (_name == null) {
-            _name = "";
+        String $name = object.getString("name");
+        if ($name == null) {
+            $name = "";
         }
-        name.setValue(_name);
+        name.setValue($name);
 
         bo.setValue(object.getBooleanValue("bo"));
         by.setValue(object.getByteValue("by"));
@@ -279,93 +279,93 @@ public class RoleData2 extends Data<Long> {
         f.setValue(object.getFloatValue("f"));
         d.setValue(object.getDoubleValue("d"));
 
-        JSONObject _item = object.getJSONObject("item");
-        if (_item != null) {
-            ItemBean _item_Value = item.getValue();
-            if (_item_Value == null) {
-                _item_Value = new ItemBean();
-                item.setValue(_item_Value);
+        JSONObject $item = object.getJSONObject("item");
+        if ($item != null) {
+            ItemBean $item$Value = item.getValue();
+            if ($item$Value == null) {
+                $item$Value = new ItemBean();
+                item.setValue($item$Value);
             }
-            _item_Value.decode(_item);
+            $item$Value.decode($item);
         }
 
         itemType.setValue(object.getIntValue("itemType"));
-        JSONObject _items_1 = object.getJSONObject("items");
-        if (_items_1 != null) {
-            Map<Integer, ItemBean> _items_2 = new HashMap<>();
-            for (String _items_1_Key : _items_1.keySet()) {
-                ItemBean _items_Value = new ItemBean();
-                _items_Value.decode(_items_1.getJSONObject(_items_1_Key));
-                _items_2.put(Integer.valueOf(_items_1_Key), _items_Value);
+        JSONObject $items$1 = object.getJSONObject("items");
+        if ($items$1 != null) {
+            Map<Integer, ItemBean> $items$2 = new HashMap<>();
+            for (String $items$1_Key : $items$1.keySet()) {
+                ItemBean $items$Value = new ItemBean();
+                $items$Value.decode($items$1.getJSONObject($items$1_Key));
+                $items$2.put(Integer.valueOf($items$1_Key), $items$Value);
             }
-            PMap<Integer, ItemBean> _items_3 = Empty.map();
-            items.setValue(_items_3.plusAll(_items_2));
+            PMap<Integer, ItemBean> $items$3 = Empty.map();
+            items.setValue($items$3.plusAll($items$2));
         }
 
-        JSONArray _set_1 = object.getJSONArray("set");
-        if (_set_1 != null) {
-            Set<Boolean> _set_2 = new HashSet<>();
-            for (int i = 0; i < _set_1.size(); i++) {
-                _set_2.add(_set_1.getBoolean(i));
+        JSONArray $set$1 = object.getJSONArray("set");
+        if ($set$1 != null) {
+            Set<Boolean> $set$2 = new HashSet<>();
+            for (int i = 0; i < $set$1.size(); i++) {
+                $set$2.add($set$1.getBoolean(i));
             }
-            PSet<Boolean> _set_3 = Empty.set();
-            set.setValue(_set_3.plusAll(_set_2));
+            PSet<Boolean> $set$3 = Empty.set();
+            set.setValue($set$3.plusAll($set$2));
         }
 
-        JSONArray _list_1 = object.getJSONArray("list");
-        if (_list_1 != null) {
-            List<String> _list_2 = new ArrayList<>();
-            for (int i = 0; i < _list_1.size(); i++) {
-                _list_2.add(_list_1.getString(i));
+        JSONArray $list$1 = object.getJSONArray("list");
+        if ($list$1 != null) {
+            List<String> $list$2 = new ArrayList<>();
+            for (int i = 0; i < $list$1.size(); i++) {
+                $list$2.add($list$1.getString(i));
             }
-            PVector<String> _list_3 = Empty.vector();
-            list.setValue(_list_3.plusAll(_list_2));
+            PVector<String> $list$3 = Empty.vector();
+            list.setValue($list$3.plusAll($list$2));
         }
 
-        JSONObject _map_1 = object.getJSONObject("map");
-        if (_map_1 != null) {
-            Map<Integer, Integer> _map_2 = new HashMap<>();
-            for (String _map_1_Key : _map_1.keySet()) {
-                _map_2.put(Integer.valueOf(_map_1_Key), _map_1.getInteger(_map_1_Key));
+        JSONObject $map$1 = object.getJSONObject("map");
+        if ($map$1 != null) {
+            Map<Integer, Integer> $map$2 = new HashMap<>();
+            for (String $map$1_Key : $map$1.keySet()) {
+                $map$2.put(Integer.valueOf($map$1_Key), $map$1.getInteger($map$1_Key));
             }
-            PMap<Integer, Integer> _map_3 = Empty.map();
-            map.setValue(_map_3.plusAll(_map_2));
+            PMap<Integer, Integer> $map$3 = Empty.map();
+            map.setValue($map$3.plusAll($map$2));
         }
 
-        JSONArray _set2_1 = object.getJSONArray("set2");
-        if (_set2_1 != null) {
-            Set<ItemBean> _set2_2 = new HashSet<>();
-            for (int i = 0; i < _set2_1.size(); i++) {
-                ItemBean _set2_Value = new ItemBean();
-                _set2_Value.decode(_set2_1.getJSONObject(i));
-                _set2_2.add(_set2_Value);
+        JSONArray $set2$1 = object.getJSONArray("set2");
+        if ($set2$1 != null) {
+            Set<ItemBean> $set2$2 = new HashSet<>();
+            for (int i = 0; i < $set2$1.size(); i++) {
+                ItemBean $set2$Value = new ItemBean();
+                $set2$Value.decode($set2$1.getJSONObject(i));
+                $set2$2.add($set2$Value);
             }
-            PSet<ItemBean> _set2_3 = Empty.set();
-            set2.setValue(_set2_3.plusAll(_set2_2));
+            PSet<ItemBean> $set2$3 = Empty.set();
+            set2.setValue($set2$3.plusAll($set2$2));
         }
 
-        JSONArray _list2_1 = object.getJSONArray("list2");
-        if (_list2_1 != null) {
-            List<ItemBean> _list2_2 = new ArrayList<>();
-            for (int i = 0; i < _list2_1.size(); i++) {
-                ItemBean _list2_Value = new ItemBean();
-                _list2_Value.decode(_list2_1.getJSONObject(i));
-                _list2_2.add(_list2_Value);
+        JSONArray $list2$1 = object.getJSONArray("list2");
+        if ($list2$1 != null) {
+            List<ItemBean> $list2$2 = new ArrayList<>();
+            for (int i = 0; i < $list2$1.size(); i++) {
+                ItemBean $list2$Value = new ItemBean();
+                $list2$Value.decode($list2$1.getJSONObject(i));
+                $list2$2.add($list2$Value);
             }
-            PVector<ItemBean> _list2_3 = Empty.vector();
-            list2.setValue(_list2_3.plusAll(_list2_2));
+            PVector<ItemBean> $list2$3 = Empty.vector();
+            list2.setValue($list2$3.plusAll($list2$2));
         }
 
-        JSONObject _map2_1 = object.getJSONObject("map2");
-        if (_map2_1 != null) {
-            Map<Integer, ItemBean> _map2_2 = new HashMap<>();
-            for (String _map2_1_Key : _map2_1.keySet()) {
-                ItemBean _map2_Value = new ItemBean();
-                _map2_Value.decode(_map2_1.getJSONObject(_map2_1_Key));
-                _map2_2.put(Integer.valueOf(_map2_1_Key), _map2_Value);
+        JSONObject $map2$1 = object.getJSONObject("map2");
+        if ($map2$1 != null) {
+            Map<Integer, ItemBean> $map2$2 = new HashMap<>();
+            for (String $map2$1_Key : $map2$1.keySet()) {
+                ItemBean $map2$Value = new ItemBean();
+                $map2$Value.decode($map2$1.getJSONObject($map2$1_Key));
+                $map2$2.put(Integer.valueOf($map2$1_Key), $map2$Value);
             }
-            PMap<Integer, ItemBean> _map2_3 = Empty.map();
-            map2.setValue(_map2_3.plusAll(_map2_2));
+            PMap<Integer, ItemBean> $map2$3 = Empty.map();
+            map2.setValue($map2$3.plusAll($map2$2));
         }
 
     }

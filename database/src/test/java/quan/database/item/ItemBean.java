@@ -6,7 +6,7 @@ import java.util.*;
 import com.alibaba.fastjson.*;
 
 /**
- * 道具
+ * 道具<br/>
  * Created by 自动生成
  */
 public class ItemBean extends Bean {
@@ -52,11 +52,11 @@ public class ItemBean extends Bean {
     public void decode(JSONObject object) {
         id.setValue(object.getIntValue("id"));
 
-        String _name = object.getString("name");
-        if (_name == null) {
-            _name = "";
+        String $name = object.getString("name");
+        if ($name == null) {
+            $name = "";
         }
-        name.setValue(_name);
+        name.setValue($name);
 
     }
 

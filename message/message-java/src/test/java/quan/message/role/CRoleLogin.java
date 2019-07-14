@@ -101,19 +101,19 @@ public class CRoleLogin extends Message {
         roleInfo.encode(buffer);
 
         buffer.writeInt(roleInfoList.size());
-        for (RoleInfo _roleInfoList_Value : roleInfoList) {
-            _roleInfoList_Value.encode(buffer);
+        for (RoleInfo $roleInfoList$Value : roleInfoList) {
+            $roleInfoList$Value.encode(buffer);
         }
 
         buffer.writeInt(roleInfoSet.size());
-        for (RoleInfo _roleInfoSet_Value : roleInfoSet) {
-            _roleInfoSet_Value.encode(buffer);
+        for (RoleInfo $roleInfoSet$Value : roleInfoSet) {
+            $roleInfoSet$Value.encode(buffer);
         }
 
         buffer.writeInt(roleInfoMap.size());
-        for (long _roleInfoMap_Key : roleInfoMap.keySet()) {
-            buffer.writeLong(_roleInfoMap_Key);
-            roleInfoMap.get(_roleInfoMap_Key).encode(buffer);
+        for (long $roleInfoMap$Key : roleInfoMap.keySet()) {
+            buffer.writeLong($roleInfoMap$Key);
+            roleInfoMap.get($roleInfoMap$Key).encode(buffer);
         }
 
         buffer.writeBool(userInfo != null);
@@ -131,26 +131,26 @@ public class CRoleLogin extends Message {
         roleName = buffer.readString();
         roleInfo.decode(buffer);
 
-        int _roleInfoList_Size = buffer.readInt();
-        for (int i = 0; i < _roleInfoList_Size; i++) {
-            RoleInfo _roleInfoList_Value = new RoleInfo();
-            _roleInfoList_Value.decode(buffer);
-            roleInfoList.add(_roleInfoList_Value);
+        int $roleInfoList$Size = buffer.readInt();
+        for (int i = 0; i < $roleInfoList$Size; i++) {
+            RoleInfo $roleInfoList$Value = new RoleInfo();
+            $roleInfoList$Value.decode(buffer);
+            roleInfoList.add($roleInfoList$Value);
         }
 
-        int _roleInfoSet_Size = buffer.readInt();
-        for (int i = 0; i < _roleInfoSet_Size; i++) {
-            RoleInfo _roleInfoSet_Value = new RoleInfo();
-            _roleInfoSet_Value.decode(buffer);
-            roleInfoSet.add(_roleInfoSet_Value);
+        int $roleInfoSet$Size = buffer.readInt();
+        for (int i = 0; i < $roleInfoSet$Size; i++) {
+            RoleInfo $roleInfoSet$Value = new RoleInfo();
+            $roleInfoSet$Value.decode(buffer);
+            roleInfoSet.add($roleInfoSet$Value);
         }
 
-        int _roleInfoMap_Size = buffer.readInt();
-        for (int i = 0; i < _roleInfoMap_Size; i++) {
-            long _roleInfoMap_Key = buffer.readLong();
-            RoleInfo _roleInfoMap_Value = new RoleInfo();
-            _roleInfoMap_Value.decode(buffer);
-            roleInfoMap.put(_roleInfoMap_Key, _roleInfoMap_Value);
+        int $roleInfoMap$Size = buffer.readInt();
+        for (int i = 0; i < $roleInfoMap$Size; i++) {
+            long $roleInfoMap$Key = buffer.readLong();
+            RoleInfo $roleInfoMap$Value = new RoleInfo();
+            $roleInfoMap$Value.decode(buffer);
+            roleInfoMap.put($roleInfoMap$Key, $roleInfoMap$Value);
         }
 
         if (buffer.readBool()) {

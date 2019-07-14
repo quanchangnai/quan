@@ -1,16 +1,16 @@
 using System;
 using System.Collections.Generic;
-using message_cs;
-using Buffer = message_cs.Buffer;
-using message_cs.test.user;
+using MessageCS;
+using Buffer = MessageCS.Buffer;
+using MessageCS.Test.User;
 
-namespace message_cs.test.role
+namespace MessageCS.Test.Role
 {
 	/// <summary>
 	/// 角色登录<br/>
 	/// Created by 自动生成
 	/// </summary>
-    public class SRoleLogin : Message
+    public class CRoleLogin : Message
     {
 		public long roleId { get; set; }
 
@@ -39,13 +39,13 @@ namespace message_cs.test.role
 		private UserInfo userInfo { get; set; }
 
 
-		public SRoleLogin(): base(222)
+		public CRoleLogin(): base(111)
 		{
 		}
 
 		public override Message Create()
 		{
-			return new SRoleLogin();
+			return new CRoleLogin();
 		}
 
 		public override void Encode(Buffer buffer)
@@ -57,19 +57,19 @@ namespace message_cs.test.role
 		    roleInfo.Encode(buffer);
 
 		    buffer.WriteInt(roleInfoList.Count);
-		    foreach (var _roleInfoList_Value in roleInfoList) {
-			    _roleInfoList_Value.Encode(buffer);
+		    foreach (var @roleInfoList_Value in roleInfoList) {
+				@roleInfoList_Value.Encode(buffer);
 		    }
 
 		    buffer.WriteInt(roleInfoSet.Count);
-		    foreach (var _roleInfoSet_Value in roleInfoSet) {
-			    _roleInfoSet_Value.Encode(buffer);
+		    foreach (var @roleInfoSet_Value in roleInfoSet) {
+				@roleInfoSet_Value.Encode(buffer);
 		    }
 
 		    buffer.WriteInt(roleInfoMap.Count);
-		    foreach (var _roleInfoMap_Key in roleInfoMap.Keys) {
-		        buffer.WriteLong(_roleInfoMap_Key);
-			    roleInfoMap[_roleInfoMap_Key].Encode(buffer);
+		    foreach (var @roleInfoMap_Key in roleInfoMap.Keys) {
+		        buffer.WriteLong(@roleInfoMap_Key);
+			    roleInfoMap[@roleInfoMap_Key].Encode(buffer);
 		    }
 
 		    buffer.WriteBool(userInfo != null);
@@ -85,26 +85,26 @@ namespace message_cs.test.role
 		    roleName = buffer.ReadString();
 		    roleInfo.Decode(buffer);
 
-		    var _roleInfoList_Size = buffer.ReadInt();
-		    for (var _index_ = 0; _index_ < _roleInfoList_Size; _index_++) {
-			    var _roleInfoList_Value = new RoleInfo();
-			    _roleInfoList_Value.Decode(buffer);
-			    roleInfoList.Add(_roleInfoList_Value);
+		    var @roleInfoList_Size = buffer.ReadInt();
+		    for (var @i = 0; @i < @roleInfoList_Size; @i++) {
+			    var @roleInfoList_Value = new RoleInfo();
+			  	@roleInfoList_Value.Decode(buffer);
+			    roleInfoList.Add(@roleInfoList_Value);
 		    }
 
-		    var _roleInfoSet_Size = buffer.ReadInt();
-		    for (var _index_ = 0; _index_ < _roleInfoSet_Size; _index_++) {
-			    var _roleInfoSet_Value = new RoleInfo();
-			    _roleInfoSet_Value.Decode(buffer);
-			    roleInfoSet.Add(_roleInfoSet_Value);
+		    var @roleInfoSet_Size = buffer.ReadInt();
+		    for (var @i = 0; @i < @roleInfoSet_Size; @i++) {
+			    var @roleInfoSet_Value = new RoleInfo();
+			  	@roleInfoSet_Value.Decode(buffer);
+			    roleInfoSet.Add(@roleInfoSet_Value);
 		    }
 
-		    var _roleInfoMap_Size = buffer.ReadInt();
-		    for (var _index_ = 0; _index_ < _roleInfoMap_Size; _index_++) {
-			    var _roleInfoMap_Key = buffer.ReadLong();
-			    var _roleInfoMap_Value = new RoleInfo();
-			    _roleInfoMap_Value.Decode(buffer);
-			    roleInfoMap.Add(_roleInfoMap_Key, _roleInfoMap_Value);
+		    var @roleInfoMap_Size = buffer.ReadInt();
+		    for (var @i = 0; @i < @roleInfoMap_Size; @i++) {
+			    var @roleInfoMap_Key = buffer.ReadLong();
+			    var @roleInfoMap_Value = new RoleInfo();
+				@roleInfoMap_Value.Decode(buffer);
+			    roleInfoMap.Add(@roleInfoMap_Key, @roleInfoMap_Value);
 		    }
 
 		    if (buffer.ReadBool()) {
@@ -118,7 +118,7 @@ namespace message_cs.test.role
 
 		public override string ToString()
 		{
-			return "SRoleLogin{" +
+			return "CRoleLogin{" +
 					"roleId=" + roleId +
 					",roleName='" + roleName + '\'' +
 					",roleInfo=" + roleInfo +

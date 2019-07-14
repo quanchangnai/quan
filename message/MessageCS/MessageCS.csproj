@@ -8,7 +8,7 @@
         <OutputType>Exe</OutputType>
         <AppDesignerFolder>Properties</AppDesignerFolder>
         <RootNamespace>message_cs</RootNamespace>
-        <AssemblyName>message_cs</AssemblyName>
+        <AssemblyName>MessageCS</AssemblyName>
         <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
         <FileAlignment>512</FileAlignment>
     </PropertyGroup>
@@ -42,12 +42,12 @@
         <Compile Include="Buffer.cs" />
         <Compile Include="Message.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
-        <Compile Include="test\role\CRoleLogin.cs" />
-        <Compile Include="test\role\RoleInfo.cs" />
-        <Compile Include="test\role\RoleType.cs" />
-        <Compile Include="test\role\SRoleLogin.cs" />
-        <Compile Include="test\Test.cs" />
-        <Compile Include="test\user\UserInfo.cs" />
+        <Compile Include="Test\Role\CRoleLogin.cs" />
+        <Compile Include="Test\Role\RoleInfo.cs" />
+        <Compile Include="Test\Role\RoleType.cs" />
+        <Compile Include="Test\Role\SRoleLogin.cs" />
+        <Compile Include="Test\Test.cs" />
+        <Compile Include="Test\User\UserInfo.cs" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

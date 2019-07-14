@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "message_cs", "message\message_cs\message_cs.csproj", "{383CEE75-952D-4820-9611-5C0869879A07}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageCS", "message\MessageCS\MessageCS.csproj", "{383CEE75-952D-4820-9611-5C0869879A07}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

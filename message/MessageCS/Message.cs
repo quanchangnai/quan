@@ -1,6 +1,6 @@
 using System.IO;
 
-namespace message_cs
+namespace MessageCS
 {
     /// <summary>
     /// 基于VarInt和ZigZag编码的消息

@@ -1,9 +1,9 @@
 using System;
-using message_cs;
-using message_cs.test.role;
-using message_cs.test.user;
+using MessageCS;
+using MessageCS.Test.Role;
+using MessageCS.Test.User;
 
-namespace message_cs.test
+namespace MessageCS.Test
 {
     internal class Test
     {
@@ -12,6 +12,7 @@ namespace message_cs.test
             Test1();
             Test2();
             Test3();
+            Console.ReadLine();
         }
 
         static void Test1()

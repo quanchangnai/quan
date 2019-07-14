@@ -1,4 +1,4 @@
-namespace message_cs.test.role
+namespace MessageCS.Test.Role
 {
     /// <summary>
     /// 角色类型<br/>

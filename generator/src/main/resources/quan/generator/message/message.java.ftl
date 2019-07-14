@@ -1,6 +1,5 @@
-<#if packageName !=".">package ${packageName};
+package ${packageName};
 
-</#if>
 <#list imports as import>
 import ${import};
 <#if !import_has_next>
@@ -83,11 +82,11 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 
         </#if>
         buffer.writeInt(${field.name}.size());
-        for (${field.basicValueType} _${field.name}_Value : ${field.name}) {
+        for (${field.basicValueType} $${field.name}$Value : ${field.name}) {
         <#if field.valueBuiltInType>
-            buffer.write${field.valueType?cap_first}(_${field.name}_Value);
+            buffer.write${field.valueType?cap_first}($${field.name}$Value);
         <#else>
-            _${field.name}_Value.encode(buffer);
+            $${field.name}$Value.encode(buffer);
         </#if>
         }
 
@@ -96,12 +95,12 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 
         </#if>
         buffer.writeInt(${field.name}.size());
-        for (${field.basicKeyType} _${field.name}_Key : ${field.name}.keySet()) {
-            buffer.write${field.keyType?cap_first}(_${field.name}_Key);
+        for (${field.basicKeyType} $${field.name}$Key : ${field.name}.keySet()) {
+            buffer.write${field.keyType?cap_first}($${field.name}$Key);
         <#if field.valueBuiltInType>
-            buffer.write${field.valueType?cap_first}(${field.name}.get(_${field.name}_Key));
+            buffer.write${field.valueType?cap_first}(${field.name}.get($${field.name}$Key));
         <#else>
-            ${field.name}.get(_${field.name}_Key).encode(buffer);
+            ${field.name}.get($${field.name}$Key).encode(buffer);
         </#if>
         }
 
@@ -141,14 +140,14 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         <#if field_index gt 0 && !fields[field_index-1].optional && !fields[field_index-1].collectionType >
 
         </#if>
-        int _${field.name}_Size = buffer.readInt();
-        for (int i = 0; i < _${field.name}_Size; i++) {
+        int $${field.name}$Size = buffer.readInt();
+        for (int i = 0; i < $${field.name}$Size; i++) {
         <#if field.valueBuiltInType>
             ${field.name}.add(buffer.read${field.valueType?cap_first}());
         <#else>
-            ${field.valueType} _${field.name}_Value = new ${field.valueType}();
-            _${field.name}_Value.decode(buffer);
-            ${field.name}.add(_${field.name}_Value);
+            ${field.valueType} $${field.name}$Value = new ${field.valueType}();
+            $${field.name}$Value.decode(buffer);
+            ${field.name}.add($${field.name}$Value);
         </#if>
         }
 
@@ -156,15 +155,15 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         <#if field_index gt 0 && !fields[field_index-1].optional && !fields[field_index-1].collectionType >
 
         </#if>
-        int _${field.name}_Size = buffer.readInt();
-        for (int i = 0; i < _${field.name}_Size; i++) {
+        int $${field.name}$Size = buffer.readInt();
+        for (int i = 0; i < $${field.name}$Size; i++) {
         <#if field.valueBuiltInType>
             ${field.name}.put(buffer.read${field.keyType?cap_first}(), buffer.read${field.valueType?cap_first}());
         <#else>
-            ${field.basicKeyType} _${field.name}_Key = buffer.read${field.keyType?cap_first}();
-            ${field.basicValueType} _${field.name}_Value = new ${field.valueType}();
-            _${field.name}_Value.decode(buffer);
-            ${field.name}.put(_${field.name}_Key, _${field.name}_Value);
+            ${field.basicKeyType} $${field.name}$Key = buffer.read${field.keyType?cap_first}();
+            ${field.basicValueType} $${field.name}$Value = new ${field.valueType}();
+            $${field.name}$Value.decode(buffer);
+            ${field.name}.put($${field.name}$Key, $${field.name}$Value);
         </#if>
         }
 

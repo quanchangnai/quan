@@ -1,9 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Policy;
 
-namespace message_cs
+namespace MessageCS
 {
     public abstract class Bean
     {

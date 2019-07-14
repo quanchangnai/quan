@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using message_cs;
-using Buffer = message_cs.Buffer;
+using MessageCS;
+using Buffer = MessageCS.Buffer;
 
-namespace message_cs.test.user
+namespace MessageCS.Test.User
 {
 	/// <summary>
 	/// Created by 自动生成

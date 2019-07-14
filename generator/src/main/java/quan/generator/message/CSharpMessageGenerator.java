@@ -39,6 +39,22 @@ public class CSharpMessageGenerator extends MessageGenerator {
         return "cs";
     }
 
+    protected void processClass(ClassDefinition classDefinition) {
+        String packageName = classDefinition.getPackageName();
+        //C#命名空间首字母大写
+        String newPackageName = "";
+        for (int i = 0; i < packageName.length(); i++) {
+            String c = String.valueOf(packageName.charAt(i));
+            if (i == 0 || packageName.charAt(i - 1) == '.') {
+                c = c.toUpperCase();
+            }
+            newPackageName += c;
+        }
+        classDefinition.setPackageName(newPackageName);
+
+        super.processClass(classDefinition);
+    }
+
     @Override
     protected void processBeanImports(FieldDefinition fieldDefinition) {
         BeanDefinition beanDefinition = (BeanDefinition) fieldDefinition.getClassDefinition();
@@ -68,7 +84,7 @@ public class CSharpMessageGenerator extends MessageGenerator {
 
         String srcPath = "generator\\src\\test\\java\\quan\\generator\\message";
         String destPath = "message";
-        String packagePrefix = "message_cs.test";
+        String packagePrefix = "MessageCS.test";
 
         CSharpMessageGenerator messageGenerator = new CSharpMessageGenerator(srcPath, destPath);
         messageGenerator.setPackagePrefix(packagePrefix);

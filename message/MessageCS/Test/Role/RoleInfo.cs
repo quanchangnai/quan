@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using message_cs;
-using Buffer = message_cs.Buffer;
+using MessageCS;
+using Buffer = MessageCS.Buffer;
 
-namespace message_cs.test.role
+namespace MessageCS.Test.Role
 {
 	/// <summary>
 	/// 角色信息<br/>
@@ -36,7 +36,7 @@ namespace message_cs.test.role
 		public RoleType roleType { get; set; }
 
 		private byte[] _data = new byte[0];
-        
+
 		public byte[] data
 		{
             get => _data;
@@ -70,19 +70,19 @@ namespace message_cs.test.role
 		    buffer.WriteBytes(data);
 
 		    buffer.WriteInt(list.Count);
-		    foreach (var _list_Value in list) {
-			    buffer.WriteInt(_list_Value);
+		    foreach (var @list_Value in list) {
+			    buffer.WriteInt(@list_Value);
 		    }
 
 		    buffer.WriteInt(set.Count);
-		    foreach (var _set_Value in set) {
-			    buffer.WriteInt(_set_Value);
+		    foreach (var @set_Value in set) {
+			    buffer.WriteInt(@set_Value);
 		    }
 
 		    buffer.WriteInt(map.Count);
-		    foreach (var _map_Key in map.Keys) {
-		        buffer.WriteInt(_map_Key);
-			    buffer.WriteInt(map[_map_Key]);
+		    foreach (var @map_Key in map.Keys) {
+		        buffer.WriteInt(@map_Key);
+			    buffer.WriteInt(map[@map_Key]);
 		    }
 
 		}
@@ -102,18 +102,18 @@ namespace message_cs.test.role
 		    roleType = (RoleType)buffer.ReadInt();
 		    data = buffer.ReadBytes();
 
-		    var _list_Size = buffer.ReadInt();
-		    for (var _index_ = 0; _index_ < _list_Size; _index_++) {
+		    var @list_Size = buffer.ReadInt();
+		    for (var @i = 0; @i < @list_Size; @i++) {
 			    list.Add(buffer.ReadInt());
 		    }
 
-		    var _set_Size = buffer.ReadInt();
-		    for (var _index_ = 0; _index_ < _set_Size; _index_++) {
+		    var @set_Size = buffer.ReadInt();
+		    for (var @i = 0; @i < @set_Size; @i++) {
 			    set.Add(buffer.ReadInt());
 		    }
 
-		    var _map_Size = buffer.ReadInt();
-		    for (var _index_ = 0; _index_ < _map_Size; _index_++) {
+		    var @map_Size = buffer.ReadInt();
+		    for (var @i = 0; @i < @map_Size; @i++) {
 			    map.Add(buffer.ReadInt(), buffer.ReadInt());
 		    }
 

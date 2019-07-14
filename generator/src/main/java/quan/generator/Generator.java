@@ -10,7 +10,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by quanchangnai on 2019/6/23.
@@ -111,20 +113,19 @@ public abstract class Generator {
 
         parser.parse();
 
-        for (ClassDefinition classDefinition : ClassDefinition.getAll().values()) {
-            if (!support(classDefinition)) {
-                continue;
-            }
-            if (classDefinition instanceof BeanDefinition) {
-                BeanDefinition beanDefinition = (BeanDefinition) classDefinition;
-                processBean(beanDefinition);
+        List<ClassDefinition> classDefinitions = ClassDefinition.getAll().values().stream().filter(this::support).collect(Collectors.toList());
+
+        for (ClassDefinition classDefinition : classDefinitions) {
+            processClass(classDefinition);
+        }
+
+        for (ClassDefinition classDefinition : classDefinitions) {
+            for (FieldDefinition fieldDefinition : classDefinition.getFields()) {
+                processField(fieldDefinition);
             }
         }
 
-        for (ClassDefinition classDefinition : ClassDefinition.getAll().values()) {
-            if (!support(classDefinition)) {
-                continue;
-            }
+        for (ClassDefinition classDefinition : classDefinitions) {
 
             Template template = templates.get(classDefinition.getClass());
             String packageName = classDefinition.getPackageName();
@@ -139,14 +140,23 @@ public abstract class Generator {
             Writer writer = new FileWriter(new File(destFilePath, fileName));
             template.process(classDefinition, writer);
 
-            logger.info("生成[{}]成功", fileName);
+            logger.info("生成[{}]成功", destFilePath + "\\" + fileName);
         }
 
     }
 
+    protected void processClass(ClassDefinition classDefinition) {
+        if (classDefinition instanceof BeanDefinition) {
+            BeanDefinition beanDefinition = (BeanDefinition) classDefinition;
+            processBean(beanDefinition);
+        }
+    }
 
     protected void processBean(BeanDefinition beanDefinition) {
-        for (FieldDefinition fieldDefinition : beanDefinition.getFields()) {
+    }
+
+    protected void processField(FieldDefinition fieldDefinition) {
+        if (fieldDefinition.getClassDefinition() instanceof BeanDefinition) {
             processBeanField(fieldDefinition);
         }
     }
