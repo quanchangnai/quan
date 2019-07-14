@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package>
+
+    <config name="QuestConfig" source="任务.csv">
+        <field name="id" type="long" source="ID" index="unique"/>
+        <field name="name" type="string" source="名字"/>
+        <field name="type" type="int" source="类型" index="normal"/>
+        <field name="a1" type="int" source="A1"/>
+        <field name="a2" type="int" source="A2"/>
+        <field name="b1" type="int" source="B1"/>
+        <field name="b2" type="int" source="B2"/>
+        <field name="c1" type="int" source="C1"/>
+        <field name="c2" type="int" source="C2"/>
+        <field name="c3" type="int" source="C3"/>
+        <field name="d1" type="int" source="D1"/>
+        <field name="d2" type="int" source="D2"/>
+        <field name="d3" type="int" source="D3"/>
+        <index name="composite1" type="u" fields="a1,a2"/>
+        <index name="composite2" type="normal" fields="b1,b2"/>
+        <index name="composite3" type="unique" fields="c1,c1,c3"/>
+        <index name="composite4" type="n" fields="d1,d2,d3"/>
+    </config>
+
+</package>

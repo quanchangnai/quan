@@ -42,6 +42,10 @@ public abstract class ClassDefinition extends Definition {
         return fields;
     }
 
+    public void addField(FieldDefinition fieldDefinition) {
+        fields.add(fieldDefinition);
+    }
+
     public String getFullName() {
         return packageName + "." + getName();
     }

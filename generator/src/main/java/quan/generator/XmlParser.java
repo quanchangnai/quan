@@ -123,7 +123,7 @@ public class XmlParser extends Parser {
             }
 
             FieldDefinition fieldDefinition = new FieldDefinition();
-            classDefinition.getFields().add(fieldDefinition);
+            classDefinition.addField(fieldDefinition);
             fieldDefinition.setClassDefinition(classDefinition);
 
             fieldDefinition.setName(child.attributeValue("name"));

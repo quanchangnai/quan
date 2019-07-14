@@ -16,7 +16,7 @@
         <module>common</module>
         <module>message/message-java</module>
         <module>test</module>
-        <module>config-java</module>
+        <module>config/config-java</module>
     </modules>
 
     <properties>

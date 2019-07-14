@@ -109,7 +109,7 @@ public class QuestConfig extends Config {
         return list;
     }
 
-    static void add(List<QuestConfig> configs) {
+    static void index(List<QuestConfig> configs) {
 
         Map<Integer, QuestConfig> id_index = new HashMap<>();
 
@@ -122,6 +122,7 @@ public class QuestConfig extends Config {
         Map<Integer, Map<Integer, Map<Integer, QuestConfig>>> composite3_index = new HashMap<>();
 
         Map<Integer, Map<Integer, Map<Integer, List<QuestConfig>>>> composite4_index = new HashMap<>();
+
 
         for (QuestConfig config : configs) {
 
@@ -255,11 +256,12 @@ public class QuestConfig extends Config {
         d2 = object.getIntValue("d2");
         d3 = object.getIntValue("d3");
 
-        JSONObject _reward = object.getJSONObject("reward");
-        if (_reward != null) {
+        JSONObject $reward = object.getJSONObject("reward");
+        if ($reward != null) {
             reward = new Reward();
-            reward.parse(_reward);
+            reward.parse($reward);
         }
+
     }
 
 

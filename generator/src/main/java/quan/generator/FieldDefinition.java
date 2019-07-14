@@ -10,11 +10,7 @@ public class FieldDefinition extends Definition {
 
     private String type;
 
-    private String value;
-
     private boolean optional;
-
-    private String source;
 
     private String keyType;
     private String valueType;
@@ -29,7 +25,12 @@ public class FieldDefinition extends Definition {
     private String classKeyType;
     private String classValueType;
 
-    private boolean enumType;//是否是枚举
+    private String value;//枚举值
+    private boolean enumType;//字段类型是否是枚举
+
+    private String source;//配置源
+    private String unique;//配置的唯一索引
+
 
     private ClassDefinition classDefinition;
 
@@ -251,6 +252,15 @@ public class FieldDefinition extends Definition {
 
     public FieldDefinition setClassDefinition(ClassDefinition classDefinition) {
         this.classDefinition = classDefinition;
+        return this;
+    }
+
+    public String getUnique() {
+        return unique;
+    }
+
+    public FieldDefinition setUnique(String unique) {
+        this.unique = unique;
         return this;
     }
 }
