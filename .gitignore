@@ -4,6 +4,7 @@
 .classpath
 .setting*
 target/
+classes
 .temp
 bin
 obj
