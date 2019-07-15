@@ -12,13 +12,10 @@ import quan.message.Bean;
 public class RoleInfo extends Bean {
 
     //角色id
-    private long roleId;
+    private long id;
 
     
-    private boolean bo;
-
-    
-    private byte by;
+    private boolean b;
 
     
     private short s;
@@ -53,30 +50,21 @@ public class RoleInfo extends Bean {
     public RoleInfo() {
     }
 
-    public long getRoleId() {
-        return roleId;
+    public long getId() {
+        return id;
     }
 
-    public RoleInfo setRoleId(long roleId) {
-        this.roleId = roleId;
+    public RoleInfo setId(long id) {
+        this.id = id;
         return this;
     }
 
-    public boolean getBo() {
-        return bo;
+    public boolean getB() {
+        return b;
     }
 
-    public RoleInfo setBo(boolean bo) {
-        this.bo = bo;
-        return this;
-    }
-
-    public byte getBy() {
-        return by;
-    }
-
-    public RoleInfo setBy(byte by) {
-        this.by = by;
+    public RoleInfo setB(boolean b) {
+        this.b = b;
         return this;
     }
 
@@ -161,9 +149,8 @@ public class RoleInfo extends Bean {
     public void encode(Buffer buffer) throws IOException {
         super.encode(buffer);
 
-        buffer.writeLong(roleId);
-        buffer.writeBool(bo);
-        buffer.writeByte(by);
+        buffer.writeLong(id);
+        buffer.writeBool(b);
         buffer.writeShort(s);
         buffer.writeInt(i);
         buffer.writeFloat(f);
@@ -200,9 +187,8 @@ public class RoleInfo extends Bean {
     public void decode(Buffer buffer) throws IOException {
         super.decode(buffer);
 
-        roleId = buffer.readLong();
-        bo = buffer.readBool();
-        by = buffer.readByte();
+        id = buffer.readLong();
+        b = buffer.readBool();
         s = buffer.readShort();
         i = buffer.readInt();
         f = buffer.readFloat();
@@ -231,9 +217,8 @@ public class RoleInfo extends Bean {
     @Override
     public String toString() {
         return "RoleInfo{" +
-                "roleId=" + roleId +
-                ",bo=" + bo +
-                ",by=" + by +
+                "id=" + id +
+                ",b=" + b +
                 ",s=" + s +
                 ",i=" + i +
                 ",f=" + f +

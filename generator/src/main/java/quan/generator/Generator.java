@@ -25,25 +25,23 @@ public abstract class Generator {
 
     {
         basicTypes.put("bool", "boolean");
-        basicTypes.put("int", "int");
-        basicTypes.put("string", "String");
-        basicTypes.put("byte", "byte");
         basicTypes.put("short", "short");
+        basicTypes.put("int", "int");
         basicTypes.put("long", "long");
         basicTypes.put("float", "float");
         basicTypes.put("double", "double");
+        basicTypes.put("string", "String");
         basicTypes.put("set", "Set");
         basicTypes.put("list", "List");
         basicTypes.put("map", "Map");
 
         classTypes.put("bool", "Boolean");
-        classTypes.put("int", "Integer");
-        classTypes.put("string", "String");
-        classTypes.put("byte", "Byte");
         classTypes.put("short", "Short");
+        classTypes.put("int", "Integer");
         classTypes.put("long", "Long");
         classTypes.put("float", "Float");
         classTypes.put("double", "Double");
+        classTypes.put("string", "String");
         classTypes.put("set", "HashSet");
         classTypes.put("list", "ArrayList");
         classTypes.put("map", "HashMap");

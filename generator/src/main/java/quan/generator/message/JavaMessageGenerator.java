@@ -14,10 +14,6 @@ public class JavaMessageGenerator extends MessageGenerator {
 
     public JavaMessageGenerator(String srcPath, String destPath) throws Exception {
         super(srcPath, destPath);
-
-        basicTypes.put("bytes", "byte[]");
-        classTypes.put("bytes", "byte[]");
-
     }
 
     @Override

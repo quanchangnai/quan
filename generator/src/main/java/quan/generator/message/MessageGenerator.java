@@ -13,6 +13,9 @@ public abstract class MessageGenerator extends Generator {
     public MessageGenerator(String srcPath, String destPath) throws Exception {
         super(srcPath, destPath);
 
+        basicTypes.put("bytes", "byte[]");
+        classTypes.put("bytes", "byte[]");
+
         Template messageTemplate = freemarkerCfg.getTemplate("message." + getLanguage() + ".ftl");
 
         templates.put(MessageDefinition.class, messageTemplate);

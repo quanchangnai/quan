@@ -12,22 +12,19 @@ public class CSharpMessageGenerator extends MessageGenerator {
 
     public CSharpMessageGenerator(String srcPath, String destPath) throws Exception {
         super(srcPath, destPath);
-        basicTypes.put("bytes", "byte[]");
         basicTypes.put("bool", "bool");
         basicTypes.put("string", "string");
         basicTypes.put("set", "HashSet");
         basicTypes.put("list", "List");
         basicTypes.put("map", "Dictionary");
 
-        classTypes.put("bytes", "byte[]");
         classTypes.put("bool", "bool");
-        classTypes.put("int", "int");
-        classTypes.put("string", "string");
-        classTypes.put("byte", "byte");
         classTypes.put("short", "short");
+        classTypes.put("int", "int");
         classTypes.put("long", "long");
         classTypes.put("float", "float");
         classTypes.put("double", "double");
+        classTypes.put("string", "string");
         classTypes.put("set", "HashSet");
         classTypes.put("list", "List");
         classTypes.put("map", "Dictionary");

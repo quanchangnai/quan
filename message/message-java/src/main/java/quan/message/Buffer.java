@@ -127,8 +127,8 @@ public class Buffer {
      * @throws IOException
      */
     protected long readVarInt(int bits) throws IOException {
-        if (bits != 8 && bits != 16 && bits != 32 && bits != 64) {
-            throw new IllegalArgumentException("参数bits限定取值范围[8,16,32,64],实际值：" + bits);
+        if (bits != 16 && bits != 32 && bits != 64) {
+            throw new IllegalArgumentException("参数bits限定取值范围[16,32,64],实际值：" + bits);
         }
         int position = reading ? this.position : 0;
         int shift = 0;
@@ -159,12 +159,9 @@ public class Buffer {
     }
 
     public boolean readBool() throws IOException {
-        return readVarInt(8) != 0;
+        return readInt() != 0;
     }
 
-    public byte readByte() throws IOException {
-        return (byte) readVarInt(8);
-    }
 
     public short readShort() throws IOException {
         return (short) readVarInt(16);
@@ -284,18 +281,14 @@ public class Buffer {
 
     public void writeBytes(byte[] bytes) throws IOException {
         checkCapacity(10 + bytes.length);
-        writeVarInt(bytes.length);
+        writeInt(bytes.length);
         System.arraycopy(bytes, 0, this.bytes, position, bytes.length);
         position += bytes.length;
     }
 
 
     public void writeBool(boolean b) throws IOException {
-        writeVarInt(b ? 1 : 0);
-    }
-
-    public void writeByte(byte n) throws IOException {
-        writeVarInt(n);
+        writeInt(b ? 1 : 0);
     }
 
     public void writeShort(short n) throws IOException {
@@ -353,16 +346,18 @@ public class Buffer {
     public void writeDouble(double n, int scale) throws IOException {
         if (scale < 0) {
             writeDouble(n);
-        } else {
-            n = new BigDecimal(n).setScale(scale, RoundingMode.FLOOR).doubleValue();
-            int times = (int) Math.pow(10, scale);
-            long threshold = Long.MAX_VALUE / times;
-            if (n >= -threshold && n <= threshold) {
-                writeLong((long) Math.floor(n * times));
-            } else {
-                throw new IllegalArgumentException("参数n超出了限定范围[" + -threshold + "," + threshold + "]，无法转换为指定精度的定点型数据");
-            }
+            return;
         }
+
+        n = new BigDecimal(n).setScale(scale, RoundingMode.FLOOR).doubleValue();
+        int times = (int) Math.pow(10, scale);
+        long threshold = Long.MAX_VALUE / times;
+        if (n >= -threshold && n <= threshold) {
+            writeLong((long) Math.floor(n * times));
+        } else {
+            throw new IllegalArgumentException("参数n超出了限定范围[" + -threshold + "," + threshold + "]，无法转换为指定精度的定点型数据");
+        }
+
     }
 
 

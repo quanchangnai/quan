@@ -129,9 +129,9 @@ namespace MessageCS
         /// <exception cref="IOException"></exception>
         private long ReadVarInt(int bits)
         {
-            if (bits != 8 && bits != 16 && bits != 32 && bits != 64)
+            if (bits != 16 && bits != 32 && bits != 64)
             {
-                throw new SystemException("参数bits限定取值范围[8,16,32,64],实际值：" + bits);
+                throw new SystemException("参数bits限定取值范围[16,32,64],实际值：" + bits);
             }
 
             var position = _reading ? _position : 0;
@@ -171,12 +171,7 @@ namespace MessageCS
 
         public bool ReadBool()
         {
-            return ReadVarInt(8) != 0;
-        }
-
-        public byte ReadByte()
-        {
-            return (byte) ReadVarInt(8);
+            return ReadInt() != 0;
         }
 
         public short ReadShort()
@@ -323,19 +318,14 @@ namespace MessageCS
         public void WriteBytes(byte[] bytes)
         {
             CheckCapacity(10 + bytes.Length);
-            WriteVarInt(bytes.Length);
+            WriteInt(bytes.Length);
             Array.Copy(bytes, 0, this._bytes, _position, bytes.Length);
             _position += bytes.Length;
         }
 
         public void WriteBool(bool b)
         {
-            WriteVarInt(b ? 1 : 0);
-        }
-
-        public void WriteByte(byte n)
-        {
-            WriteVarInt(n);
+            WriteInt(b ? 1 : 0);
         }
 
         public void WriteShort(short n)
@@ -412,21 +402,18 @@ namespace MessageCS
             if (scale < 0)
             {
                 WriteDouble(n);
+                return;
             }
-            else
+
+            n = Math.Round(n, scale);
+            var times = (int) Math.Pow(10, scale);
+            var threshold = long.MaxValue / times;
+            if (n >= -threshold && n <= threshold)
             {
-                n = Math.Round(n, scale);
-                var times = (int) Math.Pow(10, scale);
-                var threshold = long.MaxValue / times;
-                if (n >= -threshold && n <= threshold)
-                {
-                    WriteLong((long) Math.Floor(n * times));
-                }
-                else
-                {
-                    throw new SystemException("参数n超出了限定范围[" + -threshold + "," + threshold + "]，无法转换为指定精度的定点型数据");
-                }
+                WriteLong((long) Math.Floor(n * times));
+                return;
             }
+            throw new SystemException("参数n超出了限定范围[" + -threshold + "," + threshold + "]，无法转换为指定精度的定点型数据");
         }
 
         public void WriteString(string s)

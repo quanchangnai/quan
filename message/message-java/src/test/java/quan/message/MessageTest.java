@@ -23,17 +23,17 @@ public class MessageTest {
     public static void main(String[] args) throws Exception {
         SRoleLogin sRoleLogin1 = new SRoleLogin();
         sRoleLogin1.setRoleId(1111);
-        sRoleLogin1.setRoleName("aaa");
+        sRoleLogin1.setRoleName("张三1111");
         sRoleLogin1.setRoleInfo(new RoleInfo());
 
         sRoleLogin1.getRoleInfoList().add(new RoleInfo());
         sRoleLogin1.getRoleInfoSet().add(new RoleInfo());
 
         RoleInfo roleInfo = new RoleInfo();
-        roleInfo.setRoleId(111111);
+        roleInfo.setId(111111);
         roleInfo.setRoleType(RoleType.type1);
         roleInfo.getSet().add(2213);
-        sRoleLogin1.getRoleInfoMap().put(roleInfo.getRoleId(), roleInfo);
+        sRoleLogin1.getRoleInfoMap().put(roleInfo.getId(), roleInfo);
 
         System.err.println("sRoleLogin1:" + sRoleLogin1);
 
