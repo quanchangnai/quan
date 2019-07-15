@@ -57,19 +57,19 @@ namespace MessageCS.Test.Role
 		    roleInfo.Encode(buffer);
 
 		    buffer.WriteInt(roleInfoList.Count);
-		    foreach (var @roleInfoList_Value in roleInfoList) {
-				@roleInfoList_Value.Encode(buffer);
+		    foreach (var roleInfoList_Value in roleInfoList) {
+				roleInfoList_Value.Encode(buffer);
 		    }
 
 		    buffer.WriteInt(roleInfoSet.Count);
-		    foreach (var @roleInfoSet_Value in roleInfoSet) {
-				@roleInfoSet_Value.Encode(buffer);
+		    foreach (var roleInfoSet_Value in roleInfoSet) {
+				roleInfoSet_Value.Encode(buffer);
 		    }
 
 		    buffer.WriteInt(roleInfoMap.Count);
-		    foreach (var @roleInfoMap_Key in roleInfoMap.Keys) {
-		        buffer.WriteLong(@roleInfoMap_Key);
-			    roleInfoMap[@roleInfoMap_Key].Encode(buffer);
+		    foreach (var roleInfoMap_Key in roleInfoMap.Keys) {
+		        buffer.WriteLong(roleInfoMap_Key);
+			    roleInfoMap[roleInfoMap_Key].Encode(buffer);
 		    }
 
 		    buffer.WriteBool(userInfo != null);
@@ -85,26 +85,26 @@ namespace MessageCS.Test.Role
 		    roleName = buffer.ReadString();
 		    roleInfo.Decode(buffer);
 
-		    var @roleInfoList_Size = buffer.ReadInt();
-		    for (var @i = 0; @i < @roleInfoList_Size; @i++) {
-			    var @roleInfoList_Value = new RoleInfo();
-			  	@roleInfoList_Value.Decode(buffer);
-			    roleInfoList.Add(@roleInfoList_Value);
+		    var roleInfoList_Size = buffer.ReadInt();
+		    for (var i = 0; i < roleInfoList_Size; i++) {
+			    var roleInfoList_Value = new RoleInfo();
+			  	roleInfoList_Value.Decode(buffer);
+			    roleInfoList.Add(roleInfoList_Value);
 		    }
 
-		    var @roleInfoSet_Size = buffer.ReadInt();
-		    for (var @i = 0; @i < @roleInfoSet_Size; @i++) {
-			    var @roleInfoSet_Value = new RoleInfo();
-			  	@roleInfoSet_Value.Decode(buffer);
-			    roleInfoSet.Add(@roleInfoSet_Value);
+		    var roleInfoSet_Size = buffer.ReadInt();
+		    for (var i = 0; i < roleInfoSet_Size; i++) {
+			    var roleInfoSet_Value = new RoleInfo();
+			  	roleInfoSet_Value.Decode(buffer);
+			    roleInfoSet.Add(roleInfoSet_Value);
 		    }
 
-		    var @roleInfoMap_Size = buffer.ReadInt();
-		    for (var @i = 0; @i < @roleInfoMap_Size; @i++) {
-			    var @roleInfoMap_Key = buffer.ReadLong();
-			    var @roleInfoMap_Value = new RoleInfo();
-				@roleInfoMap_Value.Decode(buffer);
-			    roleInfoMap.Add(@roleInfoMap_Key, @roleInfoMap_Value);
+		    var roleInfoMap_Size = buffer.ReadInt();
+		    for (var i = 0; i < roleInfoMap_Size; i++) {
+			    var roleInfoMap_Key = buffer.ReadLong();
+			    var roleInfoMap_Value = new RoleInfo();
+				roleInfoMap_Value.Decode(buffer);
+			    roleInfoMap.Add(roleInfoMap_Key, roleInfoMap_Value);
 		    }
 
 		    if (buffer.ReadBool()) {

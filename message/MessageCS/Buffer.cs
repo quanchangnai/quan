@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 
 namespace MessageCS
 {
@@ -34,7 +35,7 @@ namespace MessageCS
 
         public Buffer(byte[] bytes)
         {
-            this._bytes = bytes;
+            _bytes = bytes;
             _position = bytes.Length - 1;
             _end = Capacity() - 1;
         }
@@ -57,7 +58,7 @@ namespace MessageCS
         /// <returns></returns>
         public byte[] AvailableBytes()
         {
-            byte[] availableBytes = new byte[Available()];
+            var availableBytes = new byte[Available()];
             if (_reading)
             {
                 Array.Copy(_bytes, _position, availableBytes, 0, availableBytes.Length);
@@ -92,14 +93,14 @@ namespace MessageCS
         /// <returns></returns>
         public byte[] RemainingBytes()
         {
-            byte[] remainingBytes = new byte[Remaining()];
+            var remainingBytes = new byte[Remaining()];
             if (_reading)
             {
-                Array.Copy(this._bytes, _position, remainingBytes, 0, remainingBytes.Length);
+                Array.Copy(_bytes, _position, remainingBytes, 0, remainingBytes.Length);
             }
             else
             {
-                Array.Copy(this._bytes, 0, remainingBytes, 0, remainingBytes.Length);
+                Array.Copy(_bytes, 0, remainingBytes, 0, remainingBytes.Length);
             }
 
             return remainingBytes;

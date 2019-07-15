@@ -9,4 +9,4 @@ classes
 bin
 obj
 .vs
-.DotSettings.user
+*.DotSettings.user

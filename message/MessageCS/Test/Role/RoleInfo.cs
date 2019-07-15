@@ -70,19 +70,19 @@ namespace MessageCS.Test.Role
 		    buffer.WriteBytes(data);
 
 		    buffer.WriteInt(list.Count);
-		    foreach (var @list_Value in list) {
-			    buffer.WriteInt(@list_Value);
+		    foreach (var list_Value in list) {
+			    buffer.WriteInt(list_Value);
 		    }
 
 		    buffer.WriteInt(set.Count);
-		    foreach (var @set_Value in set) {
-			    buffer.WriteInt(@set_Value);
+		    foreach (var set_Value in set) {
+			    buffer.WriteInt(set_Value);
 		    }
 
 		    buffer.WriteInt(map.Count);
-		    foreach (var @map_Key in map.Keys) {
-		        buffer.WriteInt(@map_Key);
-			    buffer.WriteInt(map[@map_Key]);
+		    foreach (var map_Key in map.Keys) {
+		        buffer.WriteInt(map_Key);
+			    buffer.WriteInt(map[map_Key]);
 		    }
 
 		}
@@ -102,18 +102,18 @@ namespace MessageCS.Test.Role
 		    roleType = (RoleType)buffer.ReadInt();
 		    data = buffer.ReadBytes();
 
-		    var @list_Size = buffer.ReadInt();
-		    for (var @i = 0; @i < @list_Size; @i++) {
+		    var list_Size = buffer.ReadInt();
+		    for (var i = 0; i < list_Size; i++) {
 			    list.Add(buffer.ReadInt());
 		    }
 
-		    var @set_Size = buffer.ReadInt();
-		    for (var @i = 0; @i < @set_Size; @i++) {
+		    var set_Size = buffer.ReadInt();
+		    for (var i = 0; i < set_Size; i++) {
 			    set.Add(buffer.ReadInt());
 		    }
 
-		    var @map_Size = buffer.ReadInt();
-		    for (var @i = 0; @i < @map_Size; @i++) {
+		    var map_Size = buffer.ReadInt();
+		    for (var i = 0; i < map_Size; i++) {
 			    map.Add(buffer.ReadInt(), buffer.ReadInt());
 		    }
 

@@ -66,6 +66,7 @@ namespace MessageCS.Test
             var userInfo = new UserInfo() {id = 1, name = "abc", level = 123};
 
             Console.WriteLine("userInfo:" + userInfo);
+            
         }
     }
 }

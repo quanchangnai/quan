@@ -80,11 +80,11 @@ namespace ${packageName}
 
 		</#if>
 		    buffer.WriteInt(${field.name}.Count);
-		    foreach (var @${field.name}_Value in ${field.name}) {
+		    foreach (var ${field.name}_Value in ${field.name}) {
 		<#if field.valueBuiltInType>
-			    buffer.Write${field.valueType?cap_first}(@${field.name}_Value);
+			    buffer.Write${field.valueType?cap_first}(${field.name}_Value);
 		<#else>
-				@${field.name}_Value.Encode(buffer);
+				${field.name}_Value.Encode(buffer);
 		</#if>
 		    }
 
@@ -93,12 +93,12 @@ namespace ${packageName}
 
 		</#if>
 		    buffer.WriteInt(${field.name}.Count);
-		    foreach (var @${field.name}_Key in ${field.name}.Keys) {
-		        buffer.Write${field.keyType?cap_first}(@${field.name}_Key);
+		    foreach (var ${field.name}_Key in ${field.name}.Keys) {
+		        buffer.Write${field.keyType?cap_first}(${field.name}_Key);
 		<#if field.valueBuiltInType>
-			    buffer.Write${field.valueType?cap_first}(${field.name}[@${field.name}_Key]);
+			    buffer.Write${field.valueType?cap_first}(${field.name}[${field.name}_Key]);
 		<#else>
-			    ${field.name}[@${field.name}_Key].Encode(buffer);
+			    ${field.name}[${field.name}_Key].Encode(buffer);
 		</#if>
 		    }
 
@@ -128,14 +128,14 @@ namespace ${packageName}
 		<#if field_index gt 0 && !fields[field_index-1].optional && !fields[field_index-1].collectionType >
 
 		</#if>
-		    var @${field.name}_Size = buffer.ReadInt();
-		    for (var @i = 0; @i < @${field.name}_Size; @i++) {
+		    var ${field.name}_Size = buffer.ReadInt();
+		    for (var i = 0; i < ${field.name}_Size; i++) {
 		<#if field.valueBuiltInType>
 			    ${field.name}.Add(buffer.Read${field.valueType?cap_first}());
 		<#else>
-			    var @${field.name}_Value = new ${field.valueType}();
-			  	@${field.name}_Value.Decode(buffer);
-			    ${field.name}.Add(@${field.name}_Value);
+			    var ${field.name}_Value = new ${field.valueType}();
+			  	${field.name}_Value.Decode(buffer);
+			    ${field.name}.Add(${field.name}_Value);
 		</#if>
 		    }
 
@@ -143,15 +143,15 @@ namespace ${packageName}
 		<#if field_index gt 0 && !fields[field_index-1].optional && !fields[field_index-1].collectionType >
 
 		</#if>
-		    var @${field.name}_Size = buffer.ReadInt();
-		    for (var @i = 0; @i < @${field.name}_Size; @i++) {
+		    var ${field.name}_Size = buffer.ReadInt();
+		    for (var i = 0; i < ${field.name}_Size; i++) {
 		<#if field.valueBuiltInType>
 			    ${field.name}.Add(buffer.Read${field.keyType?cap_first}(), buffer.Read${field.valueType?cap_first}());
 		<#else>
-			    var @${field.name}_Key = buffer.Read${field.keyType?cap_first}();
-			    var @${field.name}_Value = new ${field.valueType}();
-				@${field.name}_Value.Decode(buffer);
-			    ${field.name}.Add(@${field.name}_Key, @${field.name}_Value);
+			    var ${field.name}_Key = buffer.Read${field.keyType?cap_first}();
+			    var ${field.name}_Value = new ${field.valueType}();
+				${field.name}_Value.Decode(buffer);
+			    ${field.name}.Add(${field.name}_Key, ${field.name}_Value);
 		</#if>
 		    }
 

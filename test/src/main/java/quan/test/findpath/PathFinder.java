@@ -154,9 +154,9 @@ public class PathFinder {
         int point2Index = path.indexOf(point2);
 
         boolean noBlock = true;
-        int benginY = Math.min(point1.getY(), point2.getY());
+        int beginY = Math.min(point1.getY(), point2.getY());
         int endY = Math.max(point1.getY(), point2.getY());
-        for (int tmpY = benginY + 1; tmpY < endY; tmpY++) {
+        for (int tmpY = beginY + 1; tmpY < endY; tmpY++) {
             if (mapData.indexOf(point1.getX(), tmpY) == MapData.OBSTACLE) {
                 //有障碍
                 noBlock = false;
@@ -177,9 +177,9 @@ public class PathFinder {
         int point2Index = path.indexOf(point2);
 
         boolean noBlock = true;
-        int benginX = Math.min(point1.getX(), point2.getX());
+        int beginX = Math.min(point1.getX(), point2.getX());
         int endX = Math.max(point1.getY(), point2.getY());
-        for (int tmpX = benginX + 1; tmpX < endX; tmpX++) {
+        for (int tmpX = beginX + 1; tmpX < endX; tmpX++) {
             if (mapData.indexOf(tmpX, point1.getY()) == MapData.OBSTACLE) {
                 //有障碍
                 noBlock = false;

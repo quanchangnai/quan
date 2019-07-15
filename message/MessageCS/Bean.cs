@@ -26,29 +26,28 @@ namespace MessageCS
         {
         }
 
-        public static string ToString<T>(List<T> list)
+        protected static string ToString<T>(ICollection<T> collection)
         {
-            if (list == null)
+            if (collection == null)
             {
                 return "null";
             }
 
             var result = "[";
-            result += string.Join(", ", list.ToArray());
-            result += "]";
 
-            return result;
-        }
-
-        public static string ToString<T>(HashSet<T> set)
-        {
-            if (set == null)
+            var i = 0;
+            foreach (var item in collection)
             {
-                return "null";
+                result += ReferenceEquals(item, collection) ? "(this)" : item.ToString();
+
+                if (i < collection.Count - 1)
+                {
+                    result += ", ";
+                }
+
+                i++;
             }
 
-            var result = "[";
-            result += string.Join(", ", set.ToArray());
             result += "]";
 
             return result;
@@ -63,12 +62,14 @@ namespace MessageCS
 
             var result = "{";
 
-
             var i = 0;
             foreach (var key in dictionary.Keys)
             {
                 var value = dictionary[key];
-                result += ", " + key + "=" + value;
+                result += ReferenceEquals(key, dictionary) ? "(this)" : key.ToString();
+                result += "=" + value;
+                result += ReferenceEquals(value, dictionary) ? "(this)" : value.ToString();
+
                 if (i < dictionary.Count - 1)
                 {
                     result += ", ";
@@ -76,7 +77,6 @@ namespace MessageCS
 
                 i++;
             }
-
 
             result += "}";
 
