@@ -20,6 +20,8 @@ public class DatabaseGenerator extends Generator {
     public DatabaseGenerator(String srcPath, String destPath) throws Exception {
         super(srcPath, destPath);
 
+        basicTypes.put("byte", "byte");
+        classTypes.put("byte", "Byte");
         classTypes.put("set", SetField.class.getSimpleName());
         classTypes.put("list", ListField.class.getSimpleName());
         classTypes.put("map", MapField.class.getSimpleName());

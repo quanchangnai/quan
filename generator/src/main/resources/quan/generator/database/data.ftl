@@ -242,18 +242,17 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         </#if>
         JSONArray $${field.name}$1 = object.getJSONArray("${field.name}");
         if ($${field.name}$1 != null) {
-            List<${field.classValueType}> $${field.name}$2 = new ArrayList<>();
+            PVector<${field.classValueType}> $${field.name}$2 = Empty.vector();
             for (int i = 0; i < $${field.name}$1.size(); i++) {
         <#if !field.valueBuiltInType>
                 ${field.classValueType} $${field.name}$Value = new ${field.classValueType}();
                 $${field.name}$Value.decode($${field.name}$1.getJSONObject(i));
-                $${field.name}$2.add($${field.name}$Value);
+                $${field.name}$2 = $${field.name}$2.plus($${field.name}$Value);
         <#else>
-                $${field.name}$2.add($${field.name}$1.get${field.classValueType}(i));
+                $${field.name}$2 = $${field.name}$2.plus($${field.name}$1.get${field.classValueType}(i));
         </#if>
             }
-            PVector<${field.classValueType}> $${field.name}$3 = Empty.vector();
-            ${field.name}.setValue($${field.name}$3.plusAll($${field.name}$2));
+            ${field.name}.setValue($${field.name}$2);
         }
 
     <#elseif field.type == "set">
@@ -262,18 +261,17 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         </#if>
         JSONArray $${field.name}$1 = object.getJSONArray("${field.name}");
         if ($${field.name}$1 != null) {
-            Set<${field.classValueType}> $${field.name}$2 = new HashSet<>();
+            PSet<${field.classValueType}> $${field.name}$2 = Empty.set();
             for (int i = 0; i < $${field.name}$1.size(); i++) {
         <#if !field.valueBuiltInType>
                 ${field.classValueType} $${field.name}$Value = new ${field.classValueType}();
                 $${field.name}$Value.decode($${field.name}$1.getJSONObject(i));
-                $${field.name}$2.add($${field.name}$Value);
+                $${field.name}$2 = $${field.name}$2.plus($${field.name}$Value);
         <#else>
-                $${field.name}$2.add($${field.name}$1.get${field.classValueType}(i));
+                $${field.name}$2 = $${field.name}$2.plus($${field.name}$1.get${field.classValueType}(i));
         </#if>
             }
-            PSet<${field.classValueType}> $${field.name}$3 = Empty.set();
-            ${field.name}.setValue($${field.name}$3.plusAll($${field.name}$2));
+            ${field.name}.setValue($${field.name}$2);
         }
 
     <#elseif field.type == "map">
@@ -282,18 +280,17 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         </#if>
         JSONObject $${field.name}$1 = object.getJSONObject("${field.name}");
         if ($${field.name}$1 != null) {
-            Map<${field.classKeyType}, ${field.classValueType}> $${field.name}$2 = new HashMap<>();
+            PMap<${field.classKeyType}, ${field.classValueType}> $${field.name}$2 = Empty.map();
             for (String $${field.name}$1_Key : $${field.name}$1.keySet()) {
         <#if !field.valueBuiltInType>
                 ${field.classValueType} $${field.name}$Value = new ${field.classValueType}();
                 $${field.name}$Value.decode($${field.name}$1.getJSONObject($${field.name}$1_Key));
-                $${field.name}$2.put(${field.classKeyType}.valueOf($${field.name}$1_Key), $${field.name}$Value);
+                $${field.name}$2 = $${field.name}$2.plus(${field.classKeyType}.valueOf($${field.name}$1_Key), $${field.name}$Value);
         <#else>
-                $${field.name}$2.put(${field.classKeyType}.valueOf($${field.name}$1_Key), $${field.name}$1.get${field.classValueType}($${field.name}$1_Key));
+                $${field.name}$2 = $${field.name}$2.plus(${field.classKeyType}.valueOf($${field.name}$1_Key), $${field.name}$1.get${field.classValueType}($${field.name}$1_Key));
         </#if>
             }
-            PMap<${field.classKeyType}, ${field.classValueType}> $${field.name}$3 = Empty.map();
-            ${field.name}.setValue($${field.name}$3.plusAll($${field.name}$2));
+            ${field.name}.setValue($${field.name}$2);
         }
 
     <#elseif field.type=="int" || field.enumType>

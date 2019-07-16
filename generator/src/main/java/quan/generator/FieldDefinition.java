@@ -35,7 +35,7 @@ public class FieldDefinition extends Definition {
     private ClassDefinition classDefinition;
 
 
-    public static final List<String> BUILT_IN_TYPES = Arrays.asList("bool", "short", "int", "long", "float", "double", "string", "bytes", "list", "set", "map");
+    public static final List<String> BUILT_IN_TYPES = Arrays.asList("bool", "byte", "short", "int", "long", "float", "double", "string", "bytes", "list", "set", "map");
 
     public static final List<String> PRIMITIVE_TYPES = Arrays.asList("bool", "short", "int", "long", "float", "double", "string");
 
