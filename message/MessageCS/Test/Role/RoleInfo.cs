@@ -11,11 +11,9 @@ namespace MessageCS.Test.Role
 	/// </summary>
     public class RoleInfo : Bean
     {
-		public long roleId { get; set; }
+		public long id { get; set; }
 
-		public bool bo { get; set; }
-
-		public byte by { get; set; }
+		public bool b { get; set; }
 
 		public short s { get; set; }
 
@@ -58,9 +56,8 @@ namespace MessageCS.Test.Role
 		{
 	    	base.Encode(buffer);
 
-		    buffer.WriteLong(roleId);
-		    buffer.WriteBool(bo);
-		    buffer.WriteByte(by);
+		    buffer.WriteLong(id);
+		    buffer.WriteBool(b);
 		    buffer.WriteShort(s);
 		    buffer.WriteInt(i);
 		    buffer.WriteFloat(f);
@@ -91,9 +88,8 @@ namespace MessageCS.Test.Role
 		{
 	    	base.Decode(buffer);
 
-		    roleId = buffer.ReadLong();
-		    bo = buffer.ReadBool();
-		    by = buffer.ReadByte();
+		    id = buffer.ReadLong();
+		    b = buffer.ReadBool();
 		    s = buffer.ReadShort();
 		    i = buffer.ReadInt();
 		    f = buffer.ReadFloat();
@@ -122,9 +118,8 @@ namespace MessageCS.Test.Role
 		public override string ToString()
 		{
 			return "RoleInfo{" +
-					"roleId=" + roleId +
-					",bo=" + bo +
-					",by=" + by +
+					"id=" + id +
+					",b=" + b +
 					",s=" + s +
 					",i=" + i +
 					",f=" + f +

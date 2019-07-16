@@ -9,7 +9,7 @@ namespace MessageCS
         {
             var buffer = new Buffer();
             Encode(buffer);
-            return buffer.RemainingBytes();
+            return buffer.AvailableBytes();
         }
 
         public virtual void Encode(Buffer buffer)

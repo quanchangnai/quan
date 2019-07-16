@@ -7,7 +7,7 @@
         <ProjectGuid>{383CEE75-952D-4820-9611-5C0869879A07}</ProjectGuid>
         <OutputType>Exe</OutputType>
         <AppDesignerFolder>Properties</AppDesignerFolder>
-        <RootNamespace>message_cs</RootNamespace>
+        <RootNamespace>MessageCS</RootNamespace>
         <AssemblyName>MessageCS</AssemblyName>
         <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
         <FileAlignment>512</FileAlignment>
@@ -46,7 +46,7 @@
         <Compile Include="Test\Role\RoleInfo.cs" />
         <Compile Include="Test\Role\RoleType.cs" />
         <Compile Include="Test\Role\SRoleLogin.cs" />
-        <Compile Include="Test\Test.cs" />
+        <Compile Include="Test\MessageTest.cs" />
         <Compile Include="Test\User\UserInfo.cs" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -6,7 +6,7 @@ import java.math.RoundingMode;
 import java.nio.ByteBuffer;
 
 /**
- * 基于VarInt和ZigZag编码的缓冲区<br/>
+ * 基于VarInt和ZigZag编码的缓冲区，字节顺序采用小端模式<br/>
  * Created by quanchangnai on 2018/7/2.
  */
 public class Buffer {

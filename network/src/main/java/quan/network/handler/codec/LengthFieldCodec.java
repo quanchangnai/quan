@@ -28,7 +28,7 @@ public class LengthFieldCodec implements Handler<Object> {
     private ByteBuffer lastBuffer;
 
     public LengthFieldCodec() {
-        this.lengthFieldLength = 4;
+        this.lengthFieldLength = 2;
         this.lengthFieldInclude = false;
     }
 
@@ -121,7 +121,7 @@ public class LengthFieldCodec implements Handler<Object> {
     }
 
     private void validateLengthFieldLength() {
-        List<Integer> allowLengthFieldLengthList = Arrays.asList(1, 2, 4, 8);
+        List<Integer> allowLengthFieldLengthList = Arrays.asList(1, 2, 4);
         if (!allowLengthFieldLengthList.contains(lengthFieldLength)) {
             throw new IllegalArgumentException("lengthFieldLength不合法，允许的值为：" + allowLengthFieldLengthList);
         }
@@ -130,18 +130,23 @@ public class LengthFieldCodec implements Handler<Object> {
     private void putLengthField(ByteBuffer byteBuffer, int length) {
         switch (lengthFieldLength) {
             case 1:
+                if (length > Byte.MAX_VALUE) {
+                    throw new RuntimeException("允许的最大帧长度" + Byte.MAX_VALUE + "，实际帧长度为:" + length);
+                }
                 byteBuffer.put((byte) length);
                 break;
             case 2:
+                if (length > Short.MAX_VALUE) {
+                    throw new RuntimeException("允许的最大帧长度" + Short.MAX_VALUE + "，实际帧长度为:" + length);
+                }
                 byteBuffer.putShort((short) length);
                 break;
             case 4:
+                if (length > Integer.MAX_VALUE) {
+                    throw new RuntimeException("允许的最大帧长度" + Integer.MAX_VALUE + "，实际帧长度为:" + length);
+                }
                 byteBuffer.putInt(length);
                 break;
-            case 8:
-                byteBuffer.putLong(length);
-                break;
-
             default:
                 break;
         }
@@ -158,9 +163,6 @@ public class LengthFieldCodec implements Handler<Object> {
                 break;
             case 4:
                 length = byteBuffer.getInt();
-                break;
-            case 8:
-                length = (int) byteBuffer.getLong();
                 break;
             default:
                 break;

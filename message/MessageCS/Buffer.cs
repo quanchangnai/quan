@@ -5,7 +5,7 @@ using System.Linq;
 namespace MessageCS
 {
     /// <summary>
-    /// 基于VarInt和ZigZag编码的缓冲区
+    /// 基于VarInt和ZigZag编码的缓冲区，字节顺序采用小端模式
     /// </summary>
     public class Buffer
     {
@@ -413,6 +413,7 @@ namespace MessageCS
                 WriteLong((long) Math.Floor(n * times));
                 return;
             }
+
             throw new SystemException("参数n超出了限定范围[" + -threshold + "," + threshold + "]，无法转换为指定精度的定点型数据");
         }
 

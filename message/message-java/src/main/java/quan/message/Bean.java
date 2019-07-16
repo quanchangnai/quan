@@ -10,7 +10,7 @@ public abstract class Bean {
     public final byte[] encode() throws IOException {
         Buffer buffer = new Buffer();
         encode(buffer);
-        return buffer.remainingBytes();
+        return buffer.availableBytes();
     }
 
     public void encode(Buffer buffer) throws IOException {
