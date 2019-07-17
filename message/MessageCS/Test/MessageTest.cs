@@ -1,6 +1,7 @@
 using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using MessageCS;
 using MessageCS.Test.Role;
 using MessageCS.Test.User;
@@ -72,7 +73,7 @@ namespace MessageCS.Test
 
             var sRoleLogin1 = new SRoleLogin {roleId = 1111, roleName = "张三1111"};
 
-            var roleInfo = new RoleInfo() {id = 1312, roleName = "李四1123123", f = 343.4532F, d = 4242.54453D};
+            var roleInfo = new RoleInfo{id = 1312, roleName = "李四1123123", f = 343.4532F, d = 4242.54453D};
 
             sRoleLogin1.roleInfo = roleInfo;
 
@@ -92,7 +93,13 @@ namespace MessageCS.Test
 
             socket.Connect(new IPEndPoint(ip, port));
 
-            socket.Send(sendBytes);
+            while (true)
+            {
+                Thread.Sleep(3000);
+                socket.Send(sendBytes);
+
+            }
+
 
             socket.Close();
         }

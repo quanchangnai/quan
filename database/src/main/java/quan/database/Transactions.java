@@ -41,27 +41,19 @@ public class Transactions {
      * @return
      * @throws Exception
      */
-    public synchronized static <T> T subclass(Class<T> superclass) {
+    public synchronized static <T> Class<? extends T> subclass(Class<T> superclass) {
         Objects.requireNonNull(superclass);
         MethodDelegation methodDelegation = MethodDelegation.to(TransactionDelegation.class);
 
         ElementMatcher.Junction<MethodDescription> methodMatcher = ElementMatchers.isAnnotatedWith(Transactional.class);
 
-        Class<? extends T> subclass = new ByteBuddy()
+        return new ByteBuddy()
                 .subclass(superclass)
                 .method(methodMatcher)
                 .intercept(methodDelegation)
                 .make()
                 .load(superclass.getClassLoader())
                 .getLoaded();
-
-        try {
-            return subclass.getDeclaredConstructor().newInstance();
-        } catch (Exception e) {
-            logger.error("", e);
-            return null;
-        }
-
     }
 
     /**

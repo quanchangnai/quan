@@ -40,7 +40,9 @@ public class DatabaseTest4 {
 
     private static void test1() throws Exception {
         Transactions.setExecutor(executor);
-        Role role = Transactions.subclass(Role.class);
+        Class<? extends Role> subclass = Transactions.subclass(Role.class);
+
+        Role role = subclass.getDeclaredConstructor().newInstance();
         logger.error("role.getClass:{}", role.getClass());
 
         Transactions.setExecutor(executor);
