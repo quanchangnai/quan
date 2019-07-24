@@ -114,13 +114,11 @@ public abstract class Generator {
         List<ClassDefinition> classDefinitions = ClassDefinition.getAll().values().stream().filter(this::support).collect(Collectors.toList());
 
         for (ClassDefinition classDefinition : classDefinitions) {
-            processClass(classDefinition);
+            processClassSelf(classDefinition);
         }
 
         for (ClassDefinition classDefinition : classDefinitions) {
-            for (FieldDefinition fieldDefinition : classDefinition.getFields()) {
-                processField(fieldDefinition);
-            }
+            processClassDependency(classDefinition);
         }
 
         for (ClassDefinition classDefinition : classDefinitions) {
@@ -143,14 +141,14 @@ public abstract class Generator {
 
     }
 
-    protected void processClass(ClassDefinition classDefinition) {
-        if (classDefinition instanceof BeanDefinition) {
-            BeanDefinition beanDefinition = (BeanDefinition) classDefinition;
-            processBean(beanDefinition);
-        }
+    protected void processClassSelf(ClassDefinition classDefinition) {
+
     }
 
-    protected void processBean(BeanDefinition beanDefinition) {
+    protected void processClassDependency(ClassDefinition classDefinition) {
+        for (FieldDefinition fieldDefinition : classDefinition.getFields()) {
+            processField(fieldDefinition);
+        }
     }
 
     protected void processField(FieldDefinition fieldDefinition) {
@@ -180,11 +178,11 @@ public abstract class Generator {
             }
         }
 
-        processBeanImports(fieldDefinition);
+        processBeanFieldImports(fieldDefinition);
 
     }
 
-    protected void processBeanImports(FieldDefinition fieldDefinition) {
+    protected void processBeanFieldImports(FieldDefinition fieldDefinition) {
         BeanDefinition beanDefinition = (BeanDefinition) fieldDefinition.getClassDefinition();
 
         ClassDefinition fieldTypeClassDefinition = ClassDefinition.getAll().get(fieldDefinition.getType());

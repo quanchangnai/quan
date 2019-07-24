@@ -47,15 +47,20 @@ public class DatabaseGenerator extends Generator {
     }
 
     @Override
-    protected void processBean(BeanDefinition beanDefinition) {
-        super.processBean(beanDefinition);
+    protected void processClassSelf(ClassDefinition classDefinition) {
+        super.processClassSelf(classDefinition);
+        if (!(classDefinition instanceof BeanDefinition)) {
+            return;
+        }
+
+        BeanDefinition beanDefinition = (BeanDefinition) classDefinition;
 
         beanDefinition.getImports().add("java.util.*");
         beanDefinition.getImports().add(Data.class.getPackage().getName() + ".*");
         beanDefinition.getImports().add(JSONObject.class.getPackage().getName() + ".*");
         beanDefinition.getImports().add(PMap.class.getPackage().getName() + ".*");
-
     }
+
 
     @Override
     protected void processBeanField(FieldDefinition fieldDefinition) {

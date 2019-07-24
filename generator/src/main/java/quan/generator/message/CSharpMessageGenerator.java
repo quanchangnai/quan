@@ -36,7 +36,7 @@ public class CSharpMessageGenerator extends MessageGenerator {
         return "cs";
     }
 
-    protected void processClass(ClassDefinition classDefinition) {
+    protected void processClassSelf(ClassDefinition classDefinition) {
         String packageName = classDefinition.getPackageName();
         //C#命名空间首字母大写
         String newPackageName = "";
@@ -49,11 +49,11 @@ public class CSharpMessageGenerator extends MessageGenerator {
         }
         classDefinition.setPackageName(newPackageName);
 
-        super.processClass(classDefinition);
+        super.processClassSelf(classDefinition);
     }
 
     @Override
-    protected void processBeanImports(FieldDefinition fieldDefinition) {
+    protected void processBeanFieldImports(FieldDefinition fieldDefinition) {
         BeanDefinition beanDefinition = (BeanDefinition) fieldDefinition.getClassDefinition();
 
         ClassDefinition fieldTypeClassDefinition = ClassDefinition.getAll().get(fieldDefinition.getType());

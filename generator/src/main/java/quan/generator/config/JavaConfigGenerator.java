@@ -15,4 +15,17 @@ public class JavaConfigGenerator extends ConfigGenerator {
         return "java";
     }
 
+
+
+    public static void main(String[] args) throws Exception {
+
+        String srcPath = "generator\\src\\test\\java\\quan\\generator\\config";
+        String destPath = "config\\config-java\\src\\test\\java";
+        String packagePrefix = "quan.config";
+
+        JavaConfigGenerator generator = new JavaConfigGenerator(srcPath, destPath);
+
+        generator.setPackagePrefix(packagePrefix);
+        generator.generate();
+    }
 }

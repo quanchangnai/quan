@@ -29,7 +29,7 @@ public class FieldDefinition extends Definition {
     private boolean enumType;//字段类型是否是枚举
 
     private String source;//配置源
-    private String unique;//配置的唯一索引
+    private String index;//配置的索引类型
 
 
     private ClassDefinition classDefinition;
@@ -39,6 +39,12 @@ public class FieldDefinition extends Definition {
 
     public static final List<String> PRIMITIVE_TYPES = Arrays.asList("bool", "short", "int", "long", "float", "double", "string");
 
+    public FieldDefinition() {
+    }
+
+    public FieldDefinition(ClassDefinition classDefinition) {
+        this.classDefinition = classDefinition;
+    }
 
     @Override
     public int getDefinitionType() {
@@ -255,12 +261,13 @@ public class FieldDefinition extends Definition {
         return this;
     }
 
-    public String getUnique() {
-        return unique;
+
+    public String getIndex() {
+        return index;
     }
 
-    public FieldDefinition setUnique(String unique) {
-        this.unique = unique;
+    public FieldDefinition setIndex(String index) {
+        this.index = index;
         return this;
     }
 }

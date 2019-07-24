@@ -1,6 +1,7 @@
 package quan.generator.message;
 
 import quan.generator.BeanDefinition;
+import quan.generator.ClassDefinition;
 import quan.message.Bean;
 import quan.message.Buffer;
 import quan.message.Message;
@@ -21,9 +22,14 @@ public class JavaMessageGenerator extends MessageGenerator {
         return "java";
     }
 
-    protected void processBean(BeanDefinition beanDefinition) {
-        super.processBean(beanDefinition);
+    @Override
+    protected void processClassSelf(ClassDefinition classDefinition) {
+        super.processClassSelf(classDefinition);
+        if (!(classDefinition instanceof BeanDefinition)) {
+            return;
+        }
 
+        BeanDefinition beanDefinition = (BeanDefinition) classDefinition;
         if (beanDefinition instanceof MessageDefinition) {
             beanDefinition.getImports().add(Message.class.getName());
         } else {

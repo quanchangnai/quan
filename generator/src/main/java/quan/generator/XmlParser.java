@@ -4,6 +4,7 @@ import org.dom4j.Element;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
 import quan.generator.config.ConfigDefinition;
+import quan.generator.config.IndexDefinition;
 import quan.generator.database.DataDefinition;
 import quan.generator.message.MessageDefinition;
 
@@ -59,7 +60,7 @@ public class XmlParser extends Parser {
             } else if (element.getName().equals("data")) {
                 classDefinition = new DataDefinition(element.attributeValue("key"), element.attributeValue("persistent"));
             } else if (element.getName().equals("config")) {
-                classDefinition = new ConfigDefinition(element.attributeValue("source"));
+                classDefinition = new ConfigDefinition(element.attributeValue("source"), element.attributeValue("parent"));
             } else {
                 continue;
             }
@@ -108,38 +109,57 @@ public class XmlParser extends Parser {
     }
 
 
-    private void parseFields(Element element) {
-        ClassDefinition classDefinition = classDefinitions.get(element.attributeValue("name"));
+    private void parseFields(Element classElement) {
+        ClassDefinition classDefinition = classDefinitions.get(classElement.attributeValue("name"));
 
-        for (int i = 0; i < element.nodeCount(); i++) {
-            Node node = element.node(i);
+        for (int i = 0; i < classElement.nodeCount(); i++) {
+            Node node = classElement.node(i);
             if (!(node instanceof Element)) {
                 continue;
             }
 
             Element child = (Element) node;
-            if (!child.getName().equals("field")) {
-                continue;
+            if (child.getName().equals("field")) {
+                parseField(classDefinition, classElement, child, i);
+            } else if (child.getName().equals("index") && classDefinition instanceof ConfigDefinition) {
+                parseIndex((ConfigDefinition) classDefinition, classElement, child, i);
             }
-
-            FieldDefinition fieldDefinition = new FieldDefinition();
-            classDefinition.addField(fieldDefinition);
-            fieldDefinition.setClassDefinition(classDefinition);
-
-            fieldDefinition.setName(child.attributeValue("name"));
-            fieldDefinition.setType(child.attributeValue("type"));
-            fieldDefinition.setValue(child.attributeValue("value"));
-            fieldDefinition.setSource(child.attributeValue("source"));
-            fieldDefinition.setOptional(child.attributeValue("optional"));
-            fieldDefinition.setKeyType(child.attributeValue("key-type"));
-            fieldDefinition.setValueType(child.attributeValue("value-type"));
-
-            String comment = element.node(i + 1).getText();
-            comment = comment.replaceAll("\r|\n", "").trim();
-            fieldDefinition.setComment(comment);
 
         }
 
+    }
+
+    private void parseField(ClassDefinition classDefinition, Element classElement, Element fieldElement, int i) {
+        FieldDefinition fieldDefinition = new FieldDefinition(classDefinition);
+
+        fieldDefinition.setName(fieldElement.attributeValue("name"));
+        fieldDefinition.setType(fieldElement.attributeValue("type"));
+        fieldDefinition.setValue(fieldElement.attributeValue("value"));
+        fieldDefinition.setSource(fieldElement.attributeValue("source"));
+        fieldDefinition.setOptional(fieldElement.attributeValue("optional"));
+        fieldDefinition.setKeyType(fieldElement.attributeValue("key-type"));
+        fieldDefinition.setValueType(fieldElement.attributeValue("value-type"));
+        fieldDefinition.setIndex(fieldElement.attributeValue("index"));
+
+        String comment = classElement.node(i + 1).getText();
+        comment = comment.replaceAll("\r|\n", "").trim();
+        fieldDefinition.setComment(comment);
+
+        classDefinition.addField(fieldDefinition);
+    }
+
+    private void parseIndex(ConfigDefinition configDefinition, Element classElement, Element indexElement, int i) {
+        IndexDefinition indexDefinition = new IndexDefinition(configDefinition);
+        indexDefinition.setName(indexElement.attributeValue("name"));
+        indexDefinition.setType(indexElement.attributeValue("type"));
+        indexDefinition.setFieldNames(indexElement.attributeValue("fields"));
+
+        String comment = classElement.node(i + 1).getText();
+        comment = comment.replaceAll("\r|\n", "").trim();
+
+        indexDefinition.setComment(comment);
+
+        configDefinition.addIndex(indexDefinition);
     }
 
 }

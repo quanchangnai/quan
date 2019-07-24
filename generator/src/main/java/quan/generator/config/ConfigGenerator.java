@@ -29,16 +29,24 @@ public abstract class ConfigGenerator extends Generator {
         return super.support(classDefinition);
     }
 
+    @Override
+    protected void processClassDependency(ClassDefinition classDefinition) {
+        super.processClassDependency(classDefinition);
 
-    public static void main(String[] args) throws Exception {
+        if (!(classDefinition instanceof ConfigDefinition)) {
+            return;
+        }
 
-        String srcPath = "generator\\src\\test\\java\\quan\\generator\\config";
-        String destPath = "config\\src\\test\\java";
-        String packagePrefix = "quan.config";
+        ConfigDefinition configDefinition = (ConfigDefinition) classDefinition;
+        if (configDefinition.getParent() == null) {
+            return;
+        }
 
-        ConfigGenerator generator = new JavaConfigGenerator(srcPath, destPath);
-
-        generator.setPackagePrefix(packagePrefix);
-        generator.generate();
+        ClassDefinition parentClassDefinition = ConfigDefinition.getAll().get(configDefinition.getParent());
+        if (parentClassDefinition != null && !parentClassDefinition.getPackageName().equals(configDefinition.getPackageName())) {
+            configDefinition.getImports().add(parentClassDefinition.getFullName());
+        } else if (configDefinition.isParentWithPackage() && !configDefinition.getParentWithPackage().equals(parentClassDefinition.getPackageName())) {
+            configDefinition.getImports().add(configDefinition.getParentWithPackage());
+        }
     }
 }

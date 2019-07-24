@@ -11,11 +11,20 @@ import java.util.List;
  */
 public class IndexDefinition extends Definition {
 
-    //是不是唯一索引
-    private String unique;
+    //索引类型
+    private String type;
+
+    //被索引的字段名
+    private String fieldNames;
 
     //被索引的字段
     private List<FieldDefinition> fields = new ArrayList<>();
+
+    private FieldDefinition field1;
+
+    private FieldDefinition field2;
+
+    private FieldDefinition field3;
 
     private ConfigDefinition configDefinition;
 
@@ -26,27 +35,6 @@ public class IndexDefinition extends Definition {
         this.configDefinition = configDefinition;
     }
 
-    @Override
-    public int getDefinitionType() {
-        return 7;
-    }
-
-    public boolean isUnique() {
-        if (unique.equals("unique") || unique.equals("u")) {
-            return true;
-        }
-        return false;
-    }
-
-    public IndexDefinition setUnique(String unique) {
-        this.unique = unique;
-        return this;
-    }
-
-    public List<FieldDefinition> getFields() {
-        return fields;
-    }
-
     public ConfigDefinition getConfigDefinition() {
         return configDefinition;
     }
@@ -54,5 +42,65 @@ public class IndexDefinition extends Definition {
     public IndexDefinition setConfigDefinition(ConfigDefinition configDefinition) {
         this.configDefinition = configDefinition;
         return this;
+    }
+
+    @Override
+    public int getDefinitionType() {
+        return 7;
+    }
+
+    public boolean isUnique() {
+        if (type.equals("unique") || type.equals("u")) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isNormal() {
+        if (type.equals("normal") || type.equals("n")) {
+            return true;
+        }
+        return false;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public IndexDefinition setType(String type) {
+        this.type = type;
+        return this;
+    }
+
+    public List<FieldDefinition> getFields() {
+        return fields;
+    }
+
+    public boolean addField(FieldDefinition fieldDefinition) {
+        if (fields.contains(fieldDefinition)) {
+            return false;
+        }
+        return fields.add(fieldDefinition);
+    }
+
+    public String getFieldNames() {
+        return fieldNames;
+    }
+
+    public IndexDefinition setFieldNames(String fieldNames) {
+        this.fieldNames = fieldNames;
+        return this;
+    }
+
+    public FieldDefinition getField1() {
+        return fields.get(0);
+    }
+
+    public FieldDefinition getField2() {
+        return fields.get(1);
+    }
+
+    public FieldDefinition getField3() {
+        return fields.get(2);
     }
 }

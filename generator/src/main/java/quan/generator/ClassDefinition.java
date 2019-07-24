@@ -1,6 +1,9 @@
 package quan.generator;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 类定义
@@ -25,7 +28,7 @@ public abstract class ClassDefinition extends Definition {
 
     private List<FieldDefinition> fields = new ArrayList<>();
 
-    private Set<String> fieldNames = new HashSet<>();
+    protected Map<String, FieldDefinition> fieldMap = new HashMap<>();
 
     private static Map<String, ClassDefinition> all = new HashMap<>();
 
@@ -87,10 +90,10 @@ public abstract class ClassDefinition extends Definition {
         if (fieldDefinition.getName() == null || fieldDefinition.getName().trim().equals("")) {
             throwValidatedError("字段名不能为空");
         }
-        if (fieldNames.contains(fieldDefinition.getName())) {
+        if (fieldMap.containsKey(fieldDefinition.getName())) {
             throwValidatedError("字段名[" + fieldDefinition.getName() + "]重复");
         }
-        fieldNames.add(fieldDefinition.getName());
+        fieldMap.put(fieldDefinition.getName(), fieldDefinition);
     }
 
     protected void throwValidatedError(String error) {
