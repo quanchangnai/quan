@@ -6,8 +6,16 @@ package quan.config.quest;
  */
 public enum QuestType {
 
-    main(1),//主线
-    branch(2);//支线
+    /**
+     * 主线
+     */
+    main(1),
+    
+    /**
+     * 支线
+     */
+    branch(2);
+    
 
     private int value;
 

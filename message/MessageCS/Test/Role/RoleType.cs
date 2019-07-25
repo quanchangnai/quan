@@ -6,11 +6,15 @@ namespace MessageCS.Test.Role
     /// </summary>
     public enum RoleType {
 
-        //角色类型1
-        type1=1,
-        //角色类型2
-        type2=2
+        /// <summary>
+        /// 角色类型1
+        /// </summary>
+        type1 = 1,
 
+        /// <summary>
+        /// 角色类型2
+        /// </summary>
+        type2 = 2
 
     }
 }

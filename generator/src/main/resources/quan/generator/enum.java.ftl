@@ -11,11 +11,17 @@ package ${packageName};
 public enum ${name} {
 
 <#list fields as field>
-    <#if field_has_next>
-    ${field.name}(${field.value}),<#if field.comment !="">//${field.comment}</#if>
-    <#else>
-    ${field.name}(${field.value});<#if field.comment !="">//${field.comment}</#if>
+    <#if field.comment !="">
+    /**
+     * ${field.comment}
+     */
     </#if>
+    <#if field_has_next>
+    ${field.name}(${field.value}),
+    <#else>
+    ${field.name}(${field.value});
+    </#if>
+
 </#list>
 
     private int value;
