@@ -37,51 +37,84 @@ public class SRoleLogin extends Message {
         super(222);
     }
 
+    /**
+     * 角色id
+     */
     public long getRoleId() {
         return roleId;
     }
 
+    /**
+     * 角色id
+     */
     public SRoleLogin setRoleId(long roleId) {
         this.roleId = roleId;
         return this;
     }
 
+    /**
+     * 角色名
+     */
     public String getRoleName() {
         return roleName;
     }
 
+    /**
+     * 角色名
+     */
     public SRoleLogin setRoleName(String roleName) {
         Objects.requireNonNull(roleName);
         this.roleName = roleName;
         return this;
     }
 
+    /**
+     * 角色信息
+     */
     public RoleInfo getRoleInfo() {
         return roleInfo;
     }
 
+    /**
+     * 角色信息
+     */
     public SRoleLogin setRoleInfo(RoleInfo roleInfo) {
         Objects.requireNonNull(roleInfo);
         this.roleInfo = roleInfo;
         return this;
     }
 
+    /**
+     * 角色信息
+     */
     public ArrayList<RoleInfo> getRoleInfoList() {
         return roleInfoList;
     }
 
+    /**
+     * 角色信息
+     */
     public HashSet<RoleInfo> getRoleInfoSet() {
         return roleInfoSet;
     }
 
+    /**
+     * 角色信息
+     */
     public HashMap<Long, RoleInfo> getRoleInfoMap() {
         return roleInfoMap;
     }
 
+    /**
+     * 用户信息
+     */
     public UserInfo getUserInfo() {
         return userInfo;
     }
 
+    /**
+     * 用户信息
+     */
     public SRoleLogin setUserInfo(UserInfo userInfo) {
         this.userInfo = userInfo;
         return this;
@@ -120,7 +153,6 @@ public class SRoleLogin extends Message {
         if (userInfo != null) {
             userInfo.encode(buffer);
         }
-
     }
 
     @Override
@@ -159,7 +191,6 @@ public class SRoleLogin extends Message {
             }
             userInfo.decode(buffer);
         }
-
     }
 
     @Override

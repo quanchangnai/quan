@@ -10,10 +10,8 @@ import com.alibaba.fastjson.*;
 */
 public class Reward extends Bean {
 
-    
     private int itemId;
 
-    
     private int itemNum;
 
 

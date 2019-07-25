@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package>
+
+    <config name="ItemConfig" source="道具.csv">道具
+        <field name="id" type="int" source="ID" index="unique"/>
+        <field name="name" type="string" source="名字"/>
+    </config>
+
+    <config name="EquipConfig" parent="ItemConfig" source="装备.csv">
+        <field name="position" type="int" source="部位" index="normal"/>
+    </config>
+
+
+</package>

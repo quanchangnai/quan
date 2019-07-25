@@ -45,6 +45,7 @@ public class ItemBean extends Bean {
 
         object.put("id", id.getValue());
         object.put("name", name.getValue());
+
         return object;
     }
 
@@ -57,7 +58,6 @@ public class ItemBean extends Bean {
             $name = "";
         }
         name.setValue($name);
-
     }
 
     @Override

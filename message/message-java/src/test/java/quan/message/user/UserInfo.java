@@ -22,29 +22,47 @@ public class UserInfo extends Bean {
     public UserInfo() {
     }
 
+    /**
+     * ID
+     */
     public long getId() {
         return id;
     }
 
+    /**
+     * ID
+     */
     public UserInfo setId(long id) {
         this.id = id;
         return this;
     }
 
+    /**
+     * 名字
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * 名字
+     */
     public UserInfo setName(String name) {
         Objects.requireNonNull(name);
         this.name = name;
         return this;
     }
 
+    /**
+     * 等级
+     */
     public int getLevel() {
         return level;
     }
 
+    /**
+     * 等级
+     */
     public UserInfo setLevel(int level) {
         this.level = level;
         return this;

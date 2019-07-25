@@ -12,7 +12,19 @@ public class QuestConfig extends Config {
     //ID
 	private static Map<Long, QuestConfig> idConfigs = new HashMap<>();
 
-    public static Map<Long, QuestConfig> getById() {
+    //类型
+    private static Map<QuestType, List<QuestConfig>> typeConfigs = new HashMap<>();
+
+    private static Map<Integer, Map<Integer, QuestConfig>> composite1Configs = new HashMap<>();
+
+    private static Map<Integer, Map<Boolean, List<QuestConfig>>> composite2Configs = new HashMap<>();
+
+    private static Map<String, Map<Integer, Map<Integer, QuestConfig>>> composite3Configs = new HashMap<>();
+
+    private static Map<String, Map<Integer, Map<Integer, List<QuestConfig>>>> composite4Configs = new HashMap<>();
+
+
+    public static Map<Long, QuestConfig> getIdConfigs() {
         return idConfigs;
     }
 
@@ -20,15 +32,17 @@ public class QuestConfig extends Config {
         return idConfigs.get(id);
     }
 
-    //类型
-    private static Map<Integer, List<QuestConfig>> typeConfigs = new HashMap<>();
+    public static Map<QuestType, List<QuestConfig>> getTypeConfigs() {
+        return typeConfigs;
+    }
 
-    public static List<QuestConfig> getByType(int type) {
+    public static List<QuestConfig> getByType(QuestType type) {
         return typeConfigs.getOrDefault(type, Collections.emptyList());
     }
 
-    
-    private static Map<Integer, Map<Integer, QuestConfig>> composite1Configs = new HashMap<>();
+    public static Map<Integer, Map<Integer, QuestConfig>> getComposite1Configs() {
+        return composite1Configs;
+    }
 
     public static Map<Integer, QuestConfig> getByComposite1(int a1) {
         return composite1Configs.getOrDefault(a1, Collections.emptyMap());
@@ -38,84 +52,77 @@ public class QuestConfig extends Config {
         return getByComposite1(a1).get(a2);
     }
 
-    
-    private static Map<Integer, Map<Integer, List<QuestConfig>>> composite2Configs = new HashMap<>();
+    public static Map<Integer, Map<Boolean, List<QuestConfig>>> getComposite2Configs() {
+        return composite2Configs;
+    }
 
-    public static Map<Integer, List<QuestConfig>> getByComposite2(int b1) {
+    public static Map<Boolean, List<QuestConfig>> getByComposite2(int b1) {
         return composite2Configs.getOrDefault(b1, Collections.emptyMap());
     }
 
-    public static List<QuestConfig> getByComposite2(int b1, int b2) {
+    public static List<QuestConfig> getByComposite2(int b1, boolean b2) {
         return getByComposite2(b1).getOrDefault(b2, Collections.emptyList());
     }
 
-    
-    private static Map<Integer, Map<Integer, Map<Integer, QuestConfig>>> composite3Configs = new HashMap<>();
+    public static Map<String, Map<Integer, Map<Integer, QuestConfig>>> getComposite3Configs() {
+        return composite3Configs;
+    }
 
-    public static Map<Integer, Map<Integer, QuestConfig>> getByComposite3(int c1) {
+    public static Map<Integer, Map<Integer, QuestConfig>> getByComposite3(String c1) {
         return composite3Configs.getOrDefault(c1, Collections.emptyMap());
     }
 
-    public static Map<Integer, QuestConfig> getByComposite3(int c1, int c2) {
+    public static Map<Integer, QuestConfig> getByComposite3(String c1, int c2) {
         return getByComposite3(c1).getOrDefault(c2, Collections.emptyMap());
     }
 
-    public static QuestConfig getByComposite3(int c1, int c2, int c3) {
+    public static QuestConfig getByComposite3(String c1, int c2, int c3) {
         return getByComposite3(c1, c3).get(c3);
     }
 
-    
-    private static Map<Integer, Map<Integer, Map<Integer, List<QuestConfig>>>> composite4Configs = new HashMap<>();
+    public static Map<String, Map<Integer, Map<Integer, List<QuestConfig>>>> getComposite4Configs() {
+        return composite4Configs;
+    }
 
-    public static Map<Integer, Map<Integer, List<QuestConfig>>> getByComposite4(int d1) {
+    public static Map<Integer, Map<Integer, List<QuestConfig>>> getByComposite4(String d1) {
         return composite4Configs.getOrDefault(d1, Collections.emptyMap());
     }
 
-    public static Map<Integer, List<QuestConfig>> getByComposite4(int d1, int d2) {
+    public static Map<Integer, List<QuestConfig>> getByComposite4(String d1, int d2) {
         return getByComposite4(d1).getOrDefault(d2, Collections.emptyMap());
     }
 
-    public static List<QuestConfig> getByComposite4(int d1, int d2, int d3) {
+    public static List<QuestConfig> getByComposite4(String d1, int d2, int d3) {
         return getByComposite4(d1, d2).getOrDefault(d3, Collections.emptyList());
     }
 
 
     static void index(List<QuestConfig> configs) {
         Map<Long, QuestConfig> idConfigs = new HashMap<>();
-
-        Map<Integer, List<QuestConfig>> typeConfigs = new HashMap<>();
-
+        Map<QuestType, List<QuestConfig>> typeConfigs = new HashMap<>();
         Map<Integer, Map<Integer, QuestConfig>> composite1Configs = new HashMap<>();
+        Map<Integer, Map<Boolean, List<QuestConfig>>> composite2Configs = new HashMap<>();
+        Map<String, Map<Integer, Map<Integer, QuestConfig>>> composite3Configs = new HashMap<>();
+        Map<String, Map<Integer, Map<Integer, List<QuestConfig>>>> composite4Configs = new HashMap<>();
 
-        Map<Integer, Map<Integer, List<QuestConfig>>> composite2Configs = new HashMap<>();
-            
-        Map<Integer, Map<Integer, Map<Integer, QuestConfig>>> composite3Configs = new HashMap<>();
-
-        Map<Integer, Map<Integer, Map<Integer, List<QuestConfig>>>> composite4Configs = new HashMap<>();
-
-        QuestConfig oldConfig;
         for (QuestConfig config : configs) {
-            oldConfig = idConfigs.put(config.id, config);
-            if (oldConfig != null) {
-                throw new RuntimeException("配置[" + QuestConfig.class.getSimpleName() + "]的索引[id]:[" + config.id + "]有重复");
+            if (idConfigs.put(config.id, config) != null) {
+                throw new RuntimeException("配置[QuestConfig]的索引[id]:[" + config.id + "]有重复");
             }
 
             typeConfigs.computeIfAbsent(config.type, k -> new ArrayList<>()).add(config);
 
-            oldConfig = composite1Configs.computeIfAbsent(config.a1, k -> new HashMap<>()).put(config.a2, config);
-            if (oldConfig != null) {
-                throw new RuntimeException("配置[" + QuestConfig.class.getSimpleName() + "]的索引[[a1,[a2]:[" + config.a1 + "," + config.a2 + "]有重复");
+            if (composite1Configs.computeIfAbsent(config.a1, k -> new HashMap<>()).put(config.a2, config) != null) {
+                throw new RuntimeException("配置[QuestConfig]的索引[[a1,[a2]:[" + config.a1 + "," + config.a2 + "]有重复");
             }
 
             composite2Configs.computeIfAbsent(config.b1, k -> new HashMap<>()).computeIfAbsent(config.b2, k -> new ArrayList<>()).add(config);
 
-            oldConfig = composite3Configs.computeIfAbsent(config.c1, k -> new HashMap<>()).computeIfAbsent(config.c2, k -> new HashMap<>()).put(config.c3, config);
-            if (oldConfig != null) {
-                throw new RuntimeException("配置[" + QuestConfig.class.getSimpleName() + "]的索引[c1,c2,c3]:[" + config.c1 + "," + config.c2 + "," + config.c3 + "]有重复");
+            if (composite3Configs.computeIfAbsent(config.c1, k -> new HashMap<>()).computeIfAbsent(config.c2, k -> new HashMap<>()).put(config.c3, config) != null) {
+                throw new RuntimeException("配置[QuestConfig]的索引[c1,c2,c3]:[" + config.c1 + "," + config.c2 + "," + config.c3 + "]有重复");
             }
 
             composite4Configs.computeIfAbsent(config.d1, k -> new HashMap<>()).computeIfAbsent(config.d2, k -> new HashMap<>()).computeIfAbsent(config.d3, k -> new ArrayList<>()).add(config);
-
         }
 
         QuestConfig.idConfigs = unmodifiable(idConfigs);
@@ -134,7 +141,7 @@ public class QuestConfig extends Config {
     private String name;
 
     //类型
-    private int type;
+    private QuestType type;
 
     //A1
     private int a1;
@@ -146,10 +153,10 @@ public class QuestConfig extends Config {
     private int b1;
 
     //B2
-    private int b2;
+    private boolean b2;
 
     //C1
-    private int c1;
+    private String c1;
 
     //C2
     private int c2;
@@ -158,7 +165,7 @@ public class QuestConfig extends Config {
     private int c3;
 
     //D1
-    private int d1;
+    private String d1;
 
     //D2
     private int d2;
@@ -196,7 +203,7 @@ public class QuestConfig extends Config {
     /**
      * 类型
      */
-    public int getType() {
+    public QuestType getType() {
         return type;
     }
 
@@ -224,14 +231,14 @@ public class QuestConfig extends Config {
     /**
      * B2
      */
-    public int getB2() {
+    public boolean getB2() {
         return b2;
     }
 
     /**
      * C1
      */
-    public int getC1() {
+    public String getC1() {
         return c1;
     }
 
@@ -252,7 +259,7 @@ public class QuestConfig extends Config {
     /**
      * D1
      */
-    public int getD1() {
+    public String getD1() {
         return d1;
     }
 
@@ -303,15 +310,20 @@ public class QuestConfig extends Config {
     protected void parse(JSONObject object) {
         id = object.getLongValue("id");
         name = object.getString("name");
-        type = object.getIntValue("type");
+
+        String $type = object.getString("type");
+        if ($type != null) {
+            type = QuestType.valueOf($type);
+        }
+
         a1 = object.getIntValue("a1");
         a2 = object.getIntValue("a2");
         b1 = object.getIntValue("b1");
-        b2 = object.getIntValue("b2");
-        c1 = object.getIntValue("c1");
+        b2 = object.getBooleanValue("b2");
+        c1 = object.getString("c1");
         c2 = object.getIntValue("c2");
         c3 = object.getIntValue("c3");
-        d1 = object.getIntValue("d1");
+        d1 = object.getString("d1");
         d2 = object.getIntValue("d2");
         d3 = object.getIntValue("d3");
 
@@ -351,15 +363,15 @@ public class QuestConfig extends Config {
         return "QuestConfig{" +
                 "id=" + id +
                 ",name='" + name + '\'' +
-                ",type=" + type +
+                ",type=" + QuestType.valueOf(type.getValue()) +
                 ",a1=" + a1 +
                 ",a2=" + a2 +
                 ",b1=" + b1 +
                 ",b2=" + b2 +
-                ",c1=" + c1 +
+                ",c1='" + c1 + '\'' +
                 ",c2=" + c2 +
                 ",c3=" + c3 +
-                ",d1=" + d1 +
+                ",d1='" + d1 + '\'' +
                 ",d2=" + d2 +
                 ",d3=" + d3 +
                 ",reward=" + reward +
@@ -370,37 +382,4 @@ public class QuestConfig extends Config {
 
         }
 
-    public static void main(String[] args) {
-
-        Random random = new Random();
-        List<QuestConfig> questConfigs = new ArrayList<>();
-
-        for (int i = 1; i < 100; i++) {
-            QuestConfig questConfig = new QuestConfig();
-            questConfig.id = i;
-            questConfig.name = "quest" + i;
-            questConfig.type = random.nextInt(5) + 1;
-            questConfig.a1 = random.nextInt(5) + 1;
-            questConfig.a2 = random.nextInt(5) + 1;;
-            questConfig.b1 = random.nextInt(5) + 1;
-            questConfig.b2 = random.nextInt(5) + 1;
-            questConfig.c1 = random.nextInt(5) + 1;
-            questConfig.c2 = random.nextInt(5) + 1;
-            questConfig.c3 = i;
-            questConfig.d1 = random.nextInt(5) + 1;
-            questConfig.d2 = random.nextInt(5) + 1;
-            questConfig.d3 = random.nextInt(5) + 1;
-
-            questConfigs.add(questConfig);
-        }
-
-        QuestConfig.index(questConfigs);
-
-        System.err.println("idConfigs:" + QuestConfig.idConfigs);
-        System.err.println("typeConfigs:" + QuestConfig.typeConfigs);
-        System.err.println("composite1Configs:" + QuestConfig.composite1Configs);
-        System.err.println("composite2Configs:" + QuestConfig.composite2Configs);
-        System.err.println("composite3Configs:" + QuestConfig.composite3Configs);
-        System.err.println("composite4Configs:" + QuestConfig.composite4Configs);
-    }
 }

@@ -14,46 +14,42 @@ public class RoleInfo extends Bean {
     //角色id
     private long id;
 
-    
     private boolean b;
 
-    
     private short s;
 
-    
     private int i;
 
-    
     private float f;
 
-    
     private double d;
 
     //角色名
     private String roleName = "";
 
-    
     private RoleType roleType;
 
-    
     private byte[] data = new byte[0];
 
-    
     private ArrayList<Integer> list = new ArrayList<>();
 
-    
     private HashSet<Integer> set = new HashSet<>();
 
-    
     private HashMap<Integer, Integer> map = new HashMap<>();
 
     public RoleInfo() {
     }
 
+    /**
+     * 角色id
+     */
     public long getId() {
         return id;
     }
 
+    /**
+     * 角色id
+     */
     public RoleInfo setId(long id) {
         this.id = id;
         return this;
@@ -104,10 +100,16 @@ public class RoleInfo extends Bean {
         return this;
     }
 
+    /**
+     * 角色名
+     */
     public String getRoleName() {
         return roleName;
     }
 
+    /**
+     * 角色名
+     */
     public RoleInfo setRoleName(String roleName) {
         Objects.requireNonNull(roleName);
         this.roleName = roleName;
@@ -180,7 +182,6 @@ public class RoleInfo extends Bean {
             buffer.writeInt($map$Key);
             buffer.writeInt(map.get($map$Key));
         }
-
     }
 
     @Override
@@ -211,7 +212,6 @@ public class RoleInfo extends Bean {
         for (int i = 0; i < $map$Size; i++) {
             map.put(buffer.readInt(), buffer.readInt());
         }
-
     }
 
     @Override

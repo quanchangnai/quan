@@ -17,6 +17,10 @@ public class ConfigDefinition extends BeanDefinition {
 
     private List<IndexDefinition> indexes = new ArrayList<>();
 
+    private Map<String, FieldDefinition> sourceFields = new HashMap<>();
+
+    private static Map<String, ConfigDefinition> sourceConfigs = new HashMap<>();
+
     public ConfigDefinition() {
     }
 
@@ -84,9 +88,19 @@ public class ConfigDefinition extends BeanDefinition {
         indexes.add(indexDefinition);
     }
 
+    public Map<String, FieldDefinition> getSourceFields() {
+        return sourceFields;
+    }
+
+    public static Map<String, ConfigDefinition> getSourceConfigs() {
+        return sourceConfigs;
+    }
+
     @Override
     public void addField(FieldDefinition fieldDefinition) {
         super.addField(fieldDefinition);
+
+        sourceFields.put(fieldDefinition.getSource(), fieldDefinition);
 
         if (fieldDefinition.getIndex() != null) {
             IndexDefinition indexDefinition = new IndexDefinition(this);
@@ -111,6 +125,12 @@ public class ConfigDefinition extends BeanDefinition {
             throwValidatedError("配置[" + getName() + "]的来源不能为空");
         }
 
+        ConfigDefinition other = sourceConfigs.get(source);
+        if (other != null) {
+            throwValidatedError("配置的来源[" + source + "]不能重复", other);
+        }
+        sourceConfigs.put(source, this);
+
         if (getParent() != null && !isParentWithPackage()) {
             ClassDefinition parentClassDefinition = ClassDefinition.getAll().get(getParent());
             if (parentClassDefinition == null) {
@@ -119,6 +139,7 @@ public class ConfigDefinition extends BeanDefinition {
             if (!(parentClassDefinition instanceof ConfigDefinition)) {
                 throwValidatedError("配置[" + getName() + "]的父类[" + parent + "]不合法，父类也必须是配置类");
             }
+
         }
 
         if (indexes.isEmpty()) {

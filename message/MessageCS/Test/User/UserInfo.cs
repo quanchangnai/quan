@@ -10,16 +10,25 @@ namespace MessageCS.Test.User
 	/// </summary>
     public class UserInfo : Bean
     {
+        /// <summary>
+		/// ID
+		/// </summary>
 		public long id { get; set; }
 
 		private string _name = "";
 
+        /// <summary>
+		/// 名字
+		/// </summary>
 		public string name
 		{
 	    	get => _name;
 	    	set => _name = value ?? throw new NullReferenceException();
 		}
 
+        /// <summary>
+		/// 等级
+		/// </summary>
 		public int level { get; set; }
 
 

@@ -15,7 +15,9 @@ import ${import};
 public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType ==3>Message</#if> {
 
 <#list fields as field>
-    <#if field.comment !="">//${field.comment}</#if>
+    <#if field.comment !="">
+    //${field.comment}
+    </#if>
     <#if field.type == "set" || field.type == "list">
     private ${field.classType}<${field.classValueType}> ${field.name} = new ${field.classType}<>();
     <#elseif field.type == "map">
@@ -40,6 +42,11 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     }
 
 <#list fields as field>
+    <#if field.comment !="">
+    /**
+     * ${field.comment}
+     */
+    </#if>
     <#if field.type == "list" || field.type == "set">
     public ${field.classType}<${field.classValueType}> get${field.name?cap_first}() {
         return ${field.name};
@@ -55,6 +62,11 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         return ${field.name};
     }
 
+    <#if field.comment !="">
+    /**
+     * ${field.comment}
+     */
+    </#if>
     public ${name} set${field.name?cap_first}(${field.basicType} ${field.name}) {
         <#if (!field.builtInType && !field.optional && !field.enumType) || field.type == "string" || field.type == "bytes">
         Objects.requireNonNull(${field.name});
@@ -78,7 +90,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 
 <#list fields as field>
     <#if field.type=="set" || field.type=="list">
-        <#if field_index gt 0 && !fields[field_index-1].optional && !fields[field_index-1].collectionType >
+        <#if field_index gt 0>
 
         </#if>
         buffer.writeInt(${field.name}.size());
@@ -89,9 +101,11 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
             $${field.name}$Value.encode(buffer);
         </#if>
         }
+        <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || !fields[field_index+1].optional) >
 
+        </#if>
     <#elseif field.type=="map">
-        <#if field_index gt 0 && !fields[field_index-1].optional && !fields[field_index-1].collectionType >
+        <#if field_index gt 0>
 
         </#if>
         buffer.writeInt(${field.name}.size());
@@ -103,11 +117,13 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
             ${field.name}.get($${field.name}$Key).encode(buffer);
         </#if>
         }
+        <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || !fields[field_index+1].optional) >
 
+        </#if>
     <#elseif field.builtInType>
         buffer.write${field.type?cap_first}(${field.name});
     <#elseif field.enumType>
-        <#if field_index gt 0 && !fields[field_index-1].optional && !fields[field_index-1].collectionType >
+        <#if field_index gt 0>
 
         </#if>
         if(${field.name} != null) {
@@ -115,16 +131,20 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         }else {
             buffer.writeInt(0);
         }
+        <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || !fields[field_index+1].optional) >
 
+        </#if>
     <#elseif field.optional>
-        <#if field_index gt 0 && !fields[field_index-1].optional && !fields[field_index-1].collectionType >
+        <#if field_index gt 0>
 
         </#if>
         buffer.writeBool(${field.name} != null);
         if (${field.name} != null) {
             ${field.name}.encode(buffer);
         }
+        <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || !fields[field_index+1].optional) >
 
+        </#if>
     <#else>
         ${field.name}.encode(buffer);
     </#if>
@@ -137,7 +157,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 
 <#list fields as field>
     <#if field.type=="set" || field.type=="list">
-        <#if field_index gt 0 && !fields[field_index-1].optional && !fields[field_index-1].collectionType >
+        <#if field_index gt 0>
 
         </#if>
         int $${field.name}$Size = buffer.readInt();
@@ -150,9 +170,11 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
             ${field.name}.add($${field.name}$Value);
         </#if>
         }
+        <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || !fields[field_index+1].optional) >
 
+        </#if>
     <#elseif field.type=="map">
-        <#if field_index gt 0 && !fields[field_index-1].optional && !fields[field_index-1].collectionType >
+        <#if field_index gt 0>
 
         </#if>
         int $${field.name}$Size = buffer.readInt();
@@ -166,13 +188,15 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
             ${field.name}.put($${field.name}$Key, $${field.name}$Value);
         </#if>
         }
+        <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || !fields[field_index+1].optional) >
 
+        </#if>
     <#elseif field.builtInType>
         ${field.name} = buffer.read${field.type?cap_first}();
     <#elseif field.enumType>
         ${field.name} = ${field.type}.valueOf(buffer.readInt());
     <#elseif field.optional>
-        <#if field_index gt 0 && !fields[field_index-1].optional && !fields[field_index-1].collectionType >
+        <#if field_index gt 0>
 
         </#if>
         if (buffer.readBool()) {
@@ -181,7 +205,9 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
             }
             ${field.name}.decode(buffer);
         }
+        <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || !fields[field_index+1].optional) >
 
+        </#if>
     <#else>
         ${field.name}.decode(buffer);
     </#if>

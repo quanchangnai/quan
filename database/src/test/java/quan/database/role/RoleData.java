@@ -71,10 +71,12 @@ public class RoleData extends Data<Long> {
     }
 
 
-    private BaseField<Long> id = new BaseField<>(0L);//角色ID
+    //角色ID
+    private BaseField<Long> id = new BaseField<>(0L);
 
     private BaseField<String> name = new BaseField<>("");
 
+    //角色类型
     private BaseField<Integer> roleType = new BaseField<>(0);
 
     private BaseField<Boolean> bo = new BaseField<>(false);
@@ -89,6 +91,7 @@ public class RoleData extends Data<Long> {
 
     private BaseField<Double> d = new BaseField<>(0D);
 
+    //道具
     private BeanField<ItemBean> item = new BeanField<>();
 
     private MapField<Integer, ItemBean> items = new MapField<>(getRoot());
@@ -106,6 +109,9 @@ public class RoleData extends Data<Long> {
     private MapField<Integer, ItemBean> map2 = new MapField<>(getRoot());
 
 
+    /**
+     * 角色ID
+     */
     public long getId() {
         return id.getValue();
     }
@@ -119,10 +125,16 @@ public class RoleData extends Data<Long> {
         return this;
     }
 
+    /**
+     * 角色类型
+     */
     public RoleType getRoleType() {
         return RoleType.valueOf(roleType.getValue());
     }
 
+    /**
+     * 角色类型
+     */
     public RoleData setRoleType(RoleType roleType) {
         this.roleType.setLogValue(roleType.getValue(), getRoot());
 	    return this;
@@ -182,10 +194,16 @@ public class RoleData extends Data<Long> {
         return this;
     }
 
+    /**
+     * 道具
+     */
     public ItemBean getItem() {
         return item.getValue();
     }
 
+    /**
+     * 道具
+     */
     public RoleData setItem(ItemBean item) {
         this.item.setLogValue(item, getRoot());
         return this;
@@ -398,7 +416,6 @@ public class RoleData extends Data<Long> {
             }
             map2.setValue($map2$2);
         }
-
     }
 
     @Override

@@ -11,6 +11,9 @@ namespace MessageCS.Test.Role
 	/// </summary>
     public class RoleInfo : Bean
     {
+        /// <summary>
+		/// 角色id
+		/// </summary>
 		public long id { get; set; }
 
 		public bool b { get; set; }
@@ -25,6 +28,9 @@ namespace MessageCS.Test.Role
 
 		private string _roleName = "";
 
+        /// <summary>
+		/// 角色名
+		/// </summary>
 		public string roleName
 		{
 	    	get => _roleName;
@@ -81,7 +87,6 @@ namespace MessageCS.Test.Role
 		        buffer.WriteInt(map_Key);
 			    buffer.WriteInt(map[map_Key]);
 		    }
-
 		}
 
 		public override void Decode(Buffer buffer)
@@ -112,7 +117,6 @@ namespace MessageCS.Test.Role
 		    for (var i = 0; i < map_Size; i++) {
 			    map.Add(buffer.ReadInt(), buffer.ReadInt());
 		    }
-
 		}
 
 		public override string ToString()

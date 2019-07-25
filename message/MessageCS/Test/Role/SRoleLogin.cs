@@ -12,10 +12,16 @@ namespace MessageCS.Test.Role
 	/// </summary>
     public class SRoleLogin : Message
     {
+        /// <summary>
+		/// 角色id
+		/// </summary>
 		public long roleId { get; set; }
 
 		private string _roleName = "";
 
+        /// <summary>
+		/// 角色名
+		/// </summary>
 		public string roleName
 		{
 	    	get => _roleName;
@@ -24,18 +30,33 @@ namespace MessageCS.Test.Role
 
 		private RoleInfo _roleInfo = new RoleInfo();
 
+        /// <summary>
+		/// 角色信息
+		/// </summary>
 		public RoleInfo roleInfo
 		{
 	    	get => _roleInfo;
 	    	set => _roleInfo = value ?? throw new NullReferenceException();
 		}
 
+        /// <summary>
+		/// 角色信息
+		/// </summary>
 		public List<RoleInfo> roleInfoList { get; } = new List<RoleInfo>();
 
+        /// <summary>
+		/// 角色信息
+		/// </summary>
 		public HashSet<RoleInfo> roleInfoSet { get; } = new HashSet<RoleInfo>();
 
+        /// <summary>
+		/// 角色信息
+		/// </summary>
 		public Dictionary<long, RoleInfo> roleInfoMap { get; } = new Dictionary<long, RoleInfo>();
 
+        /// <summary>
+		/// 用户信息
+		/// </summary>
 		private UserInfo userInfo { get; set; }
 
 
@@ -74,7 +95,6 @@ namespace MessageCS.Test.Role
 
 		    buffer.WriteBool(userInfo != null);
 		    userInfo?.Encode(buffer);
-
 		}
 
 		public override void Decode(Buffer buffer)
@@ -113,7 +133,6 @@ namespace MessageCS.Test.Role
 		        }
 		        userInfo.Decode(buffer);
             }
-
 		}
 
 		public override string ToString()

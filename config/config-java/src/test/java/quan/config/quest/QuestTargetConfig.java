@@ -12,7 +12,8 @@ public class QuestTargetConfig extends Config {
     //ID
 	private static Map<Long, QuestTargetConfig> idConfigs = new HashMap<>();
 
-    public static Map<Long, QuestTargetConfig> getById() {
+
+    public static Map<Long, QuestTargetConfig> getIdConfigs() {
         return idConfigs;
     }
 
@@ -24,13 +25,10 @@ public class QuestTargetConfig extends Config {
     static void index(List<QuestTargetConfig> configs) {
         Map<Long, QuestTargetConfig> idConfigs = new HashMap<>();
 
-        QuestTargetConfig oldConfig;
         for (QuestTargetConfig config : configs) {
-            oldConfig = idConfigs.put(config.id, config);
-            if (oldConfig != null) {
-                throw new RuntimeException("配置[" + QuestTargetConfig.class.getSimpleName() + "]的索引[id]:[" + config.id + "]有重复");
+            if (idConfigs.put(config.id, config) != null) {
+                throw new RuntimeException("配置[QuestTargetConfig]的索引[id]:[" + config.id + "]有重复");
             }
-
         }
 
         QuestTargetConfig.idConfigs = unmodifiable(idConfigs);

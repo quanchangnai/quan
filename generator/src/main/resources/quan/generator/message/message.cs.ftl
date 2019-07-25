@@ -18,14 +18,29 @@ namespace ${packageName}
     {
 <#list fields as field>
     <#if field.type == "set" || field.type == "list">
+        <#if field.comment !="">
+        /// <summary>
+		/// ${field.comment}
+		/// </summary>
+        </#if>
 		public ${field.classType}<${field.basicValueType}> ${field.name} { get; } = new ${field.classType}<${field.basicValueType}>();
 
     <#elseif field.type == "map">
+        <#if field.comment !="">
+        /// <summary>
+		/// ${field.comment}
+		/// </summary>
+        </#if>
 		public Dictionary<${field.basicKeyType}, ${field.basicValueType}> ${field.name} { get; } = new Dictionary<${field.basicKeyType}, ${field.basicValueType}>();
 
     <#elseif field.type == "string">
 		private string _${field.name} = "";
 
+        <#if field.comment !="">
+        /// <summary>
+		/// ${field.comment}
+		/// </summary>
+        </#if>
 		public string ${field.name}
 		{
 	    	get => _${field.name};
@@ -35,6 +50,11 @@ namespace ${packageName}
     <#elseif field.type == "bytes">
 		private byte[] _${field.name} = new byte[0];
 
+        <#if field.comment !="">
+        /// <summary>
+		/// ${field.comment}
+		/// </summary>
+        </#if>
 		public byte[] ${field.name}
 		{
             get => _${field.name};
@@ -42,11 +62,21 @@ namespace ${packageName}
 		}
 
     <#elseif field.builtInType || field.enumType>
+        <#if field.comment !="">
+        /// <summary>
+		/// ${field.comment}
+		/// </summary>
+        </#if>
 		public ${field.basicType} ${field.name} { get; set; }
 
     <#elseif !field.optional>
 		private ${field.basicType} _${field.name} = new ${field.type}();
 
+        <#if field.comment !="">
+        /// <summary>
+		/// ${field.comment}
+		/// </summary>
+        </#if>
 		public ${field.basicType} ${field.name}
 		{
 	    	get => _${field.name};
@@ -54,6 +84,11 @@ namespace ${packageName}
 		}
 
     <#else>
+        <#if field.comment !="">
+        /// <summary>
+		/// ${field.comment}
+		/// </summary>
+        </#if>
 		private ${field.basicType} ${field.name} { get; set; }
 
     </#if>
@@ -76,9 +111,9 @@ namespace ${packageName}
 
 <#list fields as field>
 	<#if field.type=="set" || field.type=="list">
-		<#if field_index gt 0 && !fields[field_index-1].optional && !fields[field_index-1].collectionType >
+		<#if field_index gt 0>
 
-		</#if>
+        </#if>
 		    buffer.WriteInt(${field.name}.Count);
 		    foreach (var ${field.name}_Value in ${field.name}) {
 		<#if field.valueBuiltInType>
@@ -87,11 +122,13 @@ namespace ${packageName}
 				${field.name}_Value.Encode(buffer);
 		</#if>
 		    }
+        <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || !fields[field_index+1].optional) >
 
+        </#if>
 	<#elseif field.type=="map">
-		<#if field_index gt 0 && !fields[field_index-1].optional && !fields[field_index-1].collectionType >
+		<#if field_index gt 0>
 
-		</#if>
+        </#if>
 		    buffer.WriteInt(${field.name}.Count);
 		    foreach (var ${field.name}_Key in ${field.name}.Keys) {
 		        buffer.Write${field.keyType?cap_first}(${field.name}_Key);
@@ -101,18 +138,22 @@ namespace ${packageName}
 			    ${field.name}[${field.name}_Key].Encode(buffer);
 		</#if>
 		    }
+        <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || !fields[field_index+1].optional) >
 
+        </#if>
 	<#elseif field.builtInType>
 		    buffer.Write${field.type?cap_first}(${field.name});
 	<#elseif field.enumType>
 			buffer.WriteInt((int)${field.name});
 	<#elseif field.optional>
-		<#if field_index gt 0 && !fields[field_index-1].optional && !fields[field_index-1].collectionType >
+		<#if field_index gt 0>
 
-		</#if>
+        </#if>
 		    buffer.WriteBool(${field.name} != null);
 		    ${field.name}?.Encode(buffer);
+        <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || !fields[field_index+1].optional) >
 
+        </#if>
 	<#else>
 		    ${field.name}.Encode(buffer);
 	</#if>
@@ -125,9 +166,9 @@ namespace ${packageName}
 
 <#list fields as field>
 	<#if field.type=="set" || field.type=="list">
-		<#if field_index gt 0 && !fields[field_index-1].optional && !fields[field_index-1].collectionType >
+		<#if field_index gt 0>
 
-		</#if>
+        </#if>
 		    var ${field.name}_Size = buffer.ReadInt();
 		    for (var i = 0; i < ${field.name}_Size; i++) {
 		<#if field.valueBuiltInType>
@@ -138,11 +179,13 @@ namespace ${packageName}
 			    ${field.name}.Add(${field.name}_Value);
 		</#if>
 		    }
+        <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || !fields[field_index+1].optional) >
 
+        </#if>
 	<#elseif field.type=="map">
-		<#if field_index gt 0 && !fields[field_index-1].optional && !fields[field_index-1].collectionType >
+		<#if field_index gt 0>
 
-		</#if>
+        </#if>
 		    var ${field.name}_Size = buffer.ReadInt();
 		    for (var i = 0; i < ${field.name}_Size; i++) {
 		<#if field.valueBuiltInType>
@@ -154,22 +197,26 @@ namespace ${packageName}
 			    ${field.name}.Add(${field.name}_Key, ${field.name}_Value);
 		</#if>
 		    }
+        <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || !fields[field_index+1].optional) >
 
+        </#if>
 	<#elseif field.builtInType>
 		    ${field.name} = buffer.Read${field.type?cap_first}();
 	<#elseif field.enumType>
 		    ${field.name} = (${field.type})buffer.ReadInt();
 	<#elseif field.optional>
-		<#if field_index gt 0 && !fields[field_index-1].optional && !fields[field_index-1].collectionType >
+		<#if field_index gt 0>
 
-		</#if>
+        </#if>
 		    if (buffer.ReadBool()) {
 		        if (${field.name} == null) {
 		            ${field.name} = new ${field.type}();
 		        }
 		        ${field.name}.Decode(buffer);
             }
+        <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || !fields[field_index+1].optional) >
 
+        </#if>
 	<#else>
 		    ${field.name}.Decode(buffer);
 	</#if>

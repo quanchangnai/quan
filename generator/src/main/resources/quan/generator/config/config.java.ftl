@@ -20,11 +20,33 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 <#if definitionType ==6>
 
     <#list indexes as index>
-    <#if index.comment !="">//${index.comment}</#if>
+        <#if index.comment !="">
+    //${index.comment}
+        </#if>
         <#if index.unique && index.fields?size==1>
 	private static Map<${index.field1.classType}, ${name}> ${index.name}Configs = new HashMap<>();
 
-    public static Map<${index.field1.classType}, ${name}> getBy${index.name?cap_first}() {
+        <#elseif index.normal && index.fields?size==1>
+    private static Map<${index.field1.classType}, List<${name}>> ${index.name}Configs = new HashMap<>();
+
+        <#elseif index.unique && index.fields?size==2>
+    private static Map<${index.field1.classType}, Map<${index.field2.classType}, ${name}>> ${index.name}Configs = new HashMap<>();
+
+        <#elseif index.normal && index.fields?size==2>
+    private static Map<${index.field1.classType}, Map<${index.field2.classType}, List<${name}>>> ${index.name}Configs = new HashMap<>();
+
+        <#elseif index.unique && index.fields?size==3>
+    private static Map<${index.field1.classType}, Map<${index.field2.classType}, Map<${index.field3.classType}, ${name}>>> ${index.name}Configs = new HashMap<>();
+
+        <#elseif index.normal && index.fields?size==3>
+    private static Map<${index.field1.classType}, Map<${index.field2.classType}, Map<${index.field3.classType}, List<${name}>>>> ${index.name}Configs = new HashMap<>();
+
+        </#if>
+    </#list>
+
+    <#list indexes as index>
+        <#if index.unique && index.fields?size==1>
+    public static Map<${index.field1.classType}, ${name}> get${index.name?cap_first}Configs() {
         return ${index.name}Configs;
     }
 
@@ -33,14 +55,18 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     }
 
         <#elseif index.normal && index.fields?size==1>
-    private static Map<${index.field1.classType}, List<${name}>> ${index.name}Configs = new HashMap<>();
+    public static Map<${index.field1.classType}, List<${name}>> get${index.name?cap_first}Configs() {
+        return ${index.name}Configs;
+    }
 
     public static List<${name}> getBy${index.name?cap_first}(${index.field1.basicType} ${index.field1.name}) {
         return ${index.name}Configs.getOrDefault(${index.field1.name}, Collections.emptyList());
     }
 
         <#elseif index.unique && index.fields?size==2>
-    private static Map<${index.field1.classType}, Map<${index.field2.classType}, ${name}>> ${index.name}Configs = new HashMap<>();
+    public static Map<${index.field1.classType}, Map<${index.field2.classType}, ${name}>> get${index.name?cap_first}Configs() {
+        return ${index.name}Configs;
+    }
 
     public static Map<${index.field2.classType}, ${name}> getBy${index.name?cap_first}(${index.field1.basicType} ${index.field1.name}) {
         return ${index.name}Configs.getOrDefault(${index.field1.name}, Collections.emptyMap());
@@ -51,7 +77,9 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     }
 
         <#elseif index.normal && index.fields?size==2>
-    private static Map<${index.field1.classType}, Map<${index.field2.classType}, List<${name}>>> ${index.name}Configs = new HashMap<>();
+    public static Map<${index.field1.classType}, Map<${index.field2.classType}, List<${name}>>> get${index.name?cap_first}Configs() {
+        return ${index.name}Configs;
+    }
 
     public static Map<${index.field2.classType}, List<${name}>> getBy${index.name?cap_first}(${index.field1.basicType} ${index.field1.name}) {
         return ${index.name}Configs.getOrDefault(${index.field1.name}, Collections.emptyMap());
@@ -62,7 +90,9 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     }
 
         <#elseif index.unique && index.fields?size==3>
-    private static Map<${index.field1.classType}, Map<${index.field2.classType}, Map<${index.field3.classType}, ${name}>>> ${index.name}Configs = new HashMap<>();
+    public static Map<${index.field1.classType}, Map<${index.field2.classType}, Map<${index.field3.classType}, ${name}>>> get${index.name?cap_first}Configs() {
+        return ${index.name}Configs;
+    }
 
     public static Map<${index.field2.classType}, Map<${index.field3.classType}, ${name}>> getBy${index.name?cap_first}(${index.field1.basicType} ${index.field1.name}) {
         return ${index.name}Configs.getOrDefault(${index.field1.name}, Collections.emptyMap());
@@ -77,10 +107,12 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     }
 
         <#elseif index.normal && index.fields?size==3>
-    private static Map<${index.field1.classType}, Map<${index.field2.classType}, Map<${index.field3.classType}, List<${name}>>>> ${index.name}Configs = new HashMap<>();
+    public static Map<${index.field1.classType}, Map<${index.field2.classType}, Map<${index.field3.classType}, List<${name}>>>> get${index.name?cap_first}Configs() {
+        return ${index.name}Configs;
+    }
 
-    public static Map<${index.field2.classType}, Map<${index.field3.classType}, List<${name}>>> getBy${index.name?cap_first}(int d1) {
-        return ${index.name}Configs.getOrDefault(d1, Collections.emptyMap());
+    public static Map<${index.field2.classType}, Map<${index.field3.classType}, List<${name}>>> getBy${index.name?cap_first}(${index.field1.basicType} ${index.field1.name}) {
+        return ${index.name}Configs.getOrDefault(${index.field1.name}, Collections.emptyMap());
     }
 
     public static Map<${index.field3.classType}, List<${name}>> getBy${index.name?cap_first}(${index.field1.basicType} ${index.field1.name}, ${index.field2.basicType} ${index.field2.name}) {
@@ -98,53 +130,41 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     <#list indexes as index>
         <#if index.unique && index.fields?size==1>
         Map<${index.field1.classType}, ${name}> ${index.name}Configs = new HashMap<>();
-
         <#elseif index.normal && index.fields?size==1>
         Map<${index.field1.classType}, List<${name}>> ${index.name}Configs = new HashMap<>();
-
         <#elseif index.unique && index.fields?size==2>
         Map<${index.field1.classType}, Map<${index.field2.classType}, ${name}>> ${index.name}Configs = new HashMap<>();
-
         <#elseif index.normal && index.fields?size==2>
         Map<${index.field1.classType}, Map<${index.field2.classType}, List<${name}>>> ${index.name}Configs = new HashMap<>();
-            
         <#elseif index.unique && index.fields?size==3>
         Map<${index.field1.classType}, Map<${index.field2.classType}, Map<${index.field3.classType}, ${name}>>> ${index.name}Configs = new HashMap<>();
-
         <#elseif index.normal && index.fields?size==3>
         Map<${index.field1.classType}, Map<${index.field2.classType}, Map<${index.field3.classType}, List<${name}>>>> ${index.name}Configs = new HashMap<>();
-
         </#if>
     </#list>
-        ${name} oldConfig;
+
         for (${name} config : configs) {
     <#list indexes as index>
         <#if index.unique && index.fields?size==1>
-            oldConfig = ${index.name}Configs.put(config.${index.field1.name}, config);
-            if (oldConfig != null) {
-                throw new RuntimeException("配置[" + ${name}.class.getSimpleName() + "]的索引[${index.field1.name}]:[" + config.${index.field1.name} + "]有重复");
+            if (${index.name}Configs.put(config.${index.field1.name}, config) != null) {
+                throw new RuntimeException("配置[${name}]的索引[${index.field1.name}]:[" + config.${index.field1.name} + "]有重复");
             }
-
         <#elseif index.normal && index.fields?size==1>
             ${index.name}Configs.computeIfAbsent(config.${index.field1.name}, k -> new ArrayList<>()).add(config);
-
         <#elseif index.unique && index.fields?size==2>
-            oldConfig = ${index.name}Configs.computeIfAbsent(config.${index.field1.name}, k -> new HashMap<>()).put(config.${index.field2.name}, config);
-            if (oldConfig != null) {
-                throw new RuntimeException("配置[" + ${name}.class.getSimpleName() + "]的索引[[${index.field1.name},[${index.field2.name}]:[" + config.${index.field1.name} + "," + config.${index.field2.name} + "]有重复");
+            if (${index.name}Configs.computeIfAbsent(config.${index.field1.name}, k -> new HashMap<>()).put(config.${index.field2.name}, config) != null) {
+                throw new RuntimeException("配置[${name}]的索引[[${index.field1.name},[${index.field2.name}]:[" + config.${index.field1.name} + "," + config.${index.field2.name} + "]有重复");
             }
-
         <#elseif index.normal && index.fields?size==2>
             ${index.name}Configs.computeIfAbsent(config.${index.field1.name}, k -> new HashMap<>()).computeIfAbsent(config.${index.field2.name}, k -> new ArrayList<>()).add(config);
-
         <#elseif index.unique && index.fields?size==3>
-            oldConfig = ${index.name}Configs.computeIfAbsent(config.${index.field1.name}, k -> new HashMap<>()).computeIfAbsent(config.${index.field2.name}, k -> new HashMap<>()).put(config.${index.field3.name}, config);
-            if (oldConfig != null) {
-                throw new RuntimeException("配置[" + ${name}.class.getSimpleName() + "]的索引[${index.field1.name},${index.field2.name},${index.field3.name}]:[" + config.${index.field1.name} + "," + config.${index.field2.name} + "," + config.${index.field3.name} + "]有重复");
+            if (${index.name}Configs.computeIfAbsent(config.${index.field1.name}, k -> new HashMap<>()).computeIfAbsent(config.${index.field2.name}, k -> new HashMap<>()).put(config.${index.field3.name}, config) != null) {
+                throw new RuntimeException("配置[${name}]的索引[${index.field1.name},${index.field2.name},${index.field3.name}]:[" + config.${index.field1.name} + "," + config.${index.field2.name} + "," + config.${index.field3.name} + "]有重复");
             }
-
         <#elseif index.normal && index.fields?size==3>
             ${index.name}Configs.computeIfAbsent(config.${index.field1.name}, k -> new HashMap<>()).computeIfAbsent(config.${index.field2.name}, k -> new HashMap<>()).computeIfAbsent(config.${index.field3.name}, k -> new ArrayList<>()).add(config);
+        </#if>
+        <#if index_index<indexes?size-1>
 
         </#if>
     </#list>
@@ -158,7 +178,9 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 </#if>
 
 <#list fields as field>
-    <#if field.comment !="">//${field.comment}</#if>
+    <#if field.comment !="">
+    //${field.comment}
+    </#if>
     <#if field.type=="list">
     private ${field.basicType}<${field.classValueType}> ${field.name} = new ArrayList<>();
     <#elseif field.type=="set">
@@ -199,7 +221,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     <#if field.type=="string">
         ${field.name} = object.getString("${field.name}");
     <#elseif field.type=="list" || field.type=="set">
-        <#if field_index gt 0 !fields[field_index-1].primitiveType >
+        <#if field_index gt 0 >
 
         </#if>
         JSONArray $${field.name} = object.getJSONArray("${field.name}");
@@ -209,8 +231,11 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
             }
         }
         ${field.name} = Collections.unmodifiable${field.basicType}(${field.name});
+        <#if field_has_next && fields[field_index+1].primitiveType >
+
+        </#if>
     <#elseif field.type=="map">
-        <#if field_index gt 0 !fields[field_index-1].primitiveType >
+        <#if field_index gt 0 >
 
         </#if>
         JSONObject $${field.name} = object.getJSONObject("${field.name}");
@@ -220,10 +245,26 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
             }
         }
         ${field.name} = Collections.unmodifiableMap(${field.name});
-    <#elseif field.builtInType>
+        <#if field_has_next && fields[field_index+1].primitiveType >
+
+        </#if>
+    <#elseif field.type=="bool">
+        ${field.name} = object.getBooleanValue("${field.name}");
+     <#elseif field.builtInType>
         ${field.name} = object.get${field.type?cap_first}Value("${field.name}");
+     <#elseif field.enumType>
+       <#if field_index gt 0 >
+
+        </#if>
+        String $${field.name} = object.getString("${field.name}");
+        if ($${field.name} != null) {
+            ${field.name} = QuestType.valueOf($${field.name});
+        }
+         <#if field_has_next && fields[field_index+1].primitiveType >
+
+        </#if>
     <#else>
-        <#if field_index gt 0 !fields[field_index-1].primitiveType >
+        <#if field_index gt 0 >
 
         </#if>
         JSONObject $${field.name} = object.getJSONObject("${field.name}");
@@ -231,6 +272,9 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
             ${field.name} = new ${field.basicType}();
             ${field.name}.parse($reward);
         }
+        <#if field_has_next && fields[field_index+1].primitiveType >
+
+        </#if>
     </#if>
 </#list>
     }

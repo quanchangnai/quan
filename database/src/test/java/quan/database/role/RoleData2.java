@@ -28,7 +28,8 @@ public class RoleData2 extends Data<Long> {
     }
 
 
-    private BaseField<Long> id = new BaseField<>(0L);//角色ID
+    //角色ID
+    private BaseField<Long> id = new BaseField<>(0L);
 
     private BaseField<String> name = new BaseField<>("");
 
@@ -63,10 +64,16 @@ public class RoleData2 extends Data<Long> {
     private MapField<Integer, ItemBean> map2 = new MapField<>(getRoot());
 
 
+    /**
+     * 角色ID
+     */
     public long getId() {
         return id.getValue();
     }
 
+    /**
+     * 角色ID
+     */
     public RoleData2 setId(long id) {
         this.id.setLogValue(id, getRoot());
         return this;
@@ -217,6 +224,7 @@ public class RoleData2 extends Data<Long> {
         }
 
         object.put("itemType", itemType.getValue());
+
         JSONObject $items = new JSONObject();
         for (Integer $items$Key : items.keySet()) {
             $items.put(String.valueOf($items$Key), items.get($items$Key).encode());
@@ -290,6 +298,7 @@ public class RoleData2 extends Data<Long> {
         }
 
         itemType.setValue(object.getIntValue("itemType"));
+
         JSONObject $items$1 = object.getJSONObject("items");
         if ($items$1 != null) {
             PMap<Integer, ItemBean> $items$2 = Empty.map();
@@ -360,7 +369,6 @@ public class RoleData2 extends Data<Long> {
             }
             map2.setValue($map2$2);
         }
-
     }
 
     @Override

@@ -91,43 +91,51 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 </#if>
 
 <#list fields as field>
+    <#if field.comment !="">
+    //${field.comment}
+    </#if>
     <#if field.type == "set" || field.type == "list">
-    private ${field.classType}<${field.classValueType}> ${field.name} = new ${field.classType}<>(getRoot());<#if field.comment !="">//${field.comment}</#if>
+    private ${field.classType}<${field.classValueType}> ${field.name} = new ${field.classType}<>(getRoot());
 
     <#elseif field.type == "map">
-    private ${field.classType}<${field.classKeyType}, ${field.classValueType}> ${field.name} = new ${field.classType}<>(getRoot());<#if field.comment !="">//${field.comment}</#if>
+    private ${field.classType}<${field.classKeyType}, ${field.classValueType}> ${field.name} = new ${field.classType}<>(getRoot());
 
     <#elseif field.type = "string">
-    private BaseField<${field.classType}> ${field.name} = new BaseField<>("");<#if field.comment !="">//${field.comment}</#if>
+    private BaseField<${field.classType}> ${field.name} = new BaseField<>("");
 
     <#elseif field.type = "byte">
-    private BaseField<${field.classType}> ${field.name} = new BaseField<>((byte) 0);<#if field.comment !="">//${field.comment}</#if>
+    private BaseField<${field.classType}> ${field.name} = new BaseField<>((byte) 0);
 
     <#elseif field.type = "short">
-    private BaseField<${field.classType}> ${field.name} = new BaseField<>((short) 0);<#if field.comment !="">//${field.comment}</#if>
+    private BaseField<${field.classType}> ${field.name} = new BaseField<>((short) 0);
 
     <#elseif field.type = "int" || field.enumType>
-    private BaseField<Integer> ${field.name} = new BaseField<>(0);<#if field.comment !="">//${field.comment}</#if>
+    private BaseField<Integer> ${field.name} = new BaseField<>(0);
 
     <#elseif field.type = "long">
-    private BaseField<${field.classType}> ${field.name} = new BaseField<>(0L);<#if field.comment !="">//${field.comment}</#if>
+    private BaseField<${field.classType}> ${field.name} = new BaseField<>(0L);
 
     <#elseif field.type = "float">
-    private BaseField<${field.classType}> ${field.name} = new BaseField<>(0F);<#if field.comment !="">//${field.comment}</#if>
+    private BaseField<${field.classType}> ${field.name} = new BaseField<>(0F);
 
     <#elseif field.type = "double">
-    private BaseField<${field.classType}> ${field.name} = new BaseField<>(0D);<#if field.comment !="">//${field.comment}</#if>
+    private BaseField<${field.classType}> ${field.name} = new BaseField<>(0D);
 
     <#elseif field.type = "bool">
-    private BaseField<${field.classType}> ${field.name} = new BaseField<>(false);<#if field.comment !="">//${field.comment}</#if>
+    private BaseField<${field.classType}> ${field.name} = new BaseField<>(false);
 
     <#else>
-    private BeanField<${field.classType}> ${field.name} = new BeanField<>();<#if field.comment !="">//${field.comment}</#if>
+    private BeanField<${field.classType}> ${field.name} = new BeanField<>();
 
     </#if>
 </#list>
 
 <#list fields as field>
+    <#if field.comment !="">
+    /**
+     * ${field.comment}
+     */
+    </#if>
     <#if field.type == "list" || field.type == "set">
     public ${field.basicType}<${field.classValueType}> get${field.name?cap_first}() {
         return ${field.name};
@@ -148,6 +156,11 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         return ${field.type}.valueOf(${field.name}.getValue());
     }
 
+    <#if field.comment !="">
+    /**
+     * ${field.comment}
+     */
+    </#if>
     public ${name} set${field.name?cap_first}(${field.basicType} ${field.name}) {
         this.${field.name}.setLogValue(${field.name}.getValue(), getRoot());
 	    return this;
@@ -158,6 +171,11 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         return ${field.name}.getValue();
     }
 
+    <#if field.comment !="">
+    /**
+     * ${field.comment}
+     */
+    </#if>
     public ${name} set${field.name?cap_first}(${field.basicType} ${field.name}) {
         this.${field.name}.setLogValue(${field.name}, getRoot());
         return this;
@@ -190,7 +208,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 
 <#list fields as field>
     <#if field.type == "list" || field.type == "set">
-        <#if field_index gt 0 && fields[field_index-1].builtInType && !fields[field_index-1].collectionType>
+        <#if field_index gt 0 >
 
         </#if>
         JSONArray $${field.name} = new JSONArray();
@@ -202,9 +220,11 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         </#if>
         }
         object.put("${field.name}", $${field.name});
+        <#if field_has_next && (fields[field_index+1].enumType || fields[field_index+1].primitiveType) >
 
+        </#if>
     <#elseif field.type == "map">
-        <#if field_index gt 0 && fields[field_index-1].builtInType && !fields[field_index-1].collectionType>
+        <#if field_index gt 0 >
 
         </#if>
         JSONObject $${field.name} = new JSONObject();
@@ -216,20 +236,25 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         </#if>
         }
         object.put("${field.name}", $${field.name});
+        <#if field_has_next && (fields[field_index+1].enumType || fields[field_index+1].primitiveType) >
 
+        </#if>
     <#elseif field.builtInType || field.enumType>
         object.put("${field.name}", ${field.name}.getValue());
     <#else>
-        <#if field_index gt 0 && fields[field_index-1].builtInType && !fields[field_index-1].collectionType>
+        <#if field_index gt 0 >
 
         </#if>
         ${field.type} $${field.name} = ${field.name}.getValue();
         if ($${field.name} != null) {
             object.put("${field.name}", $${field.name}.encode());
         }
+        <#if field_has_next && (fields[field_index+1].enumType || fields[field_index+1].primitiveType) >
 
+        </#if>
     </#if>
 </#list>
+
         return object;
     }
 
@@ -237,7 +262,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     public void decode(JSONObject object) {
 <#list fields as field>
     <#if field.type == "list">
-        <#if field_index gt 0 && fields[field_index-1].builtInType && !fields[field_index-1].collectionType && fields[field_index-1].type!="string">
+        <#if field_index gt 0 >
 
         </#if>
         JSONArray $${field.name}$1 = object.getJSONArray("${field.name}");
@@ -254,9 +279,11 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
             }
             ${field.name}.setValue($${field.name}$2);
         }
+        <#if field_has_next && (fields[field_index+1].enumType || fields[field_index+1].primitiveType && fields[field_index+1].type!="string")>
 
+        </#if>
     <#elseif field.type == "set">
-        <#if field_index gt 0 && fields[field_index-1].builtInType && !fields[field_index-1].collectionType && fields[field_index-1].type!="string">
+        <#if field_index gt 0 >
 
         </#if>
         JSONArray $${field.name}$1 = object.getJSONArray("${field.name}");
@@ -273,9 +300,11 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
             }
             ${field.name}.setValue($${field.name}$2);
         }
+        <#if field_has_next && (fields[field_index+1].enumType || fields[field_index+1].primitiveType && fields[field_index+1].type!="string")>
 
+        </#if>
     <#elseif field.type == "map">
-        <#if field_index gt 0 && fields[field_index-1].builtInType && !fields[field_index-1].collectionType && fields[field_index-1].type!="string">
+        <#if field_index gt 0 >
 
         </#if>
         JSONObject $${field.name}$1 = object.getJSONObject("${field.name}");
@@ -292,11 +321,13 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
             }
             ${field.name}.setValue($${field.name}$2);
         }
+        <#if field_has_next && (fields[field_index+1].enumType || fields[field_index+1].primitiveType && fields[field_index+1].type!="string")>
 
+        </#if>
     <#elseif field.type=="int" || field.enumType>
         ${field.name}.setValue(object.getIntValue("${field.name}"));
     <#elseif field.type=="string">
-        <#if field_index gt 0 && fields[field_index-1].builtInType && !fields[field_index-1].collectionType && fields[field_index-1].type!="string">
+        <#if field_index gt 0 >
 
         </#if>
         String $${field.name} = object.getString("${field.name}");
@@ -304,11 +335,13 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
             $${field.name} = "";
         }
         ${field.name}.setValue($${field.name});
+        <#if field_has_next && (fields[field_index+1].enumType || fields[field_index+1].primitiveType && fields[field_index+1].type!="string")>
 
+        </#if>
     <#elseif field.builtInType>
         ${field.name}.setValue(object.get${field.classType}Value("${field.name}"));
     <#else>
-        <#if field_index gt 0 && fields[field_index-1].builtInType && !fields[field_index-1].collectionType && fields[field_index-1].type!="string">
+        <#if field_index gt 0 >
 
         </#if>
         JSONObject $${field.name} = object.getJSONObject("${field.name}");
@@ -320,7 +353,9 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
             }
             $${field.name}$Value.decode($${field.name});
         }
+        <#if field_has_next && (fields[field_index+1].enumType || fields[field_index+1].primitiveType && fields[field_index+1].type!="string")>
 
+        </#if>
     </#if>
 </#list>
     }

@@ -9,14 +9,14 @@
     <data name="RoleData" key="id">角色
         <field name="id" type="long"/>角色ID
         <field name="name" type="string"/>
-        <field name="roleType" type="RoleType"/>
+        <field name="roleType" type="RoleType"/>角色类型
         <field name="bo" type="bool"/>
         <field name="by" type="byte"/>
         <field name="s" type="short"/>
         <field name="i" type="int"/>
         <field name="f" type="float"/>
         <field name="d" type="double"/>
-        <field name="item" type="ItemBean"/>
+        <field name="item" type="ItemBean"/>道具
         <field name="items" type="map" key-type="int" value-type="ItemBean"/>
         <field name="set" type="set" value-type="bool"/>
         <field name="list" type="list" value-type="string"/>
