@@ -6,8 +6,16 @@ package quan.database.item;
  */
 public enum ItemType {
 
-    type1(1),//道具类型1
-    type2(2);//道具类型2
+    /**
+     * 道具类型1
+     */
+    type1(1),
+
+    /**
+     * 道具类型2
+     */
+    type2(2);
+
 
     private int value;
 

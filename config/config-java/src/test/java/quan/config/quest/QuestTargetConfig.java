@@ -10,37 +10,10 @@ import com.alibaba.fastjson.*;
 public class QuestTargetConfig extends Config {
 
     //ID
-	private static Map<Long, QuestTargetConfig> idConfigs = new HashMap<>();
-
-
-    public static Map<Long, QuestTargetConfig> getIdConfigs() {
-        return idConfigs;
-    }
-
-    public static QuestTargetConfig getById(long id) {
-        return idConfigs.get(id);
-    }
-
-
-    static void index(List<QuestTargetConfig> configs) {
-        Map<Long, QuestTargetConfig> idConfigs = new HashMap<>();
-
-        for (QuestTargetConfig config : configs) {
-            if (idConfigs.put(config.id, config) != null) {
-                throw new RuntimeException("配置[QuestTargetConfig]的索引[id]:[" + config.id + "]有重复");
-            }
-        }
-
-        QuestTargetConfig.idConfigs = unmodifiable(idConfigs);
-    }
-
-
-    //ID
     private long id;
 
     //名字
     private String name;
-
 
     /**
      * ID
@@ -71,5 +44,32 @@ public class QuestTargetConfig extends Config {
                 '}';
 
         }
+
+
+    //ID
+	private static Map<Long, QuestTargetConfig> idConfigs = new HashMap<>();
+
+
+    public static Map<Long, QuestTargetConfig> getIdConfigs() {
+        return idConfigs;
+    }
+
+    public static QuestTargetConfig getById(long id) {
+        return idConfigs.get(id);
+    }
+
+
+    static void index(List<QuestTargetConfig> configs) {
+        Map<Long, QuestTargetConfig> idConfigs = new HashMap<>();
+
+        for (QuestTargetConfig config : configs) {
+            if (idConfigs.put(config.id, config) != null) {
+                throw new RuntimeException("配置[QuestTargetConfig]的索引[id]:[" + config.id + "]有重复");
+            }
+        }
+
+        QuestTargetConfig.idConfigs = unmodifiable(idConfigs);
+
+    }
 
 }

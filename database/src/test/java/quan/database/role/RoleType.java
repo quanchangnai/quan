@@ -6,8 +6,16 @@ package quan.database.role;
  */
 public enum RoleType {
 
-    type1(1),//角色类型1
-    type2(2);//角色类型2
+    /**
+     * 角色类型1
+     */
+    type1(1),
+
+    /**
+     * 角色类型2
+     */
+    type2(2);
+
 
     private int value;
 

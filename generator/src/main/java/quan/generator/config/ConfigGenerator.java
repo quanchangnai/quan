@@ -38,15 +38,12 @@ public abstract class ConfigGenerator extends Generator {
         }
 
         ConfigDefinition configDefinition = (ConfigDefinition) classDefinition;
-        if (configDefinition.getParent() == null) {
-            return;
+        if (configDefinition.getParent() != null) {
+            ClassDefinition parentClassDefinition = ConfigDefinition.getAll().get(configDefinition.getParent());
+            if (!parentClassDefinition.getPackageName().equals(configDefinition.getPackageName())) {
+                configDefinition.getImports().add(parentClassDefinition.getFullName());
+            }
         }
 
-        ClassDefinition parentClassDefinition = ConfigDefinition.getAll().get(configDefinition.getParent());
-        if (parentClassDefinition != null && !parentClassDefinition.getPackageName().equals(configDefinition.getPackageName())) {
-            configDefinition.getImports().add(parentClassDefinition.getFullName());
-        } else if (configDefinition.isParentWithPackage() && !configDefinition.getParentWithPackage().equals(parentClassDefinition.getPackageName())) {
-            configDefinition.getImports().add(configDefinition.getParentWithPackage());
-        }
     }
 }

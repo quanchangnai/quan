@@ -12,65 +12,6 @@ import com.alibaba.fastjson.*;
  */
 public class RoleData extends Data<Long> {
 
-    private static Cache<Long, RoleData> cache;
-
-    public RoleData(Long id) {
-	    super(cache);
-        this.id.setLogValue(id, getRoot());
-    }
-
-    @Override
-    public Long getKey() {
-        return getId();
-    }
-
-    public synchronized static void setCache(Cache<Long, RoleData> cache) {
-        cache.checkWorkable();
-        if (RoleData.cache != null && RoleData.cache.isWorkable()) {
-            throw new IllegalStateException("数据已设置缓存");
-        }
-        RoleData.cache = cache;
-    }
-
-    private synchronized static void checkCache() {
-        if (cache != null && cache.isWorkable()) {
-            return;
-        }
-
-        Database database = Database.getDefault();
-        if (database == null) {
-            throw new IllegalStateException("没有默认数据库");
-        }
-
-        if (cache == null) {
-            cache = new Cache<>("RoleData", RoleData::new);
-            database.registerCache(cache);
-        } else if (!cache.isWorkable()) {
-            database.registerCache(cache);
-        }
-    }
-
-    public static RoleData get(Long id) {
-        checkCache();
-        return cache.get(id);
-    }
-
-    public static void delete(Long id) {
-        checkCache();
-        cache.delete(id);
-    }
-
-    public static void insert(RoleData data) {
-        checkCache();
-        cache.insert(data);
-    }
-
-    public static RoleData getOrInsert(Long id) {
-        checkCache();
-        return cache.getOrInsert(id);
-    }
-
-
     //角色ID
     private BaseField<Long> id = new BaseField<>(0L);
 
@@ -108,6 +49,18 @@ public class RoleData extends Data<Long> {
 
     private MapField<Integer, ItemBean> map2 = new MapField<>(getRoot());
 
+
+    private static Cache<Long, RoleData> _cache;
+
+    public RoleData(Long id) {
+	    super(_cache);
+        this.id.setLogValue(id, getRoot());
+    }
+
+    @Override
+    public Long getKey() {
+        return getId();
+    }
 
     /**
      * 角色ID
@@ -440,6 +393,52 @@ public class RoleData extends Data<Long> {
                 ",map2=" + map2 +
                 '}';
 
+    }
+
+    public synchronized static void setCache(Cache<Long, RoleData> cache) {
+        cache.checkWorkable();
+        if (_cache != null && _cache.isWorkable()) {
+            throw new IllegalStateException("数据已设置缓存");
+        }
+        _cache = cache;
+    }
+
+    private synchronized static void checkCache() {
+        if (_cache != null && _cache.isWorkable()) {
+            return;
+        }
+
+        Database database = Database.getDefault();
+        if (database == null) {
+            throw new IllegalStateException("没有默认数据库");
+        }
+
+        if (_cache == null) {
+            _cache = new Cache<>("RoleData", RoleData::new);
+            database.registerCache(_cache);
+        } else if (!_cache.isWorkable()) {
+            database.registerCache(_cache);
+        }
+    }
+
+    public static RoleData get(Long id) {
+        checkCache();
+        return _cache.get(id);
+    }
+
+    public static void delete(Long id) {
+        checkCache();
+        _cache.delete(id);
+    }
+
+    public static void insert(RoleData data) {
+        checkCache();
+        _cache.insert(data);
+    }
+
+    public static RoleData getOrInsert(Long id) {
+        checkCache();
+        return _cache.getOrInsert(id);
     }
 
 }

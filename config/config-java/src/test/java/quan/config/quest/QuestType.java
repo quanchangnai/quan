@@ -10,12 +10,12 @@ public enum QuestType {
      * 主线
      */
     main(1),
-    
+
     /**
      * 支线
      */
     branch(2);
-    
+
 
     private int value;
 

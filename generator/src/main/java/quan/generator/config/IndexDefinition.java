@@ -92,15 +92,4 @@ public class IndexDefinition extends Definition {
         return this;
     }
 
-    public FieldDefinition getField1() {
-        return fields.get(0);
-    }
-
-    public FieldDefinition getField2() {
-        return fields.get(1);
-    }
-
-    public FieldDefinition getField3() {
-        return fields.get(2);
-    }
 }

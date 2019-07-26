@@ -131,7 +131,7 @@ public class ConfigDefinition extends BeanDefinition {
         }
         sourceConfigs.put(source, this);
 
-        if (getParent() != null && !isParentWithPackage()) {
+        if (getParent() != null) {
             ClassDefinition parentClassDefinition = ClassDefinition.getAll().get(getParent());
             if (parentClassDefinition == null) {
                 throwValidatedError("配置[" + getName() + "]的父类[" + parent + "]不存在");

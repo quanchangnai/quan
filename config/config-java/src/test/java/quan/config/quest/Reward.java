@@ -14,7 +14,6 @@ public class Reward extends Bean {
 
     private int itemNum;
 
-
     public int getItemId() {
         return itemId;
     }

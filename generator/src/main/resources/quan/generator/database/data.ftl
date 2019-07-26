@@ -14,81 +14,6 @@ import ${import};
  * Created by 自动生成
  */
 public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType ==5>Data<${keyType}></#if> {
-<#if definitionType ==5>
-
-    <#if persistent>
-    private static Cache<${keyType}, ${name}> cache;
-
-    public ${name}(${keyType} ${keyName}) {
-	    super(cache);
-        this.${keyName}.setLogValue(${keyName}, getRoot());
-    }
-
-    <#else>
-    public ${name}() {
-        super(null);
-    }
-        
-    public ${name}(${keyType} ${keyName}) {
-        super(null);
-        this.${keyName}.setLogValue(${keyName}, getRoot());
-    }
-
-    </#if>
-    @Override
-    public ${keyType} getKey() {
-        return get${keyName?cap_first}();
-    }
-
-    <#if persistent>
-    public synchronized static void setCache(Cache<${keyType}, ${name}> cache) {
-        cache.checkWorkable();
-        if (${name}.cache != null && RoleData.cache.isWorkable()) {
-            throw new IllegalStateException("数据已设置缓存");
-        }
-        ${name}.cache = cache;
-    }
-
-    private synchronized static void checkCache() {
-        if (cache != null && cache.isWorkable()) {
-            return;
-        }
-
-        Database database = Database.getDefault();
-        if (database == null) {
-            throw new IllegalStateException("没有默认数据库");
-        }
-
-        if (cache == null) {
-            cache = new Cache<>("${name}", ${name}::new);
-            database.registerCache(cache);
-        } else if (!cache.isWorkable()) {
-            database.registerCache(cache);
-        }
-    }
-
-    public static ${name} get(${keyType} ${keyName}) {
-        checkCache();
-        return cache.get(${keyName});
-    }
-
-    public static void delete(${keyType} ${keyName}) {
-        checkCache();
-        cache.delete(${keyName});
-    }
-
-    public static void insert(${name} data) {
-        checkCache();
-        cache.insert(data);
-    }
-
-    public static ${name} getOrInsert(${keyType} ${keyName}) {
-        checkCache();
-        return cache.getOrInsert(${keyName});
-    }
-
-    </#if>
-</#if>
 
 <#list fields as field>
     <#if field.comment !="">
@@ -129,6 +54,32 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 
     </#if>
 </#list>
+<#if definitionType ==5>
+
+    <#if persistent>
+    private static Cache<${keyType}, ${name}> _cache;
+
+    public ${name}(${keyType} ${keyName}) {
+	    super(_cache);
+        this.${keyName}.setLogValue(${keyName}, getRoot());
+    }
+
+    <#else>
+    public ${name}() {
+        super(null);
+    }
+        
+    public ${name}(${keyType} ${keyName}) {
+        super(null);
+        this.${keyName}.setLogValue(${keyName}, getRoot());
+    }
+
+    </#if>
+    @Override
+    public ${keyType} getKey() {
+        return get${keyName?cap_first}();
+    }
+</#if>
 
 <#list fields as field>
     <#if field.comment !="">
@@ -380,4 +331,52 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 
     }
 
+<#if definitionType ==5 && persistent>
+    public synchronized static void setCache(Cache<${keyType}, ${name}> cache) {
+        cache.checkWorkable();
+        if (_cache != null && _cache.isWorkable()) {
+            throw new IllegalStateException("数据已设置缓存");
+        }
+        _cache = cache;
+    }
+
+    private synchronized static void checkCache() {
+        if (_cache != null && _cache.isWorkable()) {
+            return;
+        }
+
+        Database database = Database.getDefault();
+        if (database == null) {
+            throw new IllegalStateException("没有默认数据库");
+        }
+
+        if (_cache == null) {
+            _cache = new Cache<>("${name}", ${name}::new);
+            database.registerCache(_cache);
+        } else if (!_cache.isWorkable()) {
+            database.registerCache(_cache);
+        }
+    }
+
+    public static ${name} get(${keyType} ${keyName}) {
+        checkCache();
+        return _cache.get(${keyName});
+    }
+
+    public static void delete(${keyType} ${keyName}) {
+        checkCache();
+        _cache.delete(${keyName});
+    }
+
+    public static void insert(${name} data) {
+        checkCache();
+        _cache.insert(data);
+    }
+
+    public static ${name} getOrInsert(${keyType} ${keyName}) {
+        checkCache();
+        return _cache.getOrInsert(${keyName});
+    }
+
+</#if>
 }

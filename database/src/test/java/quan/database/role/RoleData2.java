@@ -13,21 +13,6 @@ import quan.database.item.ItemType;
  */
 public class RoleData2 extends Data<Long> {
 
-    public RoleData2() {
-        super(null);
-    }
-        
-    public RoleData2(Long id) {
-        super(null);
-        this.id.setLogValue(id, getRoot());
-    }
-
-    @Override
-    public Long getKey() {
-        return getId();
-    }
-
-
     //角色ID
     private BaseField<Long> id = new BaseField<>(0L);
 
@@ -63,6 +48,20 @@ public class RoleData2 extends Data<Long> {
 
     private MapField<Integer, ItemBean> map2 = new MapField<>(getRoot());
 
+
+    public RoleData2() {
+        super(null);
+    }
+        
+    public RoleData2(Long id) {
+        super(null);
+        this.id.setLogValue(id, getRoot());
+    }
+
+    @Override
+    public Long getKey() {
+        return getId();
+    }
 
     /**
      * 角色ID
