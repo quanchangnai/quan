@@ -1,8 +1,8 @@
 package quan.config.quest;
 
-import quan.config.*;
 import java.util.*;
 import com.alibaba.fastjson.*;
+    import quan.config.*;
 
 /**
 * 奖励<br/>

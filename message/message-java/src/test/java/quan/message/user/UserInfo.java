@@ -1,9 +1,8 @@
 package quan.message.user;
 
-import quan.message.Buffer;
 import java.util.*;
 import java.io.IOException;
-import quan.message.Bean;
+import quan.message.*;
 
 /**
  * Created by 自动生成

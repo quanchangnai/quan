@@ -2,11 +2,7 @@ package quan.generator.message;
 
 import quan.generator.BeanDefinition;
 import quan.generator.ClassDefinition;
-import quan.message.Bean;
-import quan.message.Buffer;
 import quan.message.Message;
-
-import java.io.IOException;
 
 /**
  * Created by quanchangnai on 2017/7/6.
@@ -30,15 +26,7 @@ public class JavaMessageGenerator extends MessageGenerator {
         }
 
         BeanDefinition beanDefinition = (BeanDefinition) classDefinition;
-        if (beanDefinition instanceof MessageDefinition) {
-            beanDefinition.getImports().add(Message.class.getName());
-        } else {
-            beanDefinition.getImports().add(Bean.class.getName());
-        }
-
-        beanDefinition.getImports().add("java.util.*");
-        beanDefinition.getImports().add(IOException.class.getName());
-        beanDefinition.getImports().add(Buffer.class.getName());
+        beanDefinition.getImports().add(Message.class.getPackage().getName() + ".*");
     }
 
 

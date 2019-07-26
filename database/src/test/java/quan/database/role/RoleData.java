@@ -1,10 +1,10 @@
 package quan.database.role;
 
-import quan.database.*;
-import org.pcollections.*;
 import java.util.*;
-import quan.database.item.ItemBean;
 import com.alibaba.fastjson.*;
+import org.pcollections.*;
+import quan.database.*;
+import quan.database.item.ItemBean;
 
 /**
  * 角色<br/>

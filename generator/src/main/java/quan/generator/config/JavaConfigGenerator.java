@@ -1,5 +1,9 @@
 package quan.generator.config;
 
+import quan.config.Config;
+import quan.generator.BeanDefinition;
+import quan.generator.ClassDefinition;
+
 /**
  * Created by quanchangnai on 2019/7/11.
  */
@@ -16,6 +20,16 @@ public class JavaConfigGenerator extends ConfigGenerator {
     }
 
 
+    @Override
+    protected void processClassSelf(ClassDefinition classDefinition) {
+        super.processClassSelf(classDefinition);
+        if (!(classDefinition instanceof BeanDefinition)) {
+            return;
+        }
+
+        BeanDefinition beanDefinition = (BeanDefinition) classDefinition;
+        beanDefinition.getImports().add(Config.class.getPackage().getName() + ".*");
+    }
 
     public static void main(String[] args) throws Exception {
 

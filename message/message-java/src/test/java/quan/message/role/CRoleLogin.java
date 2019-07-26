@@ -1,10 +1,9 @@
 package quan.message.role;
 
-import quan.message.Buffer;
 import java.util.*;
-import quan.message.Message;
-import quan.message.user.UserInfo;
 import java.io.IOException;
+import quan.message.user.UserInfo;
+import quan.message.*;
 
 /**
  * 角色登录<br/>

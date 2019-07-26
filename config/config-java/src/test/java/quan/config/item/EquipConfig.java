@@ -1,8 +1,8 @@
 package quan.config.item;
 
-import quan.config.*;
 import java.util.*;
 import com.alibaba.fastjson.*;
+    import quan.config.*;
 
 /**
 * Created by 自动生成

@@ -52,6 +52,14 @@ public class ConfigDefinition extends BeanDefinition {
         return parent;
     }
 
+    public ConfigDefinition getParentDefinition() {
+        ClassDefinition classDefinition = ClassDefinition.getAll().get(getParent());
+        if (classDefinition instanceof ConfigDefinition) {
+            return (ConfigDefinition) classDefinition;
+        }
+        return null;
+    }
+
     public boolean isParentWithPackage() {
         if (parent == null) {
             return false;
@@ -137,9 +145,19 @@ public class ConfigDefinition extends BeanDefinition {
                 throwValidatedError("配置[" + getName() + "]的父类[" + parent + "]不存在");
             }
             if (!(parentClassDefinition instanceof ConfigDefinition)) {
-                throwValidatedError("配置[" + getName() + "]的父类[" + parent + "]不合法，父类也必须是配置类");
+                throwValidatedError("配置[" + getName() + "]的父类[" + parent + "]不合法，配置类的父类也必须是配置类");
             }
 
+            Set<ConfigDefinition> parentConfigDefinitions = new HashSet<>();
+            ConfigDefinition parentConfigDefinition = (ConfigDefinition) parentClassDefinition;
+
+            while (parentConfigDefinition != null) {
+                if (parentConfigDefinitions.contains(parentConfigDefinition)) {
+                    throwValidatedError("配置[" + getName() + "]的父类链不能有循环");
+                }
+                parentConfigDefinitions.add(parentConfigDefinition);
+                parentConfigDefinition = parentConfigDefinition.getParentDefinition();
+            }
         }
 
         if (indexes.isEmpty()) {

@@ -1,13 +1,9 @@
 package ${packageName};
 
-import quan.config.*;
 import java.util.*;
 import com.alibaba.fastjson.*;
 <#list imports as import>
     import ${import};
-    <#if !import_has_next>
-
-    </#if>
 </#list>
 
 /**

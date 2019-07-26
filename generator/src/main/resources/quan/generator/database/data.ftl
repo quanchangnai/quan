@@ -1,12 +1,12 @@
-<#if packageName !=".">package ${packageName};
+package ${packageName};
 
-</#if>
+import java.util.*;
+import com.alibaba.fastjson.*;
+import org.pcollections.*;
 <#list imports as import>
 import ${import};
-<#if !import_has_next>
-
-</#if>
 </#list>
+
 /**
 <#if comment !="">
  * ${comment}<br/>

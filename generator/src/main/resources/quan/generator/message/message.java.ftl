@@ -1,11 +1,11 @@
 package ${packageName};
 
+import java.util.*;
+import java.io.IOException;
 <#list imports as import>
 import ${import};
-<#if !import_has_next>
-
-</#if>
 </#list>
+
 /**
 <#if comment !="">
  * ${comment}<br/>

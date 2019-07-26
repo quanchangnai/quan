@@ -54,11 +54,7 @@ public class DatabaseGenerator extends Generator {
         }
 
         BeanDefinition beanDefinition = (BeanDefinition) classDefinition;
-
-        beanDefinition.getImports().add("java.util.*");
         beanDefinition.getImports().add(Data.class.getPackage().getName() + ".*");
-        beanDefinition.getImports().add(JSONObject.class.getPackage().getName() + ".*");
-        beanDefinition.getImports().add(PMap.class.getPackage().getName() + ".*");
     }
 
 
