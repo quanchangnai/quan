@@ -11,7 +11,6 @@ public enum Language {
 
     java, cs;
 
-
     private static List<String> names;
 
     static {
