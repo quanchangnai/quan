@@ -6,7 +6,7 @@ import quan.generator.ClassDefinition;
 import quan.generator.Language;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -20,7 +20,7 @@ public class JavaConfigGenerator extends ConfigGenerator {
     }
 
     public JavaConfigGenerator(String srcPath, String destPath) throws Exception {
-        this(Arrays.asList(srcPath), destPath);
+        this(Collections.singletonList(srcPath), destPath);
     }
 
     @Override

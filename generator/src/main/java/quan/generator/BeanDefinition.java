@@ -21,11 +21,7 @@ public class BeanDefinition extends ClassDefinition {
 
 
     public static boolean isBeanDefinition(String type) {
-        ClassDefinition classDefinition = ClassDefinition.getAll().get(type);
-        if (classDefinition instanceof BeanDefinition) {
-            return true;
-        }
-        return false;
+        return ClassDefinition.getAll().get(type) instanceof BeanDefinition;
     }
 
     @Override

@@ -4,7 +4,7 @@ import quan.generator.ClassDefinition;
 import quan.generator.FieldDefinition;
 import quan.generator.Language;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -34,7 +34,7 @@ public class CSharpMessageGenerator extends MessageGenerator {
     }
 
     public CSharpMessageGenerator(String srcPath, String destPath) throws Exception {
-        this(Arrays.asList(srcPath), destPath);
+        this(Collections.singletonList(srcPath), destPath);
     }
 
     @Override
@@ -45,15 +45,15 @@ public class CSharpMessageGenerator extends MessageGenerator {
     protected void processClassSelf(ClassDefinition classDefinition) {
         String packageName = classDefinition.getPackageName();
         //C#命名空间首字母大写
-        String newPackageName = "";
+        StringBuilder newPackageName = new StringBuilder();
         for (int i = 0; i < packageName.length(); i++) {
             String c = String.valueOf(packageName.charAt(i));
             if (i == 0 || packageName.charAt(i - 1) == '.') {
                 c = c.toUpperCase();
             }
-            newPackageName += c;
+            newPackageName.append(c);
         }
-        classDefinition.setPackageName(newPackageName);
+        classDefinition.setPackageName(newPackageName.toString());
 
         super.processClassSelf(classDefinition);
     }

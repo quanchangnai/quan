@@ -7,7 +7,7 @@ import quan.database.MapField;
 import quan.database.SetField;
 import quan.generator.*;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -32,7 +32,7 @@ public class DatabaseGenerator extends Generator {
     }
 
     public DatabaseGenerator(String srcPath, String destPath) throws Exception {
-        this(Arrays.asList(srcPath), destPath);
+        this(Collections.singletonList(srcPath), destPath);
     }
 
     @Override

@@ -28,7 +28,7 @@ public class EnumDefinition extends ClassDefinition {
         int enumValue = 0;
         try {
             enumValue = Integer.parseInt(fieldDefinition.getValue());
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException ignored) {
         }
         if (enumValue < 1) {
             throwValidatedError("枚举值必须为正整数");
@@ -42,10 +42,6 @@ public class EnumDefinition extends ClassDefinition {
     }
 
     public static boolean isEnumDefinition(String type) {
-        ClassDefinition classDefinition = ClassDefinition.getAll().get(type);
-        if (classDefinition instanceof EnumDefinition) {
-            return true;
-        }
-        return false;
+        return ClassDefinition.getAll().get(type) instanceof EnumDefinition;
     }
 }

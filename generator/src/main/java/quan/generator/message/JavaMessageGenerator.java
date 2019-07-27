@@ -5,7 +5,7 @@ import quan.generator.ClassDefinition;
 import quan.generator.Language;
 import quan.message.Message;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -18,7 +18,7 @@ public class JavaMessageGenerator extends MessageGenerator {
     }
 
     public JavaMessageGenerator(String srcPath, String destPath) throws Exception {
-        this(Arrays.asList(srcPath), destPath);
+        this(Collections.singletonList(srcPath), destPath);
     }
 
     @Override

@@ -5,7 +5,6 @@ import quan.generator.BeanDefinition;
 import quan.generator.ClassDefinition;
 import quan.generator.Generator;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
