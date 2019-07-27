@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -104,10 +103,7 @@ public abstract class Generator {
 
 
     protected boolean support(ClassDefinition classDefinition) {
-        if (classDefinition instanceof BeanDefinition || classDefinition instanceof EnumDefinition) {
-            return true;
-        }
-        return false;
+        return classDefinition instanceof BeanDefinition || classDefinition instanceof EnumDefinition;
     }
 
     public final void generate() throws Exception {
