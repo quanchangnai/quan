@@ -2,6 +2,7 @@ package quan.generator.message;
 
 import quan.generator.BeanDefinition;
 import quan.generator.ClassDefinition;
+import quan.generator.Language;
 import quan.message.Message;
 
 /**
@@ -14,8 +15,8 @@ public class JavaMessageGenerator extends MessageGenerator {
     }
 
     @Override
-    protected String getLanguage() {
-        return "java";
+    protected Language supportLanguage() {
+        return Language.java;
     }
 
     @Override

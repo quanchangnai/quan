@@ -1,9 +1,8 @@
 package quan.generator.message;
 
-import quan.generator.BeanDefinition;
 import quan.generator.ClassDefinition;
-import quan.generator.EnumDefinition;
 import quan.generator.FieldDefinition;
+import quan.generator.Language;
 
 /**
  * Created by quanchangnai on 2017/7/6.
@@ -32,8 +31,8 @@ public class CSharpMessageGenerator extends MessageGenerator {
     }
 
     @Override
-    protected String getLanguage() {
-        return "cs";
+    protected Language supportLanguage() {
+        return Language.cs;
     }
 
     protected void processClassSelf(ClassDefinition classDefinition) {
@@ -53,28 +52,13 @@ public class CSharpMessageGenerator extends MessageGenerator {
     }
 
     @Override
-    protected void processBeanFieldImports(FieldDefinition fieldDefinition) {
-        BeanDefinition beanDefinition = (BeanDefinition) fieldDefinition.getClassDefinition();
+    protected String resolveFieldImport(FieldDefinition fieldDefinition, boolean fieldSelf) {
+        return fieldSelf ? fieldDefinition.getTypePackage() : fieldDefinition.getValueTypePackage();
+    }
 
-        ClassDefinition fieldTypeClassDefinition = ClassDefinition.getAll().get(fieldDefinition.getType());
-        if (fieldTypeClassDefinition != null) {
-            if (!fieldTypeClassDefinition.getPackageName().equals(beanDefinition.getPackageName())) {
-                beanDefinition.getImports().add(fieldTypeClassDefinition.getPackageName());
-            }
-            if (fieldTypeClassDefinition instanceof EnumDefinition) {
-                fieldDefinition.setEnumType(true);
-            }
-        } else if (fieldDefinition.isTypeWithPackage() && !fieldDefinition.getTypeWithPackage().equals(beanDefinition.getPackageName())) {
-            beanDefinition.getImports().add(fieldDefinition.getTypePackage());
-        }
-
-        ClassDefinition fieldValueTypeClassDefinition = ClassDefinition.getAll().get(fieldDefinition.getValueType());
-        if (fieldValueTypeClassDefinition != null && !fieldValueTypeClassDefinition.getPackageName().equals(beanDefinition.getPackageName())) {
-            beanDefinition.getImports().add(fieldValueTypeClassDefinition.getPackageName());
-        }
-        if (fieldValueTypeClassDefinition == null && fieldDefinition.isValueTypeWithPackage() && !fieldDefinition.getValueTypePackage().equals(beanDefinition.getPackageName())) {
-            beanDefinition.getImports().add(fieldDefinition.getValueTypePackage());
-        }
+    @Override
+    protected String resolveClassImport(ClassDefinition classDefinition) {
+        return classDefinition.getPackageName();
     }
 
     public static void main(String[] args) throws Exception {

@@ -71,7 +71,7 @@ public abstract class Generator {
         this.destPath = destPath;
         this.freemarkerCfg = freemarkerCfg;
 
-        Template enumTemplate = freemarkerCfg.getTemplate("enum." + getLanguage() + ".ftl");
+        Template enumTemplate = freemarkerCfg.getTemplate("enum." + supportLanguage() + ".ftl");
         templates.put(EnumDefinition.class, enumTemplate);
 
         freemarkerCfg.setClassForTemplateLoading(getClass(), "");
@@ -95,7 +95,7 @@ public abstract class Generator {
         return this;
     }
 
-    protected abstract String getLanguage();
+    protected abstract Language supportLanguage();
 
 
     protected boolean support(ClassDefinition classDefinition) {
@@ -122,7 +122,9 @@ public abstract class Generator {
         }
 
         for (ClassDefinition classDefinition : classDefinitions) {
-
+            if (!classDefinition.supportLanguage(supportLanguage())) {
+                continue;
+            }
             Template template = templates.get(classDefinition.getClass());
             String packageName = classDefinition.getPackageName();
 
@@ -132,7 +134,7 @@ public abstract class Generator {
                 destFilePath.mkdirs();
             }
 
-            String fileName = classDefinition.getName() + "." + getLanguage();
+            String fileName = classDefinition.getName() + "." + supportLanguage();
             Writer writer = new FileWriter(new File(destFilePath, fileName));
             template.process(classDefinition, writer);
 
@@ -182,27 +184,32 @@ public abstract class Generator {
 
     }
 
+    protected String resolveFieldImport(FieldDefinition fieldDefinition, boolean fieldSelf) {
+        return fieldSelf ? fieldDefinition.getTypeWithPackage() : fieldDefinition.getValueTypeWithPackage();
+    }
+
+    protected String resolveClassImport(ClassDefinition classDefinition) {
+        return classDefinition.getFullName();
+    }
+
     protected void processBeanFieldImports(FieldDefinition fieldDefinition) {
         BeanDefinition beanDefinition = (BeanDefinition) fieldDefinition.getClassDefinition();
 
         ClassDefinition fieldTypeClassDefinition = ClassDefinition.getAll().get(fieldDefinition.getType());
         if (fieldTypeClassDefinition != null) {
             if (!fieldTypeClassDefinition.getPackageName().equals(beanDefinition.getPackageName())) {
-                beanDefinition.getImports().add(fieldTypeClassDefinition.getFullName());
-            }
-            if (fieldTypeClassDefinition instanceof EnumDefinition) {
-                fieldDefinition.setEnumType(true);
+                beanDefinition.getImports().add(resolveClassImport(fieldTypeClassDefinition));
             }
         } else if (fieldDefinition.isTypeWithPackage() && !fieldDefinition.getTypeWithPackage().equals(beanDefinition.getPackageName())) {
-            beanDefinition.getImports().add(fieldDefinition.getTypeWithPackage());
+            beanDefinition.getImports().add(resolveFieldImport(fieldDefinition, true));
         }
 
         ClassDefinition fieldValueTypeClassDefinition = ClassDefinition.getAll().get(fieldDefinition.getValueType());
         if (fieldValueTypeClassDefinition != null && !fieldValueTypeClassDefinition.getPackageName().equals(beanDefinition.getPackageName())) {
-            beanDefinition.getImports().add(fieldValueTypeClassDefinition.getFullName());
+            beanDefinition.getImports().add(resolveClassImport(fieldValueTypeClassDefinition));
         }
         if (fieldValueTypeClassDefinition == null && fieldDefinition.isValueTypeWithPackage() && !fieldDefinition.getValueTypePackage().equals(beanDefinition.getPackageName())) {
-            beanDefinition.getImports().add(fieldDefinition.getValueTypeWithPackage());
+            beanDefinition.getImports().add(resolveFieldImport(fieldDefinition, false));
         }
     }
 

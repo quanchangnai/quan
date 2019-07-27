@@ -1,5 +1,7 @@
 package quan.config;
 
+import quan.config.quest.QuestType;
+
 import java.util.Arrays;
 
 /**
@@ -9,9 +11,7 @@ public class ConfigTest {
 
     public static void main(String[] args) {
 
-        String s = "sadd gda11bvv";
-
-        System.err.println(Arrays.toString(s.split(" ")));
+        System.err.println(QuestType.main);
 
     }
 

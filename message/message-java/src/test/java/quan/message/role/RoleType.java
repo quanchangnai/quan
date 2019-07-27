@@ -38,8 +38,4 @@ public enum RoleType {
         }
     }
 
-    @Override
-    public String toString() {
-        return name();
-    }
 }

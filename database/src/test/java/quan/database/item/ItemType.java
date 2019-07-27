@@ -38,8 +38,4 @@ public enum ItemType {
         }
     }
 
-    @Override
-    public String toString() {
-        return name();
-    }
 }

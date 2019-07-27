@@ -3,6 +3,7 @@ package quan.generator.config;
 import quan.config.Config;
 import quan.generator.BeanDefinition;
 import quan.generator.ClassDefinition;
+import quan.generator.Language;
 
 /**
  * Created by quanchangnai on 2019/7/11.
@@ -15,8 +16,8 @@ public class JavaConfigGenerator extends ConfigGenerator {
     }
 
     @Override
-    protected String getLanguage() {
-        return "java";
+    protected Language supportLanguage() {
+        return Language.java;
     }
 
 

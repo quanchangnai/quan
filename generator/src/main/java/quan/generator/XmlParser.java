@@ -70,6 +70,7 @@ public class XmlParser extends Parser {
 
             classDefinition.setPackageName(packageName);
             classDefinition.setName(element.attributeValue("name"));
+            classDefinition.setLang(element.attributeValue("lang"));
 
             String comment = root.node(i - 1).getText();
             comment = comment.replaceAll("\r|\n", "").trim();

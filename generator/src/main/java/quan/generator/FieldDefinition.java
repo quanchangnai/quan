@@ -26,7 +26,6 @@ public class FieldDefinition extends Definition {
     private String classValueType;
 
     private String value;//枚举值
-    private boolean enumType;//字段类型是否是枚举
 
     private String source;//配置源
     private String index;//配置的索引类型
@@ -93,11 +92,11 @@ public class FieldDefinition extends Definition {
     }
 
     public boolean isEnumType() {
-        return enumType;
+        return ClassDefinition.getAll().get(getType()) instanceof EnumDefinition;
     }
 
-    public void setEnumType(boolean enumType) {
-        this.enumType = enumType;
+    public boolean isBeanType() {
+        return ClassDefinition.getAll().get(getType()) instanceof BeanDefinition;
     }
 
     public String getValue() {

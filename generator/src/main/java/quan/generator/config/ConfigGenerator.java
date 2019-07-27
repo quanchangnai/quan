@@ -14,7 +14,7 @@ public abstract class ConfigGenerator extends Generator {
     public ConfigGenerator(String srcPath, String destPath) throws Exception {
         super(srcPath, destPath);
 
-        Template configTemplate = freemarkerCfg.getTemplate("config." + getLanguage() + ".ftl");
+        Template configTemplate = freemarkerCfg.getTemplate("config." + supportLanguage() + ".ftl");
 
         templates.put(ConfigDefinition.class, configTemplate);
         templates.put(BeanDefinition.class, configTemplate);

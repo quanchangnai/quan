@@ -26,6 +26,8 @@ public abstract class ClassDefinition extends Definition {
      */
     private String definitionText;
 
+    private List<String> languages = new ArrayList<>();
+
     private List<FieldDefinition> fields = new ArrayList<>();
 
     protected Map<String, FieldDefinition> fieldMap = new HashMap<>();
@@ -75,9 +77,29 @@ public abstract class ClassDefinition extends Definition {
         return all;
     }
 
+    public void setLang(String language) {
+        if (language == null) {
+            return;
+        }
+        for (String lang : language.trim().split(",")) {
+            this.languages.add(lang.trim());
+        }
+    }
+
+    public boolean supportLanguage(Language language) {
+        if (languages.isEmpty() || languages.contains(language.name())) {
+            return true;
+        }
+        return false;
+    }
+
     public void validate() {
         if (getName() == null || getName().trim().equals("")) {
             throwValidatedError("类名不能为空");
+        }
+
+        if (!languages.isEmpty() && !Language.names().containsAll(languages)) {
+            throwValidatedError("语言类型" + languages + "非法,支持的语言类型" + Language.names());
         }
 
         for (FieldDefinition fieldDefinition : getFields()) {

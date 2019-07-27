@@ -1,16 +1,11 @@
 package quan.generator.database;
 
-import com.alibaba.fastjson.JSONObject;
 import freemarker.template.Template;
-import org.pcollections.PMap;
 import quan.database.Data;
 import quan.database.ListField;
 import quan.database.MapField;
 import quan.database.SetField;
-import quan.generator.BeanDefinition;
-import quan.generator.ClassDefinition;
-import quan.generator.FieldDefinition;
-import quan.generator.Generator;
+import quan.generator.*;
 
 /**
  * Created by quanchangnai on 2017/7/6.
@@ -34,8 +29,8 @@ public class DatabaseGenerator extends Generator {
     }
 
     @Override
-    protected String getLanguage() {
-        return "java";
+    protected Language supportLanguage() {
+        return Language.java;
     }
 
     @Override

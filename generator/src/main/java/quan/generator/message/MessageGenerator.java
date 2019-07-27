@@ -16,7 +16,7 @@ public abstract class MessageGenerator extends Generator {
         basicTypes.put("bytes", "byte[]");
         classTypes.put("bytes", "byte[]");
 
-        Template messageTemplate = freemarkerCfg.getTemplate("message." + getLanguage() + ".ftl");
+        Template messageTemplate = freemarkerCfg.getTemplate("message." + supportLanguage() + ".ftl");
 
         templates.put(MessageDefinition.class, messageTemplate);
         templates.put(BeanDefinition.class, messageTemplate);

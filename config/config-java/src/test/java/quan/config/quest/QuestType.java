@@ -38,8 +38,4 @@ public enum QuestType {
         }
     }
 
-    @Override
-    public String toString() {
-        return name();
-    }
 }
