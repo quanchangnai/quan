@@ -5,20 +5,21 @@ import quan.generator.BeanDefinition;
 import quan.generator.ClassDefinition;
 import quan.generator.Generator;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Created by quanchangnai on 2019/7/11.
  */
 public abstract class ConfigGenerator extends Generator {
 
-
-    public ConfigGenerator(String srcPath, String destPath) throws Exception {
-        super(srcPath, destPath);
+    public ConfigGenerator(List<String> srcPaths, String destPath) throws Exception {
+        super(srcPaths, destPath);
 
         Template configTemplate = freemarkerCfg.getTemplate("config." + supportLanguage() + ".ftl");
 
         templates.put(ConfigDefinition.class, configTemplate);
         templates.put(BeanDefinition.class, configTemplate);
-
     }
 
     @Override

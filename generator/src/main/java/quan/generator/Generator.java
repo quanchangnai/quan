@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,25 +50,27 @@ public abstract class Generator {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    protected String srcPath;
+    protected Parser parser = new XmlParser();
 
-    protected String destPath;
+    private List<String> srcPaths;
 
-    protected String packagePrefix;
+    private String destPath;
+
+    private String packagePrefix;
+
+    private String enumPackagePrefix;
 
     protected Configuration freemarkerCfg;
 
     protected Map<Class<? extends ClassDefinition>, Template> templates = new HashMap<>();
 
-    protected Parser parser = new XmlParser();
-
-    public Generator(String srcPath, String destPath) throws Exception {
+    public Generator(List<String> srcPaths, String destPath) throws Exception {
         Configuration freemarkerCfg = new Configuration(Configuration.VERSION_2_3_23);
         freemarkerCfg.setClassForTemplateLoading(Generator.class, "");
         freemarkerCfg.setDefaultEncoding("UTF-8");
         freemarkerCfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
 
-        this.srcPath = srcPath;
+        this.srcPaths = srcPaths;
         this.destPath = destPath;
         this.freemarkerCfg = freemarkerCfg;
 
@@ -83,10 +86,12 @@ public abstract class Generator {
     }
 
     public Generator setPackagePrefix(String packagePrefix) {
-        if (packagePrefix == null && packagePrefix.trim().equals("")) {
-            return this;
-        }
         this.packagePrefix = packagePrefix;
+        return this;
+    }
+
+    public Generator setEnumPackagePrefix(String enumPackagePrefix) {
+        this.enumPackagePrefix = enumPackagePrefix;
         return this;
     }
 
@@ -107,7 +112,8 @@ public abstract class Generator {
 
     public final void generate() throws Exception {
         parser.setPackagePrefix(packagePrefix);
-        parser.setSrcPath(srcPath);
+        parser.setEnumPackagePrefix(enumPackagePrefix);
+        parser.setSrcPaths(srcPaths);
 
         parser.parse();
 

@@ -4,13 +4,17 @@ import quan.generator.ClassDefinition;
 import quan.generator.FieldDefinition;
 import quan.generator.Language;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Created by quanchangnai on 2017/7/6.
  */
 public class CSharpMessageGenerator extends MessageGenerator {
 
-    public CSharpMessageGenerator(String srcPath, String destPath) throws Exception {
-        super(srcPath, destPath);
+    public CSharpMessageGenerator(List<String> srcPaths, String destPath) throws Exception {
+        super(srcPaths, destPath);
+
         basicTypes.put("bool", "bool");
         basicTypes.put("string", "string");
         basicTypes.put("set", "HashSet");
@@ -27,7 +31,10 @@ public class CSharpMessageGenerator extends MessageGenerator {
         classTypes.put("set", "HashSet");
         classTypes.put("list", "List");
         classTypes.put("map", "Dictionary");
+    }
 
+    public CSharpMessageGenerator(String srcPath, String destPath) throws Exception {
+        this(Arrays.asList(srcPath), destPath);
     }
 
     @Override

@@ -5,14 +5,16 @@ import quan.generator.BeanDefinition;
 import quan.generator.ClassDefinition;
 import quan.generator.Generator;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Created by quanchangnai on 2017/7/6.
  */
 public abstract class MessageGenerator extends Generator {
 
-    public MessageGenerator(String srcPath, String destPath) throws Exception {
-        super(srcPath, destPath);
-
+    public MessageGenerator(List<String> srcPaths, String destPath) throws Exception {
+        super(srcPaths, destPath);
         basicTypes.put("bytes", "byte[]");
         classTypes.put("bytes", "byte[]");
 
@@ -20,7 +22,6 @@ public abstract class MessageGenerator extends Generator {
 
         templates.put(MessageDefinition.class, messageTemplate);
         templates.put(BeanDefinition.class, messageTemplate);
-
     }
 
     @Override

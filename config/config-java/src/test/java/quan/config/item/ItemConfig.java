@@ -2,7 +2,8 @@ package quan.config.item;
 
 import java.util.*;
 import com.alibaba.fastjson.*;
-    import quan.config.*;
+import quan.common.ItemType;
+import quan.config.*;
 
 /**
 * 道具<br/>
@@ -15,6 +16,9 @@ public class ItemConfig extends Config {
 
     //名字
     private String name;
+
+    //类型
+    private ItemType type;
 
     /**
      * ID
@@ -30,11 +34,23 @@ public class ItemConfig extends Config {
         return name;
     }
 
+    /**
+     * 类型
+     */
+    public ItemType getType() {
+        return type;
+    }
+
 
     @Override
     protected void parse(JSONObject object) {
         id = object.getIntValue("id");
         name = object.getString("name");
+
+        String $type = object.getString("type");
+        if ($type != null) {
+            type = ItemType.valueOf($type);
+        }
     }
 
     @Override
@@ -42,6 +58,7 @@ public class ItemConfig extends Config {
         return "ItemConfig{" +
                 "id=" + id +
                 ",name='" + name + '\'' +
+                ",type=" + ItemType.valueOf(type.getValue()) +
                 '}';
 
         }

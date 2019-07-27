@@ -3,7 +3,7 @@ package ${packageName};
 import java.util.*;
 import com.alibaba.fastjson.*;
 <#list imports as import>
-    import ${import};
+import ${import};
 </#list>
 
 /**
@@ -94,7 +94,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         </#if>
         String $${field.name} = object.getString("${field.name}");
         if ($${field.name} != null) {
-            ${field.name} = QuestType.valueOf($${field.name});
+            ${field.name} = ${field.type}.valueOf($${field.name});
         }
          <#if field_has_next && fields[field_index+1].primitiveType >
 
@@ -105,7 +105,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         </#if>
         JSONObject $${field.name} = object.getJSONObject("${field.name}");
         if ($${field.name} != null) {
-            ${field.name} = new ${field.basicType}();
+            ${field.name} = new ${field.type}();
             ${field.name}.parse($reward);
         }
         <#if field_has_next && fields[field_index+1].primitiveType >

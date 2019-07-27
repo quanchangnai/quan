@@ -2,7 +2,7 @@ package quan.config.quest;
 
 import java.util.*;
 import com.alibaba.fastjson.*;
-    import quan.config.*;
+import quan.config.*;
 
 /**
 * 奖励<br/>

@@ -1,4 +1,4 @@
-package quan.config.quest;
+package quan.quest;
 
 /**
  * 任务类型<br/>

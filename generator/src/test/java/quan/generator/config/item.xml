@@ -4,6 +4,7 @@
     <config name="ItemConfig" source="道具.csv">道具
         <field name="id" type="int" source="ID" index="unique"/>
         <field name="name" type="string" source="名字"/>
+        <field name="type" type="ItemType" source="类型"/>
     </config>
 
     <config name="EquipConfig" parent="ItemConfig" source="装备.csv">

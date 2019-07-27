@@ -7,13 +7,16 @@ import quan.database.MapField;
 import quan.database.SetField;
 import quan.generator.*;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Created by quanchangnai on 2017/7/6.
  */
 public class DatabaseGenerator extends Generator {
 
-    public DatabaseGenerator(String srcPath, String destPath) throws Exception {
-        super(srcPath, destPath);
+    public DatabaseGenerator(List<String> srcPaths, String destPath) throws Exception {
+        super(srcPaths, destPath);
 
         basicTypes.put("byte", "byte");
         classTypes.put("byte", "Byte");
@@ -26,6 +29,10 @@ public class DatabaseGenerator extends Generator {
         templates.put(DataDefinition.class, dataTemplate);
         templates.put(BeanDefinition.class, dataTemplate);
 
+    }
+
+    public DatabaseGenerator(String srcPath, String destPath) throws Exception {
+        this(Arrays.asList(srcPath), destPath);
     }
 
     @Override

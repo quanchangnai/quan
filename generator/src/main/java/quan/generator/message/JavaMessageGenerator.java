@@ -5,13 +5,20 @@ import quan.generator.ClassDefinition;
 import quan.generator.Language;
 import quan.message.Message;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Created by quanchangnai on 2017/7/6.
  */
 public class JavaMessageGenerator extends MessageGenerator {
 
+    public JavaMessageGenerator(List<String> srcPaths, String destPath) throws Exception {
+        super(srcPaths, destPath);
+    }
+
     public JavaMessageGenerator(String srcPath, String destPath) throws Exception {
-        super(srcPath, destPath);
+        this(Arrays.asList(srcPath), destPath);
     }
 
     @Override

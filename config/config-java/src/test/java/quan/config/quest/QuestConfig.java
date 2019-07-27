@@ -2,7 +2,8 @@ package quan.config.quest;
 
 import java.util.*;
 import com.alibaba.fastjson.*;
-    import quan.config.*;
+import quan.quest.QuestType;
+import quan.config.*;
 
 /**
 * Created by 自动生成

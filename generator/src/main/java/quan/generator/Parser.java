@@ -15,20 +15,32 @@ public abstract class Parser {
 
     protected String packagePrefix;
 
+    protected String enumPackagePrefix;
+
     protected List<File> srcFiles = new ArrayList<>();
 
     protected Map<String, ClassDefinition> classDefinitions = new HashMap<>();
 
-    public void setSrcPath(String srcPath) {
-        File file = new File(srcPath);
-        File[] files = file.listFiles((File dir, String name) -> name.endsWith("." + getSrcFileType()));
-        if (files != null) {
-            srcFiles = Arrays.asList(files);
+    public void setSrcPaths(List<String> srcPaths) {
+        for (String srcPath : srcPaths) {
+            File file = new File(srcPath);
+            File[] files = file.listFiles((File dir, String name) -> name.endsWith("." + getSrcFileType()));
+            if (files != null) {
+                srcFiles.addAll(Arrays.asList(files));
+            }
         }
+    }
+
+    public void setSrcPath(String srcPath) {
+        setSrcPaths(Arrays.asList(srcPath));
     }
 
     public void setPackagePrefix(String packagePrefix) {
         this.packagePrefix = packagePrefix;
+    }
+
+    public void setEnumPackagePrefix(String enumPackagePrefix) {
+        this.enumPackagePrefix = enumPackagePrefix;
     }
 
     protected abstract String getSrcFileType();

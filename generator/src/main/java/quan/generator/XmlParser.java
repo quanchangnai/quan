@@ -37,9 +37,16 @@ public class XmlParser extends Parser {
             return;
         }
 
-        String packageName = srcFile.getName().substring(0, srcFile.getName().lastIndexOf("."));
+        String simplePackageName = srcFile.getName().substring(0, srcFile.getName().lastIndexOf("."));
+
+        String packageName = simplePackageName;
         if (packagePrefix != null) {
             packageName = packagePrefix + "." + packageName;
+        }
+
+        String enumPackageName = packageName;
+        if (enumPackagePrefix != null) {
+            enumPackageName = enumPackagePrefix + "." + simplePackageName;
         }
 
         for (int i = 0; i < root.nodeCount(); i++) {
@@ -68,7 +75,12 @@ public class XmlParser extends Parser {
             classDefinition.setDefinitionFile(srcFile.getName());
             classDefinition.setDefinitionText(element.asXML());
 
-            classDefinition.setPackageName(packageName);
+            if (classDefinition instanceof EnumDefinition) {
+                classDefinition.setPackageName(enumPackageName);
+            } else {
+                classDefinition.setPackageName(packageName);
+            }
+
             classDefinition.setName(element.attributeValue("name"));
             classDefinition.setLang(element.attributeValue("lang"));
 
