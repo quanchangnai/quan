@@ -2,12 +2,13 @@ package quan.config.quest;
 
 import java.util.*;
 import com.alibaba.fastjson.*;
-import quan.quest.QuestType;
 import quan.config.*;
+import quan.quest.QuestType;
 
 /**
 * Created by 自动生成
 */
+@SuppressWarnings({"unchecked"})
 public class QuestConfig extends Config {
 
     //ID
@@ -326,7 +327,7 @@ public class QuestConfig extends Config {
     }
 
     public static QuestConfig getByComposite3(String c1, int c2, int c3) {
-        return getByComposite3(c1, c3).get(c3);
+        return getByComposite3(c1, c2).get(c3);
     }
 
     public static Map<String, Map<Integer, Map<Integer, List<QuestConfig>>>> getComposite4Configs() {
@@ -346,7 +347,7 @@ public class QuestConfig extends Config {
     }
 
 
-    static void index(List<QuestConfig> configs) {
+    public static void index(List<QuestConfig> configs) {
         Map<Long, QuestConfig> idConfigs = new HashMap<>();
         Map<QuestType, List<QuestConfig>> typeConfigs = new HashMap<>();
         Map<Integer, Map<Integer, QuestConfig>> composite1Configs = new HashMap<>();

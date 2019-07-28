@@ -7,6 +7,7 @@ import java.util.Map;
 /**
  * Created by quanchangnai on 2019/7/11.
  */
+@SuppressWarnings({"unchecked"})
 public abstract class Config extends Bean {
 
     protected static Map unmodifiable(Map map) {

@@ -8,6 +8,7 @@ import quan.config.*;
 * 奖励<br/>
 * Created by 自动生成
 */
+@SuppressWarnings({"unchecked"})
 public class Reward extends Bean {
 
     private int itemId;

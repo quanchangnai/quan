@@ -1,6 +1,5 @@
 package quan.generator.config;
 
-import quan.config.Config;
 import quan.generator.BeanDefinition;
 import quan.generator.ClassDefinition;
 import quan.generator.Language;
@@ -26,18 +25,6 @@ public class JavaConfigGenerator extends ConfigGenerator {
     @Override
     protected Language supportLanguage() {
         return Language.java;
-    }
-
-
-    @Override
-    protected void processClassSelf(ClassDefinition classDefinition) {
-        super.processClassSelf(classDefinition);
-        if (!(classDefinition instanceof BeanDefinition)) {
-            return;
-        }
-
-        BeanDefinition beanDefinition = (BeanDefinition) classDefinition;
-        beanDefinition.getImports().add(Config.class.getPackage().getName() + ".*");
     }
 
     public static void main(String[] args) throws Exception {

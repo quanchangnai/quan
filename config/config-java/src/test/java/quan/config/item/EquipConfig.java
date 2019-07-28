@@ -7,6 +7,7 @@ import quan.config.*;
 /**
 * Created by 自动生成
 */
+@SuppressWarnings({"unchecked"})
 public class EquipConfig extends Config {
 
     //部位
@@ -47,7 +48,7 @@ public class EquipConfig extends Config {
     }
 
 
-    static void index(List<EquipConfig> configs) {
+    public static void index(List<EquipConfig> configs) {
         Map<Integer, List<EquipConfig>> positionConfigs = new HashMap<>();
 
         for (EquipConfig config : configs) {

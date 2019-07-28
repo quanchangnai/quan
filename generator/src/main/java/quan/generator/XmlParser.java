@@ -58,18 +58,24 @@ public class XmlParser extends Parser {
             Element element = (Element) node;
             ClassDefinition classDefinition;
 
-            if (element.getName().equals("enum")) {
-                classDefinition = new EnumDefinition();
-            } else if (element.getName().equals("bean")) {
-                classDefinition = new BeanDefinition();
-            } else if (element.getName().equals("message")) {
-                classDefinition = new MessageDefinition(element.attributeValue("id"));
-            } else if (element.getName().equals("data")) {
-                classDefinition = new DataDefinition(element.attributeValue("key"), element.attributeValue("persistent"));
-            } else if (element.getName().equals("config")) {
-                classDefinition = new ConfigDefinition(element.attributeValue("source"), element.attributeValue("parent"));
-            } else {
-                continue;
+            switch (element.getName()) {
+                case "enum":
+                    classDefinition = new EnumDefinition();
+                    break;
+                case "bean":
+                    classDefinition = new BeanDefinition();
+                    break;
+                case "message":
+                    classDefinition = new MessageDefinition(element.attributeValue("id"));
+                    break;
+                case "data":
+                    classDefinition = new DataDefinition(element.attributeValue("key"), element.attributeValue("persistent"));
+                    break;
+                case "config":
+                    classDefinition = new ConfigDefinition(element.attributeValue("source"), element.attributeValue("parent"));
+                    break;
+                default:
+                    continue;
             }
 
             classDefinition.setDefinitionFile(srcFile.getName());
@@ -85,10 +91,10 @@ public class XmlParser extends Parser {
             classDefinition.setLang(element.attributeValue("lang"));
 
             String comment = root.node(i - 1).getText();
-            comment = comment.replaceAll("\r|\n", "").trim();
+            comment = comment.replaceAll("[\r\n]", "").trim();
             if (comment.equals("")) {
                 comment = element.node(0).getText();
-                comment = comment.replaceAll("\r|\n", "").trim();
+                comment = comment.replaceAll("[\r\n]", "").trim();
             }
             classDefinition.setComment(comment);
 
@@ -155,7 +161,7 @@ public class XmlParser extends Parser {
         fieldDefinition.setIndex(fieldElement.attributeValue("index"));
 
         String comment = classElement.node(i + 1).getText();
-        comment = comment.replaceAll("\r|\n", "").trim();
+        comment = comment.replaceAll("[\r\n]", "").trim();
         fieldDefinition.setComment(comment);
 
         classDefinition.addField(fieldDefinition);
@@ -168,7 +174,7 @@ public class XmlParser extends Parser {
         indexDefinition.setFieldNames(indexElement.attributeValue("fields"));
 
         String comment = classElement.node(i + 1).getText();
-        comment = comment.replaceAll("\r|\n", "").trim();
+        comment = comment.replaceAll("[\r\n]", "").trim();
 
         indexDefinition.setComment(comment);
 

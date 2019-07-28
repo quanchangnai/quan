@@ -2,13 +2,14 @@ package quan.config.item;
 
 import java.util.*;
 import com.alibaba.fastjson.*;
-import quan.common.ItemType;
 import quan.config.*;
+import quan.common.ItemType;
 
 /**
 * 道具<br/>
 * Created by 自动生成
 */
+@SuppressWarnings({"unchecked"})
 public class ItemConfig extends Config {
 
     //ID
@@ -77,7 +78,7 @@ public class ItemConfig extends Config {
     }
 
 
-    static void index(List<ItemConfig> configs) {
+    public static void index(List<ItemConfig> configs) {
         Map<Integer, ItemConfig> idConfigs = new HashMap<>();
 
         for (ItemConfig config : configs) {

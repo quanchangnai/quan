@@ -2,6 +2,7 @@ package ${packageName};
 
 import java.util.*;
 import com.alibaba.fastjson.*;
+import quan.config.*;
 <#list imports as import>
 import ${import};
 </#list>
@@ -12,6 +13,7 @@ import ${import};
 </#if>
 * Created by 自动生成
 */
+@SuppressWarnings({"unchecked"})
 public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType ==6>Config</#if> {
 
 <#list fields as field>
@@ -221,7 +223,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     }
 
     public static ${name} getBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name}, ${index.fields[2].basicType} ${index.fields[2].name}) {
-        return getBy${index.name?cap_first}(${index.fields[0].name}, ${index.fields[2].name}).get(${index.fields[2].name});
+        return getBy${index.name?cap_first}(${index.fields[0].name}, ${index.fields[1].name}).get(${index.fields[2].name});
     }
 
         <#elseif index.normal && index.fields?size==3>
@@ -244,7 +246,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         </#if>
     </#list>
 
-    static void index(List<${name}> configs) {
+    public static void index(List<${name}> configs) {
     <#list indexes as index>
         <#if index.unique && index.fields?size==1>
         Map<${index.fields[0].classType}, ${name}> ${index.name}Configs = new HashMap<>();

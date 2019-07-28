@@ -87,10 +87,7 @@ public abstract class ClassDefinition extends Definition {
     }
 
     public boolean supportLanguage(Language language) {
-        if (languages.isEmpty() || languages.contains(language.name())) {
-            return true;
-        }
-        return false;
+        return languages.isEmpty() || languages.contains(language.name());
     }
 
     public void validate() {

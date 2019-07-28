@@ -32,7 +32,7 @@ public abstract class Parser {
     }
 
     public void setSrcPath(String srcPath) {
-        setSrcPaths(Arrays.asList(srcPath));
+        setSrcPaths(Collections.singletonList(srcPath));
     }
 
     public void setPackagePrefix(String packagePrefix) {

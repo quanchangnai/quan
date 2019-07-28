@@ -7,6 +7,7 @@ import quan.config.*;
 /**
 * Created by 自动生成
 */
+@SuppressWarnings({"unchecked"})
 public class QuestTargetConfig extends Config {
 
     //ID
@@ -59,7 +60,7 @@ public class QuestTargetConfig extends Config {
     }
 
 
-    static void index(List<QuestTargetConfig> configs) {
+    public static void index(List<QuestTargetConfig> configs) {
         Map<Long, QuestTargetConfig> idConfigs = new HashMap<>();
 
         for (QuestTargetConfig config : configs) {

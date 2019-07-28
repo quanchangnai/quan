@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Linq;
 
 namespace MessageCS
 {
@@ -164,7 +163,7 @@ namespace MessageCS
         {
             var length = ReadInt();
             var bytes = new byte[length];
-            Array.Copy(this._bytes, _position, bytes, 0, length);
+            Array.Copy(_bytes, _position, bytes, 0, length);
             _position += length;
             return bytes;
         }
@@ -238,7 +237,7 @@ namespace MessageCS
             if (!_reading)
             {
                 _reading = true;
-                _end = this._position - 1;
+                _end = _position - 1;
             }
 
             _position = position;
@@ -265,7 +264,7 @@ namespace MessageCS
         private void CheckCapacity(int minAddValue)
         {
             var capacity = Capacity();
-            var position = _reading ? 0 : this._position;
+            var position = _reading ? 0 : _position;
             if (position + minAddValue < capacity)
             {
                 return;
@@ -279,7 +278,7 @@ namespace MessageCS
             }
 
             var newBytes = new byte[newCapacity];
-            Array.Copy(this._bytes, 0, newBytes, 0, capacity);
+            Array.Copy(_bytes, 0, newBytes, 0, capacity);
             _bytes = newBytes;
 
             if (!_reading)
@@ -319,7 +318,7 @@ namespace MessageCS
         {
             CheckCapacity(10 + bytes.Length);
             WriteInt(bytes.Length);
-            Array.Copy(bytes, 0, this._bytes, _position, bytes.Length);
+            Array.Copy(bytes, 0, _bytes, _position, bytes.Length);
             _position += bytes.Length;
         }
 
@@ -346,7 +345,7 @@ namespace MessageCS
         public void WriteFloat(float n)
         {
             CheckCapacity(4);
-            var position = _reading ? 0 : this._position;
+            var position = _reading ? 0 : _position;
             var temp = BitConverter.ToInt32(BitConverter.GetBytes(n), 0);
             var shift = 0;
             while (shift < 32)
@@ -379,7 +378,7 @@ namespace MessageCS
         public void WriteDouble(double n)
         {
             CheckCapacity(8);
-            var position = _reading ? 0 : this._position;
+            var position = _reading ? 0 : _position;
             var temp = BitConverter.DoubleToInt64Bits(n);
             var shift = 0;
             while (shift < 64)
