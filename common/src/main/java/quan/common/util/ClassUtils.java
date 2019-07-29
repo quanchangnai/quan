@@ -5,6 +5,7 @@ import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.jar.asm.ClassReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import quan.common.tuple.One;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,6 +15,7 @@ import java.net.JarURLConnection;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -28,8 +30,8 @@ public class ClassUtils {
     /**
      * 从字节码里读取类名
      *
-     * @param classBytes
-     * @return
+     * @param classBytes 类的字节码
+     * @return 类名
      */
     public static String readClassName(byte[] classBytes) {
         ClassReader classReader = new ClassReader(classBytes);
@@ -39,8 +41,7 @@ public class ClassUtils {
     /**
      * 重定义类
      *
-     * @param classBytes
-     * @throws Exception
+     * @param classBytes 类的字节码
      */
     public static synchronized void redefineClass(byte[] classBytes) {
         try {
@@ -70,8 +71,8 @@ public class ClassUtils {
         return loadClasses(packageName, null, null);
     }
 
-    public static Set<Class<?>> loadClasses(Class<?> superClass) {
-        return loadClasses(null, superClass, null);
+    public static Set<Class<?>> loadClasses(String packageName, Class<?> superClass) {
+        return loadClasses(packageName, superClass, null);
     }
 
     /**
@@ -79,13 +80,10 @@ public class ClassUtils {
      *
      * @param packageName 该包以及子包下面的所有类
      * @param superClass  该类的子孙类
-     * @return
-     * @throws Exception
+     * @return 符合条件的类
      */
     public static Set<Class<?>> loadClasses(String packageName, Class<?> superClass, ClassLoader classLoader) {
-        if (packageName == null) {
-            packageName = "";
-        }
+        Objects.requireNonNull(packageName, "包名不能为空");
         packageName = packageName.replace(".", "/");
 
         if (classLoader == null) {
@@ -171,8 +169,11 @@ public class ClassUtils {
 
     private static void parseFile(Set<File> resultFiles, File file) throws Exception {
         if (file.isDirectory()) {
-            for (File listFile : file.listFiles()) {
-                parseFile(resultFiles, listFile);
+            File[] listFiles = file.listFiles();
+            if (listFiles != null) {
+                for (File listFile : listFiles) {
+                    parseFile(resultFiles, listFile);
+                }
             }
         } else {
             String fileName = file.getCanonicalPath();
@@ -182,4 +183,7 @@ public class ClassUtils {
         }
     }
 
+    public static void main(String[] args) {
+        System.err.println(loadClasses("quan", One.class));
+    }
 }

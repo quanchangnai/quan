@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * Created by quanchangnai on 2017/7/10.
  */
-public class XmlParser extends Parser {
+public class XmlDefinitionParser extends DefinitionParser {
 
     @Override
     protected String getSrcFileType() {
@@ -91,10 +91,10 @@ public class XmlParser extends Parser {
             classDefinition.setLang(element.attributeValue("lang"));
 
             String comment = root.node(i - 1).getText();
-            comment = comment.replaceAll("[\r\n]", "").trim();
+            comment = comment.replaceAll("[\r|\n]", "").trim();
             if (comment.equals("")) {
                 comment = element.node(0).getText();
-                comment = comment.replaceAll("[\r\n]", "").trim();
+                comment = comment.replaceAll("[\r|\n]", "").trim();
             }
             classDefinition.setComment(comment);
 
@@ -161,7 +161,7 @@ public class XmlParser extends Parser {
         fieldDefinition.setIndex(fieldElement.attributeValue("index"));
 
         String comment = classElement.node(i + 1).getText();
-        comment = comment.replaceAll("[\r\n]", "").trim();
+        comment = comment.replaceAll("[\r|\n]", "").trim();
         fieldDefinition.setComment(comment);
 
         classDefinition.addField(fieldDefinition);
@@ -174,7 +174,7 @@ public class XmlParser extends Parser {
         indexDefinition.setFieldNames(indexElement.attributeValue("fields"));
 
         String comment = classElement.node(i + 1).getText();
-        comment = comment.replaceAll("[\r\n]", "").trim();
+        comment = comment.replaceAll("[\r|\n]", "").trim();
 
         indexDefinition.setComment(comment);
 

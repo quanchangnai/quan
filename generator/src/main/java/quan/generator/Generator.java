@@ -49,7 +49,7 @@ public abstract class Generator {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    protected Parser parser = new XmlParser();
+    protected DefinitionParser definitionParser = new XmlDefinitionParser();
 
     private List<String> srcPaths;
 
@@ -94,8 +94,8 @@ public abstract class Generator {
         return this;
     }
 
-    public Generator setParser(Parser parser) {
-        this.parser = parser;
+    public Generator setDefinitionParser(DefinitionParser definitionParser) {
+        this.definitionParser = definitionParser;
         return this;
     }
 
@@ -107,11 +107,11 @@ public abstract class Generator {
     }
 
     public final void generate() throws Exception {
-        parser.setPackagePrefix(packagePrefix);
-        parser.setEnumPackagePrefix(enumPackagePrefix);
-        parser.setSrcPaths(srcPaths);
+        definitionParser.setPackagePrefix(packagePrefix);
+        definitionParser.setEnumPackagePrefix(enumPackagePrefix);
+        definitionParser.setSrcPaths(srcPaths);
 
-        parser.parse();
+        definitionParser.parse();
 
         List<ClassDefinition> classDefinitions = ClassDefinition.getAll().values().stream().filter(this::support).collect(Collectors.toList());
 
@@ -129,18 +129,17 @@ public abstract class Generator {
             }
             Template template = templates.get(classDefinition.getClass());
             String packageName = classDefinition.getPackageName();
-
-            String packagePath = packageName.replace(".", "\\");
-            File destFilePath = new File(destPath + "\\" + packagePath);
-            if (!destFilePath.exists()) {
-                destFilePath.mkdirs();
+            File destFilePath = new File(destPath + File.separator + packageName.replace(".", File.separator));
+            if (!destFilePath.exists() && !destFilePath.mkdirs()) {
+                logger.info("创建目录[{}]失败", destFilePath);
+                continue;
             }
 
             String fileName = classDefinition.getName() + "." + supportLanguage();
             Writer writer = new FileWriter(new File(destFilePath, fileName));
             template.process(classDefinition, writer);
 
-            logger.info("生成[{}]成功", destFilePath + "\\" + fileName);
+            logger.info("生成[{}]成功", destFilePath + File.separator + fileName);
         }
 
     }
@@ -214,5 +213,6 @@ public abstract class Generator {
             beanDefinition.getImports().add(resolveFieldImport(fieldDefinition, false));
         }
     }
+
 
 }

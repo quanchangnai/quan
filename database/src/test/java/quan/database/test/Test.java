@@ -1,6 +1,8 @@
 package quan.database.test;
 
-import quan.database.Transaction;
+import quan.common.util.ClassUtils;
+
+import java.util.List;
 
 /**
  * Created by quanchangnai on 2019/7/1.
@@ -8,7 +10,6 @@ import quan.database.Transaction;
 public class Test {
 
     public static void main(String[] args) {
-        Transaction transaction = Transaction.get();
     }
 
 }

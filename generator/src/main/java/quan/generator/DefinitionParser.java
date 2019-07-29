@@ -9,7 +9,7 @@ import java.util.*;
 /**
  * Created by quanchangnai on 2019/7/9.
  */
-public abstract class Parser {
+public abstract class DefinitionParser {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
