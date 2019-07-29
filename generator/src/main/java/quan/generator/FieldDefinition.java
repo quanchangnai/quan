@@ -269,4 +269,19 @@ public class FieldDefinition extends Definition {
         this.index = index;
         return this;
     }
+
+    public FieldDefinition copy(ClassDefinition classDefinition) {
+        FieldDefinition fieldDefinition = new FieldDefinition();
+        fieldDefinition.setName(getName());
+        fieldDefinition.type = type;
+        fieldDefinition.value = value;
+        fieldDefinition.source = source;
+        fieldDefinition.optional = optional;
+        fieldDefinition.keyType = keyType;
+        fieldDefinition.valueType = valueType;
+        fieldDefinition.index = index;
+        fieldDefinition.setComment(getComment());
+        fieldDefinition.setClassDefinition(classDefinition);
+        return fieldDefinition;
+    }
 }

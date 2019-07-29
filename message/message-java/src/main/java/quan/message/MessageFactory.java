@@ -25,8 +25,8 @@ public class MessageFactory {
         prototypes.put(message.getId(), message);
     }
 
-    public void autoRegister() {
-        Set<Class<?>> messageClasses = ClassUtils.loadClasses(Message.class);
+    public void autoRegister(String packageName) {
+        Set<Class<?>> messageClasses = ClassUtils.loadClasses(packageName, Message.class);
         for (Class<?> messageClass : messageClasses) {
             try {
                 Message message = (Message) messageClass.getDeclaredConstructor().newInstance();

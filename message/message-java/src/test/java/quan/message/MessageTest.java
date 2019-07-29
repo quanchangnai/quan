@@ -15,7 +15,7 @@ public class MessageTest {
     public static MessageFactory messageFactory = new MessageFactory();
 
     static {
-        messageFactory.autoRegister();
+        messageFactory.autoRegister("quan");
     }
 
     public static void main(String[] args) throws Exception {

@@ -75,6 +75,10 @@ public class ClassUtils {
         return loadClasses(packageName, superClass, null);
     }
 
+    public static Set<Class<?>> loadClasses(String packageName, ClassLoader classLoader) {
+        return loadClasses(packageName, null, classLoader);
+    }
+
     /**
      * 加载符合条件的类
      *

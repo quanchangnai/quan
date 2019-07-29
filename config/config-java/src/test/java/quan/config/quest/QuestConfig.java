@@ -259,12 +259,6 @@ public class QuestConfig extends Config {
         }
 
 
-    //ID
-	private static Map<Long, QuestConfig> idConfigs = new HashMap<>();
-
-    //类型
-    private static Map<QuestType, List<QuestConfig>> typeConfigs = new HashMap<>();
-
     private static Map<Integer, Map<Integer, QuestConfig>> composite1Configs = new HashMap<>();
 
     private static Map<Integer, Map<Boolean, List<QuestConfig>>> composite2Configs = new HashMap<>();
@@ -273,22 +267,12 @@ public class QuestConfig extends Config {
 
     private static Map<String, Map<Integer, Map<Integer, List<QuestConfig>>>> composite4Configs = new HashMap<>();
 
+    //ID
+	private static Map<Long, QuestConfig> idConfigs = new HashMap<>();
 
-    public static Map<Long, QuestConfig> getIdConfigs() {
-        return idConfigs;
-    }
+    //类型
+    private static Map<QuestType, List<QuestConfig>> typeConfigs = new HashMap<>();
 
-    public static QuestConfig getById(long id) {
-        return idConfigs.get(id);
-    }
-
-    public static Map<QuestType, List<QuestConfig>> getTypeConfigs() {
-        return typeConfigs;
-    }
-
-    public static List<QuestConfig> getByType(QuestType type) {
-        return typeConfigs.getOrDefault(type, Collections.emptyList());
-    }
 
     public static Map<Integer, Map<Integer, QuestConfig>> getComposite1Configs() {
         return composite1Configs;
@@ -346,22 +330,32 @@ public class QuestConfig extends Config {
         return getByComposite4(d1, d2).getOrDefault(d3, Collections.emptyList());
     }
 
+    public static Map<Long, QuestConfig> getIdConfigs() {
+        return idConfigs;
+    }
+
+    public static QuestConfig getById(long id) {
+        return idConfigs.get(id);
+    }
+
+    public static Map<QuestType, List<QuestConfig>> getTypeConfigs() {
+        return typeConfigs;
+    }
+
+    public static List<QuestConfig> getByType(QuestType type) {
+        return typeConfigs.getOrDefault(type, Collections.emptyList());
+    }
+
 
     public static void index(List<QuestConfig> configs) {
-        Map<Long, QuestConfig> idConfigs = new HashMap<>();
-        Map<QuestType, List<QuestConfig>> typeConfigs = new HashMap<>();
         Map<Integer, Map<Integer, QuestConfig>> composite1Configs = new HashMap<>();
         Map<Integer, Map<Boolean, List<QuestConfig>>> composite2Configs = new HashMap<>();
         Map<String, Map<Integer, Map<Integer, QuestConfig>>> composite3Configs = new HashMap<>();
         Map<String, Map<Integer, Map<Integer, List<QuestConfig>>>> composite4Configs = new HashMap<>();
+        Map<Long, QuestConfig> idConfigs = new HashMap<>();
+        Map<QuestType, List<QuestConfig>> typeConfigs = new HashMap<>();
 
         for (QuestConfig config : configs) {
-            if (idConfigs.put(config.id, config) != null) {
-                throw new RuntimeException("配置[QuestConfig]的索引[id]:[" + config.id + "]有重复");
-            }
-
-            typeConfigs.computeIfAbsent(config.type, k -> new ArrayList<>()).add(config);
-
             if (composite1Configs.computeIfAbsent(config.a1, k -> new HashMap<>()).put(config.a2, config) != null) {
                 throw new RuntimeException("配置[QuestConfig]的索引[[a1,[a2]:[" + config.a1 + "," + config.a2 + "]有重复");
             }
@@ -373,14 +367,20 @@ public class QuestConfig extends Config {
             }
 
             composite4Configs.computeIfAbsent(config.d1, k -> new HashMap<>()).computeIfAbsent(config.d2, k -> new HashMap<>()).computeIfAbsent(config.d3, k -> new ArrayList<>()).add(config);
+
+            if (idConfigs.put(config.id, config) != null) {
+                throw new RuntimeException("配置[QuestConfig]的索引[id]:[" + config.id + "]有重复");
+            }
+
+            typeConfigs.computeIfAbsent(config.type, k -> new ArrayList<>()).add(config);
         }
 
-        QuestConfig.idConfigs = unmodifiable(idConfigs);
-        QuestConfig.typeConfigs = unmodifiable(typeConfigs);
         QuestConfig.composite1Configs = unmodifiable(composite1Configs);
         QuestConfig.composite2Configs = unmodifiable(composite2Configs);
         QuestConfig.composite3Configs = unmodifiable(composite3Configs);
         QuestConfig.composite4Configs = unmodifiable(composite4Configs);
+        QuestConfig.idConfigs = unmodifiable(idConfigs);
+        QuestConfig.typeConfigs = unmodifiable(typeConfigs);
 
     }
 

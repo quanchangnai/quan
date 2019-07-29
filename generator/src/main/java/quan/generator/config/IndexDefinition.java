@@ -20,12 +20,6 @@ public class IndexDefinition extends Definition {
     //被索引的字段
     private List<FieldDefinition> fields = new ArrayList<>();
 
-    private FieldDefinition field1;
-
-    private FieldDefinition field2;
-
-    private FieldDefinition field3;
-
     private ConfigDefinition configDefinition;
 
     public IndexDefinition() {
@@ -92,4 +86,16 @@ public class IndexDefinition extends Definition {
         return this;
     }
 
+    public IndexDefinition copy(ConfigDefinition configDefinition) {
+        IndexDefinition indexDefinition = new IndexDefinition();
+        indexDefinition.setName(getName());
+        indexDefinition.type = type;
+        indexDefinition.fieldNames = fieldNames;
+        indexDefinition.setComment(getComment());
+        indexDefinition.setConfigDefinition(configDefinition);
+        for (FieldDefinition fieldDefinition : fields) {
+            indexDefinition.addField(fieldDefinition.copy(configDefinition));
+        }
+        return indexDefinition;
+    }
 }

@@ -26,9 +26,9 @@ public abstract class ClassDefinition extends Definition {
      */
     private String definitionText;
 
-    private List<String> languages = new ArrayList<>();
+    protected List<String> languages = new ArrayList<>();
 
-    private List<FieldDefinition> fields = new ArrayList<>();
+    protected List<FieldDefinition> fields = new ArrayList<>();
 
     protected Map<String, FieldDefinition> fieldMap = new HashMap<>();
 
