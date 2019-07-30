@@ -251,16 +251,6 @@ public class FieldDefinition extends Definition {
     }
 
 
-    public ClassDefinition getClassDefinition() {
-        return classDefinition;
-    }
-
-    public FieldDefinition setClassDefinition(ClassDefinition classDefinition) {
-        this.classDefinition = classDefinition;
-        return this;
-    }
-
-
     public String getIndex() {
         return index;
     }
@@ -270,18 +260,4 @@ public class FieldDefinition extends Definition {
         return this;
     }
 
-    public FieldDefinition copy(ClassDefinition classDefinition) {
-        FieldDefinition fieldDefinition = new FieldDefinition();
-        fieldDefinition.setName(getName());
-        fieldDefinition.type = type;
-        fieldDefinition.value = value;
-        fieldDefinition.source = source;
-        fieldDefinition.optional = optional;
-        fieldDefinition.keyType = keyType;
-        fieldDefinition.valueType = valueType;
-        fieldDefinition.index = index;
-        fieldDefinition.setComment(getComment());
-        fieldDefinition.setClassDefinition(classDefinition);
-        return fieldDefinition;
-    }
 }

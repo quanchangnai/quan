@@ -231,15 +231,11 @@ public class RoleData2 extends Data<Long> {
         object.put("items", $items);
 
         JSONArray $set = new JSONArray();
-        for (Boolean $set$Value : set) {
-            $set.add($set$Value);
-        }
+        $set.addAll(set);
         object.put("set", $set);
 
         JSONArray $list = new JSONArray();
-        for (String $list$Value : list) {
-            $list.add($list$Value);
-        }
+        $list.addAll(list);
         object.put("list", $list);
 
         JSONObject $map = new JSONObject();

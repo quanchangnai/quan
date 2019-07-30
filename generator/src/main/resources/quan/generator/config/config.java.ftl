@@ -127,8 +127,6 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
             </#if>
             <#if field.type == "string">
                 <#lt>${field.name}='" + ${field.name} + '\'' +
-            <#elseif field.enumType>
-                <#lt>${field.name}=" + ${field.type}.valueOf(${field.name}.getValue()) +
             <#else>
                 <#lt>${field.name}=" + ${field.name} +
             </#if>

@@ -44,17 +44,11 @@ public class IndexDefinition extends Definition {
     }
 
     public boolean isUnique() {
-        if (type.equals("unique") || type.equals("u")) {
-            return true;
-        }
-        return false;
+        return type.equals("unique") || type.equals("u");
     }
 
     public boolean isNormal() {
-        if (type.equals("normal") || type.equals("n")) {
-            return true;
-        }
-        return false;
+        return type.equals("normal") || type.equals("n");
     }
 
     public String getType() {
@@ -84,18 +78,5 @@ public class IndexDefinition extends Definition {
     public IndexDefinition setFieldNames(String fieldNames) {
         this.fieldNames = fieldNames;
         return this;
-    }
-
-    public IndexDefinition copy(ConfigDefinition configDefinition) {
-        IndexDefinition indexDefinition = new IndexDefinition();
-        indexDefinition.setName(getName());
-        indexDefinition.type = type;
-        indexDefinition.fieldNames = fieldNames;
-        indexDefinition.setComment(getComment());
-        indexDefinition.setConfigDefinition(configDefinition);
-        for (FieldDefinition fieldDefinition : fields) {
-            indexDefinition.addField(fieldDefinition.copy(configDefinition));
-        }
-        return indexDefinition;
     }
 }

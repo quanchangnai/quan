@@ -14,12 +14,12 @@ import java.util.List;
 public class JavaConfigGenerator extends ConfigGenerator {
 
 
-    public JavaConfigGenerator(List<String> srcPaths, String destPath) throws Exception {
-        super(srcPaths, destPath);
+    public JavaConfigGenerator(List<String> definitionPaths, String codePath) throws Exception {
+        super(definitionPaths, codePath);
     }
 
-    public JavaConfigGenerator(String srcPath, String destPath) throws Exception {
-        this(Collections.singletonList(srcPath), destPath);
+    public JavaConfigGenerator(String definitionPaths, String codePath) throws Exception {
+        this(Collections.singletonList(definitionPaths), codePath);
     }
 
     @Override
@@ -29,16 +29,15 @@ public class JavaConfigGenerator extends ConfigGenerator {
 
     public static void main(String[] args) throws Exception {
 
-        List<String> srcPaths = new ArrayList<>();
-        srcPaths.add("generator\\src\\test\\java\\quan\\generator");
-        srcPaths.add("generator\\src\\test\\java\\quan\\generator\\config");
+        List<String> definitionPaths = new ArrayList<>();
+        definitionPaths.add("generator\\src\\test\\java\\quan\\generator");
+        definitionPaths.add("generator\\src\\test\\java\\quan\\generator\\config");
         String destPath = "config\\config-java\\src\\test\\java";
-        String packagePrefix = "quan.config";
 
-        JavaConfigGenerator generator = new JavaConfigGenerator(srcPaths, destPath);
-
-        generator.setPackagePrefix(packagePrefix);
+        JavaConfigGenerator generator = new JavaConfigGenerator(definitionPaths, destPath);
+        generator.setPackagePrefix("quan.config");
         generator.setEnumPackagePrefix("quan");
+
         generator.generate();
     }
 }

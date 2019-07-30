@@ -18,7 +18,7 @@ import java.util.List;
 public class XmlDefinitionParser extends DefinitionParser {
 
     @Override
-    protected String getSrcFileType() {
+    protected String getDefinitionFileType() {
         return "xml";
     }
 

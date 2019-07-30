@@ -13,8 +13,8 @@ import java.util.List;
  */
 public abstract class MessageGenerator extends Generator {
 
-    public MessageGenerator(List<String> srcPaths, String destPath) throws Exception {
-        super(srcPaths, destPath);
+    public MessageGenerator(List<String> definitionPaths, String codePath) throws Exception {
+        super(definitionPaths, codePath);
         basicTypes.put("bytes", "byte[]");
         classTypes.put("bytes", "byte[]");
 

@@ -163,13 +163,13 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 
         </#if>
         JSONArray $${field.name} = new JSONArray();
-        for (${field.classValueType} $${field.name}$Value : ${field.name}) {
         <#if !field.valueBuiltInType>
+        for (${field.classValueType} $${field.name}$Value : ${field.name}) {
             $${field.name}.add($${field.name}$Value.encode());
-        <#else>
-            $${field.name}.add($${field.name}$Value);
-        </#if>
         }
+        <#else>
+        $${field.name}.addAll(${field.name});
+        </#if>
         object.put("${field.name}", $${field.name});
         <#if field_has_next && (fields[field_index+1].enumType || fields[field_index+1].primitiveType) >
 

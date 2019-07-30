@@ -13,12 +13,12 @@ import java.util.List;
  */
 public class JavaMessageGenerator extends MessageGenerator {
 
-    public JavaMessageGenerator(List<String> srcPaths, String destPath) throws Exception {
-        super(srcPaths, destPath);
+    public JavaMessageGenerator(List<String> definitionPaths, String codePath) throws Exception {
+        super(definitionPaths, codePath);
     }
 
-    public JavaMessageGenerator(String srcPath, String destPath) throws Exception {
-        this(Collections.singletonList(srcPath), destPath);
+    public JavaMessageGenerator(String definitionPath, String codePath) throws Exception {
+        this(Collections.singletonList(definitionPath), codePath);
     }
 
     @Override
@@ -39,11 +39,11 @@ public class JavaMessageGenerator extends MessageGenerator {
 
 
     public static void main(String[] args) throws Exception {
-        String srcPath = "generator\\src\\test\\java\\quan\\generator\\message";
-        String destPath = "message\\message-java\\src\\test\\java";
+        String definitionPath = "generator\\src\\test\\java\\quan\\generator\\message";
+        String codePath = "message\\message-java\\src\\test\\java";
         String packagePrefix = "quan.message";
 
-        JavaMessageGenerator messageGenerator = new JavaMessageGenerator(srcPath, destPath);
+        JavaMessageGenerator messageGenerator = new JavaMessageGenerator(definitionPath, codePath);
         messageGenerator.setPackagePrefix(packagePrefix);
         messageGenerator.generate();
     }

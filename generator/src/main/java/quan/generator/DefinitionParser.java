@@ -17,22 +17,22 @@ public abstract class DefinitionParser {
 
     protected String enumPackagePrefix;
 
-    protected List<File> srcFiles = new ArrayList<>();
+    protected List<File> definitionFiles = new ArrayList<>();
 
     protected Map<String, ClassDefinition> classDefinitions = new HashMap<>();
 
-    public void setSrcPaths(List<String> srcPaths) {
-        for (String srcPath : srcPaths) {
-            File file = new File(srcPath);
-            File[] files = file.listFiles((File dir, String name) -> name.endsWith("." + getSrcFileType()));
+    public void setDefinitionPaths(List<String> definitionPaths) {
+        for (String path : definitionPaths) {
+            File file = new File(path);
+            File[] files = file.listFiles((File dir, String name) -> name.endsWith("." + getDefinitionFileType()));
             if (files != null) {
-                srcFiles.addAll(Arrays.asList(files));
+                definitionFiles.addAll(Arrays.asList(files));
             }
         }
     }
 
     public void setSrcPath(String srcPath) {
-        setSrcPaths(Collections.singletonList(srcPath));
+        setDefinitionPaths(Collections.singletonList(srcPath));
     }
 
     public void setPackagePrefix(String packagePrefix) {
@@ -43,16 +43,16 @@ public abstract class DefinitionParser {
         this.enumPackagePrefix = enumPackagePrefix;
     }
 
-    protected abstract String getSrcFileType();
+    protected abstract String getDefinitionFileType();
 
     public void parse() throws Exception {
-        for (File srcFile : srcFiles) {
+        for (File srcFile : definitionFiles) {
             parseClasses(srcFile);
         }
 
         ClassDefinition.getAll().putAll(classDefinitions);
 
-        for (File srcFile : srcFiles) {
+        for (File srcFile : definitionFiles) {
             parseFields(srcFile);
         }
 

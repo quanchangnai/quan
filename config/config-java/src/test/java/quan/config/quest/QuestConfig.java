@@ -239,7 +239,7 @@ public class QuestConfig extends Config {
         return "QuestConfig{" +
                 "id=" + id +
                 ",name='" + name + '\'' +
-                ",type=" + QuestType.valueOf(type.getValue()) +
+                ",type=" + type +
                 ",a1=" + a1 +
                 ",a2=" + a2 +
                 ",b1=" + b1 +

@@ -12,8 +12,8 @@ import java.util.List;
  */
 public class CSharpMessageGenerator extends MessageGenerator {
 
-    public CSharpMessageGenerator(List<String> srcPaths, String destPath) throws Exception {
-        super(srcPaths, destPath);
+    public CSharpMessageGenerator(List<String> definitionPaths, String codePath) throws Exception {
+        super(definitionPaths, codePath);
 
         basicTypes.put("bool", "bool");
         basicTypes.put("string", "string");
@@ -33,8 +33,8 @@ public class CSharpMessageGenerator extends MessageGenerator {
         classTypes.put("map", "Dictionary");
     }
 
-    public CSharpMessageGenerator(String srcPath, String destPath) throws Exception {
-        this(Collections.singletonList(srcPath), destPath);
+    public CSharpMessageGenerator(String definitionPath, String codePath) throws Exception {
+        this(Collections.singletonList(definitionPath), codePath);
     }
 
     @Override
@@ -70,11 +70,11 @@ public class CSharpMessageGenerator extends MessageGenerator {
 
     public static void main(String[] args) throws Exception {
 
-        String srcPath = "generator\\src\\test\\java\\quan\\generator\\message";
+        String definitionPath = "generator\\src\\test\\java\\quan\\generator\\message";
         String destPath = "message";
         String packagePrefix = "MessageCS.test";
 
-        CSharpMessageGenerator messageGenerator = new CSharpMessageGenerator(srcPath, destPath);
+        CSharpMessageGenerator messageGenerator = new CSharpMessageGenerator(definitionPath, destPath);
         messageGenerator.setPackagePrefix(packagePrefix);
         messageGenerator.generate();
 

@@ -15,8 +15,8 @@ import java.util.List;
  */
 public class DatabaseGenerator extends Generator {
 
-    public DatabaseGenerator(List<String> srcPaths, String destPath) throws Exception {
-        super(srcPaths, destPath);
+    public DatabaseGenerator(List<String> definitionPaths, String codePath) throws Exception {
+        super(definitionPaths, codePath);
 
         basicTypes.put("byte", "byte");
         classTypes.put("byte", "Byte");
@@ -31,8 +31,8 @@ public class DatabaseGenerator extends Generator {
 
     }
 
-    public DatabaseGenerator(String srcPath, String destPath) throws Exception {
-        this(Collections.singletonList(srcPath), destPath);
+    public DatabaseGenerator(String definitionPath, String codePath) throws Exception {
+        this(Collections.singletonList(definitionPath), codePath);
     }
 
     @Override
@@ -59,14 +59,11 @@ public class DatabaseGenerator extends Generator {
         beanDefinition.getImports().add(Data.class.getPackage().getName() + ".*");
     }
 
-
     @Override
-    protected void processBeanField(FieldDefinition fieldDefinition) {
-        super.processBeanField(fieldDefinition);
-
-        ClassDefinition classDefinition = fieldDefinition.getClassDefinition();
-        if (classDefinition instanceof DataDefinition) {
-            DataDefinition dataDefinition = (DataDefinition) classDefinition;
+    protected void processBeanField(BeanDefinition beanDefinition, FieldDefinition fieldDefinition) {
+        super.processBeanField(beanDefinition, fieldDefinition);
+        if (beanDefinition instanceof DataDefinition) {
+            DataDefinition dataDefinition = (DataDefinition) beanDefinition;
             if (fieldDefinition.getName().equals(dataDefinition.getKeyName())) {
                 dataDefinition.setKeyType(classTypes.get(fieldDefinition.getType()));
             }
@@ -76,10 +73,10 @@ public class DatabaseGenerator extends Generator {
     public static void main(String[] args) throws Exception {
 
         String srcPath = "generator\\src\\test\\java\\quan\\generator\\database";
-        String destPath = "database\\src\\test\\java";
+        String codePath = "database\\src\\test\\java";
         String packagePrefix = "quan.database";
 
-        DatabaseGenerator generator = new DatabaseGenerator(srcPath, destPath);
+        DatabaseGenerator generator = new DatabaseGenerator(srcPath, codePath);
         generator.setPackagePrefix(packagePrefix);
         generator.generate();
     }

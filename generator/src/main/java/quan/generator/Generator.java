@@ -51,9 +51,9 @@ public abstract class Generator {
 
     protected DefinitionParser definitionParser = new XmlDefinitionParser();
 
-    private List<String> srcPaths;
+    private List<String> definitionPaths;
 
-    private String destPath;
+    private String codePath;
 
     private String packagePrefix;
 
@@ -63,14 +63,14 @@ public abstract class Generator {
 
     protected Map<Class<? extends ClassDefinition>, Template> templates = new HashMap<>();
 
-    public Generator(List<String> srcPaths, String destPath) throws Exception {
+    public Generator(List<String> definitionPaths, String codePath) throws Exception {
         Configuration freemarkerCfg = new Configuration(Configuration.VERSION_2_3_23);
         freemarkerCfg.setClassForTemplateLoading(Generator.class, "");
         freemarkerCfg.setDefaultEncoding("UTF-8");
         freemarkerCfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
 
-        this.srcPaths = srcPaths;
-        this.destPath = destPath;
+        this.definitionPaths = definitionPaths;
+        this.codePath = codePath;
         this.freemarkerCfg = freemarkerCfg;
 
         Template enumTemplate = freemarkerCfg.getTemplate("enum." + supportLanguage() + ".ftl");
@@ -79,10 +79,6 @@ public abstract class Generator {
         freemarkerCfg.setClassForTemplateLoading(getClass(), "");
     }
 
-
-    public String getPackagePrefix() {
-        return packagePrefix;
-    }
 
     public Generator setPackagePrefix(String packagePrefix) {
         this.packagePrefix = packagePrefix;
@@ -107,9 +103,9 @@ public abstract class Generator {
     }
 
     public final void generate() throws Exception {
+        definitionParser.setDefinitionPaths(definitionPaths);
         definitionParser.setPackagePrefix(packagePrefix);
         definitionParser.setEnumPackagePrefix(enumPackagePrefix);
-        definitionParser.setSrcPaths(srcPaths);
 
         definitionParser.parse();
 
@@ -129,7 +125,7 @@ public abstract class Generator {
             }
             Template template = templates.get(classDefinition.getClass());
             String packageName = classDefinition.getPackageName();
-            File destFilePath = new File(destPath + File.separator + packageName.replace(".", File.separator));
+            File destFilePath = new File(codePath + File.separator + packageName.replace(".", File.separator));
             if (!destFilePath.exists() && !destFilePath.mkdirs()) {
                 logger.info("创建目录[{}]失败", destFilePath);
                 continue;
@@ -150,17 +146,17 @@ public abstract class Generator {
 
     protected void processClassDependency(ClassDefinition classDefinition) {
         for (FieldDefinition fieldDefinition : classDefinition.getFields()) {
-            processField(fieldDefinition);
+            processField(classDefinition, fieldDefinition);
         }
     }
 
-    protected void processField(FieldDefinition fieldDefinition) {
-        if (fieldDefinition.getClassDefinition() instanceof BeanDefinition) {
-            processBeanField(fieldDefinition);
+    protected void processField(ClassDefinition classDefinition, FieldDefinition fieldDefinition) {
+        if (classDefinition instanceof BeanDefinition) {
+            processBeanField((BeanDefinition) classDefinition, fieldDefinition);
         }
     }
 
-    protected void processBeanField(FieldDefinition fieldDefinition) {
+    protected void processBeanField(BeanDefinition beanDefinition, FieldDefinition fieldDefinition) {
         String fieldType = fieldDefinition.getType();
         if (fieldDefinition.isBuiltInType()) {
             fieldDefinition.setBasicType(basicTypes.get(fieldType));
@@ -181,7 +177,7 @@ public abstract class Generator {
             }
         }
 
-        processBeanFieldImports(fieldDefinition);
+        processBeanFieldImports(beanDefinition, fieldDefinition);
 
     }
 
@@ -193,8 +189,7 @@ public abstract class Generator {
         return classDefinition.getFullName();
     }
 
-    protected void processBeanFieldImports(FieldDefinition fieldDefinition) {
-        BeanDefinition beanDefinition = (BeanDefinition) fieldDefinition.getClassDefinition();
+    protected void processBeanFieldImports(BeanDefinition beanDefinition, FieldDefinition fieldDefinition) {
 
         ClassDefinition fieldTypeClassDefinition = ClassDefinition.getAll().get(fieldDefinition.getType());
         if (fieldTypeClassDefinition != null) {

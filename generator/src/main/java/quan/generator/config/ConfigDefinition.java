@@ -14,6 +14,9 @@ public class ConfigDefinition extends BeanDefinition {
 
     private String source;
 
+    private List<String> sources = new ArrayList<>();
+
+    //配置的父类，支持子表
     private String parent;
 
     private List<IndexDefinition> indexes = new ArrayList<>();
@@ -128,14 +131,19 @@ public class ConfigDefinition extends BeanDefinition {
         }
 
         if (source == null || source.trim().equals("")) {
-            throwValidatedError("配置[" + getName() + "]的来源不能为空");
+            throwValidatedError("配置[" + getName() + "]的源表不能为空");
         }
 
-        ConfigDefinition other = sourceConfigs.get(source);
-        if (other != null) {
-            throwValidatedError("配置的来源[" + source + "]不能重复", other);
+        //支持分表
+        String[] sources = source.split("[,]");
+        for (String src : sources) {
+            src = src.trim();
+            ConfigDefinition other = sourceConfigs.get(src);
+            if (other != null) {
+                throwValidatedError("配置[" + getName() + "][" + other.getName() + "]和源表[" + src + "]不能多对一", other);
+            }
+            sourceConfigs.put(src, this);
         }
-        sourceConfigs.put(source, this);
 
         validateParent();
 
@@ -158,22 +166,18 @@ public class ConfigDefinition extends BeanDefinition {
             throwValidatedError("配置[" + getName() + "]的父类[" + parent + "]也必须是配置类");
         }
 
-        Set<ConfigDefinition> parentConfigDefinitions = new HashSet<>();
+        Set<String> parents = new HashSet<>();
         ConfigDefinition parentConfigDefinition = getParentDefinition();
 
         while (parentConfigDefinition != null) {
-            if (parentConfigDefinitions.contains(parentConfigDefinition)) {
-                throwValidatedError("配置[" + getName() + "]的父类不能有循环");
+            if (parents.contains(parentConfigDefinition.getName())) {
+                throwValidatedError("配置[" + getName() + "]的父类" + parents + "不能有循环");
             }
-            for (FieldDefinition selfField : parentConfigDefinition.selfFields) {
-                fields.add(0, selfField.copy(this));
-            }
-            for (IndexDefinition selfIndex : parentConfigDefinition.selfIndexes) {
-                indexes.add(0, selfIndex);
+            parents.add(parentConfigDefinition.getName());
 
-            }
+            fields.addAll(0, parentConfigDefinition.selfFields);
+            indexes.addAll(0, parentConfigDefinition.selfIndexes);
 
-            parentConfigDefinitions.add(parentConfigDefinition);
             parentConfigDefinition = parentConfigDefinition.getParentDefinition();
         }
 
@@ -184,10 +188,10 @@ public class ConfigDefinition extends BeanDefinition {
         super.validateField(fieldDefinition);
 
         if (fieldDefinition.getSource() == null || fieldDefinition.getSource().trim().equals("")) {
-            throwValidatedError("字段[" + fieldDefinition.getName() + "]的来源不能为空");
+            throwValidatedError("字段源[" + fieldDefinition.getName() + "]不能为空");
         }
         if (sourceFields.containsKey(fieldDefinition.getSource())) {
-            throwValidatedError("字段[" + fieldDefinition.getName() + "]的来源[" + fieldDefinition.getSource() + "]不能重复");
+            throwValidatedError("字段源[" + fieldDefinition.getName() + "][" + fieldDefinition.getSource() + "]不能重复");
         }
 
         if (fieldDefinition.getComment() == null || fieldDefinition.getComment().trim().equals("")) {
@@ -263,6 +267,4 @@ public class ConfigDefinition extends BeanDefinition {
             }
         }
     }
-
-
 }

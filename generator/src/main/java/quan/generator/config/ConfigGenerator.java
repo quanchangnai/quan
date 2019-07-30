@@ -12,8 +12,8 @@ import java.util.List;
  */
 public abstract class ConfigGenerator extends Generator {
 
-    public ConfigGenerator(List<String> srcPaths, String destPath) throws Exception {
-        super(srcPaths, destPath);
+    public ConfigGenerator(List<String> definitionPaths, String codePath) throws Exception {
+        super(definitionPaths, codePath);
 
         Template configTemplate = freemarkerCfg.getTemplate("config." + supportLanguage() + ".ftl");
 

@@ -11,23 +11,35 @@ import quan.common.ItemType;
 @SuppressWarnings({"unchecked"})
 public class EquipConfig extends Config {
 
-    //类型
-    private ItemType type;
+    //ID
+    private int id;
 
     //名字
     private String name;
 
-    //ID
-    private int id;
+    //类型
+    private ItemType type;
+
+    //List
+    private List<Integer> list = new ArrayList<>();
+
+    //Set
+    private Set<Integer> set = new HashSet<>();
+
+    //Map
+    private Map<Integer, Integer> map = new HashMap<>();
 
     //部位
     private int position;
 
+    //颜色
+    private int color;
+
     /**
-     * 类型
+     * ID
      */
-    public ItemType getType() {
-        return type;
+    public int getId() {
+        return id;
     }
 
     /**
@@ -38,10 +50,31 @@ public class EquipConfig extends Config {
     }
 
     /**
-     * ID
+     * 类型
      */
-    public int getId() {
-        return id;
+    public ItemType getType() {
+        return type;
+    }
+
+    /**
+     * List
+     */
+    public List<Integer> getList() {
+        return list;
+    }
+
+    /**
+     * Set
+     */
+    public Set<Integer> getSet() {
+        return set;
+    }
+
+    /**
+     * Map
+     */
+    public Map<Integer, Integer> getMap() {
+        return map;
     }
 
     /**
@@ -51,26 +84,63 @@ public class EquipConfig extends Config {
         return position;
     }
 
+    /**
+     * 颜色
+     */
+    public int getColor() {
+        return color;
+    }
+
 
     @Override
     protected void parse(JSONObject object) {
+        id = object.getIntValue("id");
+        name = object.getString("name");
+
         String $type = object.getString("type");
         if ($type != null) {
             type = ItemType.valueOf($type);
         }
 
-        name = object.getString("name");
-        id = object.getIntValue("id");
+        JSONArray $list = object.getJSONArray("list");
+        if ($list != null) {
+            for (int i = 0; i < $list.size(); i++) {
+                list.add($list.getInteger(i));
+            }
+        }
+        list = Collections.unmodifiableList(list);
+
+        JSONArray $set = object.getJSONArray("set");
+        if ($set != null) {
+            for (int i = 0; i < $set.size(); i++) {
+                set.add($set.getInteger(i));
+            }
+        }
+        set = Collections.unmodifiableSet(set);
+
+        JSONObject $map = object.getJSONObject("map");
+        if ($map != null) {
+            for (String $map$Key : $map.keySet()) {
+                map.put(Integer.valueOf($map$Key), $map.getInteger($map$Key));
+            }
+        }
+        map = Collections.unmodifiableMap(map);
+
         position = object.getIntValue("position");
+        color = object.getIntValue("color");
     }
 
     @Override
     public String toString() {
         return "EquipConfig{" +
-                "type=" + ItemType.valueOf(type.getValue()) +
+                "id=" + id +
                 ",name='" + name + '\'' +
-                ",id=" + id +
+                ",type=" + type +
+                ",list=" + list +
+                ",set=" + set +
+                ",map=" + map +
                 ",position=" + position +
+                ",color=" + color +
                 '}';
 
         }
