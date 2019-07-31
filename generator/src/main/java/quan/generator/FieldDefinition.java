@@ -27,7 +27,7 @@ public class FieldDefinition extends Definition {
 
     private String value;//枚举值
 
-    private String source;//配置源
+    private String column;//对应配置表格中的列
     private String index;//配置的索引类型
 
 
@@ -241,12 +241,12 @@ public class FieldDefinition extends Definition {
     }
 
 
-    public String getSource() {
-        return source;
+    public String getColumn() {
+        return column;
     }
 
-    public FieldDefinition setSource(String source) {
-        this.source = source;
+    public FieldDefinition setColumn(String column) {
+        this.column = column;
         return this;
     }
 

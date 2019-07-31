@@ -7,6 +7,7 @@ import com.alibaba.fastjson.JSONObject;
  */
 public abstract class Bean {
 
-    protected abstract void parse(JSONObject object);
+    public void parse(JSONObject object) {
+    }
 
 }

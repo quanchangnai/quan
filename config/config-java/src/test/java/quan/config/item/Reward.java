@@ -1,4 +1,4 @@
-package quan.config.quest;
+package quan.config.item;
 
 import java.util.*;
 import com.alibaba.fastjson.*;
@@ -11,9 +11,9 @@ import quan.config.*;
 @SuppressWarnings({"unchecked"})
 public class Reward extends Bean {
 
-    private int itemId;
+    protected int itemId;
 
-    private int itemNum;
+    protected int itemNum;
 
     public int getItemId() {
         return itemId;
@@ -25,7 +25,9 @@ public class Reward extends Bean {
 
 
     @Override
-    protected void parse(JSONObject object) {
+    public void parse(JSONObject object) {
+        super.parse(object);
+
         itemId = object.getIntValue("itemId");
         itemNum = object.getIntValue("itemNum");
     }
@@ -37,6 +39,6 @@ public class Reward extends Bean {
                 ",itemNum=" + itemNum +
                 '}';
 
-        }
+    }
 
 }

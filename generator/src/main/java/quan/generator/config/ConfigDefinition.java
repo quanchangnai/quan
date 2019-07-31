@@ -12,12 +12,17 @@ import java.util.*;
  */
 public class ConfigDefinition extends BeanDefinition {
 
-    private String source;
+    //配置本身对应的表，有分表以逗号分格
+    private String table;
 
-    private List<String> sources = new ArrayList<>();
+    //配置对应的表，包含分表和子表
+    private List<String> tables = new ArrayList<>();
 
-    //配置的父类，支持子表
+    //配置的父类
     private String parent;
+
+    //配置的所有子孙类
+    private Set<String> children = new HashSet<>();
 
     private List<IndexDefinition> indexes = new ArrayList<>();
 
@@ -25,15 +30,15 @@ public class ConfigDefinition extends BeanDefinition {
 
     protected List<FieldDefinition> selfFields = new ArrayList<>();
 
-    private Map<String, FieldDefinition> sourceFields = new HashMap<>();
+    private Map<String, FieldDefinition> columnFields = new HashMap<>();
 
-    private static Map<String, ConfigDefinition> sourceConfigs = new HashMap<>();
+    private static Map<String, ConfigDefinition> tableConfigs = new HashMap<>();
 
     public ConfigDefinition() {
     }
 
-    public ConfigDefinition(String source, String parent) {
-        this.source = source;
+    public ConfigDefinition(String table, String parent) {
+        this.table = table;
         this.parent = parent;
     }
 
@@ -43,12 +48,12 @@ public class ConfigDefinition extends BeanDefinition {
     }
 
 
-    public String getSource() {
-        return source;
+    public String getTable() {
+        return table;
     }
 
-    public ConfigDefinition setSource(String source) {
-        this.source = source;
+    public ConfigDefinition setTable(String table) {
+        this.table = table;
         return this;
     }
 
@@ -66,6 +71,22 @@ public class ConfigDefinition extends BeanDefinition {
             return (ConfigDefinition) classDefinition;
         }
         return null;
+    }
+
+    public List<String> getTables() {
+        if (!tables.isEmpty()) {
+            return tables;
+        }
+
+        Set<String> childrenAndMe = new HashSet<>(children);
+        childrenAndMe.add(getName());
+
+        for (String configName : childrenAndMe) {
+            ConfigDefinition configDefinition = (ConfigDefinition) getAll().get(configName);
+            tables.addAll(Arrays.asList(configDefinition.table.split("[,]")));
+        }
+
+        return tables;
     }
 
     public boolean isParentWithPackage() {
@@ -105,12 +126,12 @@ public class ConfigDefinition extends BeanDefinition {
         selfIndexes.add(indexDefinition);
     }
 
-    public Map<String, FieldDefinition> getSourceFields() {
-        return sourceFields;
+    public Map<String, FieldDefinition> getColumnFields() {
+        return columnFields;
     }
 
-    public static Map<String, ConfigDefinition> getSourceConfigs() {
-        return sourceConfigs;
+    public static Map<String, ConfigDefinition> getTableConfigs() {
+        return tableConfigs;
     }
 
     @Override
@@ -119,6 +140,11 @@ public class ConfigDefinition extends BeanDefinition {
         selfFields.add(fieldDefinition);
     }
 
+
+
+    public List<FieldDefinition> getSelfFields() {
+        return selfFields;
+    }
 
     @Override
     public void validate() {
@@ -130,19 +156,18 @@ public class ConfigDefinition extends BeanDefinition {
             throwValidatedError("语言类型" + languages + "非法,支持的语言类型" + Language.names());
         }
 
-        if (source == null || source.trim().equals("")) {
-            throwValidatedError("配置[" + getName() + "]的源表不能为空");
+        if (table == null || table.trim().equals("")) {
+            throwValidatedError("配置[" + getName() + "]的对应表格不能为空");
         }
 
         //支持分表
-        String[] sources = source.split("[,]");
-        for (String src : sources) {
-            src = src.trim();
-            ConfigDefinition other = sourceConfigs.get(src);
+        String[] tables = table.split(",");
+        for (String t : tables) {
+            ConfigDefinition other = tableConfigs.get(t);
             if (other != null) {
-                throwValidatedError("配置[" + getName() + "][" + other.getName() + "]和源表[" + src + "]不能多对一", other);
+                throwValidatedError("配置[" + getName() + "," + other.getName() + "]和表格[" + t + "]不能多对一", other);
             }
-            sourceConfigs.put(src, this);
+            tableConfigs.put(t, this);
         }
 
         validateParent();
@@ -158,6 +183,8 @@ public class ConfigDefinition extends BeanDefinition {
         if (getParent() == null) {
             return;
         }
+
+        //支持子表
         ClassDefinition parentClassDefinition = ClassDefinition.getAll().get(getParent());
         if (parentClassDefinition == null) {
             throwValidatedError("配置[" + getName() + "]的父类[" + parent + "]不存在");
@@ -177,6 +204,7 @@ public class ConfigDefinition extends BeanDefinition {
 
             fields.addAll(0, parentConfigDefinition.selfFields);
             indexes.addAll(0, parentConfigDefinition.selfIndexes);
+            parentConfigDefinition.children.add(getName());
 
             parentConfigDefinition = parentConfigDefinition.getParentDefinition();
         }
@@ -187,19 +215,19 @@ public class ConfigDefinition extends BeanDefinition {
     protected void validateField(FieldDefinition fieldDefinition) {
         super.validateField(fieldDefinition);
 
-        if (fieldDefinition.getSource() == null || fieldDefinition.getSource().trim().equals("")) {
-            throwValidatedError("字段源[" + fieldDefinition.getName() + "]不能为空");
+        if (fieldDefinition.getColumn() == null || fieldDefinition.getColumn().trim().equals("")) {
+            throwValidatedError("字段对应的列[" + fieldDefinition.getName() + "]不能为空");
         }
-        if (sourceFields.containsKey(fieldDefinition.getSource())) {
-            throwValidatedError("字段源[" + fieldDefinition.getName() + "][" + fieldDefinition.getSource() + "]不能重复");
+        if (columnFields.containsKey(fieldDefinition.getColumn())) {
+            throwValidatedError("字段[" + fieldDefinition.getName() + "]和列[" + fieldDefinition.getColumn() + "]必须一一对应");
         }
 
         if (fieldDefinition.getComment() == null || fieldDefinition.getComment().trim().equals("")) {
-            fieldDefinition.setComment(fieldDefinition.getSource());
+            fieldDefinition.setComment(fieldDefinition.getColumn());
         }
 
 
-        sourceFields.put(fieldDefinition.getSource(), fieldDefinition);
+        columnFields.put(fieldDefinition.getColumn(), fieldDefinition);
     }
 
     private void validateIndexes() {
@@ -212,7 +240,7 @@ public class ConfigDefinition extends BeanDefinition {
             indexDefinition.setFieldNames(selfField.getName());
             indexDefinition.setType(selfField.getIndex());
             if (selfField.getComment() == null || selfField.getComment().trim().equals("")) {
-                indexDefinition.setComment(selfField.getSource());
+                indexDefinition.setComment(selfField.getColumn());
             } else {
                 indexDefinition.setComment(selfField.getComment());
             }

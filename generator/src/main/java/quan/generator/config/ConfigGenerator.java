@@ -3,6 +3,7 @@ package quan.generator.config;
 import freemarker.template.Template;
 import quan.generator.BeanDefinition;
 import quan.generator.ClassDefinition;
+import quan.generator.FieldDefinition;
 import quan.generator.Generator;
 
 import java.util.List;
@@ -31,19 +32,19 @@ public abstract class ConfigGenerator extends Generator {
 
     @Override
     protected void processClassDependency(ClassDefinition classDefinition) {
-        super.processClassDependency(classDefinition);
-
         if (!(classDefinition instanceof ConfigDefinition)) {
+            super.processClassDependency(classDefinition);
             return;
         }
 
         ConfigDefinition configDefinition = (ConfigDefinition) classDefinition;
-        if (configDefinition.getParent() != null) {
-            ClassDefinition parentClassDefinition = ConfigDefinition.getAll().get(configDefinition.getParent());
-            if (!parentClassDefinition.getPackageName().equals(configDefinition.getPackageName())) {
-                configDefinition.getImports().add(parentClassDefinition.getFullName());
-            }
+        for (FieldDefinition fieldDefinition : configDefinition.getSelfFields()) {
+            processField(classDefinition, fieldDefinition);
         }
-
+        ConfigDefinition parentDefinition = configDefinition.getParentDefinition();
+        if (parentDefinition != null && !parentDefinition.getPackageName().equals(configDefinition.getPackageName())) {
+            configDefinition.getImports().add(parentDefinition.getFullName());
+        }
     }
+
 }

@@ -1,39 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <package>
 
-    <config name="QuestConfig" source="任务.csv">
-        <field name="id" type="long" source="ID" index="unique"/>
-        <field name="name" type="string" source="名字"/>
-        <field name="type" type="QuestType" source="类型" index="normal"/>
-        <field name="a1" type="int" source="A1"/>
-        <field name="a2" type="int" source="A2"/>
-        <field name="b1" type="int" source="B1"/>
-        <field name="b2" type="bool" source="B2"/>
-        <field name="c1" type="string" source="C1"/>
-        <field name="c2" type="int" source="C2"/>
-        <field name="c3" type="int" source="C3"/>
-        <field name="d1" type="string" source="D1"/>
-        <field name="d2" type="int" source="D2"/>
-        <field name="d3" type="int" source="D3"/>
-        <field name="reward" type="Reward" source="Reward"/>
-        <field name="s1" type="set" value-type="int" source="S1"/>
-        <field name="l1" type="list" value-type="int" source="L1"/>
-        <field name="m1" type="map" key-type="int" value-type="int" source="M1"/>
+    <config name="QuestConfig" table="任务.csv">
+        <field name="id" type="long" column="ID" index="unique"/>
+        <field name="name" type="string" column="名字"/>
+        <field name="type" type="QuestType" column="类型" index="normal"/>
+        <field name="a1" type="int" column="A1"/>
+        <field name="a2" type="int" column="A2"/>
+        <field name="b1" type="int" column="B1"/>
+        <field name="b2" type="bool" column="B2"/>
+        <field name="c1" type="string" column="C1"/>
+        <field name="c2" type="int" column="C2"/>
+        <field name="c3" type="int" column="C3"/>
+        <field name="d1" type="string" column="D1"/>
+        <field name="d2" type="int" column="D2"/>
+        <field name="d3" type="int" column="D3"/>
+        <field name="reward" type="Reward" column="Reward"/>
+        <field name="s1" type="set" value-type="int" column="S1"/>
+        <field name="l1" type="list" value-type="int" column="L1"/>
+        <field name="m1" type="map" key-type="int" value-type="int" column="M1"/>
         <index name="composite1" type="u" fields="a1,a2"/>
         <index name="composite2" type="normal" fields="b1,b2"/>
         <index name="composite3" type="unique" fields="c1,c2,c3"/>
         <index name="composite4" type="n" fields="d1,d2,d3"/>
     </config>
 
-    <config name="QuestTargetConfig" source="任务目标.csv">
-        <field name="id" type="long" source="ID" index="u"/>
-        <field name="name" type="string" source="名字"/>
+    <config name="QuestTargetConfig" table="任务目标.csv">
+        <field name="id" type="long" column="ID" index="u"/>
+        <field name="name" type="string" column="名字"/>
     </config>
-
-    <bean name="Reward">奖励
-        <field name="itemId" type="int"/>
-        <field name="itemNum" type="int"/>
-    </bean>
 
     <enum name="QuestType">任务类型
         <field name="main" value="1"/>主线

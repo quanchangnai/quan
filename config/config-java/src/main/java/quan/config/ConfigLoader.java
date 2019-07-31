@@ -1,13 +1,13 @@
 package quan.config;
 
-import com.alibaba.fastjson.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import quan.generator.DefinitionParser;
 import quan.generator.XmlDefinitionParser;
 import quan.generator.config.ConfigDefinition;
 
-import java.io.File;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.Method;
+import java.util.*;
 
 /**
  * 加载配置数据
@@ -15,21 +15,25 @@ import java.util.Map;
  */
 public class ConfigLoader {
 
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
+
     protected DefinitionParser definitionParser = new XmlDefinitionParser();
 
     //配置的定义文件所在目录
     private List<String> definitionPaths;
 
     //配置表所在目录
-    private String sourcePath;
+    private String tablePath;
 
     private String packagePrefix;
 
     private String enumPackagePrefix;
 
-    public ConfigLoader(List<String> definitionPaths, String sourcePath) {
+    private Map<String, ConfigReader> readers = new HashMap<>();
+
+    public ConfigLoader(List<String> definitionPaths, String tablePath) {
         this.definitionPaths = definitionPaths;
-        this.sourcePath = sourcePath;
+        this.tablePath = tablePath;
     }
 
     public ConfigLoader setDefinitionParser(DefinitionParser definitionParser) {
@@ -47,27 +51,72 @@ public class ConfigLoader {
         return this;
     }
 
-    public void load() throws Exception {
+    /**
+     * 全量加载配置
+     */
+    public void load() {
+        if (!definitionParser.getClassDefinitions().isEmpty()) {
+            logger.error("重加载请调用reload方法");
+            return;
+        }
         definitionParser.setDefinitionPaths(definitionPaths);
         definitionParser.setPackagePrefix(packagePrefix);
         definitionParser.setEnumPackagePrefix(enumPackagePrefix);
 
-        definitionParser.parse();
+        try {
+            definitionParser.parse();
+        } catch (Exception e) {
+            throw new ConfigException("解析配置定义文件[" + definitionPaths + "]出错", e);
+        }
 
-        Map<String, ConfigDefinition> sourceConfigs = ConfigDefinition.getSourceConfigs();
-        for (String source : sourceConfigs.keySet()) {
-            ConfigDefinition configDefinition = sourceConfigs.get(source);
-            File sourceFile = new File(sourcePath, source);
-            ConfigSource configSource = new CSVConfigSource(sourceFile, configDefinition);
-            try {
-                List<JSONObject> objects = configSource.read();
-                System.err.println(source);
-                for (JSONObject object : objects) {
-                    System.err.println(object);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+        Set<ConfigDefinition> loadConfigs = new HashSet<>(ConfigDefinition.getTableConfigs().values());
+        for (ConfigDefinition configDefinition : loadConfigs) {
+            load(configDefinition);
+        }
+    }
+
+    private void load(ConfigDefinition configDefinition) {
+        List<Config> configs = new ArrayList<>();
+        for (String table : configDefinition.getTables()) {
+            ConfigReader configReader = readers.get(table);
+            if (configReader == null) {
+                configReader = new CSVConfigReader(tablePath, table, ConfigDefinition.getTableConfigs().get(table));
+                readers.put(table, configReader);
             }
+            configs.addAll(configReader.readObjects());
+        }
+
+        try {
+            Method indexMethod = Class.forName(configDefinition.getFullName() + "$get").getMethod("index", List.class);
+            indexMethod.invoke(null, configs);
+        } catch (Exception e) {
+            throw new ConfigException("配置[" + configDefinition.getName() + "]索引数据出错", e);
+        }
+    }
+
+    /**
+     * 重加载配置
+     *
+     * @param tables 表格名字列表
+     */
+    public void reload(List<String> tables) {
+        Set<ConfigDefinition> reloadConfigs = new HashSet<>();
+        for (String table : tables) {
+            ConfigReader configReader = readers.get(table);
+            if (configReader == null) {
+                logger.error("重加载[{}]出错，对应配置不存在", table);
+                continue;
+            }
+            configReader.clear();
+            ConfigDefinition configDefinition = ConfigDefinition.getTableConfigs().get(table);
+            while (configDefinition != null) {
+                reloadConfigs.add(configDefinition);
+                configDefinition = configDefinition.getParentDefinition();
+            }
+        }
+
+        for (ConfigDefinition configDefinition : reloadConfigs) {
+            load(configDefinition);
         }
     }
 

@@ -47,6 +47,8 @@ public abstract class ClassDefinition extends Definition {
         return fields;
     }
 
+
+
     public void addField(FieldDefinition fieldDefinition) {
         fields.add(fieldDefinition);
     }

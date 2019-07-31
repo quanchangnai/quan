@@ -72,7 +72,7 @@ public class XmlDefinitionParser extends DefinitionParser {
                     classDefinition = new DataDefinition(element.attributeValue("key"), element.attributeValue("persistent"));
                     break;
                 case "config":
-                    classDefinition = new ConfigDefinition(element.attributeValue("source"), element.attributeValue("parent"));
+                    classDefinition = new ConfigDefinition(element.attributeValue("table"), element.attributeValue("parent"));
                     break;
                 default:
                     continue;
@@ -154,7 +154,7 @@ public class XmlDefinitionParser extends DefinitionParser {
         fieldDefinition.setName(fieldElement.attributeValue("name"));
         fieldDefinition.setType(fieldElement.attributeValue("type"));
         fieldDefinition.setValue(fieldElement.attributeValue("value"));
-        fieldDefinition.setSource(fieldElement.attributeValue("source"));
+        fieldDefinition.setColumn(fieldElement.attributeValue("column"));
         fieldDefinition.setOptional(fieldElement.attributeValue("optional"));
         fieldDefinition.setKeyType(fieldElement.attributeValue("key-type"));
         fieldDefinition.setValueType(fieldElement.attributeValue("value-type"));

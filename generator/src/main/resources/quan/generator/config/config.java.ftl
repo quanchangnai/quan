@@ -14,24 +14,27 @@ import ${import};
 * Created by 自动生成
 */
 @SuppressWarnings({"unchecked"})
-public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType ==6>Config</#if> {
+public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType ==6 && (!parent?? || parent=="")>Config<#elseif definitionType ==6>${parent}</#if> {
+<#if !selfFields??>
+    <#assign selfFields = fields>
+</#if>
 
-<#list fields as field>
+<#list selfFields as field>
     <#if field.comment !="">
     //${field.comment}
     </#if>
     <#if field.type=="list">
-    private ${field.basicType}<${field.classValueType}> ${field.name} = new ArrayList<>();
+    protected ${field.basicType}<${field.classValueType}> ${field.name} = new ArrayList<>();
     <#elseif field.type=="set">
-    private ${field.basicType}<${field.classValueType}> ${field.name} = new HashSet<>();
+    protected ${field.basicType}<${field.classValueType}> ${field.name} = new HashSet<>();
     <#elseif field.type=="map">
-    private ${field.basicType}<${field.classKeyType}, ${field.classValueType}> ${field.name} = new HashMap<>();
+    protected ${field.basicType}<${field.classKeyType}, ${field.classValueType}> ${field.name} = new HashMap<>();
     <#else >
-    private ${field.basicType} ${field.name};
+    protected ${field.basicType} ${field.name};
     </#if>
 
 </#list>
-<#list fields as field>
+<#list selfFields as field>
     <#if field.comment !="">
     /**
      * ${field.comment}
@@ -54,8 +57,10 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 </#list>
 
     @Override
-    protected void parse(JSONObject object) {
-<#list fields as field>
+    public void parse(JSONObject object) {
+        super.parse(object);
+
+<#list selfFields as field>
     <#if field.type=="string">
         ${field.name} = object.getString("${field.name}");
     <#elseif field.type=="list" || field.type=="set">
@@ -69,7 +74,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
             }
         }
         ${field.name} = Collections.unmodifiable${field.basicType}(${field.name});
-        <#if field_has_next && fields[field_index+1].primitiveType >
+        <#if field_has_next && selfFields[field_index+1].primitiveType >
 
         </#if>
     <#elseif field.type=="map">
@@ -83,7 +88,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
             }
         }
         ${field.name} = Collections.unmodifiableMap(${field.name});
-        <#if field_has_next && fields[field_index+1].primitiveType >
+        <#if field_has_next && selfFields[field_index+1].primitiveType >
 
         </#if>
     <#elseif field.type=="bool">
@@ -98,7 +103,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         if ($${field.name} != null) {
             ${field.name} = ${field.type}.valueOf($${field.name});
         }
-         <#if field_has_next && fields[field_index+1].primitiveType >
+         <#if field_has_next && selfFields[field_index+1].primitiveType >
 
         </#if>
     <#else>
@@ -110,7 +115,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
             ${field.name} = new ${field.type}();
             ${field.name}.parse($reward);
         }
-        <#if field_has_next && fields[field_index+1].primitiveType >
+        <#if field_has_next && selfFields[field_index+1].primitiveType >
 
         </#if>
     </#if>
@@ -133,164 +138,191 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         </#list>
                 '}';
 
-        }
+    }
 
  <#if definitionType ==6>
+    @Override
+    public ${name} create() {
+        return new ${name}();
+    }
+
+    public static class get {
+        
+        private get() {
+        }
 
     <#list indexes as index>
         <#if index.comment !="">
-    //${index.comment}
+        //${index.comment}
         </#if>
         <#if index.unique && index.fields?size==1>
-	private static Map<${index.fields[0].classType}, ${name}> ${index.name}Configs = new HashMap<>();
+	    private static Map<${index.fields[0].classType}, ${name}> ${index.name}Configs = new HashMap<>();
 
         <#elseif index.normal && index.fields?size==1>
-    private static Map<${index.fields[0].classType}, List<${name}>> ${index.name}Configs = new HashMap<>();
+        private static Map<${index.fields[0].classType}, List<${name}>> ${index.name}Configs = new HashMap<>();
 
         <#elseif index.unique && index.fields?size==2>
-    private static Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, ${name}>> ${index.name}Configs = new HashMap<>();
-
+        private static Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, ${name}>> ${index.name}Configs = new HashMap<>();
+    
         <#elseif index.normal && index.fields?size==2>
-    private static Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, List<${name}>>> ${index.name}Configs = new HashMap<>();
+        private static Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, List<${name}>>> ${index.name}Configs = new HashMap<>();
 
         <#elseif index.unique && index.fields?size==3>
-    private static Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, ${name}>>> ${index.name}Configs = new HashMap<>();
+        private static Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, ${name}>>> ${index.name}Configs = new HashMap<>();
 
         <#elseif index.normal && index.fields?size==3>
-    private static Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, List<${name}>>>> ${index.name}Configs = new HashMap<>();
+        private static Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, List<${name}>>>> ${index.name}Configs = new HashMap<>();
 
         </#if>
     </#list>
 
     <#list indexes as index>
         <#if index.unique && index.fields?size==1>
-    public static Map<${index.fields[0].classType}, ${name}> get${index.name?cap_first}Configs() {
-        return ${index.name}Configs;
-    }
+        public static Map<${index.fields[0].classType}, ${name}> ${index.name}Configs() {
+            return ${index.name}Configs;
+        }
 
-    public static ${name} getBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}) {
-        return ${index.name}Configs.get(${index.fields[0].name});
-    }
+        public static ${name} by${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}) {
+            return ${index.name}Configs.get(${index.fields[0].name});
+        }
 
         <#elseif index.normal && index.fields?size==1>
-    public static Map<${index.fields[0].classType}, List<${name}>> get${index.name?cap_first}Configs() {
-        return ${index.name}Configs;
-    }
+        public static Map<${index.fields[0].classType}, List<${name}>> ${index.name}Configs() {
+            return ${index.name}Configs;
+        }
 
-    public static List<${name}> getBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}) {
-        return ${index.name}Configs.getOrDefault(${index.fields[0].name}, Collections.emptyList());
-    }
+        public static List<${name}> by${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}) {
+            return ${index.name}Configs.getOrDefault(${index.fields[0].name}, Collections.emptyList());
+        }
 
         <#elseif index.unique && index.fields?size==2>
-    public static Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, ${name}>> get${index.name?cap_first}Configs() {
-        return ${index.name}Configs;
-    }
+        public static Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, ${name}>> ${index.name}Configs() {
+            return ${index.name}Configs;
+        }
 
-    public static Map<${index.fields[1].classType}, ${name}> getBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}) {
-        return ${index.name}Configs.getOrDefault(${index.fields[0].name}, Collections.emptyMap());
-    }
+        public static Map<${index.fields[1].classType}, ${name}> by${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}) {
+            return ${index.name}Configs.getOrDefault(${index.fields[0].name}, Collections.emptyMap());
+        }
 
-    public static ${name} getBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name}) {
-        return getBy${index.name?cap_first}(${index.fields[0].name}).get(${index.fields[1].name});
-    }
+        public static ${name} by${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name}) {
+            return by${index.name?cap_first}(${index.fields[0].name}).get(${index.fields[1].name});
+        }
 
         <#elseif index.normal && index.fields?size==2>
-    public static Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, List<${name}>>> get${index.name?cap_first}Configs() {
-        return ${index.name}Configs;
-    }
+        public static Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, List<${name}>>> ${index.name}Configs() {
+            return ${index.name}Configs;
+        }
 
-    public static Map<${index.fields[1].classType}, List<${name}>> getBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}) {
-        return ${index.name}Configs.getOrDefault(${index.fields[0].name}, Collections.emptyMap());
-    }
+        public static Map<${index.fields[1].classType}, List<${name}>> by${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}) {
+            return ${index.name}Configs.getOrDefault(${index.fields[0].name}, Collections.emptyMap());
+        }
 
-    public static List<${name}> getBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name}) {
-        return getBy${index.name?cap_first}(${index.fields[0].name}).getOrDefault(${index.fields[1].name}, Collections.emptyList());
-    }
+        public static List<${name}> by${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name}) {
+            return by${index.name?cap_first}(${index.fields[0].name}).getOrDefault(${index.fields[1].name}, Collections.emptyList());
+        }
 
         <#elseif index.unique && index.fields?size==3>
-    public static Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, ${name}>>> get${index.name?cap_first}Configs() {
-        return ${index.name}Configs;
-    }
+        public static Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, ${name}>>> ${index.name}Configs() {
+            return ${index.name}Configs;
+        }
 
-    public static Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, ${name}>> getBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}) {
-        return ${index.name}Configs.getOrDefault(${index.fields[0].name}, Collections.emptyMap());
-    }
+        public static Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, ${name}>> by${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}) {
+            return ${index.name}Configs.getOrDefault(${index.fields[0].name}, Collections.emptyMap());
+        }
 
-    public static Map<${index.fields[2].classType}, ${name}> getBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name}) {
-        return getBy${index.name?cap_first}(${index.fields[0].name}).getOrDefault(${index.fields[1].name}, Collections.emptyMap());
-    }
+        public static Map<${index.fields[2].classType}, ${name}> by${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name}) {
+            return by${index.name?cap_first}(${index.fields[0].name}).getOrDefault(${index.fields[1].name}, Collections.emptyMap());
+        }
 
-    public static ${name} getBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name}, ${index.fields[2].basicType} ${index.fields[2].name}) {
-        return getBy${index.name?cap_first}(${index.fields[0].name}, ${index.fields[1].name}).get(${index.fields[2].name});
-    }
+        public static ${name} by${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name}, ${index.fields[2].basicType} ${index.fields[2].name}) {
+            return by${index.name?cap_first}(${index.fields[0].name}, ${index.fields[1].name}).get(${index.fields[2].name});
+        }
 
         <#elseif index.normal && index.fields?size==3>
-    public static Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, List<${name}>>>> get${index.name?cap_first}Configs() {
-        return ${index.name}Configs;
-    }
+        public static Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, List<${name}>>>> ${index.name}Configs() {
+            return ${index.name}Configs;
+        }
 
-    public static Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, List<${name}>>> getBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}) {
-        return ${index.name}Configs.getOrDefault(${index.fields[0].name}, Collections.emptyMap());
-    }
+        public static Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, List<${name}>>> by${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}) {
+            return ${index.name}Configs.getOrDefault(${index.fields[0].name}, Collections.emptyMap());
+        }
 
-    public static Map<${index.fields[2].classType}, List<${name}>> getBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name}) {
-        return getBy${index.name?cap_first}(${index.fields[0].name}).getOrDefault(${index.fields[1].name}, Collections.emptyMap());
-    }
+        public static Map<${index.fields[2].classType}, List<${name}>> by${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name}) {
+            return by${index.name?cap_first}(${index.fields[0].name}).getOrDefault(${index.fields[1].name}, Collections.emptyMap());
+        }
 
-    public static List<${name}> getBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name}, ${index.fields[2].basicType} ${index.fields[2].name}) {
-        return getBy${index.name?cap_first}(${index.fields[0].name}, ${index.fields[1].name}).getOrDefault(${index.fields[2].name}, Collections.emptyList());
-    }
+        public static List<${name}> by${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name}, ${index.fields[2].basicType} ${index.fields[2].name}) {
+            return by${index.name?cap_first}(${index.fields[0].name}, ${index.fields[1].name}).getOrDefault(${index.fields[2].name}, Collections.emptyList());
+        }
 
         </#if>
     </#list>
 
-    public static void index(List<${name}> configs) {
+        public static void index(List<${name}> configs) {
     <#list indexes as index>
         <#if index.unique && index.fields?size==1>
-        Map<${index.fields[0].classType}, ${name}> ${index.name}Configs = new HashMap<>();
+            Map<${index.fields[0].classType}, ${name}> ${index.name}Configs = new HashMap<>();
         <#elseif index.normal && index.fields?size==1>
-        Map<${index.fields[0].classType}, List<${name}>> ${index.name}Configs = new HashMap<>();
+            Map<${index.fields[0].classType}, List<${name}>> ${index.name}Configs = new HashMap<>();
         <#elseif index.unique && index.fields?size==2>
-        Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, ${name}>> ${index.name}Configs = new HashMap<>();
+            Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, ${name}>> ${index.name}Configs = new HashMap<>();
         <#elseif index.normal && index.fields?size==2>
-        Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, List<${name}>>> ${index.name}Configs = new HashMap<>();
+            Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, List<${name}>>> ${index.name}Configs = new HashMap<>();
         <#elseif index.unique && index.fields?size==3>
-        Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, ${name}>>> ${index.name}Configs = new HashMap<>();
+            Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, ${name}>>> ${index.name}Configs = new HashMap<>();
         <#elseif index.normal && index.fields?size==3>
-        Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, List<${name}>>>> ${index.name}Configs = new HashMap<>();
+            Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, List<${name}>>>> ${index.name}Configs = new HashMap<>();
         </#if>
     </#list>
 
-        for (${name} config : configs) {
+            ${name} oldConfig;
+            for (${name} config : configs) {
     <#list indexes as index>
         <#if index.unique && index.fields?size==1>
-            if (${index.name}Configs.put(config.${index.fields[0].name}, config) != null) {
-                throw new RuntimeException("配置[${name}]的索引[${index.fields[0].name}]:[" + config.${index.fields[0].name} + "]有重复");
-            }
+                oldConfig = ${index.name}Configs.put(config.${index.fields[0].name}, config);
+                if (oldConfig != null) {
+                    String repeatedConfigs = config.getClass().getSimpleName();
+                    if (oldConfig.getClass() != config.getClass()) {
+                        repeatedConfigs += "," + oldConfig.getClass().getSimpleName();
+                    }
+                    throw new ConfigException("配置[" + repeatedConfigs + "]有重复索引[${index.fields[0].name}:" + config.${index.fields[0].name} + "]");
+                }
         <#elseif index.normal && index.fields?size==1>
-            ${index.name}Configs.computeIfAbsent(config.${index.fields[0].name}, k -> new ArrayList<>()).add(config);
+                ${index.name}Configs.computeIfAbsent(config.${index.fields[0].name}, k -> new ArrayList<>()).add(config);
         <#elseif index.unique && index.fields?size==2>
-            if (${index.name}Configs.computeIfAbsent(config.${index.fields[0].name}, k -> new HashMap<>()).put(config.${index.fields[1].name}, config) != null) {
-                throw new RuntimeException("配置[${name}]的索引[[${index.fields[0].name},[${index.fields[1].name}]:[" + config.${index.fields[0].name} + "," + config.${index.fields[1].name} + "]有重复");
-            }
+                oldConfig = ${index.name}Configs.computeIfAbsent(config.${index.fields[0].name}, k -> new HashMap<>()).put(config.${index.fields[1].name}, config);
+                if (oldConfig != null) {
+                    String repeatedConfigs = config.getClass().getSimpleName();
+                    if (oldConfig.getClass() != config.getClass()) {
+                        repeatedConfigs += "," + oldConfig.getClass().getSimpleName();
+                    }
+                    throw new ConfigException("配置[" + repeatedConfigs + "]有重复索引[${index.fields[0].name},${index.fields[1].name}:" + config.${index.fields[0].name} + "," + config.${index.fields[1].name} + "]");
+                }
         <#elseif index.normal && index.fields?size==2>
-            ${index.name}Configs.computeIfAbsent(config.${index.fields[0].name}, k -> new HashMap<>()).computeIfAbsent(config.${index.fields[1].name}, k -> new ArrayList<>()).add(config);
+                ${index.name}Configs.computeIfAbsent(config.${index.fields[0].name}, k -> new HashMap<>()).computeIfAbsent(config.${index.fields[1].name}, k -> new ArrayList<>()).add(config);
         <#elseif index.unique && index.fields?size==3>
-            if (${index.name}Configs.computeIfAbsent(config.${index.fields[0].name}, k -> new HashMap<>()).computeIfAbsent(config.${index.fields[1].name}, k -> new HashMap<>()).put(config.${index.fields[2].name}, config) != null) {
-                throw new RuntimeException("配置[${name}]的索引[${index.fields[0].name},${index.fields[1].name},${index.fields[2].name}]:[" + config.${index.fields[0].name} + "," + config.${index.fields[1].name} + "," + config.${index.fields[2].name} + "]有重复");
-            }
+                oldConfig = ${index.name}Configs.computeIfAbsent(config.${index.fields[0].name}, k -> new HashMap<>()).computeIfAbsent(config.${index.fields[1].name}, k -> new HashMap<>()).put(config.${index.fields[2].name}, config);
+                if (oldConfig != null) {
+                    String repeatedConfigs = config.getClass().getSimpleName();
+                    if (oldConfig.getClass() != config.getClass()) {
+                        repeatedConfigs += "," + oldConfig.getClass().getSimpleName();
+                    }
+                    throw new ConfigException("配置[" + repeatedConfigs + "]有重复索引[${index.fields[0].name},${index.fields[1].name},${index.fields[2].name}:" + config.${index.fields[0].name} + "," + config.${index.fields[1].name} + "," + config.${index.fields[2].name} + "]");
+                }
         <#elseif index.normal && index.fields?size==3>
-            ${index.name}Configs.computeIfAbsent(config.${index.fields[0].name}, k -> new HashMap<>()).computeIfAbsent(config.${index.fields[1].name}, k -> new HashMap<>()).computeIfAbsent(config.${index.fields[2].name}, k -> new ArrayList<>()).add(config);
+                ${index.name}Configs.computeIfAbsent(config.${index.fields[0].name}, k -> new HashMap<>()).computeIfAbsent(config.${index.fields[1].name}, k -> new HashMap<>()).computeIfAbsent(config.${index.fields[2].name}, k -> new ArrayList<>()).add(config);
         </#if>
         <#if index_index<indexes?size-1>
 
         </#if>
     </#list>
-        }
+            }
 
     <#list indexes as index>
-        ${name}.${index.name}Configs = unmodifiable(${index.name}Configs);
+            get.${index.name}Configs = unmodifiable(${index.name}Configs);
     </#list>
+
+        }
 
     }
 

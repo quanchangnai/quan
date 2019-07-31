@@ -10,6 +10,8 @@ import java.util.Map;
 @SuppressWarnings({"unchecked"})
 public abstract class Config extends Bean {
 
+    public abstract Config create();
+
     protected static Map unmodifiable(Map map) {
         for (Object key : map.keySet()) {
             Object value = map.get(key);
@@ -19,7 +21,6 @@ public abstract class Config extends Bean {
                 map.put(key, Collections.unmodifiableList((List) value));
             }
         }
-
         return Collections.unmodifiableMap(map);
     }
 

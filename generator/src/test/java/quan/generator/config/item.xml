@@ -1,25 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <package>
 
-    <config name="ItemConfig" source="道具.csv">道具
-        <field name="id" type="int" source="ID" index="unique"/>
-        <field name="name" type="string" source="名字"/>
-        <field name="type" type="ItemType" source="类型"/>
-        <field name="list" type="list" source="List" value-type="int"/>
-        <field name="set" type="set" source="Set" value-type="int"/>
-        <field name="map" type="map" source="Map" key-type="int" value-type="int"/>
+    <bean name="Reward">奖励
+        <field name="itemId" type="int"/>
+        <field name="itemNum" type="int"/>
+    </bean>
+
+    <config name="ItemConfig" table="道具.csv">道具
+        <field name="id" type="int" column="ID" index="unique"/>
+        <field name="name" type="string" column="名字"/>
+        <field name="type" type="ItemType" column="类型"/>
+        <field name="reward" type="Reward" column="奖励"/>
+        <field name="list" type="list" column="List" value-type="int"/>
+        <field name="set" type="set" column="Set" value-type="int"/>
+        <field name="map" type="map" column="Map" key-type="int" value-type="int"/>
     </config>
 
-    <config name="EquipConfig" parent="ItemConfig" source="装备1.csv,装备2.csv">
-        <field name="position" type="int" source="部位" index="normal"/>
-        <field name="color" type="int" source="颜色"/>
+    <config name="EquipConfig" parent="ItemConfig" table="装备1.csv,装备2.csv">
+        <field name="position" type="int" column="部位" index="normal"/>
+        <field name="color" type="int" column="颜色"/>
     </config>
 
-    <config name="WeaponConfig" parent="EquipConfig" source="武器.csv">
-        <field name="w1" type="int" source="字段1"/>
-        <field name="w2" type="int" source="字段2"/>
+    <config name="WeaponConfig" parent="EquipConfig" table="武器.csv">
+        <field name="w1" type="int" column="字段1"/>
+        <field name="w2" type="int" column="字段2"/>
         <index name="composite1" type="n" fields="color,w1"/>
     </config>
-
 
 </package>

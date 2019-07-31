@@ -80,4 +80,7 @@ public abstract class DefinitionParser {
         classDefinitions.put(classDefinition.getName(), classDefinition);
     }
 
+    public Map<String, ClassDefinition> getClassDefinitions() {
+        return classDefinitions;
+    }
 }
