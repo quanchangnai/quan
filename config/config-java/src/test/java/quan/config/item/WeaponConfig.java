@@ -62,45 +62,45 @@ public class WeaponConfig extends EquipConfig {
         return new WeaponConfig();
     }
 
-    public static class get {
+    public static class self {
         
-        private get() {
+        private self() {
         }
 
         //ID
-	    private static Map<Integer, WeaponConfig> idConfigs = new HashMap<>();
+        private static Map<Integer, WeaponConfig> idConfigs = new HashMap<>();
 
         private static Map<Integer, Map<Integer, List<WeaponConfig>>> composite1Configs = new HashMap<>();
 
-
-        public static Map<Integer, WeaponConfig> idConfigs() {
+    
+        public static Map<Integer, WeaponConfig> getIdConfigs() {
             return idConfigs;
         }
 
-        public static WeaponConfig byId(int id) {
+        public static WeaponConfig getById(int id) {
             return idConfigs.get(id);
         }
 
-        public static Map<Integer, Map<Integer, List<WeaponConfig>>> composite1Configs() {
+        public static Map<Integer, Map<Integer, List<WeaponConfig>>> getComposite1Configs() {
             return composite1Configs;
         }
 
-        public static Map<Integer, List<WeaponConfig>> byComposite1(int color) {
+        public static Map<Integer, List<WeaponConfig>> getByComposite1(int color) {
             return composite1Configs.getOrDefault(color, Collections.emptyMap());
         }
 
-        public static List<WeaponConfig> byComposite1(int color, int w1) {
-            return byComposite1(color).getOrDefault(w1, Collections.emptyList());
+        public static List<WeaponConfig> getByComposite1(int color, int w1) {
+            return getByComposite1(color).getOrDefault(w1, Collections.emptyList());
         }
 
 
         public static void index(List<WeaponConfig> configs) {
-            Map<Integer, WeaponConfig> idConfigs = new HashMap<>();
-            Map<Integer, Map<Integer, List<WeaponConfig>>> composite1Configs = new HashMap<>();
+            Map<Integer, WeaponConfig> _idConfigs = new HashMap<>();
+            Map<Integer, Map<Integer, List<WeaponConfig>>> _composite1Configs = new HashMap<>();
 
             WeaponConfig oldConfig;
             for (WeaponConfig config : configs) {
-                oldConfig = idConfigs.put(config.id, config);
+                oldConfig = _idConfigs.put(config.id, config);
                 if (oldConfig != null) {
                     String repeatedConfigs = config.getClass().getSimpleName();
                     if (oldConfig.getClass() != config.getClass()) {
@@ -109,11 +109,11 @@ public class WeaponConfig extends EquipConfig {
                     throw new ConfigException("配置[" + repeatedConfigs + "]有重复索引[id:" + config.id + "]");
                 }
 
-                composite1Configs.computeIfAbsent(config.color, k -> new HashMap<>()).computeIfAbsent(config.w1, k -> new ArrayList<>()).add(config);
+                _composite1Configs.computeIfAbsent(config.color, k -> new HashMap<>()).computeIfAbsent(config.w1, k -> new ArrayList<>()).add(config);
             }
 
-            get.idConfigs = unmodifiable(idConfigs);
-            get.composite1Configs = unmodifiable(composite1Configs);
+            idConfigs = unmodifiable(_idConfigs);
+            composite1Configs = unmodifiable(_composite1Configs);
 
         }
 

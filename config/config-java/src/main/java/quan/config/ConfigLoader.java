@@ -86,8 +86,17 @@ public class ConfigLoader {
             configs.addAll(configReader.readObjects());
         }
 
+        String indexer = configDefinition.getFullName();
+        if (configDefinition.getParentDefinition() != null) {
+            indexer += "$self";
+        }
+        Method indexMethod;
         try {
-            Method indexMethod = Class.forName(configDefinition.getFullName() + "$get").getMethod("index", List.class);
+            indexMethod = Class.forName(indexer).getMethod("index", List.class);
+        } catch (Exception e) {
+            throw new ConfigException("配置类[" + configDefinition.getName() + "]加载出错", e);
+        }
+        try {
             indexMethod.invoke(null, configs);
         } catch (Exception e) {
             throw new ConfigException("配置[" + configDefinition.getName() + "]索引数据出错", e);

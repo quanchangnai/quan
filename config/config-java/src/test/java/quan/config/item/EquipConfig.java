@@ -60,42 +60,42 @@ public class EquipConfig extends ItemConfig {
         return new EquipConfig();
     }
 
-    public static class get {
+    public static class self {
         
-        private get() {
+        private self() {
         }
 
         //ID
-	    private static Map<Integer, EquipConfig> idConfigs = new HashMap<>();
+        private static Map<Integer, EquipConfig> idConfigs = new HashMap<>();
 
         //部位
         private static Map<Integer, List<EquipConfig>> positionConfigs = new HashMap<>();
 
-
-        public static Map<Integer, EquipConfig> idConfigs() {
+    
+        public static Map<Integer, EquipConfig> getIdConfigs() {
             return idConfigs;
         }
 
-        public static EquipConfig byId(int id) {
+        public static EquipConfig getById(int id) {
             return idConfigs.get(id);
         }
 
-        public static Map<Integer, List<EquipConfig>> positionConfigs() {
+        public static Map<Integer, List<EquipConfig>> getPositionConfigs() {
             return positionConfigs;
         }
 
-        public static List<EquipConfig> byPosition(int position) {
+        public static List<EquipConfig> getByPosition(int position) {
             return positionConfigs.getOrDefault(position, Collections.emptyList());
         }
 
 
         public static void index(List<EquipConfig> configs) {
-            Map<Integer, EquipConfig> idConfigs = new HashMap<>();
-            Map<Integer, List<EquipConfig>> positionConfigs = new HashMap<>();
+            Map<Integer, EquipConfig> _idConfigs = new HashMap<>();
+            Map<Integer, List<EquipConfig>> _positionConfigs = new HashMap<>();
 
             EquipConfig oldConfig;
             for (EquipConfig config : configs) {
-                oldConfig = idConfigs.put(config.id, config);
+                oldConfig = _idConfigs.put(config.id, config);
                 if (oldConfig != null) {
                     String repeatedConfigs = config.getClass().getSimpleName();
                     if (oldConfig.getClass() != config.getClass()) {
@@ -104,11 +104,11 @@ public class EquipConfig extends ItemConfig {
                     throw new ConfigException("配置[" + repeatedConfigs + "]有重复索引[id:" + config.id + "]");
                 }
 
-                positionConfigs.computeIfAbsent(config.position, k -> new ArrayList<>()).add(config);
+                _positionConfigs.computeIfAbsent(config.position, k -> new ArrayList<>()).add(config);
             }
 
-            get.idConfigs = unmodifiable(idConfigs);
-            get.positionConfigs = unmodifiable(positionConfigs);
+            idConfigs = unmodifiable(_idConfigs);
+            positionConfigs = unmodifiable(_positionConfigs);
 
         }
 

@@ -145,42 +145,35 @@ public class ItemConfig extends Config {
         return new ItemConfig();
     }
 
-    public static class get {
-        
-        private get() {
-        }
+    //ID
+    private static Map<Integer, ItemConfig> idConfigs = new HashMap<>();
 
-        //ID
-	    private static Map<Integer, ItemConfig> idConfigs = new HashMap<>();
+    
+    public static Map<Integer, ItemConfig> getIdConfigs() {
+        return idConfigs;
+    }
 
-
-        public static Map<Integer, ItemConfig> idConfigs() {
-            return idConfigs;
-        }
-
-        public static ItemConfig byId(int id) {
-            return idConfigs.get(id);
-        }
+    public static ItemConfig getById(int id) {
+        return idConfigs.get(id);
+    }
 
 
-        public static void index(List<ItemConfig> configs) {
-            Map<Integer, ItemConfig> idConfigs = new HashMap<>();
+    public static void index(List<ItemConfig> configs) {
+        Map<Integer, ItemConfig> _idConfigs = new HashMap<>();
 
-            ItemConfig oldConfig;
-            for (ItemConfig config : configs) {
-                oldConfig = idConfigs.put(config.id, config);
-                if (oldConfig != null) {
-                    String repeatedConfigs = config.getClass().getSimpleName();
-                    if (oldConfig.getClass() != config.getClass()) {
-                        repeatedConfigs += "," + oldConfig.getClass().getSimpleName();
-                    }
-                    throw new ConfigException("配置[" + repeatedConfigs + "]有重复索引[id:" + config.id + "]");
+        ItemConfig oldConfig;
+        for (ItemConfig config : configs) {
+            oldConfig = _idConfigs.put(config.id, config);
+            if (oldConfig != null) {
+                String repeatedConfigs = config.getClass().getSimpleName();
+                if (oldConfig.getClass() != config.getClass()) {
+                    repeatedConfigs += "," + oldConfig.getClass().getSimpleName();
                 }
+                throw new ConfigException("配置[" + repeatedConfigs + "]有重复索引[id:" + config.id + "]");
             }
-
-            get.idConfigs = unmodifiable(idConfigs);
-
         }
+
+        idConfigs = unmodifiable(_idConfigs);
 
     }
 

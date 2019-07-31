@@ -53,42 +53,35 @@ public class QuestTargetConfig extends Config {
         return new QuestTargetConfig();
     }
 
-    public static class get {
-        
-        private get() {
-        }
+    //ID
+    private static Map<Long, QuestTargetConfig> idConfigs = new HashMap<>();
 
-        //ID
-	    private static Map<Long, QuestTargetConfig> idConfigs = new HashMap<>();
+    
+    public static Map<Long, QuestTargetConfig> getIdConfigs() {
+        return idConfigs;
+    }
 
-
-        public static Map<Long, QuestTargetConfig> idConfigs() {
-            return idConfigs;
-        }
-
-        public static QuestTargetConfig byId(long id) {
-            return idConfigs.get(id);
-        }
+    public static QuestTargetConfig getById(long id) {
+        return idConfigs.get(id);
+    }
 
 
-        public static void index(List<QuestTargetConfig> configs) {
-            Map<Long, QuestTargetConfig> idConfigs = new HashMap<>();
+    public static void index(List<QuestTargetConfig> configs) {
+        Map<Long, QuestTargetConfig> _idConfigs = new HashMap<>();
 
-            QuestTargetConfig oldConfig;
-            for (QuestTargetConfig config : configs) {
-                oldConfig = idConfigs.put(config.id, config);
-                if (oldConfig != null) {
-                    String repeatedConfigs = config.getClass().getSimpleName();
-                    if (oldConfig.getClass() != config.getClass()) {
-                        repeatedConfigs += "," + oldConfig.getClass().getSimpleName();
-                    }
-                    throw new ConfigException("配置[" + repeatedConfigs + "]有重复索引[id:" + config.id + "]");
+        QuestTargetConfig oldConfig;
+        for (QuestTargetConfig config : configs) {
+            oldConfig = _idConfigs.put(config.id, config);
+            if (oldConfig != null) {
+                String repeatedConfigs = config.getClass().getSimpleName();
+                if (oldConfig.getClass() != config.getClass()) {
+                    repeatedConfigs += "," + oldConfig.getClass().getSimpleName();
                 }
+                throw new ConfigException("配置[" + repeatedConfigs + "]有重复索引[id:" + config.id + "]");
             }
-
-            get.idConfigs = unmodifiable(idConfigs);
-
         }
+
+        idConfigs = unmodifiable(_idConfigs);
 
     }
 

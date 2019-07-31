@@ -42,12 +42,12 @@ public class ConfigTest {
 
     private static void printConfigs() {
         System.err.println("ItemConfig============");
-        ItemConfig.get.idConfigs().values().forEach(System.out::println);
+        ItemConfig.getIdConfigs().values().forEach(System.out::println);
 
         System.err.println("EquipConfig============");
-        EquipConfig.get.idConfigs().values().forEach(System.out::println);
+        EquipConfig.self.getIdConfigs().values().forEach(System.out::println);
 
         System.err.println("WeaponConfig============");
-        WeaponConfig.get.idConfigs().values().forEach(System.out::println);
+        WeaponConfig.self.getIdConfigs().values().forEach(System.out::println);
     }
 }
