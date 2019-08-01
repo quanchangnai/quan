@@ -13,7 +13,22 @@ public abstract class Definition {
         return name;
     }
 
+    public String getName4Validate() {
+        return getName4Validate("");
+    }
+
+    public String getName4Validate(String append) {
+        if (name != null) {
+            return "[" + name + "]" + append;
+        }
+        return "";
+    }
+
+
     public void setName(String name) {
+        if (name == null || name.trim().equals("")) {
+            return;
+        }
         this.name = name;
     }
 
@@ -22,6 +37,9 @@ public abstract class Definition {
     }
 
     public void setComment(String comment) {
+        if (comment == null || comment.trim().equals("")) {
+            return;
+        }
         this.comment = comment;
     }
 

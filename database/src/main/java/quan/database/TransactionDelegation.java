@@ -5,9 +5,10 @@ import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 import net.bytebuddy.implementation.bind.annotation.SuperCall;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import quan.common.tuple.One;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 
@@ -26,12 +27,12 @@ public class TransactionDelegation {
     @RuntimeType
     public static Object delegate(@SuperCall Callable<?> callable, @Origin Method originMethod) {
         //被代理的方法的返回结果，同步调用一定能正确返回，异步调用结果会丢失
-        One<Object> delegateResult = new One<>();
+        List<Object> delegateResult = new ArrayList<>();
 
         Task task = () -> {
             try {
                 Object callResult = callable.call();
-                delegateResult.setOne(callResult);
+                delegateResult.add(callResult);
                 //返回false代表事务执行失败，其他值都表示事务执行成功
                 if (callResult instanceof Boolean) {
                     return (boolean) callResult;
@@ -51,10 +52,10 @@ public class TransactionDelegation {
             Transaction.execute(task);
         }
 
-        if (delegateResult.getOne() != null) {
-            return delegateResult.getOne();
-        } else {
+        if (delegateResult.isEmpty()) {
             return asyncCallDefaultResult(originMethod.getReturnType());
+        } else {
+            return delegateResult.get(0);
         }
 
     }

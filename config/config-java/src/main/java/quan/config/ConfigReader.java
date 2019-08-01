@@ -15,6 +15,7 @@ import java.util.*;
 /**
  * Created by quanchangnai on 2019/7/11.
  */
+@SuppressWarnings({"unchecked"})
 public abstract class ConfigReader {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
@@ -51,7 +52,7 @@ public abstract class ConfigReader {
 
     public List<JSONObject> readJsons() {
         if (jsons.isEmpty()) {
-            read0();
+            read();
         }
         return jsons;
     }
@@ -72,7 +73,7 @@ public abstract class ConfigReader {
         return configs;
     }
 
-    protected abstract void read0();
+    protected abstract void read();
 
     public void clear() {
         jsons.clear();
@@ -91,7 +92,7 @@ public abstract class ConfigReader {
         } else if (type.equals("map")) {
             return convertMap(fieldDefinition, value);
         } else if (fieldDefinition.isBeanType()) {
-            return convertBean((BeanDefinition) ClassDefinition.getAll().get(fieldDefinition.getType()), value);
+            return convertBean(fieldDefinition.getBean(), value);
         }
         return value;
     }
@@ -116,7 +117,7 @@ public abstract class ConfigReader {
     }
 
     public static JSONArray convertList(FieldDefinition fieldDefinition, String value) {
-        String[] values = value.split("[;]");//TODO 分隔符需要改成可配置
+        String[] values = value.split(fieldDefinition.getEscapedDelimiter());
         return convertArray(fieldDefinition, values);
     }
 
@@ -134,14 +135,13 @@ public abstract class ConfigReader {
 
     public static JSONArray convertSet(FieldDefinition fieldDefinition, String value) {
         //set需要去重
-        String[] values = value.split("[;]");//TODO 分隔符需要改成可配置
-        Set<String> set = new HashSet<>();
-        set.addAll(Arrays.asList(values));
+        String[] values = value.split(fieldDefinition.getEscapedDelimiter());
+        Set<String> set = new HashSet<>(Arrays.asList(values));
         return convertArray(fieldDefinition, set.toArray(new String[0]));
     }
 
     public static JSONObject convertMap(FieldDefinition fieldDefinition, String value) {
-        String[] values = value.split("[;|\\*]");//TODO 分隔符需要改成可配置
+        String[] values = value.split(fieldDefinition.getEscapedDelimiter());
 
         JSONObject object = new JSONObject();
         for (int i = 0; i < values.length; i = i + 2) {
@@ -159,7 +159,7 @@ public abstract class ConfigReader {
     }
 
     public static JSONObject convertBean(BeanDefinition beanDefinition, String value) {
-        String[] values = value.split("[_]");//TODO 分隔符需要改成可配置
+        String[] values = value.split(beanDefinition.getEscapedDelimiter());
 
         JSONObject object = new JSONObject();
         for (int i = 0; i < beanDefinition.getFields().size(); i++) {

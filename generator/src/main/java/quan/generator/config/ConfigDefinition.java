@@ -34,6 +34,10 @@ public class ConfigDefinition extends BeanDefinition {
 
     private static Map<String, ConfigDefinition> tableConfigs = new HashMap<>();
 
+    public static Set<String> allowDelimiters = new HashSet<>(Arrays.asList(";", "_", "*", "|", "$", "@", "#", "&", "?"));
+
+    public static Set<String> needEscapeChars = new HashSet<>(Arrays.asList("*", "|", "?"));
+
     public ConfigDefinition() {
     }
 
@@ -53,6 +57,9 @@ public class ConfigDefinition extends BeanDefinition {
     }
 
     public ConfigDefinition setTable(String table) {
+        if (table == null || table.trim().equals("")) {
+            return this;
+        }
         this.table = table;
         return this;
     }
@@ -141,23 +148,22 @@ public class ConfigDefinition extends BeanDefinition {
     }
 
 
-
     public List<FieldDefinition> getSelfFields() {
         return selfFields;
     }
 
     @Override
     public void validate() {
-        if (getName() == null || getName().trim().equals("")) {
-            throwValidatedError("类名不能为空");
+        if (getName() == null) {
+            addValidatedError("配置" + getName4Validate() + "的类名不能为空");
         }
 
         if (!languages.isEmpty() && !Language.names().containsAll(languages)) {
-            throwValidatedError("语言类型" + languages + "非法,支持的语言类型" + Language.names());
+            addValidatedError("配置" + getName4Validate() + "的语言类型" + languages + "非法,支持的语言类型" + Language.names());
         }
 
-        if (table == null || table.trim().equals("")) {
-            throwValidatedError("配置[" + getName() + "]的对应表格不能为空");
+        if (table == null) {
+            addValidatedError("配置" + getName4Validate() + "对应的表格不能为空");
         }
 
         //支持分表
@@ -165,7 +171,7 @@ public class ConfigDefinition extends BeanDefinition {
         for (String t : tables) {
             ConfigDefinition other = tableConfigs.get(t);
             if (other != null) {
-                throwValidatedError("配置[" + getName() + "," + other.getName() + "]和表格[" + t + "]不能多对一", other);
+                addValidatedError("配置" + getName4Validate() + other.getName4Validate() + "和表格[" + t + "]不能多对一", other);
             }
             tableConfigs.put(t, this);
         }
@@ -187,59 +193,132 @@ public class ConfigDefinition extends BeanDefinition {
         //支持子表
         ClassDefinition parentClassDefinition = ClassDefinition.getAll().get(getParent());
         if (parentClassDefinition == null) {
-            throwValidatedError("配置[" + getName() + "]的父类[" + parent + "]不存在");
+            addValidatedError("配置" + getName4Validate() + "的父类[" + parent + "]不存在");
+            return;
         }
         if (!(parentClassDefinition instanceof ConfigDefinition)) {
-            throwValidatedError("配置[" + getName() + "]的父类[" + parent + "]也必须是配置类");
+            addValidatedError("配置" + getName4Validate() + "的父类[" + parent + "]也必须是配置类");
+            return;
         }
 
-        Set<String> parents = new HashSet<>();
         ConfigDefinition parentConfigDefinition = getParentDefinition();
 
+        Set<String> parents = new HashSet<>();
         while (parentConfigDefinition != null) {
             if (parents.contains(parentConfigDefinition.getName())) {
-                throwValidatedError("配置[" + getName() + "]的父类" + parents + "不能有循环");
+                addValidatedError("配置" + getName4Validate() + "和父类" + parents + "不能有循环");
+                return;
             }
             parents.add(parentConfigDefinition.getName());
+            parentConfigDefinition = parentConfigDefinition.getParentDefinition();
+        }
 
+        parentConfigDefinition = getParentDefinition();
+        while (parentConfigDefinition != null) {
             fields.addAll(0, parentConfigDefinition.selfFields);
             indexes.addAll(0, parentConfigDefinition.selfIndexes);
             parentConfigDefinition.children.add(getName());
-
             parentConfigDefinition = parentConfigDefinition.getParentDefinition();
         }
 
     }
 
+
     @Override
-    protected void validateField(FieldDefinition fieldDefinition) {
-        super.validateField(fieldDefinition);
+    protected void validateField(FieldDefinition field) {
+        super.validateField(field);
 
-        if (fieldDefinition.getColumn() == null || fieldDefinition.getColumn().trim().equals("")) {
-            throwValidatedError("字段对应的列[" + fieldDefinition.getName() + "]不能为空");
+        if (field.getColumn() == null) {
+            addValidatedError("配置" + getName4Validate() + "的字段" + field.getName4Validate() + "对应的列不能为空");
+            return;
         }
-        if (columnFields.containsKey(fieldDefinition.getColumn())) {
-            throwValidatedError("字段[" + fieldDefinition.getName() + "]和列[" + fieldDefinition.getColumn() + "]必须一一对应");
+        if (columnFields.containsKey(field.getColumn())) {
+            addValidatedError("配置" + getName4Validate() + "的字段" + field.getName4Validate() + "和列[" + field.getColumn() + "]必须一一对应");
+        } else {
+            columnFields.put(field.getColumn(), field);
         }
 
-        if (fieldDefinition.getComment() == null || fieldDefinition.getComment().trim().equals("")) {
-            fieldDefinition.setComment(fieldDefinition.getColumn());
+        if (field.getComment() == null) {
+            field.setComment(field.getColumn());
         }
 
+        ArrayList<String> delimiterList = new ArrayList<>();
+        validateDelimiter(field, delimiterList);
+        Set<String> delimiterSet = new HashSet<>(delimiterList);
+        if (delimiterList.size() != delimiterSet.size()) {
+            addValidatedError("配置" + getName4Validate() + "字段" + field.getName4Validate() + "的分隔符有重复[" + String.join("", delimiterList) + "]");
+        }
+    }
 
-        columnFields.put(fieldDefinition.getColumn(), fieldDefinition);
+    private void validateDelimiter(FieldDefinition field, List<String> delimiters) {
+        if (field.isBeanType()) {
+            validateDelimiter(field.getBean(), delimiters);
+            return;
+        }
+
+        if (!field.isCollectionType()) {
+            return;
+        }
+
+        String delimiter = field.getDelimiter();
+
+        for (int i = 0; i < delimiter.length(); i++) {
+            String s = String.valueOf(delimiter.charAt(i));
+            delimiters.add(s);
+            if (!allowDelimiters.contains(s)) {
+                addValidatedError("配置" + getName4Validate() + "字段" + field.getName4Validate() + "的分隔符[" + delimiter + "]非法,合法分隔符" + allowDelimiters);
+            }
+        }
+
+        int charNumError = 0;
+        if (delimiter.length() != 1 && (field.isBeanType() || field.getType().equals("list") || field.getType().equals("set"))) {
+            charNumError = 1;
+        }
+        if (field.getType().equals("map")) {
+            if (delimiter.length() != 2) {
+                charNumError = 2;
+            } else if (delimiter.charAt(0) == delimiter.charAt(1)) {
+                addValidatedError("配置" + getName4Validate() + "map类型字段" + field.getName4Validate() + "的分隔符[" + delimiter + "]必须是2个不相同的字符");
+            }
+        }
+        if (charNumError > 0) {
+            addValidatedError("配置" + getName4Validate() + "[" + field.getType() + "]类型字段" + field.getName4Validate() + "的分隔符[" + delimiter + "]必须是" + charNumError + "个字符");
+        }
+
+        if (field.isValueBeanType()) {
+            BeanDefinition fieldValueBean = (BeanDefinition) ClassDefinition.getAll().get(field.getValueType());
+            validateDelimiter(fieldValueBean, delimiters);
+        }
+    }
+
+    private void validateDelimiter(BeanDefinition beanDefinition, List<String> delimiters) {
+        String delimiter = beanDefinition.getDelimiter();
+        for (int i = 0; i < delimiter.length(); i++) {
+            delimiters.add(String.valueOf(delimiter.charAt(i)));
+        }
+        for (FieldDefinition beanField : beanDefinition.getFields()) {
+            validateDelimiter(beanField, delimiters);
+        }
     }
 
     private void validateIndexes() {
         for (FieldDefinition selfField : selfFields) {
-            if (selfField.getIndex() == null) {
+            if (selfField.getIndex() == null && !selfField.getName().equals("id")) {
+                continue;
+            }
+            if (!selfField.isPrimitiveType() && !selfField.isEnumType()) {
+                addValidatedError("配置" + getName4Validate() + "的字段" + selfField.getName4Validate() + "类型[" + selfField.getType() + "]不支持索引，允许的类型为" + FieldDefinition.PRIMITIVE_TYPES + "或枚举");
                 continue;
             }
             IndexDefinition indexDefinition = new IndexDefinition(this);
             indexDefinition.setName(selfField.getName());
             indexDefinition.setFieldNames(selfField.getName());
-            indexDefinition.setType(selfField.getIndex());
-            if (selfField.getComment() == null || selfField.getComment().trim().equals("")) {
+            if (selfField.getName().equals("id")) {
+                indexDefinition.setType("unique");
+            } else {
+                indexDefinition.setType(selfField.getIndex());
+            }
+            if (selfField.getComment() == null) {
                 indexDefinition.setComment(selfField.getColumn());
             } else {
                 indexDefinition.setComment(selfField.getComment());
@@ -248,7 +327,8 @@ public class ConfigDefinition extends BeanDefinition {
         }
 
         if (indexes.isEmpty()) {
-            throwValidatedError("配置[" + getName() + "]至少需要一个索引");
+            addValidatedError("配置" + getName4Validate() + "至少需要一个索引");
+            return;
         }
         for (IndexDefinition indexDefinition : selfIndexes) {
             validateIndex(indexDefinition);
@@ -256,43 +336,68 @@ public class ConfigDefinition extends BeanDefinition {
         Set<String> indexNames = new HashSet<>();
         for (IndexDefinition indexDefinition : indexes) {
             if (indexNames.contains(indexDefinition.getName())) {
-                throwValidatedError("索引名[" + indexDefinition.getName() + "]重复");
+                addValidatedError("配置" + getName4Validate() + "的索引名[" + indexDefinition.getName() + "]重复");
+                continue;
             }
             indexNames.add(indexDefinition.getName());
         }
     }
 
     private void validateIndex(IndexDefinition indexDefinition) {
-        if (indexDefinition.getName() == null || indexDefinition.getName().trim().equals("")) {
-            throwValidatedError("索引名不能为空");
+        if (indexDefinition.getName() == null) {
+            addValidatedError("配置" + getName4Validate() + "的索引名不能为空");
         }
 
         String indexType = indexDefinition.getType();
-        if (indexType == null || indexType.trim().equals("")) {
-            throwValidatedError("索引类型不能为空");
-        }
-        List<String> allowIndexTypes = Arrays.asList("normal", "n", "unique", "u");
-        if (!allowIndexTypes.contains(indexType)) {
-            throwValidatedError("索引类型[" + indexType + "]非法,允许类型" + allowIndexTypes);
+        if (indexType == null) {
+            addValidatedError("配置" + getName4Validate() + "的索引" + indexDefinition.getName4Validate() + "类型不能为空");
+        } else {
+            List<String> allowIndexTypes = Arrays.asList("normal", "n", "unique", "u");
+            if (!allowIndexTypes.contains(indexType)) {
+                addValidatedError("配置" + getName4Validate() + "的索引" + indexDefinition.getName4Validate() + "类型[" + indexType + "]非法,允许类型" + allowIndexTypes);
+            }
         }
 
         String fieldNames = indexDefinition.getFieldNames();
-        if (fieldNames == null || fieldNames.trim().equals("")) {
-            throwValidatedError("索引[" + indexDefinition.getName() + "]的字段不能为空");
-        } else {
-            String[] fieldNameArray = fieldNames.split("[,]");
-            if (fieldNameArray.length > 3) {
-                throwValidatedError("索引[" + indexDefinition.getName() + "]的字段[" + fieldNames + "]不能超过三个");
+        if (fieldNames == null) {
+            addValidatedError("配置" + getName4Validate() + "的索引" + indexDefinition.getName4Validate() + "的字段不能为空");
+            return;
+        }
+
+        String[] fieldNameArray = fieldNames.split("[,]");
+        if (fieldNameArray.length > 3) {
+            addValidatedError("配置" + getName4Validate() + "的索引" + indexDefinition.getName4Validate() + "的字段[" + fieldNames + "]不能超过三个");
+        }
+        for (String fieldName : fieldNameArray) {
+            FieldDefinition fieldDefinition = fieldMap.get(fieldName);
+            if (fieldDefinition == null) {
+                addValidatedError("配置" + getName4Validate() + "的索引" + indexDefinition.getName4Validate() + "的字段[" + fieldName + "]不存在");
+                continue;
             }
-            for (String fieldName : fieldNameArray) {
-                FieldDefinition fieldDefinition = fieldMap.get(fieldName);
-                if (fieldDefinition == null) {
-                    throwValidatedError("索引[" + indexDefinition.getName() + "]的字段[" + fieldName + "]不存在");
-                }
-                if (!indexDefinition.addField(fieldDefinition)) {
-                    throwValidatedError("索引[" + indexDefinition.getName() + "]的字段[" + fieldNames + "]不能重复");
-                }
+            if (!fieldDefinition.isPrimitiveType() && !fieldDefinition.isEnumType()) {
+                addValidatedError("配置" + getName4Validate() + "的索引" + indexDefinition.getName4Validate() + "的字段[" + fieldName + "]类型[" + fieldDefinition.getType() + "]非法，允许的类型为" + FieldDefinition.PRIMITIVE_TYPES + "或枚举");
+            }
+            if (!indexDefinition.addField(fieldDefinition)) {
+                addValidatedError("配置" + getName4Validate() + "的索引" + indexDefinition.getName4Validate() + "的字段[" + fieldNames + "]不能重复");
             }
         }
+
     }
+
+
+    public static String escapeDelimiter(String delimiter) {
+        StringBuilder escapedDelimiter = new StringBuilder();
+        for (int i = 0; i < delimiter.length(); i++) {
+            String s = String.valueOf(delimiter.charAt(i));
+            if (i > 0) {
+                escapedDelimiter.append("|");
+            }
+            if (needEscapeChars.contains(s)) {
+                escapedDelimiter.append("\\");
+            }
+            escapedDelimiter.append(s);
+        }
+        return escapedDelimiter.toString();
+    }
+
 }

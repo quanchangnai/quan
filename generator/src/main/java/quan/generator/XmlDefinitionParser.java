@@ -9,32 +9,40 @@ import quan.generator.database.DataDefinition;
 import quan.generator.message.MessageDefinition;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by quanchangnai on 2017/7/10.
  */
 public class XmlDefinitionParser extends DefinitionParser {
 
+    private Map<File, Element> file2Roots = new HashMap<>();
+
+    private Map<Element, ClassDefinition> element2Classes = new HashMap<>();
+
     @Override
-    protected String getDefinitionFileType() {
+    protected String getFileType() {
         return "xml";
     }
 
     private Element parseFile(File srcFile) throws Exception {
-        Element root = new SAXReader().read(srcFile).getRootElement();
-        if (!root.getName().equals("package")) {
-            return null;
+        Element root = file2Roots.get(srcFile);
+        if (root == null) {
+            root = new SAXReader().read(srcFile).getRootElement();
+            if (root.getName().equals("package")) {
+                file2Roots.put(srcFile, root);
+            } else {
+                root = null;
+            }
         }
         return root;
     }
 
     @Override
-    protected void parseClasses(File srcFile) throws Exception {
+    protected List<ClassDefinition> parseClasses(File srcFile) throws Exception {
         Element root = parseFile(srcFile);
         if (root == null) {
-            return;
+            return Collections.EMPTY_LIST;
         }
 
         String simplePackageName = srcFile.getName().substring(0, srcFile.getName().lastIndexOf("."));
@@ -49,6 +57,7 @@ public class XmlDefinitionParser extends DefinitionParser {
             enumPackageName = enumPackagePrefix + "." + simplePackageName;
         }
 
+        List<ClassDefinition> classDefinitions = new ArrayList<>();
         for (int i = 0; i < root.nodeCount(); i++) {
             Node node = root.node(i);
             if (!(node instanceof Element)) {
@@ -63,7 +72,7 @@ public class XmlDefinitionParser extends DefinitionParser {
                     classDefinition = new EnumDefinition();
                     break;
                 case "bean":
-                    classDefinition = new BeanDefinition();
+                    classDefinition = new BeanDefinition(element.attributeValue("delimiter"));
                     break;
                 case "message":
                     classDefinition = new MessageDefinition(element.attributeValue("id"));
@@ -98,10 +107,12 @@ public class XmlDefinitionParser extends DefinitionParser {
             }
             classDefinition.setComment(comment);
 
-            addClassDefinition(classDefinition);
-
+            element2Classes.put(element, classDefinition);
+            classDefinitions.add(classDefinition);
         }
+        return classDefinitions;
     }
+
 
     @Override
     protected void parseFields(File srcFile) throws Exception {
@@ -129,7 +140,10 @@ public class XmlDefinitionParser extends DefinitionParser {
 
 
     private void parseFields(Element classElement) {
-        ClassDefinition classDefinition = classDefinitions.get(classElement.attributeValue("name"));
+        ClassDefinition classDefinition = element2Classes.get(classElement);
+        if (classDefinition == null) {
+            return;
+        }
 
         for (int i = 0; i < classElement.nodeCount(); i++) {
             Node node = classElement.node(i);
@@ -149,7 +163,7 @@ public class XmlDefinitionParser extends DefinitionParser {
     }
 
     private void parseField(ClassDefinition classDefinition, Element classElement, Element fieldElement, int i) {
-        FieldDefinition fieldDefinition = new FieldDefinition(classDefinition);
+        FieldDefinition fieldDefinition = new FieldDefinition();
 
         fieldDefinition.setName(fieldElement.attributeValue("name"));
         fieldDefinition.setType(fieldElement.attributeValue("type"));
@@ -159,6 +173,7 @@ public class XmlDefinitionParser extends DefinitionParser {
         fieldDefinition.setKeyType(fieldElement.attributeValue("key-type"));
         fieldDefinition.setValueType(fieldElement.attributeValue("value-type"));
         fieldDefinition.setIndex(fieldElement.attributeValue("index"));
+        fieldDefinition.setDelimiter(fieldElement.attributeValue("delimiter"));
 
         String comment = classElement.node(i + 1).getText();
         comment = comment.replaceAll("[\r|\n]", "").trim();

@@ -12,172 +12,104 @@ import quan.quest.QuestType;
 @SuppressWarnings({"unchecked"})
 public class QuestConfig extends Config {
 
-    //ID
     protected long id;
 
-    //名字
     protected String name;
 
-    //类型
     protected QuestType type;
 
-    //A1
     protected int a1;
 
-    //A2
     protected int a2;
 
-    //B1
     protected int b1;
 
-    //B2
     protected boolean b2;
 
-    //C1
     protected String c1;
 
-    //C2
     protected int c2;
 
-    //C3
     protected int c3;
 
-    //D1
     protected String d1;
 
-    //D2
     protected int d2;
 
-    //D3
     protected int d3;
 
-    //Reward
     protected Reward reward;
 
-    //S1
     protected Set<Integer> s1 = new HashSet<>();
 
-    //L1
     protected List<Integer> l1 = new ArrayList<>();
 
-    //M1
     protected Map<Integer, Integer> m1 = new HashMap<>();
 
-    /**
-     * ID
-     */
     public long getId() {
         return id;
     }
 
-    /**
-     * 名字
-     */
     public String getName() {
         return name;
     }
 
-    /**
-     * 类型
-     */
     public QuestType getType() {
         return type;
     }
 
-    /**
-     * A1
-     */
     public int getA1() {
         return a1;
     }
 
-    /**
-     * A2
-     */
     public int getA2() {
         return a2;
     }
 
-    /**
-     * B1
-     */
     public int getB1() {
         return b1;
     }
 
-    /**
-     * B2
-     */
     public boolean getB2() {
         return b2;
     }
 
-    /**
-     * C1
-     */
     public String getC1() {
         return c1;
     }
 
-    /**
-     * C2
-     */
     public int getC2() {
         return c2;
     }
 
-    /**
-     * C3
-     */
     public int getC3() {
         return c3;
     }
 
-    /**
-     * D1
-     */
     public String getD1() {
         return d1;
     }
 
-    /**
-     * D2
-     */
     public int getD2() {
         return d2;
     }
 
-    /**
-     * D3
-     */
     public int getD3() {
         return d3;
     }
 
-    /**
-     * Reward
-     */
     public Reward getReward() {
         return reward;
     }
 
-    /**
-     * S1
-     */
     public Set<Integer> getS1() {
         return s1;
     }
 
-    /**
-     * L1
-     */
     public List<Integer> getL1() {
         return l1;
     }
 
-    /**
-     * M1
-     */
     public Map<Integer, Integer> getM1() {
         return m1;
     }
@@ -274,10 +206,8 @@ public class QuestConfig extends Config {
 
     private static Map<String, Map<Integer, Map<Integer, List<QuestConfig>>>> composite4Configs = new HashMap<>();
 
-    //ID
     private static Map<Long, QuestConfig> idConfigs = new HashMap<>();
 
-    //类型
     private static Map<QuestType, List<QuestConfig>> typeConfigs = new HashMap<>();
 
     
@@ -354,7 +284,7 @@ public class QuestConfig extends Config {
     }
 
 
-    public static void index(List<QuestConfig> configs) {
+    public static List<String> index(List<QuestConfig> configs) {
         Map<Integer, Map<Integer, QuestConfig>> _composite1Configs = new HashMap<>();
         Map<Integer, Map<Boolean, List<QuestConfig>>> _composite2Configs = new HashMap<>();
         Map<String, Map<Integer, Map<Integer, QuestConfig>>> _composite3Configs = new HashMap<>();
@@ -362,7 +292,9 @@ public class QuestConfig extends Config {
         Map<Long, QuestConfig> _idConfigs = new HashMap<>();
         Map<QuestType, List<QuestConfig>> _typeConfigs = new HashMap<>();
 
+        List<String> errors = new ArrayList<>();
         QuestConfig oldConfig;
+
         for (QuestConfig config : configs) {
             oldConfig = _composite1Configs.computeIfAbsent(config.a1, k -> new HashMap<>()).put(config.a2, config);
             if (oldConfig != null) {
@@ -370,7 +302,7 @@ public class QuestConfig extends Config {
                 if (oldConfig.getClass() != config.getClass()) {
                     repeatedConfigs += "," + oldConfig.getClass().getSimpleName();
                 }
-                throw new ConfigException("配置[" + repeatedConfigs + "]有重复索引[a1,a2:" + config.a1 + "," + config.a2 + "]");
+                errors.add("配置[" + repeatedConfigs + "]有重复[a1,a2:" + config.a1 + "," + config.a2 + "]");
             }
 
             _composite2Configs.computeIfAbsent(config.b1, k -> new HashMap<>()).computeIfAbsent(config.b2, k -> new ArrayList<>()).add(config);
@@ -381,7 +313,7 @@ public class QuestConfig extends Config {
                 if (oldConfig.getClass() != config.getClass()) {
                     repeatedConfigs += "," + oldConfig.getClass().getSimpleName();
                 }
-                throw new ConfigException("配置[" + repeatedConfigs + "]有重复索引[c1,c2,c3:" + config.c1 + "," + config.c2 + "," + config.c3 + "]");
+                errors.add("配置[" + repeatedConfigs + "]有重复[c1,c2,c3:" + config.c1 + "," + config.c2 + "," + config.c3 + "]");
             }
 
             _composite4Configs.computeIfAbsent(config.d1, k -> new HashMap<>()).computeIfAbsent(config.d2, k -> new HashMap<>()).computeIfAbsent(config.d3, k -> new ArrayList<>()).add(config);
@@ -392,7 +324,7 @@ public class QuestConfig extends Config {
                 if (oldConfig.getClass() != config.getClass()) {
                     repeatedConfigs += "," + oldConfig.getClass().getSimpleName();
                 }
-                throw new ConfigException("配置[" + repeatedConfigs + "]有重复索引[id:" + config.id + "]");
+                errors.add("配置[" + repeatedConfigs + "]有重复[id:" + config.id + "]");
             }
 
             _typeConfigs.computeIfAbsent(config.type, k -> new ArrayList<>()).add(config);
@@ -405,6 +337,7 @@ public class QuestConfig extends Config {
         idConfigs = unmodifiable(_idConfigs);
         typeConfigs = unmodifiable(_typeConfigs);
 
+        return errors;
     }
 
 }

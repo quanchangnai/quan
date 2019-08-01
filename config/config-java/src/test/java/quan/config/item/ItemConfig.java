@@ -12,72 +12,44 @@ import quan.common.ItemType;
 @SuppressWarnings({"unchecked"})
 public class ItemConfig extends Config {
 
-    //ID
     protected int id;
 
-    //名字
     protected String name;
 
-    //类型
     protected ItemType type;
 
-    //奖励
     protected Reward reward;
 
-    //List
     protected List<Integer> list = new ArrayList<>();
 
-    //Set
     protected Set<Integer> set = new HashSet<>();
 
-    //Map
     protected Map<Integer, Integer> map = new HashMap<>();
 
-    /**
-     * ID
-     */
     public int getId() {
         return id;
     }
 
-    /**
-     * 名字
-     */
     public String getName() {
         return name;
     }
 
-    /**
-     * 类型
-     */
     public ItemType getType() {
         return type;
     }
 
-    /**
-     * 奖励
-     */
     public Reward getReward() {
         return reward;
     }
 
-    /**
-     * List
-     */
     public List<Integer> getList() {
         return list;
     }
 
-    /**
-     * Set
-     */
     public Set<Integer> getSet() {
         return set;
     }
 
-    /**
-     * Map
-     */
     public Map<Integer, Integer> getMap() {
         return map;
     }
@@ -145,7 +117,6 @@ public class ItemConfig extends Config {
         return new ItemConfig();
     }
 
-    //ID
     private static Map<Integer, ItemConfig> idConfigs = new HashMap<>();
 
     
@@ -158,10 +129,12 @@ public class ItemConfig extends Config {
     }
 
 
-    public static void index(List<ItemConfig> configs) {
+    public static List<String> index(List<ItemConfig> configs) {
         Map<Integer, ItemConfig> _idConfigs = new HashMap<>();
 
+        List<String> errors = new ArrayList<>();
         ItemConfig oldConfig;
+
         for (ItemConfig config : configs) {
             oldConfig = _idConfigs.put(config.id, config);
             if (oldConfig != null) {
@@ -169,12 +142,13 @@ public class ItemConfig extends Config {
                 if (oldConfig.getClass() != config.getClass()) {
                     repeatedConfigs += "," + oldConfig.getClass().getSimpleName();
                 }
-                throw new ConfigException("配置[" + repeatedConfigs + "]有重复索引[id:" + config.id + "]");
+                errors.add("配置[" + repeatedConfigs + "]有重复[id:" + config.id + "]");
             }
         }
 
         idConfigs = unmodifiable(_idConfigs);
 
+        return errors;
     }
 
 }

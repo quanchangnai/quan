@@ -23,13 +23,15 @@ public class CSVConfigReader extends ConfigReader {
     }
 
     @Override
-    protected void read0() {
-        List<CSVRecord> records = new ArrayList<>();
+    protected void read() {
+        List<CSVRecord> records;
         try {
             CSVParser parser = new CSVParser(new InputStreamReader(new FileInputStream(tableFile), "GBK"), CSVFormat.DEFAULT);
             records = parser.getRecords();
         } catch (Exception e) {
-            logger.error("读取[{}]异常", table, e);
+            String error = String.format("读取配置[%s]出错:%s", table, e.getMessage());
+//            logger.error(error, e);
+            throw new ConfigException(error);
         }
 
         //第一行是表头，第二行是注释，第三行起是内容
@@ -37,9 +39,12 @@ public class CSVConfigReader extends ConfigReader {
             return;
         }
 
+        List<String> errors = new ArrayList<>();
+
         for (int i = 2; i < records.size(); i++) {
-            JSONObject jsonObject = new JSONObject();
             CSVRecord record = records.get(i);
+            JSONObject jsonObject = new JSONObject();
+
             for (int j = 0; j < record.size(); j++) {
                 String columnName = records.get(0).get(j);
                 String columnValue = record.get(j).trim();
@@ -55,7 +60,7 @@ public class CSVConfigReader extends ConfigReader {
                 try {
                     fieldValue = convert(fieldDefinition, columnValue);
                 } catch (Exception e) {
-                    logger.error("表格[{}]的第{}行第{}列数据[{}]格式错误", table, i + 1, j + 1, columnValue);
+                    errors.add(String.format("配置[%s]的第%d行第%d列[%s]数据[%s]格式错误", table, i + 1, j + 1, columnName, columnValue));
                     continue;
                 }
 
@@ -75,6 +80,9 @@ public class CSVConfigReader extends ConfigReader {
 
         }
 
+        if (!errors.isEmpty()) {
+            throw new ConfigException(errors);
+        }
     }
 
 }

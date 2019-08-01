@@ -56,6 +56,9 @@ public class IndexDefinition extends Definition {
     }
 
     public IndexDefinition setType(String type) {
+        if (type == null || type.trim().equals("")) {
+            return this;
+        }
         this.type = type;
         return this;
     }
@@ -76,6 +79,9 @@ public class IndexDefinition extends Definition {
     }
 
     public IndexDefinition setFieldNames(String fieldNames) {
+        if (fieldNames == null || fieldNames.trim().equals("")) {
+            return this;
+        }
         this.fieldNames = fieldNames;
         return this;
     }

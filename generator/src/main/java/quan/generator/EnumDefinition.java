@@ -30,15 +30,15 @@ public class EnumDefinition extends ClassDefinition {
             enumValue = Integer.parseInt(fieldDefinition.getValue());
         } catch (NumberFormatException ignored) {
         }
-        if (enumValue < 1) {
-            throwValidatedError("枚举值必须为正整数");
-        }
-        if (enumValues.contains(enumValue)) {
-            throwValidatedError("枚举值不能重复");
-        }
 
-        enumValues.add(enumValue);
-        fieldDefinition.setValue(fieldDefinition.getValue());
+        if (enumValue < 1) {
+            addValidatedError("枚举" + getName4Validate() + "的值必须为正整数");
+        } else if (enumValues.contains(enumValue)) {
+            addValidatedError("枚举" + getName4Validate() + "的值不能重复");
+        } else {
+            enumValues.add(enumValue);
+            fieldDefinition.setValue(fieldDefinition.getValue());
+        }
     }
 
     public static boolean isEnumDefinition(String type) {

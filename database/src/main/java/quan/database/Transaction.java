@@ -145,6 +145,7 @@ public class Transaction {
         if (data.isExpired()) {
             throw new IllegalStateException("数据已过期");
         }
+        data.touch();
         if (versionLogs.containsKey(data)) {
             return;
         }

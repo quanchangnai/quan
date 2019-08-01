@@ -18,27 +18,38 @@ public class ConfigTest {
         List<String> definitionPaths = new ArrayList<>();
         definitionPaths.add("generator\\src\\test\\java\\quan\\generator");
         definitionPaths.add("generator\\src\\test\\java\\quan\\generator\\config");
-        String sourcePath = "config\\config-java\\src\\test\\resources\\csv";
+        String tablePath = "config\\config-java\\src\\test\\resources\\csv";
 
-        ConfigLoader configLoader = new ConfigLoader(definitionPaths, sourcePath);
+        ConfigLoader configLoader = new ConfigLoader(definitionPaths, tablePath);
         configLoader.setPackagePrefix("quan.config");
         configLoader.setEnumPackagePrefix("quan");
 
         System.err.println("configLoader.load()=============");
-        configLoader.load();
-
+        try {
+            configLoader.load();
+        } catch (ConfigException e) {
+            printErrors(e);
+        }
         printConfigs();
 
         Thread.sleep(10000);
 
         List<String> reloadTables = Arrays.asList("武器.csv");
         System.err.println("configLoader.reload()=============" + reloadTables);
-        configLoader.reload(reloadTables);
-
+        try {
+            configLoader.reload(reloadTables);
+        } catch (ConfigException e) {
+            printErrors(e);
+        }
         printConfigs();
 
     }
 
+    private static void printErrors(ConfigException e) {
+        for (String error : e.getErrors()) {
+            System.err.println(error);
+        }
+    }
 
     private static void printConfigs() {
         System.err.println("ItemConfig============");

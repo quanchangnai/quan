@@ -10,24 +10,34 @@ import quan.config.*;
 @SuppressWarnings({"unchecked"})
 public class WeaponConfig extends EquipConfig {
 
-    //字段1
     protected int w1;
 
-    //字段2
     protected int w2;
 
-    /**
-     * 字段1
-     */
+    protected List<Reward> rewardList = new ArrayList<>();
+
+    protected Map<Integer, Reward> rewardMap = new HashMap<>();
+
+    protected List<Integer> list2 = new ArrayList<>();
+
     public int getW1() {
         return w1;
     }
 
-    /**
-     * 字段2
-     */
     public int getW2() {
         return w2;
+    }
+
+    public List<Reward> getRewardList() {
+        return rewardList;
+    }
+
+    public Map<Integer, Reward> getRewardMap() {
+        return rewardMap;
+    }
+
+    public List<Integer> getList2() {
+        return list2;
     }
 
 
@@ -37,6 +47,34 @@ public class WeaponConfig extends EquipConfig {
 
         w1 = object.getIntValue("w1");
         w2 = object.getIntValue("w2");
+
+        JSONArray $rewardList = object.getJSONArray("rewardList");
+        if ($rewardList != null) {
+            for (int i = 0; i < $rewardList.size(); i++) {
+                Reward $rewardList$Value = new Reward();
+                $rewardList$Value.parse($rewardList.getJSONObject(i));
+                rewardList.add($rewardList$Value);
+            }
+        }
+        rewardList = Collections.unmodifiableList(rewardList);
+
+        JSONObject $rewardMap = object.getJSONObject("rewardMap");
+        if ($rewardMap != null) {
+            for (String $rewardMap$Key : $rewardMap.keySet()) {
+                Reward $rewardMap$Value = new Reward();
+                $rewardMap$Value.parse($rewardMap.getJSONObject($rewardMap$Key));
+                rewardMap.put(Integer.valueOf($rewardMap$Key), $rewardMap$Value);
+            }
+        }
+        rewardMap = Collections.unmodifiableMap(rewardMap);
+
+        JSONArray $list2 = object.getJSONArray("list2");
+        if ($list2 != null) {
+            for (int i = 0; i < $list2.size(); i++) {
+                list2.add($list2.getInteger(i));
+            }
+        }
+        list2 = Collections.unmodifiableList(list2);
     }
 
     @Override
@@ -53,6 +91,9 @@ public class WeaponConfig extends EquipConfig {
                 ",color=" + color +
                 ",w1=" + w1 +
                 ",w2=" + w2 +
+                ",rewardList=" + rewardList +
+                ",rewardMap=" + rewardMap +
+                ",list2=" + list2 +
                 '}';
 
     }
@@ -67,8 +108,9 @@ public class WeaponConfig extends EquipConfig {
         private self() {
         }
 
-        //ID
         private static Map<Integer, WeaponConfig> idConfigs = new HashMap<>();
+
+        private static Map<Integer, List<WeaponConfig>> positionConfigs = new HashMap<>();
 
         private static Map<Integer, Map<Integer, List<WeaponConfig>>> composite1Configs = new HashMap<>();
 
@@ -79,6 +121,14 @@ public class WeaponConfig extends EquipConfig {
 
         public static WeaponConfig getById(int id) {
             return idConfigs.get(id);
+        }
+
+        public static Map<Integer, List<WeaponConfig>> getPositionConfigs() {
+            return positionConfigs;
+        }
+
+        public static List<WeaponConfig> getByPosition(int position) {
+            return positionConfigs.getOrDefault(position, Collections.emptyList());
         }
 
         public static Map<Integer, Map<Integer, List<WeaponConfig>>> getComposite1Configs() {
@@ -94,11 +144,14 @@ public class WeaponConfig extends EquipConfig {
         }
 
 
-        public static void index(List<WeaponConfig> configs) {
+        public static List<String> index(List<WeaponConfig> configs) {
             Map<Integer, WeaponConfig> _idConfigs = new HashMap<>();
+            Map<Integer, List<WeaponConfig>> _positionConfigs = new HashMap<>();
             Map<Integer, Map<Integer, List<WeaponConfig>>> _composite1Configs = new HashMap<>();
 
+            List<String> errors = new ArrayList<>();
             WeaponConfig oldConfig;
+
             for (WeaponConfig config : configs) {
                 oldConfig = _idConfigs.put(config.id, config);
                 if (oldConfig != null) {
@@ -106,15 +159,19 @@ public class WeaponConfig extends EquipConfig {
                     if (oldConfig.getClass() != config.getClass()) {
                         repeatedConfigs += "," + oldConfig.getClass().getSimpleName();
                     }
-                    throw new ConfigException("配置[" + repeatedConfigs + "]有重复索引[id:" + config.id + "]");
+                    errors.add("配置[" + repeatedConfigs + "]有重复[id:" + config.id + "]");
                 }
+
+                _positionConfigs.computeIfAbsent(config.position, k -> new ArrayList<>()).add(config);
 
                 _composite1Configs.computeIfAbsent(config.color, k -> new HashMap<>()).computeIfAbsent(config.w1, k -> new ArrayList<>()).add(config);
             }
 
             idConfigs = unmodifiable(_idConfigs);
+            positionConfigs = unmodifiable(_positionConfigs);
             composite1Configs = unmodifiable(_composite1Configs);
 
+            return errors;
         }
 
     }

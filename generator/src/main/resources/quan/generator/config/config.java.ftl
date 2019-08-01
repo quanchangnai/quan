@@ -70,7 +70,13 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         JSONArray $${field.name} = object.getJSONArray("${field.name}");
         if ($${field.name} != null) {
             for (int i = 0; i < $${field.name}.size(); i++) {
+                <#if field.valueBeanType>
+                ${field.classValueType} $${field.name}$Value = new ${field.classValueType}();
+                $${field.name}$Value.parse($${field.name}.getJSONObject(i));
+                ${field.name}.add($${field.name}$Value);
+                <#else>
                 ${field.name}.add($${field.name}.get${field.classValueType}(i));
+                </#if>
             }
         }
         ${field.name} = Collections.unmodifiable${field.basicType}(${field.name});
@@ -84,7 +90,13 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         JSONObject $${field.name} = object.getJSONObject("${field.name}");
         if ($${field.name} != null) {
             for (String $${field.name}$Key : $${field.name}.keySet()) {
+                <#if field.valueBeanType>
+                ${field.classValueType} $${field.name}$Value = new ${field.classValueType}();
+                $${field.name}$Value.parse($${field.name}.getJSONObject($${field.name}$Key));
+                ${field.name}.put(${field.classKeyType}.valueOf($${field.name}$Key), $${field.name}$Value);
+                <#else>
                 ${field.name}.put(${field.classKeyType}.valueOf($${field.name}$Key), $${field.name}.get${field.classValueType}($${field.name}$Key));
+                </#if>
             }
         }
         ${field.name} = Collections.unmodifiableMap(${field.name});
@@ -247,7 +259,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         </#if>
     </#list>
 
-    ${tab}public static void index(List<${name}> configs) {
+    ${tab}public static List<String> index(List<${name}> configs) {
     <#list indexes as index>
         <#if index.unique && index.fields?size==1>
         ${tab}Map<${index.fields[0].classType}, ${name}> _${index.name}Configs = new HashMap<>();
@@ -264,7 +276,9 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         </#if>
     </#list>
 
+        ${tab}List<String> errors = new ArrayList<>();
         ${tab}${name} oldConfig;
+
         ${tab}for (${name} config : configs) {
     <#list indexes as index>
         <#if index.unique && index.fields?size==1>
@@ -274,7 +288,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
                 ${tab}if (oldConfig.getClass() != config.getClass()) {
                     ${tab}repeatedConfigs += "," + oldConfig.getClass().getSimpleName();
                 ${tab}}
-                ${tab}throw new ConfigException("配置[" + repeatedConfigs + "]有重复索引[${index.fields[0].name}:" + config.${index.fields[0].name} + "]");
+                ${tab}errors.add("配置[" + repeatedConfigs + "]有重复[${index.fields[0].name}:" + config.${index.fields[0].name} + "]");
             ${tab}}
         <#elseif index.normal && index.fields?size==1>
             ${tab}_${index.name}Configs.computeIfAbsent(config.${index.fields[0].name}, k -> new ArrayList<>()).add(config);
@@ -285,7 +299,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
                 ${tab}if (oldConfig.getClass() != config.getClass()) {
                     ${tab}repeatedConfigs += "," + oldConfig.getClass().getSimpleName();
                 ${tab}}
-                ${tab}throw new ConfigException("配置[" + repeatedConfigs + "]有重复索引[${index.fields[0].name},${index.fields[1].name}:" + config.${index.fields[0].name} + "," + config.${index.fields[1].name} + "]");
+                ${tab}errors.add("配置[" + repeatedConfigs + "]有重复[${index.fields[0].name},${index.fields[1].name}:" + config.${index.fields[0].name} + "," + config.${index.fields[1].name} + "]");
             ${tab}}
         <#elseif index.normal && index.fields?size==2>
             ${tab}_${index.name}Configs.computeIfAbsent(config.${index.fields[0].name}, k -> new HashMap<>()).computeIfAbsent(config.${index.fields[1].name}, k -> new ArrayList<>()).add(config);
@@ -296,7 +310,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
                 ${tab}if (oldConfig.getClass() != config.getClass()) {
                     ${tab}repeatedConfigs += "," + oldConfig.getClass().getSimpleName();
                 ${tab}}
-                ${tab}throw new ConfigException("配置[" + repeatedConfigs + "]有重复索引[${index.fields[0].name},${index.fields[1].name},${index.fields[2].name}:" + config.${index.fields[0].name} + "," + config.${index.fields[1].name} + "," + config.${index.fields[2].name} + "]");
+                ${tab}errors.add("配置[" + repeatedConfigs + "]有重复[${index.fields[0].name},${index.fields[1].name},${index.fields[2].name}:" + config.${index.fields[0].name} + "," + config.${index.fields[1].name} + "," + config.${index.fields[2].name} + "]");
             }
         <#elseif index.normal && index.fields?size==3>
             ${tab}_${index.name}Configs.computeIfAbsent(config.${index.fields[0].name}, k -> new HashMap<>()).computeIfAbsent(config.${index.fields[1].name}, k -> new HashMap<>()).computeIfAbsent(config.${index.fields[2].name}, k -> new ArrayList<>()).add(config);
@@ -311,6 +325,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         ${tab}${index.name}Configs = unmodifiable(_${index.name}Configs);
     </#list>
 
+        ${tab}return errors;
     ${tab}}
     </#macro>
 

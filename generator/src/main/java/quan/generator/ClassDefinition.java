@@ -34,6 +34,7 @@ public abstract class ClassDefinition extends Definition {
 
     private static Map<String, ClassDefinition> all = new HashMap<>();
 
+    private static List<String> validatedErrors = new ArrayList<>();
 
     public String getPackageName() {
         return packageName;
@@ -46,7 +47,6 @@ public abstract class ClassDefinition extends Definition {
     public List<FieldDefinition> getFields() {
         return fields;
     }
-
 
 
     public void addField(FieldDefinition fieldDefinition) {
@@ -93,12 +93,12 @@ public abstract class ClassDefinition extends Definition {
     }
 
     public void validate() {
-        if (getName() == null || getName().trim().equals("")) {
-            throwValidatedError("类名不能为空");
+        if (getName() == null) {
+            addValidatedError("类名不能为空");
         }
 
         if (!languages.isEmpty() && !Language.names().containsAll(languages)) {
-            throwValidatedError("语言类型" + languages + "非法,支持的语言类型" + Language.names());
+            addValidatedError("类" + getName4Validate() + "的语言类型" + languages + "非法,支持的语言类型" + Language.names());
         }
 
         for (FieldDefinition fieldDefinition : getFields()) {
@@ -108,35 +108,41 @@ public abstract class ClassDefinition extends Definition {
 
     protected void validateField(FieldDefinition fieldDefinition) {
         //校验字段名
-        if (fieldDefinition.getName() == null || fieldDefinition.getName().trim().equals("")) {
-            throwValidatedError("字段名不能为空");
+        if (fieldDefinition.getName() == null) {
+            addValidatedError(getName4Validate("的") + "字段名不能为空");
+            return;
         }
         if (fieldMap.containsKey(fieldDefinition.getName())) {
-            throwValidatedError("字段名[" + fieldDefinition.getName() + "]重复");
+            addValidatedError(getName4Validate("的") + "字段名[" + fieldDefinition.getName() + "]重复");
+            return;
         }
         fieldMap.put(fieldDefinition.getName(), fieldDefinition);
     }
-
-    protected void throwValidatedError(String error) {
-        throwValidatedError(error, null);
+    
+    protected void addValidatedError(String error) {
+        addValidatedError(error, null);
     }
 
-    protected void throwValidatedError(String error, ClassDefinition other) {
-        String errorPosition = "。定义文件[" + getDefinitionFile() + "]";
-        if (getName() != null && !getName().trim().equals("")) {
-            errorPosition += "，类[" + getName() + "]。";
+    protected void addValidatedError(String error, ClassDefinition other) {
+        String position = "。定义文件[" + getDefinitionFile() + "]";
+        if (getName() != null) {
+            position += "，类[" + getName() + "]";
         }
 
         if (other != null) {
-            errorPosition += "定义文件[" + other.getDefinitionFile() + "]";
-            if (getName() != null && !getName().trim().equals("")) {
-                errorPosition += "，类[" + other.getName() + "]。";
+            position += "。定义文件[" + other.getDefinitionFile() + "]";
+            if (getName() != null) {
+                position += "，类[" + other.getName() + "]";
             }
         }
 
-        throw new RuntimeException(error + errorPosition);
+        error += position + "。";
+        validatedErrors.add(error);
     }
 
+    public static List<String> getValidatedErrors() {
+        return validatedErrors;
+    }
 
     @Override
     public String toString() {

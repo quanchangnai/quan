@@ -10,22 +10,14 @@ import quan.config.*;
 @SuppressWarnings({"unchecked"})
 public class QuestTargetConfig extends Config {
 
-    //ID
     protected long id;
 
-    //名字
     protected String name;
 
-    /**
-     * ID
-     */
     public long getId() {
         return id;
     }
 
-    /**
-     * 名字
-     */
     public String getName() {
         return name;
     }
@@ -53,7 +45,6 @@ public class QuestTargetConfig extends Config {
         return new QuestTargetConfig();
     }
 
-    //ID
     private static Map<Long, QuestTargetConfig> idConfigs = new HashMap<>();
 
     
@@ -66,10 +57,12 @@ public class QuestTargetConfig extends Config {
     }
 
 
-    public static void index(List<QuestTargetConfig> configs) {
+    public static List<String> index(List<QuestTargetConfig> configs) {
         Map<Long, QuestTargetConfig> _idConfigs = new HashMap<>();
 
+        List<String> errors = new ArrayList<>();
         QuestTargetConfig oldConfig;
+
         for (QuestTargetConfig config : configs) {
             oldConfig = _idConfigs.put(config.id, config);
             if (oldConfig != null) {
@@ -77,12 +70,13 @@ public class QuestTargetConfig extends Config {
                 if (oldConfig.getClass() != config.getClass()) {
                     repeatedConfigs += "," + oldConfig.getClass().getSimpleName();
                 }
-                throw new ConfigException("配置[" + repeatedConfigs + "]有重复索引[id:" + config.id + "]");
+                errors.add("配置[" + repeatedConfigs + "]有重复[id:" + config.id + "]");
             }
         }
 
         idConfigs = unmodifiable(_idConfigs);
 
+        return errors;
     }
 
 }

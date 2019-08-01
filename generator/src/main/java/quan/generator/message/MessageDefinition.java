@@ -36,18 +36,21 @@ public class MessageDefinition extends BeanDefinition {
 
     @Override
     public void validate() {
+        boolean idIsInt = true;
         try {
             Integer.parseInt(id);
         } catch (NumberFormatException e) {
-            throwValidatedError("消息ID[" + id + "]必须是整数");
+            idIsInt = false;
+            addValidatedError("消息" + getName4Validate() + "ID[" + id + "]必须是整数");
         }
 
-        MessageDefinition other = all.get(id);
-        if (other != null) {
-            throwValidatedError("消息ID[" + id + "]不能重复", other);
+        if (idIsInt) {
+            MessageDefinition other = all.get(id);
+            if (other != null) {
+                addValidatedError("消息" + getName4Validate() + "ID[" + id + "]不能重复", other);
+            }
+            all.put(id, this);
         }
-
-        all.put(id, this);
 
         super.validate();
 

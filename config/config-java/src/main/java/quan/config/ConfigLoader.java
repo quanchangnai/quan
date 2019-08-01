@@ -2,6 +2,7 @@ package quan.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import quan.generator.ClassDefinition;
 import quan.generator.DefinitionParser;
 import quan.generator.XmlDefinitionParser;
 import quan.generator.config.ConfigDefinition;
@@ -55,9 +56,8 @@ public class ConfigLoader {
      * 全量加载配置
      */
     public void load() {
-        if (!definitionParser.getClassDefinitions().isEmpty()) {
-            logger.error("重加载请调用reload方法");
-            return;
+        if (!ClassDefinition.getAll().isEmpty()) {
+            throw new ConfigException("重加载请调用reload方法");
         }
         definitionParser.setDefinitionPaths(definitionPaths);
         definitionParser.setPackagePrefix(packagePrefix);
@@ -66,41 +66,80 @@ public class ConfigLoader {
         try {
             definitionParser.parse();
         } catch (Exception e) {
-            throw new ConfigException("解析配置定义文件[" + definitionPaths + "]出错", e);
+            String error = String.format("读取[%s]异常:%s", definitionPaths, e.getMessage());
+//            logger.error(error, e);
+            throw new ConfigException(error);
         }
 
+        List<String> validatedErrors = ClassDefinition.getValidatedErrors();
+        if (!validatedErrors.isEmpty()) {
+            ConfigException configException = new ConfigException(String.format("解析定义文件%s共发现%d条错误。", definitionPaths, validatedErrors.size()));
+            configException.addErrors(validatedErrors);
+            throw configException;
+        }
+
+        List<String> errors = new ArrayList<>();
         Set<ConfigDefinition> loadConfigs = new HashSet<>(ConfigDefinition.getTableConfigs().values());
         for (ConfigDefinition configDefinition : loadConfigs) {
-            load(configDefinition);
+            errors.addAll(load(configDefinition));
+        }
+
+        if (!errors.isEmpty()) {
+            throw new ConfigException(errors);
         }
     }
 
-    private void load(ConfigDefinition configDefinition) {
+    private List<String> load(ConfigDefinition configDefinition) {
+        List<String> errors = new ArrayList<>();
         List<Config> configs = new ArrayList<>();
+
         for (String table : configDefinition.getTables()) {
             ConfigReader configReader = readers.get(table);
             if (configReader == null) {
                 configReader = new CSVConfigReader(tablePath, table, ConfigDefinition.getTableConfigs().get(table));
                 readers.put(table, configReader);
             }
-            configs.addAll(configReader.readObjects());
+            try {
+                configs.addAll(configReader.readObjects());
+            } catch (ConfigException e) {
+                errors.addAll(e.getErrors());
+            }
         }
 
-        String indexer = configDefinition.getFullName();
+        errors.addAll(index(configDefinition, configs));
+
+        return errors;
+    }
+
+    @SuppressWarnings({"unchecked"})
+    private List<String> index(ConfigDefinition configDefinition, List<Config> configs) {
+        List<String> errors = new ArrayList<>();
+
+        String indexClass = configDefinition.getFullName();
         if (configDefinition.getParentDefinition() != null) {
-            indexer += "$self";
+            indexClass += "$self";
         }
+
         Method indexMethod;
         try {
-            indexMethod = Class.forName(indexer).getMethod("index", List.class);
+            indexMethod = Class.forName(indexClass).getMethod("index", List.class);
         } catch (Exception e) {
-            throw new ConfigException("配置类[" + configDefinition.getName() + "]加载出错", e);
+            String error = String.format("加载配置[%s]类出错:%s", configDefinition.getName(), e.getMessage());
+            errors.add(error);
+//            logger.error(error, e);
+            return errors;
         }
+
         try {
-            indexMethod.invoke(null, configs);
+            errors.addAll((List<String>) indexMethod.invoke(null, configs));
         } catch (Exception e) {
-            throw new ConfigException("配置[" + configDefinition.getName() + "]索引数据出错", e);
+            String error = String.format("调用配置[%s]的索引方法出错:%s", configDefinition.getName(), e.getMessage());
+            errors.add(error);
+//            logger.error(error, e);
         }
+
+        return errors;
+
     }
 
     /**
@@ -109,11 +148,12 @@ public class ConfigLoader {
      * @param tables 表格名字列表
      */
     public void reload(List<String> tables) {
+        List<String> errors = new ArrayList<>();
         Set<ConfigDefinition> reloadConfigs = new HashSet<>();
         for (String table : tables) {
             ConfigReader configReader = readers.get(table);
             if (configReader == null) {
-                logger.error("重加载[{}]出错，对应配置不存在", table);
+                errors.add(String.format("重加载[%s]出错，对应配置从未被加载", table));
                 continue;
             }
             configReader.clear();
@@ -125,7 +165,11 @@ public class ConfigLoader {
         }
 
         for (ConfigDefinition configDefinition : reloadConfigs) {
-            load(configDefinition);
+            errors.addAll(load(configDefinition));
+        }
+
+        if (!errors.isEmpty()) {
+            throw new ConfigException(errors);
         }
     }
 

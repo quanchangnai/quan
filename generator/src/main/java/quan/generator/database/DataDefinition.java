@@ -37,6 +37,9 @@ public class DataDefinition extends BeanDefinition {
     }
 
     public DataDefinition setKeyName(String keyName) {
+        if (keyName == null || keyName.trim().equals("")) {
+            return this;
+        }
         this.keyName = keyName;
         return this;
     }
@@ -58,11 +61,12 @@ public class DataDefinition extends BeanDefinition {
     @Override
     public void validate() {
         super.validate();
-        if (getKeyName() == null || getKeyName().trim().equals("")) {
-            throwValidatedError("主键不能为空");
+        if (getKeyName() == null) {
+            addValidatedError("配置" + getName4Validate() + "的主键不能为空");
+            return;
         }
         if (getFields().stream().noneMatch(t -> t.getName().equals(getKeyName()))) {
-            throwValidatedError("主键不存在");
+            addValidatedError("配置" + getName4Validate() + "的主键[" + getKeyName() + "]不存在");
         }
     }
 }

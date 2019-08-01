@@ -5,7 +5,6 @@ import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.jar.asm.ClassReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import quan.common.tuple.One;
 
 import java.io.File;
 import java.io.IOException;
@@ -188,6 +187,5 @@ public class ClassUtils {
     }
 
     public static void main(String[] args) {
-        System.err.println(loadClasses("quan", One.class));
     }
 }

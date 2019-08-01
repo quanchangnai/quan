@@ -1,8 +1,8 @@
 package quan.database;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import quan.common.tuple.Two;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -205,18 +205,18 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
             lock.readLock().unlock();
         }
 
-        Two<V, Integer> rowDataAndState = row == null ? null : row.getDataAndState();
+        Pair<V, Integer> rowDataAndState = row == null ? null : row.getDataAndState();
 
         V data = null;
         V rowData = null;
         int rowState = 0;
 
         if (rowDataAndState != null) {
-            if (rowDataAndState.getTwo() != Row.DELETE) {
-                data = rowDataAndState.getOne();
+            if (rowDataAndState.getRight() != Row.DELETE) {
+                data = rowDataAndState.getLeft();
             }
-            rowData = rowDataAndState.getOne();
-            rowState = rowDataAndState.getTwo();
+            rowData = rowDataAndState.getLeft();
+            rowState = rowDataAndState.getRight();
         }
 
         log = new DataLog(data, row, rowData, rowState, this, key);
@@ -238,14 +238,14 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
         }
 
         Row<V> row = rows.get(key);
-        Two<V, Integer> rowDataAndState = row == null ? null : row.getDataAndState();
+        Pair<V, Integer> rowDataAndState = row == null ? null : row.getDataAndState();
 
         V rowData = null;
         int rowState = 0;
 
         if (rowDataAndState != null) {
-            rowData = rowDataAndState.getOne();
-            rowState = rowDataAndState.getTwo();
+            rowData = rowDataAndState.getLeft();
+            rowState = rowDataAndState.getRight();
         }
 
         //数据不一定存在，增加删除日志，这样如果存在数据就一点会被删掉
@@ -448,10 +448,10 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
             }
         }
 
-        public Two<V, Integer> getDataAndState() {
+        public Pair<V, Integer> getDataAndState() {
             lock.readLock().lock();
             try {
-                return new Two<>(data, state);
+                return Pair.of(data, state);
             } finally {
                 lock.readLock().unlock();
             }

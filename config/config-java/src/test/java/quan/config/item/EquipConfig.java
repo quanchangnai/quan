@@ -10,22 +10,14 @@ import quan.config.*;
 @SuppressWarnings({"unchecked"})
 public class EquipConfig extends ItemConfig {
 
-    //部位
     protected int position;
 
-    //颜色
     protected int color;
 
-    /**
-     * 部位
-     */
     public int getPosition() {
         return position;
     }
 
-    /**
-     * 颜色
-     */
     public int getColor() {
         return color;
     }
@@ -65,10 +57,8 @@ public class EquipConfig extends ItemConfig {
         private self() {
         }
 
-        //ID
         private static Map<Integer, EquipConfig> idConfigs = new HashMap<>();
 
-        //部位
         private static Map<Integer, List<EquipConfig>> positionConfigs = new HashMap<>();
 
     
@@ -89,11 +79,13 @@ public class EquipConfig extends ItemConfig {
         }
 
 
-        public static void index(List<EquipConfig> configs) {
+        public static List<String> index(List<EquipConfig> configs) {
             Map<Integer, EquipConfig> _idConfigs = new HashMap<>();
             Map<Integer, List<EquipConfig>> _positionConfigs = new HashMap<>();
 
+            List<String> errors = new ArrayList<>();
             EquipConfig oldConfig;
+
             for (EquipConfig config : configs) {
                 oldConfig = _idConfigs.put(config.id, config);
                 if (oldConfig != null) {
@@ -101,7 +93,7 @@ public class EquipConfig extends ItemConfig {
                     if (oldConfig.getClass() != config.getClass()) {
                         repeatedConfigs += "," + oldConfig.getClass().getSimpleName();
                     }
-                    throw new ConfigException("配置[" + repeatedConfigs + "]有重复索引[id:" + config.id + "]");
+                    errors.add("配置[" + repeatedConfigs + "]有重复[id:" + config.id + "]");
                 }
 
                 _positionConfigs.computeIfAbsent(config.position, k -> new ArrayList<>()).add(config);
@@ -110,6 +102,7 @@ public class EquipConfig extends ItemConfig {
             idConfigs = unmodifiable(_idConfigs);
             positionConfigs = unmodifiable(_positionConfigs);
 
+            return errors;
         }
 
     }

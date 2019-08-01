@@ -1,7 +1,11 @@
 package quan.generator;
 
+import quan.generator.config.ConfigDefinition;
+
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by quanchangnai on 2017/7/6.
@@ -25,24 +29,27 @@ public class FieldDefinition extends Definition {
     private String classKeyType;
     private String classValueType;
 
-    private String value;//枚举值
+    //枚举值
+    private String value;
 
-    private String column;//对应配置表格中的列
-    private String index;//配置的索引类型
+    //对应配置表格中的列
+    private String column;
 
+    //配置的索引类型
+    private String index;
 
-    private ClassDefinition classDefinition;
+    //配置集合类型字段的分隔符
+    private String delimiter;
 
+    public static Set<String> allowDelimiters = new HashSet<>(Arrays.asList(";", "_", "*", "|", "$", "@", "#", "&", "?"));
+
+    public static Set<String> needEscapeChars = new HashSet<>(Arrays.asList("*", "|", "?"));
 
     public static final List<String> BUILT_IN_TYPES = Arrays.asList("bool", "byte", "short", "int", "long", "float", "double", "string", "bytes", "list", "set", "map");
 
     public static final List<String> PRIMITIVE_TYPES = Arrays.asList("bool", "short", "int", "long", "float", "double", "string");
 
     public FieldDefinition() {
-    }
-
-    public FieldDefinition(ClassDefinition classDefinition) {
-        this.classDefinition = classDefinition;
     }
 
     @Override
@@ -76,6 +83,9 @@ public class FieldDefinition extends Definition {
     }
 
     public void setType(String type) {
+        if (type == null || type.trim().equals("")) {
+            return;
+        }
         this.type = type;
     }
 
@@ -96,7 +106,22 @@ public class FieldDefinition extends Definition {
     }
 
     public boolean isBeanType() {
-        return ClassDefinition.getAll().get(getType()) instanceof BeanDefinition;
+        return getBean() != null;
+    }
+
+    public BeanDefinition getBean() {
+        ClassDefinition classDefinition = ClassDefinition.getAll().get(getType());
+        if (classDefinition instanceof BeanDefinition) {
+            return (BeanDefinition) classDefinition;
+        }
+        return null;
+    }
+
+    public boolean isValueBeanType() {
+        if (!isCollectionType()) {
+            return false;
+        }
+        return ClassDefinition.getAll().get(getValueType()) instanceof BeanDefinition;
     }
 
     public String getValue() {
@@ -123,6 +148,9 @@ public class FieldDefinition extends Definition {
     }
 
     public void setKeyType(String keyType) {
+        if (keyType == null || keyType.trim().equals("")) {
+            return;
+        }
         this.keyType = keyType;
     }
 
@@ -163,6 +191,9 @@ public class FieldDefinition extends Definition {
     }
 
     public void setValueType(String valueType) {
+        if (valueType == null || valueType.trim().equals("")) {
+            return;
+        }
         this.valueType = valueType;
     }
 
@@ -246,6 +277,9 @@ public class FieldDefinition extends Definition {
     }
 
     public FieldDefinition setColumn(String column) {
+        if (column == null || column.trim().equals("")) {
+            return this;
+        }
         this.column = column;
         return this;
     }
@@ -260,4 +294,27 @@ public class FieldDefinition extends Definition {
         return this;
     }
 
+    public String getDelimiter() {
+        if (delimiter != null) {
+            return delimiter;
+        }
+        if (type.equals("list") || type.equals("set")) {
+            return ";";
+        } else if (type.equals("map")) {
+            return "*;";
+        }
+        return null;
+    }
+
+    public String getEscapedDelimiter() {
+        return ConfigDefinition.escapeDelimiter(getDelimiter());
+    }
+
+    public FieldDefinition setDelimiter(String delimiter) {
+        if (delimiter == null || delimiter.trim().equals("")) {
+            return this;
+        }
+        this.delimiter = delimiter;
+        return this;
+    }
 }

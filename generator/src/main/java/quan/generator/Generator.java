@@ -109,6 +109,16 @@ public abstract class Generator {
 
         definitionParser.parse();
 
+        List<String> validatedErrors = ClassDefinition.getValidatedErrors();
+        if (!validatedErrors.isEmpty()) {
+            System.err.println(String.format("生成%s代码失败，解析定义文件%s共发现%d条错误。", supportLanguage(), definitionPaths, validatedErrors.size()));
+            for (int i = 0; i < validatedErrors.size(); i++) {
+                String validatedError = validatedErrors.get(i);
+                System.err.println((i + 1) + ":" + validatedError);
+            }
+            return;
+        }
+
         List<ClassDefinition> classDefinitions = ClassDefinition.getAll().values().stream().filter(this::support).collect(Collectors.toList());
 
         for (ClassDefinition classDefinition : classDefinitions) {
