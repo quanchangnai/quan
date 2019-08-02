@@ -7,14 +7,14 @@ namespace MessageCS
     /// </summary>
     public abstract class Message : Bean
     {
-        public int id { get; }
+        public int Id { get; }
 
-        public long sn { get; set; }
+        public long Sn { get; set; }
 
 
         protected Message(int id)
         {
-            this.id = id;
+            Id = id;
         }
 
         public abstract Message Create();
@@ -22,19 +22,19 @@ namespace MessageCS
 
         public override void Encode(Buffer buffer)
         {
-            buffer.WriteInt(id);
-            buffer.WriteLong(sn);
+            buffer.WriteInt(Id);
+            buffer.WriteLong(Sn);
         }
 
         public override void Decode(Buffer buffer)
         {
-            var msgId = buffer.ReadInt();
-            if (msgId != id)
+            var id = buffer.ReadInt();
+            if (id != Id)
             {
-                throw new IOException("消息ID不匹配,目标值：" + id + "，实际值：" + msgId);
+                throw new IOException("消息ID不匹配,目标值：" + Id + "，实际值：" + id);
             }
 
-            sn = buffer.ReadLong();
+            Sn = buffer.ReadLong();
         }
     }
 }

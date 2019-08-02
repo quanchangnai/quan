@@ -181,7 +181,7 @@ public abstract class Generator {
             }
 
             String fieldValueType = fieldDefinition.getValueType();
-            if (fieldDefinition.isValueBuiltInType()) {
+            if (fieldDefinition.isBuiltInValueType()) {
                 fieldDefinition.setBasicValueType(basicTypes.get(fieldValueType));
                 fieldDefinition.setClassValueType(classTypes.get(fieldValueType));
             }
@@ -191,33 +191,16 @@ public abstract class Generator {
 
     }
 
-    protected String resolveFieldImport(FieldDefinition fieldDefinition, boolean fieldSelf) {
-        return fieldSelf ? fieldDefinition.getTypeWithPackage() : fieldDefinition.getValueTypeWithPackage();
-    }
-
-    protected String resolveClassImport(ClassDefinition classDefinition) {
-        return classDefinition.getFullName();
-    }
-
     protected void processBeanFieldImports(BeanDefinition beanDefinition, FieldDefinition fieldDefinition) {
-
-        ClassDefinition fieldTypeClassDefinition = ClassDefinition.getAll().get(fieldDefinition.getType());
-        if (fieldTypeClassDefinition != null) {
-            if (!fieldTypeClassDefinition.getPackageName().equals(beanDefinition.getPackageName())) {
-                beanDefinition.getImports().add(resolveClassImport(fieldTypeClassDefinition));
-            }
-        } else if (fieldDefinition.isTypeWithPackage() && !fieldDefinition.getTypeWithPackage().equals(beanDefinition.getPackageName())) {
-            beanDefinition.getImports().add(resolveFieldImport(fieldDefinition, true));
+        ClassDefinition fieldClass = ClassDefinition.getAll().get(fieldDefinition.getType());
+        if (fieldClass != null && !fieldClass.getPackageName().equals(beanDefinition.getPackageName())) {
+            beanDefinition.getImports().add(fieldClass.getFullName());
         }
 
-        ClassDefinition fieldValueTypeClassDefinition = ClassDefinition.getAll().get(fieldDefinition.getValueType());
-        if (fieldValueTypeClassDefinition != null && !fieldValueTypeClassDefinition.getPackageName().equals(beanDefinition.getPackageName())) {
-            beanDefinition.getImports().add(resolveClassImport(fieldValueTypeClassDefinition));
-        }
-        if (fieldValueTypeClassDefinition == null && fieldDefinition.isValueTypeWithPackage() && !fieldDefinition.getValueTypePackage().equals(beanDefinition.getPackageName())) {
-            beanDefinition.getImports().add(resolveFieldImport(fieldDefinition, false));
+        BeanDefinition fieldValueBean = fieldDefinition.getValueBean();
+        if (fieldValueBean != null && !fieldValueBean.getPackageName().equals(beanDefinition.getPackageName())) {
+            beanDefinition.getImports().add(fieldValueBean.getFullName());
         }
     }
-
 
 }

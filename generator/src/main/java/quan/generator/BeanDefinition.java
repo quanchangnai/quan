@@ -52,8 +52,7 @@ public class BeanDefinition extends ClassDefinition {
             return;
         }
 
-        //字段类型是自定义类型且带包名，不校验
-        if (!fieldDefinition.isBuiltInType() && !fieldDefinition.isTypeWithPackage() && !isBeanDefinition(fieldDefinition.getType()) && !EnumDefinition.isEnumDefinition(fieldDefinition.getType())) {
+        if (!fieldDefinition.isLegalType()) {
             addValidatedError(getName4Validate("的") + "字段" + fieldDefinition.getName4Validate() + "类型[" + fieldDefinition.getType() + "]不合法");
             return;
         }
@@ -66,8 +65,7 @@ public class BeanDefinition extends ClassDefinition {
             addValidatedError(getName4Validate("的") + fieldDefinition.getType() + "类型字段" + fieldDefinition.getName4Validate() + "的值类型不能为空");
             return;
         }
-        //集合值类型是自定义类型且带包名，不校验
-        if (!fieldDefinition.isValuePrimitiveType() && !fieldDefinition.isValueTypeWithPackage() && !isBeanDefinition(fieldDefinition.getValueType())) {
+        if (!fieldDefinition.isLegalValueType()) {
             addValidatedError(getName4Validate("的") + fieldDefinition.getType() + "类型字段" + fieldDefinition.getName4Validate() + "的值类型[" + fieldDefinition.getValueType() + "]不合法");
             return;
         }
@@ -77,7 +75,7 @@ public class BeanDefinition extends ClassDefinition {
                 addValidatedError(getName4Validate("的") + fieldDefinition.getType() + "类型字段" + fieldDefinition.getName4Validate() + "的键类型不能为空");
                 return;
             }
-            if (!fieldDefinition.isKeyPrimitiveType()) {
+            if (!fieldDefinition.isPrimitiveKeyType()) {
                 addValidatedError(getName4Validate("的") + fieldDefinition.getType() + "类型字段" + fieldDefinition.getName4Validate() + "的键类型[" + fieldDefinition.getKeyType() + "]不合法");
             }
         }

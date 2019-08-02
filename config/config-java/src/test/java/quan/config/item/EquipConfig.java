@@ -53,7 +53,7 @@ public class EquipConfig extends ItemConfig {
     }
 
     public static class self {
-        
+
         private self() {
         }
 
@@ -61,7 +61,7 @@ public class EquipConfig extends ItemConfig {
 
         private static Map<Integer, List<EquipConfig>> positionConfigs = new HashMap<>();
 
-    
+
         public static Map<Integer, EquipConfig> getIdConfigs() {
             return idConfigs;
         }
@@ -93,7 +93,7 @@ public class EquipConfig extends ItemConfig {
                     if (oldConfig.getClass() != config.getClass()) {
                         repeatedConfigs += "," + oldConfig.getClass().getSimpleName();
                     }
-                    errors.add("配置[" + repeatedConfigs + "]有重复[id]:[" + config.id + "]");
+                    errors.add(String.format("配置[%s]有重复数据[%s = %s]", repeatedConfigs, "id", config.id));
                 }
 
                 _positionConfigs.computeIfAbsent(config.position, k -> new ArrayList<>()).add(config);

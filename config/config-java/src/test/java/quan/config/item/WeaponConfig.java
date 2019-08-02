@@ -104,7 +104,7 @@ public class WeaponConfig extends EquipConfig {
     }
 
     public static class self {
-        
+
         private self() {
         }
 
@@ -115,8 +115,8 @@ public class WeaponConfig extends EquipConfig {
         private static Map<Integer, Map<Integer, List<WeaponConfig>>> composite1Configs = new HashMap<>();
 
         private static Map<Integer, Map<Integer, WeaponConfig>> composite2Configs = new HashMap<>();
-    
-    
+
+
         public static Map<Integer, WeaponConfig> getIdConfigs() {
             return idConfigs;
         }
@@ -174,7 +174,7 @@ public class WeaponConfig extends EquipConfig {
                     if (oldConfig.getClass() != config.getClass()) {
                         repeatedConfigs += "," + oldConfig.getClass().getSimpleName();
                     }
-                    errors.add("配置[" + repeatedConfigs + "]有重复[id]:[" + config.id + "]");
+                    errors.add(String.format("配置[%s]有重复数据[%s = %s]", repeatedConfigs, "id", config.id));
                 }
 
                 _positionConfigs.computeIfAbsent(config.position, k -> new ArrayList<>()).add(config);
@@ -187,7 +187,7 @@ public class WeaponConfig extends EquipConfig {
                     if (oldConfig.getClass() != config.getClass()) {
                         repeatedConfigs += "," + oldConfig.getClass().getSimpleName();
                     }
-                    errors.add("配置[" + repeatedConfigs + "]有重复[w1,w2]:[" + config.w1 + "," + config.w2 + "]");
+                    errors.add(String.format("配置[%s]有重复数据[%s,%s = %s,%s]", repeatedConfigs, "w1", "w2", config.w1, config.w2));
                 }
             }
 

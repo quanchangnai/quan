@@ -285,7 +285,7 @@ public class ConfigDefinition extends BeanDefinition {
             addValidatedError("配置" + getName4Validate() + "[" + field.getType() + "]类型字段" + field.getName4Validate() + "的分隔符[" + delimiter + "]必须是" + charNumError + "个字符");
         }
 
-        if (field.isValueBeanType()) {
+        if (field.isBeanValueType()) {
             BeanDefinition fieldValueBean = (BeanDefinition) ClassDefinition.getAll().get(field.getValueType());
             validateDelimiter(fieldValueBean, delimiters);
         }
@@ -307,7 +307,7 @@ public class ConfigDefinition extends BeanDefinition {
                 continue;
             }
             if (!selfField.isPrimitiveType() && !selfField.isEnumType()) {
-                addValidatedError("配置" + getName4Validate() + "的字段" + selfField.getName4Validate() + "类型[" + selfField.getType() + "]不支持索引，允许的类型为" + FieldDefinition.PRIMITIVE_TYPES + "或枚举");
+                addValidatedError("配置" + getName4Validate() + "的字段" + selfField.getName4Validate() + "类型[" + selfField.getType() + "]不支持索引，允许的类型为" + FieldDefinition.primitiveTypes + "或枚举");
                 continue;
             }
             IndexDefinition indexDefinition = new IndexDefinition(this);
@@ -375,7 +375,7 @@ public class ConfigDefinition extends BeanDefinition {
                 continue;
             }
             if (!fieldDefinition.isPrimitiveType() && !fieldDefinition.isEnumType()) {
-                addValidatedError("配置" + getName4Validate() + "的索引" + indexDefinition.getName4Validate() + "的字段[" + fieldName + "]类型[" + fieldDefinition.getType() + "]非法，允许的类型为" + FieldDefinition.PRIMITIVE_TYPES + "或枚举");
+                addValidatedError("配置" + getName4Validate() + "的索引" + indexDefinition.getName4Validate() + "的字段[" + fieldName + "]类型[" + fieldDefinition.getType() + "]非法，允许的类型为" + FieldDefinition.primitiveTypes + "或枚举");
             }
             if (!indexDefinition.addField(fieldDefinition)) {
                 addValidatedError("配置" + getName4Validate() + "的索引" + indexDefinition.getName4Validate() + "的字段[" + fieldNames + "]不能重复");

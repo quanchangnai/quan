@@ -42,18 +42,18 @@ namespace MessageCS.Test
         {
             Console.WriteLine("Test2====================");
 
-            var sRoleLogin1 = new SRoleLogin {roleId = 1111, roleName = "张三1111"};
+            var sRoleLogin1 = new SRoleLogin {RoleId = 1111, RoleName = "张三1111"};
 
-            var roleInfo1 = new RoleInfo {id = 111, roleName = "aaa", roleType = RoleType.type1};
+            var RoleInfo1 = new RoleInfo {Id = 111, RoleName = "aaa", RoleType = RoleType.Type1};
 
-            sRoleLogin1.roleInfo = roleInfo1;
+            sRoleLogin1.RoleInfo = RoleInfo1;
 
-            var roleInfo2 = new RoleInfo {id = 222, roleName = "bbb", roleType = RoleType.type2};
-            roleInfo2.set.Add(2213);
+            var RoleInfo2 = new RoleInfo {Id = 222, RoleName = "bbb", RoleType = RoleType.Type2};
+            RoleInfo2.Set.Add(2213);
 
-            sRoleLogin1.roleInfoList.Add(roleInfo2);
-            sRoleLogin1.roleInfoSet.Add(roleInfo2);
-            sRoleLogin1.roleInfoMap.Add(roleInfo2.id, roleInfo2);
+            sRoleLogin1.RoleInfoList.Add(RoleInfo2);
+            sRoleLogin1.RoleInfoSet.Add(RoleInfo2);
+            sRoleLogin1.RoleInfoMap.Add(RoleInfo2.Id, RoleInfo2);
 
             Console.WriteLine("sRoleLogin1:" + sRoleLogin1);
 
@@ -71,11 +71,11 @@ namespace MessageCS.Test
         {
             Console.WriteLine("Test3====================");
 
-            var sRoleLogin1 = new SRoleLogin {roleId = 1111, roleName = "张三1111"};
+            var sRoleLogin1 = new SRoleLogin {RoleId = 1111, RoleName = "张三1111"};
 
-            var roleInfo = new RoleInfo{id = 1312, roleName = "李四1123123", f = 343.4532F, d = 4242.54453D};
+            var RoleInfo = new RoleInfo{Id = 1312, RoleName = "李四1123123", F = 343.4532F, D = 4242.54453D};
 
-            sRoleLogin1.roleInfo = roleInfo;
+            sRoleLogin1.RoleInfo = RoleInfo;
 
 
             var encodedBytes = sRoleLogin1.Encode();
@@ -101,7 +101,7 @@ namespace MessageCS.Test
             }
 
 
-            socket.Close();
+//            socket.Close();
         }
     }
 }

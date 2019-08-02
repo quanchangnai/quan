@@ -14,78 +14,75 @@ namespace MessageCS.Test.Role
         /// <summary>
 		/// 角色id
 		/// </summary>
-		public long id { get; set; }
+		public long Id { get; set; }
 
-		public bool b { get; set; }
+		public bool B { get; set; }
 
-		public short s { get; set; }
+		public short S { get; set; }
 
-		public int i { get; set; }
+		public int I { get; set; }
 
-		public float f { get; set; }
+		public float F { get; set; }
 
-		public double d { get; set; }
+		public double D { get; set; }
 
 		private string _roleName = "";
 
         /// <summary>
 		/// 角色名
 		/// </summary>
-		public string roleName
+		public string RoleName
 		{
 	    	get => _roleName;
 	    	set => _roleName = value ?? throw new NullReferenceException();
 		}
 
-		public RoleType roleType { get; set; }
+		public RoleType RoleType { get; set; }
 
 		private byte[] _data = new byte[0];
 
-		public byte[] data
+		public byte[] Data
 		{
             get => _data;
             set => _data = value ?? throw new NullReferenceException();
 		}
 
-		public List<int> list { get; } = new List<int>();
+		public List<int> List { get; } = new List<int>();
 
-		public HashSet<int> set { get; } = new HashSet<int>();
+		public HashSet<int> Set { get; } = new HashSet<int>();
 
-		public Dictionary<int, int> map { get; } = new Dictionary<int, int>();
+		public Dictionary<int, int> Map { get; } = new Dictionary<int, int>();
 
 
-		public RoleInfo()
-		{
-		}
 
 		public override void Encode(Buffer buffer)
 		{
 	    	base.Encode(buffer);
 
-		    buffer.WriteLong(id);
-		    buffer.WriteBool(b);
-		    buffer.WriteShort(s);
-		    buffer.WriteInt(i);
-		    buffer.WriteFloat(f);
-		    buffer.WriteDouble(d);
-		    buffer.WriteString(roleName);
-			buffer.WriteInt((int)roleType);
-		    buffer.WriteBytes(data);
+		    buffer.WriteLong(Id);
+		    buffer.WriteBool(B);
+		    buffer.WriteShort(S);
+		    buffer.WriteInt(I);
+		    buffer.WriteFloat(F);
+		    buffer.WriteDouble(D);
+		    buffer.WriteString(RoleName);
+			buffer.WriteInt((int)RoleType);
+		    buffer.WriteBytes(Data);
 
-		    buffer.WriteInt(list.Count);
-		    foreach (var list_Value in list) {
-			    buffer.WriteInt(list_Value);
+		    buffer.WriteInt(List.Count);
+		    foreach (var listValue in List) {
+			    buffer.WriteInt(listValue);
 		    }
 
-		    buffer.WriteInt(set.Count);
-		    foreach (var set_Value in set) {
-			    buffer.WriteInt(set_Value);
+		    buffer.WriteInt(Set.Count);
+		    foreach (var setValue in Set) {
+			    buffer.WriteInt(setValue);
 		    }
 
-		    buffer.WriteInt(map.Count);
-		    foreach (var map_Key in map.Keys) {
-		        buffer.WriteInt(map_Key);
-			    buffer.WriteInt(map[map_Key]);
+		    buffer.WriteInt(Map.Count);
+		    foreach (var mapKey in Map.Keys) {
+		        buffer.WriteInt(mapKey);
+			    buffer.WriteInt(Map[mapKey]);
 		    }
 		}
 
@@ -93,47 +90,47 @@ namespace MessageCS.Test.Role
 		{
 	    	base.Decode(buffer);
 
-		    id = buffer.ReadLong();
-		    b = buffer.ReadBool();
-		    s = buffer.ReadShort();
-		    i = buffer.ReadInt();
-		    f = buffer.ReadFloat();
-		    d = buffer.ReadDouble();
-		    roleName = buffer.ReadString();
-		    roleType = (RoleType)buffer.ReadInt();
-		    data = buffer.ReadBytes();
+		    Id = buffer.ReadLong();
+		    B = buffer.ReadBool();
+		    S = buffer.ReadShort();
+		    I = buffer.ReadInt();
+		    F = buffer.ReadFloat();
+		    D = buffer.ReadDouble();
+		    RoleName = buffer.ReadString();
+		    RoleType = (RoleType)buffer.ReadInt();
+		    Data = buffer.ReadBytes();
 
-		    var list_Size = buffer.ReadInt();
-		    for (var i = 0; i < list_Size; i++) {
-			    list.Add(buffer.ReadInt());
+		    var listSize = buffer.ReadInt();
+		    for (var i = 0; i < listSize; i++) {
+			    List.Add(buffer.ReadInt());
 		    }
 
-		    var set_Size = buffer.ReadInt();
-		    for (var i = 0; i < set_Size; i++) {
-			    set.Add(buffer.ReadInt());
+		    var setSize = buffer.ReadInt();
+		    for (var i = 0; i < setSize; i++) {
+			    Set.Add(buffer.ReadInt());
 		    }
 
-		    var map_Size = buffer.ReadInt();
-		    for (var i = 0; i < map_Size; i++) {
-			    map.Add(buffer.ReadInt(), buffer.ReadInt());
+		    var mapSize = buffer.ReadInt();
+		    for (var i = 0; i < mapSize; i++) {
+			    Map.Add(buffer.ReadInt(), buffer.ReadInt());
 		    }
 		}
 
 		public override string ToString()
 		{
 			return "RoleInfo{" +
-					"id=" + id +
-					",b=" + b +
-					",s=" + s +
-					",i=" + i +
-					",f=" + f +
-					",d=" + d +
-					",roleName='" + roleName + '\'' +
-					",roleType=" + roleType +
-					",data=" + Convert.ToBase64String(data) +
-					",list=" + ToString(list) +
-					",set=" + ToString(set) +
-					",map=" + ToString(map) +
+					"id=" + Id +
+					",b=" + B +
+					",s=" + S +
+					",i=" + I +
+					",f=" + F +
+					",d=" + D +
+					",roleName='" + RoleName + '\'' +
+					",roleType=" + RoleType +
+					",data=" + Convert.ToBase64String(Data) +
+					",list=" + ToString(List) +
+					",set=" + ToString(Set) +
+					",map=" + ToString(Map) +
 					'}';
 		}
     }

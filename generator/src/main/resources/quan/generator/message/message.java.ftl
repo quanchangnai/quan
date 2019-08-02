@@ -95,7 +95,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         </#if>
         buffer.writeInt(${field.name}.size());
         for (${field.basicValueType} $${field.name}$Value : ${field.name}) {
-        <#if field.valueBuiltInType>
+        <#if field.builtInValueType>
             buffer.write${field.valueType?cap_first}($${field.name}$Value);
         <#else>
             $${field.name}$Value.encode(buffer);
@@ -111,7 +111,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         buffer.writeInt(${field.name}.size());
         for (${field.basicKeyType} $${field.name}$Key : ${field.name}.keySet()) {
             buffer.write${field.keyType?cap_first}($${field.name}$Key);
-        <#if field.valueBuiltInType>
+        <#if field.builtInValueType>
             buffer.write${field.valueType?cap_first}(${field.name}.get($${field.name}$Key));
         <#else>
             ${field.name}.get($${field.name}$Key).encode(buffer);
@@ -162,7 +162,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         </#if>
         int $${field.name}$Size = buffer.readInt();
         for (int i = 0; i < $${field.name}$Size; i++) {
-        <#if field.valueBuiltInType>
+        <#if field.builtInValueType>
             ${field.name}.add(buffer.read${field.valueType?cap_first}());
         <#else>
             ${field.valueType} $${field.name}$Value = new ${field.valueType}();
@@ -179,7 +179,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         </#if>
         int $${field.name}$Size = buffer.readInt();
         for (int i = 0; i < $${field.name}$Size; i++) {
-        <#if field.valueBuiltInType>
+        <#if field.builtInValueType>
             ${field.name}.put(buffer.read${field.keyType?cap_first}(), buffer.read${field.valueType?cap_first}());
         <#else>
             ${field.basicKeyType} $${field.name}$Key = buffer.read${field.keyType?cap_first}();

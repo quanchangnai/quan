@@ -47,7 +47,7 @@ public class QuestTargetConfig extends Config {
 
     private static Map<Long, QuestTargetConfig> idConfigs = new HashMap<>();
 
-    
+
     public static Map<Long, QuestTargetConfig> getIdConfigs() {
         return idConfigs;
     }
@@ -70,7 +70,7 @@ public class QuestTargetConfig extends Config {
                 if (oldConfig.getClass() != config.getClass()) {
                     repeatedConfigs += "," + oldConfig.getClass().getSimpleName();
                 }
-                errors.add("配置[" + repeatedConfigs + "]有重复[id]:[" + config.id + "]");
+                errors.add(String.format("配置[%s]有重复数据[%s = %s]", repeatedConfigs, "id", config.id));
             }
         }
 

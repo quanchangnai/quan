@@ -119,7 +119,7 @@ public class ItemConfig extends Config {
 
     private static Map<Integer, ItemConfig> idConfigs = new HashMap<>();
 
-    
+
     public static Map<Integer, ItemConfig> getIdConfigs() {
         return idConfigs;
     }
@@ -142,7 +142,7 @@ public class ItemConfig extends Config {
                 if (oldConfig.getClass() != config.getClass()) {
                     repeatedConfigs += "," + oldConfig.getClass().getSimpleName();
                 }
-                errors.add("配置[" + repeatedConfigs + "]有重复[id]:[" + config.id + "]");
+                errors.add(String.format("配置[%s]有重复数据[%s = %s]", repeatedConfigs, "id", config.id));
             }
         }
 

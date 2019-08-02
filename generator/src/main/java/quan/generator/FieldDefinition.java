@@ -41,13 +41,20 @@ public class FieldDefinition extends Definition {
     //配置集合类型字段的分隔符
     private String delimiter;
 
-    public static Set<String> allowDelimiters = new HashSet<>(Arrays.asList(";", "_", "*", "|", "$", "@", "#", "&", "?"));
+    //允许的分隔符
+    public static final Set<String> allowDelimiters = new HashSet<>(Arrays.asList(";", "_", "*", "|", "$", "@", "#", "&", "?"));
 
-    public static Set<String> needEscapeChars = new HashSet<>(Arrays.asList("*", "|", "?"));
+    //需要转义的分隔符(正则表达式特殊字符)
+    public static final Set<String> needEscapeChars = new HashSet<>(Arrays.asList("*", "|", "?"));
 
-    public static final List<String> BUILT_IN_TYPES = Arrays.asList("bool", "byte", "short", "int", "long", "float", "double", "string", "bytes", "list", "set", "map");
+    //内建类型
+    public static final List<String> builtInTypes = Arrays.asList("bool", "byte", "short", "int", "long", "float", "double", "string", "bytes", "list", "set", "map");
 
-    public static final List<String> PRIMITIVE_TYPES = Arrays.asList("bool", "short", "int", "long", "float", "double", "string");
+    //原生类型
+    public static final List<String> primitiveTypes = Arrays.asList("bool", "short", "int", "long", "float", "double", "string");
+
+    //事件类型
+    public static final List<String> timeTypes = Arrays.asList("date", "time", "datetime");
 
     public FieldDefinition() {
     }
@@ -58,29 +65,9 @@ public class FieldDefinition extends Definition {
     }
 
     public String getType() {
-        if (isTypeWithPackage()) {
-            return type.substring(type.lastIndexOf(".") + 1);
-        }
         return type;
     }
 
-    public boolean isTypeWithPackage() {
-        return type.contains(".");
-    }
-
-    public String getTypeWithPackage() {
-        if (!isTypeWithPackage()) {
-            return null;
-        }
-        return type;
-    }
-
-    public String getTypePackage() {
-        if (isTypeWithPackage()) {
-            return type.substring(0, type.lastIndexOf("."));
-        }
-        return null;
-    }
 
     public void setType(String type) {
         if (type == null || type.trim().equals("")) {
@@ -90,7 +77,7 @@ public class FieldDefinition extends Definition {
     }
 
     public boolean isBuiltInType() {
-        return BUILT_IN_TYPES.contains(type);
+        return builtInTypes.contains(type);
     }
 
     public boolean isCollectionType() {
@@ -98,7 +85,7 @@ public class FieldDefinition extends Definition {
     }
 
     public boolean isPrimitiveType() {
-        return PRIMITIVE_TYPES.contains(type);
+        return primitiveTypes.contains(type);
     }
 
     public boolean isEnumType() {
@@ -117,12 +104,6 @@ public class FieldDefinition extends Definition {
         return null;
     }
 
-    public boolean isValueBeanType() {
-        if (!isCollectionType()) {
-            return false;
-        }
-        return ClassDefinition.getAll().get(getValueType()) instanceof BeanDefinition;
-    }
 
     public String getValue() {
         return value;
@@ -154,39 +135,16 @@ public class FieldDefinition extends Definition {
         this.keyType = keyType;
     }
 
-    public boolean isKeyBuiltInType() {
-        return BUILT_IN_TYPES.contains(keyType);
+    public boolean isBuiltInKeyType() {
+        return builtInTypes.contains(keyType);
     }
 
-    public boolean isKeyPrimitiveType() {
-        return PRIMITIVE_TYPES.contains(keyType);
+    public boolean isPrimitiveKeyType() {
+        return primitiveTypes.contains(keyType);
     }
 
-    public boolean isValueTypeWithPackage() {
-        if (valueType != null) {
-            return valueType.contains(".");
-        }
-        return false;
-    }
-
-    public String getValueTypeWithPackage() {
-        if (!isValueTypeWithPackage()) {
-            return null;
-        }
-        return valueType;
-    }
-
-    public String getValueTypePackage() {
-        if (isValueTypeWithPackage()) {
-            return valueType.substring(0, valueType.lastIndexOf("."));
-        }
-        return null;
-    }
 
     public String getValueType() {
-        if (isTypeWithPackage()) {
-            return valueType.substring(valueType.lastIndexOf(".") + 1);
-        }
         return valueType;
     }
 
@@ -197,12 +155,27 @@ public class FieldDefinition extends Definition {
         this.valueType = valueType;
     }
 
-    public boolean isValueBuiltInType() {
-        return BUILT_IN_TYPES.contains(valueType);
+    public boolean isBuiltInValueType() {
+        return builtInTypes.contains(valueType);
     }
 
-    public boolean isValuePrimitiveType() {
-        return PRIMITIVE_TYPES.contains(valueType);
+    public boolean isPrimitiveValueType() {
+        return primitiveTypes.contains(valueType);
+    }
+
+    public boolean isBeanValueType() {
+        return getValueBean() != null;
+    }
+
+    public BeanDefinition getValueBean() {
+        if (!isCollectionType()) {
+            return null;
+        }
+        ClassDefinition classDefinition = ClassDefinition.getAll().get(getValueType());
+        if (classDefinition instanceof BeanDefinition) {
+            return (BeanDefinition) classDefinition;
+        }
+        return null;
     }
 
     public String getBasicType() {
@@ -316,5 +289,19 @@ public class FieldDefinition extends Definition {
         }
         this.delimiter = delimiter;
         return this;
+    }
+
+    /**
+     * 类型是否合法
+     */
+    public boolean isLegalType() {
+        return isBuiltInType() || isBeanType() || isEnumType();
+    }
+
+    /**
+     * 集合值类型是否合法
+     */
+    public boolean isLegalValueType() {
+        return isPrimitiveValueType() || isBeanValueType();
     }
 }

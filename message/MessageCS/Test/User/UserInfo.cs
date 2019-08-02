@@ -13,14 +13,14 @@ namespace MessageCS.Test.User
         /// <summary>
 		/// ID
 		/// </summary>
-		public long id { get; set; }
+		public long Id { get; set; }
 
 		private string _name = "";
 
         /// <summary>
 		/// 名字
 		/// </summary>
-		public string name
+		public string Name
 		{
 	    	get => _name;
 	    	set => _name = value ?? throw new NullReferenceException();
@@ -29,37 +29,34 @@ namespace MessageCS.Test.User
         /// <summary>
 		/// 等级
 		/// </summary>
-		public int level { get; set; }
+		public int Level { get; set; }
 
 
-		public UserInfo()
-		{
-		}
 
 		public override void Encode(Buffer buffer)
 		{
 	    	base.Encode(buffer);
 
-		    buffer.WriteLong(id);
-		    buffer.WriteString(name);
-		    buffer.WriteInt(level);
+		    buffer.WriteLong(Id);
+		    buffer.WriteString(Name);
+		    buffer.WriteInt(Level);
 		}
 
 		public override void Decode(Buffer buffer)
 		{
 	    	base.Decode(buffer);
 
-		    id = buffer.ReadLong();
-		    name = buffer.ReadString();
-		    level = buffer.ReadInt();
+		    Id = buffer.ReadLong();
+		    Name = buffer.ReadString();
+		    Level = buffer.ReadInt();
 		}
 
 		public override string ToString()
 		{
 			return "UserInfo{" +
-					"id=" + id +
-					",name='" + name + '\'' +
-					",level=" + level +
+					"id=" + Id +
+					",name='" + Name + '\'' +
+					",level=" + Level +
 					'}';
 		}
     }

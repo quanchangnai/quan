@@ -15,9 +15,9 @@ namespace ${packageName}
         /// </summary>
         </#if>
         <#if field_has_next>
-        ${field.name} = ${field.value},
+        ${field.name?cap_first} = ${field.value},
         <#else>
-        ${field.name} = ${field.value}
+        ${field.name?cap_first} = ${field.value}
         </#if>
 
     </#list>

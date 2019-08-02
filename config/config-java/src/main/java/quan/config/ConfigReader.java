@@ -64,7 +64,6 @@ public abstract class ConfigReader {
         try {
             readJsons();
         } catch (Exception e) {
-
         }
         return jsons;
     }
@@ -73,8 +72,12 @@ public abstract class ConfigReader {
         if (prototype == null || !configs.isEmpty()) {
             return configs;
         }
-
-        readJsons();
+        ConfigException configException = null;
+        try {
+            readJsons();
+        } catch (ConfigException e) {
+            configException = e;
+        }
 
         for (JSONObject json : jsons) {
             Config config = prototype.create();
@@ -82,6 +85,18 @@ public abstract class ConfigReader {
             configs.add(config);
         }
 
+        if (configException != null) {
+            throw configException;
+        }
+
+        return configs;
+    }
+
+    public List<Config> getObjects() {
+        try {
+            readObjects();
+        } catch (Exception e) {
+        }
         return configs;
     }
 
@@ -136,7 +151,7 @@ public abstract class ConfigReader {
     public static JSONArray convertArray(FieldDefinition fieldDefinition, String[] values) {
         JSONArray array = new JSONArray();
         for (String v : values) {
-            if (fieldDefinition.isValuePrimitiveType()) {
+            if (fieldDefinition.isPrimitiveValueType()) {
                 array.add(convertPrimitiveType(fieldDefinition.getValueType(), v));
             } else {
                 array.add(convertBean((BeanDefinition) ClassDefinition.getAll().get(fieldDefinition.getValueType()), v));
@@ -159,7 +174,7 @@ public abstract class ConfigReader {
         for (int i = 0; i < values.length; i = i + 2) {
             Object k = convertPrimitiveType(fieldDefinition.getKeyType(), values[i]);
             Object v;
-            if (fieldDefinition.isValuePrimitiveType()) {
+            if (fieldDefinition.isPrimitiveValueType()) {
                 v = convertPrimitiveType(fieldDefinition.getValueType(), values[i + 1]);
             } else {
                 v = convertBean((BeanDefinition) ClassDefinition.getAll().get(fieldDefinition.getValueType()), values[i + 1]);

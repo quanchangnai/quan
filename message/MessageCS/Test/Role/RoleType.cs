@@ -9,12 +9,12 @@ namespace MessageCS.Test.Role
         /// <summary>
         /// 角色类型1
         /// </summary>
-        type1 = 1,
+        Type1 = 1,
 
         /// <summary>
         /// 角色类型2
         /// </summary>
-        type2 = 2
+        Type2 = 2
 
     }
 }

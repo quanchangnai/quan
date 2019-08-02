@@ -23,7 +23,7 @@ public class ConfigTest {
         ConfigLoader configLoader = new ConfigLoader(definitionPaths, tablePath);
         configLoader.setPackagePrefix("quan.config");
         configLoader.setEnumPackagePrefix("quan");
-//        configLoader.setOnlyCheck(true);
+//        configLoader.onlyCheck(true);
         configLoader.setCheckerPackage("quan");
 
         System.err.println("configLoader.load()=============");
@@ -36,7 +36,7 @@ public class ConfigTest {
 
         Thread.sleep(10000);
 
-        List<String> reloadTables = Arrays.asList("武器.csv");
+        List<String> reloadTables = Arrays.asList("道具.csv", "武器.csv");
         System.err.println("configLoader.reload()=============" + reloadTables);
         try {
             configLoader.reload(reloadTables);

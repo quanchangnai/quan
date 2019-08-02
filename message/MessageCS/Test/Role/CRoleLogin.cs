@@ -15,14 +15,14 @@ namespace MessageCS.Test.Role
         /// <summary>
 		/// 角色id
 		/// </summary>
-		public long roleId { get; set; }
+		public long RoleId { get; set; }
 
 		private string _roleName = "";
 
         /// <summary>
 		/// 角色名
 		/// </summary>
-		public string roleName
+		public string RoleName
 		{
 	    	get => _roleName;
 	    	set => _roleName = value ?? throw new NullReferenceException();
@@ -33,7 +33,7 @@ namespace MessageCS.Test.Role
         /// <summary>
 		/// 角色信息
 		/// </summary>
-		public RoleInfo roleInfo
+		public RoleInfo RoleInfo
 		{
 	    	get => _roleInfo;
 	    	set => _roleInfo = value ?? throw new NullReferenceException();
@@ -42,25 +42,25 @@ namespace MessageCS.Test.Role
         /// <summary>
 		/// 角色信息
 		/// </summary>
-		public List<RoleInfo> roleInfoList { get; } = new List<RoleInfo>();
+		public List<RoleInfo> RoleInfoList { get; } = new List<RoleInfo>();
 
         /// <summary>
 		/// 角色信息
 		/// </summary>
-		public HashSet<RoleInfo> roleInfoSet { get; } = new HashSet<RoleInfo>();
+		public HashSet<RoleInfo> RoleInfoSet { get; } = new HashSet<RoleInfo>();
 
         /// <summary>
 		/// 角色信息
 		/// </summary>
-		public Dictionary<long, RoleInfo> roleInfoMap { get; } = new Dictionary<long, RoleInfo>();
+		public Dictionary<long, RoleInfo> RoleInfoMap { get; } = new Dictionary<long, RoleInfo>();
 
         /// <summary>
 		/// 用户信息
 		/// </summary>
-		private UserInfo userInfo { get; set; }
+		private UserInfo UserInfo { get; set; }
 
 
-		public CRoleLogin(): base(111)
+        public CRoleLogin(): base(111)
 		{
 		}
 
@@ -73,78 +73,78 @@ namespace MessageCS.Test.Role
 		{
 	    	base.Encode(buffer);
 
-		    buffer.WriteLong(roleId);
-		    buffer.WriteString(roleName);
-		    roleInfo.Encode(buffer);
+		    buffer.WriteLong(RoleId);
+		    buffer.WriteString(RoleName);
+		    RoleInfo.Encode(buffer);
 
-		    buffer.WriteInt(roleInfoList.Count);
-		    foreach (var roleInfoList_Value in roleInfoList) {
-				roleInfoList_Value.Encode(buffer);
+		    buffer.WriteInt(RoleInfoList.Count);
+		    foreach (var roleInfoListValue in RoleInfoList) {
+				roleInfoListValue.Encode(buffer);
 		    }
 
-		    buffer.WriteInt(roleInfoSet.Count);
-		    foreach (var roleInfoSet_Value in roleInfoSet) {
-				roleInfoSet_Value.Encode(buffer);
+		    buffer.WriteInt(RoleInfoSet.Count);
+		    foreach (var roleInfoSetValue in RoleInfoSet) {
+				roleInfoSetValue.Encode(buffer);
 		    }
 
-		    buffer.WriteInt(roleInfoMap.Count);
-		    foreach (var roleInfoMap_Key in roleInfoMap.Keys) {
-		        buffer.WriteLong(roleInfoMap_Key);
-			    roleInfoMap[roleInfoMap_Key].Encode(buffer);
+		    buffer.WriteInt(RoleInfoMap.Count);
+		    foreach (var roleInfoMapKey in RoleInfoMap.Keys) {
+		        buffer.WriteLong(roleInfoMapKey);
+			    RoleInfoMap[roleInfoMapKey].Encode(buffer);
 		    }
 
-		    buffer.WriteBool(userInfo != null);
-		    userInfo?.Encode(buffer);
+		    buffer.WriteBool(UserInfo != null);
+		    UserInfo?.Encode(buffer);
 		}
 
 		public override void Decode(Buffer buffer)
 		{
 	    	base.Decode(buffer);
 
-		    roleId = buffer.ReadLong();
-		    roleName = buffer.ReadString();
-		    roleInfo.Decode(buffer);
+		    RoleId = buffer.ReadLong();
+		    RoleName = buffer.ReadString();
+		    RoleInfo.Decode(buffer);
 
-		    var roleInfoList_Size = buffer.ReadInt();
-		    for (var i = 0; i < roleInfoList_Size; i++) {
-			    var roleInfoList_Value = new RoleInfo();
-			  	roleInfoList_Value.Decode(buffer);
-			    roleInfoList.Add(roleInfoList_Value);
+		    var roleInfoListSize = buffer.ReadInt();
+		    for (var i = 0; i < roleInfoListSize; i++) {
+			    var roleInfoListValue = new RoleInfo();
+			  	roleInfoListValue.Decode(buffer);
+			    RoleInfoList.Add(roleInfoListValue);
 		    }
 
-		    var roleInfoSet_Size = buffer.ReadInt();
-		    for (var i = 0; i < roleInfoSet_Size; i++) {
-			    var roleInfoSet_Value = new RoleInfo();
-			  	roleInfoSet_Value.Decode(buffer);
-			    roleInfoSet.Add(roleInfoSet_Value);
+		    var roleInfoSetSize = buffer.ReadInt();
+		    for (var i = 0; i < roleInfoSetSize; i++) {
+			    var roleInfoSetValue = new RoleInfo();
+			  	roleInfoSetValue.Decode(buffer);
+			    RoleInfoSet.Add(roleInfoSetValue);
 		    }
 
-		    var roleInfoMap_Size = buffer.ReadInt();
-		    for (var i = 0; i < roleInfoMap_Size; i++) {
-			    var roleInfoMap_Key = buffer.ReadLong();
-			    var roleInfoMap_Value = new RoleInfo();
-				roleInfoMap_Value.Decode(buffer);
-			    roleInfoMap.Add(roleInfoMap_Key, roleInfoMap_Value);
+		    var roleInfoMapSize = buffer.ReadInt();
+		    for (var i = 0; i < roleInfoMapSize; i++) {
+			    var roleInfoMapKey = buffer.ReadLong();
+			    var roleInfoMapValue = new RoleInfo();
+				roleInfoMapValue.Decode(buffer);
+			    RoleInfoMap.Add(roleInfoMapKey, roleInfoMapValue);
 		    }
 
 		    if (buffer.ReadBool()) {
-		        if (userInfo == null) {
-		            userInfo = new UserInfo();
+		        if (UserInfo == null) {
+		            UserInfo = new UserInfo();
 		        }
-		        userInfo.Decode(buffer);
+		        UserInfo.Decode(buffer);
             }
 		}
 
 		public override string ToString()
 		{
 			return "CRoleLogin{" +
-					"roleId=" + roleId +
-					",roleName='" + roleName + '\'' +
-					",roleInfo=" + roleInfo +
-					",roleInfoList=" + ToString(roleInfoList) +
-					",roleInfoSet=" + ToString(roleInfoSet) +
-					",roleInfoMap=" + ToString(roleInfoMap) +
-					",userInfo=" + userInfo +
+					"roleId=" + RoleId +
+					",roleName='" + RoleName + '\'' +
+					",roleInfo=" + RoleInfo +
+					",roleInfoList=" + ToString(RoleInfoList) +
+					",roleInfoSet=" + ToString(RoleInfoSet) +
+					",roleInfoMap=" + ToString(RoleInfoMap) +
+					",userInfo=" + UserInfo +
 					'}';
 		}
     }

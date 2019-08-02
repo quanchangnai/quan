@@ -1,5 +1,6 @@
 package quan.generator.message;
 
+import quan.generator.BeanDefinition;
 import quan.generator.ClassDefinition;
 import quan.generator.FieldDefinition;
 import quan.generator.Language;
@@ -59,13 +60,15 @@ public class CSharpMessageGenerator extends MessageGenerator {
     }
 
     @Override
-    protected String resolveFieldImport(FieldDefinition fieldDefinition, boolean fieldSelf) {
-        return fieldSelf ? fieldDefinition.getTypePackage() : fieldDefinition.getValueTypePackage();
-    }
-
-    @Override
-    protected String resolveClassImport(ClassDefinition classDefinition) {
-        return classDefinition.getPackageName();
+    protected void processBeanFieldImports(BeanDefinition beanDefinition, FieldDefinition fieldDefinition) {
+        ClassDefinition fieldClass = ClassDefinition.getAll().get(fieldDefinition.getType());
+        if (fieldClass != null && !fieldClass.getPackageName().equals(beanDefinition.getPackageName())) {
+            beanDefinition.getImports().add(fieldClass.getPackageName());
+        }
+        BeanDefinition fieldValueBean = fieldDefinition.getValueBean();
+        if (fieldValueBean != null && !fieldValueBean.getPackageName().equals(beanDefinition.getPackageName())) {
+            beanDefinition.getImports().add(fieldValueBean.getPackageName());
+        }
     }
 
     public static void main(String[] args) throws Exception {

@@ -163,7 +163,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 
         </#if>
         JSONArray $${field.name} = new JSONArray();
-        <#if !field.valueBuiltInType>
+        <#if !field.builtInValueType>
         for (${field.classValueType} $${field.name}$Value : ${field.name}) {
             $${field.name}.add($${field.name}$Value.encode());
         }
@@ -180,7 +180,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         </#if>
         JSONObject $${field.name} = new JSONObject();
         for (${field.classKeyType} $${field.name}$Key : ${field.name}.keySet()) {
-        <#if !field.valueBuiltInType>
+        <#if !field.builtInValueType>
             $${field.name}.put(String.valueOf($${field.name}$Key), ${field.name}.get($${field.name}$Key).encode());
         <#else>
             $${field.name}.put(String.valueOf($${field.name}$Key), ${field.name}.get($${field.name}$Key));
@@ -220,7 +220,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         if ($${field.name}$1 != null) {
             PVector<${field.classValueType}> $${field.name}$2 = Empty.vector();
             for (int i = 0; i < $${field.name}$1.size(); i++) {
-        <#if !field.valueBuiltInType>
+        <#if !field.builtInValueType>
                 ${field.classValueType} $${field.name}$Value = new ${field.classValueType}();
                 $${field.name}$Value.decode($${field.name}$1.getJSONObject(i));
                 $${field.name}$2 = $${field.name}$2.plus($${field.name}$Value);
@@ -241,7 +241,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         if ($${field.name}$1 != null) {
             PSet<${field.classValueType}> $${field.name}$2 = Empty.set();
             for (int i = 0; i < $${field.name}$1.size(); i++) {
-        <#if !field.valueBuiltInType>
+        <#if !field.builtInValueType>
                 ${field.classValueType} $${field.name}$Value = new ${field.classValueType}();
                 $${field.name}$Value.decode($${field.name}$1.getJSONObject(i));
                 $${field.name}$2 = $${field.name}$2.plus($${field.name}$Value);
@@ -262,7 +262,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         if ($${field.name}$1 != null) {
             PMap<${field.classKeyType}, ${field.classValueType}> $${field.name}$2 = Empty.map();
             for (String $${field.name}$1_Key : $${field.name}$1.keySet()) {
-        <#if !field.valueBuiltInType>
+        <#if !field.builtInValueType>
                 ${field.classValueType} $${field.name}$Value = new ${field.classValueType}();
                 $${field.name}$Value.decode($${field.name}$1.getJSONObject($${field.name}$1_Key));
                 $${field.name}$2 = $${field.name}$2.plus(${field.classKeyType}.valueOf($${field.name}$1_Key), $${field.name}$Value);

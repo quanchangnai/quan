@@ -32,7 +32,6 @@ public class ConfigLoader {
     //配置表所在目录
     private String tablePath;
 
-    //仅检查配置，不加载到类
     private boolean onlyCheck;
 
     private String packagePrefix;
@@ -68,11 +67,20 @@ public class ConfigLoader {
         return this;
     }
 
-    public ConfigLoader setOnlyCheck(boolean onlyCheck) {
+    /**
+     * 是否仅检查配置
+     *
+     * @param onlyCheck true:不会创建配置对象。false:会创建配置对象并加载到类的缓存里。
+     */
+    public void onlyCheck(boolean onlyCheck) {
         this.onlyCheck = onlyCheck;
-        return this;
     }
 
+    /**
+     * 实例化给定包下面的自定义检查器对象
+     *
+     * @param checkerPackage 自定义配置检查器所在的包
+     */
     public void setCheckerPackage(String checkerPackage) {
         if (StringUtils.isBlank(checkerPackage)) {
             return;
@@ -170,7 +178,9 @@ public class ConfigLoader {
     }
 
     private void check(ConfigDefinition configDefinition) {
+        //索引对应的配置JSON
         Map<IndexDefinition, Map> configIndexedJsons = new HashMap<>();
+        //配置JSON对应的表格
         Map<JSONObject, String> jsonTables = new HashMap();
 
         for (String table : configDefinition.getTables()) {
@@ -184,7 +194,6 @@ public class ConfigLoader {
             }
 
             for (JSONObject json : tableJsons) {
-                //记录Json配置对应的表格
                 jsonTables.put(json, table);
                 //检查索引
                 for (IndexDefinition indexDefinition : configDefinition.getIndexes()) {
@@ -192,7 +201,6 @@ public class ConfigLoader {
                     checkTableIndex(indexDefinition, indexedJsons, jsonTables, json);
                 }
             }
-
         }
     }
 
@@ -207,7 +215,7 @@ public class ConfigLoader {
                 if (!jsonTables.get(oldJson).equals(table)) {
                     repeatedTables += "," + jsonTables.get(oldJson);
                 }
-                errors.add(String.format("配置[%s]有重复[%s]:[%s]", repeatedTables, field1.getColumn(), json.get(field1.getName())));
+                errors.add(String.format("配置[%s]有重复数据[%s = %s]", repeatedTables, field1.getColumn(), json.get(field1.getName())));
             }
         }
 
@@ -220,7 +228,7 @@ public class ConfigLoader {
                 if (!jsonTables.get(oldJson).equals(table)) {
                     repeatedTables += "," + jsonTables.get(oldJson);
                 }
-                errors.add(String.format("配置[%s]有重复[%s,%s]:[%s,%s]", repeatedTables, field1.getColumn(), field2.getColumn(), json.get(field1.getName()), json.get(field2.getName())));
+                errors.add(String.format("配置[%s]有重复数据[%s,%s = %s,%s]", repeatedTables, field1.getColumn(), field2.getColumn(), json.get(field1.getName()), json.get(field2.getName())));
             }
         }
 
@@ -234,7 +242,7 @@ public class ConfigLoader {
                 if (!jsonTables.get(oldJson).equals(table)) {
                     repeatedTables += "," + jsonTables.get(oldJson);
                 }
-                errors.add(String.format("配置[%s]有重复[%s,%s,%s]:[%s,%s,%s]", repeatedTables, field1.getColumn(), field2.getColumn(), field3.getColumn(), json.get(field1.getName()), json.get(field2.getName()), json.get(field3.getName())));
+                errors.add(String.format("配置[%s]有重复数据[%s,%s,%s = %s,%s,%s]", repeatedTables, field1.getColumn(), field2.getColumn(), field3.getColumn(), json.get(field1.getName()), json.get(field2.getName()), json.get(field3.getName())));
             }
         }
     }
@@ -255,6 +263,7 @@ public class ConfigLoader {
             try {
                 configs.addAll(configReader.readObjects());
             } catch (ConfigException e) {
+                configs.addAll(configReader.getObjects());
                 errors.addAll(e.getErrors());
             }
         }
@@ -299,6 +308,10 @@ public class ConfigLoader {
      * @param tables 表格名字列表
      */
     public void reload(List<String> tables) {
+        if (onlyCheck) {
+            return;
+        }
+
         errors.clear();
         Set<ConfigDefinition> reloadConfigs = new HashSet<>();
 
