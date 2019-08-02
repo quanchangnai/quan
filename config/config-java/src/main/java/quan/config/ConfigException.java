@@ -1,14 +1,14 @@
 package quan.config;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 
 /**
  * Created by quanchangnai on 2019/7/31.
  */
 public class ConfigException extends RuntimeException {
 
-    private List<String> errors = new ArrayList<>();
+    private LinkedHashSet<String> errors = new LinkedHashSet<>();
 
     public ConfigException() {
     }
@@ -17,11 +17,11 @@ public class ConfigException extends RuntimeException {
         errors.add(error);
     }
 
-    public ConfigException(List<String> errors) {
+    public ConfigException(Collection<String> errors) {
         this.errors.addAll(errors);
     }
 
-    public List<String> getErrors() {
+    public LinkedHashSet<String> getErrors() {
         return errors;
     }
 
@@ -30,7 +30,7 @@ public class ConfigException extends RuntimeException {
         return this;
     }
 
-    public ConfigException addErrors(List<String> errors) {
+    public ConfigException addErrors(Collection<String> errors) {
         this.errors.addAll(errors);
         return this;
     }

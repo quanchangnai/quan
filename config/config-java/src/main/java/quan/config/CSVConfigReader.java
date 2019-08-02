@@ -10,7 +10,6 @@ import quan.generator.config.ConfigDefinition;
 
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,22 +23,23 @@ public class CSVConfigReader extends ConfigReader {
 
     @Override
     protected void read() {
+        clear();
         List<CSVRecord> records;
+
         try {
             CSVParser parser = new CSVParser(new InputStreamReader(new FileInputStream(tableFile), "GBK"), CSVFormat.DEFAULT);
             records = parser.getRecords();
         } catch (Exception e) {
             String error = String.format("读取配置[%s]出错:%s", table, e.getMessage());
-//            logger.error(error, e);
-            throw new ConfigException(error);
+            errors.add(error);
+            logger.debug(error, e);
+            return;
         }
 
         //第一行是表头，第二行是注释，第三行起是内容
         if (records.size() <= 2) {
             return;
         }
-
-        List<String> errors = new ArrayList<>();
 
         for (int i = 2; i < records.size(); i++) {
             CSVRecord record = records.get(i);
@@ -78,10 +78,6 @@ public class CSVConfigReader extends ConfigReader {
 
             jsons.add(jsonObject);
 
-        }
-
-        if (!errors.isEmpty()) {
-            throw new ConfigException(errors);
         }
     }
 

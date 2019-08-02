@@ -159,6 +159,10 @@ public class ConfigLoader {
             }
         }
 
+        for (ConfigReader reader : readers.values()) {
+            errors.addAll(reader.getErrors());
+        }
+
         //自定义检查
         for (ConfigChecker checker : checkers) {
             try {
@@ -185,13 +189,7 @@ public class ConfigLoader {
 
         for (String table : configDefinition.getTables()) {
             ConfigReader configReader = getOrAddReader(table);
-            List<JSONObject> tableJsons;
-            try {
-                tableJsons = configReader.readJsons();
-            } catch (ConfigException e) {
-                tableJsons = configReader.getJsons();
-                errors.addAll(e.getErrors());
-            }
+            List<JSONObject> tableJsons = configReader.readJsons();
 
             for (JSONObject json : tableJsons) {
                 jsonTables.put(json, table);
@@ -260,12 +258,7 @@ public class ConfigLoader {
 
         for (String table : configDefinition.getTables()) {
             ConfigReader configReader = getOrAddReader(table);
-            try {
-                configs.addAll(configReader.readObjects());
-            } catch (ConfigException e) {
-                configs.addAll(configReader.getObjects());
-                errors.addAll(e.getErrors());
-            }
+            configs.addAll(configReader.readObjects());
         }
 
         indexConfigs(configDefinition, configs, reload);
@@ -313,7 +306,9 @@ public class ConfigLoader {
         }
 
         errors.clear();
-        Set<ConfigDefinition> reloadConfigs = new HashSet<>();
+
+        Set<ConfigDefinition> reloadConfigs = new LinkedHashSet<>();
+        Set<ConfigReader> reloadReaders = new LinkedHashSet<>();
 
         for (String table : tables) {
             ConfigReader configReader = readers.get(table);
@@ -321,7 +316,9 @@ public class ConfigLoader {
                 errors.add(String.format("重加载[%s]出错，对应配置从未被加载", table));
                 continue;
             }
+            reloadReaders.add(configReader);
             configReader.clear();
+
             ConfigDefinition configDefinition = ConfigDefinition.getTableConfigs().get(table);
             while (configDefinition != null) {
                 reloadConfigs.add(configDefinition);
@@ -331,6 +328,10 @@ public class ConfigLoader {
 
         for (ConfigDefinition configDefinition : reloadConfigs) {
             reload(configDefinition);
+        }
+
+        for (ConfigReader reloadReader : reloadReaders) {
+            errors.addAll(reloadReader.getErrors());
         }
 
         if (!errors.isEmpty()) {

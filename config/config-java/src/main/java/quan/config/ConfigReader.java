@@ -28,6 +28,8 @@ public abstract class ConfigReader {
 
     protected List<JSONObject> jsons = new ArrayList<>();
 
+    protected List<String> errors = new ArrayList<>();
+
     private List<Config> configs = new ArrayList<>();
 
     private Config prototype;
@@ -60,24 +62,13 @@ public abstract class ConfigReader {
         return jsons;
     }
 
-    public List<JSONObject> getJsons() {
-        try {
-            readJsons();
-        } catch (Exception e) {
-        }
-        return jsons;
-    }
 
     public List<Config> readObjects() {
         if (prototype == null || !configs.isEmpty()) {
             return configs;
         }
-        ConfigException configException = null;
-        try {
-            readJsons();
-        } catch (ConfigException e) {
-            configException = e;
-        }
+
+        readJsons();
 
         for (JSONObject json : jsons) {
             Config config = prototype.create();
@@ -85,19 +76,11 @@ public abstract class ConfigReader {
             configs.add(config);
         }
 
-        if (configException != null) {
-            throw configException;
-        }
-
         return configs;
     }
 
-    public List<Config> getObjects() {
-        try {
-            readObjects();
-        } catch (Exception e) {
-        }
-        return configs;
+    public List<String> getErrors() {
+        return errors;
     }
 
     protected abstract void read();
@@ -105,6 +88,7 @@ public abstract class ConfigReader {
     public void clear() {
         jsons.clear();
         configs.clear();
+        errors.clear();
     }
 
 
