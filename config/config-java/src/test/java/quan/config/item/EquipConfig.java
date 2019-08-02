@@ -93,7 +93,7 @@ public class EquipConfig extends ItemConfig {
                     if (oldConfig.getClass() != config.getClass()) {
                         repeatedConfigs += "," + oldConfig.getClass().getSimpleName();
                     }
-                    errors.add("配置[" + repeatedConfigs + "]有重复[id:" + config.id + "]");
+                    errors.add("配置[" + repeatedConfigs + "]有重复[id]:[" + config.id + "]");
                 }
 
                 _positionConfigs.computeIfAbsent(config.position, k -> new ArrayList<>()).add(config);

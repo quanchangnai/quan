@@ -28,6 +28,7 @@
         <field name="rewardMap" type="map" key-type="int" value-type="Reward" column="奖励Map"/>
         <field name="list2" type="list" value-type="int" column="List2" delimiter="|"/>
         <index name="composite1" type="n" fields="color,w1"/>
+        <index name="composite2" type="u" fields="w1,w2"/>
     </config>
 
 </package>

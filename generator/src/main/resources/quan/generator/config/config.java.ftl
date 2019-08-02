@@ -288,7 +288,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
                 ${tab}if (oldConfig.getClass() != config.getClass()) {
                     ${tab}repeatedConfigs += "," + oldConfig.getClass().getSimpleName();
                 ${tab}}
-                ${tab}errors.add("配置[" + repeatedConfigs + "]有重复[${index.fields[0].name}:" + config.${index.fields[0].name} + "]");
+                ${tab}errors.add("配置[" + repeatedConfigs + "]有重复[${index.fields[0].name}]:[" + config.${index.fields[0].name} + "]");
             ${tab}}
         <#elseif index.normal && index.fields?size==1>
             ${tab}_${index.name}Configs.computeIfAbsent(config.${index.fields[0].name}, k -> new ArrayList<>()).add(config);
@@ -299,7 +299,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
                 ${tab}if (oldConfig.getClass() != config.getClass()) {
                     ${tab}repeatedConfigs += "," + oldConfig.getClass().getSimpleName();
                 ${tab}}
-                ${tab}errors.add("配置[" + repeatedConfigs + "]有重复[${index.fields[0].name},${index.fields[1].name}:" + config.${index.fields[0].name} + "," + config.${index.fields[1].name} + "]");
+                ${tab}errors.add("配置[" + repeatedConfigs + "]有重复[${index.fields[0].name},${index.fields[1].name}]:[" + config.${index.fields[0].name} + "," + config.${index.fields[1].name} + "]");
             ${tab}}
         <#elseif index.normal && index.fields?size==2>
             ${tab}_${index.name}Configs.computeIfAbsent(config.${index.fields[0].name}, k -> new HashMap<>()).computeIfAbsent(config.${index.fields[1].name}, k -> new ArrayList<>()).add(config);
@@ -310,7 +310,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
                 ${tab}if (oldConfig.getClass() != config.getClass()) {
                     ${tab}repeatedConfigs += "," + oldConfig.getClass().getSimpleName();
                 ${tab}}
-                ${tab}errors.add("配置[" + repeatedConfigs + "]有重复[${index.fields[0].name},${index.fields[1].name},${index.fields[2].name}:" + config.${index.fields[0].name} + "," + config.${index.fields[1].name} + "," + config.${index.fields[2].name} + "]");
+                ${tab}errors.add("配置[" + repeatedConfigs + "]有重复[${index.fields[0].name},${index.fields[1].name},${index.fields[2].name}]:[" + config.${index.fields[0].name} + "," + config.${index.fields[1].name} + "," + config.${index.fields[2].name} + "]");
             }
         <#elseif index.normal && index.fields?size==3>
             ${tab}_${index.name}Configs.computeIfAbsent(config.${index.fields[0].name}, k -> new HashMap<>()).computeIfAbsent(config.${index.fields[1].name}, k -> new HashMap<>()).computeIfAbsent(config.${index.fields[2].name}, k -> new ArrayList<>()).add(config);

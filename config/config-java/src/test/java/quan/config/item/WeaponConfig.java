@@ -114,6 +114,8 @@ public class WeaponConfig extends EquipConfig {
 
         private static Map<Integer, Map<Integer, List<WeaponConfig>>> composite1Configs = new HashMap<>();
 
+        private static Map<Integer, Map<Integer, WeaponConfig>> composite2Configs = new HashMap<>();
+    
     
         public static Map<Integer, WeaponConfig> getIdConfigs() {
             return idConfigs;
@@ -143,11 +145,24 @@ public class WeaponConfig extends EquipConfig {
             return getByComposite1(color).getOrDefault(w1, Collections.emptyList());
         }
 
+        public static Map<Integer, Map<Integer, WeaponConfig>> getComposite2Configs() {
+            return composite2Configs;
+        }
+
+        public static Map<Integer, WeaponConfig> getByComposite2(int w1) {
+            return composite2Configs.getOrDefault(w1, Collections.emptyMap());
+        }
+
+        public static WeaponConfig getByComposite2(int w1, int w2) {
+            return getByComposite2(w1).get(w2);
+        }
+
 
         public static List<String> index(List<WeaponConfig> configs) {
             Map<Integer, WeaponConfig> _idConfigs = new HashMap<>();
             Map<Integer, List<WeaponConfig>> _positionConfigs = new HashMap<>();
             Map<Integer, Map<Integer, List<WeaponConfig>>> _composite1Configs = new HashMap<>();
+            Map<Integer, Map<Integer, WeaponConfig>> _composite2Configs = new HashMap<>();
 
             List<String> errors = new ArrayList<>();
             WeaponConfig oldConfig;
@@ -159,17 +174,27 @@ public class WeaponConfig extends EquipConfig {
                     if (oldConfig.getClass() != config.getClass()) {
                         repeatedConfigs += "," + oldConfig.getClass().getSimpleName();
                     }
-                    errors.add("配置[" + repeatedConfigs + "]有重复[id:" + config.id + "]");
+                    errors.add("配置[" + repeatedConfigs + "]有重复[id]:[" + config.id + "]");
                 }
 
                 _positionConfigs.computeIfAbsent(config.position, k -> new ArrayList<>()).add(config);
 
                 _composite1Configs.computeIfAbsent(config.color, k -> new HashMap<>()).computeIfAbsent(config.w1, k -> new ArrayList<>()).add(config);
+
+                oldConfig = _composite2Configs.computeIfAbsent(config.w1, k -> new HashMap<>()).put(config.w2, config);
+                if (oldConfig != null) {
+                    String repeatedConfigs = config.getClass().getSimpleName();
+                    if (oldConfig.getClass() != config.getClass()) {
+                        repeatedConfigs += "," + oldConfig.getClass().getSimpleName();
+                    }
+                    errors.add("配置[" + repeatedConfigs + "]有重复[w1,w2]:[" + config.w1 + "," + config.w2 + "]");
+                }
             }
 
             idConfigs = unmodifiable(_idConfigs);
             positionConfigs = unmodifiable(_positionConfigs);
             composite1Configs = unmodifiable(_composite1Configs);
+            composite2Configs = unmodifiable(_composite2Configs);
 
             return errors;
         }

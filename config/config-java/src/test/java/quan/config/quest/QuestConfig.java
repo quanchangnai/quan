@@ -302,7 +302,7 @@ public class QuestConfig extends Config {
                 if (oldConfig.getClass() != config.getClass()) {
                     repeatedConfigs += "," + oldConfig.getClass().getSimpleName();
                 }
-                errors.add("配置[" + repeatedConfigs + "]有重复[a1,a2:" + config.a1 + "," + config.a2 + "]");
+                errors.add("配置[" + repeatedConfigs + "]有重复[a1,a2]:[" + config.a1 + "," + config.a2 + "]");
             }
 
             _composite2Configs.computeIfAbsent(config.b1, k -> new HashMap<>()).computeIfAbsent(config.b2, k -> new ArrayList<>()).add(config);
@@ -313,7 +313,7 @@ public class QuestConfig extends Config {
                 if (oldConfig.getClass() != config.getClass()) {
                     repeatedConfigs += "," + oldConfig.getClass().getSimpleName();
                 }
-                errors.add("配置[" + repeatedConfigs + "]有重复[c1,c2,c3:" + config.c1 + "," + config.c2 + "," + config.c3 + "]");
+                errors.add("配置[" + repeatedConfigs + "]有重复[c1,c2,c3]:[" + config.c1 + "," + config.c2 + "," + config.c3 + "]");
             }
 
             _composite4Configs.computeIfAbsent(config.d1, k -> new HashMap<>()).computeIfAbsent(config.d2, k -> new HashMap<>()).computeIfAbsent(config.d3, k -> new ArrayList<>()).add(config);
@@ -324,7 +324,7 @@ public class QuestConfig extends Config {
                 if (oldConfig.getClass() != config.getClass()) {
                     repeatedConfigs += "," + oldConfig.getClass().getSimpleName();
                 }
-                errors.add("配置[" + repeatedConfigs + "]有重复[id:" + config.id + "]");
+                errors.add("配置[" + repeatedConfigs + "]有重复[id]:[" + config.id + "]");
             }
 
             _typeConfigs.computeIfAbsent(config.type, k -> new ArrayList<>()).add(config);

@@ -23,6 +23,8 @@ public class ConfigTest {
         ConfigLoader configLoader = new ConfigLoader(definitionPaths, tablePath);
         configLoader.setPackagePrefix("quan.config");
         configLoader.setEnumPackagePrefix("quan");
+//        configLoader.setOnlyCheck(true);
+        configLoader.setCheckerPackage("quan");
 
         System.err.println("configLoader.load()=============");
         try {
@@ -46,12 +48,15 @@ public class ConfigTest {
     }
 
     private static void printErrors(ConfigException e) {
+        System.err.println("printErrors============");
         for (String error : e.getErrors()) {
             System.err.println(error);
         }
+        System.err.println("printErrors============");
     }
 
-    private static void printConfigs() {
+    private static void printConfigs() throws Exception {
+        Thread.sleep(100);
         System.err.println("ItemConfig============");
         ItemConfig.getIdConfigs().values().forEach(System.out::println);
 

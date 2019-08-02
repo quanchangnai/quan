@@ -1,12 +1,10 @@
 package quan.config;
 
 /**
- * Created by quanchangnai on 2019/8/1.
+ * Created by quanchangnai on 2019/8/2.
  */
-public class ConfigChecker {
+public interface ConfigChecker {
 
-    public void check() {
-
-    }
-
+    void checkConfig();
+    
 }

@@ -38,21 +38,33 @@ public abstract class ConfigReader {
         this.tableFile = new File(tablePath, this.table);
         this.configDefinition = configDefinition;
 
-        try {
-            Class<Config> configClass = (Class<Config>) Class.forName(configDefinition.getFullName());
-            prototype = configClass.getDeclaredConstructor().newInstance();
-        } catch (Exception e) {
-            logger.error("配置类[{}]加载失败", configDefinition.getFullName(), e);
-        }
     }
 
     public String getTable() {
         return table;
     }
 
+    public void initPrototype() {
+        try {
+            Class<Config> configClass = (Class<Config>) Class.forName(configDefinition.getFullName());
+            prototype = configClass.getDeclaredConstructor().newInstance();
+        } catch (Exception e) {
+            logger.error("实例化配置类[{}]失败", configDefinition.getFullName(), e);
+        }
+    }
+
     public List<JSONObject> readJsons() {
         if (jsons.isEmpty()) {
             read();
+        }
+        return jsons;
+    }
+
+    public List<JSONObject> getJsons() {
+        try {
+            readJsons();
+        } catch (Exception e) {
+
         }
         return jsons;
     }
