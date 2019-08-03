@@ -1,5 +1,6 @@
 package quan.generator.config;
 
+import org.apache.commons.lang3.StringUtils;
 import quan.generator.Definition;
 import quan.generator.FieldDefinition;
 
@@ -43,6 +44,11 @@ public class IndexDefinition extends Definition {
         return 7;
     }
 
+    @Override
+    public String getDefinitionTypeName() {
+        return "索引";
+    }
+
     public boolean isUnique() {
         return type.equals("unique") || type.equals("u");
     }
@@ -56,10 +62,10 @@ public class IndexDefinition extends Definition {
     }
 
     public IndexDefinition setType(String type) {
-        if (type == null || type.trim().equals("")) {
+        if (StringUtils.isBlank(type)) {
             return this;
         }
-        this.type = type;
+        this.type = type.trim();
         return this;
     }
 
@@ -79,10 +85,10 @@ public class IndexDefinition extends Definition {
     }
 
     public IndexDefinition setFieldNames(String fieldNames) {
-        if (fieldNames == null || fieldNames.trim().equals("")) {
+        if (StringUtils.isBlank(fieldNames)) {
             return this;
         }
-        this.fieldNames = fieldNames;
+        this.fieldNames = fieldNames.trim();
         return this;
     }
 }

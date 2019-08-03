@@ -10,11 +10,11 @@ import quan.config.*;
 @SuppressWarnings({"unchecked"})
 public class QuestTargetConfig extends Config {
 
-    protected long id;
+    protected int id;
 
     protected String name;
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
@@ -27,7 +27,7 @@ public class QuestTargetConfig extends Config {
     public void parse(JSONObject object) {
         super.parse(object);
 
-        id = object.getLongValue("id");
+        id = object.getIntValue("id");
         name = object.getString("name");
     }
 
@@ -45,20 +45,20 @@ public class QuestTargetConfig extends Config {
         return new QuestTargetConfig();
     }
 
-    private static Map<Long, QuestTargetConfig> idConfigs = new HashMap<>();
+    private static Map<Integer, QuestTargetConfig> idConfigs = new HashMap<>();
 
 
-    public static Map<Long, QuestTargetConfig> getIdConfigs() {
+    public static Map<Integer, QuestTargetConfig> getIdConfigs() {
         return idConfigs;
     }
 
-    public static QuestTargetConfig getById(long id) {
+    public static QuestTargetConfig getById(int id) {
         return idConfigs.get(id);
     }
 
 
     public static List<String> index(List<QuestTargetConfig> configs) {
-        Map<Long, QuestTargetConfig> _idConfigs = new HashMap<>();
+        Map<Integer, QuestTargetConfig> _idConfigs = new HashMap<>();
 
         List<String> errors = new ArrayList<>();
         QuestTargetConfig oldConfig;

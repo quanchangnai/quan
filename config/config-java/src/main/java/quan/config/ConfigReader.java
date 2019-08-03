@@ -28,7 +28,7 @@ public abstract class ConfigReader {
 
     protected List<JSONObject> jsons = new ArrayList<>();
 
-    protected List<String> errors = new ArrayList<>();
+    protected LinkedHashSet<String> errors = new LinkedHashSet<>();
 
     private List<Config> configs = new ArrayList<>();
 
@@ -80,7 +80,7 @@ public abstract class ConfigReader {
     }
 
     public List<String> getErrors() {
-        return errors;
+        return new ArrayList<>(errors);
     }
 
     protected abstract void read();

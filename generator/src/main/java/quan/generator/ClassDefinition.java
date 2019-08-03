@@ -1,9 +1,8 @@
 package quan.generator;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.*;
 
 /**
  * 类定义
@@ -34,14 +33,17 @@ public abstract class ClassDefinition extends Definition {
 
     private static Map<String, ClassDefinition> all = new HashMap<>();
 
-    private static List<String> validatedErrors = new ArrayList<>();
+    private static LinkedHashSet<String> validatedErrors = new LinkedHashSet<>();
 
     public String getPackageName() {
         return packageName;
     }
 
     public void setPackageName(String packageName) {
-        this.packageName = packageName;
+        if (StringUtils.isBlank(packageName)) {
+            return;
+        }
+        this.packageName = packageName.trim();
     }
 
     public List<FieldDefinition> getFields() {
@@ -51,6 +53,20 @@ public abstract class ClassDefinition extends Definition {
 
     public void addField(FieldDefinition fieldDefinition) {
         fields.add(fieldDefinition);
+    }
+
+    public FieldDefinition getField(String fieldName) {
+        if (fieldMap.containsKey(fieldName)) {
+            return fieldMap.get(fieldName);
+        }
+
+        for (FieldDefinition field : fields) {
+            if (field.getName().equals(fieldName)) {
+                return field;
+            }
+        }
+
+        return null;
     }
 
     public String getFullName() {
@@ -80,7 +96,7 @@ public abstract class ClassDefinition extends Definition {
     }
 
     public void setLang(String language) {
-        if (language == null) {
+        if (StringUtils.isBlank(language)) {
             return;
         }
         for (String lang : language.trim().split(",")) {
@@ -92,18 +108,27 @@ public abstract class ClassDefinition extends Definition {
         return languages.isEmpty() || languages.contains(language.name());
     }
 
+    /**
+     * 校验1
+     */
     public void validate() {
         if (getName() == null) {
             addValidatedError("类名不能为空");
         }
 
         if (!languages.isEmpty() && !Language.names().containsAll(languages)) {
-            addValidatedError("类" + getName4Validate() + "的语言类型" + languages + "非法,支持的语言类型" + Language.names());
+            addValidatedError(getName4Validate() + "的语言类型" + languages + "非法,合法的语言类型" + Language.names());
         }
 
         for (FieldDefinition fieldDefinition : getFields()) {
             validateField(fieldDefinition);
         }
+    }
+
+    /**
+     * 校验2，依赖[校验1]的结果，必须等所有类的[校验1]执行完成后再执行
+     */
+    public void validate2() {
     }
 
     protected void validateField(FieldDefinition fieldDefinition) {
@@ -113,12 +138,12 @@ public abstract class ClassDefinition extends Definition {
             return;
         }
         if (fieldMap.containsKey(fieldDefinition.getName())) {
-            addValidatedError(getName4Validate("的") + "字段名[" + fieldDefinition.getName() + "]重复");
+            addValidatedError(getName4Validate("的") + "字段名[" + fieldDefinition.getName() + "]不能重复");
             return;
         }
         fieldMap.put(fieldDefinition.getName(), fieldDefinition);
     }
-    
+
     protected void addValidatedError(String error) {
         addValidatedError(error, null);
     }
@@ -141,7 +166,12 @@ public abstract class ClassDefinition extends Definition {
     }
 
     public static List<String> getValidatedErrors() {
-        return validatedErrors;
+        return new ArrayList<>(validatedErrors);
+    }
+
+    @Override
+    public String getDefinitionTypeName() {
+        return "类";
     }
 
     @Override

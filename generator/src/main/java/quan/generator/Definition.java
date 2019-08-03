@@ -1,5 +1,7 @@
 package quan.generator;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * Created by quanchangnai on 2017/7/6.
  */
@@ -18,18 +20,22 @@ public abstract class Definition {
     }
 
     public String getName4Validate(String append) {
+        String definitionTypeName = getDefinitionTypeName();
+        String name4Validate;
         if (name != null) {
-            return "[" + name + "]" + append;
+            name4Validate = definitionTypeName + "[" + name + "]" + append;
+        } else {
+            name4Validate = definitionTypeName + append;
         }
-        return "";
+        return name4Validate;
     }
 
 
     public void setName(String name) {
-        if (name == null || name.trim().equals("")) {
+        if (StringUtils.isBlank(name)) {
             return;
         }
-        this.name = name;
+        this.name = name.trim();
     }
 
     public String getComment() {
@@ -37,13 +43,15 @@ public abstract class Definition {
     }
 
     public void setComment(String comment) {
-        if (comment == null || comment.trim().equals("")) {
+        if (StringUtils.isBlank(comment)) {
             return;
         }
-        this.comment = comment;
+        this.comment = comment.trim();
     }
 
     public abstract int getDefinitionType();
+
+    public abstract String getDefinitionTypeName();
 
     @Override
     public String toString() {

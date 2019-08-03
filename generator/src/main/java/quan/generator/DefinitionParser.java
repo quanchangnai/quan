@@ -80,6 +80,10 @@ public abstract class DefinitionParser {
             classDefinition.validate();
         }
 
+        for (ClassDefinition classDefinition : classDefinitions) {
+            classDefinition.validate2();
+        }
+
     }
 
     protected abstract List<ClassDefinition> parseClasses(File srcFile) throws Exception;

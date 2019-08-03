@@ -43,7 +43,7 @@ public class CSVConfigReader extends ConfigReader {
 
         for (int i = 2; i < records.size(); i++) {
             CSVRecord record = records.get(i);
-            JSONObject jsonObject = new JSONObject();
+            JSONObject jsonObject = new JSONObject(true);
 
             for (int j = 0; j < record.size(); j++) {
                 String columnName = records.get(0).get(j);

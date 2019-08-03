@@ -8,18 +8,12 @@ import java.util.Set;
  */
 public class EnumDefinition extends ClassDefinition {
 
+    private Set<Integer> enumValues = new HashSet<>();
+
     @Override
     public int getDefinitionType() {
         return 1;
     }
-
-    @Override
-    public void validate() {
-        super.validate();
-
-    }
-
-    private Set<Integer> enumValues = new HashSet<>();
 
     @Override
     protected void validateField(FieldDefinition fieldDefinition) {
@@ -32,9 +26,9 @@ public class EnumDefinition extends ClassDefinition {
         }
 
         if (enumValue < 1) {
-            addValidatedError("枚举" + getName4Validate() + "的值必须为正整数");
+            addValidatedError(getName4Validate() + "的值必须为正整数");
         } else if (enumValues.contains(enumValue)) {
-            addValidatedError("枚举" + getName4Validate() + "的值不能重复");
+            addValidatedError(getName4Validate() + "的值不能重复");
         } else {
             enumValues.add(enumValue);
             fieldDefinition.setValue(fieldDefinition.getValue());
@@ -43,5 +37,10 @@ public class EnumDefinition extends ClassDefinition {
 
     public static boolean isEnumDefinition(String type) {
         return ClassDefinition.getAll().get(type) instanceof EnumDefinition;
+    }
+
+    @Override
+    public String getDefinitionTypeName() {
+        return "枚举";
     }
 }

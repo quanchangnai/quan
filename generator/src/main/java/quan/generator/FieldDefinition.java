@@ -1,5 +1,6 @@
 package quan.generator;
 
+import org.apache.commons.lang3.StringUtils;
 import quan.generator.config.ConfigDefinition;
 
 import java.util.Arrays;
@@ -41,6 +42,9 @@ public class FieldDefinition extends Definition {
     //配置集合类型字段的分隔符
     private String delimiter;
 
+    //配置引用的字段
+    private String ref;
+
     //允许的分隔符
     public static final Set<String> allowDelimiters = new HashSet<>(Arrays.asList(";", "_", "*", "|", "$", "@", "#", "&", "?"));
 
@@ -64,16 +68,21 @@ public class FieldDefinition extends Definition {
         return 4;
     }
 
+    @Override
+    public String getDefinitionTypeName() {
+        return "字段";
+    }
+
     public String getType() {
         return type;
     }
 
 
     public void setType(String type) {
-        if (type == null || type.trim().equals("")) {
+        if (StringUtils.isBlank(type)) {
             return;
         }
-        this.type = type;
+        this.type = type.trim();
     }
 
     public boolean isBuiltInType() {
@@ -104,13 +113,23 @@ public class FieldDefinition extends Definition {
         return null;
     }
 
+    /**
+     * 类型是否合法
+     */
+    public boolean isLegalType() {
+        return isBuiltInType() || isBeanType() || isEnumType();
+    }
+
 
     public String getValue() {
         return value;
     }
 
     public void setValue(String value) {
-        this.value = value;
+        if (StringUtils.isBlank(value)) {
+            return;
+        }
+        this.value = value.trim();
     }
 
     public boolean isOptional() {
@@ -118,7 +137,7 @@ public class FieldDefinition extends Definition {
     }
 
     public FieldDefinition setOptional(String optional) {
-        if (optional != null && optional.equals("true")) {
+        if (!StringUtils.isBlank(optional) && optional.trim().equals("true")) {
             this.optional = true;
         }
         return this;
@@ -129,10 +148,10 @@ public class FieldDefinition extends Definition {
     }
 
     public void setKeyType(String keyType) {
-        if (keyType == null || keyType.trim().equals("")) {
+        if (StringUtils.isBlank(keyType)) {
             return;
         }
-        this.keyType = keyType;
+        this.keyType = keyType.trim();
     }
 
     public boolean isBuiltInKeyType() {
@@ -149,10 +168,10 @@ public class FieldDefinition extends Definition {
     }
 
     public void setValueType(String valueType) {
-        if (valueType == null || valueType.trim().equals("")) {
+        if (StringUtils.isBlank(valueType)) {
             return;
         }
-        this.valueType = valueType;
+        this.valueType = valueType.trim();
     }
 
     public boolean isBuiltInValueType() {
@@ -176,6 +195,13 @@ public class FieldDefinition extends Definition {
             return (BeanDefinition) classDefinition;
         }
         return null;
+    }
+
+    /**
+     * 集合值类型是否合法
+     */
+    public boolean isLegalValueType() {
+        return isPrimitiveValueType() || isBeanValueType();
     }
 
     public String getBasicType() {
@@ -250,10 +276,10 @@ public class FieldDefinition extends Definition {
     }
 
     public FieldDefinition setColumn(String column) {
-        if (column == null || column.trim().equals("")) {
+        if (StringUtils.isBlank(column)) {
             return this;
         }
-        this.column = column;
+        this.column = column.trim();
         return this;
     }
 
@@ -263,7 +289,10 @@ public class FieldDefinition extends Definition {
     }
 
     public FieldDefinition setIndex(String index) {
-        this.index = index;
+        if (StringUtils.isBlank(index)) {
+            return this;
+        }
+        this.index = index.trim();
         return this;
     }
 
@@ -284,24 +313,106 @@ public class FieldDefinition extends Definition {
     }
 
     public FieldDefinition setDelimiter(String delimiter) {
-        if (delimiter == null || delimiter.trim().equals("")) {
+        if (StringUtils.isBlank(delimiter)) {
             return this;
         }
-        this.delimiter = delimiter;
+        this.delimiter = delimiter.trim();
+        return this;
+    }
+
+    public String getRef() {
+        return ref;
+    }
+
+    public FieldDefinition setRef(String ref) {
+        if (StringUtils.isBlank(ref)) {
+            return this;
+        }
+        this.ref = ref.trim();
         return this;
     }
 
     /**
-     * 类型是否合法
+     * 返回字段的引用配置类
+     *
+     * @param keyRef true:map类型字段的键引用,false:map list set类型字段的值引用或者原生类型字段的引用
      */
-    public boolean isLegalType() {
-        return isBuiltInType() || isBeanType() || isEnumType();
+    public ConfigDefinition getRefConfig(boolean keyRef) {
+        if (StringUtils.isBlank(ref)) {
+            return null;
+        }
+        if (type.equals("map")) {
+            String[] fieldRefs = ref.split("[,]");
+            ClassDefinition refClass = null;
+
+            if (keyRef && fieldRefs.length >= 1) {
+                refClass = ClassDefinition.getAll().get(fieldRefs[0].split("[.]")[0]);
+            }
+            if (!keyRef && fieldRefs.length == 2) {
+                refClass = ClassDefinition.getAll().get(fieldRefs[1].split("[.]")[0]);
+            }
+            if (refClass instanceof ConfigDefinition) {
+                return (ConfigDefinition) refClass;
+            }
+
+            return null;
+        }
+
+        //list set 原生类型
+        String[] fieldRefs = ref.split("[.]");
+        if (fieldRefs.length != 2) {
+            return null;
+        }
+
+        ClassDefinition refClass = ClassDefinition.getAll().get(fieldRefs[0]);
+        if (refClass instanceof ConfigDefinition) {
+            return (ConfigDefinition) refClass;
+        }
+        return null;
     }
 
     /**
-     * 集合值类型是否合法
+     * 返回字段的引用字段
+     *
+     * @param keyRef true:map类型字段的键引用,false:map list set类型字段的值引用或者原生类型字段的引用
+     * @return
      */
-    public boolean isLegalValueType() {
-        return isPrimitiveValueType() || isBeanValueType();
+    public FieldDefinition getRefField(boolean keyRef) {
+        if (StringUtils.isBlank(ref)) {
+            return null;
+        }
+        if (type.equals("map")) {
+            String[] fieldRefs = ref.split("[,]");
+            ClassDefinition refClass = null;
+
+            if (keyRef && fieldRefs.length >= 1) {
+                String[] fieldKeyRefs = fieldRefs[0].split("[.]");
+                refClass = ClassDefinition.getAll().get(fieldKeyRefs[0]);
+                if (refClass instanceof ConfigDefinition) {
+                    return refClass.getField(fieldKeyRefs[1]);
+                }
+            }
+            if (!keyRef && fieldRefs.length == 2) {
+                String[] fieldValueRefs = fieldRefs[1].split("[.]");
+                refClass = ClassDefinition.getAll().get(fieldValueRefs[0]);
+                if (refClass instanceof ConfigDefinition) {
+                    return refClass.getField(fieldValueRefs[1]);
+                }
+            }
+            return null;
+        }
+
+        //list set 原生类型
+        String[] fieldRefs = ref.split("[.]");
+        if (fieldRefs.length != 2) {
+            return null;
+        }
+
+        ClassDefinition refClass = ClassDefinition.getAll().get(fieldRefs[0]);
+        if (refClass instanceof ConfigDefinition) {
+            return refClass.getField(fieldRefs[1]);
+        }
+        return null;
     }
+
 }

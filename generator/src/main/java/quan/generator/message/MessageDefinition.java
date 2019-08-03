@@ -1,5 +1,6 @@
 package quan.generator.message;
 
+import org.apache.commons.lang3.StringUtils;
 import quan.generator.BeanDefinition;
 
 import java.util.HashMap;
@@ -26,12 +27,20 @@ public class MessageDefinition extends BeanDefinition {
         return 3;
     }
 
+    @Override
+    public String getDefinitionTypeName() {
+        return "消息";
+    }
+
     public String getId() {
         return id;
     }
 
     public void setId(String id) {
-        this.id = id;
+        if (StringUtils.isBlank(id)) {
+            return;
+        }
+        this.id = id.trim();
     }
 
     @Override
@@ -41,13 +50,13 @@ public class MessageDefinition extends BeanDefinition {
             Integer.parseInt(id);
         } catch (NumberFormatException e) {
             idIsInt = false;
-            addValidatedError("消息" + getName4Validate() + "ID[" + id + "]必须是整数");
+            addValidatedError(getName4Validate() + "的ID[" + id + "]必须是整数");
         }
 
         if (idIsInt) {
             MessageDefinition other = all.get(id);
             if (other != null) {
-                addValidatedError("消息" + getName4Validate() + "ID[" + id + "]不能重复", other);
+                addValidatedError(getName4Validate() + "的ID[" + id + "]不能重复", other);
             }
             all.put(id, this);
         }
@@ -55,4 +64,6 @@ public class MessageDefinition extends BeanDefinition {
         super.validate();
 
     }
+
+
 }

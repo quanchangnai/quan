@@ -1,5 +1,6 @@
 package quan.generator.config;
 
+import org.apache.commons.lang3.StringUtils;
 import quan.generator.BeanDefinition;
 import quan.generator.ClassDefinition;
 import quan.generator.FieldDefinition;
@@ -51,24 +52,25 @@ public class ConfigDefinition extends BeanDefinition {
         return 6;
     }
 
+    @Override
+    public String getDefinitionTypeName() {
+        return "配置";
+    }
 
     public String getTable() {
         return table;
     }
 
     public ConfigDefinition setTable(String table) {
-        if (table == null || table.trim().equals("")) {
+        if (StringUtils.isBlank(table)) {
             return this;
         }
-        this.table = table;
+        this.table = table.trim();
         return this;
     }
 
 
     public String getParent() {
-        if (isParentWithPackage()) {
-            return parent.substring(parent.lastIndexOf(".") + 1);
-        }
         return parent;
     }
 
@@ -96,31 +98,12 @@ public class ConfigDefinition extends BeanDefinition {
         return tables;
     }
 
-    public boolean isParentWithPackage() {
-        if (parent == null) {
-            return false;
-        }
-        return parent.contains(".");
-    }
-
-    public String getParentWithPackage() {
-        if (!isParentWithPackage()) {
-            return null;
-        }
-        return parent;
-    }
-
-    public String getParentPackage() {
-        if (isParentWithPackage()) {
-            return parent.substring(0, parent.lastIndexOf("."));
-        }
-        return null;
-    }
 
     public ConfigDefinition setParent(String parent) {
-        if (parent != null && !parent.trim().equals("")) {
-            this.parent = parent;
+        if (StringUtils.isBlank(parent)) {
+            return this;
         }
+        this.parent = parent.trim();
         return this;
     }
 
@@ -131,6 +114,15 @@ public class ConfigDefinition extends BeanDefinition {
     public void addIndex(IndexDefinition indexDefinition) {
         indexes.add(indexDefinition);
         selfIndexes.add(indexDefinition);
+    }
+
+    public IndexDefinition getIndexByStartField(FieldDefinition field) {
+        for (IndexDefinition index : indexes) {
+            if (index.getFields().get(0) == field) {
+                return index;
+            }
+        }
+        return null;
     }
 
     public Map<String, FieldDefinition> getColumnFields() {
@@ -155,15 +147,15 @@ public class ConfigDefinition extends BeanDefinition {
     @Override
     public void validate() {
         if (getName() == null) {
-            addValidatedError("配置" + getName4Validate() + "的类名不能为空");
+            addValidatedError(getName4Validate() + "的名字不能为空");
         }
 
         if (!languages.isEmpty() && !Language.names().containsAll(languages)) {
-            addValidatedError("配置" + getName4Validate() + "的语言类型" + languages + "非法,支持的语言类型" + Language.names());
+            addValidatedError(getName4Validate() + "的语言类型" + languages + "非法,支持的语言类型" + Language.names());
         }
 
         if (table == null) {
-            addValidatedError("配置" + getName4Validate() + "对应的表格不能为空");
+            addValidatedError(getName4Validate() + "对应的表格不能为空");
         }
 
         //支持分表
@@ -171,7 +163,7 @@ public class ConfigDefinition extends BeanDefinition {
         for (String t : tables) {
             ConfigDefinition other = tableConfigs.get(t);
             if (other != null) {
-                addValidatedError("配置" + getName4Validate() + other.getName4Validate() + "和表格[" + t + "]不能多对一", other);
+                addValidatedError(getName4Validate() + other.getName4Validate() + "和表格[" + t + "]不能多对一", other);
             }
             tableConfigs.put(t, this);
         }
@@ -193,11 +185,11 @@ public class ConfigDefinition extends BeanDefinition {
         //支持子表
         ClassDefinition parentClassDefinition = ClassDefinition.getAll().get(getParent());
         if (parentClassDefinition == null) {
-            addValidatedError("配置" + getName4Validate() + "的父类[" + parent + "]不存在");
+            addValidatedError(getName4Validate() + "的父类[" + parent + "]不存在");
             return;
         }
         if (!(parentClassDefinition instanceof ConfigDefinition)) {
-            addValidatedError("配置" + getName4Validate() + "的父类[" + parent + "]也必须是配置类");
+            addValidatedError(getName4Validate() + "的父类[" + parent + "]也必须是配置类");
             return;
         }
 
@@ -206,7 +198,7 @@ public class ConfigDefinition extends BeanDefinition {
         Set<String> parents = new HashSet<>();
         while (parentConfigDefinition != null) {
             if (parents.contains(parentConfigDefinition.getName())) {
-                addValidatedError("配置" + getName4Validate() + "和父类" + parents + "不能有循环");
+                addValidatedError(getName4Validate() + "和父类" + parents + "不能有循环");
                 return;
             }
             parents.add(parentConfigDefinition.getName());
@@ -229,11 +221,11 @@ public class ConfigDefinition extends BeanDefinition {
         super.validateField(field);
 
         if (field.getColumn() == null) {
-            addValidatedError("配置" + getName4Validate() + "的字段" + field.getName4Validate() + "对应的列不能为空");
+            addValidatedError(getName4Validate("的") + field.getName4Validate() + "对应的列不能为空");
             return;
         }
         if (columnFields.containsKey(field.getColumn())) {
-            addValidatedError("配置" + getName4Validate() + "的字段" + field.getName4Validate() + "和列[" + field.getColumn() + "]必须一一对应");
+            addValidatedError(getName4Validate("的") + field.getName4Validate() + "和列[" + field.getColumn() + "]必须一一对应");
         } else {
             columnFields.put(field.getColumn(), field);
         }
@@ -242,12 +234,14 @@ public class ConfigDefinition extends BeanDefinition {
             field.setComment(field.getColumn());
         }
 
+        //校验字段的分隔符
         ArrayList<String> delimiterList = new ArrayList<>();
         validateDelimiter(field, delimiterList);
         Set<String> delimiterSet = new HashSet<>(delimiterList);
         if (delimiterList.size() != delimiterSet.size()) {
-            addValidatedError("配置" + getName4Validate() + "字段" + field.getName4Validate() + "的分隔符有重复[" + String.join("", delimiterList) + "]");
+            addValidatedError(getName4Validate("的") + field.getName4Validate() + "的分隔符有重复[" + String.join("", delimiterList) + "]");
         }
+
     }
 
     private void validateDelimiter(FieldDefinition field, List<String> delimiters) {
@@ -266,7 +260,7 @@ public class ConfigDefinition extends BeanDefinition {
             String s = String.valueOf(delimiter.charAt(i));
             delimiters.add(s);
             if (!allowDelimiters.contains(s)) {
-                addValidatedError("配置" + getName4Validate() + "字段" + field.getName4Validate() + "的分隔符[" + delimiter + "]非法,合法分隔符" + allowDelimiters);
+                addValidatedError(getName4Validate("的") + field.getName4Validate() + "的分隔符[" + delimiter + "]非法,合法分隔符" + allowDelimiters);
             }
         }
 
@@ -278,11 +272,11 @@ public class ConfigDefinition extends BeanDefinition {
             if (delimiter.length() != 2) {
                 charNumError = 2;
             } else if (delimiter.charAt(0) == delimiter.charAt(1)) {
-                addValidatedError("配置" + getName4Validate() + "map类型字段" + field.getName4Validate() + "的分隔符[" + delimiter + "]必须是2个不相同的字符");
+                addValidatedError(getName4Validate() + "map类型字段" + field.getName4Validate() + "的分隔符[" + delimiter + "]必须是2个不相同的字符");
             }
         }
         if (charNumError > 0) {
-            addValidatedError("配置" + getName4Validate() + "[" + field.getType() + "]类型字段" + field.getName4Validate() + "的分隔符[" + delimiter + "]必须是" + charNumError + "个字符");
+            addValidatedError(getName4Validate() + "[" + field.getType() + "]类型字段" + field.getName4Validate() + "的分隔符[" + delimiter + "]必须是" + charNumError + "个字符");
         }
 
         if (field.isBeanValueType()) {
@@ -301,13 +295,25 @@ public class ConfigDefinition extends BeanDefinition {
         }
     }
 
+    @Override
+    public void validate2() {
+        for (FieldDefinition selfField : selfFields) {
+            validateRef(selfField);
+        }
+
+    }
+
+    protected boolean supportRef() {
+        return true;
+    }
+
     private void validateIndexes() {
         for (FieldDefinition selfField : selfFields) {
             if (selfField.getIndex() == null && !selfField.getName().equals("id")) {
                 continue;
             }
             if (!selfField.isPrimitiveType() && !selfField.isEnumType()) {
-                addValidatedError("配置" + getName4Validate() + "的字段" + selfField.getName4Validate() + "类型[" + selfField.getType() + "]不支持索引，允许的类型为" + FieldDefinition.primitiveTypes + "或枚举");
+                addValidatedError(getName4Validate("的") + selfField.getName4Validate() + "类型[" + selfField.getType() + "]不支持索引，允许的类型为" + FieldDefinition.primitiveTypes + "或枚举");
                 continue;
             }
             IndexDefinition indexDefinition = new IndexDefinition(this);
@@ -327,7 +333,7 @@ public class ConfigDefinition extends BeanDefinition {
         }
 
         if (indexes.isEmpty()) {
-            addValidatedError("配置" + getName4Validate() + "至少需要一个索引");
+            addValidatedError(getName4Validate() + "至少需要一个索引");
             return;
         }
         for (IndexDefinition indexDefinition : selfIndexes) {
@@ -336,7 +342,7 @@ public class ConfigDefinition extends BeanDefinition {
         Set<String> indexNames = new HashSet<>();
         for (IndexDefinition indexDefinition : indexes) {
             if (indexNames.contains(indexDefinition.getName())) {
-                addValidatedError("配置" + getName4Validate() + "的索引名[" + indexDefinition.getName() + "]重复");
+                addValidatedError(getName4Validate() + "的索引名[" + indexDefinition.getName() + "]重复");
                 continue;
             }
             indexNames.add(indexDefinition.getName());
@@ -345,40 +351,40 @@ public class ConfigDefinition extends BeanDefinition {
 
     private void validateIndex(IndexDefinition indexDefinition) {
         if (indexDefinition.getName() == null) {
-            addValidatedError("配置" + getName4Validate() + "的索引名不能为空");
+            addValidatedError(getName4Validate() + "的索引名不能为空");
         }
 
         String indexType = indexDefinition.getType();
         if (indexType == null) {
-            addValidatedError("配置" + getName4Validate() + "的索引" + indexDefinition.getName4Validate() + "类型不能为空");
+            addValidatedError(getName4Validate() + "的索引" + indexDefinition.getName4Validate() + "类型不能为空");
         } else {
             List<String> allowIndexTypes = Arrays.asList("normal", "n", "unique", "u");
             if (!allowIndexTypes.contains(indexType)) {
-                addValidatedError("配置" + getName4Validate() + "的索引" + indexDefinition.getName4Validate() + "类型[" + indexType + "]非法,允许类型" + allowIndexTypes);
+                addValidatedError(getName4Validate() + "的索引" + indexDefinition.getName4Validate() + "类型[" + indexType + "]非法,允许类型" + allowIndexTypes);
             }
         }
 
         String fieldNames = indexDefinition.getFieldNames();
         if (fieldNames == null) {
-            addValidatedError("配置" + getName4Validate() + "的索引" + indexDefinition.getName4Validate() + "的字段不能为空");
+            addValidatedError(getName4Validate() + "的索引" + indexDefinition.getName4Validate() + "的字段不能为空");
             return;
         }
 
         String[] fieldNameArray = fieldNames.split("[,]");
         if (fieldNameArray.length > 3) {
-            addValidatedError("配置" + getName4Validate() + "的索引" + indexDefinition.getName4Validate() + "的字段[" + fieldNames + "]不能超过三个");
+            addValidatedError(getName4Validate() + "的索引" + indexDefinition.getName4Validate() + "的字段[" + fieldNames + "]不能超过三个");
         }
         for (String fieldName : fieldNameArray) {
             FieldDefinition fieldDefinition = fieldMap.get(fieldName);
             if (fieldDefinition == null) {
-                addValidatedError("配置" + getName4Validate() + "的索引" + indexDefinition.getName4Validate() + "的字段[" + fieldName + "]不存在");
+                addValidatedError(getName4Validate() + "的索引" + indexDefinition.getName4Validate() + "的字段[" + fieldName + "]不存在");
                 continue;
             }
             if (!fieldDefinition.isPrimitiveType() && !fieldDefinition.isEnumType()) {
-                addValidatedError("配置" + getName4Validate() + "的索引" + indexDefinition.getName4Validate() + "的字段[" + fieldName + "]类型[" + fieldDefinition.getType() + "]非法，允许的类型为" + FieldDefinition.primitiveTypes + "或枚举");
+                addValidatedError(getName4Validate() + "的索引" + indexDefinition.getName4Validate() + "的字段[" + fieldName + "]类型[" + fieldDefinition.getType() + "]非法，允许的类型为" + FieldDefinition.primitiveTypes + "或枚举");
             }
             if (!indexDefinition.addField(fieldDefinition)) {
-                addValidatedError("配置" + getName4Validate() + "的索引" + indexDefinition.getName4Validate() + "的字段[" + fieldNames + "]不能重复");
+                addValidatedError(getName4Validate() + "的索引" + indexDefinition.getName4Validate() + "的字段[" + fieldNames + "]不能重复");
             }
         }
 

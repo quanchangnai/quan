@@ -2,7 +2,7 @@
 <package>
 
     <bean name="Reward" delimiter="_">奖励
-        <field name="itemId" type="int"/>
+        <field name="itemId" type="int" ref="ItemConfig.id"/>
         <field name="itemNum" type="int"/>
     </bean>
 
@@ -11,9 +11,9 @@
         <field name="name" type="string" column="名字"/>
         <field name="type" type="ItemType" column="类型"/>
         <field name="reward" type="Reward" column="奖励"/>
-        <field name="list" type="list" value-type="int" column="List"/>
+        <field name="list" type="list" value-type="int" column="List" ref="ItemConfig.id"/>
         <field name="set" type="set" value-type="int" column="Set"/>
-        <field name="map" type="map" key-type="int" value-type="int" column="Map"/>
+        <field name="map" type="map" key-type="int" value-type="int" column="Map" ref="ItemConfig.id"/>
     </config>
 
     <config name="EquipConfig" parent="ItemConfig" table="装备1.csv,装备2.csv">

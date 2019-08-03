@@ -174,6 +174,7 @@ public class XmlDefinitionParser extends DefinitionParser {
         fieldDefinition.setValueType(fieldElement.attributeValue("value-type"));
         fieldDefinition.setIndex(fieldElement.attributeValue("index"));
         fieldDefinition.setDelimiter(fieldElement.attributeValue("delimiter"));
+        fieldDefinition.setRef(fieldElement.attributeValue("ref"));
 
         String comment = classElement.node(i + 1).getText();
         comment = comment.replaceAll("[\r|\n]", "").trim();

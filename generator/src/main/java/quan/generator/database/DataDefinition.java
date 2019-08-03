@@ -49,6 +49,11 @@ public class DataDefinition extends BeanDefinition {
         return 5;
     }
 
+    @Override
+    public String getDefinitionTypeName() {
+        return "数据";
+    }
+
     public boolean isPersistent() {
         return persistent;
     }
@@ -62,11 +67,12 @@ public class DataDefinition extends BeanDefinition {
     public void validate() {
         super.validate();
         if (getKeyName() == null) {
-            addValidatedError("配置" + getName4Validate() + "的主键不能为空");
+            addValidatedError(getName4Validate() + "的主键不能为空");
             return;
         }
         if (getFields().stream().noneMatch(t -> t.getName().equals(getKeyName()))) {
-            addValidatedError("配置" + getName4Validate() + "的主键[" + getKeyName() + "]不存在");
+            addValidatedError(getName4Validate() + "的主键[" + getKeyName() + "]不存在");
         }
     }
+
 }

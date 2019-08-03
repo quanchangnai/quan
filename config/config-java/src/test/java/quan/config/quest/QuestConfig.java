@@ -12,11 +12,15 @@ import quan.quest.QuestType;
 @SuppressWarnings({"unchecked"})
 public class QuestConfig extends Config {
 
-    protected long id;
+    protected int id;
 
     protected String name;
 
     protected QuestType type;
+
+    protected int target;
+
+    protected Reward reward;
 
     protected int a1;
 
@@ -38,15 +42,13 @@ public class QuestConfig extends Config {
 
     protected int d3;
 
-    protected Reward reward;
-
     protected Set<Integer> s1 = new HashSet<>();
 
     protected List<Integer> l1 = new ArrayList<>();
 
     protected Map<Integer, Integer> m1 = new HashMap<>();
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
@@ -56,6 +58,14 @@ public class QuestConfig extends Config {
 
     public QuestType getType() {
         return type;
+    }
+
+    public int getTarget() {
+        return target;
+    }
+
+    public Reward getReward() {
+        return reward;
     }
 
     public int getA1() {
@@ -98,10 +108,6 @@ public class QuestConfig extends Config {
         return d3;
     }
 
-    public Reward getReward() {
-        return reward;
-    }
-
     public Set<Integer> getS1() {
         return s1;
     }
@@ -119,12 +125,20 @@ public class QuestConfig extends Config {
     public void parse(JSONObject object) {
         super.parse(object);
 
-        id = object.getLongValue("id");
+        id = object.getIntValue("id");
         name = object.getString("name");
 
         String $type = object.getString("type");
         if ($type != null) {
             type = QuestType.valueOf($type);
+        }
+
+        target = object.getIntValue("target");
+
+        JSONObject $reward = object.getJSONObject("reward");
+        if ($reward != null) {
+            reward = new Reward();
+            reward.parse($reward);
         }
 
         a1 = object.getIntValue("a1");
@@ -137,12 +151,6 @@ public class QuestConfig extends Config {
         d1 = object.getString("d1");
         d2 = object.getIntValue("d2");
         d3 = object.getIntValue("d3");
-
-        JSONObject $reward = object.getJSONObject("reward");
-        if ($reward != null) {
-            reward = new Reward();
-            reward.parse($reward);
-        }
 
         JSONArray $s1 = object.getJSONArray("s1");
         if ($s1 != null) {
@@ -175,6 +183,8 @@ public class QuestConfig extends Config {
                 "id=" + id +
                 ",name='" + name + '\'' +
                 ",type=" + type +
+                ",target=" + target +
+                ",reward=" + reward +
                 ",a1=" + a1 +
                 ",a2=" + a2 +
                 ",b1=" + b1 +
@@ -185,7 +195,6 @@ public class QuestConfig extends Config {
                 ",d1='" + d1 + '\'' +
                 ",d2=" + d2 +
                 ",d3=" + d3 +
-                ",reward=" + reward +
                 ",s1=" + s1 +
                 ",l1=" + l1 +
                 ",m1=" + m1 +
@@ -206,7 +215,7 @@ public class QuestConfig extends Config {
 
     private static Map<String, Map<Integer, Map<Integer, List<QuestConfig>>>> composite4Configs = new HashMap<>();
 
-    private static Map<Long, QuestConfig> idConfigs = new HashMap<>();
+    private static Map<Integer, QuestConfig> idConfigs = new HashMap<>();
 
     private static Map<QuestType, List<QuestConfig>> typeConfigs = new HashMap<>();
 
@@ -267,11 +276,11 @@ public class QuestConfig extends Config {
         return getByComposite4(d1, d2).getOrDefault(d3, Collections.emptyList());
     }
 
-    public static Map<Long, QuestConfig> getIdConfigs() {
+    public static Map<Integer, QuestConfig> getIdConfigs() {
         return idConfigs;
     }
 
-    public static QuestConfig getById(long id) {
+    public static QuestConfig getById(int id) {
         return idConfigs.get(id);
     }
 
@@ -289,7 +298,7 @@ public class QuestConfig extends Config {
         Map<Integer, Map<Boolean, List<QuestConfig>>> _composite2Configs = new HashMap<>();
         Map<String, Map<Integer, Map<Integer, QuestConfig>>> _composite3Configs = new HashMap<>();
         Map<String, Map<Integer, Map<Integer, List<QuestConfig>>>> _composite4Configs = new HashMap<>();
-        Map<Long, QuestConfig> _idConfigs = new HashMap<>();
+        Map<Integer, QuestConfig> _idConfigs = new HashMap<>();
         Map<QuestType, List<QuestConfig>> _typeConfigs = new HashMap<>();
 
         List<String> errors = new ArrayList<>();

@@ -1,14 +1,13 @@
 package quan.config;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Triple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.common.util.ClassUtils;
-import quan.generator.ClassDefinition;
-import quan.generator.DefinitionParser;
-import quan.generator.FieldDefinition;
-import quan.generator.XmlDefinitionParser;
+import quan.generator.*;
 import quan.generator.config.ConfigDefinition;
 import quan.generator.config.IndexDefinition;
 
@@ -45,7 +44,7 @@ public class ConfigLoader {
     //自定义的配置检查器
     private Set<ConfigChecker> checkers = new HashSet<>();
 
-    private List<String> errors = new ArrayList<>();
+    private LinkedHashSet<String> errors = new LinkedHashSet<>();
 
     public ConfigLoader(List<String> definitionPaths, String tablePath) {
         this.definitionPaths = definitionPaths;
@@ -149,10 +148,14 @@ public class ConfigLoader {
         //解析定义文件
         parseDefinition();
 
-        Set<ConfigDefinition> loadConfigs = new HashSet<>(ConfigDefinition.getTableConfigs().values());
-        for (ConfigDefinition configDefinition : loadConfigs) {
-            //通用检查
-            check(configDefinition);
+        //配置对应的已索引Json数据
+        Map<ConfigDefinition, Map<IndexDefinition, Map>> configIndexedJsonsAll = new HashMap<>();
+
+        Set<ConfigDefinition> needLoadConfigs = new HashSet<>(ConfigDefinition.getTableConfigs().values());
+
+        for (ConfigDefinition configDefinition : needLoadConfigs) {
+            //索引检查
+            configIndexedJsonsAll.put(configDefinition, checkIndex(configDefinition));
             //加载配置
             if (!onlyCheck) {
                 load(configDefinition);
@@ -161,6 +164,11 @@ public class ConfigLoader {
 
         for (ConfigReader reader : readers.values()) {
             errors.addAll(reader.getErrors());
+        }
+
+        //引用检查，依赖索引检查结果
+        for (ConfigDefinition configDefinition : configIndexedJsonsAll.keySet()) {
+            checkRef(configDefinition, configIndexedJsonsAll);
         }
 
         //自定义检查
@@ -181,7 +189,7 @@ public class ConfigLoader {
         }
     }
 
-    private void check(ConfigDefinition configDefinition) {
+    private Map<IndexDefinition, Map> checkIndex(ConfigDefinition configDefinition) {
         //索引对应的配置JSON
         Map<IndexDefinition, Map> configIndexedJsons = new HashMap<>();
         //配置JSON对应的表格
@@ -200,6 +208,8 @@ public class ConfigLoader {
                 }
             }
         }
+
+        return configIndexedJsons;
     }
 
     private void checkTableIndex(IndexDefinition indexDefinition, Map indexedJsons, Map<JSONObject, String> jsonTables, JSONObject json) {
@@ -242,6 +252,92 @@ public class ConfigLoader {
                 }
                 errors.add(String.format("配置[%s]有重复数据[%s,%s,%s = %s,%s,%s]", repeatedTables, field1.getColumn(), field2.getColumn(), field3.getColumn(), json.get(field1.getName()), json.get(field2.getName()), json.get(field3.getName())));
             }
+        }
+    }
+
+    private void checkRef(ConfigDefinition configDefinition, Map<ConfigDefinition, Map<IndexDefinition, Map>> configIndexedJsonsAll) {
+        for (String table : configDefinition.getTables()) {
+            List<JSONObject> tableJsons = getOrAddReader(table).readJsons();
+            for (int i = 0; i < tableJsons.size(); i++) {
+                JSONObject json = tableJsons.get(i);
+                for (FieldDefinition field : configDefinition.getFields()) {
+                    Object fieldValue = json.get(field.getName());
+                    Triple position = Triple.of(table, String.valueOf(i + 1), field.getColumn());
+                    checkFieldRef(position, configDefinition, field, fieldValue, configIndexedJsonsAll);
+                }
+            }
+        }
+    }
+
+    private void checkFieldRef(Triple position, BeanDefinition bean, FieldDefinition field, Object value, Map<ConfigDefinition, Map<IndexDefinition, Map>> configIndexedJsonsAll) {
+        if (field.isPrimitiveType()) {
+            checkPrimitiveTypeRef(position, bean, field, value, false, configIndexedJsonsAll);
+        } else if (field.isBeanType()) {
+            checkBeanTypeRef(position, field.getBean(), (JSONObject) value, configIndexedJsonsAll);
+        } else if (field.getType().equals("map")) {
+            JSONObject map = (JSONObject) value;
+            for (String mapKey : map.keySet()) {
+                //检查map的key引用
+                checkPrimitiveTypeRef(position, bean, field, mapKey, true, configIndexedJsonsAll);
+                //检查map的value引用
+                Object mapValue = map.get(mapKey);
+                if (field.isPrimitiveValueType()) {
+                    checkPrimitiveTypeRef(position, bean, field, mapValue, false, configIndexedJsonsAll);
+                } else {
+                    checkBeanTypeRef(position, field.getValueBean(), (JSONObject) mapValue, configIndexedJsonsAll);
+                }
+            }
+
+        } else if (field.getType().equals("set") || field.getType().equals("list")) {
+            JSONArray array = (JSONArray) value;
+            for (Object arrayValue : array) {
+                if (field.isPrimitiveValueType()) {
+                    checkPrimitiveTypeRef(position, bean, field, arrayValue, false, configIndexedJsonsAll);
+                } else {
+                    checkBeanTypeRef(position, field.getValueBean(), (JSONObject) arrayValue, configIndexedJsonsAll);
+                }
+            }
+        }
+    }
+
+    private void checkPrimitiveTypeRef(Triple position, BeanDefinition bean, FieldDefinition field, Object value, boolean mapKey, Map<ConfigDefinition, Map<IndexDefinition, Map>> configIndexedJsonsAll) {
+        ConfigDefinition fieldRefConfig = field.getRefConfig(mapKey);
+        FieldDefinition fieldRefField = field.getRefField(mapKey);
+        if (fieldRefConfig == null || fieldRefField == null) {
+            return;
+        }
+
+        if (value instanceof Number && ((Number) value).doubleValue() <= 0) {
+            return;
+        }
+        if (value instanceof String && value.equals("")) {
+            return;
+        }
+
+        String fieldRefs = fieldRefConfig.getName() + "." + fieldRefField.getName();
+
+        IndexDefinition fieldRefIndex = fieldRefConfig.getIndexByStartField(fieldRefField);
+        Map refIndexedJsons = configIndexedJsonsAll.get(fieldRefConfig).get(fieldRefIndex);
+
+        if (!refIndexedJsons.containsKey(value)) {
+            String error;
+            String keyOrValue = "值";
+            if (field.isCollectionType() && mapKey) {
+                keyOrValue = "键";
+            }
+            if (bean instanceof ConfigDefinition) {
+                error = String.format("配置[%s]的第%s行[%s]的%s引用[%s]数据[%s]不存在", position.getLeft(), position.getMiddle(), position.getRight(), keyOrValue, fieldRefs, value);
+            } else {
+                error = String.format("配置[%s]第%s行[%s]的对象[%s]字段[%s]的%s引用[%s]数据[%s]不存在", position.getLeft(), position.getMiddle(), position.getRight(), bean.getName(), field.getName(), keyOrValue, fieldRefs, value);
+            }
+            errors.add(error);
+        }
+    }
+
+    private void checkBeanTypeRef(Triple position, BeanDefinition bean, JSONObject json, Map<ConfigDefinition, Map<IndexDefinition, Map>> configIndexedJsonsAll) {
+        for (FieldDefinition field : bean.getFields()) {
+            Object fieldValue = json.get(field.getName());
+            checkFieldRef(position, bean, field, fieldValue, configIndexedJsonsAll);
         }
     }
 
@@ -307,7 +403,7 @@ public class ConfigLoader {
 
         errors.clear();
 
-        Set<ConfigDefinition> reloadConfigs = new LinkedHashSet<>();
+        Set<ConfigDefinition> needReloadConfigs = new LinkedHashSet<>();
         Set<ConfigReader> reloadReaders = new LinkedHashSet<>();
 
         for (String table : tables) {
@@ -321,12 +417,12 @@ public class ConfigLoader {
 
             ConfigDefinition configDefinition = ConfigDefinition.getTableConfigs().get(table);
             while (configDefinition != null) {
-                reloadConfigs.add(configDefinition);
+                needReloadConfigs.add(configDefinition);
                 configDefinition = configDefinition.getParentDefinition();
             }
         }
 
-        for (ConfigDefinition configDefinition : reloadConfigs) {
+        for (ConfigDefinition configDefinition : needReloadConfigs) {
             reload(configDefinition);
         }
 
