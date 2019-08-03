@@ -3,6 +3,8 @@ package quan.generator;
 import org.apache.commons.lang3.StringUtils;
 import quan.generator.config.ConfigDefinition;
 import quan.generator.config.IndexDefinition;
+import quan.generator.database.DataDefinition;
+import quan.generator.message.MessageDefinition;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -35,10 +37,6 @@ public class BeanDefinition extends ClassDefinition {
         return imports;
     }
 
-
-    public static boolean isBeanDefinition(String type) {
-        return ClassDefinition.getAll().get(type) instanceof BeanDefinition;
-    }
 
     @Override
     public void validate() {
@@ -257,6 +255,16 @@ public class BeanDefinition extends ClassDefinition {
 
     }
 
+    public static boolean isBeanDefinition(String type) {
+        return isBeanDefinition(ClassDefinition.getAll().get(type));
+    }
+
+    public static boolean isBeanDefinition(ClassDefinition classDefinition) {
+        if (!(classDefinition instanceof BeanDefinition)) {
+            return false;
+        }
+        return !(classDefinition instanceof DataDefinition) && !(classDefinition instanceof MessageDefinition) && !(classDefinition instanceof ConfigDefinition);
+    }
 
     @Override
     public String toString() {

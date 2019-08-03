@@ -2,8 +2,6 @@ package quan.generator;
 
 import org.apache.commons.lang3.StringUtils;
 import quan.generator.config.ConfigDefinition;
-import quan.generator.database.DataDefinition;
-import quan.generator.message.MessageDefinition;
 
 /**
  * Created by quanchangnai on 2017/7/6.
@@ -92,10 +90,7 @@ public class FieldDefinition extends Definition {
 
     public BeanDefinition getBean() {
         ClassDefinition classDefinition = ClassDefinition.getAll().get(getType());
-        if (classDefinition instanceof BeanDefinition
-                && !(classDefinition instanceof DataDefinition)
-                && !(classDefinition instanceof MessageDefinition)
-                && !(classDefinition instanceof ConfigDefinition)) {
+        if (BeanDefinition.isBeanDefinition(classDefinition)) {
             return (BeanDefinition) classDefinition;
         }
         return null;
@@ -179,7 +174,7 @@ public class FieldDefinition extends Definition {
             return null;
         }
         ClassDefinition classDefinition = ClassDefinition.getAll().get(getValueType());
-        if (classDefinition instanceof BeanDefinition) {
+        if (BeanDefinition.isBeanDefinition(classDefinition)) {
             return (BeanDefinition) classDefinition;
         }
         return null;

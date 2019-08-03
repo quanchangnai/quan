@@ -1,15 +1,14 @@
 package quan.config;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import quan.generator.FieldDefinition;
 import quan.generator.config.ConfigDefinition;
 
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,10 +23,10 @@ public class CSVConfigReader extends ConfigReader {
     @Override
     protected void read() {
         clear();
+
         List<CSVRecord> records;
 
-        try {
-            CSVParser parser = new CSVParser(new InputStreamReader(new FileInputStream(tableFile), "GBK"), CSVFormat.DEFAULT);
+        try (CSVParser parser = new CSVParser(new InputStreamReader(new FileInputStream(tableFile), "GBK"), CSVFormat.DEFAULT)) {
             records = parser.getRecords();
         } catch (Exception e) {
             String error = String.format("读取配置[%s]出错:%s", table, e.getMessage());
@@ -36,6 +35,16 @@ public class CSVConfigReader extends ConfigReader {
             return;
         }
 
+        if (records.size() < 1) {
+            return;
+        }
+
+        List<String> columnNames = new ArrayList<>();
+        for (String columnName : records.get(0)) {
+            columnNames.add(columnName);
+        }
+        checkColumns(columnNames);
+
         //第一行是表头，第二行是注释，第三行起是内容
         if (records.size() <= 2) {
             return;
@@ -43,41 +52,11 @@ public class CSVConfigReader extends ConfigReader {
 
         for (int i = 2; i < records.size(); i++) {
             CSVRecord record = records.get(i);
-            JSONObject jsonObject = new JSONObject(true);
-
-            for (int j = 0; j < record.size(); j++) {
-                String columnName = records.get(0).get(j);
-                String columnValue = record.get(j).trim();
-
-                FieldDefinition fieldDefinition = configDefinition.getColumnFields().get(columnName);
-                if (fieldDefinition == null) {
-                    continue;
-                }
-                String fieldName = fieldDefinition.getName();
-                String fieldType = fieldDefinition.getType();
-                Object fieldValue;
-
-                try {
-                    fieldValue = convert(fieldDefinition, columnValue);
-                } catch (Exception e) {
-                    errors.add(String.format("配置[%s]的第%d行第%d列[%s]数据[%s]格式错误", table, i + 1, j + 1, columnName, columnValue));
-                    continue;
-                }
-
-                if (fieldType.equals("list") || fieldType.equals("set")) {
-                    JSONArray jsonArray = jsonObject.getJSONArray(fieldName);
-                    if (jsonArray == null) {
-                        jsonObject.put(fieldName, fieldValue);
-                    } else {
-                        jsonArray.addAll((JSONArray) fieldValue);
-                    }
-                } else {
-                    jsonObject.put(fieldName, fieldValue);
-                }
+            JSONObject rowJson = new JSONObject(true);
+            for (int j = 0; j < columnNames.size(); j++) {
+                addColumnToRow(rowJson, columnNames.get(j), record.get(j).trim(), i + 1, j + 1);
             }
-
-            jsons.add(jsonObject);
-
+            jsons.add(rowJson);
         }
     }
 

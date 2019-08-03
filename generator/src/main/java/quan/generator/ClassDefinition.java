@@ -29,7 +29,8 @@ public abstract class ClassDefinition extends Definition {
 
     protected List<FieldDefinition> fields = new ArrayList<>();
 
-    protected Map<String, FieldDefinition> fieldMap = new HashMap<>();
+    //key:字段名
+    protected Map<String, FieldDefinition> nameFields = new HashMap<>();
 
     private static Map<String, ClassDefinition> all = new HashMap<>();
 
@@ -50,14 +51,17 @@ public abstract class ClassDefinition extends Definition {
         return fields;
     }
 
+    public Map<String, FieldDefinition> getNameFields() {
+        return nameFields;
+    }
 
     public void addField(FieldDefinition fieldDefinition) {
         fields.add(fieldDefinition);
     }
 
     public FieldDefinition getField(String fieldName) {
-        if (fieldMap.containsKey(fieldName)) {
-            return fieldMap.get(fieldName);
+        if (nameFields.containsKey(fieldName)) {
+            return nameFields.get(fieldName);
         }
 
         for (FieldDefinition field : fields) {
@@ -137,11 +141,11 @@ public abstract class ClassDefinition extends Definition {
             addValidatedError(getName4Validate("的") + "字段名不能为空");
             return;
         }
-        if (fieldMap.containsKey(fieldDefinition.getName())) {
+        if (nameFields.containsKey(fieldDefinition.getName())) {
             addValidatedError(getName4Validate("的") + "字段名[" + fieldDefinition.getName() + "]不能重复");
             return;
         }
-        fieldMap.put(fieldDefinition.getName(), fieldDefinition);
+        nameFields.put(fieldDefinition.getName(), fieldDefinition);
     }
 
     protected void addValidatedError(String error) {

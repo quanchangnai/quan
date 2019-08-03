@@ -373,7 +373,7 @@ public class ConfigDefinition extends BeanDefinition {
             addValidatedError(getName4Validate() + "的索引" + indexDefinition.getName4Validate() + "的字段[" + fieldNames + "]不能超过三个");
         }
         for (String fieldName : fieldNameArray) {
-            FieldDefinition fieldDefinition = fieldMap.get(fieldName);
+            FieldDefinition fieldDefinition = nameFields.get(fieldName);
             if (fieldDefinition == null) {
                 addValidatedError(getName4Validate() + "的索引" + indexDefinition.getName4Validate() + "的字段[" + fieldName + "]不存在");
                 continue;

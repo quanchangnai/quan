@@ -91,6 +91,50 @@ public abstract class ConfigReader {
         errors.clear();
     }
 
+    protected void checkColumns(List<String> columns) {
+        Set<FieldDefinition> fields = new HashSet<>(configDefinition.getFields());
+
+        for (String columnName : columns) {
+            FieldDefinition fieldDefinition = configDefinition.getColumnFields().get(columnName);
+            if (fieldDefinition != null) {
+                fields.remove(fieldDefinition);
+            }
+        }
+
+        for (FieldDefinition field : fields) {
+            String error = String.format("配置[%s]缺少字段[%s]对应的列[%s]", table, field.getName(), field.getColumn());
+            errors.add(error);
+        }
+    }
+
+    protected void addColumnToRow(JSONObject lineJson, String columnName, String columnValue, int row, int column) {
+        FieldDefinition fieldDefinition = configDefinition.getColumnFields().get(columnName);
+        if (fieldDefinition == null) {
+            return;
+        }
+
+        String fieldName = fieldDefinition.getName();
+        String fieldType = fieldDefinition.getType();
+        Object fieldValue;
+
+        try {
+            fieldValue = convert(fieldDefinition, columnValue);
+        } catch (Exception e) {
+            errors.add(String.format("配置[%s]的第%d行第%d列[%s]数据[%s]格式错误", table, row, column, columnName, columnValue));
+            return;
+        }
+
+        if (fieldType.equals("list") || fieldType.equals("set")) {
+            JSONArray jsonArray = lineJson.getJSONArray(fieldName);
+            if (jsonArray == null) {
+                lineJson.put(fieldName, fieldValue);
+            } else {
+                jsonArray.addAll((JSONArray) fieldValue);
+            }
+        } else {
+            lineJson.put(fieldName, fieldValue);
+        }
+    }
 
     public static Object convert(FieldDefinition fieldDefinition, String value) {
         String type = fieldDefinition.getType();

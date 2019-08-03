@@ -38,6 +38,8 @@ public class ConfigLoader {
 
     private String enumPackagePrefix;
 
+    private Class<? extends ConfigReader> readerClass = CSVConfigReader.class;
+
     private Map<String, ConfigReader> readers = new HashMap<>();
 
     private boolean definitionParsed;
@@ -52,6 +54,12 @@ public class ConfigLoader {
             this.definitionPaths.add(definitionPath.replace("/", File.separator).replace("\\", File.separator));
         }
         this.tablePath = tablePath.replace("/", File.separator).replace("\\", File.separator);
+    }
+
+    public ConfigLoader setReaderClass(Class<? extends ConfigReader> readerClass) {
+        Objects.requireNonNull(readerClass, "配置读取器类型不能为空");
+        this.readerClass = readerClass;
+        return this;
     }
 
     public ConfigLoader setDefinitionParser(DefinitionParser definitionParser) {
@@ -109,7 +117,11 @@ public class ConfigLoader {
     private ConfigReader getOrAddReader(String table) {
         ConfigReader configReader = readers.get(table);
         if (configReader == null) {
-            configReader = new CSVConfigReader(tablePath, table, ConfigDefinition.getTableConfigs().get(table));
+            if (readerClass == ExcelConfigReader.class) {
+                configReader = new ExcelConfigReader(tablePath, table, ConfigDefinition.getTableConfigs().get(table));
+            } else {
+                configReader = new CSVConfigReader(tablePath, table, ConfigDefinition.getTableConfigs().get(table));
+            }
             readers.put(table, configReader);
             if (!onlyCheck) {
                 configReader.initPrototype();
@@ -263,8 +275,13 @@ public class ConfigLoader {
             List<JSONObject> tableJsons = getOrAddReader(table).readJsons();
             for (int i = 0; i < tableJsons.size(); i++) {
                 JSONObject json = tableJsons.get(i);
-                for (FieldDefinition field : configDefinition.getFields()) {
-                    Object fieldValue = json.get(field.getName());
+                configDefinition.getFields();
+                for (String fieldName : json.keySet()) {
+                    FieldDefinition field = configDefinition.getField(fieldName);
+                    if (field == null) {
+                        continue;
+                    }
+                    Object fieldValue = json.get(fieldName);
                     Triple position = Triple.of(table, String.valueOf(i + 1), field.getColumn());
                     checkFieldRef(position, configDefinition, field, fieldValue, configIndexedJsonsAll);
                 }

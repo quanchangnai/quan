@@ -17,12 +17,14 @@ public class ConfigTest {
         List<String> definitionPaths = new ArrayList<>();
         definitionPaths.add("generator\\src\\test\\java\\quan\\generator");
         definitionPaths.add("generator\\src/test\\java\\quan\\generator\\config");
-        String tablePath = "config\\config-java\\src\\test\\resources\\csv";
+//        String tablePath = "config\\config-java\\src\\test\\resources\\csv";
+        String tablePath = "config\\config-java\\src\\test\\resources\\excel";
 
         ConfigLoader configLoader = new ConfigLoader(definitionPaths, tablePath);
         configLoader.setPackagePrefix("quan.config");
         configLoader.setEnumPackagePrefix("quan");
 //        configLoader.onlyCheck(true);
+        configLoader.setReaderClass(ExcelConfigReader.class);
         configLoader.setCheckerPackage("quan");
 
         System.err.println("configLoader.load()=============");
