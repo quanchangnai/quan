@@ -35,8 +35,8 @@ public abstract class ConfigReader {
     private Config prototype;
 
     public ConfigReader(String tablePath, String table, ConfigDefinition configDefinition) {
-        tablePath = tablePath.replace("\\", File.separator);
-        this.table = table.replace("\\", File.separator);
+        tablePath = tablePath.replace("/", File.separator).replace("\\", File.separator);
+        this.table = table.replace("/", File.separator).replace("\\", File.separator);
         this.tableFile = new File(tablePath, this.table);
         this.configDefinition = configDefinition;
 
@@ -147,8 +147,8 @@ public abstract class ConfigReader {
     public static JSONArray convertSet(FieldDefinition fieldDefinition, String value) {
         //set需要去重
         String[] values = value.split(fieldDefinition.getEscapedDelimiter());
-        Set<String> set = new HashSet<>(Arrays.asList(values));
-        return convertArray(fieldDefinition, set.toArray(new String[0]));
+        Set<String> setValues = new HashSet<>(Arrays.asList(values));
+        return convertArray(fieldDefinition, setValues.toArray(new String[0]));
     }
 
     public static JSONObject convertMap(FieldDefinition fieldDefinition, String value) {

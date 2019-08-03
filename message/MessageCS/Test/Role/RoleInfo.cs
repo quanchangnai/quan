@@ -16,16 +16,6 @@ namespace MessageCS.Test.Role
 		/// </summary>
 		public long Id { get; set; }
 
-		public bool B { get; set; }
-
-		public short S { get; set; }
-
-		public int I { get; set; }
-
-		public float F { get; set; }
-
-		public double D { get; set; }
-
 		private string _roleName = "";
 
         /// <summary>
@@ -38,6 +28,16 @@ namespace MessageCS.Test.Role
 		}
 
 		public RoleType RoleType { get; set; }
+
+		public bool B { get; set; }
+
+		public short S { get; set; }
+
+		public int I { get; set; }
+
+		public float F { get; set; }
+
+		public double D { get; set; }
 
 		private byte[] _data = new byte[0];
 
@@ -60,13 +60,13 @@ namespace MessageCS.Test.Role
 	    	base.Encode(buffer);
 
 		    buffer.WriteLong(Id);
+		    buffer.WriteString(RoleName);
+			buffer.WriteInt((int)RoleType);
 		    buffer.WriteBool(B);
 		    buffer.WriteShort(S);
 		    buffer.WriteInt(I);
 		    buffer.WriteFloat(F);
 		    buffer.WriteDouble(D);
-		    buffer.WriteString(RoleName);
-			buffer.WriteInt((int)RoleType);
 		    buffer.WriteBytes(Data);
 
 		    buffer.WriteInt(List.Count);
@@ -91,13 +91,13 @@ namespace MessageCS.Test.Role
 	    	base.Decode(buffer);
 
 		    Id = buffer.ReadLong();
+		    RoleName = buffer.ReadString();
+		    RoleType = (RoleType)buffer.ReadInt();
 		    B = buffer.ReadBool();
 		    S = buffer.ReadShort();
 		    I = buffer.ReadInt();
 		    F = buffer.ReadFloat();
 		    D = buffer.ReadDouble();
-		    RoleName = buffer.ReadString();
-		    RoleType = (RoleType)buffer.ReadInt();
 		    Data = buffer.ReadBytes();
 
 		    var listSize = buffer.ReadInt();
@@ -120,13 +120,13 @@ namespace MessageCS.Test.Role
 		{
 			return "RoleInfo{" +
 					"id=" + Id +
+					",roleName='" + RoleName + '\'' +
+					",roleType=" + RoleType +
 					",b=" + B +
 					",s=" + S +
 					",i=" + I +
 					",f=" + F +
 					",d=" + D +
-					",roleName='" + RoleName + '\'' +
-					",roleType=" + RoleType +
 					",data=" + Convert.ToBase64String(Data) +
 					",list=" + ToString(List) +
 					",set=" + ToString(Set) +

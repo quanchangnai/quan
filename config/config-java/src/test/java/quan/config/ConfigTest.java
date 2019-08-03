@@ -13,11 +13,10 @@ import java.util.List;
  */
 public class ConfigTest {
 
-
     public static void main(String[] args) throws Exception {
         List<String> definitionPaths = new ArrayList<>();
         definitionPaths.add("generator\\src\\test\\java\\quan\\generator");
-        definitionPaths.add("generator\\src\\test\\java\\quan\\generator\\config");
+        definitionPaths.add("generator\\src/test\\java\\quan\\generator\\config");
         String tablePath = "config\\config-java\\src\\test\\resources\\csv";
 
         ConfigLoader configLoader = new ConfigLoader(definitionPaths, tablePath);

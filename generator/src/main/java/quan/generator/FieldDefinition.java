@@ -2,11 +2,8 @@ package quan.generator;
 
 import org.apache.commons.lang3.StringUtils;
 import quan.generator.config.ConfigDefinition;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import quan.generator.database.DataDefinition;
+import quan.generator.message.MessageDefinition;
 
 /**
  * Created by quanchangnai on 2017/7/6.
@@ -45,20 +42,8 @@ public class FieldDefinition extends Definition {
     //配置引用的字段
     private String ref;
 
-    //允许的分隔符
-    public static final Set<String> allowDelimiters = new HashSet<>(Arrays.asList(";", "_", "*", "|", "$", "@", "#", "&", "?"));
-
-    //需要转义的分隔符(正则表达式特殊字符)
-    public static final Set<String> needEscapeChars = new HashSet<>(Arrays.asList("*", "|", "?"));
-
-    //内建类型
-    public static final List<String> builtInTypes = Arrays.asList("bool", "byte", "short", "int", "long", "float", "double", "string", "bytes", "list", "set", "map");
-
-    //原生类型
-    public static final List<String> primitiveTypes = Arrays.asList("bool", "short", "int", "long", "float", "double", "string");
-
-    //事件类型
-    public static final List<String> timeTypes = Arrays.asList("date", "time", "datetime");
+    //字段类型依赖是否有循环
+    private boolean loop;
 
     public FieldDefinition() {
     }
@@ -86,7 +71,7 @@ public class FieldDefinition extends Definition {
     }
 
     public boolean isBuiltInType() {
-        return builtInTypes.contains(type);
+        return Constants.builtInTypes.contains(type);
     }
 
     public boolean isCollectionType() {
@@ -94,7 +79,7 @@ public class FieldDefinition extends Definition {
     }
 
     public boolean isPrimitiveType() {
-        return primitiveTypes.contains(type);
+        return Constants.primitiveTypes.contains(type);
     }
 
     public boolean isEnumType() {
@@ -107,7 +92,10 @@ public class FieldDefinition extends Definition {
 
     public BeanDefinition getBean() {
         ClassDefinition classDefinition = ClassDefinition.getAll().get(getType());
-        if (classDefinition instanceof BeanDefinition) {
+        if (classDefinition instanceof BeanDefinition
+                && !(classDefinition instanceof DataDefinition)
+                && !(classDefinition instanceof MessageDefinition)
+                && !(classDefinition instanceof ConfigDefinition)) {
             return (BeanDefinition) classDefinition;
         }
         return null;
@@ -155,11 +143,11 @@ public class FieldDefinition extends Definition {
     }
 
     public boolean isBuiltInKeyType() {
-        return builtInTypes.contains(keyType);
+        return Constants.builtInTypes.contains(keyType);
     }
 
     public boolean isPrimitiveKeyType() {
-        return primitiveTypes.contains(keyType);
+        return Constants.primitiveTypes.contains(keyType);
     }
 
 
@@ -175,11 +163,11 @@ public class FieldDefinition extends Definition {
     }
 
     public boolean isBuiltInValueType() {
-        return builtInTypes.contains(valueType);
+        return Constants.builtInTypes.contains(valueType);
     }
 
     public boolean isPrimitiveValueType() {
-        return primitiveTypes.contains(valueType);
+        return Constants.primitiveTypes.contains(valueType);
     }
 
     public boolean isBeanValueType() {
@@ -375,7 +363,7 @@ public class FieldDefinition extends Definition {
      * 返回字段的引用字段
      *
      * @param keyRef true:map类型字段的键引用,false:map list set类型字段的值引用或者原生类型字段的引用
-     * @return
+     * @return 字段的引用字段
      */
     public FieldDefinition getRefField(boolean keyRef) {
         if (StringUtils.isBlank(ref)) {
@@ -383,7 +371,7 @@ public class FieldDefinition extends Definition {
         }
         if (type.equals("map")) {
             String[] fieldRefs = ref.split("[,]");
-            ClassDefinition refClass = null;
+            ClassDefinition refClass;
 
             if (keyRef && fieldRefs.length >= 1) {
                 String[] fieldKeyRefs = fieldRefs[0].split("[.]");
@@ -415,4 +403,12 @@ public class FieldDefinition extends Definition {
         return null;
     }
 
+    public boolean isLoop() {
+        return loop;
+    }
+
+    public FieldDefinition setLoop(boolean loop) {
+        this.loop = loop;
+        return this;
+    }
 }

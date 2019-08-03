@@ -1,10 +1,7 @@
 package quan.generator.config;
 
 import org.apache.commons.lang3.StringUtils;
-import quan.generator.BeanDefinition;
-import quan.generator.ClassDefinition;
-import quan.generator.FieldDefinition;
-import quan.generator.Language;
+import quan.generator.*;
 
 import java.util.*;
 
@@ -235,18 +232,19 @@ public class ConfigDefinition extends BeanDefinition {
         }
 
         //校验字段的分隔符
-        ArrayList<String> delimiterList = new ArrayList<>();
-        validateDelimiter(field, delimiterList);
-        Set<String> delimiterSet = new HashSet<>(delimiterList);
-        if (delimiterList.size() != delimiterSet.size()) {
-            addValidatedError(getName4Validate("的") + field.getName4Validate() + "的分隔符有重复[" + String.join("", delimiterList) + "]");
+        if (!field.isLoop()) {
+            ArrayList<String> delimiterList = new ArrayList<>();
+            validateFieldDelimiter(field, delimiterList);
+            Set<String> delimiterSet = new HashSet<>(delimiterList);
+            if (delimiterList.size() != delimiterSet.size()) {
+                addValidatedError(getName4Validate("的") + field.getName4Validate() + "的分隔符有重复[" + String.join("", delimiterList) + "]");
+            }
         }
-
     }
 
-    private void validateDelimiter(FieldDefinition field, List<String> delimiters) {
+    private void validateFieldDelimiter(FieldDefinition field, List<String> delimiters) {
         if (field.isBeanType()) {
-            validateDelimiter(field.getBean(), delimiters);
+            validateBeanDelimiter(field.getBean(), delimiters);
             return;
         }
 
@@ -281,29 +279,29 @@ public class ConfigDefinition extends BeanDefinition {
 
         if (field.isBeanValueType()) {
             BeanDefinition fieldValueBean = (BeanDefinition) ClassDefinition.getAll().get(field.getValueType());
-            validateDelimiter(fieldValueBean, delimiters);
+            validateBeanDelimiter(fieldValueBean, delimiters);
         }
     }
 
-    private void validateDelimiter(BeanDefinition beanDefinition, List<String> delimiters) {
+    private void validateBeanDelimiter(BeanDefinition beanDefinition, List<String> delimiters) {
         String delimiter = beanDefinition.getDelimiter();
         for (int i = 0; i < delimiter.length(); i++) {
             delimiters.add(String.valueOf(delimiter.charAt(i)));
         }
         for (FieldDefinition beanField : beanDefinition.getFields()) {
-            validateDelimiter(beanField, delimiters);
+            validateFieldDelimiter(beanField, delimiters);
         }
     }
 
     @Override
     public void validate2() {
         for (FieldDefinition selfField : selfFields) {
-            validateRef(selfField);
+            validateFieldRef(selfField);
         }
 
     }
 
-    protected boolean supportRef() {
+    protected boolean supportFieldRef() {
         return true;
     }
 
@@ -313,7 +311,7 @@ public class ConfigDefinition extends BeanDefinition {
                 continue;
             }
             if (!selfField.isPrimitiveType() && !selfField.isEnumType()) {
-                addValidatedError(getName4Validate("的") + selfField.getName4Validate() + "类型[" + selfField.getType() + "]不支持索引，允许的类型为" + FieldDefinition.primitiveTypes + "或枚举");
+                addValidatedError(getName4Validate("的") + selfField.getName4Validate() + "类型[" + selfField.getType() + "]不支持索引，允许的类型为" + Constants.primitiveTypes + "或枚举");
                 continue;
             }
             IndexDefinition indexDefinition = new IndexDefinition(this);
@@ -381,7 +379,7 @@ public class ConfigDefinition extends BeanDefinition {
                 continue;
             }
             if (!fieldDefinition.isPrimitiveType() && !fieldDefinition.isEnumType()) {
-                addValidatedError(getName4Validate() + "的索引" + indexDefinition.getName4Validate() + "的字段[" + fieldName + "]类型[" + fieldDefinition.getType() + "]非法，允许的类型为" + FieldDefinition.primitiveTypes + "或枚举");
+                addValidatedError(getName4Validate() + "的索引" + indexDefinition.getName4Validate() + "的字段[" + fieldName + "]类型[" + fieldDefinition.getType() + "]非法，允许的类型为" + Constants.primitiveTypes + "或枚举");
             }
             if (!indexDefinition.addField(fieldDefinition)) {
                 addValidatedError(getName4Validate() + "的索引" + indexDefinition.getName4Validate() + "的字段[" + fieldNames + "]不能重复");
@@ -389,7 +387,6 @@ public class ConfigDefinition extends BeanDefinition {
         }
 
     }
-
 
     public static String escapeDelimiter(String delimiter) {
         StringBuilder escapedDelimiter = new StringBuilder();

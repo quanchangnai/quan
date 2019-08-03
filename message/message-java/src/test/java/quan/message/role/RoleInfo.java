@@ -13,6 +13,11 @@ public class RoleInfo extends Bean {
     //角色id
     private long id;
 
+    //角色名
+    private String roleName = "";
+
+    private RoleType roleType;
+
     private boolean b;
 
     private short s;
@@ -22,11 +27,6 @@ public class RoleInfo extends Bean {
     private float f;
 
     private double d;
-
-    //角色名
-    private String roleName = "";
-
-    private RoleType roleType;
 
     private byte[] data = new byte[0];
 
@@ -51,6 +51,31 @@ public class RoleInfo extends Bean {
      */
     public RoleInfo setId(long id) {
         this.id = id;
+        return this;
+    }
+
+    /**
+     * 角色名
+     */
+    public String getRoleName() {
+        return roleName;
+    }
+
+    /**
+     * 角色名
+     */
+    public RoleInfo setRoleName(String roleName) {
+        Objects.requireNonNull(roleName);
+        this.roleName = roleName;
+        return this;
+    }
+
+    public RoleType getRoleType() {
+        return roleType;
+    }
+
+    public RoleInfo setRoleType(RoleType roleType) {
+        this.roleType = roleType;
         return this;
     }
 
@@ -99,31 +124,6 @@ public class RoleInfo extends Bean {
         return this;
     }
 
-    /**
-     * 角色名
-     */
-    public String getRoleName() {
-        return roleName;
-    }
-
-    /**
-     * 角色名
-     */
-    public RoleInfo setRoleName(String roleName) {
-        Objects.requireNonNull(roleName);
-        this.roleName = roleName;
-        return this;
-    }
-
-    public RoleType getRoleType() {
-        return roleType;
-    }
-
-    public RoleInfo setRoleType(RoleType roleType) {
-        this.roleType = roleType;
-        return this;
-    }
-
     public byte[] getData() {
         return data;
     }
@@ -151,11 +151,6 @@ public class RoleInfo extends Bean {
         super.encode(buffer);
 
         buffer.writeLong(id);
-        buffer.writeBool(b);
-        buffer.writeShort(s);
-        buffer.writeInt(i);
-        buffer.writeFloat(f);
-        buffer.writeDouble(d);
         buffer.writeString(roleName);
 
         if(roleType != null) {
@@ -164,6 +159,11 @@ public class RoleInfo extends Bean {
             buffer.writeInt(0);
         }
 
+        buffer.writeBool(b);
+        buffer.writeShort(s);
+        buffer.writeInt(i);
+        buffer.writeFloat(f);
+        buffer.writeDouble(d);
         buffer.writeBytes(data);
 
         buffer.writeInt(list.size());
@@ -188,13 +188,13 @@ public class RoleInfo extends Bean {
         super.decode(buffer);
 
         id = buffer.readLong();
+        roleName = buffer.readString();
+        roleType = RoleType.valueOf(buffer.readInt());
         b = buffer.readBool();
         s = buffer.readShort();
         i = buffer.readInt();
         f = buffer.readFloat();
         d = buffer.readDouble();
-        roleName = buffer.readString();
-        roleType = RoleType.valueOf(buffer.readInt());
         data = buffer.readBytes();
 
         int $list$Size = buffer.readInt();
@@ -217,13 +217,13 @@ public class RoleInfo extends Bean {
     public String toString() {
         return "RoleInfo{" +
                 "id=" + id +
+                ",roleName='" + roleName + '\'' +
+                ",roleType=" + roleType +
                 ",b=" + b +
                 ",s=" + s +
                 ",i=" + i +
                 ",f=" + f +
                 ",d=" + d +
-                ",roleName='" + roleName + '\'' +
-                ",roleType=" + roleType +
                 ",data=" + Arrays.toString(data) +
                 ",list=" + list +
                 ",set=" + set +

@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +52,7 @@ public abstract class Generator {
 
     protected DefinitionParser definitionParser = new XmlDefinitionParser();
 
-    private List<String> definitionPaths;
+    private List<String> definitionPaths = new ArrayList<>();
 
     private String codePath;
 
@@ -69,8 +70,10 @@ public abstract class Generator {
         freemarkerCfg.setDefaultEncoding("UTF-8");
         freemarkerCfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
 
-        this.definitionPaths = definitionPaths;
-        this.codePath = codePath;
+        for (String definitionPath : definitionPaths) {
+            this.definitionPaths.add(definitionPath.replace("/", File.separator).replace("\\", File.separator));
+        }
+        this.codePath = codePath.replace("/", File.separator).replace("\\", File.separator);
         this.freemarkerCfg = freemarkerCfg;
 
         Template enumTemplate = freemarkerCfg.getTemplate("enum." + supportLanguage() + ".ftl");

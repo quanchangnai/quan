@@ -15,13 +15,15 @@ public class BeanDefinition extends ClassDefinition {
     private Set<String> imports = new HashSet<>();
 
     //配置Bean的字段分隔符
-    private String delimiter;
+    private String delimiter = "_";
 
     public BeanDefinition() {
     }
 
     public BeanDefinition(String delimiter) {
-        this.delimiter = delimiter;
+        if (!StringUtils.isBlank(delimiter)) {
+            this.delimiter = delimiter;
+        }
     }
 
     @Override
@@ -61,15 +63,49 @@ public class BeanDefinition extends ClassDefinition {
 
         //校验集合值类型
         if (field.isCollectionType()) {
-            validateCollectionType(field);
+            validateFieldCollectionType(field);
+        }
+
+        //校验字段循环依赖，字段类型为bean类型或者集合类型字段的值类型为bean
+        Set<BeanDefinition> fieldBeans = new HashSet<>();
+        fieldBeans.add(this);
+        boolean loop = validateFieldBeanLoop(field, field, fieldBeans);
+        if (loop) {
+            field.setLoop(true);
         }
     }
 
-    public String getDelimiter() {
-        if (delimiter != null) {
-            return delimiter;
+
+    protected boolean validateFieldBeanLoop(FieldDefinition rootField, FieldDefinition field, Set<BeanDefinition> fieldBeans) {
+        BeanDefinition fieldBean = null;
+        if (field.isBeanType()) {
+            fieldBean = field.getBean();
+        } else if (field.isCollectionType()) {
+            fieldBean = field.getValueBean();
         }
-        return "_";
+
+        if (fieldBean == null) {
+            return false;
+        }
+
+        if (fieldBeans.contains(fieldBean)) {
+            addValidatedError(getName4Validate("的") + rootField.getName4Validate() + "循环依赖类型[" + fieldBean.getName() + "]");
+            return true;
+        }
+
+        fieldBeans.add(fieldBean);
+
+        for (FieldDefinition fieldBeanField : fieldBean.getFields()) {
+            if (validateFieldBeanLoop(rootField, fieldBeanField, fieldBeans)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public String getDelimiter() {
+        return delimiter;
     }
 
     public BeanDefinition setDelimiter(String delimiter) {
@@ -88,7 +124,6 @@ public class BeanDefinition extends ClassDefinition {
         if (getClass() != BeanDefinition.class) {
             return;
         }
-        String delimiter = getDelimiter();
         if (delimiter.length() != 1) {
             addValidatedError(getName4Validate() + "的分隔符[" + delimiter + "]长度必须1个字符");
         }
@@ -101,7 +136,7 @@ public class BeanDefinition extends ClassDefinition {
     }
 
 
-    protected void validateCollectionType(FieldDefinition field) {
+    protected void validateFieldCollectionType(FieldDefinition field) {
         if (field.getValueType() == null) {
             addValidatedError(getName4Validate("的") + field.getType() + "类型" + field.getName4Validate() + "的值类型不能为空");
             return;
@@ -128,16 +163,16 @@ public class BeanDefinition extends ClassDefinition {
 
         for (FieldDefinition field : fields) {
             //校验字段引用
-            validateRef(field);
+            validateFieldRef(field);
         }
     }
 
-    protected boolean supportRef() {
+    protected boolean supportFieldRef() {
         return true;
     }
 
-    protected void validateRef(FieldDefinition field) {
-        if (!supportRef()) {
+    protected void validateFieldRef(FieldDefinition field) {
+        if (!supportFieldRef()) {
             return;
         }
         if (field.getRef() == null) {
@@ -150,7 +185,7 @@ public class BeanDefinition extends ClassDefinition {
                 addValidatedError(getName4Validate() + field.getName4Validate() + "的引用格式错误[" + field.getRef() + "]，正确格式:[配置.字段]");
                 return;
             }
-            validateRef(field, false, fieldRefs[0], fieldRefs[1]);
+            validateFieldRef(field, false, fieldRefs[0], fieldRefs[1]);
             return;
         }
 
@@ -172,18 +207,18 @@ public class BeanDefinition extends ClassDefinition {
             addValidatedError(mapRefPatternError);
             return;
         }
-        validateRef(field, true, fieldKeyRefs[0], fieldKeyRefs[1]);
+        validateFieldRef(field, true, fieldKeyRefs[0], fieldKeyRefs[1]);
 
         if (fieldValueRefs != null) {
             if (fieldValueRefs.length != 2) {
                 addValidatedError(mapRefPatternError);
                 return;
             }
-            validateRef(field, false, fieldValueRefs[0], fieldValueRefs[1]);
+            validateFieldRef(field, false, fieldValueRefs[0], fieldValueRefs[1]);
         }
     }
 
-    protected void validateRef(FieldDefinition field, boolean keType, String refConfigName, String refFiledName) {
+    protected void validateFieldRef(FieldDefinition field, boolean keType, String refConfigName, String refFiledName) {
         String refConfigAndField = refConfigName + "." + refFiledName;
 
         ClassDefinition refClass = ClassDefinition.getAll().get(refConfigName);

@@ -11,6 +11,7 @@ import quan.generator.*;
 import quan.generator.config.ConfigDefinition;
 import quan.generator.config.IndexDefinition;
 
+import java.io.File;
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -26,7 +27,7 @@ public class ConfigLoader {
     protected DefinitionParser definitionParser = new XmlDefinitionParser();
 
     //配置的定义文件所在目录
-    private List<String> definitionPaths;
+    private List<String> definitionPaths = new ArrayList<>();
 
     //配置表所在目录
     private String tablePath;
@@ -47,8 +48,10 @@ public class ConfigLoader {
     private LinkedHashSet<String> errors = new LinkedHashSet<>();
 
     public ConfigLoader(List<String> definitionPaths, String tablePath) {
-        this.definitionPaths = definitionPaths;
-        this.tablePath = tablePath;
+        for (String definitionPath : definitionPaths) {
+            this.definitionPaths.add(definitionPath.replace("/", File.separator).replace("\\", File.separator));
+        }
+        this.tablePath = tablePath.replace("/", File.separator).replace("\\", File.separator);
     }
 
     public ConfigLoader setDefinitionParser(DefinitionParser definitionParser) {
@@ -166,7 +169,7 @@ public class ConfigLoader {
             errors.addAll(reader.getErrors());
         }
 
-        //引用检查，依赖索引检查结果
+        //引用检查，依赖索引结果
         for (ConfigDefinition configDefinition : configIndexedJsonsAll.keySet()) {
             checkRef(configDefinition, configIndexedJsonsAll);
         }

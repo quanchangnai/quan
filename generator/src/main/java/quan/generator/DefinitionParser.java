@@ -25,6 +25,7 @@ public abstract class DefinitionParser {
 
     public void setDefinitionPaths(List<String> definitionPaths) {
         for (String path : definitionPaths) {
+            path = path.replace("/", File.separator).replace("\\", File.separator);
             File file = new File(path);
             File[] files = file.listFiles((File dir, String name) -> name.endsWith("." + getFileType()));
             if (files != null) {
