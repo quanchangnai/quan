@@ -28,9 +28,7 @@ public class CSVConfigReader extends ConfigReader {
         try (CSVParser parser = new CSVParser(new InputStreamReader(new FileInputStream(tableFile), "GBK"), CSVFormat.DEFAULT)) {
             records = parser.getRecords();
         } catch (Exception e) {
-            String error = String.format("读取配置[%s]出错:%s", table, e.getMessage());
-            errors.add(error);
-            logger.debug(error, e);
+            logger.error("读取配置[{}]出错", tableFile.getName(), e);
             return;
         }
 

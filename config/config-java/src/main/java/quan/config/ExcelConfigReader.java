@@ -33,13 +33,11 @@ public class ExcelConfigReader extends ConfigReader {
             } else if (tableFile.getName().endsWith(".xlsx")) {
                 workbook = new XSSFWorkbook(new FileInputStream(tableFile));
             } else {
-                errors.add(String.format("配置[%s]格式非法:%s", table, tableFile.getName()));
+                logger.error("配置[{}]格式非法", tableFile.getName());
                 return;
             }
         } catch (Exception e) {
-            String error = String.format("读取配置[%s]出错:%s", table, e.getMessage());
-            errors.add(error);
-            logger.debug(error, e);
+            logger.error("读取配置[{}]出错", tableFile.getName(), e);
             return;
         }
 

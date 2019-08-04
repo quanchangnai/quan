@@ -26,9 +26,7 @@ public class JsonConfigReader extends ConfigReader {
             List<JSONObject> jsons = (List<JSONObject>) JSON.parse(input);
             this.jsons.addAll(jsons);
         } catch (Exception e) {
-            String error = String.format("读取配置[%s]出错:%s", table, e.getMessage());
-            errors.add(error);
-            logger.debug(error, e);
+            logger.error("读取配置[{}]出错", e);
         }
     }
 }
