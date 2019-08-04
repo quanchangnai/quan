@@ -28,10 +28,14 @@ public class ConfigLoader {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    protected DefinitionParser definitionParser = new XmlDefinitionParser();
+    private String packagePrefix;
+
+    private String enumPackagePrefix;
 
     //配置的定义文件所在目录
     private List<String> definitionPaths = new ArrayList<>();
+
+    protected DefinitionParser definitionParser = new XmlDefinitionParser();
 
     private boolean definitionParsed;
 
@@ -42,10 +46,6 @@ public class ConfigLoader {
     private String tableType = "csv";
 
     private Type loadType = Type.validateAndLoad;
-
-    private String packagePrefix;
-
-    private String enumPackagePrefix;
 
     private int bodyRowNum;
 
@@ -141,9 +141,10 @@ public class ConfigLoader {
     }
 
     private void parseDefinition() {
-        if (definitionParsed) {
+        if (definitionParser == null || definitionParsed) {
             return;
         }
+
         definitionParser.setDefinitionPaths(definitionPaths);
         definitionParser.setPackagePrefix(packagePrefix);
         definitionParser.setEnumPackagePrefix(enumPackagePrefix);
@@ -176,6 +177,54 @@ public class ConfigLoader {
         //解析定义文件
         parseDefinition();
 
+        if (isLoadNoDefinition()) {
+            //没有定义文件直接加载JSON
+            loadOnNoDefinition();
+        } else {
+            //通知配置定义加载或者校验
+            loadByDefinitions();
+        }
+
+        if (needValidate()) {
+            for (ConfigReader reader : readers.values()) {
+                validatedErrors.addAll(reader.getValidatedErrors());
+            }
+        }
+
+        executeValidators();
+
+        loaded = true;
+
+        if (!validatedErrors.isEmpty()) {
+            throw new ConfigException(validatedErrors);
+        }
+    }
+
+    /**
+     * JSON格式可以没有定义文件直接加载，加载后父表没有子表的数据
+     */
+    private boolean isLoadNoDefinition() {
+        return ConfigDefinition.getTableConfigs().isEmpty() && tableType.equals("json");
+    }
+
+    /**
+     * 没有定义文件直接加载JSON，加载后父表没有子表的数据
+     */
+    private void loadOnNoDefinition() {
+        File tablePathFile = new File(tablePath);
+        File[] tableFiles = tablePathFile.listFiles((File dir, String name) -> name.endsWith(".json"));
+        if (tableFiles == null) {
+            return;
+        }
+
+        for (File tableFile : tableFiles) {
+            String tableName = tableFile.getName().substring(0, tableFile.getName().lastIndexOf("."));
+            String configFullName = packagePrefix + "." + tableName;
+            load(configFullName, false, Collections.singleton(tableName));
+        }
+    }
+
+    private void loadByDefinitions() {
         Set<ConfigDefinition> configDefinitions = new HashSet<>(ConfigDefinition.getTableConfigs().values());
 
         //配置对应的已索引Json数据
@@ -191,32 +240,31 @@ public class ConfigLoader {
         }
 
         if (needValidate()) {
-            for (ConfigReader reader : readers.values()) {
-                validatedErrors.addAll(reader.getValidatedErrors());
-            }
             //引用校验，依赖索引结果
             for (ConfigDefinition configDefinition : configIndexedJsonsAll.keySet()) {
                 validateRef(configDefinition, configIndexedJsonsAll);
             }
+        }
+    }
 
-            //自定义校验
-            for (ConfigValidator validator : validators) {
-                try {
-                    validator.validateConfig();
-                } catch (ConfigException e) {
-                    validatedErrors.addAll(e.getErrors());
-                } catch (Exception e) {
-                    String error = String.format("配置错误:%s", e.getMessage());
-                    validatedErrors.add(error);
-                    logger.debug("", e);
-                }
-            }
+    /**
+     * 执行自定义校验器
+     */
+    private void executeValidators() {
+        if (!needValidate()) {
+            return;
         }
 
-        loaded = true;
-
-        if (!validatedErrors.isEmpty()) {
-            throw new ConfigException(validatedErrors);
+        for (ConfigValidator validator : validators) {
+            try {
+                validator.validateConfig();
+            } catch (ConfigException e) {
+                validatedErrors.addAll(e.getErrors());
+            } catch (Exception e) {
+                String error = String.format("配置错误:%s", e.getMessage());
+                validatedErrors.add(error);
+                logger.debug("", e);
+            }
         }
     }
 
@@ -244,9 +292,7 @@ public class ConfigLoader {
             } catch (Exception e) {
                 logger.error("配置[{}]写到JSON文件出错", configName, e);
             }
-
         }
-
     }
 
     /**
@@ -430,19 +476,25 @@ public class ConfigLoader {
     /**
      * 加载配置到类索引
      */
-    @SuppressWarnings({"unchecked"})
     private void load(ConfigDefinition configDefinition) {
         if (!needLoad()) {
             return;
         }
+        boolean hasParent = configDefinition.getParentConfig() != null;
+        Collection<String> configTables = getConfigTables(configDefinition);
+        load(configDefinition.getFullName(), hasParent, configTables);
+    }
+
+    private void load(String configFullName, boolean hasParent, Collection<String> configTables) {
+        String configName = configFullName.substring(configFullName.lastIndexOf(".") + 1);
         List<Config> configs = new ArrayList<>();
-        for (String table : getConfigTables(configDefinition)) {
+        for (String table : configTables) {
             ConfigReader configReader = getOrCreateReader(table);
             configs.addAll(configReader.readObjects());
         }
 
-        String indexClass = configDefinition.getFullName();
-        if (configDefinition.getParentConfig() != null) {
+        String indexClass = configFullName;
+        if (hasParent) {
             indexClass += "$self";
         }
 
@@ -450,7 +502,7 @@ public class ConfigLoader {
         try {
             indexMethod = Class.forName(indexClass).getMethod("index", List.class);
         } catch (Exception e) {
-            logger.error("加载配置[{}]类出错", configDefinition.getName(), e);
+            logger.error("加载配置[{}]类出错", configName, e);
             return;
         }
 
@@ -460,7 +512,7 @@ public class ConfigLoader {
                 validatedErrors.addAll(indexErrors);
             }
         } catch (Exception e) {
-            logger.error("调用配置[{}]的索引方法出错", configDefinition.getName(), e);
+            logger.error("调用配置[{}]的索引方法出错", configName, e);
         }
     }
 

@@ -20,10 +20,10 @@ public class ConfigTest {
 
 //        String tableType = "csv";
 //        String tablePath = "config\\csv";
-//        String tableType = "xlsx";
-//        String tablePath = "config\\excel";
-        String tableType = "json";
-        String tablePath = "config\\json";
+        String tableType = "xlsx";
+        String tablePath = "config\\excel";
+//        String tableType = "json";
+//        String tablePath = "config\\json";
 
 
         ConfigLoader configLoader = new ConfigLoader(definitionPaths, tablePath);
