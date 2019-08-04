@@ -1,7 +1,9 @@
 package quan.config;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Triple;
 import org.slf4j.Logger;
@@ -12,6 +14,7 @@ import quan.generator.config.ConfigDefinition;
 import quan.generator.config.IndexDefinition;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -37,7 +40,10 @@ public class ConfigLoader {
     //配置表类型,csv xls xlsx等
     private String tableType = "csv";
 
-    private boolean onlyCheck;
+    //输出目录
+    private String outputPath;
+
+    private Type loadType = Type.validateAndLoad;
 
     private String packagePrefix;
 
@@ -60,6 +66,13 @@ public class ConfigLoader {
     public ConfigLoader setTableType(String tableType) {
         Objects.requireNonNull(tableType, "表格类型不能为空");
         this.tableType = tableType;
+        readers.clear();
+        return this;
+    }
+
+    public ConfigLoader setOutputPath(String outputPath) {
+        Objects.requireNonNull(outputPath, "输出目录不能为空");
+        this.outputPath = outputPath;
         return this;
     }
 
@@ -78,13 +91,18 @@ public class ConfigLoader {
         return this;
     }
 
-    /**
-     * 是否仅校验配置
-     *
-     * @param onlyCheck true:不会创建配置对象。false:会创建配置对象并加载到类的缓存里。
-     */
-    public void onlyCheck(boolean onlyCheck) {
-        this.onlyCheck = onlyCheck;
+    public ConfigLoader setLoadType(Type loadType) {
+        Objects.requireNonNull(loadType, "加载类型不能为空");
+        this.loadType = loadType;
+        return this;
+    }
+
+    public boolean needValidate() {
+        return loadType == Type.onlyValidate || loadType == Type.validateAndLoad;
+    }
+
+    public boolean needLoad() {
+        return loadType == Type.onlyLoad || loadType == Type.validateAndLoad;
     }
 
     /**
@@ -110,24 +128,6 @@ public class ConfigLoader {
                 }
             }
         }
-
-    }
-
-    private ConfigReader createReader(String tablePath, String table, ConfigDefinition configDefinition) {
-        ConfigReader configReader = new CSVConfigReader(tablePath, table, configDefinition);
-        if (!onlyCheck) {
-            configReader.initPrototype();
-        }
-        return configReader;
-    }
-
-    private ConfigReader getOrAddReader(String table) {
-        ConfigReader configReader = readers.get(table);
-        if (configReader == null) {
-            configReader = ConfigReader.create(tableType, tablePath, table, ConfigDefinition.getTableConfigs().get(table));
-            readers.put(table, configReader);
-        }
-        return configReader;
     }
 
     private void parseDefinition() {
@@ -163,44 +163,104 @@ public class ConfigLoader {
         //解析定义文件
         parseDefinition();
 
+        Set<ConfigDefinition> configDefinitions = new HashSet<>(ConfigDefinition.getTableConfigs().values());
+
         //配置对应的已索引Json数据
         Map<ConfigDefinition, Map<IndexDefinition, Map>> configIndexedJsonsAll = new HashMap<>();
 
-        Set<ConfigDefinition> needLoadConfigs = new HashSet<>(ConfigDefinition.getTableConfigs().values());
-
-        for (ConfigDefinition configDefinition : needLoadConfigs) {
+        for (ConfigDefinition configDefinition : configDefinitions) {
             //索引校验
-            configIndexedJsonsAll.put(configDefinition, validateIndex(configDefinition));
+            if (needValidate()) {
+                configIndexedJsonsAll.put(configDefinition, validateIndex(configDefinition));
+            }
             //加载配置
-            if (!onlyCheck) {
+            if (needLoad()) {
                 load(configDefinition);
             }
         }
 
-        for (ConfigReader reader : readers.values()) {
-            errors.addAll(reader.getErrors());
-        }
+        if (needValidate()) {
+            for (ConfigReader reader : readers.values()) {
+                errors.addAll(reader.getErrors());
+            }
+            //引用校验，依赖索引结果
+            for (ConfigDefinition configDefinition : configIndexedJsonsAll.keySet()) {
+                validateRef(configDefinition, configIndexedJsonsAll);
+            }
 
-        //引用校验，依赖索引结果
-        for (ConfigDefinition configDefinition : configIndexedJsonsAll.keySet()) {
-            validateRef(configDefinition, configIndexedJsonsAll);
-        }
-
-        //自定义校验
-        for (ConfigValidator validator : validators) {
-            try {
-                validator.validateConfig();
-            } catch (ConfigException e) {
-                errors.addAll(e.getErrors());
-            } catch (Exception e) {
-                String error = String.format("配置错误:%s", e.getMessage());
-                errors.add(error);
-                logger.debug("", e);
+            //自定义校验
+            for (ConfigValidator validator : validators) {
+                try {
+                    validator.validateConfig();
+                } catch (ConfigException e) {
+                    errors.addAll(e.getErrors());
+                } catch (Exception e) {
+                    String error = String.format("配置错误:%s", e.getMessage());
+                    errors.add(error);
+                    logger.debug("", e);
+                }
             }
         }
 
         if (!errors.isEmpty()) {
             throw new ConfigException(errors);
+        }
+    }
+
+    public void writeToJson() {
+        if (outputPath == null) {
+            logger.error("输出目录未设置");
+            return;
+        }
+        if (tableType.equals("json")) {
+            logger.error("配置已经是JSON格式了");
+            return;
+        }
+
+        File path = new File(outputPath);
+        Set<ConfigDefinition> configDefinitions = new HashSet<>(ConfigDefinition.getTableConfigs().values());
+
+        for (ConfigDefinition configDefinition : configDefinitions) {
+            JSONArray rows = new JSONArray();
+            for (String table : configDefinition.getTables()) {
+                ConfigReader reader = readers.get(table);
+                if (reader == null) {
+                    logger.error("配置[{}]从未被加载", table);
+                    continue;
+                }
+                List<JSONObject> jsons = reader.readJsons();
+                rows.addAll(jsons);
+            }
+
+            String configName = configDefinition.getName();
+            try (FileOutputStream fileOutputStream = new FileOutputStream(new File(path, configName + ".json"))) {
+                JSON.writeJSONString(fileOutputStream, rows, SerializerFeature.PrettyFormat);
+            } catch (Exception e) {
+                logger.error("配置[{}]写到JSON文件出错", configName, e);
+            }
+
+        }
+
+    }
+
+    /**
+     * 通过表名查找配置定义
+     *
+     * @param table Json的表名实际上就是配置名
+     */
+    private ConfigDefinition getConfigByTable(String table) {
+        if (tableType.equals("json")) {
+            return ConfigDefinition.getConfig(table);
+        } else {
+            return ConfigDefinition.getTableConfigs().get(table);
+        }
+    }
+
+    private Collection<String> getConfigTables(ConfigDefinition configDefinition) {
+        if (tableType.equals("json")) {
+            return configDefinition.getChildrenAndMe();
+        } else {
+            return configDefinition.getAllTables();
         }
     }
 
@@ -210,8 +270,8 @@ public class ConfigLoader {
         //配置JSON对应的表格
         Map<JSONObject, String> jsonTables = new HashMap();
 
-        for (String table : configDefinition.getTables()) {
-            ConfigReader configReader = getOrAddReader(table);
+        for (String table : getConfigTables(configDefinition)) {
+            ConfigReader configReader = getOrCreateReader(table);
             List<JSONObject> tableJsons = configReader.readJsons();
 
             for (JSONObject json : tableJsons) {
@@ -271,8 +331,8 @@ public class ConfigLoader {
     }
 
     private void validateRef(ConfigDefinition configDefinition, Map<ConfigDefinition, Map<IndexDefinition, Map>> configIndexedJsonsAll) {
-        for (String table : configDefinition.getTables()) {
-            List<JSONObject> tableJsons = getOrAddReader(table).readJsons();
+        for (String table : getConfigTables(configDefinition)) {
+            List<JSONObject> tableJsons = getOrCreateReader(table).readJsons();
             for (int i = 0; i < tableJsons.size(); i++) {
                 JSONObject json = tableJsons.get(i);
                 configDefinition.getFields();
@@ -336,7 +396,7 @@ public class ConfigLoader {
 
         String fieldRefs = fieldRefConfig.getName() + "." + fieldRefField.getName();
 
-        IndexDefinition fieldRefIndex = fieldRefConfig.getIndexByStartField(fieldRefField);
+        IndexDefinition fieldRefIndex = fieldRefConfig.getIndexByField1(fieldRefField);
         Map refIndexedJsons = configIndexedJsonsAll.get(fieldRefConfig).get(fieldRefIndex);
 
         if (!refIndexedJsons.containsKey(value)) {
@@ -371,12 +431,10 @@ public class ConfigLoader {
 
     private void load(ConfigDefinition configDefinition, boolean reload) {
         List<Config> configs = new ArrayList<>();
-
-        for (String table : configDefinition.getTables()) {
-            ConfigReader configReader = getOrAddReader(table);
+        for (String table : getConfigTables(configDefinition)) {
+            ConfigReader configReader = getOrCreateReader(table);
             configs.addAll(configReader.readObjects());
         }
-
         indexConfigs(configDefinition, configs, reload);
     }
 
@@ -417,7 +475,7 @@ public class ConfigLoader {
      * @param configs 配置名字
      */
     public void reloadConfigs(Collection<String> configs) {
-        if (onlyCheck) {
+        if (!needLoad()) {
             return;
         }
         errors.clear();
@@ -430,19 +488,48 @@ public class ConfigLoader {
                 errors.add(String.format("重加载[%s]出错，不存在该配置", configName));
                 continue;
             }
-            needReloadTables.addAll(configDefinition.getTables());
+            needReloadTables.addAll(getConfigTables(configDefinition));
         }
 
         reloadTables(needReloadTables);
     }
 
     /**
-     * 重加载表格
+     * 重加载表格，注意：表格转成Json格式后使用的表名实际上是配置类名
+     *
+     * @param tables       表名
+     * @param originalName 表名是不是原名，表格转成Json格式后使用的表名实际上是配置类名
+     */
+    public void reloadTables(Collection<String> tables, boolean originalName) {
+        if (!needLoad()) {
+            return;
+        }
+
+        if (!tableType.equals("json") || !originalName) {
+            reloadTables(tables);
+            return;
+        }
+
+        List<String> realTables = new ArrayList<>();
+        for (String table : tables) {
+            ConfigDefinition configDefinition = ConfigDefinition.getTableConfigs().get(table);
+            if (configDefinition == null) {
+                errors.add(String.format("重加载[%s]出错，不存在该配置", table));
+                continue;
+            }
+            realTables.add(configDefinition.getName());
+            reloadTables(realTables);
+        }
+
+    }
+
+    /**
+     * 重加载表格，注意：表格转成Json格式后使用的表名实际上是配置类名
      *
      * @param tables 表名
      */
     public void reloadTables(Collection<String> tables) {
-        if (onlyCheck) {
+        if (!needLoad()) {
             return;
         }
         errors.clear();
@@ -459,7 +546,7 @@ public class ConfigLoader {
             configReader.clear();
             reloadReaders.add(configReader);
 
-            ConfigDefinition configDefinition = ConfigDefinition.getTableConfigs().get(table);
+            ConfigDefinition configDefinition = getConfigByTable(table);
             while (configDefinition != null) {
                 needReloadConfigs.add(configDefinition);
                 configDefinition = configDefinition.getParentConfig();
@@ -471,7 +558,10 @@ public class ConfigLoader {
         }
 
         for (ConfigReader reloadReader : reloadReaders) {
-            errors.addAll(reloadReader.getErrors());
+            List<String> errors = reloadReader.getErrors();
+            if (needValidate()) {
+                this.errors.addAll(errors);
+            }
         }
 
         if (!errors.isEmpty()) {
@@ -479,4 +569,44 @@ public class ConfigLoader {
         }
     }
 
+    private ConfigReader createReader(String table) {
+        ConfigDefinition configDefinition = getConfigByTable(table);
+        switch (tableType) {
+            case "csv":
+                return new CSVConfigReader(tablePath, table + "." + tableType, configDefinition);
+            case "xls":
+            case "xlsx":
+                return new ExcelConfigReader(tablePath, table + "." + tableType, configDefinition);
+            case "json":
+                return new JsonConfigReader(tablePath, table + "." + tableType, configDefinition);
+            default:
+                return null;
+        }
+
+    }
+
+    private ConfigReader getOrCreateReader(String table) {
+        ConfigReader configReader = readers.get(table);
+        if (configReader == null) {
+            configReader = createReader(table);
+            readers.put(table, configReader);
+        }
+        return configReader;
+    }
+
+
+    public enum Type {
+        /**
+         * 仅校验配置
+         */
+        onlyValidate,
+        /**
+         * 仅加载,会创建配置对象并加载到类的缓存里
+         */
+        onlyLoad,
+        /**
+         * 校验并加载,会创建配置对象并加载到类的缓存里
+         */
+        validateAndLoad
+    }
 }

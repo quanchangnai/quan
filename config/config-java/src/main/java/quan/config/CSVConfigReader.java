@@ -25,7 +25,6 @@ public class CSVConfigReader extends ConfigReader {
         clear();
 
         List<CSVRecord> records;
-
         try (CSVParser parser = new CSVParser(new InputStreamReader(new FileInputStream(tableFile), "GBK"), CSVFormat.DEFAULT)) {
             records = parser.getRecords();
         } catch (Exception e) {
@@ -41,7 +40,7 @@ public class CSVConfigReader extends ConfigReader {
 
         List<String> columnNames = new ArrayList<>();
         for (String columnName : records.get(0)) {
-            columnNames.add(columnName);
+            columnNames.add(columnName.trim());
         }
         checkColumns(columnNames);
 

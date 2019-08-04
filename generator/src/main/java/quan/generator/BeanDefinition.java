@@ -135,8 +135,8 @@ public class BeanDefinition extends ClassDefinition {
         }
         for (int i = 0; i < delimiter.length(); i++) {
             String s = String.valueOf(delimiter.charAt(i));
-            if (!ConfigDefinition.allowDelimiters.contains(s)) {
-                addValidatedError(getName4Validate() + "的分隔符[" + delimiter + "]非法,合法分隔符" + ConfigDefinition.allowDelimiters);
+            if (!Constants.legalDelimiters.contains(s)) {
+                addValidatedError(getName4Validate() + "的分隔符[" + delimiter + "]非法,合法分隔符" + Constants.legalDelimiters);
             }
         }
     }
@@ -255,7 +255,7 @@ public class BeanDefinition extends ClassDefinition {
             addValidatedError(getName4Validate("的") + field.getName4Validate() + "的类型[" + field.getType() + "]和引用字段[" + refConfigAndField + "]的类型[" + refField.getType() + "]不一致");
         }
 
-        IndexDefinition refFieldIndex = refConfig.getIndexByStartField(refField);
+        IndexDefinition refFieldIndex = refConfig.getIndexByField1(refField);
         if (refFieldIndex == null) {
             addValidatedError(getName4Validate() + field.getName4Validate() + "的引用字段[" + refConfigAndField + "]不是一级索引");
         }

@@ -13,8 +13,11 @@ public class ConfigDefinition extends BeanDefinition {
     //配置本身对应的表，有分表以逗号分格
     private String table;
 
-    //配置对应的表，包含分表和子表
+    //配置对应的表，包含分表
     private List<String> tables = new ArrayList<>();
+
+    //配置对应的表，包含分表和子表
+    private List<String> allTables = new ArrayList<>();
 
     //配置的父类
     private String parent;
@@ -32,16 +35,16 @@ public class ConfigDefinition extends BeanDefinition {
 
     private static Map<String, ConfigDefinition> tableConfigs = new HashMap<>();
 
-    public static Set<String> allowDelimiters = new HashSet<>(Arrays.asList(";", "_", "*", "|", "$", "@", "#", "&", "?"));
-
-    public static Set<String> needEscapeChars = new HashSet<>(Arrays.asList("*", "|", "?"));
-
     public ConfigDefinition() {
     }
 
     public ConfigDefinition(String table, String parent) {
-        this.table = table;
-        this.parent = parent;
+        if (!StringUtils.isBlank(table)) {
+            this.table = table;
+        }
+        if (!StringUtils.isBlank(parent)) {
+            this.parent = parent;
+        }
     }
 
     @Override
@@ -54,30 +57,46 @@ public class ConfigDefinition extends BeanDefinition {
         return "配置";
     }
 
-    public String getTable() {
-        return table;
+    @Override
+    public void setName(String name) {
+        super.setName(name);
+        if (table == null) {
+            table = getName();
+        }
+    }
+
+    public Set<String> getChildren() {
+        return children;
+    }
+
+    public Set<String> getChildrenAndMe() {
+        Set<String> childrenAndMe = new HashSet<>(children);
+        childrenAndMe.add(getName());
+        return childrenAndMe;
     }
 
     public ConfigDefinition setTable(String table) {
         if (StringUtils.isBlank(table)) {
             return this;
         }
-        this.table = table.trim();
+        this.table = table;
         return this;
     }
 
-
-    public String getParent() {
-        return parent;
-    }
-
-    public ConfigDefinition getParentConfig() {
-        return getConfig(getParent());
+    public String getTable() {
+        return table;
     }
 
     public List<String> getTables() {
-        if (!tables.isEmpty()) {
-            return tables;
+        return tables;
+    }
+
+    /**
+     * 自身和子类的所有表
+     */
+    public List<String> getAllTables() {
+        if (!allTables.isEmpty()) {
+            return allTables;
         }
 
         Set<String> childrenAndMe = new HashSet<>(children);
@@ -88,12 +107,11 @@ public class ConfigDefinition extends BeanDefinition {
             if (configDefinition == null) {
                 continue;
             }
-            tables.addAll(Arrays.asList(configDefinition.table.split("[,]")));
+            allTables.addAll(Arrays.asList(configDefinition.table.split("[,]")));
         }
 
-        return tables;
+        return allTables;
     }
-
 
     public ConfigDefinition setParent(String parent) {
         if (StringUtils.isBlank(parent)) {
@@ -101,6 +119,14 @@ public class ConfigDefinition extends BeanDefinition {
         }
         this.parent = parent.trim();
         return this;
+    }
+
+    public String getParent() {
+        return parent;
+    }
+
+    public ConfigDefinition getParentConfig() {
+        return getConfig(getParent());
     }
 
     public List<IndexDefinition> getIndexes() {
@@ -112,9 +138,9 @@ public class ConfigDefinition extends BeanDefinition {
         selfIndexes.add(indexDefinition);
     }
 
-    public IndexDefinition getIndexByStartField(FieldDefinition field) {
+    public IndexDefinition getIndexByField1(FieldDefinition field1) {
         for (IndexDefinition index : indexes) {
-            if (index.getFields().get(0) == field) {
+            if (index.getFields().get(0) == field1) {
                 return index;
             }
         }
@@ -161,9 +187,8 @@ public class ConfigDefinition extends BeanDefinition {
         if (table == null) {
             table = getName();
         }
-
         //支持分表
-        String[] tables = table.split(",");
+        tables.addAll(Arrays.asList(table.split(",")));
         for (String t : tables) {
             ConfigDefinition other = tableConfigs.get(t);
             if (other != null) {
@@ -258,8 +283,8 @@ public class ConfigDefinition extends BeanDefinition {
         for (int i = 0; i < delimiter.length(); i++) {
             String s = String.valueOf(delimiter.charAt(i));
             delimiters.add(s);
-            if (!allowDelimiters.contains(s)) {
-                addValidatedError(getName4Validate("的") + field.getName4Validate() + "的分隔符[" + delimiter + "]非法,合法分隔符" + allowDelimiters);
+            if (!Constants.legalDelimiters.contains(s)) {
+                addValidatedError(getName4Validate("的") + field.getName4Validate() + "的分隔符[" + delimiter + "]非法,合法分隔符" + Constants.legalDelimiters);
             }
         }
 
@@ -396,7 +421,7 @@ public class ConfigDefinition extends BeanDefinition {
             if (i > 0) {
                 escapedDelimiter.append("|");
             }
-            if (needEscapeChars.contains(s)) {
+            if (Constants.needEscapeChars.contains(s)) {
                 escapedDelimiter.append("\\");
             }
             escapedDelimiter.append(s);

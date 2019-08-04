@@ -8,7 +8,6 @@ import quan.generator.config.ConfigDefinition;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +15,8 @@ import java.util.List;
  * Created by quanchangnai on 2019/8/3.
  */
 public class ExcelConfigReader extends ConfigReader {
+
+    private DataFormatter dataFormatter = new DataFormatter();
 
     public ExcelConfigReader(String tablePath, String table, ConfigDefinition configDefinition) {
         super(tablePath, table, configDefinition);
@@ -27,12 +28,12 @@ public class ExcelConfigReader extends ConfigReader {
 
         Workbook workbook;
         try {
-            if (tableFile.getName().endsWith("xls")) {
+            if (tableFile.getName().endsWith(".xls")) {
                 workbook = new HSSFWorkbook(new FileInputStream(tableFile));
-            } else if (tableFile.getName().endsWith("xlsx")) {
+            } else if (tableFile.getName().endsWith(".xlsx")) {
                 workbook = new XSSFWorkbook(new FileInputStream(tableFile));
             } else {
-                errors.add(String.format("配置[%s]格式非法", table));
+                errors.add(String.format("配置[%s]格式非法:%s", table, tableFile.getName()));
                 return;
             }
         } catch (Exception e) {
@@ -55,7 +56,8 @@ public class ExcelConfigReader extends ConfigReader {
 
     private void read(Workbook workbook) {
         Sheet sheet = workbook.getSheetAt(0);
-        int rowNum = sheet.getLastRowNum();
+        //总行数
+        int rowNum = sheet.getPhysicalNumberOfRows();
         if (rowNum < 1) {
             return;
         }
@@ -63,7 +65,7 @@ public class ExcelConfigReader extends ConfigReader {
         List<String> columnNames = new ArrayList<>();
         Row row1 = sheet.getRow(0);
         for (Cell cell : row1) {
-            columnNames.add(getCellValue(cell));
+            columnNames.add(dataFormatter.formatCellValue(cell).trim());
         }
         checkColumns(columnNames);
 
@@ -76,35 +78,10 @@ public class ExcelConfigReader extends ConfigReader {
             Row row = sheet.getRow(i);
             JSONObject rowJson = new JSONObject(true);
             for (int j = 0; j < columnNames.size(); j++) {
-                addColumnToRow(rowJson, columnNames.get(j), getCellValue(row.getCell(j)), i + 1, j + 1);
+                addColumnToRow(rowJson, columnNames.get(j), dataFormatter.formatCellValue(row.getCell(j)).trim(), i + 1, j + 1);
             }
             jsons.add(rowJson);
         }
     }
 
-    protected String getCellValue(Cell cell) {
-        String cellValue = "";
-        switch (cell.getCellType()) {
-            case NUMERIC: // 数字
-                if (org.apache.poi.ss.usermodel.DateUtil.isCellDateFormatted(cell)) {
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                    cellValue = sdf.format(org.apache.poi.ss.usermodel.DateUtil.getJavaDate(cell.getNumericCellValue()));
-                } else {
-                    DataFormatter dataFormatter = new DataFormatter();
-                    cellValue = dataFormatter.formatCellValue(cell);
-                }
-                break;
-            case STRING: // 字符串
-                cellValue = cell.getStringCellValue();
-                break;
-            case BOOLEAN: // Boolean
-                cellValue = cell.getBooleanCellValue() + "";
-                break;
-            case FORMULA: // 公式
-                cellValue = cell.getCellFormula() + "";
-                break;
-        }
-        return cellValue.trim();
-
-    }
 }

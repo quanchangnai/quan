@@ -39,24 +39,17 @@ public abstract class ConfigReader {
         this.tableFile = new File(tablePath, table);
         this.table = table.substring(0, table.lastIndexOf("."));
         this.configDefinition = configDefinition;
-    }
 
-    public static ConfigReader create(String tableType, String tablePath, String table, ConfigDefinition configDefinition) {
-        if (tableType.equals("csv")) {
-            return new CSVConfigReader(tablePath, table + "." + tableType, configDefinition);
-        } else if (tableType.equals("xls") || tableType.equals("xlsx")) {
-            return new ExcelConfigReader(tablePath, table + "." + tableType, configDefinition);
-        }
-        return null;
-    }
-
-    public void initPrototype() {
         try {
             Class<Config> configClass = (Class<Config>) Class.forName(configDefinition.getFullName());
             prototype = configClass.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
             logger.error("实例化配置类[{}]失败", configDefinition.getFullName(), e);
         }
+    }
+
+    public ConfigDefinition getConfigDefinition() {
+        return configDefinition;
     }
 
     public List<JSONObject> readJsons() {
@@ -111,7 +104,7 @@ public abstract class ConfigReader {
         }
     }
 
-    protected void addColumnToRow(JSONObject lineJson, String columnName, String columnValue, int row, int column) {
+    protected void addColumnToRow(JSONObject rowJson, String columnName, String columnValue, int row, int column) {
         FieldDefinition fieldDefinition = configDefinition.getColumnFields().get(columnName);
         if (fieldDefinition == null) {
             return;
@@ -129,14 +122,14 @@ public abstract class ConfigReader {
         }
 
         if (fieldType.equals("list") || fieldType.equals("set")) {
-            JSONArray jsonArray = lineJson.getJSONArray(fieldName);
+            JSONArray jsonArray = rowJson.getJSONArray(fieldName);
             if (jsonArray == null) {
-                lineJson.put(fieldName, fieldValue);
+                rowJson.put(fieldName, fieldValue);
             } else {
                 jsonArray.addAll((JSONArray) fieldValue);
             }
         } else {
-            lineJson.put(fieldName, fieldValue);
+            rowJson.put(fieldName, fieldValue);
         }
     }
 

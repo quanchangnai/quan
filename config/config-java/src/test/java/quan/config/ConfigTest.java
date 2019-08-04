@@ -20,16 +20,19 @@ public class ConfigTest {
 
 //        String tableType = "csv";
 //        String tablePath = "config\\csv";
-        String tableType = "xlsx";
-        String tablePath = "config\\excel";
+//        String tableType = "xlsx";
+//        String tablePath = "config\\excel";
+        String tableType = "json";
+        String tablePath = "config\\json";
 
 
         ConfigLoader configLoader = new ConfigLoader(definitionPaths, tablePath);
         configLoader.setPackagePrefix("quan.config");
         configLoader.setEnumPackagePrefix("quan");
-//        configLoader.onlyCheck(true);
+        configLoader.setLoadType(ConfigLoader.Type.onlyLoad);
         configLoader.setValidatorsPackage("quan");
         configLoader.setTableType(tableType);
+        configLoader.setOutputPath("config\\json");
 
         System.err.println("configLoader.load()=============");
         long startTime = System.currentTimeMillis();
@@ -40,6 +43,11 @@ public class ConfigTest {
         }
         System.err.println("configLoader.load()耗时:" + (System.currentTimeMillis() - startTime));
         printConfigs();
+
+        System.err.println("configLoader.writeToJson()=============");
+        startTime = System.currentTimeMillis();
+        configLoader.writeToJson();
+        System.err.println("configLoader.writeToJson()耗时:" + (System.currentTimeMillis() - startTime));
 
         Thread.sleep(10000);
 
@@ -69,7 +77,7 @@ public class ConfigTest {
         System.err.println("configLoader.reloadTables()=============" + reloadConfigs);
         long startTime = System.currentTimeMillis();
         try {
-            configLoader.reloadTables(reloadConfigs);
+            configLoader.reloadTables(reloadConfigs, true);
         } catch (ConfigException e) {
             printErrors(e);
         }
