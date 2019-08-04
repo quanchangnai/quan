@@ -28,7 +28,7 @@ public abstract class ConfigReader {
 
     protected List<JSONObject> jsons = new ArrayList<>();
 
-    protected LinkedHashSet<String> errors = new LinkedHashSet<>();
+    protected LinkedHashSet<String> validatedErrors = new LinkedHashSet<>();
 
     private List<Config> configs = new ArrayList<>();
 
@@ -77,8 +77,8 @@ public abstract class ConfigReader {
         return configs;
     }
 
-    public List<String> getErrors() {
-        return new ArrayList<>(errors);
+    public List<String> getValidatedErrors() {
+        return new ArrayList<>(validatedErrors);
     }
 
     protected abstract void read();
@@ -86,7 +86,7 @@ public abstract class ConfigReader {
     public void clear() {
         jsons.clear();
         configs.clear();
-        errors.clear();
+        validatedErrors.clear();
     }
 
     protected void validateColumnNames(List<String> columns) {
@@ -101,7 +101,7 @@ public abstract class ConfigReader {
 
         for (FieldDefinition field : fields) {
             String error = String.format("配置[%s]缺少字段[%s]对应的列[%s]", table, field.getName(), field.getColumn());
-            errors.add(error);
+            validatedErrors.add(error);
         }
     }
 
@@ -118,7 +118,7 @@ public abstract class ConfigReader {
         try {
             fieldValue = convert(fieldDefinition, columnValue);
         } catch (Exception e) {
-            errors.add(String.format("配置[%s]的第%d行第%d列[%s]数据[%s]格式错误", table, row, column, columnName, columnValue));
+            validatedErrors.add(String.format("配置[%s]的第%d行第%d列[%s]数据[%s]格式错误", table, row, column, columnName, columnValue));
             return;
         }
 

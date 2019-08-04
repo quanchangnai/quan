@@ -52,7 +52,7 @@ public class ConfigLoader {
     //自定义的配置校验器
     private Set<ConfigValidator> validators = new HashSet<>();
 
-    private LinkedHashSet<String> errors = new LinkedHashSet<>();
+    private LinkedHashSet<String> validatedErrors = new LinkedHashSet<>();
 
     public ConfigLoader(List<String> definitionPaths, String tablePath) {
         for (String definitionPath : definitionPaths) {
@@ -66,6 +66,10 @@ public class ConfigLoader {
         this.tableType = tableType;
         readers.clear();
         return this;
+    }
+
+    public String getTableType() {
+        return tableType;
     }
 
     public ConfigLoader setDefinitionParser(DefinitionParser definitionParser) {
@@ -133,14 +137,13 @@ public class ConfigLoader {
         try {
             definitionParser.parse();
         } catch (Exception e) {
-            String error = String.format("读取[%s]异常:%s", definitionPaths, e.getMessage());
-            logger.debug(error, e);
-            throw new ConfigException(error);
+            logger.error("解析配置定义文件[{}]出错", definitionPaths, e);
+            return;
         }
 
         List<String> validatedErrors = ClassDefinition.getValidatedErrors();
         if (!validatedErrors.isEmpty()) {
-            ConfigException configException = new ConfigException(String.format("解析定义文件%s共发现%d条错误。", definitionPaths, validatedErrors.size()));
+            ConfigException configException = new ConfigException(String.format("解析配置定义文件%s共发现%d条错误。", definitionPaths, validatedErrors.size()));
             configException.addErrors(validatedErrors);
             throw configException;
         }
@@ -151,7 +154,7 @@ public class ConfigLoader {
      * 全量加载配置
      */
     public void load() {
-        errors.clear();
+        validatedErrors.clear();
         //解析定义文件
         parseDefinition();
 
@@ -165,15 +168,13 @@ public class ConfigLoader {
             if (needValidate()) {
                 configIndexedJsonsAll.put(configDefinition, validateIndex(configDefinition));
             }
-            //加载配置
-            if (needLoad()) {
-                load(configDefinition);
-            }
+            //needLoad():加载配置
+            load(configDefinition);
         }
 
         if (needValidate()) {
             for (ConfigReader reader : readers.values()) {
-                errors.addAll(reader.getErrors());
+                validatedErrors.addAll(reader.getValidatedErrors());
             }
             //引用校验，依赖索引结果
             for (ConfigDefinition configDefinition : configIndexedJsonsAll.keySet()) {
@@ -185,17 +186,17 @@ public class ConfigLoader {
                 try {
                     validator.validateConfig();
                 } catch (ConfigException e) {
-                    errors.addAll(e.getErrors());
+                    validatedErrors.addAll(e.getErrors());
                 } catch (Exception e) {
                     String error = String.format("配置错误:%s", e.getMessage());
-                    errors.add(error);
+                    validatedErrors.add(error);
                     logger.debug("", e);
                 }
             }
         }
 
-        if (!errors.isEmpty()) {
-            throw new ConfigException(errors);
+        if (!validatedErrors.isEmpty()) {
+            throw new ConfigException(validatedErrors);
         }
     }
 
@@ -283,7 +284,7 @@ public class ConfigLoader {
                 if (!jsonTables.get(oldJson).equals(table)) {
                     repeatedTables += "," + jsonTables.get(oldJson);
                 }
-                errors.add(String.format("配置[%s]有重复数据[%s = %s]", repeatedTables, field1.getColumn(), json.get(field1.getName())));
+                validatedErrors.add(String.format("配置[%s]有重复数据[%s = %s]", repeatedTables, field1.getColumn(), json.get(field1.getName())));
             }
         }
 
@@ -296,7 +297,7 @@ public class ConfigLoader {
                 if (!jsonTables.get(oldJson).equals(table)) {
                     repeatedTables += "," + jsonTables.get(oldJson);
                 }
-                errors.add(String.format("配置[%s]有重复数据[%s,%s = %s,%s]", repeatedTables, field1.getColumn(), field2.getColumn(), json.get(field1.getName()), json.get(field2.getName())));
+                validatedErrors.add(String.format("配置[%s]有重复数据[%s,%s = %s,%s]", repeatedTables, field1.getColumn(), field2.getColumn(), json.get(field1.getName()), json.get(field2.getName())));
             }
         }
 
@@ -310,7 +311,7 @@ public class ConfigLoader {
                 if (!jsonTables.get(oldJson).equals(table)) {
                     repeatedTables += "," + jsonTables.get(oldJson);
                 }
-                errors.add(String.format("配置[%s]有重复数据[%s,%s,%s = %s,%s,%s]", repeatedTables, field1.getColumn(), field2.getColumn(), field3.getColumn(), json.get(field1.getName()), json.get(field2.getName()), json.get(field3.getName())));
+                validatedErrors.add(String.format("配置[%s]有重复数据[%s,%s,%s = %s,%s,%s]", repeatedTables, field1.getColumn(), field2.getColumn(), field3.getColumn(), json.get(field1.getName()), json.get(field2.getName()), json.get(field3.getName())));
             }
         }
     }
@@ -395,7 +396,7 @@ public class ConfigLoader {
             } else {
                 error = String.format("配置[%s]第%s行[%s]的对象[%s]字段[%s]的%s引用[%s]数据[%s]不存在", position.getLeft(), position.getMiddle(), position.getRight(), bean.getName(), field.getName(), keyOrValue, fieldRefs, value);
             }
-            errors.add(error);
+            validatedErrors.add(error);
         }
     }
 
@@ -406,25 +407,20 @@ public class ConfigLoader {
         }
     }
 
+    /**
+     * 加载配置到类索引
+     */
+    @SuppressWarnings({"unchecked"})
     private void load(ConfigDefinition configDefinition) {
-        load(configDefinition, false);
-    }
-
-    private void reload(ConfigDefinition configDefinition) {
-        load(configDefinition, true);
-    }
-
-    private void load(ConfigDefinition configDefinition, boolean reload) {
+        if (!needLoad()) {
+            return;
+        }
         List<Config> configs = new ArrayList<>();
         for (String table : getConfigTables(configDefinition)) {
             ConfigReader configReader = getOrCreateReader(table);
             configs.addAll(configReader.readObjects());
         }
-        indexConfigs(configDefinition, configs, reload);
-    }
 
-    @SuppressWarnings({"unchecked"})
-    private void indexConfigs(ConfigDefinition configDefinition, List<Config> configs, boolean reload) {
         String indexClass = configDefinition.getFullName();
         if (configDefinition.getParentConfig() != null) {
             indexClass += "$self";
@@ -434,43 +430,50 @@ public class ConfigLoader {
         try {
             indexMethod = Class.forName(indexClass).getMethod("index", List.class);
         } catch (Exception e) {
-            String error = String.format("加载配置[%s]类出错:%s", configDefinition.getName(), e.getMessage());
-            errors.add(error);
-            logger.debug(error, e);
+            logger.error("加载配置[{}]类出错", configDefinition.getName(), e);
             return;
         }
 
         try {
             List<String> indexErrors = (List<String>) indexMethod.invoke(null, configs);
-            if (reload) {
-                errors.addAll(indexErrors);
+            if (needValidate()) {
+                validatedErrors.addAll(indexErrors);
             }
         } catch (Exception e) {
-            String error = String.format("调用配置[%s]的索引方法出错:%s", configDefinition.getName(), e.getMessage());
-            errors.add(error);
-            logger.debug(error, e);
+            logger.error("调用配置[{}]的索引方法出错", configDefinition.getName(), e);
         }
-
-
     }
 
     /**
-     * 重加载配置
-     *
-     * @param configs 配置名字
+     * 重加载全部配置，校验依赖
      */
-    public void reloadConfigs(Collection<String> configs) {
+    public void reload() {
         if (!needLoad()) {
             return;
         }
-        errors.clear();
+        for (ConfigReader reader : readers.values()) {
+            reader.clear();
+        }
+        load();
+    }
+
+    /**
+     * 重加载给定的配置，部分加载不校验依赖
+     *
+     * @param configs 配置名字
+     */
+    public void reload(Collection<String> configs) {
+        if (!needLoad()) {
+            return;
+        }
+        validatedErrors.clear();
 
         Set<String> needReloadTables = new LinkedHashSet<>();
 
         for (String configName : configs) {
             ConfigDefinition configDefinition = ConfigDefinition.getConfig(configName);
             if (configDefinition == null) {
-                errors.add(String.format("重加载[%s]出错，不存在该配置", configName));
+                logger.error("重加载[{}]失败，不存在该配置", configName);
                 continue;
             }
             needReloadTables.addAll(getConfigTables(configDefinition));
@@ -480,7 +483,7 @@ public class ConfigLoader {
     }
 
     /**
-     * 重加载表格，注意：表格转成Json格式后使用的表名实际上是配置类名
+     * 重加载给定的表格，部分加载不校验依赖，注意：表格转成Json格式后使用的表名实际上是配置类名
      *
      * @param tables       表名
      * @param originalName 表名是不是原名，表格转成Json格式后使用的表名实际上是配置类名
@@ -499,17 +502,17 @@ public class ConfigLoader {
         for (String table : tables) {
             ConfigDefinition configDefinition = ConfigDefinition.getTableConfigs().get(table);
             if (configDefinition == null) {
-                errors.add(String.format("重加载[%s]出错，不存在该配置", table));
+                logger.error("重加载[{}]失败，不存在该配置", table);
                 continue;
             }
             realTables.add(configDefinition.getName());
-            reloadTables(realTables);
         }
 
+        reloadTables(realTables);
     }
 
     /**
-     * 重加载表格，注意：表格转成Json格式后使用的表名实际上是配置类名
+     * 重加载表格，部分加载不校验依赖，注意：表格转成Json格式后使用的表名实际上是配置类名
      *
      * @param tables 表名
      */
@@ -517,7 +520,7 @@ public class ConfigLoader {
         if (!needLoad()) {
             return;
         }
-        errors.clear();
+        validatedErrors.clear();
 
         Set<ConfigDefinition> needReloadConfigs = new LinkedHashSet<>();
         Set<ConfigReader> reloadReaders = new LinkedHashSet<>();
@@ -525,7 +528,7 @@ public class ConfigLoader {
         for (String table : tables) {
             ConfigReader configReader = readers.get(table);
             if (configReader == null) {
-                errors.add(String.format("重加载[%s]出错，对应配置从未被加载", table));
+                logger.error("重加载[{}]失败，对应配置从未被加载", table);
                 continue;
             }
             configReader.clear();
@@ -539,18 +542,18 @@ public class ConfigLoader {
         }
 
         for (ConfigDefinition configDefinition : needReloadConfigs) {
-            reload(configDefinition);
+            load(configDefinition);
         }
 
         for (ConfigReader reloadReader : reloadReaders) {
-            List<String> errors = reloadReader.getErrors();
+            List<String> errors = reloadReader.getValidatedErrors();
             if (needValidate()) {
-                this.errors.addAll(errors);
+                this.validatedErrors.addAll(errors);
             }
         }
 
-        if (!errors.isEmpty()) {
-            throw new ConfigException(errors);
+        if (!validatedErrors.isEmpty()) {
+            throw new ConfigException(validatedErrors);
         }
     }
 
