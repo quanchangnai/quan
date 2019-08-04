@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class ExcelConfigReader extends ConfigReader {
 
-    private DataFormatter dataFormatter = new DataFormatter();
+    private static final DataFormatter dataFormatter = new DataFormatter();
 
     public ExcelConfigReader(String tablePath, String table, ConfigDefinition configDefinition) {
         super(tablePath, table, configDefinition);
@@ -32,7 +32,7 @@ public class ExcelConfigReader extends ConfigReader {
                 return;
             }
 
-            //第一行是表头，第二行是注释，第三行起是内容
+            //第一行是表头
             List<String> columnNames = new ArrayList<>();
             Row row1 = sheet.getRow(0);
             for (Cell cell : row1) {
@@ -40,15 +40,16 @@ public class ExcelConfigReader extends ConfigReader {
             }
             validateColumnNames(columnNames);
 
-            if (rowNum <= 2) {
+            //第bodyRowNum行起是正文
+            if (rowNum < bodyRowNum) {
                 return;
             }
 
-            for (int i = 2; i < rowNum; i++) {
-                Row row = sheet.getRow(i);
+            for (int i = bodyRowNum; i <= rowNum; i++) {
+                Row row = sheet.getRow(i - 1);
                 JSONObject rowJson = new JSONObject(true);
-                for (int j = 0; j < columnNames.size(); j++) {
-                    addColumnToRow(rowJson, columnNames.get(j), dataFormatter.formatCellValue(row.getCell(j)).trim(), i + 1, j + 1);
+                for (int j = 1; j <= columnNames.size(); j++) {
+                    addColumnToRow(rowJson, columnNames.get(j - 1), dataFormatter.formatCellValue(row.getCell(j - 1)).trim(), i, j);
                 }
                 jsons.add(rowJson);
             }

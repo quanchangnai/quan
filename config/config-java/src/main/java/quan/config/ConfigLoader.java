@@ -47,6 +47,8 @@ public class ConfigLoader {
 
     private String enumPackagePrefix;
 
+    private int bodyRowNum;
+
     private Map<String, ConfigReader> readers = new HashMap<>();
 
     //自定义的配置校验器
@@ -92,6 +94,16 @@ public class ConfigLoader {
     public ConfigLoader setLoadType(Type loadType) {
         Objects.requireNonNull(loadType, "加载类型不能为空");
         this.loadType = loadType;
+        return this;
+    }
+
+    /**
+     * 设置表格正文起始行号，默认是第3行,第1行固定是表头，中间是注释等，行号从1开始
+     */
+    public ConfigLoader setBodyRowNum(int bodyRowNum) {
+        if (bodyRowNum > 1 && this.bodyRowNum == 0) {
+            this.bodyRowNum = bodyRowNum;
+        }
         return this;
     }
 
@@ -567,19 +579,25 @@ public class ConfigLoader {
     }
 
     private ConfigReader createReader(String table) {
+        ConfigReader configReader = null;
         ConfigDefinition configDefinition = getConfigByTable(table);
         switch (tableType) {
             case "csv":
-                return new CSVConfigReader(tablePath, table + "." + tableType, configDefinition);
+                configReader = new CSVConfigReader(tablePath, table + "." + tableType, configDefinition);
+                break;
             case "xls":
             case "xlsx":
-                return new ExcelConfigReader(tablePath, table + "." + tableType, configDefinition);
+                configReader = new ExcelConfigReader(tablePath, table + "." + tableType, configDefinition);
+                break;
             case "json":
-                return new JsonConfigReader(tablePath, table + "." + tableType, configDefinition);
-            default:
-                return null;
+                configReader = new JsonConfigReader(tablePath, table + "." + tableType, configDefinition);
+                break;
         }
 
+        if (configReader != null && bodyRowNum > 0) {
+            configReader.setBodyRowNum(bodyRowNum);
+        }
+        return configReader;
     }
 
     private ConfigReader getOrCreateReader(String table) {

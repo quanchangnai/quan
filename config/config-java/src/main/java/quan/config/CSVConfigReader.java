@@ -36,22 +36,23 @@ public class CSVConfigReader extends ConfigReader {
             return;
         }
 
-        //第一行是表头，第二行是注释，第三行起是内容
+        //第一行是表头
         List<String> columnNames = new ArrayList<>();
         for (String columnName : records.get(0)) {
             columnNames.add(columnName.trim());
         }
         validateColumnNames(columnNames);
 
-        if (records.size() <= 2) {
+        //第bodyRowNum行起是正文
+        if (records.size() < bodyRowNum) {
             return;
         }
 
-        for (int i = 2; i < records.size(); i++) {
-            CSVRecord record = records.get(i);
+        for (int i = bodyRowNum; i <= records.size(); i++) {
+            CSVRecord record = records.get(i - 1);
             JSONObject rowJson = new JSONObject(true);
-            for (int j = 0; j < columnNames.size(); j++) {
-                addColumnToRow(rowJson, columnNames.get(j), record.get(j).trim(), i + 1, j + 1);
+            for (int j = 1; j <= columnNames.size(); j++) {
+                addColumnToRow(rowJson, columnNames.get(j - 1), record.get(j - 1).trim(), i, j);
             }
             jsons.add(rowJson);
         }

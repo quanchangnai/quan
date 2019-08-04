@@ -26,13 +26,16 @@ public abstract class ConfigReader {
 
     protected ConfigDefinition configDefinition;
 
+    //表格正文起始行号，默认是第3行,第1行固定是表头，中间是注释等，行号从1开始
+    protected int bodyRowNum = 3;
+
+    private Config prototype;
+
     protected List<JSONObject> jsons = new ArrayList<>();
 
     protected LinkedHashSet<String> validatedErrors = new LinkedHashSet<>();
 
     private List<Config> configs = new ArrayList<>();
-
-    private Config prototype;
 
     public ConfigReader(String tablePath, String table, ConfigDefinition configDefinition) {
         tablePath = PathUtils.crossPlatPath(tablePath);
@@ -47,6 +50,13 @@ public abstract class ConfigReader {
         } catch (Exception e) {
             logger.error("实例化配置类[{}]失败", configDefinition.getFullName(), e);
         }
+    }
+
+    public ConfigReader setBodyRowNum(int bodyRowNum) {
+        if (bodyRowNum > 1) {
+            this.bodyRowNum = bodyRowNum;
+        }
+        return this;
     }
 
     public ConfigDefinition getConfigDefinition() {
