@@ -54,6 +54,8 @@ public class ConfigLoader {
 
     private LinkedHashSet<String> validatedErrors = new LinkedHashSet<>();
 
+    private boolean loaded;
+
     public ConfigLoader(List<String> definitionPaths, String tablePath) {
         for (String definitionPath : definitionPaths) {
             this.definitionPaths.add(PathUtils.crossPlatPath(definitionPath));
@@ -151,9 +153,13 @@ public class ConfigLoader {
     }
 
     /**
-     * 全量加载配置
+     * 加载全部配置
      */
     public void load() {
+        if (loaded) {
+            logger.error("配置已经全部加载了");
+            return;
+        }
         validatedErrors.clear();
         //解析定义文件
         parseDefinition();
@@ -194,6 +200,8 @@ public class ConfigLoader {
                 }
             }
         }
+
+        loaded = true;
 
         if (!validatedErrors.isEmpty()) {
             throw new ConfigException(validatedErrors);
@@ -447,10 +455,11 @@ public class ConfigLoader {
     /**
      * 重加载全部配置，校验依赖
      */
-    public void reload() {
+    public void reloadAll() {
         if (!needLoad()) {
             return;
         }
+        loaded = false;
         for (ConfigReader reader : readers.values()) {
             reader.clear();
         }

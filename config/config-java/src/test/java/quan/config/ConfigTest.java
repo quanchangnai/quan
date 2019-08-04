@@ -75,7 +75,7 @@ public class ConfigTest {
         System.err.println("configLoader.reloadAllConfigs()=============");
         long startTime = System.currentTimeMillis();
         try {
-            configLoader.reload();
+            configLoader.reloadAll();
         } catch (ConfigException e) {
             printErrors(e);
         }
