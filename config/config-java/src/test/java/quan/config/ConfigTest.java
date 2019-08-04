@@ -20,10 +20,10 @@ public class ConfigTest {
 
 //        String tableType = "csv";
 //        String tablePath = "config\\csv";
-//        String tableType = "xlsx";
-//        String tablePath = "config\\excel";
-        String tableType = "json";
-        String tablePath = "config\\json";
+        String tableType = "xlsx";
+        String tablePath = "config\\excel";
+//        String tableType = "json";
+//        String tablePath = "config\\json";
 
 
         ConfigLoader configLoader = new ConfigLoader(definitionPaths, tablePath);
@@ -32,7 +32,6 @@ public class ConfigTest {
         configLoader.setLoadType(ConfigLoader.Type.onlyLoad);
         configLoader.setValidatorsPackage("quan");
         configLoader.setTableType(tableType);
-        configLoader.setOutputPath("config\\json");
 
         System.err.println("configLoader.load()=============");
         long startTime = System.currentTimeMillis();
@@ -44,10 +43,12 @@ public class ConfigTest {
         System.err.println("configLoader.load()耗时:" + (System.currentTimeMillis() - startTime));
         printConfigs();
 
-        System.err.println("configLoader.writeToJson()=============");
-        startTime = System.currentTimeMillis();
-        configLoader.writeToJson();
-        System.err.println("configLoader.writeToJson()耗时:" + (System.currentTimeMillis() - startTime));
+        if (!tableType.equals("json")) {
+            System.err.println("configLoader.writeJson()=============");
+            startTime = System.currentTimeMillis();
+            configLoader.writeJson("config\\json");
+            System.err.println("configLoader.writeJson()耗时:" + (System.currentTimeMillis() - startTime));
+        }
 
         Thread.sleep(10000);
 

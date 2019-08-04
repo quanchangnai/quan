@@ -2,6 +2,7 @@ package quan.generator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import quan.common.util.PathUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -25,8 +26,7 @@ public abstract class DefinitionParser {
 
     public void setDefinitionPaths(List<String> definitionPaths) {
         for (String path : definitionPaths) {
-            path = path.replace("/", File.separator).replace("\\", File.separator);
-            File file = new File(path);
+            File file = new File(PathUtils.crossPlatPath(path));
             File[] files = file.listFiles((File dir, String name) -> name.endsWith("." + getFileType()));
             if (files != null) {
                 definitionFiles.addAll(Arrays.asList(files));

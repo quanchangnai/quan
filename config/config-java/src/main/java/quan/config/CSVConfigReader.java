@@ -36,13 +36,13 @@ public class CSVConfigReader extends ConfigReader {
             return;
         }
 
+        //第一行是表头，第二行是注释，第三行起是内容
         List<String> columnNames = new ArrayList<>();
         for (String columnName : records.get(0)) {
             columnNames.add(columnName.trim());
         }
-        checkColumns(columnNames);
+        validateColumnNames(columnNames);
 
-        //第一行是表头，第二行是注释，第三行起是内容
         if (records.size() <= 2) {
             return;
         }

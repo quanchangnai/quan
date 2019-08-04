@@ -5,6 +5,7 @@ import freemarker.template.Template;
 import freemarker.template.TemplateExceptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import quan.common.util.PathUtils;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -71,9 +72,9 @@ public abstract class Generator {
         freemarkerCfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
 
         for (String definitionPath : definitionPaths) {
-            this.definitionPaths.add(definitionPath.replace("/", File.separator).replace("\\", File.separator));
+            this.definitionPaths.add(PathUtils.crossPlatPath(definitionPath));
         }
-        this.codePath = codePath.replace("/", File.separator).replace("\\", File.separator);
+        this.codePath = PathUtils.crossPlatPath(codePath);
         this.freemarkerCfg = freemarkerCfg;
 
         Template enumTemplate = freemarkerCfg.getTemplate("enum." + supportLanguage() + ".ftl");

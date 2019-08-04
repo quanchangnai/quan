@@ -9,6 +9,7 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.common.util.ClassUtils;
+import quan.common.util.PathUtils;
 import quan.generator.*;
 import quan.generator.config.ConfigDefinition;
 import quan.generator.config.IndexDefinition;
@@ -40,9 +41,6 @@ public class ConfigLoader {
     //配置表类型,csv xls xlsx等
     private String tableType = "csv";
 
-    //输出目录
-    private String outputPath;
-
     private Type loadType = Type.validateAndLoad;
 
     private String packagePrefix;
@@ -58,21 +56,15 @@ public class ConfigLoader {
 
     public ConfigLoader(List<String> definitionPaths, String tablePath) {
         for (String definitionPath : definitionPaths) {
-            this.definitionPaths.add(definitionPath.replace("/", File.separator).replace("\\", File.separator));
+            this.definitionPaths.add(PathUtils.crossPlatPath(definitionPath));
         }
-        this.tablePath = tablePath.replace("/", File.separator).replace("\\", File.separator);
+        this.tablePath = PathUtils.crossPlatPath(tablePath);
     }
 
     public ConfigLoader setTableType(String tableType) {
         Objects.requireNonNull(tableType, "表格类型不能为空");
         this.tableType = tableType;
         readers.clear();
-        return this;
-    }
-
-    public ConfigLoader setOutputPath(String outputPath) {
-        Objects.requireNonNull(outputPath, "输出目录不能为空");
-        this.outputPath = outputPath;
         return this;
     }
 
@@ -207,17 +199,10 @@ public class ConfigLoader {
         }
     }
 
-    public void writeToJson() {
-        if (outputPath == null) {
-            logger.error("输出目录未设置");
-            return;
-        }
-        if (tableType.equals("json")) {
-            logger.error("配置已经是JSON格式了");
-            return;
-        }
+    public void writeJson(String path) {
+        Objects.requireNonNull(path, "输出目录不能为空");
 
-        File path = new File(outputPath);
+        File pathFile = new File(PathUtils.crossPlatPath(path));
         Set<ConfigDefinition> configDefinitions = new HashSet<>(ConfigDefinition.getTableConfigs().values());
 
         for (ConfigDefinition configDefinition : configDefinitions) {
@@ -233,7 +218,7 @@ public class ConfigLoader {
             }
 
             String configName = configDefinition.getName();
-            try (FileOutputStream fileOutputStream = new FileOutputStream(new File(path, configName + ".json"))) {
+            try (FileOutputStream fileOutputStream = new FileOutputStream(new File(pathFile, configName + ".json"))) {
                 JSON.writeJSONString(fileOutputStream, rows, SerializerFeature.PrettyFormat);
             } catch (Exception e) {
                 logger.error("配置[{}]写到JSON文件出错", configName, e);

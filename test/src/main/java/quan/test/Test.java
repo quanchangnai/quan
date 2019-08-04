@@ -8,9 +8,7 @@ import java.io.File;
 public class Test {
 
     public static void main(String[] args) {
-        String path = "aa/bb/vv\\cc\\dd";
-        path = path.replace("/", File.separator).replace("\\", File.separator);
-        System.err.println(path);
+
     }
 
 

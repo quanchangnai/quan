@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import quan.common.util.PathUtils;
 import quan.generator.BeanDefinition;
 import quan.generator.FieldDefinition;
 import quan.generator.config.ConfigDefinition;
@@ -34,8 +35,8 @@ public abstract class ConfigReader {
     private Config prototype;
 
     public ConfigReader(String tablePath, String table, ConfigDefinition configDefinition) {
-        tablePath = tablePath.replace("/", File.separator).replace("\\", File.separator);
-        table = table.replace("/", File.separator).replace("\\", File.separator);
+        tablePath = PathUtils.crossPlatPath(tablePath);
+        table = PathUtils.crossPlatPath(table);
         this.tableFile = new File(tablePath, table);
         this.table = table.substring(0, table.lastIndexOf("."));
         this.configDefinition = configDefinition;
@@ -88,7 +89,7 @@ public abstract class ConfigReader {
         errors.clear();
     }
 
-    protected void checkColumns(List<String> columns) {
+    protected void validateColumnNames(List<String> columns) {
         Set<FieldDefinition> fields = new HashSet<>(configDefinition.getFields());
 
         for (String columnName : columns) {
