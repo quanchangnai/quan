@@ -54,11 +54,6 @@ public class ExcelConfigReader extends ConfigReader {
     }
 
     private void read(Workbook workbook) {
-        if (workbook.getNumberOfSheets() < 1) {
-            errors.add(String.format("配置[%s]至少要有一个工作表", table));
-            return;
-        }
-
         Sheet sheet = workbook.getSheetAt(0);
         int rowNum = sheet.getLastRowNum();
         if (rowNum < 1) {

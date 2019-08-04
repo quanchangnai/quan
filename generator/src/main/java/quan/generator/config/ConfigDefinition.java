@@ -71,12 +71,8 @@ public class ConfigDefinition extends BeanDefinition {
         return parent;
     }
 
-    public ConfigDefinition getParentDefinition() {
-        ClassDefinition classDefinition = ClassDefinition.getAll().get(getParent());
-        if (classDefinition instanceof ConfigDefinition) {
-            return (ConfigDefinition) classDefinition;
-        }
-        return null;
+    public ConfigDefinition getParentConfig() {
+        return getConfig(getParent());
     }
 
     public List<String> getTables() {
@@ -88,7 +84,10 @@ public class ConfigDefinition extends BeanDefinition {
         childrenAndMe.add(getName());
 
         for (String configName : childrenAndMe) {
-            ConfigDefinition configDefinition = (ConfigDefinition) getAll().get(configName);
+            ConfigDefinition configDefinition = getConfig(configName);
+            if (configDefinition == null) {
+                continue;
+            }
             tables.addAll(Arrays.asList(configDefinition.table.split("[,]")));
         }
 
@@ -141,6 +140,14 @@ public class ConfigDefinition extends BeanDefinition {
         return selfFields;
     }
 
+    public static ConfigDefinition getConfig(String name) {
+        ClassDefinition classDefinition = getClasses().get(name);
+        if (classDefinition instanceof ConfigDefinition) {
+            return (ConfigDefinition) classDefinition;
+        }
+        return null;
+    }
+
     @Override
     public void validate() {
         if (getName() == null) {
@@ -152,7 +159,7 @@ public class ConfigDefinition extends BeanDefinition {
         }
 
         if (table == null) {
-            addValidatedError(getName4Validate() + "对应的表格不能为空");
+            table = getName();
         }
 
         //支持分表
@@ -180,34 +187,28 @@ public class ConfigDefinition extends BeanDefinition {
         }
 
         //支持子表
-        ClassDefinition parentClassDefinition = ClassDefinition.getAll().get(getParent());
-        if (parentClassDefinition == null) {
-            addValidatedError(getName4Validate() + "的父类[" + parent + "]不存在");
+        ConfigDefinition parentConfig = getParentConfig();
+        if (parentConfig == null) {
+            addValidatedError(getName4Validate() + "的父配置[" + parent + "]不存在");
             return;
         }
-        if (!(parentClassDefinition instanceof ConfigDefinition)) {
-            addValidatedError(getName4Validate() + "的父类[" + parent + "]也必须是配置类");
-            return;
-        }
-
-        ConfigDefinition parentConfigDefinition = getParentDefinition();
 
         Set<String> parents = new HashSet<>();
-        while (parentConfigDefinition != null) {
-            if (parents.contains(parentConfigDefinition.getName())) {
+        while (parentConfig != null) {
+            if (parents.contains(parentConfig.getName())) {
                 addValidatedError(getName4Validate() + "和父类" + parents + "不能有循环");
                 return;
             }
-            parents.add(parentConfigDefinition.getName());
-            parentConfigDefinition = parentConfigDefinition.getParentDefinition();
+            parents.add(parentConfig.getName());
+            parentConfig = parentConfig.getParentConfig();
         }
 
-        parentConfigDefinition = getParentDefinition();
-        while (parentConfigDefinition != null) {
-            fields.addAll(0, parentConfigDefinition.selfFields);
-            indexes.addAll(0, parentConfigDefinition.selfIndexes);
-            parentConfigDefinition.children.add(getName());
-            parentConfigDefinition = parentConfigDefinition.getParentDefinition();
+        parentConfig = getParentConfig();
+        while (parentConfig != null) {
+            fields.addAll(0, parentConfig.selfFields);
+            indexes.addAll(0, parentConfig.selfIndexes);
+            parentConfig.children.add(getName());
+            parentConfig = parentConfig.getParentConfig();
         }
 
     }
@@ -277,8 +278,8 @@ public class ConfigDefinition extends BeanDefinition {
             addValidatedError(getName4Validate() + "[" + field.getType() + "]类型字段" + field.getName4Validate() + "的分隔符[" + delimiter + "]必须是" + charNumError + "个字符");
         }
 
-        if (field.isBeanValueType()) {
-            BeanDefinition fieldValueBean = (BeanDefinition) ClassDefinition.getAll().get(field.getValueType());
+        BeanDefinition fieldValueBean = BeanDefinition.getBean(field.getValueType());
+        if (fieldValueBean != null) {
             validateBeanDelimiter(fieldValueBean, delimiters);
         }
     }

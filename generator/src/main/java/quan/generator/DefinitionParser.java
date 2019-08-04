@@ -49,7 +49,7 @@ public abstract class DefinitionParser {
     protected abstract String getFileType();
 
     public void parse() throws Exception {
-        if (!ClassDefinition.getAll().isEmpty()) {
+        if (!ClassDefinition.getClasses().isEmpty()) {
             return;
         }
         List<ClassDefinition> classDefinitions = new ArrayList<>();
@@ -66,14 +66,14 @@ public abstract class DefinitionParser {
             if (classDefinition.getName() == null) {
                 continue;
             }
-            ClassDefinition otherClassDefinition = ClassDefinition.getAll().get(classDefinition.getName());
+            ClassDefinition otherClassDefinition = ClassDefinition.getClass(classDefinition.getName());
             if (otherClassDefinition != null) {
                 String error = "定义文件[" + classDefinition.getDefinitionFile();
                 error += "]和[" + otherClassDefinition.getDefinitionFile();
                 error += "]有同名类[" + classDefinition.getName() + "]";
                 ClassDefinition.getValidatedErrors().add(error);
             } else {
-                ClassDefinition.getAll().put(classDefinition.getName(), classDefinition);
+                ClassDefinition.getClasses().put(classDefinition.getName(), classDefinition);
             }
         }
 

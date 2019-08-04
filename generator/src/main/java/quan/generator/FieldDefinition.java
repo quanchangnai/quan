@@ -81,7 +81,7 @@ public class FieldDefinition extends Definition {
     }
 
     public boolean isEnumType() {
-        return ClassDefinition.getAll().get(getType()) instanceof EnumDefinition;
+        return ClassDefinition.getClass(getType()) instanceof EnumDefinition;
     }
 
     public boolean isBeanType() {
@@ -89,7 +89,7 @@ public class FieldDefinition extends Definition {
     }
 
     public BeanDefinition getBean() {
-        ClassDefinition classDefinition = ClassDefinition.getAll().get(getType());
+        ClassDefinition classDefinition = ClassDefinition.getClass(getType());
         if (BeanDefinition.isBeanDefinition(classDefinition)) {
             return (BeanDefinition) classDefinition;
         }
@@ -173,7 +173,7 @@ public class FieldDefinition extends Definition {
         if (!isCollectionType()) {
             return null;
         }
-        ClassDefinition classDefinition = ClassDefinition.getAll().get(getValueType());
+        ClassDefinition classDefinition = ClassDefinition.getClass(getValueType());
         if (BeanDefinition.isBeanDefinition(classDefinition)) {
             return (BeanDefinition) classDefinition;
         }
@@ -324,21 +324,18 @@ public class FieldDefinition extends Definition {
         if (StringUtils.isBlank(ref)) {
             return null;
         }
+
         if (type.equals("map")) {
             String[] fieldRefs = ref.split("[,]");
-            ClassDefinition refClass = null;
+            ConfigDefinition refConfig = null;
 
             if (keyRef && fieldRefs.length >= 1) {
-                refClass = ClassDefinition.getAll().get(fieldRefs[0].split("[.]")[0]);
+                refConfig = ConfigDefinition.getConfig(fieldRefs[0].split("[.]")[0]);
             }
             if (!keyRef && fieldRefs.length == 2) {
-                refClass = ClassDefinition.getAll().get(fieldRefs[1].split("[.]")[0]);
+                refConfig = ConfigDefinition.getConfig(fieldRefs[1].split("[.]")[0]);
             }
-            if (refClass instanceof ConfigDefinition) {
-                return (ConfigDefinition) refClass;
-            }
-
-            return null;
+            return refConfig;
         }
 
         //list set 原生类型
@@ -346,12 +343,7 @@ public class FieldDefinition extends Definition {
         if (fieldRefs.length != 2) {
             return null;
         }
-
-        ClassDefinition refClass = ClassDefinition.getAll().get(fieldRefs[0]);
-        if (refClass instanceof ConfigDefinition) {
-            return (ConfigDefinition) refClass;
-        }
-        return null;
+        return ConfigDefinition.getConfig(fieldRefs[0]);
     }
 
     /**
@@ -366,20 +358,20 @@ public class FieldDefinition extends Definition {
         }
         if (type.equals("map")) {
             String[] fieldRefs = ref.split("[,]");
-            ClassDefinition refClass;
+            ConfigDefinition refConfig;
 
             if (keyRef && fieldRefs.length >= 1) {
                 String[] fieldKeyRefs = fieldRefs[0].split("[.]");
-                refClass = ClassDefinition.getAll().get(fieldKeyRefs[0]);
-                if (refClass instanceof ConfigDefinition) {
-                    return refClass.getField(fieldKeyRefs[1]);
+                refConfig = ConfigDefinition.getConfig(fieldKeyRefs[0]);
+                if (refConfig != null) {
+                    return refConfig.getField(fieldKeyRefs[1]);
                 }
             }
             if (!keyRef && fieldRefs.length == 2) {
                 String[] fieldValueRefs = fieldRefs[1].split("[.]");
-                refClass = ClassDefinition.getAll().get(fieldValueRefs[0]);
-                if (refClass instanceof ConfigDefinition) {
-                    return refClass.getField(fieldValueRefs[1]);
+                refConfig = ConfigDefinition.getConfig(fieldValueRefs[0]);
+                if (refConfig != null) {
+                    return refConfig.getField(fieldValueRefs[1]);
                 }
             }
             return null;
@@ -391,9 +383,9 @@ public class FieldDefinition extends Definition {
             return null;
         }
 
-        ClassDefinition refClass = ClassDefinition.getAll().get(fieldRefs[0]);
-        if (refClass instanceof ConfigDefinition) {
-            return refClass.getField(fieldRefs[1]);
+        ConfigDefinition refConfig = ConfigDefinition.getConfig(fieldRefs[0]);
+        if (refConfig != null) {
+            return refConfig.getField(fieldRefs[1]);
         }
         return null;
     }

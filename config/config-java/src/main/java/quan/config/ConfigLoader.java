@@ -29,8 +29,13 @@ public class ConfigLoader {
     //配置的定义文件所在目录
     private List<String> definitionPaths = new ArrayList<>();
 
+    private boolean definitionParsed;
+
     //配置表所在目录
     private String tablePath;
+
+    //配置表类型,csv xls xlsx等
+    private String tableType = "csv";
 
     private boolean onlyCheck;
 
@@ -38,14 +43,10 @@ public class ConfigLoader {
 
     private String enumPackagePrefix;
 
-    private Class<? extends ConfigReader> readerClass = CSVConfigReader.class;
-
     private Map<String, ConfigReader> readers = new HashMap<>();
 
-    private boolean definitionParsed;
-
-    //自定义的配置检查器
-    private Set<ConfigChecker> checkers = new HashSet<>();
+    //自定义的配置校验器
+    private Set<ConfigValidator> validators = new HashSet<>();
 
     private LinkedHashSet<String> errors = new LinkedHashSet<>();
 
@@ -56,9 +57,9 @@ public class ConfigLoader {
         this.tablePath = tablePath.replace("/", File.separator).replace("\\", File.separator);
     }
 
-    public ConfigLoader setReaderClass(Class<? extends ConfigReader> readerClass) {
-        Objects.requireNonNull(readerClass, "配置读取器类型不能为空");
-        this.readerClass = readerClass;
+    public ConfigLoader setTableType(String tableType) {
+        Objects.requireNonNull(tableType, "表格类型不能为空");
+        this.tableType = tableType;
         return this;
     }
 
@@ -78,7 +79,7 @@ public class ConfigLoader {
     }
 
     /**
-     * 是否仅检查配置
+     * 是否仅校验配置
      *
      * @param onlyCheck true:不会创建配置对象。false:会创建配置对象并加载到类的缓存里。
      */
@@ -87,45 +88,44 @@ public class ConfigLoader {
     }
 
     /**
-     * 实例化给定包下面的自定义检查器对象
-     *
-     * @param checkerPackage 自定义配置检查器所在的包
+     * 设置自定义配置校验器所在的包并实例化校验器对象
      */
-    public void setCheckerPackage(String checkerPackage) {
-        if (StringUtils.isBlank(checkerPackage)) {
+    public void setValidatorsPackage(String packageName) {
+        if (StringUtils.isBlank(packageName)) {
             return;
         }
 
-        checkers.clear();
-        Set<Class<?>> checkerClasses = ClassUtils.loadClasses(checkerPackage, ConfigChecker.class);
+        validators.clear();
+        Set<Class<?>> validatorClasses = ClassUtils.loadClasses(packageName, ConfigValidator.class);
 
-        for (Class<?> checkerClass : checkerClasses) {
-            if (checkerClass.isEnum() && checkerClass.getEnumConstants().length > 0) {
-                checkers.add((ConfigChecker) checkerClass.getEnumConstants()[0]);
+        for (Class<?> validatorClass : validatorClasses) {
+            if (validatorClass.isEnum() && validatorClass.getEnumConstants().length > 0) {
+                validators.add((ConfigValidator) validatorClass.getEnumConstants()[0]);
             }
-            if (!checkerClass.isEnum()) {
+            if (!validatorClass.isEnum()) {
                 try {
-                    checkers.add((ConfigChecker) checkerClass.getConstructor().newInstance());
+                    validators.add((ConfigValidator) validatorClass.getConstructor().newInstance());
                 } catch (Exception e) {
-                    logger.error("实例化配置检查器[{}]失败", checkerClass, e);
+                    logger.error("实例化配置校验器[{}]失败", validatorClass, e);
                 }
             }
         }
 
     }
 
+    private ConfigReader createReader(String tablePath, String table, ConfigDefinition configDefinition) {
+        ConfigReader configReader = new CSVConfigReader(tablePath, table, configDefinition);
+        if (!onlyCheck) {
+            configReader.initPrototype();
+        }
+        return configReader;
+    }
+
     private ConfigReader getOrAddReader(String table) {
         ConfigReader configReader = readers.get(table);
         if (configReader == null) {
-            if (readerClass == ExcelConfigReader.class) {
-                configReader = new ExcelConfigReader(tablePath, table, ConfigDefinition.getTableConfigs().get(table));
-            } else {
-                configReader = new CSVConfigReader(tablePath, table, ConfigDefinition.getTableConfigs().get(table));
-            }
+            configReader = ConfigReader.create(tableType, tablePath, table, ConfigDefinition.getTableConfigs().get(table));
             readers.put(table, configReader);
-            if (!onlyCheck) {
-                configReader.initPrototype();
-            }
         }
         return configReader;
     }
@@ -169,8 +169,8 @@ public class ConfigLoader {
         Set<ConfigDefinition> needLoadConfigs = new HashSet<>(ConfigDefinition.getTableConfigs().values());
 
         for (ConfigDefinition configDefinition : needLoadConfigs) {
-            //索引检查
-            configIndexedJsonsAll.put(configDefinition, checkIndex(configDefinition));
+            //索引校验
+            configIndexedJsonsAll.put(configDefinition, validateIndex(configDefinition));
             //加载配置
             if (!onlyCheck) {
                 load(configDefinition);
@@ -181,15 +181,15 @@ public class ConfigLoader {
             errors.addAll(reader.getErrors());
         }
 
-        //引用检查，依赖索引结果
+        //引用校验，依赖索引结果
         for (ConfigDefinition configDefinition : configIndexedJsonsAll.keySet()) {
-            checkRef(configDefinition, configIndexedJsonsAll);
+            validateRef(configDefinition, configIndexedJsonsAll);
         }
 
-        //自定义检查
-        for (ConfigChecker checker : checkers) {
+        //自定义校验
+        for (ConfigValidator validator : validators) {
             try {
-                checker.checkConfig();
+                validator.validateConfig();
             } catch (ConfigException e) {
                 errors.addAll(e.getErrors());
             } catch (Exception e) {
@@ -204,7 +204,7 @@ public class ConfigLoader {
         }
     }
 
-    private Map<IndexDefinition, Map> checkIndex(ConfigDefinition configDefinition) {
+    private Map<IndexDefinition, Map> validateIndex(ConfigDefinition configDefinition) {
         //索引对应的配置JSON
         Map<IndexDefinition, Map> configIndexedJsons = new HashMap<>();
         //配置JSON对应的表格
@@ -216,10 +216,10 @@ public class ConfigLoader {
 
             for (JSONObject json : tableJsons) {
                 jsonTables.put(json, table);
-                //检查索引
+                //校验索引
                 for (IndexDefinition indexDefinition : configDefinition.getIndexes()) {
                     Map indexedJsons = configIndexedJsons.computeIfAbsent(indexDefinition, k -> new HashMap());
-                    checkTableIndex(indexDefinition, indexedJsons, jsonTables, json);
+                    validateTableIndex(indexDefinition, indexedJsons, jsonTables, json);
                 }
             }
         }
@@ -227,7 +227,7 @@ public class ConfigLoader {
         return configIndexedJsons;
     }
 
-    private void checkTableIndex(IndexDefinition indexDefinition, Map indexedJsons, Map<JSONObject, String> jsonTables, JSONObject json) {
+    private void validateTableIndex(IndexDefinition indexDefinition, Map indexedJsons, Map<JSONObject, String> jsonTables, JSONObject json) {
         String table = jsonTables.get(json);
 
         if (indexDefinition.isUnique() && indexDefinition.getFields().size() == 1) {
@@ -270,7 +270,7 @@ public class ConfigLoader {
         }
     }
 
-    private void checkRef(ConfigDefinition configDefinition, Map<ConfigDefinition, Map<IndexDefinition, Map>> configIndexedJsonsAll) {
+    private void validateRef(ConfigDefinition configDefinition, Map<ConfigDefinition, Map<IndexDefinition, Map>> configIndexedJsonsAll) {
         for (String table : configDefinition.getTables()) {
             List<JSONObject> tableJsons = getOrAddReader(table).readJsons();
             for (int i = 0; i < tableJsons.size(); i++) {
@@ -283,28 +283,28 @@ public class ConfigLoader {
                     }
                     Object fieldValue = json.get(fieldName);
                     Triple position = Triple.of(table, String.valueOf(i + 1), field.getColumn());
-                    checkFieldRef(position, configDefinition, field, fieldValue, configIndexedJsonsAll);
+                    validateFieldRef(position, configDefinition, field, fieldValue, configIndexedJsonsAll);
                 }
             }
         }
     }
 
-    private void checkFieldRef(Triple position, BeanDefinition bean, FieldDefinition field, Object value, Map<ConfigDefinition, Map<IndexDefinition, Map>> configIndexedJsonsAll) {
+    private void validateFieldRef(Triple position, BeanDefinition bean, FieldDefinition field, Object value, Map<ConfigDefinition, Map<IndexDefinition, Map>> configIndexedJsonsAll) {
         if (field.isPrimitiveType()) {
-            checkPrimitiveTypeRef(position, bean, field, value, false, configIndexedJsonsAll);
+            validatePrimitiveTypeRef(position, bean, field, value, false, configIndexedJsonsAll);
         } else if (field.isBeanType()) {
-            checkBeanTypeRef(position, field.getBean(), (JSONObject) value, configIndexedJsonsAll);
+            validateBeanTypeRef(position, field.getBean(), (JSONObject) value, configIndexedJsonsAll);
         } else if (field.getType().equals("map")) {
             JSONObject map = (JSONObject) value;
             for (String mapKey : map.keySet()) {
-                //检查map的key引用
-                checkPrimitiveTypeRef(position, bean, field, mapKey, true, configIndexedJsonsAll);
-                //检查map的value引用
+                //校验map的key引用
+                validatePrimitiveTypeRef(position, bean, field, mapKey, true, configIndexedJsonsAll);
+                //校验map的value引用
                 Object mapValue = map.get(mapKey);
                 if (field.isPrimitiveValueType()) {
-                    checkPrimitiveTypeRef(position, bean, field, mapValue, false, configIndexedJsonsAll);
+                    validatePrimitiveTypeRef(position, bean, field, mapValue, false, configIndexedJsonsAll);
                 } else {
-                    checkBeanTypeRef(position, field.getValueBean(), (JSONObject) mapValue, configIndexedJsonsAll);
+                    validateBeanTypeRef(position, field.getValueBean(), (JSONObject) mapValue, configIndexedJsonsAll);
                 }
             }
 
@@ -312,15 +312,15 @@ public class ConfigLoader {
             JSONArray array = (JSONArray) value;
             for (Object arrayValue : array) {
                 if (field.isPrimitiveValueType()) {
-                    checkPrimitiveTypeRef(position, bean, field, arrayValue, false, configIndexedJsonsAll);
+                    validatePrimitiveTypeRef(position, bean, field, arrayValue, false, configIndexedJsonsAll);
                 } else {
-                    checkBeanTypeRef(position, field.getValueBean(), (JSONObject) arrayValue, configIndexedJsonsAll);
+                    validateBeanTypeRef(position, field.getValueBean(), (JSONObject) arrayValue, configIndexedJsonsAll);
                 }
             }
         }
     }
 
-    private void checkPrimitiveTypeRef(Triple position, BeanDefinition bean, FieldDefinition field, Object value, boolean mapKey, Map<ConfigDefinition, Map<IndexDefinition, Map>> configIndexedJsonsAll) {
+    private void validatePrimitiveTypeRef(Triple position, BeanDefinition bean, FieldDefinition field, Object value, boolean mapKey, Map<ConfigDefinition, Map<IndexDefinition, Map>> configIndexedJsonsAll) {
         ConfigDefinition fieldRefConfig = field.getRefConfig(mapKey);
         FieldDefinition fieldRefField = field.getRefField(mapKey);
         if (fieldRefConfig == null || fieldRefField == null) {
@@ -354,10 +354,10 @@ public class ConfigLoader {
         }
     }
 
-    private void checkBeanTypeRef(Triple position, BeanDefinition bean, JSONObject json, Map<ConfigDefinition, Map<IndexDefinition, Map>> configIndexedJsonsAll) {
+    private void validateBeanTypeRef(Triple position, BeanDefinition bean, JSONObject json, Map<ConfigDefinition, Map<IndexDefinition, Map>> configIndexedJsonsAll) {
         for (FieldDefinition field : bean.getFields()) {
             Object fieldValue = json.get(field.getName());
-            checkFieldRef(position, bean, field, fieldValue, configIndexedJsonsAll);
+            validateFieldRef(position, bean, field, fieldValue, configIndexedJsonsAll);
         }
     }
 
@@ -383,7 +383,7 @@ public class ConfigLoader {
     @SuppressWarnings({"unchecked"})
     private void indexConfigs(ConfigDefinition configDefinition, List<Config> configs, boolean reload) {
         String indexClass = configDefinition.getFullName();
-        if (configDefinition.getParentDefinition() != null) {
+        if (configDefinition.getParentConfig() != null) {
             indexClass += "$self";
         }
 
@@ -414,13 +414,37 @@ public class ConfigLoader {
     /**
      * 重加载配置
      *
-     * @param tables 表格名字列表
+     * @param configs 配置名字
      */
-    public void reload(List<String> tables) {
+    public void reloadConfigs(Collection<String> configs) {
         if (onlyCheck) {
             return;
         }
+        errors.clear();
 
+        Set<String> needReloadTables = new LinkedHashSet<>();
+
+        for (String configName : configs) {
+            ConfigDefinition configDefinition = ConfigDefinition.getConfig(configName);
+            if (configDefinition == null) {
+                errors.add(String.format("重加载[%s]出错，不存在该配置", configName));
+                continue;
+            }
+            needReloadTables.addAll(configDefinition.getTables());
+        }
+
+        reloadTables(needReloadTables);
+    }
+
+    /**
+     * 重加载表格
+     *
+     * @param tables 表名
+     */
+    public void reloadTables(Collection<String> tables) {
+        if (onlyCheck) {
+            return;
+        }
         errors.clear();
 
         Set<ConfigDefinition> needReloadConfigs = new LinkedHashSet<>();
@@ -432,13 +456,13 @@ public class ConfigLoader {
                 errors.add(String.format("重加载[%s]出错，对应配置从未被加载", table));
                 continue;
             }
-            reloadReaders.add(configReader);
             configReader.clear();
+            reloadReaders.add(configReader);
 
             ConfigDefinition configDefinition = ConfigDefinition.getTableConfigs().get(table);
             while (configDefinition != null) {
                 needReloadConfigs.add(configDefinition);
-                configDefinition = configDefinition.getParentDefinition();
+                configDefinition = configDefinition.getParentConfig();
             }
         }
 

@@ -41,7 +41,7 @@ public abstract class ConfigGenerator extends Generator {
         for (FieldDefinition fieldDefinition : configDefinition.getSelfFields()) {
             processField(classDefinition, fieldDefinition);
         }
-        ConfigDefinition parentDefinition = configDefinition.getParentDefinition();
+        ConfigDefinition parentDefinition = configDefinition.getParentConfig();
         if (parentDefinition != null && !parentDefinition.getPackageName().equals(configDefinition.getPackageName())) {
             configDefinition.getImports().add(parentDefinition.getFullName());
         }

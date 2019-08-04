@@ -38,6 +38,14 @@ public class BeanDefinition extends ClassDefinition {
     }
 
 
+    public static BeanDefinition getBean(String name) {
+        ClassDefinition classDefinition = getClasses().get(name);
+        if (classDefinition instanceof BeanDefinition) {
+            return (BeanDefinition) classDefinition;
+        }
+        return null;
+    }
+
     @Override
     public void validate() {
         super.validate();
@@ -219,13 +227,12 @@ public class BeanDefinition extends ClassDefinition {
     protected void validateFieldRef(FieldDefinition field, boolean keType, String refConfigName, String refFiledName) {
         String refConfigAndField = refConfigName + "." + refFiledName;
 
-        ClassDefinition refClass = ClassDefinition.getAll().get(refConfigName);
-        if (!(refClass instanceof ConfigDefinition)) {
+        ConfigDefinition refConfig = ConfigDefinition.getConfig(refConfigName);
+        if (refConfig == null) {
             addValidatedError(getName4Validate() + field.getName4Validate() + "的引用配置[" + refConfigName + "]不存在");
             return;
         }
 
-        ConfigDefinition refConfig = (ConfigDefinition) refClass;
         FieldDefinition refField = refConfig.getField(refFiledName);
 
         if (refField == null) {
@@ -253,10 +260,6 @@ public class BeanDefinition extends ClassDefinition {
             addValidatedError(getName4Validate() + field.getName4Validate() + "的引用字段[" + refConfigAndField + "]不是一级索引");
         }
 
-    }
-
-    public static boolean isBeanDefinition(String type) {
-        return isBeanDefinition(ClassDefinition.getAll().get(type));
     }
 
     public static boolean isBeanDefinition(ClassDefinition classDefinition) {

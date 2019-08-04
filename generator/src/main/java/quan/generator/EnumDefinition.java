@@ -36,7 +36,7 @@ public class EnumDefinition extends ClassDefinition {
     }
 
     public static boolean isEnumDefinition(String type) {
-        return ClassDefinition.getAll().get(type) instanceof EnumDefinition;
+        return ClassDefinition.getClass(type) instanceof EnumDefinition;
     }
 
     @Override

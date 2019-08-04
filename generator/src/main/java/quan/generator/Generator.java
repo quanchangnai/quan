@@ -122,7 +122,7 @@ public abstract class Generator {
             return;
         }
 
-        List<ClassDefinition> classDefinitions = ClassDefinition.getAll().values().stream().filter(this::support).collect(Collectors.toList());
+        List<ClassDefinition> classDefinitions = ClassDefinition.getClasses().values().stream().filter(this::support).collect(Collectors.toList());
 
         for (ClassDefinition classDefinition : classDefinitions) {
             processClassSelf(classDefinition);
@@ -195,7 +195,7 @@ public abstract class Generator {
     }
 
     protected void processBeanFieldImports(BeanDefinition beanDefinition, FieldDefinition fieldDefinition) {
-        ClassDefinition fieldClass = ClassDefinition.getAll().get(fieldDefinition.getType());
+        ClassDefinition fieldClass = ClassDefinition.getClass(fieldDefinition.getType());
         if (fieldClass != null && !fieldClass.getPackageName().equals(beanDefinition.getPackageName())) {
             beanDefinition.getImports().add(fieldClass.getFullName());
         }

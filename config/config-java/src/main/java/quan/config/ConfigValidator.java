@@ -3,8 +3,8 @@ package quan.config;
 /**
  * Created by quanchangnai on 2019/8/2.
  */
-public interface ConfigChecker {
+public interface ConfigValidator {
 
-    void checkConfig();
+    void validateConfig();
     
 }

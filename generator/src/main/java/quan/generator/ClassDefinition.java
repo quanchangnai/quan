@@ -32,7 +32,7 @@ public abstract class ClassDefinition extends Definition {
     //key:字段名
     protected Map<String, FieldDefinition> nameFields = new HashMap<>();
 
-    private static Map<String, ClassDefinition> all = new HashMap<>();
+    private static Map<String, ClassDefinition> classes = new HashMap<>();
 
     private static LinkedHashSet<String> validatedErrors = new LinkedHashSet<>();
 
@@ -95,8 +95,12 @@ public abstract class ClassDefinition extends Definition {
         return this;
     }
 
-    public static Map<String, ClassDefinition> getAll() {
-        return all;
+    public static Map<String, ClassDefinition> getClasses() {
+        return classes;
+    }
+
+    public static ClassDefinition getClass(String name) {
+        return classes.get(name);
     }
 
     public void setLang(String language) {
@@ -186,4 +190,5 @@ public abstract class ClassDefinition extends Definition {
                 ",fields=" + getFields() +
                 '}';
     }
+
 }

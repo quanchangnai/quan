@@ -61,7 +61,7 @@ public class CSharpMessageGenerator extends MessageGenerator {
 
     @Override
     protected void processBeanFieldImports(BeanDefinition beanDefinition, FieldDefinition fieldDefinition) {
-        ClassDefinition fieldClass = ClassDefinition.getAll().get(fieldDefinition.getType());
+        ClassDefinition fieldClass = ClassDefinition.getClass(fieldDefinition.getType());
         if (fieldClass != null && !fieldClass.getPackageName().equals(beanDefinition.getPackageName())) {
             beanDefinition.getImports().add(fieldClass.getPackageName());
         }

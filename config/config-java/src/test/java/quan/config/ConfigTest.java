@@ -17,35 +17,64 @@ public class ConfigTest {
         List<String> definitionPaths = new ArrayList<>();
         definitionPaths.add("generator\\src\\test\\java\\quan\\generator");
         definitionPaths.add("generator\\src/test\\java\\quan\\generator\\config");
-//        String tablePath = "config\\config-java\\src\\test\\resources\\csv";
-        String tablePath = "config\\config-java\\src\\test\\resources\\excel";
+
+//        String tableType = "csv";
+//        String tablePath = "config\\csv";
+        String tableType = "xlsx";
+        String tablePath = "config\\excel";
+
 
         ConfigLoader configLoader = new ConfigLoader(definitionPaths, tablePath);
         configLoader.setPackagePrefix("quan.config");
         configLoader.setEnumPackagePrefix("quan");
 //        configLoader.onlyCheck(true);
-        configLoader.setReaderClass(ExcelConfigReader.class);
-        configLoader.setCheckerPackage("quan");
+        configLoader.setValidatorsPackage("quan");
+        configLoader.setTableType(tableType);
 
         System.err.println("configLoader.load()=============");
+        long startTime = System.currentTimeMillis();
         try {
             configLoader.load();
         } catch (ConfigException e) {
             printErrors(e);
         }
+        System.err.println("configLoader.load()耗时:" + (System.currentTimeMillis() - startTime));
         printConfigs();
 
         Thread.sleep(10000);
 
-        List<String> reloadTables = Arrays.asList("道具.csv", "武器.csv");
-        System.err.println("configLoader.reload()=============" + reloadTables);
+        reloadConfigs(configLoader);
+
+        Thread.sleep(10000);
+
+        reloadTables(configLoader);
+
+    }
+
+    private static void reloadConfigs(ConfigLoader configLoader) throws Exception {
+        List<String> reloadConfigs = Arrays.asList("ItemConfig", "WeaponConfig");
+        System.err.println("configLoader.reloadConfigs()=============" + reloadConfigs);
+        long startTime = System.currentTimeMillis();
         try {
-            configLoader.reload(reloadTables);
+            configLoader.reloadConfigs(reloadConfigs);
         } catch (ConfigException e) {
             printErrors(e);
         }
+        System.err.println("configLoader.reloadConfigs()耗时:" + (System.currentTimeMillis() - startTime));
         printConfigs();
+    }
 
+    private static void reloadTables(ConfigLoader configLoader) throws Exception {
+        List<String> reloadConfigs = Arrays.asList("道具", "武器");
+        System.err.println("configLoader.reloadTables()=============" + reloadConfigs);
+        long startTime = System.currentTimeMillis();
+        try {
+            configLoader.reloadTables(reloadConfigs);
+        } catch (ConfigException e) {
+            printErrors(e);
+        }
+        System.err.println("configLoader.reloadTables()耗时:" + (System.currentTimeMillis() - startTime));
+        printConfigs();
     }
 
     private static void printErrors(ConfigException e) {

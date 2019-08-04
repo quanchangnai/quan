@@ -6,7 +6,7 @@
         <field name="itemNum" type="int"/>
     </bean>
 
-    <config name="ItemConfig" table="道具.xlsx">道具
+    <config name="ItemConfig" table="道具">道具
         <field name="id" type="int" column="ID" index="unique"/>
         <field name="name" type="string" column="名字"/>
         <field name="type" type="ItemType" column="类型"/>
@@ -16,12 +16,12 @@
         <field name="map" type="map" key-type="int" value-type="int" column="Map" ref="ItemConfig.id"/>
     </config>
 
-    <config name="EquipConfig" parent="ItemConfig" table="装备1.xlsx,装备2.xlsx">
+    <config name="EquipConfig" parent="ItemConfig" table="装备1,装备2">
         <field name="position" type="int" index="normal" column="部位"/>
         <field name="color" type="int" column="颜色"/>
     </config>
 
-    <config name="WeaponConfig" parent="EquipConfig" table="武器.xlsx">
+    <config name="WeaponConfig" parent="EquipConfig" table="武器">
         <field name="w1" type="int" column="字段1"/>
         <field name="w2" type="int" column="字段2"/>
         <field name="rewardList" type="list" value-type="Reward" column="奖励List"/>

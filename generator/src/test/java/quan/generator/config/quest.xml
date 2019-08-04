@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <package>
 
-    <config name="QuestConfig" table="任务.csv">
+    <config name="QuestConfig" table="任务">
         <field name="id" type="int" column="ID" index="unique"/>
         <field name="name" type="string" column="名字"/>
         <field name="type" type="QuestType" column="类型" index="normal"/>
@@ -26,7 +26,7 @@
         <index name="composite4" type="n" fields="d1,d2,d3"/>
     </config>
 
-    <config name="QuestTargetConfig" table="任务目标.csv">
+    <config name="QuestTargetConfig">
         <field name="id" type="int" column="ID" index="u"/>
         <field name="name" type="string" column="名字"/>
     </config>
