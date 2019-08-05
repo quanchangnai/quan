@@ -71,7 +71,7 @@ public class ConfigLoader {
      */
     public DefinitionParser useXmlDefinitionParser(List<String> definitionPaths, String packagePrefix) {
         definitionParser = new XmlDefinitionParser();
-        definitionParser.setCategory(Definition.Category.config);
+        definitionParser.setCategory(DefinitionCategory.config);
         definitionParser.setDefinitionPaths(definitionPaths);
         definitionParser.setPackagePrefix(packagePrefix);
         return definitionParser;
@@ -89,7 +89,7 @@ public class ConfigLoader {
      */
     public ConfigLoader setDefinitionParser(DefinitionParser definitionParser) {
         if (definitionParser != null) {
-            definitionParser.setCategory(Definition.Category.config);
+            definitionParser.setCategory(DefinitionCategory.config);
         }
         this.definitionParser = definitionParser;
         return this;

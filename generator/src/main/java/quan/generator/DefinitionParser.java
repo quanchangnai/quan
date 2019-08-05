@@ -18,7 +18,7 @@ public abstract class DefinitionParser {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    protected Definition.Category category;
+    protected DefinitionCategory category;
 
     protected String packagePrefix;
 
@@ -28,12 +28,12 @@ public abstract class DefinitionParser {
 
     protected List<File> definitionFiles = new ArrayList<>();
 
-    public DefinitionParser setCategory(Definition.Category category) {
+    public DefinitionParser setCategory(DefinitionCategory category) {
         this.category = category;
         return this;
     }
 
-    public Definition.Category getCategory() {
+    public DefinitionCategory getCategory() {
         return category;
     }
 

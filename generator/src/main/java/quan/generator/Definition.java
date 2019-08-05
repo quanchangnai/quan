@@ -7,17 +7,17 @@ import org.apache.commons.lang3.StringUtils;
  */
 public abstract class Definition {
 
-    private Category category;
+    private DefinitionCategory category;
 
     private String name;
 
     private String comment = "";
 
-    public Category getCategory() {
+    public DefinitionCategory getCategory() {
         return category;
     }
 
-    public Definition setCategory(Category category) {
+    public Definition setCategory(DefinitionCategory category) {
         this.category = category;
         return this;
     }
@@ -63,15 +63,6 @@ public abstract class Definition {
     public abstract int getDefinitionType();
 
     public abstract String getDefinitionTypeName();
-
-    /**
-     * 定义类别
-     */
-    public enum Category {
-        data,
-        message,
-        config;
-    }
 
     @Override
     public String toString() {

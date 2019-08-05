@@ -1,10 +1,7 @@
 package quan.generator.message;
 
 import freemarker.template.Template;
-import quan.generator.BeanDefinition;
-import quan.generator.ClassDefinition;
-import quan.generator.Definition;
-import quan.generator.Generator;
+import quan.generator.*;
 
 /**
  * Created by quanchangnai on 2017/7/6.
@@ -23,8 +20,8 @@ public abstract class MessageGenerator extends Generator {
     }
 
     @Override
-    public Definition.Category category() {
-        return Definition.Category.data;
+    public DefinitionCategory category() {
+        return DefinitionCategory.data;
     }
 
     @Override

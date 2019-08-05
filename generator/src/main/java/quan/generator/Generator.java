@@ -72,7 +72,7 @@ public abstract class Generator {
     }
 
 
-    public abstract Definition.Category category();
+    public abstract DefinitionCategory category();
 
     public DefinitionParser useXmlDefinitionParser(List<String> definitionPaths, String packagePrefix) {
         definitionParser = new XmlDefinitionParser();
@@ -88,7 +88,7 @@ public abstract class Generator {
     }
 
     public Generator setDefinitionParser(DefinitionParser definitionParser) {
-        definitionParser.setCategory(Definition.Category.data);
+        definitionParser.setCategory(DefinitionCategory.data);
         this.definitionParser = definitionParser;
         return this;
     }
