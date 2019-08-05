@@ -26,6 +26,10 @@ public class ItemConfig extends Config {
 
     protected Map<Integer, Integer> map = new HashMap<>();
 
+    protected Date effectiveTime;
+
+    protected String $effectiveTime;
+
     public int getId() {
         return id;
     }
@@ -52,6 +56,14 @@ public class ItemConfig extends Config {
 
     public Map<Integer, Integer> getMap() {
         return map;
+    }
+
+    public Date getEffectiveTime() {
+        return effectiveTime;
+    }
+
+    public String get$effectiveTime() {
+        return $effectiveTime;
     }
 
 
@@ -96,6 +108,9 @@ public class ItemConfig extends Config {
             }
         }
         map = Collections.unmodifiableMap(map);
+
+        effectiveTime = object.getDate("effectiveTime");
+        $effectiveTime = object.getString("$effectiveTime");
     }
 
     @Override
@@ -108,6 +123,7 @@ public class ItemConfig extends Config {
                 ",list=" + list +
                 ",set=" + set +
                 ",map=" + map +
+                ",effectiveTime='" + $effectiveTime + '\'' +
                 '}';
 
     }
@@ -117,7 +133,7 @@ public class ItemConfig extends Config {
         return new ItemConfig();
     }
 
-    private static Map<Integer, ItemConfig> idConfigs = new HashMap<>();
+    private volatile static Map<Integer, ItemConfig> idConfigs = new HashMap<>();
 
 
     public static Map<Integer, ItemConfig> getIdConfigs() {

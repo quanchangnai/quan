@@ -87,6 +87,7 @@ public class WeaponConfig extends EquipConfig {
                 ",list=" + list +
                 ",set=" + set +
                 ",map=" + map +
+                ",effectiveTime='" + $effectiveTime + '\'' +
                 ",position=" + position +
                 ",color=" + color +
                 ",w1=" + w1 +
@@ -108,13 +109,13 @@ public class WeaponConfig extends EquipConfig {
         private self() {
         }
 
-        private static Map<Integer, WeaponConfig> idConfigs = new HashMap<>();
+        private volatile static Map<Integer, WeaponConfig> idConfigs = new HashMap<>();
 
-        private static Map<Integer, List<WeaponConfig>> positionConfigs = new HashMap<>();
+        private volatile static Map<Integer, List<WeaponConfig>> positionConfigs = new HashMap<>();
 
-        private static Map<Integer, Map<Integer, List<WeaponConfig>>> composite1Configs = new HashMap<>();
+        private volatile static Map<Integer, Map<Integer, List<WeaponConfig>>> composite1Configs = new HashMap<>();
 
-        private static Map<Integer, Map<Integer, WeaponConfig>> composite2Configs = new HashMap<>();
+        private volatile static Map<Integer, Map<Integer, WeaponConfig>> composite2Configs = new HashMap<>();
 
 
         public static Map<Integer, WeaponConfig> getIdConfigs() {

@@ -73,7 +73,7 @@ public class FieldDefinition extends Definition {
     }
 
     public boolean isCollectionType() {
-        return type.equals("list") || type.equals("set") || type.equals("map");
+        return Constants.collectionTypes.contains(type);
     }
 
     public boolean isPrimitiveType() {
@@ -96,11 +96,15 @@ public class FieldDefinition extends Definition {
         return null;
     }
 
+    public boolean isTimeType() {
+        return Constants.timeTypes.contains(type);
+    }
+
     /**
      * 类型是否合法
      */
     public boolean isLegalType() {
-        return isBuiltInType() || isBeanType() || isEnumType();
+        return isBuiltInType() || isBeanType() || isEnumType() || isTimeType();
     }
 
 

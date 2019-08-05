@@ -212,7 +212,6 @@ public class ConfigLoader {
      */
     private void loadJsonOnNoDefinition() {
         Set<File> jsonFiles = PathUtils.listFiles(new File(tablePath), "json");
-
         for (File jsonFile : jsonFiles) {
             String configFullName = jsonFile.getName().substring(0, jsonFile.getName().lastIndexOf("."));
             load(configFullName, Collections.singleton(configFullName), true);
@@ -274,10 +273,9 @@ public class ConfigLoader {
         Objects.requireNonNull(path, "输出目录不能为空");
 
         File pathFile = new File(PathUtils.crossPlatPath(path));
-        if (pathFile.exists()) {
-            pathFile.delete();
+        if (!pathFile.exists()) {
+            pathFile.mkdirs();
         }
-        pathFile.mkdirs();
 
         Set<ConfigDefinition> configDefinitions = new HashSet<>(ConfigDefinition.getTableConfigs().values());
 
@@ -318,6 +316,9 @@ public class ConfigLoader {
         }
     }
 
+    /**
+     * 配置的所有分表和子表
+     */
     private Set<String> getConfigTables(ConfigDefinition configDefinition) {
         if (tableType.equals("json")) {
             return configDefinition.getChildrenAndMe();

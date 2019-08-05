@@ -29,6 +29,13 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     protected ${field.basicType}<${field.classValueType}> ${field.name} = new HashSet<>();
     <#elseif field.type=="map">
     protected ${field.basicType}<${field.classKeyType}, ${field.classValueType}> ${field.name} = new HashMap<>();
+    <#elseif  field.timeType>
+    protected ${field.basicType} ${field.name};
+
+    <#if field.comment !="">
+    //${field.comment}
+    </#if>
+    protected String $${field.name};
     <#else >
     protected ${field.basicType} ${field.name};
     </#if>
@@ -48,6 +55,14 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     public ${field.basicType}<${field.classKeyType}, ${field.classValueType}> get${field.name?cap_first}() {
         return ${field.name};
     }
+    <#elseif field.timeType>
+    public ${field.basicType} get${field.name?cap_first}() {
+        return ${field.name};
+    }
+
+    public String get$${field.name}() {
+        return $${field.name};
+    }
     <#else >
     public ${field.basicType} get${field.name?cap_first}() {
         return ${field.name};
@@ -63,6 +78,11 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 <#list selfFields as field>
     <#if field.type=="string">
         ${field.name} = object.getString("${field.name}");
+    <#elseif field.type=="bool">
+        ${field.name} = object.getBooleanValue("${field.name}");
+    <#elseif field.timeType>
+        ${field.name} = object.getDate("${field.name}");
+        $${field.name} = object.getString("$${field.name}");
     <#elseif field.type=="list" || field.type=="set">
         <#if field_index gt 0 >
 
@@ -80,7 +100,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
             }
         }
         ${field.name} = Collections.unmodifiable${field.basicType}(${field.name});
-        <#if field_has_next && selfFields[field_index+1].primitiveType >
+        <#if field_has_next && (selfFields[field_index+1].primitiveType ||selfFields[field_index+1].timeType) >
 
         </#if>
     <#elseif field.type=="map">
@@ -100,14 +120,12 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
             }
         }
         ${field.name} = Collections.unmodifiableMap(${field.name});
-        <#if field_has_next && selfFields[field_index+1].primitiveType >
+        <#if field_has_next && (selfFields[field_index+1].primitiveType ||selfFields[field_index+1].timeType) >
 
         </#if>
-    <#elseif field.type=="bool">
-        ${field.name} = object.getBooleanValue("${field.name}");
-     <#elseif field.builtInType>
+    <#elseif field.builtInType>
         ${field.name} = object.get${field.type?cap_first}Value("${field.name}");
-     <#elseif field.enumType>
+    <#elseif field.enumType>
        <#if field_index gt 0 >
 
         </#if>
@@ -115,7 +133,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         if ($${field.name} != null) {
             ${field.name} = ${field.type}.valueOf($${field.name});
         }
-         <#if field_has_next && selfFields[field_index+1].primitiveType >
+         <#if field_has_next && (selfFields[field_index+1].primitiveType ||selfFields[field_index+1].timeType) >
 
         </#if>
     <#else>
@@ -144,6 +162,8 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
             </#if>
             <#if field.type == "string">
                 <#lt>${field.name}='" + ${field.name} + '\'' +
+            <#elseif field.timeType>
+                <#lt>${field.name}='" + $${field.name} + '\'' +
             <#else>
                 <#lt>${field.name}=" + ${field.name} +
             </#if>
@@ -157,22 +177,22 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     ${tab}//${index.comment}
         </#if>
         <#if index.unique && index.fields?size==1>
-    ${tab}private static Map<${index.fields[0].classType}, ${name}> ${index.name}Configs = new HashMap<>();
+    ${tab}private volatile static Map<${index.fields[0].classType}, ${name}> ${index.name}Configs = new HashMap<>();
 
         <#elseif index.normal && index.fields?size==1>
-    ${tab}private static Map<${index.fields[0].classType}, List<${name}>> ${index.name}Configs = new HashMap<>();
+    ${tab}private volatile static Map<${index.fields[0].classType}, List<${name}>> ${index.name}Configs = new HashMap<>();
 
         <#elseif index.unique && index.fields?size==2>
-    ${tab}private static Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, ${name}>> ${index.name}Configs = new HashMap<>();
+    ${tab}private volatile static Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, ${name}>> ${index.name}Configs = new HashMap<>();
 
         <#elseif index.normal && index.fields?size==2>
-    ${tab}private static Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, List<${name}>>> ${index.name}Configs = new HashMap<>();
+    ${tab}private volatile static Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, List<${name}>>> ${index.name}Configs = new HashMap<>();
 
         <#elseif index.unique && index.fields?size==3>
-    ${tab}private static Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, ${name}>>> ${index.name}Configs = new HashMap<>();
+    ${tab}private volatile static Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, ${name}>>> ${index.name}Configs = new HashMap<>();
 
         <#elseif index.normal && index.fields?size==3>
-    ${tab}private static Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, List<${name}>>>> ${index.name}Configs = new HashMap<>();
+    ${tab}private volatile static Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, List<${name}>>>> ${index.name}Configs = new HashMap<>();
 
         </#if>
     </#list>

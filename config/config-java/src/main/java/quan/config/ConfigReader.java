@@ -2,6 +2,7 @@ package quan.config;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.common.util.PathUtils;
@@ -10,6 +11,8 @@ import quan.generator.FieldDefinition;
 import quan.generator.config.ConfigDefinition;
 
 import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -19,6 +22,12 @@ import java.util.*;
 public abstract class ConfigReader {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
+
+    private static final SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy.MM.dd hh.mm.ss");
+
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd");
+
+    private static final SimpleDateFormat timeFormat = new SimpleDateFormat("hh.mm.ss");
 
     protected String table;
 
@@ -138,6 +147,10 @@ public abstract class ConfigReader {
 
         try {
             fieldValue = convert(fieldDefinition, columnValue);
+            //时间类型字段字符串格式
+            if (fieldDefinition.isTimeType()) {
+                rowJson.put("$" + fieldName, convertTimeType(fieldDefinition.getType(), (Date) fieldValue));
+            }
         } catch (Exception e) {
             validatedErrors.add(String.format("配置[%s]的第%d行第%d列[%s]数据[%s]格式错误", table, row, column, columnName, columnValue));
             return;
@@ -159,6 +172,8 @@ public abstract class ConfigReader {
         String type = fieldDefinition.getType();
         if (fieldDefinition.isPrimitiveType()) {
             return convertPrimitiveType(fieldDefinition.getType(), value);
+        } else if (fieldDefinition.isTimeType()) {
+            return convertTimeType(fieldDefinition.getType(), value);
         } else if (type.equals("list")) {
             return convertList(fieldDefinition, value);
         } else if (type.equals("set")) {
@@ -188,6 +203,43 @@ public abstract class ConfigReader {
             default:
                 return value;
         }
+    }
+
+    public static Object convertTimeType(String type, String value) {
+        if (StringUtils.isBlank(value)) {
+            return null;
+        }
+        try {
+            if (type.equals("datetime")) {
+                //日期加时间
+                return dateTimeFormat.parse(value);
+            }
+            if (type.equals("date")) {
+                //纯日期
+                return dateFormat.parse(value);
+            }
+            //纯时间
+            return timeFormat.parse(value);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String convertTimeType(String type, Date value) {
+        if (value == null) {
+            return null;
+        }
+        if (type.equals("datetime")) {
+            //日期加时间
+            return dateTimeFormat.format(value);
+        }
+        if (type.equals("date")) {
+            //纯日期
+            return dateFormat.format(value);
+        }
+        //纯时间
+        return timeFormat.format(value);
+
     }
 
     public static JSONArray convertList(FieldDefinition fieldDefinition, String value) {

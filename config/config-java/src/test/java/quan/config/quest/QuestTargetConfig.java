@@ -45,7 +45,7 @@ public class QuestTargetConfig extends Config {
         return new QuestTargetConfig();
     }
 
-    private static Map<Integer, QuestTargetConfig> idConfigs = new HashMap<>();
+    private volatile static Map<Integer, QuestTargetConfig> idConfigs = new HashMap<>();
 
 
     public static Map<Integer, QuestTargetConfig> getIdConfigs() {

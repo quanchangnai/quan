@@ -41,6 +41,7 @@ public class EquipConfig extends ItemConfig {
                 ",list=" + list +
                 ",set=" + set +
                 ",map=" + map +
+                ",effectiveTime='" + $effectiveTime + '\'' +
                 ",position=" + position +
                 ",color=" + color +
                 '}';
@@ -57,9 +58,9 @@ public class EquipConfig extends ItemConfig {
         private self() {
         }
 
-        private static Map<Integer, EquipConfig> idConfigs = new HashMap<>();
+        private volatile static Map<Integer, EquipConfig> idConfigs = new HashMap<>();
 
-        private static Map<Integer, List<EquipConfig>> positionConfigs = new HashMap<>();
+        private volatile static Map<Integer, List<EquipConfig>> positionConfigs = new HashMap<>();
 
 
         public static Map<Integer, EquipConfig> getIdConfigs() {

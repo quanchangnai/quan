@@ -1,7 +1,5 @@
 package quan.generator.config;
 
-import quan.generator.BeanDefinition;
-import quan.generator.ClassDefinition;
 import quan.generator.Language;
 
 import java.util.ArrayList;
@@ -16,6 +14,13 @@ public class JavaConfigGenerator extends ConfigGenerator {
 
     public JavaConfigGenerator(List<String> definitionPaths, String codePath) throws Exception {
         super(definitionPaths, codePath);
+
+        basicTypes.put("date", "Date");
+        basicTypes.put("time", "Date");
+        basicTypes.put("datetime", "Date");
+        classTypes.put("date", "Date");
+        classTypes.put("time", "Date");
+        classTypes.put("datetime", "Date");
     }
 
     public JavaConfigGenerator(String definitionPaths, String codePath) throws Exception {

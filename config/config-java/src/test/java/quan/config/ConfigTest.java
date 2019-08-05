@@ -18,23 +18,23 @@ public class ConfigTest {
         definitionPaths.add("generator\\src\\test\\java\\quan\\generator");
         definitionPaths.add("generator\\src/test\\java\\quan\\generator\\config");
 
-//        String tableType = "csv";
-//        String tablePath = "config\\csv";
+        String tableType = "csv";
+        String tablePath = "config\\csv";
 //        String tableType = "xlsx";
 //        String tablePath = "config\\excel";
-        String tableType = "json";
-        String tablePath = "config\\json";
+//        String tableType = "json";
+//        String tablePath = "config\\json";
 
 
         ConfigLoader configLoader = new ConfigLoader(tablePath);
-//        configLoader.useXmlDefinitionParser(definitionPaths, "quan.config", "quan");
+        configLoader.useXmlDefinitionParser(definitionPaths, "quan.config", "quan");
         configLoader.setLoadType(ConfigLoader.Type.validateAndLoad);
         configLoader.setValidatorsPackage("quan");
         configLoader.setTableType(tableType);
 
         loadConfigs(configLoader);
 
-//        writeJson(configLoader,false);
+        writeJson(configLoader,false);
 
         reloadAllConfigs(configLoader);
 

@@ -10,12 +10,17 @@ public class Constants {
     /**
      * 内建类型
      */
-    public static final List<String> builtInTypes = Arrays.asList("bool", "byte", "short", "int", "long", "float", "double", "string", "bytes", "list", "set", "map");
+    public static final List<String> builtInTypes = Arrays.asList("bool", "byte", "short", "int", "long", "float", "double", "string", "bytes", "list", "set", "map", "date", "time", "datetime");
 
     /**
      * 原生类型
      */
     public static final List<String> primitiveTypes = Arrays.asList("bool", "short", "int", "long", "float", "double", "string");
+
+    /**
+     * 集合类型
+     */
+    public static final List<String> collectionTypes = Arrays.asList("list", "set", "map");
 
     /**
      * 时间类型

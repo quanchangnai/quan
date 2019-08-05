@@ -14,6 +14,7 @@
         <field name="list" type="list" value-type="int" column="List" ref="ItemConfig.id"/>
         <field name="set" type="set" value-type="int" column="Set"/>
         <field name="map" type="map" key-type="int" value-type="int" column="Map" ref="ItemConfig.id"/>
+        <field name="effectiveTime" type="datetime" column="生效时间"/>
     </config>
 
     <config name="EquipConfig" parent="ItemConfig" table="装备1,装备2">

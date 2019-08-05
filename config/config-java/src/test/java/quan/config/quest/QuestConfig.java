@@ -207,17 +207,17 @@ public class QuestConfig extends Config {
         return new QuestConfig();
     }
 
-    private static Map<Integer, Map<Integer, QuestConfig>> composite1Configs = new HashMap<>();
+    private volatile static Map<Integer, Map<Integer, QuestConfig>> composite1Configs = new HashMap<>();
 
-    private static Map<Integer, Map<Boolean, List<QuestConfig>>> composite2Configs = new HashMap<>();
+    private volatile static Map<Integer, Map<Boolean, List<QuestConfig>>> composite2Configs = new HashMap<>();
 
-    private static Map<String, Map<Integer, Map<Integer, QuestConfig>>> composite3Configs = new HashMap<>();
+    private volatile static Map<String, Map<Integer, Map<Integer, QuestConfig>>> composite3Configs = new HashMap<>();
 
-    private static Map<String, Map<Integer, Map<Integer, List<QuestConfig>>>> composite4Configs = new HashMap<>();
+    private volatile static Map<String, Map<Integer, Map<Integer, List<QuestConfig>>>> composite4Configs = new HashMap<>();
 
-    private static Map<Integer, QuestConfig> idConfigs = new HashMap<>();
+    private volatile static Map<Integer, QuestConfig> idConfigs = new HashMap<>();
 
-    private static Map<QuestType, List<QuestConfig>> typeConfigs = new HashMap<>();
+    private volatile static Map<QuestType, List<QuestConfig>> typeConfigs = new HashMap<>();
 
 
     public static Map<Integer, Map<Integer, QuestConfig>> getComposite1Configs() {

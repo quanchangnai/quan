@@ -21,11 +21,6 @@ public class JsonConfigReader extends ConfigReader {
 
     @Override
     protected void initPrototype() {
-        if (configDefinition != null) {
-            super.initPrototype();
-            return;
-        }
-
         try {
             Class<Config> configClass = (Class<Config>) Class.forName(configFullName);
             prototype = configClass.getDeclaredConstructor().newInstance();
@@ -37,10 +32,10 @@ public class JsonConfigReader extends ConfigReader {
     @Override
     protected void read() {
         try (FileInputStream inputStream = new FileInputStream(tableFile)) {
-            byte[] input = new byte[inputStream.available()];
-            inputStream.read(input);
+            byte[] availableBytes = new byte[inputStream.available()];
+            inputStream.read(availableBytes);
 
-            List<JSONObject> jsons = (List<JSONObject>) JSON.parse(input);
+            List<JSONObject> jsons = (List<JSONObject>) JSON.parse(availableBytes);
             this.jsons.addAll(jsons);
         } catch (Exception e) {
             logger.error("读取配置[{}]出错", tableFile.getName(), e);
