@@ -1,5 +1,6 @@
 package quan.generator;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.common.util.PathUtils;
@@ -21,12 +22,15 @@ public abstract class DefinitionParser {
 
     protected String enumPackagePrefix;
 
-    protected List<File> definitionFiles = new ArrayList<>();
+    private List<String> definitionPaths = new ArrayList<>();
 
+    protected List<File> definitionFiles = new ArrayList<>();
 
     public void setDefinitionPaths(List<String> definitionPaths) {
         for (String path : definitionPaths) {
-            File file = new File(PathUtils.crossPlatPath(path));
+            path = PathUtils.crossPlatPath(path);
+            this.definitionPaths.add(path);
+            File file = new File(path);
             File[] files = file.listFiles((File dir, String name) -> name.endsWith("." + getFileType()));
             if (files != null) {
                 definitionFiles.addAll(Arrays.asList(files));
@@ -34,16 +38,34 @@ public abstract class DefinitionParser {
         }
     }
 
-    public void setSrcPath(String srcPath) {
-        setDefinitionPaths(Collections.singletonList(srcPath));
+    public void setDefinitionPath(String definitionPath) {
+        setDefinitionPaths(Collections.singletonList(definitionPath));
     }
 
     public void setPackagePrefix(String packagePrefix) {
+        if (StringUtils.isBlank(packagePrefix)) {
+            return;
+        }
         this.packagePrefix = packagePrefix;
     }
 
     public void setEnumPackagePrefix(String enumPackagePrefix) {
+        if (StringUtils.isBlank(enumPackagePrefix)) {
+            return;
+        }
         this.enumPackagePrefix = enumPackagePrefix;
+    }
+
+    public List<String> getDefinitionPaths() {
+        return definitionPaths;
+    }
+
+    public String getPackagePrefix() {
+        return packagePrefix;
+    }
+
+    public String getEnumPackagePrefix() {
+        return enumPackagePrefix;
     }
 
     protected abstract String getFileType();

@@ -29,7 +29,7 @@ public abstract class ConfigReader {
     //表格正文起始行号，默认是第3行,第1行固定是表头，中间是注释等，行号从1开始
     protected int bodyRowNum = 3;
 
-    private Config prototype;
+    protected Config prototype;
 
     protected List<JSONObject> jsons = new ArrayList<>();
 
@@ -37,13 +37,24 @@ public abstract class ConfigReader {
 
     private List<Config> configs = new ArrayList<>();
 
+    protected ConfigReader() {
+    }
+
     public ConfigReader(String tablePath, String table, ConfigDefinition configDefinition) {
+        init(tablePath, table, configDefinition);
+    }
+
+    protected void init(String tablePath, String tableFileName, ConfigDefinition configDefinition) {
         tablePath = PathUtils.crossPlatPath(tablePath);
-        table = PathUtils.crossPlatPath(table);
-        this.tableFile = new File(tablePath, table);
-        this.table = table.substring(0, table.lastIndexOf("."));
+        tableFileName = PathUtils.crossPlatPath(tableFileName);
+        this.tableFile = new File(tablePath, tableFileName);
+        this.table = tableFileName.substring(0, tableFileName.lastIndexOf("."));
         this.configDefinition = configDefinition;
 
+        initPrototype();
+    }
+
+    protected void initPrototype() {
         try {
             Class<Config> configClass = (Class<Config>) Class.forName(configDefinition.getFullName());
             prototype = configClass.getDeclaredConstructor().newInstance();

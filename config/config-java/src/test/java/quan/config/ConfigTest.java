@@ -20,29 +20,29 @@ public class ConfigTest {
 
 //        String tableType = "csv";
 //        String tablePath = "config\\csv";
-        String tableType = "xlsx";
-        String tablePath = "config\\excel";
-//        String tableType = "json";
-//        String tablePath = "config\\json";
+//        String tableType = "xlsx";
+//        String tablePath = "config\\excel";
+        String tableType = "json";
+        String tablePath = "config\\json";
 
 
-        ConfigLoader configLoader = new ConfigLoader(definitionPaths, tablePath);
-        configLoader.setPackagePrefix("quan.config");
-        configLoader.setEnumPackagePrefix("quan");
+        ConfigLoader configLoader = new ConfigLoader(tablePath);
+//        configLoader.useXmlDefinitionParser(definitionPaths, "quan.config", "quan");
         configLoader.setLoadType(ConfigLoader.Type.validateAndLoad);
         configLoader.setValidatorsPackage("quan");
         configLoader.setTableType(tableType);
 
-
         loadConfigs(configLoader);
 
-        writeJson(configLoader);
+//        writeJson(configLoader,false);
 
         reloadAllConfigs(configLoader);
 
-        reloadConfigs(configLoader);
+        reloadByConfigNames(configLoader);
 
-        reloadTables(configLoader);
+        reloadByTableNames(configLoader);
+
+        reloadByOriginalNames(configLoader);
 
     }
 
@@ -59,20 +59,20 @@ public class ConfigTest {
         System.err.println();
     }
 
-    private static void writeJson(ConfigLoader configLoader) {
+    private static void writeJson(ConfigLoader configLoader, boolean useFullName) {
         if (configLoader.getTableType().equals("json")) {
             return;
         }
-        System.err.println("configLoader.writeJson()=============");
+        System.err.println("writeJson()=============");
         long startTime = System.currentTimeMillis();
-        configLoader.writeJson("config\\json");
-        System.err.println("configLoader.writeJson()耗时:" + (System.currentTimeMillis() - startTime));
+        configLoader.writeJson("config\\json", useFullName);
+        System.err.println("writeJson()耗时:" + (System.currentTimeMillis() - startTime));
         System.err.println();
     }
 
     private static void reloadAllConfigs(ConfigLoader configLoader) throws Exception {
         Thread.sleep(10000);
-        System.err.println("configLoader.reloadAllConfigs()=============");
+        System.err.println("reloadAllConfigs()=============");
         long startTime = System.currentTimeMillis();
         try {
             configLoader.reloadAll();
@@ -80,37 +80,52 @@ public class ConfigTest {
             printErrors(e);
         }
         printConfigs();
-        System.err.println("configLoader.reloadAllConfigs()耗时:" + (System.currentTimeMillis() - startTime));
+        System.err.println("reloadAllConfigs()耗时:" + (System.currentTimeMillis() - startTime));
         System.err.println();
     }
 
-    private static void reloadConfigs(ConfigLoader configLoader) throws Exception {
+    private static void reloadByConfigNames(ConfigLoader configLoader) throws Exception {
         Thread.sleep(5000);
         List<String> reloadConfigs = Arrays.asList("ItemConfig", "WeaponConfig");
-        System.err.println("configLoader.reloadConfigs()=============" + reloadConfigs);
+        System.err.println("reloadByConfigNames()=============" + reloadConfigs);
         long startTime = System.currentTimeMillis();
         try {
-            configLoader.reload(reloadConfigs);
+            configLoader.reloadByConfigNames(reloadConfigs);
         } catch (ConfigException e) {
             printErrors(e);
         }
         printConfigs();
-        System.err.println("configLoader.reloadConfigs()耗时:" + (System.currentTimeMillis() - startTime));
+        System.err.println("reloadByConfigNames()耗时:" + (System.currentTimeMillis() - startTime));
         System.err.println();
     }
 
-    private static void reloadTables(ConfigLoader configLoader) throws Exception {
+    private static void reloadByTableNames(ConfigLoader configLoader) throws Exception {
         Thread.sleep(5000);
-        List<String> reloadConfigs = Arrays.asList("道具", "武器");
-        System.err.println("configLoader.reloadTables()=============" + reloadConfigs);
+        List<String> reloadConfigs = Arrays.asList("ItemConfig", "WeaponConfig");
+        System.err.println("reloadByTableNames()=============" + reloadConfigs);
         long startTime = System.currentTimeMillis();
         try {
-            configLoader.reloadTables(reloadConfigs, true);
+            configLoader.reloadByTableNames(reloadConfigs);
         } catch (ConfigException e) {
             printErrors(e);
         }
         printConfigs();
-        System.err.println("configLoader.reloadTables()耗时:" + (System.currentTimeMillis() - startTime));
+        System.err.println("reloadByTableNames()耗时:" + (System.currentTimeMillis() - startTime));
+        System.err.println();
+    }
+
+    private static void reloadByOriginalNames(ConfigLoader configLoader) throws Exception {
+        Thread.sleep(5000);
+        List<String> reloadConfigs = Arrays.asList("道具", "武器");
+        System.err.println("reloadByOriginalNames()=============" + reloadConfigs);
+        long startTime = System.currentTimeMillis();
+        try {
+            configLoader.reloadByOriginalNames(reloadConfigs);
+        } catch (ConfigException e) {
+            printErrors(e);
+        }
+        printConfigs();
+        System.err.println("reloadByOriginalNames()耗时:" + (System.currentTimeMillis() - startTime));
         System.err.println();
     }
 

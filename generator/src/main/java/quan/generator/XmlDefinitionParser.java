@@ -39,6 +39,7 @@ public class XmlDefinitionParser extends DefinitionParser {
     }
 
     @Override
+    @SuppressWarnings({"unchecked"})
     protected List<ClassDefinition> parseClasses(File srcFile) throws Exception {
         Element root = parseFile(srcFile);
         if (root == null) {

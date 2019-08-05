@@ -153,9 +153,7 @@ public class ClassUtils {
                 rootPath += File.separator;
             }
 
-            Set<File> classFiles = new HashSet<>();
-
-            parseFile(classFiles, new File(url.toURI()));
+            Set<File> classFiles = PathUtils.listFiles(new File(url.toURI()), "class");
 
             for (File classFile : classFiles) {
                 String filePath = classFile.getCanonicalPath();
@@ -167,22 +165,6 @@ public class ClassUtils {
             }
         } else {
             logger.error("不支持该url protocol:" + url.getProtocol());
-        }
-    }
-
-    private static void parseFile(Set<File> resultFiles, File file) throws Exception {
-        if (file.isDirectory()) {
-            File[] listFiles = file.listFiles();
-            if (listFiles != null) {
-                for (File listFile : listFiles) {
-                    parseFile(resultFiles, listFile);
-                }
-            }
-        } else {
-            String fileName = file.getCanonicalPath();
-            if (fileName.endsWith(".class")) {
-                resultFiles.add(file);
-            }
         }
     }
 
