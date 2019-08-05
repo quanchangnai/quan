@@ -27,14 +27,14 @@ public class ConfigTest {
 
 
         ConfigLoader configLoader = new ConfigLoader(tablePath);
-        configLoader.useXmlDefinitionParser(definitionPaths, "quan.config", "quan");
+        configLoader.useXmlDefinitionParser(definitionPaths, "quan.config").setEnumPackagePrefix("quan");
         configLoader.setLoadType(ConfigLoader.Type.validateAndLoad);
         configLoader.setValidatorsPackage("quan");
         configLoader.setTableType(tableType);
 
         loadConfigs(configLoader);
 
-        writeJson(configLoader,false);
+        writeJson(configLoader, false);
 
         reloadAllConfigs(configLoader);
 

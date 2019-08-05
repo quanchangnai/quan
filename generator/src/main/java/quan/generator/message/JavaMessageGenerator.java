@@ -5,20 +5,13 @@ import quan.generator.ClassDefinition;
 import quan.generator.Language;
 import quan.message.Message;
 
-import java.util.Collections;
-import java.util.List;
-
 /**
  * Created by quanchangnai on 2017/7/6.
  */
 public class JavaMessageGenerator extends MessageGenerator {
 
-    public JavaMessageGenerator(List<String> definitionPaths, String codePath) throws Exception {
-        super(definitionPaths, codePath);
-    }
-
-    public JavaMessageGenerator(String definitionPath, String codePath) throws Exception {
-        this(Collections.singletonList(definitionPath), codePath);
+    public JavaMessageGenerator(String codePath) throws Exception {
+        super(codePath);
     }
 
     @Override
@@ -43,8 +36,8 @@ public class JavaMessageGenerator extends MessageGenerator {
         String codePath = "message\\message-java\\src\\test\\java";
         String packagePrefix = "quan.message";
 
-        JavaMessageGenerator messageGenerator = new JavaMessageGenerator(definitionPath, codePath);
-        messageGenerator.setPackagePrefix(packagePrefix);
+        JavaMessageGenerator messageGenerator = new JavaMessageGenerator(codePath);
+        messageGenerator.useXmlDefinitionParser(definitionPath, packagePrefix);
         messageGenerator.generate();
     }
 }

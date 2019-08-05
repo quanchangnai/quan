@@ -1,25 +1,25 @@
 package quan.generator.config;
 
 import freemarker.template.Template;
-import quan.generator.BeanDefinition;
-import quan.generator.ClassDefinition;
-import quan.generator.FieldDefinition;
-import quan.generator.Generator;
-
-import java.util.List;
+import quan.generator.*;
 
 /**
  * Created by quanchangnai on 2019/7/11.
  */
 public abstract class ConfigGenerator extends Generator {
 
-    public ConfigGenerator(List<String> definitionPaths, String codePath) throws Exception {
-        super(definitionPaths, codePath);
+    public ConfigGenerator(String codePath) throws Exception {
+        super(codePath);
 
         Template configTemplate = freemarkerCfg.getTemplate("config." + supportLanguage() + ".ftl");
 
         templates.put(ConfigDefinition.class, configTemplate);
         templates.put(BeanDefinition.class, configTemplate);
+    }
+
+    @Override
+    public Definition.Category category() {
+        return Definition.Category.data;
     }
 
     @Override

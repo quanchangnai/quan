@@ -7,16 +7,13 @@ import quan.database.MapField;
 import quan.database.SetField;
 import quan.generator.*;
 
-import java.util.Collections;
-import java.util.List;
-
 /**
  * Created by quanchangnai on 2017/7/6.
  */
 public class DatabaseGenerator extends Generator {
 
-    public DatabaseGenerator(List<String> definitionPaths, String codePath) throws Exception {
-        super(definitionPaths, codePath);
+    public DatabaseGenerator(String codePath) throws Exception {
+        super(codePath);
 
         basicTypes.put("byte", "byte");
         classTypes.put("byte", "Byte");
@@ -31,8 +28,9 @@ public class DatabaseGenerator extends Generator {
 
     }
 
-    public DatabaseGenerator(String definitionPath, String codePath) throws Exception {
-        this(Collections.singletonList(definitionPath), codePath);
+    @Override
+    public Definition.Category category() {
+        return Definition.Category.data;
     }
 
     @Override
@@ -72,12 +70,12 @@ public class DatabaseGenerator extends Generator {
 
     public static void main(String[] args) throws Exception {
 
-        String srcPath = "generator\\src\\test\\java\\quan\\generator\\database";
+        String definitionPath = "generator\\src\\test\\java\\quan\\generator\\database";
         String codePath = "database\\src\\test\\java";
         String packagePrefix = "quan.database";
 
-        DatabaseGenerator generator = new DatabaseGenerator(srcPath, codePath);
-        generator.setPackagePrefix(packagePrefix);
+        DatabaseGenerator generator = new DatabaseGenerator(codePath);
+        generator.useXmlDefinitionParser(definitionPath, packagePrefix);
         generator.generate();
     }
 

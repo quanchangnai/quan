@@ -5,16 +5,13 @@ import quan.generator.ClassDefinition;
 import quan.generator.FieldDefinition;
 import quan.generator.Language;
 
-import java.util.Collections;
-import java.util.List;
-
 /**
  * Created by quanchangnai on 2017/7/6.
  */
 public class CSharpMessageGenerator extends MessageGenerator {
 
-    public CSharpMessageGenerator(List<String> definitionPaths, String codePath) throws Exception {
-        super(definitionPaths, codePath);
+    public CSharpMessageGenerator(String codePath) throws Exception {
+        super(codePath);
 
         basicTypes.put("bool", "bool");
         basicTypes.put("string", "string");
@@ -34,9 +31,6 @@ public class CSharpMessageGenerator extends MessageGenerator {
         classTypes.put("map", "Dictionary");
     }
 
-    public CSharpMessageGenerator(String definitionPath, String codePath) throws Exception {
-        this(Collections.singletonList(definitionPath), codePath);
-    }
 
     @Override
     protected Language supportLanguage() {
@@ -77,8 +71,8 @@ public class CSharpMessageGenerator extends MessageGenerator {
         String destPath = "message";
         String packagePrefix = "MessageCS.test";
 
-        CSharpMessageGenerator messageGenerator = new CSharpMessageGenerator(definitionPath, destPath);
-        messageGenerator.setPackagePrefix(packagePrefix);
+        CSharpMessageGenerator messageGenerator = new CSharpMessageGenerator(destPath);
+        messageGenerator.useXmlDefinitionParser(definitionPath, packagePrefix);
         messageGenerator.generate();
 
     }

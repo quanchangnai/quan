@@ -69,27 +69,28 @@ public class ConfigLoader {
     /**
      * 使用XML配置解析器，只有加载以配置全类名作为JSON文件名时可以为空
      */
-    public void useXmlDefinitionParser(List<String> definitionPaths, String packagePrefix, String enumPackagePrefix) {
+    public DefinitionParser useXmlDefinitionParser(List<String> definitionPaths, String packagePrefix) {
         definitionParser = new XmlDefinitionParser();
+        definitionParser.setCategory(Definition.Category.config);
         definitionParser.setDefinitionPaths(definitionPaths);
         definitionParser.setPackagePrefix(packagePrefix);
-        definitionParser.setEnumPackagePrefix(enumPackagePrefix);
+        return definitionParser;
     }
 
     /**
      * 使用XML配置解析器，只有加载以配置全类名作为JSON文件名时可以为空
      */
-    public void useXmlDefinitionParser(String definitionPath, String packagePrefix, String enumPackagePrefix) {
-        definitionParser = new XmlDefinitionParser();
-        definitionParser.setDefinitionPath(definitionPath);
-        definitionParser.setPackagePrefix(packagePrefix);
-        definitionParser.setEnumPackagePrefix(enumPackagePrefix);
+    public DefinitionParser useXmlDefinitionParser(String definitionPath, String packagePrefix) {
+        return useXmlDefinitionParser(Collections.singletonList(definitionPath), packagePrefix);
     }
 
     /**
      * 设置配置解析器，只有加载以配置全类名作为JSON文件名时可以为空
      */
     public ConfigLoader setDefinitionParser(DefinitionParser definitionParser) {
+        if (definitionParser != null) {
+            definitionParser.setCategory(Definition.Category.config);
+        }
         this.definitionParser = definitionParser;
         return this;
     }

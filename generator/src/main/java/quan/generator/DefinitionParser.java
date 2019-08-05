@@ -18,6 +18,8 @@ public abstract class DefinitionParser {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
+    protected Definition.Category category;
+
     protected String packagePrefix;
 
     protected String enumPackagePrefix;
@@ -25,6 +27,15 @@ public abstract class DefinitionParser {
     private List<String> definitionPaths = new ArrayList<>();
 
     protected List<File> definitionFiles = new ArrayList<>();
+
+    public DefinitionParser setCategory(Definition.Category category) {
+        this.category = category;
+        return this;
+    }
+
+    public Definition.Category getCategory() {
+        return category;
+    }
 
     public void setDefinitionPaths(List<String> definitionPaths) {
         for (String path : definitionPaths) {

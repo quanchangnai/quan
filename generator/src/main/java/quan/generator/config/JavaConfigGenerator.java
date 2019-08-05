@@ -3,7 +3,6 @@ package quan.generator.config;
 import quan.generator.Language;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -12,8 +11,8 @@ import java.util.List;
 public class JavaConfigGenerator extends ConfigGenerator {
 
 
-    public JavaConfigGenerator(List<String> definitionPaths, String codePath) throws Exception {
-        super(definitionPaths, codePath);
+    public JavaConfigGenerator(String codePath) throws Exception {
+        super(codePath);
 
         basicTypes.put("date", "Date");
         basicTypes.put("time", "Date");
@@ -23,9 +22,6 @@ public class JavaConfigGenerator extends ConfigGenerator {
         classTypes.put("datetime", "Date");
     }
 
-    public JavaConfigGenerator(String definitionPaths, String codePath) throws Exception {
-        this(Collections.singletonList(definitionPaths), codePath);
-    }
 
     @Override
     protected Language supportLanguage() {
@@ -37,11 +33,10 @@ public class JavaConfigGenerator extends ConfigGenerator {
         List<String> definitionPaths = new ArrayList<>();
         definitionPaths.add("generator\\src\\test\\java\\quan\\generator");
         definitionPaths.add("generator\\src\\test\\java\\quan\\generator\\config");
-        String destPath = "config\\config-java\\src\\test\\java";
+        String codePath = "config\\config-java\\src\\test\\java";
 
-        JavaConfigGenerator generator = new JavaConfigGenerator(definitionPaths, destPath);
-        generator.setPackagePrefix("quan.config");
-        generator.setEnumPackagePrefix("quan");
+        JavaConfigGenerator generator = new JavaConfigGenerator(codePath);
+        generator.useXmlDefinitionParser(definitionPaths, "quan.config").setEnumPackagePrefix("quan");
 
         generator.generate();
     }

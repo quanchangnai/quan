@@ -3,18 +3,16 @@ package quan.generator.message;
 import freemarker.template.Template;
 import quan.generator.BeanDefinition;
 import quan.generator.ClassDefinition;
+import quan.generator.Definition;
 import quan.generator.Generator;
-
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Created by quanchangnai on 2017/7/6.
  */
 public abstract class MessageGenerator extends Generator {
 
-    public MessageGenerator(List<String> definitionPaths, String codePath) throws Exception {
-        super(definitionPaths, codePath);
+    public MessageGenerator(String codePath) throws Exception {
+        super(codePath);
         basicTypes.put("bytes", "byte[]");
         classTypes.put("bytes", "byte[]");
 
@@ -22,6 +20,11 @@ public abstract class MessageGenerator extends Generator {
 
         templates.put(MessageDefinition.class, messageTemplate);
         templates.put(BeanDefinition.class, messageTemplate);
+    }
+
+    @Override
+    public Definition.Category category() {
+        return Definition.Category.data;
     }
 
     @Override

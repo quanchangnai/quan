@@ -87,7 +87,7 @@ public class XmlDefinitionParser extends DefinitionParser {
                 default:
                     continue;
             }
-
+            classDefinition.setCategory(getCategory());
             classDefinition.setDefinitionFile(srcFile.getName());
             classDefinition.setDefinitionText(element.asXML());
 
@@ -165,6 +165,7 @@ public class XmlDefinitionParser extends DefinitionParser {
 
     private void parseField(ClassDefinition classDefinition, Element classElement, Element fieldElement, int i) {
         FieldDefinition fieldDefinition = new FieldDefinition();
+        fieldDefinition.setCategory(getCategory());
 
         fieldDefinition.setName(fieldElement.attributeValue("name"));
         fieldDefinition.setType(fieldElement.attributeValue("type"));
@@ -186,6 +187,8 @@ public class XmlDefinitionParser extends DefinitionParser {
 
     private void parseIndex(ConfigDefinition configDefinition, Element classElement, Element indexElement, int i) {
         IndexDefinition indexDefinition = new IndexDefinition(configDefinition);
+        indexDefinition.setCategory(getCategory());
+
         indexDefinition.setName(indexElement.attributeValue("name"));
         indexDefinition.setType(indexElement.attributeValue("type"));
         indexDefinition.setFieldNames(indexElement.attributeValue("fields"));

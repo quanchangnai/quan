@@ -10,10 +10,7 @@ import quan.common.util.PathUtils;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -51,29 +48,20 @@ public abstract class Generator {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    protected DefinitionParser definitionParser = new XmlDefinitionParser();
-
-    private List<String> definitionPaths = new ArrayList<>();
+    protected DefinitionParser definitionParser;
 
     private String codePath;
-
-    private String packagePrefix;
-
-    private String enumPackagePrefix;
 
     protected Configuration freemarkerCfg;
 
     protected Map<Class<? extends ClassDefinition>, Template> templates = new HashMap<>();
 
-    public Generator(List<String> definitionPaths, String codePath) throws Exception {
+    public Generator(String codePath) throws Exception {
         Configuration freemarkerCfg = new Configuration(Configuration.VERSION_2_3_23);
         freemarkerCfg.setClassForTemplateLoading(Generator.class, "");
         freemarkerCfg.setDefaultEncoding("UTF-8");
         freemarkerCfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
 
-        for (String definitionPath : definitionPaths) {
-            this.definitionPaths.add(PathUtils.crossPlatPath(definitionPath));
-        }
         this.codePath = PathUtils.crossPlatPath(codePath);
         this.freemarkerCfg = freemarkerCfg;
 
@@ -84,17 +72,23 @@ public abstract class Generator {
     }
 
 
-    public Generator setPackagePrefix(String packagePrefix) {
-        this.packagePrefix = packagePrefix;
-        return this;
+    public abstract Definition.Category category();
+
+    public DefinitionParser useXmlDefinitionParser(List<String> definitionPaths, String packagePrefix) {
+        definitionParser = new XmlDefinitionParser();
+        definitionParser.setCategory(category());
+        definitionParser.setDefinitionPaths(definitionPaths);
+        definitionParser.setPackagePrefix(packagePrefix);
+        return definitionParser;
     }
 
-    public Generator setEnumPackagePrefix(String enumPackagePrefix) {
-        this.enumPackagePrefix = enumPackagePrefix;
-        return this;
+
+    public DefinitionParser useXmlDefinitionParser(String definitionPath, String packagePrefix) {
+        return useXmlDefinitionParser(Collections.singletonList(definitionPath), packagePrefix);
     }
 
     public Generator setDefinitionParser(DefinitionParser definitionParser) {
+        definitionParser.setCategory(Definition.Category.data);
         this.definitionParser = definitionParser;
         return this;
     }
@@ -107,15 +101,12 @@ public abstract class Generator {
     }
 
     public final void generate() throws Exception {
-        definitionParser.setDefinitionPaths(definitionPaths);
-        definitionParser.setPackagePrefix(packagePrefix);
-        definitionParser.setEnumPackagePrefix(enumPackagePrefix);
-
+        Objects.requireNonNull(definitionParser, "定义文件解析器不能为空");
         definitionParser.parse();
 
         List<String> validatedErrors = ClassDefinition.getValidatedErrors();
         if (!validatedErrors.isEmpty()) {
-            System.err.println(String.format("生成%s代码失败，解析定义文件%s共发现%d条错误。", supportLanguage(), definitionPaths, validatedErrors.size()));
+            System.err.println(String.format("生成%s代码失败，解析定义文件%s共发现%d条错误。", supportLanguage(), definitionParser.getDefinitionPaths(), validatedErrors.size()));
             for (int i = 0; i < validatedErrors.size(); i++) {
                 String validatedError = validatedErrors.get(i);
                 System.err.println((i + 1) + ":" + validatedError);
