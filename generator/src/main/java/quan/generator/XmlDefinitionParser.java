@@ -16,6 +16,8 @@ import java.util.*;
  */
 public class XmlDefinitionParser extends DefinitionParser {
 
+    private static List<String> elementNames = Arrays.asList("enum", "bean", "message", "data", "config");
+
     private Map<File, Element> file2Roots = new HashMap<>();
 
     private Map<Element, ClassDefinition> element2Classes = new HashMap<>();
@@ -25,12 +27,12 @@ public class XmlDefinitionParser extends DefinitionParser {
         return "xml";
     }
 
-    private Element parseFile(File srcFile) throws Exception {
-        Element root = file2Roots.get(srcFile);
+    private Element parseFile(File definitionFile) throws Exception {
+        Element root = file2Roots.get(definitionFile);
         if (root == null) {
-            root = new SAXReader().read(srcFile).getRootElement();
+            root = new SAXReader().read(definitionFile).getRootElement();
             if (root.getName().equals("package")) {
-                file2Roots.put(srcFile, root);
+                file2Roots.put(definitionFile, root);
             } else {
                 root = null;
             }
@@ -40,22 +42,22 @@ public class XmlDefinitionParser extends DefinitionParser {
 
     @Override
     @SuppressWarnings({"unchecked"})
-    protected List<ClassDefinition> parseClasses(File srcFile) throws Exception {
-        Element root = parseFile(srcFile);
+    protected List<ClassDefinition> parseClasses(File definitionFile) throws Exception {
+        Element root = parseFile(definitionFile);
         if (root == null) {
             return Collections.EMPTY_LIST;
         }
 
-        String simplePackageName = srcFile.getName().substring(0, srcFile.getName().lastIndexOf("."));
+        String fileName = definitionFile.getName().substring(0, definitionFile.getName().lastIndexOf("."));
 
-        String packageName = simplePackageName;
+        String packageName = fileName;
         if (packagePrefix != null) {
-            packageName = packagePrefix + "." + packageName;
+            packageName = packagePrefix + "." + fileName;
         }
 
         String enumPackageName = packageName;
         if (enumPackagePrefix != null) {
-            enumPackageName = enumPackagePrefix + "." + simplePackageName;
+            enumPackageName = enumPackagePrefix + "." + fileName;
         }
 
         List<ClassDefinition> classDefinitions = new ArrayList<>();
@@ -88,7 +90,7 @@ public class XmlDefinitionParser extends DefinitionParser {
                     continue;
             }
             classDefinition.setCategory(getCategory());
-            classDefinition.setDefinitionFile(srcFile.getName());
+            classDefinition.setDefinitionFile(definitionFile.getName());
             classDefinition.setDefinitionText(element.asXML());
 
             if (classDefinition instanceof EnumDefinition) {
@@ -129,7 +131,6 @@ public class XmlDefinitionParser extends DefinitionParser {
             }
             Element element = (Element) node;
 
-            List<String> elementNames = Arrays.asList("enum", "bean", "message", "data", "config");
             if (!elementNames.contains(element.getName())) {
                 continue;
             }

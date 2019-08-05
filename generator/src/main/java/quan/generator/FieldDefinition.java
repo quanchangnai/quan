@@ -2,6 +2,9 @@ package quan.generator;
 
 import org.apache.commons.lang3.StringUtils;
 import quan.generator.config.ConfigDefinition;
+import quan.generator.config.JavaConfigGenerator;
+import quan.generator.database.DatabaseGenerator;
+import quan.generator.message.JavaMessageGenerator;
 
 /**
  * Created by quanchangnai on 2017/7/6.
@@ -69,7 +72,21 @@ public class FieldDefinition extends Definition {
     }
 
     public boolean isBuiltInType() {
-        return Constants.builtInTypes.contains(type);
+        return isBuiltInType(type);
+    }
+
+    public boolean isBuiltInType(String type) {
+        if (category == DefinitionCategory.data) {
+            return DatabaseGenerator.BASIC_TYPES.containsKey(type);
+        }
+        if (category == DefinitionCategory.message) {
+            return JavaMessageGenerator.BASIC_TYPES.containsKey(type);
+        }
+        if (category == DefinitionCategory.config) {
+            return JavaConfigGenerator.BASIC_TYPES.containsKey(type);
+        }
+
+        return false;
     }
 
     public boolean isCollectionType() {
@@ -104,7 +121,7 @@ public class FieldDefinition extends Definition {
      * 类型是否合法
      */
     public boolean isLegalType() {
-        return isBuiltInType() || isBeanType() || isEnumType() || isTimeType();
+        return isBuiltInType() || isBeanType() || isEnumType() || (category == DefinitionCategory.config && isTimeType());
     }
 
 
@@ -142,7 +159,7 @@ public class FieldDefinition extends Definition {
     }
 
     public boolean isBuiltInKeyType() {
-        return Constants.builtInTypes.contains(keyType);
+        return isBuiltInType(keyType);
     }
 
     public boolean isPrimitiveKeyType() {
@@ -162,11 +179,11 @@ public class FieldDefinition extends Definition {
     }
 
     public boolean isBuiltInValueType() {
-        return Constants.builtInTypes.contains(valueType);
+        return isBuiltInType(valueType);
     }
 
     public boolean isPrimitiveValueType() {
-        return Constants.primitiveTypes.contains(valueType);
+        return isBuiltInType(valueType);
     }
 
     public boolean isBeanValueType() {

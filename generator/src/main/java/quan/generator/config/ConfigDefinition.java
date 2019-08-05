@@ -186,7 +186,10 @@ public class ConfigDefinition extends BeanDefinition {
 
         if (table == null) {
             table = getName();
+        } else if (getComment() == null) {
+            setComment(table);
         }
+
         //支持分表
         tables.addAll(Arrays.asList(table.split(",")));
         for (String t : tables) {
@@ -221,7 +224,7 @@ public class ConfigDefinition extends BeanDefinition {
         Set<String> parents = new HashSet<>();
         while (parentConfig != null) {
             if (parents.contains(parentConfig.getName())) {
-                addValidatedError(getName4Validate() + "和父类" + parents + "不能有循环");
+                addValidatedError(getName4Validate() + "和父子关系" + parents + "不能有循环");
                 return;
             }
             parents.add(parentConfig.getName());
@@ -237,7 +240,6 @@ public class ConfigDefinition extends BeanDefinition {
         }
 
     }
-
 
     @Override
     protected void validateField(FieldDefinition field) {
@@ -414,6 +416,9 @@ public class ConfigDefinition extends BeanDefinition {
 
     }
 
+    /**
+     * 转义分隔符里的正则表达式特殊字符
+     */
     public static String escapeDelimiter(String delimiter) {
         StringBuilder escapedDelimiter = new StringBuilder();
         for (int i = 0; i < delimiter.length(); i++) {

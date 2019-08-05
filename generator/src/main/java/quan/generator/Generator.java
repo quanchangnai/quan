@@ -22,30 +22,6 @@ public abstract class Generator {
 
     protected Map<String, String> classTypes = new HashMap<>();
 
-    {
-        basicTypes.put("bool", "boolean");
-        basicTypes.put("short", "short");
-        basicTypes.put("int", "int");
-        basicTypes.put("long", "long");
-        basicTypes.put("float", "float");
-        basicTypes.put("double", "double");
-        basicTypes.put("string", "String");
-        basicTypes.put("set", "Set");
-        basicTypes.put("list", "List");
-        basicTypes.put("map", "Map");
-
-        classTypes.put("bool", "Boolean");
-        classTypes.put("short", "Short");
-        classTypes.put("int", "Integer");
-        classTypes.put("long", "Long");
-        classTypes.put("float", "Float");
-        classTypes.put("double", "Double");
-        classTypes.put("string", "String");
-        classTypes.put("set", "HashSet");
-        classTypes.put("list", "ArrayList");
-        classTypes.put("map", "HashMap");
-    }
-
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     protected DefinitionParser definitionParser;
@@ -169,7 +145,7 @@ public abstract class Generator {
         }
 
         if (fieldDefinition.isCollectionType()) {
-            if (fieldType.equals("map")) {
+            if (fieldType.equals("map") && fieldDefinition.isBuiltInKeyType()) {
                 String fieldKeyType = fieldDefinition.getKeyType();
                 fieldDefinition.setBasicKeyType(basicTypes.get(fieldKeyType));
                 fieldDefinition.setClassKeyType(classTypes.get(fieldKeyType));

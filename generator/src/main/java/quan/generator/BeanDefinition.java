@@ -127,7 +127,7 @@ public class BeanDefinition extends ClassDefinition {
     }
 
     private void validateDelimiter() {
-        if (getClass() != BeanDefinition.class) {
+        if (category != DefinitionCategory.config || getClass() != BeanDefinition.class) {
             return;
         }
         if (delimiter.length() != 1) {

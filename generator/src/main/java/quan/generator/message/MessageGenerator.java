@@ -10,8 +10,6 @@ public abstract class MessageGenerator extends Generator {
 
     public MessageGenerator(String codePath) throws Exception {
         super(codePath);
-        basicTypes.put("bytes", "byte[]");
-        classTypes.put("bytes", "byte[]");
 
         Template messageTemplate = freemarkerCfg.getTemplate("message." + supportLanguage() + ".ftl");
 

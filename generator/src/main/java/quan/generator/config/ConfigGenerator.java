@@ -12,14 +12,13 @@ public abstract class ConfigGenerator extends Generator {
         super(codePath);
 
         Template configTemplate = freemarkerCfg.getTemplate("config." + supportLanguage() + ".ftl");
-
         templates.put(ConfigDefinition.class, configTemplate);
         templates.put(BeanDefinition.class, configTemplate);
     }
 
     @Override
     public DefinitionCategory category() {
-        return DefinitionCategory.data;
+        return DefinitionCategory.config;
     }
 
     @Override

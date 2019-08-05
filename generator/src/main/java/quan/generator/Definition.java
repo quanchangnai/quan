@@ -7,7 +7,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public abstract class Definition {
 
-    private DefinitionCategory category;
+    protected DefinitionCategory category;
 
     private String name;
 
