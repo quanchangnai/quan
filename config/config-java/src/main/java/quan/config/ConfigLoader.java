@@ -30,8 +30,6 @@ public class ConfigLoader {
 
     protected DefinitionParser definitionParser;
 
-    private boolean definitionParsed;
-
     //配置表所在目录
     private String tablePath;
 
@@ -144,8 +142,8 @@ public class ConfigLoader {
         }
     }
 
-    private void parseDefinition() {
-        if (definitionParser == null || definitionParsed) {
+    private void parseDefinitions() {
+        if (definitionParser == null || !ClassDefinition.getClasses().isEmpty()) {
             return;
         }
 
@@ -162,7 +160,6 @@ public class ConfigLoader {
             configException.addErrors(validatedErrors);
             throw configException;
         }
-        definitionParsed = true;
     }
 
     /**
@@ -179,7 +176,7 @@ public class ConfigLoader {
         validatedErrors.clear();
 
         //解析定义文件
-        parseDefinition();
+        parseDefinitions();
 
         if (isJsonAndNoDefinition()) {
             //没有配置定义直接加载JSON
@@ -187,12 +184,6 @@ public class ConfigLoader {
         } else {
             //通过配置定义加载或者校验
             loadByDefinitions();
-        }
-
-        if (needValidate()) {
-            for (ConfigReader reader : readers.values()) {
-                validatedErrors.addAll(reader.getValidatedErrors());
-            }
         }
 
         executeValidators();
@@ -217,6 +208,12 @@ public class ConfigLoader {
             String configFullName = jsonFile.getName().substring(0, jsonFile.getName().lastIndexOf("."));
             load(configFullName, Collections.singleton(configFullName), true);
         }
+        if (needValidate()) {
+            //格式错误
+            for (ConfigReader reader : readers.values()) {
+                validatedErrors.addAll(reader.getValidatedErrors());
+            }
+        }
     }
 
     /**
@@ -238,6 +235,10 @@ public class ConfigLoader {
         }
 
         if (needValidate()) {
+            //格式错误
+            for (ConfigReader reader : readers.values()) {
+                validatedErrors.addAll(reader.getValidatedErrors());
+            }
             //引用校验，依赖索引结果
             for (ConfigDefinition configDefinition : configIndexedJsonsAll.keySet()) {
                 validateRef(configDefinition, configIndexedJsonsAll);
@@ -619,14 +620,11 @@ public class ConfigLoader {
         Set<File> jsonFiles = PathUtils.listFiles(new File(tablePath), "json");
         LinkedHashMap<String, ConfigReader> reloadReaders = new LinkedHashMap<>();
 
-        Set<String> notExistentConfigs = new HashSet<>(configNames);
         for (File jsonFile : jsonFiles) {
             String configFullName = jsonFile.getName().substring(0, jsonFile.getName().lastIndexOf("."));
             String configName = configFullName.substring(configFullName.lastIndexOf(".") + 1);
             if (!configNames.contains(configName)) {
                 continue;
-            } else {
-                notExistentConfigs.remove(configName);
             }
             ConfigReader configReader = readers.get(configFullName);
             if (configReader == null) {

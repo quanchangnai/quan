@@ -10,26 +10,20 @@ import java.util.*;
  */
 public abstract class ClassDefinition extends Definition {
 
-    /**
-     * 包名
-     */
+    //包名
     private String packageName;
 
-    /**
-     * 类定义文件
-     */
+    //定义文件
     private String definitionFile;
 
-    /**
-     * 类定义文本
-     */
+    //定义文本
     private String definitionText;
 
     protected List<String> languages = new ArrayList<>();
 
     protected List<FieldDefinition> fields = new ArrayList<>();
 
-    //key:字段名
+    //字段名:字段定义
     protected Map<String, FieldDefinition> nameFields = new HashMap<>();
 
     private static Map<String, ClassDefinition> classes = new HashMap<>();
@@ -116,12 +110,9 @@ public abstract class ClassDefinition extends Definition {
         return languages.isEmpty() || languages.contains(language.name());
     }
 
-    /**
-     * 校验1
-     */
     public void validate() {
         if (getName() == null) {
-            addValidatedError("类名不能为空");
+            addValidatedError(getDefinitionTypeName() + "名不能为空");
         }
 
         if (!languages.isEmpty() && !Language.names().containsAll(languages)) {
@@ -134,7 +125,7 @@ public abstract class ClassDefinition extends Definition {
     }
 
     /**
-     * 校验2，依赖[校验1]的结果，必须等所有类的[校验1]执行完成后再执行
+     * 依赖validate()的结果，必须等所有类的validate()执行完成后再执行
      */
     public void validate2() {
     }

@@ -12,6 +12,7 @@ public class TestConfigValidator1 implements ConfigValidator {
         String error = "TestConfigChecker1校验测试";
         ItemConfig itemConfig = ItemConfig.getById(1);
         if (itemConfig != null) {
+            System.err.println("itemConfig.toJson():" + itemConfig.toJson());
             error += ":" + itemConfig.getName();
         }
         throw new ConfigException(error);

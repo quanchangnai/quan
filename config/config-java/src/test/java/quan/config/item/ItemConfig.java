@@ -28,7 +28,7 @@ public class ItemConfig extends Config {
 
     protected Date effectiveTime;
 
-    protected String $effectiveTime;
+    protected String effectiveTime$Str;
 
     public int getId() {
         return id;
@@ -62,8 +62,8 @@ public class ItemConfig extends Config {
         return effectiveTime;
     }
 
-    public String get$effectiveTime() {
-        return $effectiveTime;
+    public String getEffectiveTime$Str() {
+        return effectiveTime$Str;
     }
 
 
@@ -110,7 +110,7 @@ public class ItemConfig extends Config {
         map = Collections.unmodifiableMap(map);
 
         effectiveTime = object.getDate("effectiveTime");
-        $effectiveTime = object.getString("$effectiveTime");
+        effectiveTime$Str = object.getString("effectiveTime$Str");
     }
 
     @Override
@@ -123,7 +123,7 @@ public class ItemConfig extends Config {
                 ",list=" + list +
                 ",set=" + set +
                 ",map=" + map +
-                ",effectiveTime='" + $effectiveTime + '\'' +
+                ",effectiveTime='" + effectiveTime$Str + '\'' +
                 '}';
 
     }

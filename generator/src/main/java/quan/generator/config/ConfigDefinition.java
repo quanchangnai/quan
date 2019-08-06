@@ -181,7 +181,7 @@ public class ConfigDefinition extends BeanDefinition {
         }
 
         if (!languages.isEmpty() && !Language.names().containsAll(languages)) {
-            addValidatedError(getName4Validate() + "的语言类型" + languages + "非法,支持的语言类型" + Language.names());
+            addValidatedError(getName4Validate() + "的语言类型" + languages + "非法,合法语言类型" + Language.names());
         }
 
         if (table == null) {
@@ -260,13 +260,20 @@ public class ConfigDefinition extends BeanDefinition {
         }
 
         //校验字段的分隔符
-        if (!field.isLoop()) {
-            ArrayList<String> delimiterList = new ArrayList<>();
-            validateFieldDelimiter(field, delimiterList);
-            Set<String> delimiterSet = new HashSet<>(delimiterList);
-            if (delimiterList.size() != delimiterSet.size()) {
-                addValidatedError(getName4Validate("的") + field.getName4Validate() + "的分隔符有重复[" + String.join("", delimiterList) + "]");
-            }
+        validateFieldDelimiter(field);
+    }
+
+    private void validateFieldDelimiter(FieldDefinition field) {
+        if (field.isLoop()) {
+            return;
+        }
+
+        ArrayList<String> delimiterList = new ArrayList<>();
+        validateFieldDelimiter(field, delimiterList);
+
+        Set<String> delimiterSet = new HashSet<>(delimiterList);
+        if (delimiterList.size() != delimiterSet.size()) {
+            addValidatedError(getName4Validate("的") + field.getName4Validate() + "关联分隔符有重复[" + String.join("", delimiterList) + "]");
         }
     }
 

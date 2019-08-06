@@ -54,7 +54,6 @@ public class XmlDefinitionParser extends DefinitionParser {
         if (packagePrefix != null) {
             packageName = packagePrefix + "." + fileName;
         }
-
         String enumPackageName = packageName;
         if (enumPackagePrefix != null) {
             enumPackageName = enumPackagePrefix + "." + fileName;
@@ -118,8 +117,8 @@ public class XmlDefinitionParser extends DefinitionParser {
 
 
     @Override
-    protected void parseFields(File srcFile) throws Exception {
-        Element root = parseFile(srcFile);
+    protected void parseFields(File definitionFile) throws Exception {
+        Element root = parseFile(definitionFile);
         if (root == null) {
             return;
         }

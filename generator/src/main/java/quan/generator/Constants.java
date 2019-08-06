@@ -25,7 +25,7 @@ public class Constants {
     /**
      * 合法的分隔符
      */
-    public static final Set<String> legalDelimiters = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(";", "_", "*", "|", ":", "$", "@", "#", "&", "?")));
+    public static final Set<String> legalDelimiters = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(";", ":", "_", "*", "|", "$", "@", "#", "&", "?")));
 
     /**
      * 需要转义的正则表达式特殊字符

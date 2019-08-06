@@ -87,7 +87,7 @@ public class WeaponConfig extends EquipConfig {
                 ",list=" + list +
                 ",set=" + set +
                 ",map=" + map +
-                ",effectiveTime='" + $effectiveTime + '\'' +
+                ",effectiveTime='" + effectiveTime$Str + '\'' +
                 ",position=" + position +
                 ",color=" + color +
                 ",w1=" + w1 +

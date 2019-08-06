@@ -6,10 +6,7 @@ import org.slf4j.LoggerFactory;
 import quan.common.util.PathUtils;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by quanchangnai on 2019/7/9.
@@ -26,7 +23,7 @@ public abstract class DefinitionParser {
 
     private List<String> definitionPaths = new ArrayList<>();
 
-    protected List<File> definitionFiles = new ArrayList<>();
+    protected LinkedHashSet<File> definitionFiles = new LinkedHashSet<>();
 
     public DefinitionParser setCategory(DefinitionCategory category) {
         this.category = category;
@@ -41,11 +38,8 @@ public abstract class DefinitionParser {
         for (String path : definitionPaths) {
             path = PathUtils.crossPlatPath(path);
             this.definitionPaths.add(path);
-            File file = new File(path);
-            File[] files = file.listFiles((File dir, String name) -> name.endsWith("." + getFileType()));
-            if (files != null) {
-                definitionFiles.addAll(Arrays.asList(files));
-            }
+            Set<File> files = PathUtils.listFiles(new File(path), getFileType());
+            definitionFiles.addAll(files);
         }
     }
 
@@ -87,12 +81,12 @@ public abstract class DefinitionParser {
         }
         List<ClassDefinition> classDefinitions = new ArrayList<>();
 
-        for (File srcFile : definitionFiles) {
-            classDefinitions.addAll(parseClasses(srcFile));
+        for (File definitionFile : definitionFiles) {
+            classDefinitions.addAll(parseClasses(definitionFile));
         }
 
-        for (File srcFile : definitionFiles) {
-            parseFields(srcFile);
+        for (File definitionFile : definitionFiles) {
+            parseFields(definitionFile);
         }
 
         for (ClassDefinition classDefinition : classDefinitions) {
@@ -120,8 +114,8 @@ public abstract class DefinitionParser {
 
     }
 
-    protected abstract List<ClassDefinition> parseClasses(File srcFile) throws Exception;
+    protected abstract List<ClassDefinition> parseClasses(File definitionFile) throws Exception;
 
-    protected abstract void parseFields(File srcFile) throws Exception;
+    protected abstract void parseFields(File definitionFile) throws Exception;
 
 }

@@ -41,7 +41,7 @@ public class EquipConfig extends ItemConfig {
                 ",list=" + list +
                 ",set=" + set +
                 ",map=" + map +
-                ",effectiveTime='" + $effectiveTime + '\'' +
+                ",effectiveTime='" + effectiveTime$Str + '\'' +
                 ",position=" + position +
                 ",color=" + color +
                 '}';

@@ -64,12 +64,13 @@ public class JavaConfigGenerator extends ConfigGenerator {
     public static void main(String[] args) throws Exception {
 
         List<String> definitionPaths = new ArrayList<>();
-        definitionPaths.add("generator\\src\\test\\java\\quan\\generator");
         definitionPaths.add("generator\\src\\test\\java\\quan\\generator\\config");
+        definitionPaths.add("generator\\src\\test\\java\\quan\\generator\\common.xml");
         String codePath = "config\\config-java\\src\\test\\java";
+        String packagePrefix = "quan.config";
 
         JavaConfigGenerator generator = new JavaConfigGenerator(codePath);
-        generator.useXmlDefinitionParser(definitionPaths, "quan.config").setEnumPackagePrefix("quan");
+        generator.useXmlDefinitionParser(definitionPaths, packagePrefix).setEnumPackagePrefix("quan");
 
         generator.generate();
     }

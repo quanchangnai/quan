@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 
 /**
+ * 配置校验异常
  * Created by quanchangnai on 2019/7/31.
  */
 public class ConfigException extends RuntimeException {

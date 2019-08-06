@@ -149,7 +149,7 @@ public abstract class ConfigReader {
             fieldValue = convert(fieldDefinition, columnValue);
             //时间类型字段字符串格式
             if (fieldDefinition.isTimeType()) {
-                rowJson.put("$" + fieldName, convertTimeType(fieldDefinition.getType(), (Date) fieldValue));
+                rowJson.put(fieldName + "$Str", convertTimeType(fieldDefinition.getType(), (Date) fieldValue));
             }
         } catch (Exception e) {
             validatedErrors.add(String.format("配置[%s]的第%d行第%d列[%s]数据[%s]格式错误", table, row, column, columnName, columnValue));
@@ -205,7 +205,7 @@ public abstract class ConfigReader {
         }
     }
 
-    public static Object convertTimeType(String type, String value) {
+    public static Date convertTimeType(String type, String value) {
         if (StringUtils.isBlank(value)) {
             return null;
         }

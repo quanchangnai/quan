@@ -35,7 +35,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     <#if field.comment !="">
     //${field.comment}
     </#if>
-    protected String $${field.name};
+    protected String ${field.name}$Str;
     <#else >
     protected ${field.basicType} ${field.name};
     </#if>
@@ -60,8 +60,8 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         return ${field.name};
     }
 
-    public String get$${field.name}() {
-        return $${field.name};
+    public String get${field.name?cap_first}$Str() {
+        return ${field.name}$Str;
     }
     <#else >
     public ${field.basicType} get${field.name?cap_first}() {
@@ -82,7 +82,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         ${field.name} = object.getBooleanValue("${field.name}");
     <#elseif field.timeType>
         ${field.name} = object.getDate("${field.name}");
-        $${field.name} = object.getString("$${field.name}");
+        ${field.name}$Str = object.getString("${field.name}$Str");
     <#elseif field.type=="list" || field.type=="set">
         <#if field_index gt 0 >
 
@@ -163,7 +163,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
             <#if field.type == "string">
                 <#lt>${field.name}='" + ${field.name} + '\'' +
             <#elseif field.timeType>
-                <#lt>${field.name}='" + $${field.name} + '\'' +
+                <#lt>${field.name}='" + ${field.name}$Str + '\'' +
             <#else>
                 <#lt>${field.name}=" + ${field.name} +
             </#if>

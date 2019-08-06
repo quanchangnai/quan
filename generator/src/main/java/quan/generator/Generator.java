@@ -77,15 +77,15 @@ public abstract class Generator {
     }
 
     public final void generate() throws Exception {
-        Objects.requireNonNull(definitionParser, "定义文件解析器不能为空");
+        Objects.requireNonNull(definitionParser, "定义解析器不能为空");
         definitionParser.parse();
 
         List<String> validatedErrors = ClassDefinition.getValidatedErrors();
         if (!validatedErrors.isEmpty()) {
             System.err.println(String.format("生成%s代码失败，解析定义文件%s共发现%d条错误。", supportLanguage(), definitionParser.getDefinitionPaths(), validatedErrors.size()));
-            for (int i = 0; i < validatedErrors.size(); i++) {
-                String validatedError = validatedErrors.get(i);
-                System.err.println((i + 1) + ":" + validatedError);
+            for (int i = 1; i <= validatedErrors.size(); i++) {
+                String validatedError = validatedErrors.get(i - 1);
+                System.err.println(i + ":" + validatedError);
             }
             return;
         }
