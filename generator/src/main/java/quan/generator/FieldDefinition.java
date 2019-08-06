@@ -98,7 +98,15 @@ public class FieldDefinition extends Definition {
     }
 
     public boolean isEnumType() {
-        return ClassDefinition.getClass(getType()) instanceof EnumDefinition;
+        return getEnum() != null;
+    }
+
+    public EnumDefinition getEnum() {
+        ClassDefinition classDefinition = ClassDefinition.getClass(getType());
+        if (classDefinition instanceof EnumDefinition) {
+            return (EnumDefinition) classDefinition;
+        }
+        return null;
     }
 
     public boolean isBeanType() {

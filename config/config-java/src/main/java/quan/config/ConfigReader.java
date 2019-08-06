@@ -182,13 +182,15 @@ public abstract class ConfigReader {
             return convertMap(fieldDefinition, value);
         } else if (fieldDefinition.isBeanType()) {
             return convertBean(fieldDefinition.getBean(), value);
+        } else if (fieldDefinition.isEnumType()) {
+            Objects.requireNonNull(fieldDefinition.getEnum().getField(value));
         }
         return value;
     }
 
     public static Object convertPrimitiveType(String type, String value) {
-        if (value.equals("") && !type.equals("string")) {
-            value = "0";
+        if (StringUtils.isBlank(value)) {
+            return type.equals("string") ? "" : null;
         }
         switch (type) {
             case "bool":

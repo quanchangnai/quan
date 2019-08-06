@@ -452,10 +452,7 @@ public class ConfigLoader {
             return;
         }
 
-        if (value instanceof Number && ((Number) value).doubleValue() <= 0) {
-            return;
-        }
-        if (value instanceof String && value.equals("")) {
+        if (value == null || value.equals("")) {
             return;
         }
 
@@ -464,7 +461,7 @@ public class ConfigLoader {
         IndexDefinition fieldRefIndex = fieldRefConfig.getIndexByField1(fieldRefField);
         Map refIndexedJsons = configIndexedJsonsAll.get(fieldRefConfig).get(fieldRefIndex);
 
-        if (!refIndexedJsons.containsKey(value)) {
+        if (refIndexedJsons == null || !refIndexedJsons.containsKey(value)) {
             String error;
             String keyOrValue = "值";
             if (field.isCollectionType() && mapKey) {
