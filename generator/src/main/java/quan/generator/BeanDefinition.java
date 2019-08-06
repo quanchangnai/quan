@@ -173,15 +173,8 @@ public class BeanDefinition extends ClassDefinition {
         }
     }
 
-    protected boolean supportFieldRef() {
-        return true;
-    }
-
     protected void validateFieldRef(FieldDefinition field) {
-        if (!supportFieldRef()) {
-            return;
-        }
-        if (field.getRef() == null) {
+        if (getCategory() != DefinitionCategory.config || field.getRef() == null) {
             return;
         }
 
@@ -197,9 +190,9 @@ public class BeanDefinition extends ClassDefinition {
 
         //map类型字段引用校验
         String[] fieldRefs = field.getRef().split("[,]");
-        String mapRefPatternError = getName4Validate() + "的map类型字段" + field.getName4Validate() + "的引用格式错误[" + field.getRef() + "]，正确格式:[键引用的配置.字段]或者[键引用配置.字段,值引用的配置.字段]";
+        String refPatternError = getName4Validate() + "的map类型字段" + field.getName4Validate() + "的引用格式错误[" + field.getRef() + "]，正确格式:[键引用的配置.字段]或者[键引用配置.字段,值引用的配置.字段]";
         if (fieldRefs.length != 1 && fieldRefs.length != 2) {
-            addValidatedError(mapRefPatternError);
+            addValidatedError(refPatternError);
             return;
         }
 
@@ -210,14 +203,14 @@ public class BeanDefinition extends ClassDefinition {
         }
 
         if (fieldKeyRefs.length != 2) {
-            addValidatedError(mapRefPatternError);
+            addValidatedError(refPatternError);
             return;
         }
         validateFieldRef(field, true, fieldKeyRefs[0], fieldKeyRefs[1]);
 
         if (fieldValueRefs != null) {
             if (fieldValueRefs.length != 2) {
-                addValidatedError(mapRefPatternError);
+                addValidatedError(refPatternError);
                 return;
             }
             validateFieldRef(field, false, fieldValueRefs[0], fieldValueRefs[1]);

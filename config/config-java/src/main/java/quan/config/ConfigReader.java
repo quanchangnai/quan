@@ -187,19 +187,22 @@ public abstract class ConfigReader {
     }
 
     public static Object convertPrimitiveType(String type, String value) {
+        if (value.equals("") && !type.equals("string")) {
+            value = "0";
+        }
         switch (type) {
             case "bool":
                 return Boolean.parseBoolean(value.toLowerCase());
             case "short":
-                return value.equals("") ? 0 : Short.parseShort(value);
+                return Short.parseShort(value);
             case "int":
-                return value.equals("") ? 0 : Integer.parseInt(value);
+                return Integer.parseInt(value);
             case "long":
-                return value.equals("") ? 0 : Long.parseLong(value);
+                return Long.parseLong(value);
             case "float":
-                return value.equals("") ? 0 : Float.parseFloat(value);
+                return Float.parseFloat(value);
             case "double":
-                return value.equals("") ? 0 : Double.parseDouble(value);
+                return Double.parseDouble(value);
             default:
                 return value;
         }
@@ -230,14 +233,11 @@ public abstract class ConfigReader {
             return null;
         }
         if (type.equals("datetime")) {
-            //日期加时间
             return dateTimeFormat.format(value);
         }
         if (type.equals("date")) {
-            //纯日期
             return dateFormat.format(value);
         }
-        //纯时间
         return timeFormat.format(value);
 
     }
