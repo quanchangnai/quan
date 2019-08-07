@@ -72,6 +72,10 @@ public abstract class ConfigReader {
         }
     }
 
+    public Config getPrototype() {
+        return prototype;
+    }
+
     public ConfigReader setBodyRowNum(int bodyRowNum) {
         if (bodyRowNum > 1) {
             this.bodyRowNum = bodyRowNum;

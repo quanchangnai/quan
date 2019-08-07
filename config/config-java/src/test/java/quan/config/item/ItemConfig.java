@@ -133,8 +133,14 @@ public class ItemConfig extends Config {
         return new ItemConfig();
     }
 
+    private volatile static List<ItemConfig> configs = new ArrayList<>();
+
     private volatile static Map<Integer, ItemConfig> idConfigs = new HashMap<>();
 
+
+    public static List<ItemConfig> getConfigs() {
+        return configs;
+    }
 
     public static Map<Integer, ItemConfig> getIdConfigs() {
         return idConfigs;
@@ -146,13 +152,13 @@ public class ItemConfig extends Config {
 
 
     public static List<String> index(List<ItemConfig> configs) {
-        Map<Integer, ItemConfig> _idConfigs = new HashMap<>();
+        Map<Integer, ItemConfig> idConfigs = new HashMap<>();
 
         List<String> errors = new ArrayList<>();
         ItemConfig oldConfig;
 
         for (ItemConfig config : configs) {
-            oldConfig = _idConfigs.put(config.id, config);
+            oldConfig = idConfigs.put(config.id, config);
             if (oldConfig != null) {
                 String repeatedConfigs = config.getClass().getSimpleName();
                 if (oldConfig.getClass() != config.getClass()) {
@@ -162,7 +168,8 @@ public class ItemConfig extends Config {
             }
         }
 
-        idConfigs = unmodifiable(_idConfigs);
+        ItemConfig.configs = Collections.unmodifiableList(configs);
+        ItemConfig.idConfigs = unmodifiableMap(idConfigs);
 
         return errors;
     }

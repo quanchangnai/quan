@@ -45,8 +45,14 @@ public class QuestTargetConfig extends Config {
         return new QuestTargetConfig();
     }
 
+    private volatile static List<QuestTargetConfig> configs = new ArrayList<>();
+
     private volatile static Map<Integer, QuestTargetConfig> idConfigs = new HashMap<>();
 
+
+    public static List<QuestTargetConfig> getConfigs() {
+        return configs;
+    }
 
     public static Map<Integer, QuestTargetConfig> getIdConfigs() {
         return idConfigs;
@@ -58,13 +64,13 @@ public class QuestTargetConfig extends Config {
 
 
     public static List<String> index(List<QuestTargetConfig> configs) {
-        Map<Integer, QuestTargetConfig> _idConfigs = new HashMap<>();
+        Map<Integer, QuestTargetConfig> idConfigs = new HashMap<>();
 
         List<String> errors = new ArrayList<>();
         QuestTargetConfig oldConfig;
 
         for (QuestTargetConfig config : configs) {
-            oldConfig = _idConfigs.put(config.id, config);
+            oldConfig = idConfigs.put(config.id, config);
             if (oldConfig != null) {
                 String repeatedConfigs = config.getClass().getSimpleName();
                 if (oldConfig.getClass() != config.getClass()) {
@@ -74,7 +80,8 @@ public class QuestTargetConfig extends Config {
             }
         }
 
-        idConfigs = unmodifiable(_idConfigs);
+        QuestTargetConfig.configs = Collections.unmodifiableList(configs);
+        QuestTargetConfig.idConfigs = unmodifiableMap(idConfigs);
 
         return errors;
     }

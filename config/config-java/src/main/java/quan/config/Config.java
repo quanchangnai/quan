@@ -12,11 +12,11 @@ public abstract class Config extends Bean {
 
     public abstract Config create();
 
-    protected static Map unmodifiable(Map map) {
+    protected static Map unmodifiableMap(Map map) {
         for (Object key : map.keySet()) {
             Object value = map.get(key);
             if (value instanceof Map) {
-                map.put(key, unmodifiable((Map) value));
+                map.put(key, unmodifiableMap((Map) value));
             } else if (value instanceof List) {
                 map.put(key, Collections.unmodifiableList((List) value));
             }

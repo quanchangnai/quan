@@ -49,6 +49,9 @@ public class ConfigLoader {
 
     private boolean loaded;
 
+    //配置全类名:配置全类名加上所有后代类全类名
+    private Map<String, Set<String>> configDescendantsAndMe = new HashMap<>();
+
     public ConfigLoader(String tablePath) {
         this.tablePath = PathUtils.crossPlatPath(tablePath);
     }
@@ -165,14 +168,14 @@ public class ConfigLoader {
     /**
      * 加载全部配置<br/>
      * 有配置定义时加载JSON格式配置，JSON文件名是配置类名<br/>
-     * 没有配置定义时加载JSON格式配置，JSON文件名必须是配置全类名并且不支持子表<br/>
+     * 没有配置定义时加载JSON格式配置，JSON文件名必须是配置全类名<br/>
      * 其他情况的配置表不变
      */
     public void load() {
         if (loaded) {
-            logger.error("配置已经全部加载了");
-            return;
+            throw new IllegalStateException("配置已经加载了，重加载调用reloadXxx方法");
         }
+        loaded = true;
         validatedErrors.clear();
 
         //解析定义文件
@@ -180,15 +183,13 @@ public class ConfigLoader {
 
         if (isJsonAndNoDefinition()) {
             //没有配置定义直接加载JSON
-            loadJsonOnNoDefinition();
+            loadJsonsOnNoDefinition();
         } else {
             //通过配置定义加载或者校验
             loadByDefinitions();
         }
 
         executeValidators();
-
-        loaded = true;
 
         if (!validatedErrors.isEmpty()) {
             throw new ConfigException(validatedErrors);
@@ -200,14 +201,41 @@ public class ConfigLoader {
     }
 
     /**
-     * 没有配置定义直接加载JSON格式配置，JSON文件名必须是配置全类名并且不支持子表
+     * 没有配置定义直接加载JSON格式配置，JSON文件名必须是配置全类名
      */
-    private void loadJsonOnNoDefinition() {
+    private void loadJsonsOnNoDefinition() {
+        if (!needLoad()) {
+            throw new IllegalStateException("没有配置定义的JSON格式配置只能直接加载，不支持校验");
+        }
+
         Set<File> jsonFiles = PathUtils.listFiles(new File(tablePath), "json");
+        List<Config> configs = new ArrayList<>();
+
         for (File jsonFile : jsonFiles) {
             String configFullName = jsonFile.getName().substring(0, jsonFile.getName().lastIndexOf("."));
-            load(configFullName, Collections.singleton(configFullName), true);
+            configDescendantsAndMe.computeIfAbsent(configFullName, k -> new HashSet<>());
+
+            ConfigReader reader = getOrCreateReader(configFullName);
+            Config prototype = reader.getPrototype();
+            if (prototype != null) {
+                configs.add(prototype);
+            }
         }
+
+        for (Config config1 : configs) {
+            for (Config config2 : configs) {
+                if (!config1.getClass().isAssignableFrom(config2.getClass())) {
+                    continue;
+                }
+                configDescendantsAndMe.get(config1.getClass().getName()).add(config2.getClass().getName());
+            }
+        }
+
+        for (String configFullName : configDescendantsAndMe.keySet()) {
+            Set<String> descendantsAndMe = configDescendantsAndMe.get(configFullName);
+            load(configFullName, descendantsAndMe, true);
+        }
+
         if (needValidate()) {
             //格式错误
             for (ConfigReader reader : readers.values()) {
@@ -323,7 +351,7 @@ public class ConfigLoader {
      */
     private Set<String> getConfigTables(ConfigDefinition configDefinition) {
         if (tableType.equals("json")) {
-            return configDefinition.getChildrenAndMe();
+            return configDefinition.getDescendantsAndMe();
         } else {
             return new HashSet<>(configDefinition.getAllTables());
         }
@@ -524,7 +552,7 @@ public class ConfigLoader {
      */
     public void reloadAll() {
         if (!needLoad()) {
-            return;
+            throw new IllegalStateException("配置加载器仅支持校验，不能重加载");
         }
         loaded = false;
         for (ConfigReader reader : readers.values()) {
@@ -540,8 +568,12 @@ public class ConfigLoader {
      */
     public void reloadByConfigNames(Collection<String> configNames) {
         if (!needLoad()) {
-            return;
+            throw new IllegalStateException("配置加载器仅支持校验，不能重加载");
         }
+        if (!loaded) {
+            throw new IllegalStateException("配置没有加载过，不能重加载");
+        }
+
         validatedErrors.clear();
 
         if (isJsonAndNoDefinition()) {
@@ -568,12 +600,13 @@ public class ConfigLoader {
      */
     public void reloadByOriginalNames(Collection<String> originalNames) {
         if (!needLoad()) {
-            return;
+            throw new IllegalStateException("配置加载器仅支持校验，不能重加载");
         }
-
+        if (!loaded) {
+            throw new IllegalStateException("配置没有加载过，不能重加载");
+        }
         if (isJsonAndNoDefinition()) {
-            logger.error("JSON格式配置在没有配置定义时不支持原名重加载");
-            return;
+            throw new IllegalStateException("没有配置定义的JSON格式配置不支持原名重加载");
         }
 
         List<String> configNames = new ArrayList<>();
@@ -596,13 +629,17 @@ public class ConfigLoader {
      */
     public void reloadByTableNames(Collection<String> tableNames) {
         if (!needLoad()) {
-            return;
+            throw new IllegalStateException("配置加载器仅支持校验，不能重加载");
         }
+        if (!loaded) {
+            throw new IllegalStateException("配置没有加载过，不能重加载");
+        }
+
         validatedErrors.clear();
 
         if (isJsonAndNoDefinition()) {
             //没有配置定义直接加载JSON
-            reloadTablesOnNoDefinition(tableNames);
+            reloadJsonsOnNoDefinition(tableNames);
         } else {
             //通过配置定义加载
             reloadTablesByDefinitions(tableNames);
@@ -613,7 +650,7 @@ public class ConfigLoader {
         }
     }
 
-    private void reloadTablesOnNoDefinition(Collection<String> configNames) {
+    private void reloadJsonsOnNoDefinition(Collection<String> configNames) {
         Set<File> jsonFiles = PathUtils.listFiles(new File(tablePath), "json");
         LinkedHashMap<String, ConfigReader> reloadReaders = new LinkedHashMap<>();
 
@@ -631,7 +668,9 @@ public class ConfigLoader {
             configReader.clear();
             reloadReaders.put(configName, configReader);
 
-            load(configFullName, Collections.singleton(configFullName), true);
+            Set<String> descendantsAndMe = configDescendantsAndMe.get(configFullName);
+
+            load(configFullName, descendantsAndMe, true);
         }
 
         for (String configName : configNames) {

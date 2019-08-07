@@ -207,6 +207,8 @@ public class QuestConfig extends Config {
         return new QuestConfig();
     }
 
+    private volatile static List<QuestConfig> configs = new ArrayList<>();
+
     private volatile static Map<Integer, Map<Integer, QuestConfig>> composite1Configs = new HashMap<>();
 
     private volatile static Map<Integer, Map<Boolean, List<QuestConfig>>> composite2Configs = new HashMap<>();
@@ -219,6 +221,10 @@ public class QuestConfig extends Config {
 
     private volatile static Map<QuestType, List<QuestConfig>> typeConfigs = new HashMap<>();
 
+
+    public static List<QuestConfig> getConfigs() {
+        return configs;
+    }
 
     public static Map<Integer, Map<Integer, QuestConfig>> getComposite1Configs() {
         return composite1Configs;
@@ -294,18 +300,18 @@ public class QuestConfig extends Config {
 
 
     public static List<String> index(List<QuestConfig> configs) {
-        Map<Integer, Map<Integer, QuestConfig>> _composite1Configs = new HashMap<>();
-        Map<Integer, Map<Boolean, List<QuestConfig>>> _composite2Configs = new HashMap<>();
-        Map<String, Map<Integer, Map<Integer, QuestConfig>>> _composite3Configs = new HashMap<>();
-        Map<String, Map<Integer, Map<Integer, List<QuestConfig>>>> _composite4Configs = new HashMap<>();
-        Map<Integer, QuestConfig> _idConfigs = new HashMap<>();
-        Map<QuestType, List<QuestConfig>> _typeConfigs = new HashMap<>();
+        Map<Integer, Map<Integer, QuestConfig>> composite1Configs = new HashMap<>();
+        Map<Integer, Map<Boolean, List<QuestConfig>>> composite2Configs = new HashMap<>();
+        Map<String, Map<Integer, Map<Integer, QuestConfig>>> composite3Configs = new HashMap<>();
+        Map<String, Map<Integer, Map<Integer, List<QuestConfig>>>> composite4Configs = new HashMap<>();
+        Map<Integer, QuestConfig> idConfigs = new HashMap<>();
+        Map<QuestType, List<QuestConfig>> typeConfigs = new HashMap<>();
 
         List<String> errors = new ArrayList<>();
         QuestConfig oldConfig;
 
         for (QuestConfig config : configs) {
-            oldConfig = _composite1Configs.computeIfAbsent(config.a1, k -> new HashMap<>()).put(config.a2, config);
+            oldConfig = composite1Configs.computeIfAbsent(config.a1, k -> new HashMap<>()).put(config.a2, config);
             if (oldConfig != null) {
                 String repeatedConfigs = config.getClass().getSimpleName();
                 if (oldConfig.getClass() != config.getClass()) {
@@ -314,9 +320,9 @@ public class QuestConfig extends Config {
                 errors.add(String.format("配置[%s]有重复数据[%s,%s = %s,%s]", repeatedConfigs, "a1", "a2", config.a1, config.a2));
             }
 
-            _composite2Configs.computeIfAbsent(config.b1, k -> new HashMap<>()).computeIfAbsent(config.b2, k -> new ArrayList<>()).add(config);
+            composite2Configs.computeIfAbsent(config.b1, k -> new HashMap<>()).computeIfAbsent(config.b2, k -> new ArrayList<>()).add(config);
 
-            oldConfig = _composite3Configs.computeIfAbsent(config.c1, k -> new HashMap<>()).computeIfAbsent(config.c2, k -> new HashMap<>()).put(config.c3, config);
+            oldConfig = composite3Configs.computeIfAbsent(config.c1, k -> new HashMap<>()).computeIfAbsent(config.c2, k -> new HashMap<>()).put(config.c3, config);
             if (oldConfig != null) {
                 String repeatedConfigs = config.getClass().getSimpleName();
                 if (oldConfig.getClass() != config.getClass()) {
@@ -325,9 +331,9 @@ public class QuestConfig extends Config {
                 errors.add(String.format("配置[%s]有重复数据[%s,%s,%s = %s,%s,%s]", repeatedConfigs, "c1", "c2", "c3", config.c1, config.c2, config.c3));
             }
 
-            _composite4Configs.computeIfAbsent(config.d1, k -> new HashMap<>()).computeIfAbsent(config.d2, k -> new HashMap<>()).computeIfAbsent(config.d3, k -> new ArrayList<>()).add(config);
+            composite4Configs.computeIfAbsent(config.d1, k -> new HashMap<>()).computeIfAbsent(config.d2, k -> new HashMap<>()).computeIfAbsent(config.d3, k -> new ArrayList<>()).add(config);
 
-            oldConfig = _idConfigs.put(config.id, config);
+            oldConfig = idConfigs.put(config.id, config);
             if (oldConfig != null) {
                 String repeatedConfigs = config.getClass().getSimpleName();
                 if (oldConfig.getClass() != config.getClass()) {
@@ -336,15 +342,16 @@ public class QuestConfig extends Config {
                 errors.add(String.format("配置[%s]有重复数据[%s = %s]", repeatedConfigs, "id", config.id));
             }
 
-            _typeConfigs.computeIfAbsent(config.type, k -> new ArrayList<>()).add(config);
+            typeConfigs.computeIfAbsent(config.type, k -> new ArrayList<>()).add(config);
         }
 
-        composite1Configs = unmodifiable(_composite1Configs);
-        composite2Configs = unmodifiable(_composite2Configs);
-        composite3Configs = unmodifiable(_composite3Configs);
-        composite4Configs = unmodifiable(_composite4Configs);
-        idConfigs = unmodifiable(_idConfigs);
-        typeConfigs = unmodifiable(_typeConfigs);
+        QuestConfig.configs = Collections.unmodifiableList(configs);
+        QuestConfig.composite1Configs = unmodifiableMap(composite1Configs);
+        QuestConfig.composite2Configs = unmodifiableMap(composite2Configs);
+        QuestConfig.composite3Configs = unmodifiableMap(composite3Configs);
+        QuestConfig.composite4Configs = unmodifiableMap(composite4Configs);
+        QuestConfig.idConfigs = unmodifiableMap(idConfigs);
+        QuestConfig.typeConfigs = unmodifiableMap(typeConfigs);
 
         return errors;
     }

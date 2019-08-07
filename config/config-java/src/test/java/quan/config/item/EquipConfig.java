@@ -58,10 +58,16 @@ public class EquipConfig extends ItemConfig {
         private self() {
         }
 
+        private volatile static List<EquipConfig> configs = new ArrayList<>();
+
         private volatile static Map<Integer, EquipConfig> idConfigs = new HashMap<>();
 
         private volatile static Map<Integer, List<EquipConfig>> positionConfigs = new HashMap<>();
 
+
+        public static List<EquipConfig> getConfigs() {
+            return configs;
+        }
 
         public static Map<Integer, EquipConfig> getIdConfigs() {
             return idConfigs;
@@ -81,14 +87,14 @@ public class EquipConfig extends ItemConfig {
 
 
         public static List<String> index(List<EquipConfig> configs) {
-            Map<Integer, EquipConfig> _idConfigs = new HashMap<>();
-            Map<Integer, List<EquipConfig>> _positionConfigs = new HashMap<>();
+            Map<Integer, EquipConfig> idConfigs = new HashMap<>();
+            Map<Integer, List<EquipConfig>> positionConfigs = new HashMap<>();
 
             List<String> errors = new ArrayList<>();
             EquipConfig oldConfig;
 
             for (EquipConfig config : configs) {
-                oldConfig = _idConfigs.put(config.id, config);
+                oldConfig = idConfigs.put(config.id, config);
                 if (oldConfig != null) {
                     String repeatedConfigs = config.getClass().getSimpleName();
                     if (oldConfig.getClass() != config.getClass()) {
@@ -97,11 +103,12 @@ public class EquipConfig extends ItemConfig {
                     errors.add(String.format("配置[%s]有重复数据[%s = %s]", repeatedConfigs, "id", config.id));
                 }
 
-                _positionConfigs.computeIfAbsent(config.position, k -> new ArrayList<>()).add(config);
+                positionConfigs.computeIfAbsent(config.position, k -> new ArrayList<>()).add(config);
             }
 
-            idConfigs = unmodifiable(_idConfigs);
-            positionConfigs = unmodifiable(_positionConfigs);
+            EquipConfig.self.configs = Collections.unmodifiableList(configs);
+            EquipConfig.self.idConfigs = unmodifiableMap(idConfigs);
+            EquipConfig.self.positionConfigs = unmodifiableMap(positionConfigs);
 
             return errors;
         }

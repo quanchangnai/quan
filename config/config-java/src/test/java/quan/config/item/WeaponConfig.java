@@ -109,6 +109,8 @@ public class WeaponConfig extends EquipConfig {
         private self() {
         }
 
+        private volatile static List<WeaponConfig> configs = new ArrayList<>();
+
         private volatile static Map<Integer, WeaponConfig> idConfigs = new HashMap<>();
 
         private volatile static Map<Integer, List<WeaponConfig>> positionConfigs = new HashMap<>();
@@ -117,6 +119,10 @@ public class WeaponConfig extends EquipConfig {
 
         private volatile static Map<Integer, Map<Integer, WeaponConfig>> composite2Configs = new HashMap<>();
 
+
+        public static List<WeaponConfig> getConfigs() {
+            return configs;
+        }
 
         public static Map<Integer, WeaponConfig> getIdConfigs() {
             return idConfigs;
@@ -160,16 +166,16 @@ public class WeaponConfig extends EquipConfig {
 
 
         public static List<String> index(List<WeaponConfig> configs) {
-            Map<Integer, WeaponConfig> _idConfigs = new HashMap<>();
-            Map<Integer, List<WeaponConfig>> _positionConfigs = new HashMap<>();
-            Map<Integer, Map<Integer, List<WeaponConfig>>> _composite1Configs = new HashMap<>();
-            Map<Integer, Map<Integer, WeaponConfig>> _composite2Configs = new HashMap<>();
+            Map<Integer, WeaponConfig> idConfigs = new HashMap<>();
+            Map<Integer, List<WeaponConfig>> positionConfigs = new HashMap<>();
+            Map<Integer, Map<Integer, List<WeaponConfig>>> composite1Configs = new HashMap<>();
+            Map<Integer, Map<Integer, WeaponConfig>> composite2Configs = new HashMap<>();
 
             List<String> errors = new ArrayList<>();
             WeaponConfig oldConfig;
 
             for (WeaponConfig config : configs) {
-                oldConfig = _idConfigs.put(config.id, config);
+                oldConfig = idConfigs.put(config.id, config);
                 if (oldConfig != null) {
                     String repeatedConfigs = config.getClass().getSimpleName();
                     if (oldConfig.getClass() != config.getClass()) {
@@ -178,11 +184,11 @@ public class WeaponConfig extends EquipConfig {
                     errors.add(String.format("配置[%s]有重复数据[%s = %s]", repeatedConfigs, "id", config.id));
                 }
 
-                _positionConfigs.computeIfAbsent(config.position, k -> new ArrayList<>()).add(config);
+                positionConfigs.computeIfAbsent(config.position, k -> new ArrayList<>()).add(config);
 
-                _composite1Configs.computeIfAbsent(config.color, k -> new HashMap<>()).computeIfAbsent(config.w1, k -> new ArrayList<>()).add(config);
+                composite1Configs.computeIfAbsent(config.color, k -> new HashMap<>()).computeIfAbsent(config.w1, k -> new ArrayList<>()).add(config);
 
-                oldConfig = _composite2Configs.computeIfAbsent(config.w1, k -> new HashMap<>()).put(config.w2, config);
+                oldConfig = composite2Configs.computeIfAbsent(config.w1, k -> new HashMap<>()).put(config.w2, config);
                 if (oldConfig != null) {
                     String repeatedConfigs = config.getClass().getSimpleName();
                     if (oldConfig.getClass() != config.getClass()) {
@@ -192,10 +198,11 @@ public class WeaponConfig extends EquipConfig {
                 }
             }
 
-            idConfigs = unmodifiable(_idConfigs);
-            positionConfigs = unmodifiable(_positionConfigs);
-            composite1Configs = unmodifiable(_composite1Configs);
-            composite2Configs = unmodifiable(_composite2Configs);
+            WeaponConfig.self.configs = Collections.unmodifiableList(configs);
+            WeaponConfig.self.idConfigs = unmodifiableMap(idConfigs);
+            WeaponConfig.self.positionConfigs = unmodifiableMap(positionConfigs);
+            WeaponConfig.self.composite1Configs = unmodifiableMap(composite1Configs);
+            WeaponConfig.self.composite2Configs = unmodifiableMap(composite2Configs);
 
             return errors;
         }

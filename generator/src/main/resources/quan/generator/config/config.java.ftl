@@ -172,6 +172,8 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 
     }
 <#macro indexer tab>
+    ${tab}private volatile static List<${name}> configs = new ArrayList<>();
+
     <#list indexes as index>
         <#if index.comment !="">
     ${tab}//${index.comment}
@@ -196,6 +198,10 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 
         </#if>
     </#list>
+
+    ${tab}public static List<${name}> getConfigs() {
+        ${tab}return configs;
+    ${tab}}
 
     <#list indexes as index>
         <#if index.unique && index.fields?size==1>
@@ -282,17 +288,17 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     ${tab}public static List<String> index(List<${name}> configs) {
     <#list indexes as index>
         <#if index.unique && index.fields?size==1>
-        ${tab}Map<${index.fields[0].classType}, ${name}> _${index.name}Configs = new HashMap<>();
+        ${tab}Map<${index.fields[0].classType}, ${name}> ${index.name}Configs = new HashMap<>();
         <#elseif index.normal && index.fields?size==1>
-        ${tab}Map<${index.fields[0].classType}, List<${name}>> _${index.name}Configs = new HashMap<>();
+        ${tab}Map<${index.fields[0].classType}, List<${name}>> ${index.name}Configs = new HashMap<>();
         <#elseif index.unique && index.fields?size==2>
-        ${tab}Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, ${name}>> _${index.name}Configs = new HashMap<>();
+        ${tab}Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, ${name}>> ${index.name}Configs = new HashMap<>();
         <#elseif index.normal && index.fields?size==2>
-        ${tab}Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, List<${name}>>> _${index.name}Configs = new HashMap<>();
+        ${tab}Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, List<${name}>>> ${index.name}Configs = new HashMap<>();
         <#elseif index.unique && index.fields?size==3>
-        ${tab}Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, ${name}>>> _${index.name}Configs = new HashMap<>();
+        ${tab}Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, ${name}>>> ${index.name}Configs = new HashMap<>();
         <#elseif index.normal && index.fields?size==3>
-        ${tab}Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, List<${name}>>>> _${index.name}Configs = new HashMap<>();
+        ${tab}Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, List<${name}>>>> ${index.name}Configs = new HashMap<>();
         </#if>
     </#list>
 
@@ -302,7 +308,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         ${tab}for (${name} config : configs) {
     <#list indexes as index>
         <#if index.unique && index.fields?size==1>
-            ${tab}oldConfig = _${index.name}Configs.put(config.${index.fields[0].name}, config);
+            ${tab}oldConfig = ${index.name}Configs.put(config.${index.fields[0].name}, config);
             ${tab}if (oldConfig != null) {
                 ${tab}String repeatedConfigs = config.getClass().getSimpleName();
                 ${tab}if (oldConfig.getClass() != config.getClass()) {
@@ -311,9 +317,9 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
                 ${tab}errors.add(String.format("配置[%s]有重复数据[%s = %s]", repeatedConfigs, "${index.fields[0].name}", config.${index.fields[0].name}));
             ${tab}}
         <#elseif index.normal && index.fields?size==1>
-            ${tab}_${index.name}Configs.computeIfAbsent(config.${index.fields[0].name}, k -> new ArrayList<>()).add(config);
+            ${tab}${index.name}Configs.computeIfAbsent(config.${index.fields[0].name}, k -> new ArrayList<>()).add(config);
         <#elseif index.unique && index.fields?size==2>
-            ${tab}oldConfig = _${index.name}Configs.computeIfAbsent(config.${index.fields[0].name}, k -> new HashMap<>()).put(config.${index.fields[1].name}, config);
+            ${tab}oldConfig = ${index.name}Configs.computeIfAbsent(config.${index.fields[0].name}, k -> new HashMap<>()).put(config.${index.fields[1].name}, config);
             ${tab}if (oldConfig != null) {
                 ${tab}String repeatedConfigs = config.getClass().getSimpleName();
                 ${tab}if (oldConfig.getClass() != config.getClass()) {
@@ -322,9 +328,9 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
                 ${tab}errors.add(String.format("配置[%s]有重复数据[%s,%s = %s,%s]", repeatedConfigs, "${index.fields[0].name}", "${index.fields[1].name}", config.${index.fields[0].name}, config.${index.fields[1].name}));
             ${tab}}
         <#elseif index.normal && index.fields?size==2>
-            ${tab}_${index.name}Configs.computeIfAbsent(config.${index.fields[0].name}, k -> new HashMap<>()).computeIfAbsent(config.${index.fields[1].name}, k -> new ArrayList<>()).add(config);
+            ${tab}${index.name}Configs.computeIfAbsent(config.${index.fields[0].name}, k -> new HashMap<>()).computeIfAbsent(config.${index.fields[1].name}, k -> new ArrayList<>()).add(config);
         <#elseif index.unique && index.fields?size==3>
-            ${tab}oldConfig = _${index.name}Configs.computeIfAbsent(config.${index.fields[0].name}, k -> new HashMap<>()).computeIfAbsent(config.${index.fields[1].name}, k -> new HashMap<>()).put(config.${index.fields[2].name}, config);
+            ${tab}oldConfig = ${index.name}Configs.computeIfAbsent(config.${index.fields[0].name}, k -> new HashMap<>()).computeIfAbsent(config.${index.fields[1].name}, k -> new HashMap<>()).put(config.${index.fields[2].name}, config);
             ${tab}if (oldConfig != null) {
                 ${tab}String repeatedConfigs = config.getClass().getSimpleName();
                 ${tab}if (oldConfig.getClass() != config.getClass()) {
@@ -333,7 +339,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
                 ${tab}errors.add(String.format("配置[%s]有重复数据[%s,%s,%s = %s,%s,%s]", repeatedConfigs, "${index.fields[0].name}", "${index.fields[1].name}", "${index.fields[2].name}", config.${index.fields[0].name}, config.${index.fields[1].name}, config.${index.fields[2].name}));
             }
         <#elseif index.normal && index.fields?size==3>
-            ${tab}_${index.name}Configs.computeIfAbsent(config.${index.fields[0].name}, k -> new HashMap<>()).computeIfAbsent(config.${index.fields[1].name}, k -> new HashMap<>()).computeIfAbsent(config.${index.fields[2].name}, k -> new ArrayList<>()).add(config);
+            ${tab}${index.name}Configs.computeIfAbsent(config.${index.fields[0].name}, k -> new HashMap<>()).computeIfAbsent(config.${index.fields[1].name}, k -> new HashMap<>()).computeIfAbsent(config.${index.fields[2].name}, k -> new ArrayList<>()).add(config);
         </#if>
         <#if index_index<indexes?size-1>
 
@@ -341,8 +347,17 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     </#list>
         ${tab}}
 
+    <#if parent??>
+        ${tab}${name}.self.configs = Collections.unmodifiableList(configs);
+    <#else>
+        ${tab}${name}.configs = Collections.unmodifiableList(configs);
+    </#if>
     <#list indexes as index>
-        ${tab}${index.name}Configs = unmodifiable(_${index.name}Configs);
+        <#if parent??>
+        ${tab}${name}.self.${index.name}Configs = unmodifiableMap(${index.name}Configs);
+        <#else>
+        ${tab}${name}.${index.name}Configs = unmodifiableMap(${index.name}Configs);
+        </#if>
     </#list>
 
         ${tab}return errors;

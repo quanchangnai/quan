@@ -20,21 +20,21 @@ public class ConfigTest {
 
 //        String tableType = "csv";
 //        String tablePath = "config\\csv";
-        String tableType = "xlsx";
-        String tablePath = "config\\excel";
-//        String tableType = "json";
-//        String tablePath = "config\\json";
+//        String tableType = "xlsx";
+//        String tablePath = "config\\excel";
+        String tableType = "json";
+        String tablePath = "config\\json";
 
 
         ConfigLoader configLoader = new ConfigLoader(tablePath);
-        configLoader.useXmlDefinitionParser(definitionPaths, "quan.config").setEnumPackagePrefix("quan");
+//        configLoader.useXmlDefinitionParser(definitionPaths, "quan.config").setEnumPackagePrefix("quan");
         configLoader.setLoadType(ConfigLoader.Type.validateAndLoad);
         configLoader.setValidatorsPackage("quan");
         configLoader.setTableType(tableType);
 
         loadConfigs(configLoader);
 
-        writeJson(configLoader, false);
+        writeJson(configLoader, true);
 
         reloadAllConfigs(configLoader);
 
@@ -141,13 +141,13 @@ public class ConfigTest {
         System.err.println("printConfigs start============");
         Thread.sleep(100);
         System.err.println("ItemConfig============");
-        ItemConfig.getIdConfigs().values().forEach(System.out::println);
+        ItemConfig.getConfigs().forEach(System.out::println);
 
         System.err.println("EquipConfig============");
-        EquipConfig.self.getIdConfigs().values().forEach(System.out::println);
+        EquipConfig.self.getConfigs().forEach(System.out::println);
 
         System.err.println("WeaponConfig============");
-        WeaponConfig.self.getIdConfigs().values().forEach(System.out::println);
+        WeaponConfig.self.getConfigs().forEach(System.out::println);
         System.err.println("printConfigs end============");
     }
 }

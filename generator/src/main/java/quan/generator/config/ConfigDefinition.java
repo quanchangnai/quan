@@ -22,8 +22,8 @@ public class ConfigDefinition extends BeanDefinition {
     //配置的父类
     private String parent;
 
-    //配置的所有子孙类
-    private Set<String> children = new HashSet<>();
+    //配置的所有后代类
+    private Set<String> descendants = new HashSet<>();
 
     private List<IndexDefinition> indexes = new ArrayList<>();
 
@@ -65,14 +65,14 @@ public class ConfigDefinition extends BeanDefinition {
         }
     }
 
-    public Set<String> getChildren() {
-        return children;
+    public Set<String> getDescendants() {
+        return descendants;
     }
 
-    public Set<String> getChildrenAndMe() {
-        Set<String> childrenAndMe = new HashSet<>(children);
-        childrenAndMe.add(getName());
-        return childrenAndMe;
+    public Set<String> getDescendantsAndMe() {
+        Set<String> descendantsAndMe = new HashSet<>(descendants);
+        descendantsAndMe.add(getName());
+        return descendantsAndMe;
     }
 
     public ConfigDefinition setTable(String table) {
@@ -99,7 +99,7 @@ public class ConfigDefinition extends BeanDefinition {
             return allTables;
         }
 
-        Set<String> childrenAndMe = new HashSet<>(children);
+        Set<String> childrenAndMe = new HashSet<>(descendants);
         childrenAndMe.add(getName());
 
         for (String configName : childrenAndMe) {
@@ -235,7 +235,7 @@ public class ConfigDefinition extends BeanDefinition {
         while (parentConfig != null) {
             fields.addAll(0, parentConfig.selfFields);
             indexes.addAll(0, parentConfig.selfIndexes);
-            parentConfig.children.add(getName());
+            parentConfig.descendants.add(getName());
             parentConfig = parentConfig.getParentConfig();
         }
 
