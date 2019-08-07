@@ -36,7 +36,7 @@ public class ConfigLoader {
     //配置表类型,csv xls xlsx等
     private String tableType = "csv";
 
-    private Type loadType = Type.validateAndLoad;
+    private LoadType loadType = LoadType.validateAndLoad;
 
     private int bodyRowNum;
 
@@ -96,7 +96,7 @@ public class ConfigLoader {
         return this;
     }
 
-    public ConfigLoader setLoadType(Type loadType) {
+    public ConfigLoader setLoadType(LoadType loadType) {
         Objects.requireNonNull(loadType, "加载类型不能为空");
         this.loadType = loadType;
         return this;
@@ -113,11 +113,11 @@ public class ConfigLoader {
     }
 
     public boolean needValidate() {
-        return loadType == Type.onlyValidate || loadType == Type.validateAndLoad;
+        return loadType == LoadType.onlyValidate || loadType == LoadType.validateAndLoad;
     }
 
     public boolean needLoad() {
-        return loadType == Type.onlyLoad || loadType == Type.validateAndLoad;
+        return loadType == LoadType.onlyLoad || loadType == LoadType.validateAndLoad;
     }
 
     /**
@@ -205,7 +205,7 @@ public class ConfigLoader {
      */
     private void loadJsonsOnNoDefinition() {
         if (!needLoad()) {
-            throw new IllegalStateException("没有配置定义的JSON格式配置只能直接加载，不支持校验");
+            throw new IllegalStateException("没有配置定义的JSON格式配置不支持校验");
         }
 
         Set<File> jsonFiles = PathUtils.listFiles(new File(tablePath), "json");
@@ -505,6 +505,9 @@ public class ConfigLoader {
     }
 
     private void validateBeanTypeRef(Triple position, BeanDefinition bean, JSONObject json, Map<ConfigDefinition, Map<IndexDefinition, Map>> configIndexedJsonsAll) {
+        if (json == null) {
+            return;
+        }
         for (FieldDefinition field : bean.getFields()) {
             Object fieldValue = json.get(field.getName());
             validateFieldRef(position, bean, field, fieldValue, configIndexedJsonsAll);
@@ -753,18 +756,4 @@ public class ConfigLoader {
     }
 
 
-    public enum Type {
-        /**
-         * 仅校验配置
-         */
-        onlyValidate,
-        /**
-         * 仅加载,会创建配置对象并加载到类的缓存里
-         */
-        onlyLoad,
-        /**
-         * 校验并加载,会创建配置对象并加载到类的缓存里
-         */
-        validateAndLoad
-    }
 }

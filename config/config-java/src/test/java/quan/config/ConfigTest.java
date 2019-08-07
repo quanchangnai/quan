@@ -3,6 +3,7 @@ package quan.config;
 import quan.config.item.EquipConfig;
 import quan.config.item.ItemConfig;
 import quan.config.item.WeaponConfig;
+import quan.config.quest.QuestConfig;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,15 +21,15 @@ public class ConfigTest {
 
 //        String tableType = "csv";
 //        String tablePath = "config\\csv";
-//        String tableType = "xlsx";
-//        String tablePath = "config\\excel";
-        String tableType = "json";
-        String tablePath = "config\\json";
+        String tableType = "xlsx";
+        String tablePath = "config\\excel";
+//        String tableType = "json";
+//        String tablePath = "config\\json";
 
 
         ConfigLoader configLoader = new ConfigLoader(tablePath);
-//        configLoader.useXmlDefinitionParser(definitionPaths, "quan.config").setEnumPackagePrefix("quan");
-        configLoader.setLoadType(ConfigLoader.Type.validateAndLoad);
+        configLoader.useXmlDefinitionParser(definitionPaths, "quan.config").setEnumPackagePrefix("quan");
+        configLoader.setLoadType(LoadType.validateAndLoad);
         configLoader.setValidatorsPackage("quan");
         configLoader.setTableType(tableType);
 
@@ -148,6 +149,10 @@ public class ConfigTest {
 
         System.err.println("WeaponConfig============");
         WeaponConfig.self.getConfigs().forEach(System.out::println);
+
+        System.err.println("QuestConfig============");
+        QuestConfig.getConfigs().forEach(System.out::println);
+
         System.err.println("printConfigs end============");
     }
 }

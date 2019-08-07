@@ -1,14 +1,14 @@
 package quan.generator;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by quanchangnai on 2017/7/6.
  */
 public class EnumDefinition extends ClassDefinition {
 
-    private Set<Integer> enumValues = new HashSet<>();
+    private Map<Integer, FieldDefinition> valuesFields = new HashMap<>();
 
     @Override
     public int getDefinitionType() {
@@ -25,13 +25,12 @@ public class EnumDefinition extends ClassDefinition {
         } catch (NumberFormatException ignored) {
         }
 
-        if (enumValue < 1) {
+        if (enumValue <= 0) {
             addValidatedError(getName4Validate() + "的值[" + fieldDefinition.getValue() + "]必须为正整数");
-        } else if (enumValues.contains(enumValue)) {
+        } else if (valuesFields.containsKey(enumValue)) {
             addValidatedError(getName4Validate() + "的值[" + fieldDefinition.getValue() + "]不能重复");
         } else {
-            enumValues.add(enumValue);
-            fieldDefinition.setValue(fieldDefinition.getValue());
+            valuesFields.put(enumValue, fieldDefinition);
         }
     }
 
@@ -43,4 +42,9 @@ public class EnumDefinition extends ClassDefinition {
     public String getDefinitionTypeName() {
         return "枚举";
     }
+
+    public FieldDefinition getField(int enumValue) {
+        return valuesFields.get(enumValue);
+    }
+
 }

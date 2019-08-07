@@ -2,17 +2,13 @@ package quan.config;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.common.util.PathUtils;
-import quan.generator.BeanDefinition;
 import quan.generator.FieldDefinition;
 import quan.generator.config.ConfigDefinition;
 
 import java.io.File;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -22,12 +18,6 @@ import java.util.*;
 public abstract class ConfigReader {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
-
-    private static final SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy.MM.dd hh.mm.ss");
-
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd");
-
-    private static final SimpleDateFormat timeFormat = new SimpleDateFormat("hh.mm.ss");
 
     protected String table;
 
@@ -150,13 +140,13 @@ public abstract class ConfigReader {
         Object fieldValue;
 
         try {
-            fieldValue = convert(fieldDefinition, columnValue);
+            fieldValue = ConfigConverter.convert(fieldDefinition, columnValue);
             //时间类型字段字符串格式
             if (fieldDefinition.isTimeType()) {
-                rowJson.put(fieldName + "$Str", convertTimeType(fieldDefinition.getType(), (Date) fieldValue));
+                rowJson.put(fieldName + "$Str", ConfigConverter.convertTimeType(fieldDefinition.getType(), (Date) fieldValue));
             }
         } catch (Exception e) {
-            validatedErrors.add(String.format("配置[%s]的第%d行第%d列[%s]数据[%s]格式错误", table, row, column, columnName, columnValue));
+            handleConvertException(e, columnName, columnValue, row, column);
             return;
         }
 
@@ -164,143 +154,30 @@ public abstract class ConfigReader {
             JSONArray jsonArray = rowJson.getJSONArray(fieldName);
             if (jsonArray == null) {
                 rowJson.put(fieldName, fieldValue);
-            } else {
+            } else if (fieldValue instanceof JSONArray) {
                 jsonArray.addAll((JSONArray) fieldValue);
             }
+
         } else {
             rowJson.put(fieldName, fieldValue);
         }
     }
 
-    public static Object convert(FieldDefinition fieldDefinition, String value) {
-        String type = fieldDefinition.getType();
-        if (fieldDefinition.isPrimitiveType()) {
-            return convertPrimitiveType(fieldDefinition.getType(), value);
-        } else if (fieldDefinition.isTimeType()) {
-            return convertTimeType(fieldDefinition.getType(), value);
-        } else if (type.equals("list")) {
-            return convertList(fieldDefinition, value);
-        } else if (type.equals("set")) {
-            return convertSet(fieldDefinition, value);
-        } else if (type.equals("map")) {
-            return convertMap(fieldDefinition, value);
-        } else if (fieldDefinition.isBeanType()) {
-            return convertBean(fieldDefinition.getBean(), value);
-        } else if (fieldDefinition.isEnumType()) {
-            Objects.requireNonNull(fieldDefinition.getEnum().getField(value));
-        }
-        return value;
-    }
-
-    public static Object convertPrimitiveType(String type, String value) {
-        if (StringUtils.isBlank(value)) {
-            return type.equals("string") ? "" : null;
-        }
-        switch (type) {
-            case "bool":
-                return Boolean.parseBoolean(value.toLowerCase());
-            case "short":
-                return Short.parseShort(value);
-            case "int":
-                return Integer.parseInt(value);
-            case "long":
-                return Long.parseLong(value);
-            case "float":
-                return Float.parseFloat(value);
-            case "double":
-                return Double.parseDouble(value);
-            default:
-                return value;
-        }
-    }
-
-    public static Date convertTimeType(String type, String value) {
-        if (StringUtils.isBlank(value)) {
-            return null;
-        }
-        try {
-            if (type.equals("datetime")) {
-                //日期加时间
-                return dateTimeFormat.parse(value);
-            }
-            if (type.equals("date")) {
-                //纯日期
-                return dateFormat.parse(value);
-            }
-            //纯时间
-            return timeFormat.parse(value);
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static String convertTimeType(String type, Date value) {
-        if (value == null) {
-            return null;
-        }
-        if (type.equals("datetime")) {
-            return dateTimeFormat.format(value);
-        }
-        if (type.equals("date")) {
-            return dateFormat.format(value);
-        }
-        return timeFormat.format(value);
-
-    }
-
-    public static JSONArray convertList(FieldDefinition fieldDefinition, String value) {
-        String[] values = value.split(fieldDefinition.getEscapedDelimiter());
-        return convertArray(fieldDefinition, values);
-    }
-
-    public static JSONArray convertArray(FieldDefinition fieldDefinition, String[] values) {
-        JSONArray array = new JSONArray();
-        for (String v : values) {
-            if (fieldDefinition.isPrimitiveValueType()) {
-                array.add(convertPrimitiveType(fieldDefinition.getValueType(), v));
-            } else {
-                array.add(convertBean(BeanDefinition.getBean(fieldDefinition.getValueType()), v));
-            }
-        }
-        return array;
-    }
-
-    public static JSONArray convertSet(FieldDefinition fieldDefinition, String value) {
-        //set需要去重
-        String[] values = value.split(fieldDefinition.getEscapedDelimiter());
-        Set<String> setValues = new HashSet<>(Arrays.asList(values));
-        return convertArray(fieldDefinition, setValues.toArray(new String[0]));
-    }
-
-    public static JSONObject convertMap(FieldDefinition fieldDefinition, String value) {
-        String[] values = value.split(fieldDefinition.getEscapedDelimiter());
-
-        JSONObject object = new JSONObject();
-        for (int i = 0; i < values.length; i = i + 2) {
-            Object k = convertPrimitiveType(fieldDefinition.getKeyType(), values[i]);
-            Object v;
-            if (fieldDefinition.isPrimitiveValueType()) {
-                v = convertPrimitiveType(fieldDefinition.getValueType(), values[i + 1]);
-            } else {
-                v = convertBean(BeanDefinition.getBean(fieldDefinition.getValueType()), values[i + 1]);
-            }
-            object.put(k.toString(), v);
+    protected void handleConvertException(Exception e, String columnName, String columnValue, int row, int column) {
+        if (!(e instanceof ConvertException)) {
+            validatedErrors.add(String.format("配置[%s]的第%d行第%d列[%s]数据[%s]格式错误", table, row, column, columnName, columnValue));
+            return;
         }
 
-        return object;
-    }
-
-    public static JSONObject convertBean(BeanDefinition beanDefinition, String value) {
-        String[] values = value.split(beanDefinition.getEscapedDelimiter());
-
-        JSONObject object = new JSONObject();
-        for (int i = 0; i < beanDefinition.getFields().size(); i++) {
-            FieldDefinition fieldDefinition = beanDefinition.getFields().get(i);
-            Object v = convert(fieldDefinition, values[i]);
-            object.put(fieldDefinition.getName(), v);
+        ConvertException convertException = (ConvertException) e;
+        switch (convertException.getErrorType()) {
+            case enumName:
+                validatedErrors.add(String.format("配置[%s]的第%d行第%d列[%s]枚举名[%s]不合法", table, row, column, columnName, columnValue));
+                break;
+            case enumValue:
+                validatedErrors.add(String.format("配置[%s]的第%d行第%d列[%s]枚举值[%s]不合法", table, row, column, columnName, columnValue));
+                break;
         }
-
-        return object;
     }
 
 }

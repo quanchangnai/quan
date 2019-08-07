@@ -6,8 +6,13 @@ package quan.test;
 public class Test {
 
     public static void main(String[] args) {
-        System.err.println(0.0001);
-        System.err.println(60000 - 60000 * 0.0001);
+        String s = "";
+        System.err.println(s.length());
+        String[] strings = s.split(";");
+        System.err.println(strings.length);
+        for (int i = 0; i < strings.length; i++) {
+            System.err.println(i + ":" + strings[0]);
+        }
     }
 
 
