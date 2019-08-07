@@ -46,6 +46,9 @@ public class FieldDefinition extends Definition {
     //字段类型依赖是否有循环
     private boolean loop;
 
+    //Bean字段对应的列数，读数据校验表头时设置的
+    private int columnNum;
+
     public FieldDefinition() {
     }
 
@@ -426,5 +429,22 @@ public class FieldDefinition extends Definition {
     public FieldDefinition setLoop(boolean loop) {
         this.loop = loop;
         return this;
+    }
+
+    public int getColumnNum() {
+        return columnNum;
+    }
+
+    public FieldDefinition setColumnNum(int columnNum) {
+        this.columnNum = columnNum;
+        return this;
+    }
+
+    public boolean isLegalColumnNum() {
+        BeanDefinition beanDefinition = getBean();
+        if (beanDefinition == null) {
+            return true;
+        }
+        return columnNum == 1 || columnNum == beanDefinition.getFields().size();
     }
 }

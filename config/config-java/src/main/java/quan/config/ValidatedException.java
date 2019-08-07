@@ -7,18 +7,18 @@ import java.util.LinkedHashSet;
  * 配置校验异常
  * Created by quanchangnai on 2019/7/31.
  */
-public class ConfigException extends RuntimeException {
+public class ValidatedException extends RuntimeException {
 
     private LinkedHashSet<String> errors = new LinkedHashSet<>();
 
-    public ConfigException() {
+    public ValidatedException() {
     }
 
-    public ConfigException(String error) {
+    public ValidatedException(String error) {
         errors.add(error);
     }
 
-    public ConfigException(Collection<String> errors) {
+    public ValidatedException(Collection<String> errors) {
         this.errors.addAll(errors);
     }
 
@@ -26,12 +26,12 @@ public class ConfigException extends RuntimeException {
         return errors;
     }
 
-    public ConfigException addError(String error) {
+    public ValidatedException addError(String error) {
         errors.add(error);
         return this;
     }
 
-    public ConfigException addErrors(Collection<String> errors) {
+    public ValidatedException addErrors(Collection<String> errors) {
         this.errors.addAll(errors);
         return this;
     }

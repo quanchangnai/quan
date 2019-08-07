@@ -26,31 +26,29 @@ public class ConfigConverter {
     private static SimpleDateFormat timeFormat = new SimpleDateFormat("hh.mm.ss");
 
 
-    public static void setDateTimeFormat(SimpleDateFormat dateTimeFormat) {
-        ConfigConverter.dateTimeFormat = dateTimeFormat;
+    public static void setDateTimePattern(String pattern) {
+        dateTimeFormat = new SimpleDateFormat(pattern);
     }
 
-    public static SimpleDateFormat getDateTimeFormat() {
-        return dateTimeFormat;
+    public static String getDateTimePattern() {
+        return dateTimeFormat.toPattern();
     }
 
-    public static void setDateFormat(SimpleDateFormat dateFormat) {
-        ConfigConverter.dateFormat = dateFormat;
+    public static void setDatePattern(String pattern) {
+        dateFormat = new SimpleDateFormat(pattern);
     }
 
-    public static SimpleDateFormat getDateFormat() {
-        return dateFormat;
+    public static String getDatePattern() {
+        return dateFormat.toPattern();
     }
 
-
-    public static void setTimeFormat(SimpleDateFormat timeFormat) {
-        ConfigConverter.timeFormat = timeFormat;
+    public static void setTimePattern(String pattern) {
+        timeFormat = new SimpleDateFormat(pattern);
     }
 
-    public static SimpleDateFormat getTimeFormat() {
-        return timeFormat;
+    public static String getTimePattern() {
+        return timeFormat.toPattern();
     }
-
 
     public static Object convert(FieldDefinition fieldDefinition, String value) {
         String type = fieldDefinition.getType();
@@ -70,6 +68,30 @@ public class ConfigConverter {
             return convertEnumType(fieldDefinition.getEnum(), value);
         }
         return value;
+    }
+
+    public static Object convertColumnBean(FieldDefinition fieldDefinition, JSONObject rowJson, String columnValue) {
+        BeanDefinition beanDefinition = fieldDefinition.getBean();
+
+        //Bean字段对应1列
+        if (fieldDefinition.getColumnNum() == 1) {
+            return convertBean(beanDefinition, columnValue);
+        }
+
+        //Bean字段对应多列
+        JSONObject object = rowJson.getJSONObject(fieldDefinition.getName());
+        if (object == null) {
+            object = new JSONObject();
+        }
+
+        for (FieldDefinition beanField : beanDefinition.getFields()) {
+            if (!object.containsKey(beanField.getName())) {
+                object.put(beanField.getName(), convert(beanField, columnValue));
+                break;
+            }
+        }
+
+        return object;
     }
 
     /**

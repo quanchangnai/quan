@@ -52,7 +52,7 @@ public class ConfigTest {
         long startTime = System.currentTimeMillis();
         try {
             configLoader.load();
-        } catch (ConfigException e) {
+        } catch (ValidatedException e) {
             printErrors(e);
         }
         printConfigs();
@@ -77,7 +77,7 @@ public class ConfigTest {
         long startTime = System.currentTimeMillis();
         try {
             configLoader.reloadAll();
-        } catch (ConfigException e) {
+        } catch (ValidatedException e) {
             printErrors(e);
         }
         printConfigs();
@@ -92,7 +92,7 @@ public class ConfigTest {
         long startTime = System.currentTimeMillis();
         try {
             configLoader.reloadByConfigNames(reloadConfigs);
-        } catch (ConfigException e) {
+        } catch (ValidatedException e) {
             printErrors(e);
         }
         printConfigs();
@@ -107,7 +107,7 @@ public class ConfigTest {
         long startTime = System.currentTimeMillis();
         try {
             configLoader.reloadByTableNames(reloadConfigs);
-        } catch (ConfigException e) {
+        } catch (ValidatedException e) {
             printErrors(e);
         }
         printConfigs();
@@ -122,7 +122,7 @@ public class ConfigTest {
         long startTime = System.currentTimeMillis();
         try {
             configLoader.reloadByOriginalNames(reloadConfigs);
-        } catch (ConfigException e) {
+        } catch (ValidatedException e) {
             printErrors(e);
         }
         printConfigs();
@@ -130,7 +130,7 @@ public class ConfigTest {
         System.err.println();
     }
 
-    private static void printErrors(ConfigException e) {
+    private static void printErrors(ValidatedException e) {
         System.err.println("printErrors start============");
         for (String error : e.getErrors()) {
             System.err.println(error);

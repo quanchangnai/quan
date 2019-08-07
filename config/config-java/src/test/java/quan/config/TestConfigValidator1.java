@@ -15,7 +15,7 @@ public class TestConfigValidator1 implements ConfigValidator {
             System.err.println("itemConfig.toJson():" + itemConfig.toJson());
             error += ":" + itemConfig.getName();
         }
-        throw new ConfigException(error);
+        throw new ValidatedException(error);
     }
 
 

@@ -115,17 +115,43 @@ public abstract class ConfigReader {
 
     protected void validateColumnNames(List<String> columns) {
         Set<FieldDefinition> fields = new HashSet<>(configDefinition.getFields());
+        Set<String> validatedColumns = new HashSet<>();
+        Map<FieldDefinition, Integer> beanFieldColumnNums = new HashMap<>();
 
         for (String columnName : columns) {
             FieldDefinition fieldDefinition = configDefinition.getColumnFields().get(columnName);
-            if (fieldDefinition != null) {
-                fields.remove(fieldDefinition);
+            if (fieldDefinition == null) {
+                continue;
+            }
+            fields.remove(fieldDefinition);
+
+            String fieldType = fieldDefinition.getType();
+            boolean supportMultiColumns = fieldType.equals("list") || fieldType.equals("set") || fieldDefinition.isBeanType();
+
+            if (validatedColumns.contains(columnName) && !supportMultiColumns) {
+                validatedErrors.add(String.format("配置[%s]的字段类型[%s]不支持对应多列[%s]", table, fieldType, columnName));
+            }
+
+            validatedColumns.add(columnName);
+
+            if (fieldDefinition.isBeanType()) {
+                Integer columnNums = beanFieldColumnNums.getOrDefault(fieldDefinition, 0);
+                beanFieldColumnNums.put(fieldDefinition, columnNums + 1);
+            }
+        }
+
+        for (FieldDefinition fieldDefinition : beanFieldColumnNums.keySet()) {
+            Integer columnNum = beanFieldColumnNums.get(fieldDefinition);
+            if (columnNum != 1 && columnNum != fieldDefinition.getBean().getFields().size()) {
+                validatedErrors.add(String.format("配置[%s]的字段类型[%s]要么对应列数非法，要么单独对应1列，要么按其字段拆开对应%s列", table, fieldDefinition.getType(), fieldDefinition.getBean().getFields().size()));
+                fieldDefinition.setColumnNum(0);
+            } else {
+                fieldDefinition.setColumnNum(columnNum);
             }
         }
 
         for (FieldDefinition field : fields) {
-            String error = String.format("配置[%s]缺少字段[%s]对应的列[%s]", table, field.getName(), field.getColumn());
-            validatedErrors.add(error);
+            validatedErrors.add(String.format("配置[%s]缺少字段[%s]对应的列[%s]", table, field.getName(), field.getColumn()));
         }
     }
 
@@ -134,16 +160,20 @@ public abstract class ConfigReader {
         if (fieldDefinition == null) {
             return;
         }
+        if (fieldDefinition.isBeanType() && !fieldDefinition.isLegalColumnNum()) {
+            //Bean类型字段对应的列数不合法
+            return;
+        }
 
         String fieldName = fieldDefinition.getName();
         String fieldType = fieldDefinition.getType();
         Object fieldValue;
 
         try {
-            fieldValue = ConfigConverter.convert(fieldDefinition, columnValue);
-            //时间类型字段字符串格式
-            if (fieldDefinition.isTimeType()) {
-                rowJson.put(fieldName + "$Str", ConfigConverter.convertTimeType(fieldDefinition.getType(), (Date) fieldValue));
+            if (fieldDefinition.isBeanType()) {
+                fieldValue = ConfigConverter.convertColumnBean(fieldDefinition, rowJson, columnValue);
+            } else {
+                fieldValue = ConfigConverter.convert(fieldDefinition, columnValue);
             }
         } catch (Exception e) {
             handleConvertException(e, columnName, columnValue, row, column);
@@ -157,9 +187,13 @@ public abstract class ConfigReader {
             } else if (fieldValue instanceof JSONArray) {
                 jsonArray.addAll((JSONArray) fieldValue);
             }
-
         } else {
             rowJson.put(fieldName, fieldValue);
+        }
+
+        //时间类型字段字符串格式
+        if (fieldDefinition.isTimeType()) {
+            rowJson.put(fieldName + "$Str", ConfigConverter.convertTimeType(fieldDefinition.getType(), (Date) fieldValue));
         }
     }
 
@@ -176,6 +210,8 @@ public abstract class ConfigReader {
                 break;
             case enumValue:
                 validatedErrors.add(String.format("配置[%s]的第%d行第%d列[%s]枚举值[%s]不合法", table, row, column, columnName, columnValue));
+                break;
+            default:
                 break;
         }
     }

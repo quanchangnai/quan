@@ -159,9 +159,9 @@ public class ConfigLoader {
 
         List<String> validatedErrors = ClassDefinition.getValidatedErrors();
         if (!validatedErrors.isEmpty()) {
-            ConfigException configException = new ConfigException(String.format("解析配置定义文件%s共发现%d条错误。", definitionParser.getDefinitionPaths(), validatedErrors.size()));
-            configException.addErrors(validatedErrors);
-            throw configException;
+            ValidatedException validatedException = new ValidatedException(String.format("解析配置定义文件%s共发现%d条错误。", definitionParser.getDefinitionPaths(), validatedErrors.size()));
+            validatedException.addErrors(validatedErrors);
+            throw validatedException;
         }
     }
 
@@ -192,7 +192,7 @@ public class ConfigLoader {
         executeValidators();
 
         if (!validatedErrors.isEmpty()) {
-            throw new ConfigException(validatedErrors);
+            throw new ValidatedException(validatedErrors);
         }
     }
 
@@ -285,7 +285,7 @@ public class ConfigLoader {
         for (ConfigValidator validator : validators) {
             try {
                 validator.validateConfig();
-            } catch (ConfigException e) {
+            } catch (ValidatedException e) {
                 validatedErrors.addAll(e.getErrors());
             } catch (Exception e) {
                 String error = String.format("配置错误:%s", e.getMessage());
@@ -649,7 +649,7 @@ public class ConfigLoader {
         }
 
         if (!validatedErrors.isEmpty()) {
-            throw new ConfigException(validatedErrors);
+            throw new ValidatedException(validatedErrors);
         }
     }
 
