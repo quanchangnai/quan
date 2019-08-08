@@ -116,7 +116,7 @@ public abstract class ConfigReader {
     protected void validateColumnNames(List<String> columns) {
         Set<FieldDefinition> fields = new HashSet<>(configDefinition.getFields());
         Set<String> validatedColumns = new HashSet<>();
-        Map<FieldDefinition, Integer> beanFieldColumnNums = new HashMap<>();
+        Map<FieldDefinition, Integer> mapAndBeanFieldColumnNums = new HashMap<>();
 
         for (String columnName : columns) {
             FieldDefinition fieldDefinition = configDefinition.getColumnFields().get(columnName);
@@ -126,24 +126,26 @@ public abstract class ConfigReader {
             fields.remove(fieldDefinition);
 
             String fieldType = fieldDefinition.getType();
-            boolean supportMultiColumns = fieldType.equals("list") || fieldType.equals("set") || fieldDefinition.isBeanType();
 
-            if (validatedColumns.contains(columnName) && !supportMultiColumns) {
+            if (validatedColumns.contains(columnName) && !fieldDefinition.isCollectionType() && !fieldDefinition.isBeanType()) {
                 validatedErrors.add(String.format("配置[%s]的字段类型[%s]不支持对应多列[%s]", table, fieldType, columnName));
             }
 
             validatedColumns.add(columnName);
 
-            if (fieldDefinition.isBeanType()) {
-                Integer columnNums = beanFieldColumnNums.getOrDefault(fieldDefinition, 0);
-                beanFieldColumnNums.put(fieldDefinition, columnNums + 1);
+            if (fieldType.equals("map") || fieldDefinition.isBeanType()) {
+                Integer columnNums = mapAndBeanFieldColumnNums.getOrDefault(fieldDefinition, 0);
+                mapAndBeanFieldColumnNums.put(fieldDefinition, columnNums + 1);
             }
         }
 
-        for (FieldDefinition fieldDefinition : beanFieldColumnNums.keySet()) {
-            Integer columnNum = beanFieldColumnNums.get(fieldDefinition);
-            if (columnNum != 1 && columnNum != fieldDefinition.getBean().getFields().size()) {
-                validatedErrors.add(String.format("配置[%s]的字段类型[%s]要么对应列数非法，要么单独对应1列，要么按其字段拆开对应%s列", table, fieldDefinition.getType(), fieldDefinition.getBean().getFields().size()));
+        for (FieldDefinition fieldDefinition : mapAndBeanFieldColumnNums.keySet()) {
+            Integer columnNum = mapAndBeanFieldColumnNums.get(fieldDefinition);
+            if (columnNum != 1 && fieldDefinition.isBeanType() && columnNum != fieldDefinition.getBean().getFields().size()) {
+                validatedErrors.add(String.format("配置[%s]的字段类型[%s]要么对应列数非法，要么单独对应1列，要么按字段拆开对应%s列", table, fieldDefinition.getType(), fieldDefinition.getBean().getFields().size()));
+                fieldDefinition.setColumnNum(0);
+            } else if (columnNum != 1 && columnNum % 2 != 0 && fieldDefinition.getType().equals("map")) {
+                validatedErrors.add(String.format("配置[%s]的字段类型[%s]要么对应列数非法，要么单独对应1列，要么按键值对拆开对应偶数列", table, fieldDefinition.getType()));
                 fieldDefinition.setColumnNum(0);
             } else {
                 fieldDefinition.setColumnNum(columnNum);
@@ -160,8 +162,8 @@ public abstract class ConfigReader {
         if (fieldDefinition == null) {
             return;
         }
-        if (fieldDefinition.isBeanType() && !fieldDefinition.isLegalColumnNum()) {
-            //Bean类型字段对应的列数不合法
+        if (!fieldDefinition.isLegalColumnNum()) {
+            //Bean或者map类型字段对应的列数不合法
             return;
         }
 
@@ -171,7 +173,9 @@ public abstract class ConfigReader {
 
         try {
             if (fieldDefinition.isBeanType()) {
-                fieldValue = ConfigConverter.convertColumnBean(fieldDefinition, rowJson, columnValue);
+                fieldValue = ConfigConverter.convertColumnBean(fieldDefinition, rowJson.getJSONObject(fieldDefinition.getName()), columnValue);
+            } else if (fieldDefinition.getType().equals("map")) {
+                fieldValue = ConfigConverter.convertColumnMap(fieldDefinition,rowJson, columnValue);
             } else {
                 fieldValue = ConfigConverter.convert(fieldDefinition, columnValue);
             }

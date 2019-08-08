@@ -70,16 +70,15 @@ public class ConfigConverter {
         return value;
     }
 
-    public static Object convertColumnBean(FieldDefinition fieldDefinition, JSONObject rowJson, String columnValue) {
+    public static Object convertColumnBean(FieldDefinition fieldDefinition, JSONObject object, String columnValue) {
         BeanDefinition beanDefinition = fieldDefinition.getBean();
 
-        //Bean字段对应1列
+        //Bean类型字段对应1列
         if (fieldDefinition.getColumnNum() == 1) {
             return convertBean(beanDefinition, columnValue);
         }
 
-        //Bean字段对应多列
-        JSONObject object = rowJson.getJSONObject(fieldDefinition.getName());
+        //Bean类型字段对应多列
         if (object == null) {
             object = new JSONObject();
         }
@@ -198,6 +197,66 @@ public class ConfigConverter {
         return array;
     }
 
+    public static JSONObject convertColumnMap(FieldDefinition fieldDefinition, JSONObject rowJson, String value) {
+        //map类型字段对应1列
+        if (fieldDefinition.getColumnNum() == 1) {
+            return convertMap(fieldDefinition, value);
+        }
+
+        //map类型字段对应多列
+        JSONObject object = rowJson.getJSONObject(fieldDefinition.getName());
+        if (object == null) {
+            object = new JSONObject();
+            rowJson.put(fieldDefinition.getName(), object);
+        }
+
+        if (object.containsKey(null)) {
+            //上一次转换的key无效忽略这次的value
+            object.remove(null);
+            return object;
+        }
+
+        Object objectKey = null;
+
+        for (String k : object.keySet()) {
+            Object v = object.get(k);
+            if (v == null) {
+                objectKey = k;
+                break;
+            }
+        }
+
+        if (objectKey == null) {
+            try {
+                objectKey = convertPrimitiveType(fieldDefinition.getKeyType(), value);
+            } catch (Exception e) {
+            }
+            if (objectKey == null) {
+                object.put(null, null);
+                throw new NullPointerException("map类型" + fieldDefinition.getName4Validate() + "的键不能为空");
+            }
+            object.put(objectKey.toString(), null);
+        } else {
+            Object objectValue = null;
+            try {
+                if (fieldDefinition.isPrimitiveValueType()) {
+                    objectValue = convertPrimitiveType(fieldDefinition.getValueType(), value);
+                } else {
+                    objectValue = convertBean(BeanDefinition.getBean(fieldDefinition.getValueType()), value);
+                }
+            } catch (Exception e) {
+            }
+            if (objectValue == null) {
+                //value无效删除对应的key
+                object.remove(objectKey);
+                throw new NullPointerException("map类型" + fieldDefinition.getName4Validate() + "的值不能为空");
+            }
+            object.put(objectKey.toString(), objectValue);
+        }
+
+        return object;
+    }
+
     public static JSONArray convertSet(FieldDefinition fieldDefinition, String value) {
         //set需要去重
         String[] values = value.split(fieldDefinition.getEscapedDelimiter());
@@ -214,14 +273,14 @@ public class ConfigConverter {
         String[] values = value.split(fieldDefinition.getEscapedDelimiter());
         for (int i = 0; i < values.length; i = i + 2) {
             Object k = convertPrimitiveType(fieldDefinition.getKeyType(), values[i]);
-            if (k == null) {
-                continue;
-            }
             Object v;
             if (fieldDefinition.isPrimitiveValueType()) {
                 v = convertPrimitiveType(fieldDefinition.getValueType(), values[i + 1]);
             } else {
                 v = convertBean(BeanDefinition.getBean(fieldDefinition.getValueType()), values[i + 1]);
+            }
+            if (k == null || v == null) {
+                throw new NullPointerException("map的键或者值不能为空");
             }
             object.put(k.toString(), v);
         }

@@ -442,9 +442,11 @@ public class FieldDefinition extends Definition {
 
     public boolean isLegalColumnNum() {
         BeanDefinition beanDefinition = getBean();
-        if (beanDefinition == null) {
-            return true;
+        if (beanDefinition != null) {
+            return columnNum == 1 || columnNum == beanDefinition.getFields().size();
+        } else if (type.equals("map")) {
+            return columnNum == 1 || columnNum > 0 && columnNum % 2 == 0;
         }
-        return columnNum == 1 || columnNum == beanDefinition.getFields().size();
+        return true;
     }
 }
