@@ -17,13 +17,13 @@
         <field name="f" type="float"/>
         <field name="d" type="double"/>
         <field name="item" type="ItemBean"/>道具
-        <field name="items" type="map" key-type="int" value-type="ItemBean"/>
-        <field name="set" type="set" value-type="bool"/>
-        <field name="list" type="list" value-type="string"/>
-        <field name="map" type="map" key-type="int" value-type="int"/>
-        <field name="set2" type="set" value-type="ItemBean"/>
-        <field name="list2" type="list" value-type="ItemBean"/>
-        <field name="map2" type="map" key-type="int" value-type="ItemBean"/>
+        <field name="items" type="map:int:ItemBean"/>
+        <field name="set" type="set:bool"/>
+        <field name="list" type="list:string"/>
+        <field name="map" type="map:int:int"/>
+        <field name="set2" type="set:ItemBean"/>
+        <field name="list2" type="list:ItemBean"/>
+        <field name="map2" type="map:int:ItemBean"/>
     </data>
 
     <data name="RoleData2" key="id" persistent="false">角色2
@@ -37,12 +37,12 @@
         <field name="d" type="double"/>
         <field name="item" type="ItemBean"/>
         <field name="itemType" type="ItemType"/>
-        <field name="items" type="map" key-type="int" value-type="ItemBean"/>
-        <field name="set" type="set" value-type="bool"/>
-        <field name="list" type="list" value-type="string"/>
-        <field name="map" type="map" key-type="int" value-type="int"/>
-        <field name="set2" type="set" value-type="ItemBean"/>
-        <field name="list2" type="list" value-type="ItemBean"/>
-        <field name="map2" type="map" key-type="int" value-type="ItemBean"/>
+        <field name="items" type="map:int:ItemBean"/>
+        <field name="set" type="set:bool"/>
+        <field name="list" type="list:string"/>
+        <field name="map" type="map:int:int"/>
+        <field name="set2" type="set:ItemBean"/>
+        <field name="list2" type="list:ItemBean"/>
+        <field name="map2" type="map:int:ItemBean"/>
     </data>
 </package>

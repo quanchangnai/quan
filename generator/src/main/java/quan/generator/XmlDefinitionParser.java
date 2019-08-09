@@ -168,12 +168,10 @@ public class XmlDefinitionParser extends DefinitionParser {
         fieldDefinition.setCategory(getCategory());
 
         fieldDefinition.setName(fieldElement.attributeValue("name"));
-        fieldDefinition.setType(fieldElement.attributeValue("type"));
+        fieldDefinition.setTypes(fieldElement.attributeValue("type"));
         fieldDefinition.setValue(fieldElement.attributeValue("value"));
         fieldDefinition.setColumn(fieldElement.attributeValue("column"));
         fieldDefinition.setOptional(fieldElement.attributeValue("optional"));
-        fieldDefinition.setKeyType(fieldElement.attributeValue("key-type"));
-        fieldDefinition.setValueType(fieldElement.attributeValue("value-type"));
         fieldDefinition.setIndex(fieldElement.attributeValue("index"));
         fieldDefinition.setDelimiter(fieldElement.attributeValue("delimiter"));
         fieldDefinition.setRef(fieldElement.attributeValue("ref"));

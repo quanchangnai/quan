@@ -57,30 +57,78 @@ public class BeanDefinition extends ClassDefinition {
         super.validateField(field);
 
         //校验字段类型
-        if (field.getType() == null) {
+        validateFieldType(field);
+
+        //校验字段循环依赖
+        validateFieldBeanLoop(field);
+
+    }
+
+    protected void validateFieldType(FieldDefinition field) {
+        if (field.getTypes() == null) {
             addValidatedError(getName4Validate("的") + field.getName4Validate() + "类型不能为空");
             return;
         }
 
-        if (!field.isLegalType()) {
-            addValidatedError(getName4Validate("的") + field.getName4Validate() + "类型[" + field.getType() + "]不合法");
+        String[] fieldTypes = field.getTypes().split(":");
+        String fieldType = fieldTypes[0];
+
+        if (fieldTypes.length == 1 && StringUtils.isBlank(fieldType)) {
+            addValidatedError(getName4Validate("的") + field.getName4Validate() + "类型不能为空");
             return;
         }
 
-        //校验集合值类型
-        if (field.isCollectionType()) {
-            validateFieldCollectionType(field);
+        field.setType(fieldType);
+        if (!field.isLegalType()) {
+            addValidatedError(getName4Validate("的") + field.getName4Validate() + "类型[" + fieldType + "]不合法");
+            field.setType(null);
+            return;
         }
 
-        //校验字段循环依赖，字段类型为bean类型或者集合类型字段的值类型为bean
+
+        if (!field.isCollectionType() && fieldTypes.length != 1) {
+            addValidatedError(getName4Validate("的") + field.getName4Validate() + "类型[" + field.getTypes() + "]格式错误");
+            return;
+        }
+
+        if (fieldType.equals("list") || fieldType.equals("set")) {
+            if (fieldTypes.length == 2 && !StringUtils.isBlank(fieldTypes[1])) {
+                field.setValueType(fieldTypes[1]);
+                if (!field.isLegalValueType()) {
+                    addValidatedError(getName4Validate("的") + field.getName4Validate() + "类型[" + field.getType() + "]的值类型[" + field.getValueType() + "]不合法");
+                }
+            } else {
+                addValidatedError(getName4Validate("的") + field.getName4Validate() + "类型[" + field.getTypes() + "]格式错误，合法格式[" + fieldType + ":值类型]");
+            }
+        }
+
+        if (fieldType.equals("map")) {
+            if (fieldTypes.length == 3 && !StringUtils.isBlank(fieldTypes[1]) && !StringUtils.isBlank(fieldTypes[2])) {
+                field.setKeyType(fieldTypes[1]);
+                field.setValueType(fieldTypes[2]);
+                if (!field.isPrimitiveKeyType()) {
+                    addValidatedError(getName4Validate("的") + field.getName4Validate() + "类型[" + field.getType() + "]的键类型[" + field.getKeyType() + "]不合法");
+                }
+                if (!field.isLegalValueType()) {
+                    addValidatedError(getName4Validate("的") + field.getName4Validate() + "类型[" + field.getType() + "]的值类型[" + field.getValueType() + "]不合法");
+                }
+            } else {
+                addValidatedError(getName4Validate("的") + field.getName4Validate() + "类型[" + field.getTypes() + "]格式错误，合法格式[" + fieldType + ":键类型:值类型]");
+            }
+        }
+
+    }
+
+    /**
+     * 校验字段循环依赖，字段类型为bean类型或者集合类型字段的值类型为bean
+     */
+    protected void validateFieldBeanLoop(FieldDefinition field) {
         Set<BeanDefinition> fieldBeans = new HashSet<>();
         fieldBeans.add(this);
         boolean loop = validateFieldBeanLoop(field, field, fieldBeans);
-        if (loop) {
-            field.setLoop(true);
-        }
-    }
+        field.setLoop(loop);
 
+    }
 
     protected boolean validateFieldBeanLoop(FieldDefinition rootField, FieldDefinition field, Set<BeanDefinition> fieldBeans) {
         BeanDefinition fieldBean = null;
@@ -142,27 +190,6 @@ public class BeanDefinition extends ClassDefinition {
     }
 
 
-    protected void validateFieldCollectionType(FieldDefinition field) {
-        if (field.getValueType() == null) {
-            addValidatedError(getName4Validate("的") + field.getType() + "类型" + field.getName4Validate() + "的值类型不能为空");
-            return;
-        }
-        if (!field.isLegalValueType()) {
-            addValidatedError(getName4Validate("的") + field.getType() + "类型" + field.getName4Validate() + "的值类型[" + field.getValueType() + "]不合法");
-            return;
-        }
-        if (field.getType().equals("map")) {
-            //校验map键类型
-            if (field.getKeyType() == null) {
-                addValidatedError(getName4Validate("的") + field.getType() + "类型" + field.getName4Validate() + "的键类型不能为空");
-                return;
-            }
-            if (!field.isPrimitiveKeyType()) {
-                addValidatedError(getName4Validate("的") + field.getType() + "类型" + field.getName4Validate() + "的键类型[" + field.getKeyType() + "]不合法");
-            }
-        }
-    }
-
     @Override
     public void validate2() {
         super.validate2();
@@ -174,7 +201,7 @@ public class BeanDefinition extends ClassDefinition {
     }
 
     protected void validateFieldRef(FieldDefinition field) {
-        if (getCategory() != DefinitionCategory.config || field.getRef() == null) {
+        if (field.getType() == null || getCategory() != DefinitionCategory.config || field.getRef() == null) {
             return;
         }
 
@@ -189,8 +216,8 @@ public class BeanDefinition extends ClassDefinition {
         }
 
         //map类型字段引用校验
-        String[] fieldRefs = field.getRef().split("[,]");
-        String refPatternError = getName4Validate() + "的map类型字段" + field.getName4Validate() + "的引用格式错误[" + field.getRef() + "]，正确格式:[键引用的配置.字段]或者[键引用配置.字段,值引用的配置.字段]";
+        String[] fieldRefs = field.getRef().split("[:]");
+        String refPatternError = getName4Validate("的") + field.getName4Validate() + "类型[map]的引用格式错误[" + field.getRef() + "]，正确格式:[键引用的配置.字段]或者[键引用配置.字段:值引用的配置.字段]";
         if (fieldRefs.length != 1 && fieldRefs.length != 2) {
             addValidatedError(refPatternError);
             return;
@@ -238,11 +265,11 @@ public class BeanDefinition extends ClassDefinition {
             return;
         }
         if (field.isCollectionType()) {
-            if (keType && !field.getKeyType().equals(refField.getType())) {
-                addValidatedError(getName4Validate("的") + "map类型" + field.getName4Validate() + "的键类型[" + field.getKeyType() + "]和引用字段[" + refConfigAndField + "]的类型[" + refField.getType() + "]不一致");
+            if (keType && field.isPrimitiveKeyType() && !field.getKeyType().equals(refField.getType())) {
+                addValidatedError(getName4Validate("的") + field.getName4Validate() + "类型[" + field.getType() + "]的键类型[" + field.getKeyType() + "]和引用字段[" + refConfigAndField + "]的类型[" + refField.getType() + "]不一致");
             }
-            if (!keType && !field.getValueType().equals(refField.getType())) {
-                addValidatedError(getName4Validate() + field.getType() + "类型字段" + field.getName4Validate() + "的值类型[" + field.getValueType() + "]和引用字段[" + refConfigAndField + "]的类型[" + refField.getType() + "]不一致");
+            if (!keType && field.isLegalValueType() && !field.getValueType().equals(refField.getType())) {
+                addValidatedError(getName4Validate("的") + field.getName4Validate() + "类型[" + field.getType() + "]的值类型[" + field.getValueType() + "]和引用字段[" + refConfigAndField + "]的类型[" + refField.getType() + "]不一致");
             }
         } else if (!field.getType().equals(refField.getType())) {
             addValidatedError(getName4Validate("的") + field.getName4Validate() + "的类型[" + field.getType() + "]和引用字段[" + refConfigAndField + "]的类型[" + refField.getType() + "]不一致");

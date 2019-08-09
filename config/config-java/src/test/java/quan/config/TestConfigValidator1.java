@@ -9,7 +9,7 @@ public class TestConfigValidator1 implements ConfigValidator {
 
     @Override
     public void validateConfig() {
-        String error = "TestConfigChecker1校验测试";
+        String error = "TestConfigValidator1校验测试";
         ItemConfig itemConfig = ItemConfig.getById(1);
         if (itemConfig != null) {
             System.err.println("itemConfig.toJson():" + itemConfig.toJson());

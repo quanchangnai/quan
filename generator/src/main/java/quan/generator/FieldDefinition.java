@@ -11,6 +11,8 @@ import quan.generator.message.JavaMessageGenerator;
  */
 public class FieldDefinition extends Definition {
 
+    //字段类型的原始定义,set、list包含值类型，map包含键和值的类型
+    private String types;
     private String type;
 
     private boolean optional;
@@ -62,16 +64,30 @@ public class FieldDefinition extends Definition {
         return "字段";
     }
 
+
+    public String getTypes() {
+        return types;
+    }
+
+    public void setTypes(String types) {
+        if (StringUtils.isBlank(types)) {
+            return;
+        }
+        this.types = types;
+    }
+
     public String getType() {
         return type;
     }
 
 
     public void setType(String type) {
-        if (StringUtils.isBlank(type)) {
-            return;
+        if (!StringUtils.isBlank(type)) {
+            this.type = type.trim();
+        } else {
+            this.type = null;
         }
-        this.type = type.trim();
+
     }
 
     public boolean isBuiltInType() {

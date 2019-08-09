@@ -17,9 +17,9 @@
         <field name="d1" type="string" column="D1"/>
         <field name="d2" type="int" column="D2"/>
         <field name="d3" type="int" column="D3"/>
-        <field name="s1" type="set" value-type="int" column="S1"/>
-        <field name="l1" type="list" value-type="int" column="L1"/>
-        <field name="m1" type="map" key-type="int" value-type="int" column="M1"/>
+        <field name="s1" type="set:int" column="S1"/>
+        <field name="l1" type="list:int" column="L1"/>
+        <field name="m1" type="map:int:int" column="M1"/>
         <index name="composite1" type="u" fields="a1,a2"/>
         <index name="composite2" type="normal" fields="b1,b2"/>
         <index name="composite3" type="unique" fields="c1,c2,c3"/>

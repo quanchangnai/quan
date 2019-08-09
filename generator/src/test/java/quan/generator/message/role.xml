@@ -16,18 +16,18 @@
         <field name="f" type="float"/>
         <field name="d" type="double"/>
         <field name="data" type="bytes"/>
-        <field name="list" type="list" value-type="int"/>
-        <field name="set" type="set" value-type="int"/>
-        <field name="map" type="map" key-type="int" value-type="int"/>
+        <field name="list" type="list:int"/>
+        <field name="set" type="set:int"/>
+        <field name="map" type="map:int:int"/>
     </bean>
 
     <message id="111" name="CRoleLogin" lang="java,cs">角色登录
         <field name="roleId" type="long"/>角色id
         <field name="roleName" type="string"/>角色名
         <field name="roleInfo" type="RoleInfo"/>角色信息
-        <field name="roleInfoList" type="list" value-type="RoleInfo"/>角色信息
-        <field name="roleInfoSet" type="set" value-type="RoleInfo"/>角色信息
-        <field name="roleInfoMap" type="map" key-type="long" value-type="RoleInfo"/>角色信息
+        <field name="roleInfoList" type="list:RoleInfo"/>角色信息
+        <field name="roleInfoSet" type="set:RoleInfo"/>角色信息
+        <field name="roleInfoMap" type="map:long:RoleInfo"/>角色信息
         <field name="userInfo" type="UserInfo" optional="true"/>用户信息
     </message>
 
@@ -35,9 +35,9 @@
         <field name="roleId" type="long"/>角色id
         <field name="roleName" type="string"/>角色名
         <field name="roleInfo" type="RoleInfo"/>角色信息
-        <field name="roleInfoList" type="list" value-type="RoleInfo"/>角色信息
-        <field name="roleInfoSet" type="set" value-type="RoleInfo"/>角色信息
-        <field name="roleInfoMap" type="map" key-type="long" value-type="RoleInfo"/>角色信息
+        <field name="roleInfoList" type="list:RoleInfo"/>角色信息
+        <field name="roleInfoSet" type="set:RoleInfo"/>角色信息
+        <field name="roleInfoMap" type="map:long:RoleInfo"/>角色信息
         <field name="userInfo" type="UserInfo" optional="true"/>用户信息
     </message>
 

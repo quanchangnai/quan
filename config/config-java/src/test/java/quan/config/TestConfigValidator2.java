@@ -9,7 +9,7 @@ public enum TestConfigValidator2 implements ConfigValidator {
 
     @Override
     public void validateConfig() {
-        throw new RuntimeException("TestConfigChecker2校验测试");
+        throw new RuntimeException("TestConfigValidator2校验测试");
     }
 
 

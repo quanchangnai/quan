@@ -229,11 +229,11 @@ public class ConfigConverter {
         if (objectKey == null) {
             try {
                 objectKey = convertPrimitiveType(fieldDefinition.getKeyType(), value);
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
             if (objectKey == null) {
                 object.put(null, null);
-                throw new NullPointerException("map类型" + fieldDefinition.getName4Validate() + "的键不能为空");
+                throw new NullPointerException("map" + fieldDefinition.getName4Validate() + "的键不能为空");
             }
             object.put(objectKey.toString(), null);
         } else {
@@ -244,12 +244,12 @@ public class ConfigConverter {
                 } else {
                     objectValue = convertBean(BeanDefinition.getBean(fieldDefinition.getValueType()), value);
                 }
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
             if (objectValue == null) {
                 //value无效删除对应的key
                 object.remove(objectKey);
-                throw new NullPointerException("map类型" + fieldDefinition.getName4Validate() + "的值不能为空");
+                throw new NullPointerException("map" + fieldDefinition.getName4Validate() + "的值不能为空");
             }
             object.put(objectKey.toString(), objectValue);
         }

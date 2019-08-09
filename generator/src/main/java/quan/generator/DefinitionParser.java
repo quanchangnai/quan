@@ -111,7 +111,6 @@ public abstract class DefinitionParser {
         for (ClassDefinition classDefinition : classDefinitions) {
             classDefinition.validate2();
         }
-
     }
 
     protected abstract List<ClassDefinition> parseClasses(File definitionFile) throws Exception;
