@@ -16,8 +16,7 @@ public class ConfigTest {
 
     public static void main(String[] args) throws Exception {
         List<String> definitionPaths = new ArrayList<>();
-        definitionPaths.add("generator\\src/test\\java\\quan\\generator\\config");
-        definitionPaths.add("generator\\src\\test\\java\\quan\\generator\\common.xml");
+        definitionPaths.add("config\\definition");
 
 //        String tableType = "csv";
 //        String tablePath = "config\\csv";
@@ -28,7 +27,7 @@ public class ConfigTest {
 
 
         ConfigLoader configLoader = new ConfigLoader(tablePath);
-        configLoader.useXmlDefinitionParser(definitionPaths, "quan.config").setEnumPackagePrefix("quan");
+        configLoader.useXmlDefinitionParser(definitionPaths, "quan.config");
         configLoader.setLoadType(LoadType.validateAndLoad);
         configLoader.setValidatorsPackage("quan");
         configLoader.setTableType(tableType);

@@ -147,6 +147,15 @@ public class ConfigDefinition extends BeanDefinition {
         return null;
     }
 
+    public boolean isIndexField(FieldDefinition field) {
+        for (IndexDefinition index : indexes) {
+            if (index.getFields().contains(field)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public Map<String, FieldDefinition> getColumnFields() {
         return columnFields;
     }

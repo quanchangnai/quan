@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package>
+
+    <config name="QuestConfig" table="任务">
+        <field name="id" type="int" column="ID"/>
+        <field name="name" type="string" column="名字"/>
+        <field name="type" type="QuestType" column="类型" index="normal"/>
+        <field name="target" type="int" column="任务目标" ref="QuestTargetConfig.id"/>
+        <field name="reward" type="Reward" column="奖励"/>
+        <field name="a1" type="int" column="A1"/>
+        <field name="a2" type="int" column="A2"/>
+        <field name="b1" type="int" column="B1"/>
+        <field name="b2" type="bool" column="B2"/>
+        <field name="c1" type="string" column="C1"/>
+        <field name="c2" type="int" column="C2"/>
+        <field name="c3" type="int" column="C3"/>
+        <field name="d1" type="string" column="D1"/>
+        <field name="d2" type="int" column="D2"/>
+        <field name="d3" type="int" column="D3"/>
+        <field name="s1" type="set" value-type="int" column="S1"/>
+        <field name="l1" type="list" value-type="int" column="L1"/>
+        <field name="m1" type="map" key-type="int" value-type="int" column="M1"/>
+        <index name="composite1" type="u" fields="a1,a2"/>
+        <index name="composite2" type="normal" fields="b1,b2"/>
+        <index name="composite3" type="unique" fields="c1,c2,c3"/>
+        <index name="composite4" type="n" fields="d1,d2,d3"/>
+    </config>
+
+    <config name="QuestTargetConfig">
+        <field name="id" type="int" column="ID" index="u"/>
+        <field name="name" type="string" column="名字"/>
+    </config>
+
+    <enum name="QuestType">任务类型
+        <field name="main" value="1"/>主线
+        <field name="branch" value="2"/>支线
+    </enum>
+
+</package>

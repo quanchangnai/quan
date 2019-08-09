@@ -175,12 +175,18 @@ public abstract class ConfigReader {
             if (fieldDefinition.isBeanType()) {
                 fieldValue = ConfigConverter.convertColumnBean(fieldDefinition, rowJson.getJSONObject(fieldDefinition.getName()), columnValue);
             } else if (fieldDefinition.getType().equals("map")) {
-                fieldValue = ConfigConverter.convertColumnMap(fieldDefinition,rowJson, columnValue);
+                fieldValue = ConfigConverter.convertColumnMap(fieldDefinition, rowJson, columnValue);
             } else {
                 fieldValue = ConfigConverter.convert(fieldDefinition, columnValue);
             }
         } catch (Exception e) {
             handleConvertException(e, columnName, columnValue, row, column);
+            return;
+        }
+
+        //索引字段不能为空
+        if (fieldValue == null && configDefinition.isIndexField(fieldDefinition)) {
+            validatedErrors.add(String.format("配置[%s]的第%d行第%d列[%s]的索引不能为空", table, row, column, columnName));
             return;
         }
 

@@ -385,6 +385,10 @@ public class ConfigLoader {
 
         if (indexDefinition.isUnique() && indexDefinition.getFields().size() == 1) {
             FieldDefinition field1 = indexDefinition.getFields().get(0);
+            if (!json.containsKey(field1.getName())) {
+                return;
+            }
+
             JSONObject oldJson = (JSONObject) indexedJsons.put(json.get(field1.getName()), json);
             if (oldJson != null) {
                 String repeatedTables = table;
@@ -398,6 +402,10 @@ public class ConfigLoader {
         if (indexDefinition.isUnique() && indexDefinition.getFields().size() == 2) {
             FieldDefinition field1 = indexDefinition.getFields().get(0);
             FieldDefinition field2 = indexDefinition.getFields().get(1);
+            if (!json.containsKey(field1.getName()) || !json.containsKey(field2.getName())) {
+                return;
+            }
+
             JSONObject oldJson = (JSONObject) ((Map) indexedJsons.computeIfAbsent(json.get(field1.getName()), k -> new HashMap<>())).put(json.get(field2.getName()), json);
             if (oldJson != null) {
                 String repeatedTables = table;
@@ -412,6 +420,10 @@ public class ConfigLoader {
             FieldDefinition field1 = indexDefinition.getFields().get(0);
             FieldDefinition field2 = indexDefinition.getFields().get(1);
             FieldDefinition field3 = indexDefinition.getFields().get(2);
+            if (!json.containsKey(field1.getName()) || !json.containsKey(field2.getName()) || !json.containsKey(field3.getName())) {
+                return;
+            }
+
             JSONObject oldJson = (JSONObject) ((Map) ((Map) indexedJsons.computeIfAbsent(json.get(field1.getName()), k -> new HashMap<>())).computeIfAbsent(json.get(field2.getName()), k -> new HashMap<>())).put(json.get(field3.getName()), json);
             if (oldJson != null) {
                 String repeatedTables = table;

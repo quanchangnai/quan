@@ -1,25 +1,25 @@
-package quan.common;
+package quan.config.quest;
 
 /**
- * 道具类型<br/>
+ * 任务类型<br/>
  * Created by 自动生成
  */
-public enum ItemType {
+public enum QuestType {
 
     /**
-     * 道具类型1
+     * 主线
      */
-    type1(1),
+    main(1),
 
     /**
-     * 道具类型2
+     * 支线
      */
-    type2(2);
+    branch(2);
 
 
     private int value;
 
-    ItemType(int value) {
+    QuestType(int value) {
         this.value = value;
     }
 
@@ -27,12 +27,12 @@ public enum ItemType {
         return value;
     }
 
-    public static ItemType valueOf(int value) {
+    public static QuestType valueOf(int value) {
         switch (value) {
             case 1:
-                return type1;
+                return main;
             case 2:
-                return type2;
+                return branch;
             default:
                 return null;
         }

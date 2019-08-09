@@ -3,7 +3,6 @@ package quan.config.item;
 import java.util.*;
 import com.alibaba.fastjson.*;
 import quan.config.*;
-import quan.common.ItemType;
 
 /**
 * 道具<br/>

@@ -4,7 +4,6 @@ import java.util.*;
 import com.alibaba.fastjson.*;
 import quan.config.*;
 import quan.config.item.Reward;
-import quan.quest.QuestType;
 
 /**
 * Created by 自动生成
