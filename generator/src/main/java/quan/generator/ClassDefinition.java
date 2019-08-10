@@ -2,7 +2,10 @@ package quan.generator;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 类定义
@@ -25,10 +28,6 @@ public abstract class ClassDefinition extends Definition {
 
     //字段名:字段定义
     protected Map<String, FieldDefinition> nameFields = new HashMap<>();
-
-    private static Map<String, ClassDefinition> classes = new HashMap<>();
-
-    private static LinkedHashSet<String> validatedErrors = new LinkedHashSet<>();
 
     public String getPackageName() {
         return packageName;
@@ -87,14 +86,6 @@ public abstract class ClassDefinition extends Definition {
     public ClassDefinition setDefinitionText(String definitionText) {
         this.definitionText = definitionText;
         return this;
-    }
-
-    public static Map<String, ClassDefinition> getClasses() {
-        return classes;
-    }
-
-    public static ClassDefinition getClass(String name) {
-        return classes.get(name);
     }
 
     public void setLang(String language) {
@@ -161,11 +152,7 @@ public abstract class ClassDefinition extends Definition {
         }
 
         error += position + "。";
-        validatedErrors.add(error);
-    }
-
-    public static List<String> getValidatedErrors() {
-        return new ArrayList<>(validatedErrors);
+        parser.addValidatedError(error);
     }
 
     @Override

@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.common.util.PathUtils;
+import quan.generator.config.ConfigDefinition;
 
 import java.io.File;
 import java.util.*;
@@ -24,6 +25,13 @@ public abstract class DefinitionParser {
     private List<String> definitionPaths = new ArrayList<>();
 
     protected LinkedHashSet<File> definitionFiles = new LinkedHashSet<>();
+
+    private Map<String, ClassDefinition> classes = new HashMap<>();
+
+    //表名:配置
+    private Map<String, ConfigDefinition> tableConfigs = new HashMap<>();
+
+    private LinkedHashSet<String> validatedErrors = new LinkedHashSet<>();
 
     public DefinitionParser setCategory(DefinitionCategory category) {
         this.category = category;
@@ -73,10 +81,47 @@ public abstract class DefinitionParser {
         return enumPackagePrefix;
     }
 
+    public Map<String, ClassDefinition> getClasses() {
+        return classes;
+    }
+
+    public ClassDefinition getClass(String name) {
+        return classes.get(name);
+    }
+
+    public ConfigDefinition getConfig(String name) {
+        ClassDefinition classDefinition = classes.get(name);
+        if (classDefinition instanceof ConfigDefinition) {
+            return (ConfigDefinition) classDefinition;
+        }
+        return null;
+    }
+
+    public Map<String, ConfigDefinition> getTableConfigs() {
+        return tableConfigs;
+    }
+
+    public BeanDefinition getBean(String name) {
+        ClassDefinition classDefinition = classes.get(name);
+        if (classDefinition instanceof BeanDefinition) {
+            return (BeanDefinition) classDefinition;
+        }
+        return null;
+    }
+
+
+    public void addValidatedError(String error) {
+        validatedErrors.add(error);
+    }
+
+    public List<String> getValidatedErrors() {
+        return new ArrayList<>(validatedErrors);
+    }
+
     protected abstract String getFileType();
 
     public void parse() throws Exception {
-        if (!ClassDefinition.getClasses().isEmpty()) {
+        if (!classes.isEmpty()) {
             return;
         }
         List<ClassDefinition> classDefinitions = new ArrayList<>();
@@ -85,22 +130,18 @@ public abstract class DefinitionParser {
             classDefinitions.addAll(parseClasses(definitionFile));
         }
 
-        for (File definitionFile : definitionFiles) {
-            parseFields(definitionFile);
-        }
-
         for (ClassDefinition classDefinition : classDefinitions) {
             if (classDefinition.getName() == null) {
                 continue;
             }
-            ClassDefinition otherClassDefinition = ClassDefinition.getClass(classDefinition.getName());
+            ClassDefinition otherClassDefinition = classes.get(classDefinition.getName());
             if (otherClassDefinition != null) {
                 String error = "定义文件[" + classDefinition.getDefinitionFile();
                 error += "]和[" + otherClassDefinition.getDefinitionFile();
                 error += "]有同名类[" + classDefinition.getName() + "]";
-                ClassDefinition.getValidatedErrors().add(error);
+                validatedErrors.add(error);
             } else {
-                ClassDefinition.getClasses().put(classDefinition.getName(), classDefinition);
+                classes.put(classDefinition.getName(), classDefinition);
             }
         }
 
@@ -114,7 +155,5 @@ public abstract class DefinitionParser {
     }
 
     protected abstract List<ClassDefinition> parseClasses(File definitionFile) throws Exception;
-
-    protected abstract void parseFields(File definitionFile) throws Exception;
 
 }

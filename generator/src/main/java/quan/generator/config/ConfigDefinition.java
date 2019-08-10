@@ -33,7 +33,9 @@ public class ConfigDefinition extends BeanDefinition {
 
     private Map<String, FieldDefinition> columnFields = new HashMap<>();
 
-    private static Map<String, ConfigDefinition> tableConfigs = new HashMap<>();
+    {
+        category = DefinitionCategory.config;
+    }
 
     public ConfigDefinition() {
     }
@@ -45,6 +47,11 @@ public class ConfigDefinition extends BeanDefinition {
         if (!StringUtils.isBlank(parent)) {
             this.parent = parent;
         }
+    }
+
+    @Override
+    public ConfigDefinition setCategory(DefinitionCategory category) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -103,11 +110,11 @@ public class ConfigDefinition extends BeanDefinition {
         childrenAndMe.add(getName());
 
         for (String configName : childrenAndMe) {
-            ConfigDefinition configDefinition = getConfig(configName);
+            ConfigDefinition configDefinition = parser.getConfig(configName);
             if (configDefinition == null) {
                 continue;
             }
-            allTables.addAll(Arrays.asList(configDefinition.table.split("[,]")));
+            allTables.addAll(Arrays.asList(configDefinition.table.split(",")));
         }
 
         return allTables;
@@ -126,7 +133,7 @@ public class ConfigDefinition extends BeanDefinition {
     }
 
     public ConfigDefinition getParentConfig() {
-        return getConfig(getParent());
+        return parser.getConfig(getParent());
     }
 
     public List<IndexDefinition> getIndexes() {
@@ -160,9 +167,6 @@ public class ConfigDefinition extends BeanDefinition {
         return columnFields;
     }
 
-    public static Map<String, ConfigDefinition> getTableConfigs() {
-        return tableConfigs;
-    }
 
     @Override
     public void addField(FieldDefinition fieldDefinition) {
@@ -175,13 +179,6 @@ public class ConfigDefinition extends BeanDefinition {
         return selfFields;
     }
 
-    public static ConfigDefinition getConfig(String name) {
-        ClassDefinition classDefinition = getClasses().get(name);
-        if (classDefinition instanceof ConfigDefinition) {
-            return (ConfigDefinition) classDefinition;
-        }
-        return null;
-    }
 
     @Override
     public void validate() {
@@ -202,11 +199,11 @@ public class ConfigDefinition extends BeanDefinition {
         //支持分表
         tables.addAll(Arrays.asList(table.split(",")));
         for (String t : tables) {
-            ConfigDefinition other = tableConfigs.get(t);
+            ConfigDefinition other = parser.getTableConfigs().get(t);
             if (other != null) {
                 addValidatedError(getName4Validate() + other.getName4Validate() + "和表格[" + t + "]不能多对一", other);
             }
-            tableConfigs.put(t, this);
+            parser.getTableConfigs().put(t, this);
         }
 
         validateParent();
@@ -348,7 +345,7 @@ public class ConfigDefinition extends BeanDefinition {
             addValidatedError(getName4Validate() + "[" + field.getType() + "]类型字段" + field.getName4Validate() + "的分隔符[" + delimiter + "]必须是" + charNumError + "个字符");
         }
 
-        BeanDefinition fieldValueBean = BeanDefinition.getBean(field.getValueType());
+        BeanDefinition fieldValueBean = parser.getBean(field.getValueType());
         if (fieldValueBean != null) {
             validateBeanDelimiter(fieldValueBean, delimiters);
         }
@@ -384,7 +381,10 @@ public class ConfigDefinition extends BeanDefinition {
                 addValidatedError(getName4Validate("的") + selfField.getName4Validate() + "类型[" + selfField.getType() + "]不支持索引，允许的类型为" + Constants.primitiveTypes + "或枚举");
                 continue;
             }
-            IndexDefinition indexDefinition = new IndexDefinition(this);
+            IndexDefinition indexDefinition = new IndexDefinition();
+            indexDefinition.setParser(parser);
+            indexDefinition.setCategory(category);
+
             indexDefinition.setName(selfField.getName());
             indexDefinition.setFieldNames(selfField.getName());
             if (selfField.getName().equals("id")) {
@@ -438,7 +438,7 @@ public class ConfigDefinition extends BeanDefinition {
             return;
         }
 
-        String[] fieldNameArray = fieldNames.split("[,]");
+        String[] fieldNameArray = fieldNames.split(",");
         if (fieldNameArray.length > 3) {
             addValidatedError(getName4Validate("的") + indexDefinition.getName4Validate() + "字段[" + fieldNames + "]不能超过三个");
         }

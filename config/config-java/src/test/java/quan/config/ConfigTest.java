@@ -32,30 +32,30 @@ public class ConfigTest {
         configLoader.setValidatorsPackage("quan");
         configLoader.setTableType(tableType);
 
-        loadConfigs(configLoader);
+        loadConfig(configLoader);
 
         writeJson(configLoader, true);
 
-        reloadAllConfigs(configLoader);
+        reloadAllConfig(configLoader);
 
-        reloadByConfigNames(configLoader);
+        reloadByConfigName(configLoader);
 
-        reloadByTableNames(configLoader);
+        reloadByTableName(configLoader);
 
-        reloadByOriginalNames(configLoader);
+        reloadByOriginalName(configLoader);
 
     }
 
-    private static void loadConfigs(ConfigLoader configLoader) throws Exception {
-        System.err.println("configLoader.loadConfigs()=============");
+    private static void loadConfig(ConfigLoader configLoader) throws Exception {
+        System.err.println("configLoader.loadConfig()=============");
         long startTime = System.currentTimeMillis();
         try {
             configLoader.load();
         } catch (ValidatedException e) {
             printErrors(e);
         }
-        printConfigs();
-        System.err.println("configLoader.loadConfigs()耗时:" + (System.currentTimeMillis() - startTime));
+        printConfig();
+        System.err.println("configLoader.loadConfig()耗时:" + (System.currentTimeMillis() - startTime));
         System.err.println();
     }
 
@@ -70,62 +70,62 @@ public class ConfigTest {
         System.err.println();
     }
 
-    private static void reloadAllConfigs(ConfigLoader configLoader) throws Exception {
+    private static void reloadAllConfig(ConfigLoader configLoader) throws Exception {
         Thread.sleep(10000);
-        System.err.println("reloadAllConfigs()=============");
+        System.err.println("reloadAllConfig()=============");
         long startTime = System.currentTimeMillis();
         try {
             configLoader.reloadAll();
         } catch (ValidatedException e) {
             printErrors(e);
         }
-        printConfigs();
-        System.err.println("reloadAllConfigs()耗时:" + (System.currentTimeMillis() - startTime));
+        printConfig();
+        System.err.println("reloadAllConfig()耗时:" + (System.currentTimeMillis() - startTime));
         System.err.println();
     }
 
-    private static void reloadByConfigNames(ConfigLoader configLoader) throws Exception {
+    private static void reloadByConfigName(ConfigLoader configLoader) throws Exception {
         Thread.sleep(5000);
         List<String> reloadConfigs = Arrays.asList("ItemConfig", "WeaponConfig");
-        System.err.println("reloadByConfigNames()=============" + reloadConfigs);
+        System.err.println("reloadByConfigName()=============" + reloadConfigs);
         long startTime = System.currentTimeMillis();
         try {
-            configLoader.reloadByConfigNames(reloadConfigs);
+            configLoader.reloadByConfigName(reloadConfigs);
         } catch (ValidatedException e) {
             printErrors(e);
         }
-        printConfigs();
-        System.err.println("reloadByConfigNames()耗时:" + (System.currentTimeMillis() - startTime));
+        printConfig();
+        System.err.println("reloadByConfigName()耗时:" + (System.currentTimeMillis() - startTime));
         System.err.println();
     }
 
-    private static void reloadByTableNames(ConfigLoader configLoader) throws Exception {
+    private static void reloadByTableName(ConfigLoader configLoader) throws Exception {
         Thread.sleep(5000);
         List<String> reloadConfigs = Arrays.asList("ItemConfig", "WeaponConfig");
-        System.err.println("reloadByTableNames()=============" + reloadConfigs);
+        System.err.println("reloadByTableName()=============" + reloadConfigs);
         long startTime = System.currentTimeMillis();
         try {
-            configLoader.reloadByTableNames(reloadConfigs);
+            configLoader.reloadByTableName(reloadConfigs);
         } catch (ValidatedException e) {
             printErrors(e);
         }
-        printConfigs();
-        System.err.println("reloadByTableNames()耗时:" + (System.currentTimeMillis() - startTime));
+        printConfig();
+        System.err.println("reloadByTableName()耗时:" + (System.currentTimeMillis() - startTime));
         System.err.println();
     }
 
-    private static void reloadByOriginalNames(ConfigLoader configLoader) throws Exception {
+    private static void reloadByOriginalName(ConfigLoader configLoader) throws Exception {
         Thread.sleep(5000);
         List<String> reloadConfigs = Arrays.asList("道具", "武器");
-        System.err.println("reloadByOriginalNames()=============" + reloadConfigs);
+        System.err.println("reloadByOriginalName()=============" + reloadConfigs);
         long startTime = System.currentTimeMillis();
         try {
-            configLoader.reloadByOriginalNames(reloadConfigs);
+            configLoader.reloadByOriginalName(reloadConfigs);
         } catch (ValidatedException e) {
             printErrors(e);
         }
-        printConfigs();
-        System.err.println("reloadByOriginalNames()耗时:" + (System.currentTimeMillis() - startTime));
+        printConfig();
+        System.err.println("reloadByOriginalName()耗时:" + (System.currentTimeMillis() - startTime));
         System.err.println();
     }
 
@@ -137,7 +137,7 @@ public class ConfigTest {
         System.err.println("printErrors end============");
     }
 
-    private static void printConfigs() throws Exception {
+    private static void printConfig() throws Exception {
         System.err.println("printConfigs start============");
         Thread.sleep(100);
         System.err.println("ItemConfig============");

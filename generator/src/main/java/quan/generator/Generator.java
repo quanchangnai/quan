@@ -80,7 +80,7 @@ public abstract class Generator {
         Objects.requireNonNull(definitionParser, "定义解析器不能为空");
         definitionParser.parse();
 
-        List<String> validatedErrors = ClassDefinition.getValidatedErrors();
+        List<String> validatedErrors = definitionParser.getValidatedErrors();
         if (!validatedErrors.isEmpty()) {
             System.err.println(String.format("生成%s代码失败，解析定义文件%s共发现%d条错误。", supportLanguage(), definitionParser.getDefinitionPaths(), validatedErrors.size()));
             for (int i = 1; i <= validatedErrors.size(); i++) {
@@ -90,7 +90,7 @@ public abstract class Generator {
             return;
         }
 
-        List<ClassDefinition> classDefinitions = ClassDefinition.getClasses().values().stream().filter(this::support).collect(Collectors.toList());
+        List<ClassDefinition> classDefinitions = definitionParser.getClasses().values().stream().filter(this::support).collect(Collectors.toList());
 
         for (ClassDefinition classDefinition : classDefinitions) {
             processClassSelf(classDefinition);
@@ -163,7 +163,7 @@ public abstract class Generator {
     }
 
     protected void processBeanFieldImports(BeanDefinition beanDefinition, FieldDefinition fieldDefinition) {
-        ClassDefinition fieldClass = ClassDefinition.getClass(fieldDefinition.getType());
+        ClassDefinition fieldClass = definitionParser.getClass(fieldDefinition.getType());
         if (fieldClass != null && !fieldClass.getPackageName().equals(beanDefinition.getPackageName())) {
             beanDefinition.getImports().add(fieldClass.getFullName());
         }

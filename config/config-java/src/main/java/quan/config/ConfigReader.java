@@ -25,6 +25,8 @@ public abstract class ConfigReader {
 
     protected ConfigDefinition configDefinition;
 
+    protected ConfigConverter converter;
+
     //表格正文起始行号，默认是第3行,第1行固定是表头，中间是注释等，行号从1开始
     protected int bodyRowNum = 3;
 
@@ -49,6 +51,9 @@ public abstract class ConfigReader {
         this.tableFile = new File(tablePath, tableFileName);
         this.table = tableFileName.substring(0, tableFileName.lastIndexOf("."));
         this.configDefinition = configDefinition;
+        if (configDefinition != null) {
+            converter = new ConfigConverter(configDefinition.getParser());
+        }
 
         initPrototype();
     }
@@ -173,11 +178,11 @@ public abstract class ConfigReader {
 
         try {
             if (fieldDefinition.isBeanType()) {
-                fieldValue = ConfigConverter.convertColumnBean(fieldDefinition, rowJson.getJSONObject(fieldDefinition.getName()), columnValue);
+                fieldValue = converter.convertColumnBean(fieldDefinition, rowJson.getJSONObject(fieldDefinition.getName()), columnValue);
             } else if (fieldDefinition.getType().equals("map")) {
-                fieldValue = ConfigConverter.convertColumnMap(fieldDefinition, rowJson, columnValue);
+                fieldValue = converter.convertColumnMap(fieldDefinition, rowJson, columnValue);
             } else {
-                fieldValue = ConfigConverter.convert(fieldDefinition, columnValue);
+                fieldValue = converter.convert(fieldDefinition, columnValue);
             }
         } catch (Exception e) {
             handleConvertException(e, columnName, columnValue, row, column);
@@ -186,7 +191,7 @@ public abstract class ConfigReader {
 
         //索引字段不能为空
         if (fieldValue == null && configDefinition.isIndexField(fieldDefinition)) {
-            validatedErrors.add(String.format("配置[%s]的第%d行第%d列[%s]的索引不能为空", table, row, column, columnName));
+            validatedErrors.add(String.format("配置[%s]的第%d行第%d列[%s]的索引值不能为空", table, row, column, columnName));
             return;
         }
 
@@ -202,8 +207,8 @@ public abstract class ConfigReader {
         }
 
         //时间类型字段字符串格式
-        if (fieldDefinition.isTimeType()) {
-            rowJson.put(fieldName + "$Str", ConfigConverter.convertTimeType(fieldDefinition.getType(), (Date) fieldValue));
+        if (fieldDefinition.isTimeType() && fieldValue instanceof Date) {
+            rowJson.put(fieldName + "$Str", converter.convertTimeType(fieldDefinition.getType(), (Date) fieldValue));
         }
     }
 

@@ -13,6 +13,11 @@ public abstract class Definition {
 
     private String comment = "";
 
+    protected DefinitionParser parser;
+
+    public Definition() {
+    }
+
     public DefinitionCategory getCategory() {
         return category;
     }
@@ -20,6 +25,14 @@ public abstract class Definition {
     public Definition setCategory(DefinitionCategory category) {
         this.category = category;
         return this;
+    }
+
+    public void setParser(DefinitionParser parser) {
+        this.parser = parser;
+    }
+
+    public DefinitionParser getParser() {
+        return parser;
     }
 
     public String getName() {

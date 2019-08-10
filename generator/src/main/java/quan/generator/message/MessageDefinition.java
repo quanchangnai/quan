@@ -2,6 +2,7 @@ package quan.generator.message;
 
 import org.apache.commons.lang3.StringUtils;
 import quan.generator.BeanDefinition;
+import quan.generator.DefinitionCategory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,9 +12,13 @@ import java.util.Map;
  */
 public class MessageDefinition extends BeanDefinition {
 
-    private static Map<String, MessageDefinition> all = new HashMap<>();
+    private static Map<String, MessageDefinition> messages = new HashMap<>();
 
     private String id;
+
+    {
+        category = DefinitionCategory.data;
+    }
 
     public MessageDefinition() {
     }
@@ -25,6 +30,11 @@ public class MessageDefinition extends BeanDefinition {
     @Override
     public int getDefinitionType() {
         return 3;
+    }
+
+    @Override
+    public MessageDefinition setCategory(DefinitionCategory category) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -54,11 +64,11 @@ public class MessageDefinition extends BeanDefinition {
         }
 
         if (idIsInt) {
-            MessageDefinition other = all.get(id);
+            MessageDefinition other = messages.get(id);
             if (other != null) {
                 addValidatedError(getName4Validate() + "的ID[" + id + "]不能重复", other);
             }
-            all.put(id, this);
+            messages.put(id, this);
         }
 
         super.validate();

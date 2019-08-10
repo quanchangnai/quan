@@ -21,24 +21,6 @@ public class IndexDefinition extends Definition {
     //被索引的字段
     private List<FieldDefinition> fields = new ArrayList<>();
 
-    private ConfigDefinition configDefinition;
-
-    public IndexDefinition() {
-    }
-
-    public IndexDefinition(ConfigDefinition configDefinition) {
-        this.configDefinition = configDefinition;
-    }
-
-    public ConfigDefinition getConfigDefinition() {
-        return configDefinition;
-    }
-
-    public IndexDefinition setConfigDefinition(ConfigDefinition configDefinition) {
-        this.configDefinition = configDefinition;
-        return this;
-    }
-
     @Override
     public int getDefinitionType() {
         return 7;

@@ -33,18 +33,16 @@ public class BeanDefinition extends ClassDefinition {
         return 2;
     }
 
+    @Override
+    public BeanDefinition setCategory(DefinitionCategory category) {
+        this.category = category;
+        return this;
+    }
+
     public Set<String> getImports() {
         return imports;
     }
 
-
-    public static BeanDefinition getBean(String name) {
-        ClassDefinition classDefinition = getClasses().get(name);
-        if (classDefinition instanceof BeanDefinition) {
-            return (BeanDefinition) classDefinition;
-        }
-        return null;
-    }
 
     @Override
     public void validate() {
@@ -206,7 +204,7 @@ public class BeanDefinition extends ClassDefinition {
         }
 
         if (!field.getType().equals("map")) {
-            String[] fieldRefs = field.getRef().split("[.]");
+            String[] fieldRefs = field.getRef().split("\\.");
             if (fieldRefs.length != 2) {
                 addValidatedError(getName4Validate() + field.getName4Validate() + "的引用格式错误[" + field.getRef() + "]，正确格式:[配置.字段]");
                 return;
@@ -216,17 +214,17 @@ public class BeanDefinition extends ClassDefinition {
         }
 
         //map类型字段引用校验
-        String[] fieldRefs = field.getRef().split("[:]");
+        String[] fieldRefs = field.getRef().split(":");
         String refPatternError = getName4Validate("的") + field.getName4Validate() + "类型[map]的引用格式错误[" + field.getRef() + "]，正确格式:[键引用的配置.字段]或者[键引用配置.字段:值引用的配置.字段]";
         if (fieldRefs.length != 1 && fieldRefs.length != 2) {
             addValidatedError(refPatternError);
             return;
         }
 
-        String[] fieldKeyRefs = fieldRefs[0].split("[.]");
+        String[] fieldKeyRefs = fieldRefs[0].split("\\.");
         String[] fieldValueRefs = null;
         if (fieldRefs.length == 2) {
-            fieldValueRefs = fieldRefs[1].split("[.]");
+            fieldValueRefs = fieldRefs[1].split("\\.");
         }
 
         if (fieldKeyRefs.length != 2) {
@@ -247,7 +245,7 @@ public class BeanDefinition extends ClassDefinition {
     protected void validateFieldRef(FieldDefinition field, boolean keType, String refConfigName, String refFiledName) {
         String refConfigAndField = refConfigName + "." + refFiledName;
 
-        ConfigDefinition refConfig = ConfigDefinition.getConfig(refConfigName);
+        ConfigDefinition refConfig = parser.getConfig(refConfigName);
         if (refConfig == null) {
             addValidatedError(getName4Validate() + field.getName4Validate() + "的引用配置[" + refConfigName + "]不存在");
             return;

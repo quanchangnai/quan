@@ -1,6 +1,7 @@
 package quan.generator.database;
 
 import quan.generator.BeanDefinition;
+import quan.generator.DefinitionCategory;
 
 /**
  * Created by quanchangnai on 2019/6/22.
@@ -13,6 +14,10 @@ public class DataDefinition extends BeanDefinition {
 
     private boolean persistent = true;
 
+    {
+        category = DefinitionCategory.data;
+    }
+
     public DataDefinition() {
     }
 
@@ -21,6 +26,11 @@ public class DataDefinition extends BeanDefinition {
         if (persistent != null && persistent.equals("false")) {
             this.persistent = false;
         }
+    }
+
+    @Override
+    public DataDefinition setCategory(DefinitionCategory category) {
+        throw new UnsupportedOperationException();
     }
 
     public String getKeyType() {

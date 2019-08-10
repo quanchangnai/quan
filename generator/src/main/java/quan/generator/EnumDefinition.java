@@ -16,6 +16,12 @@ public class EnumDefinition extends ClassDefinition {
     }
 
     @Override
+    public EnumDefinition setCategory(DefinitionCategory category) {
+        this.category = category;
+        return this;
+    }
+
+    @Override
     protected void validateField(FieldDefinition fieldDefinition) {
         super.validateField(fieldDefinition);
 
@@ -34,9 +40,6 @@ public class EnumDefinition extends ClassDefinition {
         }
     }
 
-    public static boolean isEnumDefinition(String type) {
-        return ClassDefinition.getClass(type) instanceof EnumDefinition;
-    }
 
     @Override
     public String getDefinitionTypeName() {

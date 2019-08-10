@@ -1,7 +1,6 @@
 package quan.generator;
 
 import org.dom4j.Element;
-import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
 import quan.generator.config.ConfigDefinition;
 import quan.generator.config.IndexDefinition;
@@ -9,42 +8,25 @@ import quan.generator.database.DataDefinition;
 import quan.generator.message.MessageDefinition;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Created by quanchangnai on 2017/7/10.
  */
 public class XmlDefinitionParser extends DefinitionParser {
 
-    private static List<String> elementNames = Arrays.asList("enum", "bean", "message", "data", "config");
-
-    private Map<File, Element> file2Roots = new HashMap<>();
-
-    private Map<Element, ClassDefinition> element2Classes = new HashMap<>();
-
     @Override
     protected String getFileType() {
         return "xml";
     }
 
-    private Element parseFile(File definitionFile) throws Exception {
-        Element root = file2Roots.get(definitionFile);
-        if (root == null) {
-            root = new SAXReader().read(definitionFile).getRootElement();
-            if (root.getName().equals("package")) {
-                file2Roots.put(definitionFile, root);
-            } else {
-                root = null;
-            }
-        }
-        return root;
-    }
-
     @Override
     @SuppressWarnings({"unchecked"})
     protected List<ClassDefinition> parseClasses(File definitionFile) throws Exception {
-        Element root = parseFile(definitionFile);
-        if (root == null) {
+        Element rootElement = new SAXReader().read(definitionFile).getRootElement();
+        if (rootElement == null || !rootElement.getName().equals("package")) {
             return Collections.EMPTY_LIST;
         }
 
@@ -60,37 +42,20 @@ public class XmlDefinitionParser extends DefinitionParser {
         }
 
         List<ClassDefinition> classDefinitions = new ArrayList<>();
-        for (int i = 0; i < root.nodeCount(); i++) {
-            Node node = root.node(i);
-            if (!(node instanceof Element)) {
+        for (int i = 0; i < rootElement.nodeCount(); i++) {
+            if (!(rootElement.node(i) instanceof Element)) {
                 continue;
             }
 
-            Element element = (Element) node;
-            ClassDefinition classDefinition;
-
-            switch (element.getName()) {
-                case "enum":
-                    classDefinition = new EnumDefinition();
-                    break;
-                case "bean":
-                    classDefinition = new BeanDefinition(element.attributeValue("delimiter"));
-                    break;
-                case "message":
-                    classDefinition = new MessageDefinition(element.attributeValue("id"));
-                    break;
-                case "data":
-                    classDefinition = new DataDefinition(element.attributeValue("key"), element.attributeValue("persistent"));
-                    break;
-                case "config":
-                    classDefinition = new ConfigDefinition(element.attributeValue("table"), element.attributeValue("parent"));
-                    break;
-                default:
-                    continue;
+            Element classElement = (Element) rootElement.node(i);
+            ClassDefinition classDefinition = createClassDefinition(classElement);
+            if (classDefinition == null) {
+                continue;
             }
-            classDefinition.setCategory(getCategory());
+
+            classDefinition.setParser(this);
             classDefinition.setDefinitionFile(definitionFile.getName());
-            classDefinition.setDefinitionText(element.asXML());
+            classDefinition.setDefinitionText(classElement.asXML());
 
             if (classDefinition instanceof EnumDefinition) {
                 classDefinition.setPackageName(enumPackageName);
@@ -98,65 +63,64 @@ public class XmlDefinitionParser extends DefinitionParser {
                 classDefinition.setPackageName(packageName);
             }
 
-            classDefinition.setName(element.attributeValue("name"));
-            classDefinition.setLang(element.attributeValue("lang"));
+            classDefinition.setName(classElement.attributeValue("name"));
+            classDefinition.setLang(classElement.attributeValue("lang"));
 
-            String comment = root.node(i - 1).getText();
-            comment = comment.replaceAll("[\r|\n]", "").trim();
+            String comment = rootElement.node(i - 1).getText();
+            comment = comment.replaceAll("[\r\n]", "").trim();
             if (comment.equals("")) {
-                comment = element.node(0).getText();
-                comment = comment.replaceAll("[\r|\n]", "").trim();
+                comment = classElement.node(0).getText();
+                comment = comment.replaceAll("[\r\n]", "").trim();
             }
             classDefinition.setComment(comment);
 
-            element2Classes.put(element, classDefinition);
             classDefinitions.add(classDefinition);
+
+            parseFields(classDefinition, classElement);
         }
         return classDefinitions;
     }
 
-
-    @Override
-    protected void parseFields(File definitionFile) throws Exception {
-        Element root = parseFile(definitionFile);
-        if (root == null) {
-            return;
+    private ClassDefinition createClassDefinition(Element classElement) {
+        ClassDefinition classDefinition = null;
+        switch (classElement.getName()) {
+            case "enum":
+                classDefinition = new EnumDefinition().setCategory(getCategory());
+                break;
+            case "bean":
+                classDefinition = new BeanDefinition(classElement.attributeValue("delimiter")).setCategory(getCategory());
+                break;
+            case "message":
+                if (category == DefinitionCategory.message) {
+                    classDefinition = new MessageDefinition(classElement.attributeValue("id"));
+                }
+                break;
+            case "data":
+                if (category == DefinitionCategory.data) {
+                    classDefinition = new DataDefinition(classElement.attributeValue("key"), classElement.attributeValue("persistent"));
+                }
+                break;
+            case "config":
+                if (category == DefinitionCategory.config) {
+                    classDefinition = new ConfigDefinition(classElement.attributeValue("table"), classElement.attributeValue("parent"));
+                }
+                break;
         }
 
-        for (int i = 0; i < root.nodeCount(); i++) {
-            Node node = root.node(i);
-            if (!(node instanceof Element)) {
-                continue;
-            }
-            Element element = (Element) node;
-
-            if (!elementNames.contains(element.getName())) {
-                continue;
-            }
-
-            parseFields(element);
-
-        }
+        return classDefinition;
     }
 
-
-    private void parseFields(Element classElement) {
-        ClassDefinition classDefinition = element2Classes.get(classElement);
-        if (classDefinition == null) {
-            return;
-        }
-
+    private void parseFields(ClassDefinition classDefinition, Element classElement) {
         for (int i = 0; i < classElement.nodeCount(); i++) {
-            Node node = classElement.node(i);
-            if (!(node instanceof Element)) {
+            if (!(classElement.node(i) instanceof Element)) {
                 continue;
             }
 
-            Element child = (Element) node;
-            if (child.getName().equals("field")) {
-                parseField(classDefinition, classElement, child, i);
-            } else if (child.getName().equals("index") && classDefinition instanceof ConfigDefinition) {
-                parseIndex((ConfigDefinition) classDefinition, classElement, child, i);
+            Element fieldElement = (Element) classElement.node(i);
+            if (fieldElement.getName().equals("field")) {
+                parseField(classDefinition, classElement, fieldElement, i);
+            } else if (fieldElement.getName().equals("index") && classDefinition instanceof ConfigDefinition) {
+                parseIndex((ConfigDefinition) classDefinition, classElement, fieldElement, i);
             }
 
         }
@@ -165,6 +129,7 @@ public class XmlDefinitionParser extends DefinitionParser {
 
     private void parseField(ClassDefinition classDefinition, Element classElement, Element fieldElement, int i) {
         FieldDefinition fieldDefinition = new FieldDefinition();
+        fieldDefinition.setParser(classDefinition.parser);
         fieldDefinition.setCategory(getCategory());
 
         fieldDefinition.setName(fieldElement.attributeValue("name"));
@@ -177,14 +142,15 @@ public class XmlDefinitionParser extends DefinitionParser {
         fieldDefinition.setRef(fieldElement.attributeValue("ref"));
 
         String comment = classElement.node(i + 1).getText();
-        comment = comment.replaceAll("[\r|\n]", "").trim();
+        comment = comment.replaceAll("[\r\n]", "").trim();
         fieldDefinition.setComment(comment);
 
         classDefinition.addField(fieldDefinition);
     }
 
     private void parseIndex(ConfigDefinition configDefinition, Element classElement, Element indexElement, int i) {
-        IndexDefinition indexDefinition = new IndexDefinition(configDefinition);
+        IndexDefinition indexDefinition = new IndexDefinition();
+        indexDefinition.setParser(configDefinition.parser);
         indexDefinition.setCategory(getCategory());
 
         indexDefinition.setName(indexElement.attributeValue("name"));
@@ -192,7 +158,7 @@ public class XmlDefinitionParser extends DefinitionParser {
         indexDefinition.setFieldNames(indexElement.attributeValue("fields"));
 
         String comment = classElement.node(i + 1).getText();
-        comment = comment.replaceAll("[\r|\n]", "").trim();
+        comment = comment.replaceAll("[\r\n]", "").trim();
 
         indexDefinition.setComment(comment);
 

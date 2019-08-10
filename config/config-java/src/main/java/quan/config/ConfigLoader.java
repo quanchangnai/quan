@@ -145,8 +145,8 @@ public class ConfigLoader {
         }
     }
 
-    private void parseDefinitions() {
-        if (definitionParser == null || !ClassDefinition.getClasses().isEmpty()) {
+    private void parseDefinition() {
+        if (definitionParser == null || !definitionParser.getClasses().isEmpty()) {
             return;
         }
 
@@ -157,7 +157,7 @@ public class ConfigLoader {
             return;
         }
 
-        List<String> validatedErrors = ClassDefinition.getValidatedErrors();
+        List<String> validatedErrors = definitionParser.getValidatedErrors();
         if (!validatedErrors.isEmpty()) {
             ValidatedException validatedException = new ValidatedException(String.format("解析配置定义文件%s共发现%d条错误。", definitionParser.getDefinitionPaths(), validatedErrors.size()));
             validatedException.addErrors(validatedErrors);
@@ -179,14 +179,14 @@ public class ConfigLoader {
         validatedErrors.clear();
 
         //解析定义文件
-        parseDefinitions();
+        parseDefinition();
 
         if (isJsonAndNoDefinition()) {
             //没有配置定义直接加载JSON
-            loadJsonsOnNoDefinition();
+            loadJsonOnNoDefinition();
         } else {
             //通过配置定义加载或者校验
-            loadByDefinitions();
+            loadByDefinition();
         }
 
         executeValidators();
@@ -197,13 +197,13 @@ public class ConfigLoader {
     }
 
     private boolean isJsonAndNoDefinition() {
-        return tableType.equals("json") && ConfigDefinition.getTableConfigs().isEmpty();
+        return tableType.equals("json") && definitionParser.getTableConfigs().isEmpty();
     }
 
     /**
      * 没有配置定义直接加载JSON格式配置，JSON文件名必须是配置全类名
      */
-    private void loadJsonsOnNoDefinition() {
+    private void loadJsonOnNoDefinition() {
         if (!needLoad()) {
             throw new IllegalStateException("没有配置定义的JSON格式配置不支持校验");
         }
@@ -247,8 +247,8 @@ public class ConfigLoader {
     /**
      * 通过配置定义加载
      */
-    private void loadByDefinitions() {
-        Set<ConfigDefinition> configDefinitions = new HashSet<>(ConfigDefinition.getTableConfigs().values());
+    private void loadByDefinition() {
+        Set<ConfigDefinition> configDefinitions = new HashSet<>(definitionParser.getTableConfigs().values());
 
         //配置对应的已索引JSON数据
         Map<ConfigDefinition, Map<IndexDefinition, Map>> configIndexedJsonsAll = new HashMap<>();
@@ -307,7 +307,7 @@ public class ConfigLoader {
             pathFile.mkdirs();
         }
 
-        Set<ConfigDefinition> configDefinitions = new HashSet<>(ConfigDefinition.getTableConfigs().values());
+        Set<ConfigDefinition> configDefinitions = new HashSet<>(definitionParser.getTableConfigs().values());
 
         for (ConfigDefinition configDefinition : configDefinitions) {
             JSONArray rows = new JSONArray();
@@ -340,9 +340,9 @@ public class ConfigLoader {
      */
     private ConfigDefinition getConfigByTable(String table) {
         if (tableType.equals("json")) {
-            return ConfigDefinition.getConfig(table);
+            return definitionParser.getConfig(table);
         } else {
-            return ConfigDefinition.getTableConfigs().get(table);
+            return definitionParser.getTableConfigs().get(table);
         }
     }
 
@@ -581,7 +581,7 @@ public class ConfigLoader {
      *
      * @param configNames 配置类名
      */
-    public void reloadByConfigNames(Collection<String> configNames) {
+    public void reloadByConfigName(Collection<String> configNames) {
         if (!needLoad()) {
             throw new IllegalStateException("配置加载器仅支持校验，不能重加载");
         }
@@ -592,20 +592,20 @@ public class ConfigLoader {
         validatedErrors.clear();
 
         if (isJsonAndNoDefinition()) {
-            reloadByTableNames(new LinkedHashSet<>(configNames));
+            reloadByTableName(new LinkedHashSet<>(configNames));
             return;
         }
 
         Set<String> needReloadTables = new LinkedHashSet<>();
         for (String configName : configNames) {
-            ConfigDefinition configDefinition = ConfigDefinition.getConfig(configName);
+            ConfigDefinition configDefinition = definitionParser.getConfig(configName);
             if (configDefinition == null) {
                 logger.error("重加载[{}]失败，不存在该配置", configName);
                 continue;
             }
             needReloadTables.addAll(getConfigTables(configDefinition));
         }
-        reloadByTableNames(needReloadTables);
+        reloadByTableName(needReloadTables);
     }
 
     /**
@@ -613,7 +613,7 @@ public class ConfigLoader {
      *
      * @param originalNames 表格原名，表格转成JSON格式后使用的表名实际上是配置类名
      */
-    public void reloadByOriginalNames(Collection<String> originalNames) {
+    public void reloadByOriginalName(Collection<String> originalNames) {
         if (!needLoad()) {
             throw new IllegalStateException("配置加载器仅支持校验，不能重加载");
         }
@@ -626,7 +626,7 @@ public class ConfigLoader {
 
         List<String> configNames = new ArrayList<>();
         for (String originalName : originalNames) {
-            ConfigDefinition configDefinition = ConfigDefinition.getTableConfigs().get(originalName);
+            ConfigDefinition configDefinition = definitionParser.getTableConfigs().get(originalName);
             if (configDefinition == null) {
                 logger.error("重加载[{}]失败，不存在该配置定义", originalName);
                 continue;
@@ -634,7 +634,7 @@ public class ConfigLoader {
             configNames.add(configDefinition.getName());
         }
 
-        reloadByConfigNames(configNames);
+        reloadByConfigName(configNames);
     }
 
     /**
@@ -642,7 +642,7 @@ public class ConfigLoader {
      *
      * @param tableNames 表名，表格转成JSON格式后使用的表名实际上是配置类名
      */
-    public void reloadByTableNames(Collection<String> tableNames) {
+    public void reloadByTableName(Collection<String> tableNames) {
         if (!needLoad()) {
             throw new IllegalStateException("配置加载器仅支持校验，不能重加载");
         }
@@ -654,10 +654,10 @@ public class ConfigLoader {
 
         if (isJsonAndNoDefinition()) {
             //没有配置定义直接加载JSON
-            reloadJsonsOnNoDefinition(tableNames);
+            reloadJsonOnNoDefinition(tableNames);
         } else {
             //通过配置定义加载
-            reloadTablesByDefinitions(tableNames);
+            reloadTableByDefinition(tableNames);
         }
 
         if (!validatedErrors.isEmpty()) {
@@ -665,7 +665,7 @@ public class ConfigLoader {
         }
     }
 
-    private void reloadJsonsOnNoDefinition(Collection<String> configNames) {
+    private void reloadJsonOnNoDefinition(Collection<String> configNames) {
         Set<File> jsonFiles = PathUtils.listFiles(new File(tablePath), "json");
         LinkedHashMap<String, ConfigReader> reloadReaders = new LinkedHashMap<>();
 
@@ -702,7 +702,7 @@ public class ConfigLoader {
         }
     }
 
-    private void reloadTablesByDefinitions(Collection<String> tableNames) {
+    private void reloadTableByDefinition(Collection<String> tableNames) {
         Set<ConfigDefinition> needReloadConfigs = new LinkedHashSet<>();
         Set<ConfigReader> reloadReaders = new LinkedHashSet<>();
 
@@ -755,6 +755,7 @@ public class ConfigLoader {
         if (configReader != null && bodyRowNum > 0) {
             configReader.setBodyRowNum(bodyRowNum);
         }
+
         return configReader;
     }
 

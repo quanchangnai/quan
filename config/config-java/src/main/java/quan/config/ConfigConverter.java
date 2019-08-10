@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import quan.generator.BeanDefinition;
+import quan.generator.DefinitionParser;
 import quan.generator.EnumDefinition;
 import quan.generator.FieldDefinition;
 
@@ -25,6 +26,7 @@ public class ConfigConverter {
 
     private static SimpleDateFormat timeFormat = new SimpleDateFormat("hh.mm.ss");
 
+    private DefinitionParser definitionParser;
 
     public static void setDateTimePattern(String pattern) {
         dateTimeFormat = new SimpleDateFormat(pattern);
@@ -50,7 +52,11 @@ public class ConfigConverter {
         return timeFormat.toPattern();
     }
 
-    public static Object convert(FieldDefinition fieldDefinition, String value) {
+    public ConfigConverter(DefinitionParser definitionParser) {
+        this.definitionParser = definitionParser;
+    }
+
+    public  Object convert(FieldDefinition fieldDefinition, String value) {
         String type = fieldDefinition.getType();
         if (fieldDefinition.isPrimitiveType()) {
             return convertPrimitiveType(fieldDefinition.getType(), value);
@@ -70,7 +76,7 @@ public class ConfigConverter {
         return value;
     }
 
-    public static Object convertColumnBean(FieldDefinition fieldDefinition, JSONObject object, String columnValue) {
+    public  Object convertColumnBean(FieldDefinition fieldDefinition, JSONObject object, String columnValue) {
         BeanDefinition beanDefinition = fieldDefinition.getBean();
 
         //Bean类型字段对应1列
@@ -96,7 +102,7 @@ public class ConfigConverter {
     /**
      * 转换枚举字段，支持枚举值或者枚举名
      */
-    public static Object convertEnumType(EnumDefinition enumDefinition, String value) {
+    public  Object convertEnumType(EnumDefinition enumDefinition, String value) {
         int enumValue = 0;
         try {
             enumValue = Integer.parseInt(value);
@@ -116,7 +122,7 @@ public class ConfigConverter {
         return value;
     }
 
-    public static Object convertPrimitiveType(String type, String value) {
+    public  Object convertPrimitiveType(String type, String value) {
         if (StringUtils.isBlank(value)) {
             return type.equals("string") ? "" : null;
         }
@@ -138,7 +144,7 @@ public class ConfigConverter {
         }
     }
 
-    public static Date convertTimeType(String type, String value) {
+    public  Date convertTimeType(String type, String value) {
         if (StringUtils.isBlank(value)) {
             return null;
         }
@@ -158,7 +164,7 @@ public class ConfigConverter {
         }
     }
 
-    public static String convertTimeType(String type, Date value) {
+    public  String convertTimeType(String type, Date value) {
         if (value == null) {
             return null;
         }
@@ -172,12 +178,12 @@ public class ConfigConverter {
 
     }
 
-    public static JSONArray convertList(FieldDefinition fieldDefinition, String value) {
+    public  JSONArray convertList(FieldDefinition fieldDefinition, String value) {
         String[] values = value.split(fieldDefinition.getEscapedDelimiter());
         return convertArray(fieldDefinition, values);
     }
 
-    public static JSONArray convertArray(FieldDefinition fieldDefinition, String[] values) {
+    public  JSONArray convertArray(FieldDefinition fieldDefinition, String[] values) {
         JSONArray array = new JSONArray();
         if (values.length == 1 && values[0].equals("")) {
             return array;
@@ -188,7 +194,7 @@ public class ConfigConverter {
             if (fieldDefinition.isPrimitiveValueType()) {
                 o = convertPrimitiveType(fieldDefinition.getValueType(), v);
             } else {
-                o = convertBean(BeanDefinition.getBean(fieldDefinition.getValueType()), v);
+                o = convertBean(definitionParser.getBean(fieldDefinition.getValueType()), v);
             }
             if (o != null) {
                 array.add(o);
@@ -197,7 +203,7 @@ public class ConfigConverter {
         return array;
     }
 
-    public static JSONObject convertColumnMap(FieldDefinition fieldDefinition, JSONObject rowJson, String value) {
+    public  JSONObject convertColumnMap(FieldDefinition fieldDefinition, JSONObject rowJson, String value) {
         //map类型字段对应1列
         if (fieldDefinition.getColumnNum() == 1) {
             return convertMap(fieldDefinition, value);
@@ -242,7 +248,7 @@ public class ConfigConverter {
                 if (fieldDefinition.isPrimitiveValueType()) {
                     objectValue = convertPrimitiveType(fieldDefinition.getValueType(), value);
                 } else {
-                    objectValue = convertBean(BeanDefinition.getBean(fieldDefinition.getValueType()), value);
+                    objectValue = convertBean(definitionParser.getBean(fieldDefinition.getValueType()), value);
                 }
             } catch (Exception ignored) {
             }
@@ -257,14 +263,14 @@ public class ConfigConverter {
         return object;
     }
 
-    public static JSONArray convertSet(FieldDefinition fieldDefinition, String value) {
+    public  JSONArray convertSet(FieldDefinition fieldDefinition, String value) {
         //set需要去重
         String[] values = value.split(fieldDefinition.getEscapedDelimiter());
         Set<String> setValues = new HashSet<>(Arrays.asList(values));
         return convertArray(fieldDefinition, setValues.toArray(new String[0]));
     }
 
-    public static JSONObject convertMap(FieldDefinition fieldDefinition, String value) {
+    public  JSONObject convertMap(FieldDefinition fieldDefinition, String value) {
         JSONObject object = new JSONObject();
         if (StringUtils.isBlank(value)) {
             return object;
@@ -277,7 +283,7 @@ public class ConfigConverter {
             if (fieldDefinition.isPrimitiveValueType()) {
                 v = convertPrimitiveType(fieldDefinition.getValueType(), values[i + 1]);
             } else {
-                v = convertBean(BeanDefinition.getBean(fieldDefinition.getValueType()), values[i + 1]);
+                v = convertBean(definitionParser.getBean(fieldDefinition.getValueType()), values[i + 1]);
             }
             if (k == null || v == null) {
                 throw new NullPointerException("map的键或者值不能为空");
@@ -288,7 +294,7 @@ public class ConfigConverter {
         return object;
     }
 
-    public static JSONObject convertBean(BeanDefinition beanDefinition, String value) {
+    public  JSONObject convertBean(BeanDefinition beanDefinition, String value) {
         if (StringUtils.isBlank(value)) {
             return null;
         }
