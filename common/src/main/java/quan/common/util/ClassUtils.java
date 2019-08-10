@@ -116,10 +116,9 @@ public class ClassUtils {
             Class<?> clazz;
             try {
                 clazz = classLoader.loadClass(className);
-            } catch (NoClassDefFoundError e) {
-                continue;
-            } catch (Exception e) {
-                logger.error("加载类[{}]失败", className, e);
+                clazz.getSimpleName();//继承的类或实现的接口不在classpath下面会报错，忽略该类
+            } catch (Throwable e) {
+//                logger.error("加载类[{}]失败", className, e);
                 continue;
             }
             if (superClass == null || superClass.isAssignableFrom(clazz) && superClass != clazz) {

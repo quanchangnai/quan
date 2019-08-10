@@ -52,4 +52,5 @@ public class MessageDefinition extends BeanDefinition {
         super.validate();
         originalName = getPackageName() + "." + getName();
     }
+
 }
