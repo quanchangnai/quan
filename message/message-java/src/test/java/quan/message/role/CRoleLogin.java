@@ -11,6 +11,11 @@ import quan.message.*;
  */
 public class CRoleLogin extends Message {
 
+    /**
+     * 消息ID
+     */
+    public static final int ID = 544233;
+
     //角色id
     private long roleId;
 
@@ -33,7 +38,7 @@ public class CRoleLogin extends Message {
     private UserInfo userInfo;
 
     public CRoleLogin() {
-        super(544233);
+        super(ID);
     }
 
     /**

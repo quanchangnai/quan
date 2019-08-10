@@ -35,11 +35,11 @@ public class MessageDefinition extends BeanDefinition {
         return "消息";
     }
 
-    public String getId() {
-        return String.valueOf(id);
+    public int getId() {
+        return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(int id) {
         this.id = id;
     }
 

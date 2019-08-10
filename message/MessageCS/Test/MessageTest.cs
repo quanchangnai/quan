@@ -44,16 +44,16 @@ namespace MessageCS.Test
 
             var sRoleLogin1 = new SRoleLogin {RoleId = 1111, RoleName = "张三1111"};
 
-            var RoleInfo1 = new RoleInfo {Id = 111, RoleName = "aaa", RoleType = RoleType.Type1};
+            var roleInfo1 = new RoleInfo {Id = 111, RoleName = "aaa", RoleType = RoleType.Type1};
 
-            sRoleLogin1.RoleInfo = RoleInfo1;
+            sRoleLogin1.RoleInfo = roleInfo1;
 
-            var RoleInfo2 = new RoleInfo {Id = 222, RoleName = "bbb", RoleType = RoleType.Type2};
-            RoleInfo2.Set.Add(2213);
+            var roleInfo2 = new RoleInfo {Id = 222, RoleName = "bbb", RoleType = RoleType.Type2};
+            roleInfo2.Set.Add(2213);
 
-            sRoleLogin1.RoleInfoList.Add(RoleInfo2);
-            sRoleLogin1.RoleInfoSet.Add(RoleInfo2);
-            sRoleLogin1.RoleInfoMap.Add(RoleInfo2.Id, RoleInfo2);
+            sRoleLogin1.RoleInfoList.Add(roleInfo2);
+            sRoleLogin1.RoleInfoSet.Add(roleInfo2);
+            sRoleLogin1.RoleInfoMap.Add(roleInfo2.Id, roleInfo2);
 
             Console.WriteLine("sRoleLogin1:" + sRoleLogin1);
 
@@ -73,9 +73,9 @@ namespace MessageCS.Test
 
             var sRoleLogin1 = new SRoleLogin {RoleId = 1111, RoleName = "张三1111"};
 
-            var RoleInfo = new RoleInfo{Id = 1312, RoleName = "李四1123123", F = 343.4532F, D = 4242.54453D};
+            var roleInfo = new RoleInfo{Id = 1312, RoleName = "李四1123123", F = 343.4532F, D = 4242.54453D};
 
-            sRoleLogin1.RoleInfo = RoleInfo;
+            sRoleLogin1.RoleInfo = roleInfo;
 
 
             var encodedBytes = sRoleLogin1.Encode();

@@ -12,6 +12,11 @@ namespace MessageCS.Test.Role
 	/// </summary>
     public class SRoleLogin : Message
     {
+		/// <summary>
+		/// 消息ID
+		/// </summary>
+		public const int ID = 763075;
+
         /// <summary>
 		/// 角色id
 		/// </summary>
@@ -60,7 +65,7 @@ namespace MessageCS.Test.Role
 		private UserInfo UserInfo { get; set; }
 
 
-        public SRoleLogin(): base(763075)
+        public SRoleLogin(): base(ID)
 		{
 		}
 

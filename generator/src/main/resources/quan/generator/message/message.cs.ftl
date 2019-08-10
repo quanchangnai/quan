@@ -16,6 +16,13 @@ namespace ${fullPackageName}
 	/// </summary>
     public class ${name} : <#if definitionType ==2>Bean<#elseif definitionType ==3>Message</#if>
     {
+<#if definitionType ==3>
+		/// <summary>
+		/// 消息ID
+		/// </summary>
+		public const int ID = ${id?c};
+
+</#if>
 <#list fields as field>
     <#if field.type == "set" || field.type == "list">
         <#if field.comment !="">
@@ -95,7 +102,7 @@ namespace ${fullPackageName}
 </#list>
 
 <#if definitionType ==3>
-        public ${name}(): base(${id})
+        public ${name}(): base(ID)
 		{
 		}
 

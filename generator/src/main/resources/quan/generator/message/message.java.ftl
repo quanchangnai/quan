@@ -14,6 +14,13 @@ import ${import};
  */
 public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType ==3>Message</#if> {
 
+<#if definitionType ==3>
+    /**
+     * 消息ID
+     */
+    public static final int ID = ${id?c};
+
+</#if>
 <#list fields as field>
     <#if field.comment !="">
     //${field.comment}
@@ -37,7 +44,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 </#list>
     public ${name}() {
 <#if definitionType ==3>
-        super(${id});
+        super(ID);
 </#if>
     }
 
