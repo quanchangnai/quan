@@ -76,6 +76,7 @@ public class JavaMessageGenerator extends MessageGenerator {
 
         JavaMessageGenerator messageGenerator = new JavaMessageGenerator(codePath);
         messageGenerator.useXmlDefinitionParser(definitionPath, packagePrefix);
+        messageGenerator.setRecalculateIdOnConflicted(true);
         messageGenerator.generate();
     }
 }
