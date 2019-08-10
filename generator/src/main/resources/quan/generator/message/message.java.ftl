@@ -1,4 +1,4 @@
-package ${packageName};
+package ${fullPackageName};
 
 import java.util.*;
 import java.io.IOException;

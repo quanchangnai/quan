@@ -1,5 +1,5 @@
-<#if packageName !=".">
-package ${packageName};
+<#if fullPackageName !=".">
+package ${fullPackageName};
 
 </#if>
 /**

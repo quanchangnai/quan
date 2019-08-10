@@ -13,6 +13,9 @@ import java.util.Map;
  */
 public abstract class ClassDefinition extends Definition {
 
+    //包前缀
+    private String packagePrefix;
+
     //包名
     private String packageName;
 
@@ -29,8 +32,27 @@ public abstract class ClassDefinition extends Definition {
     //字段名:字段定义
     protected Map<String, FieldDefinition> nameFields = new HashMap<>();
 
+    public String getPackagePrefix() {
+        return packagePrefix;
+    }
+
     public String getPackageName() {
         return packageName;
+    }
+
+    public String getFullPackageName() {
+        if (packagePrefix != null) {
+            return packagePrefix + "." + packageName;
+
+        }
+        return packageName;
+    }
+
+    public void setPackagePrefix(String packagePrefix) {
+        if (StringUtils.isBlank(packagePrefix)) {
+            return;
+        }
+        this.packagePrefix = packagePrefix.trim();
     }
 
     public void setPackageName(String packageName) {
@@ -38,6 +60,10 @@ public abstract class ClassDefinition extends Definition {
             return;
         }
         this.packageName = packageName.trim();
+    }
+
+    public String getFullName() {
+        return getFullPackageName() + "." + getName();
     }
 
     public List<FieldDefinition> getFields() {
@@ -64,10 +90,6 @@ public abstract class ClassDefinition extends Definition {
         }
 
         return null;
-    }
-
-    public String getFullName() {
-        return packageName + "." + getName();
     }
 
     public String getDefinitionFile() {

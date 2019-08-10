@@ -1,4 +1,4 @@
-namespace ${packageName}
+namespace ${fullPackageName}
 {
     /// <summary>
     <#if comment !="">

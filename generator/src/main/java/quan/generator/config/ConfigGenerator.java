@@ -17,7 +17,7 @@ public abstract class ConfigGenerator extends Generator {
     }
 
     @Override
-    public DefinitionCategory category() {
+    public final DefinitionCategory category() {
         return DefinitionCategory.config;
     }
 
@@ -41,7 +41,7 @@ public abstract class ConfigGenerator extends Generator {
             processField(classDefinition, fieldDefinition);
         }
         ConfigDefinition parentDefinition = configDefinition.getParentConfig();
-        if (parentDefinition != null && !parentDefinition.getPackageName().equals(configDefinition.getPackageName())) {
+        if (parentDefinition != null && !parentDefinition.getFullPackageName().equals(configDefinition.getFullPackageName())) {
             configDefinition.getImports().add(parentDefinition.getFullName());
         }
     }

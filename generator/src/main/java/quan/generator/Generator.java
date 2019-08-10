@@ -64,7 +64,7 @@ public abstract class Generator {
     }
 
     public Generator setDefinitionParser(DefinitionParser definitionParser) {
-        definitionParser.setCategory(DefinitionCategory.data);
+        definitionParser.setCategory(category());
         this.definitionParser = definitionParser;
         return this;
     }
@@ -76,11 +76,16 @@ public abstract class Generator {
         return classDefinition instanceof BeanDefinition || classDefinition instanceof EnumDefinition;
     }
 
-    public final void generate() throws Exception {
+    protected void parseDefinition() throws Exception {
         Objects.requireNonNull(definitionParser, "定义解析器不能为空");
         definitionParser.parse();
+    }
 
+    public final void generate() throws Exception {
+        //解析定义文件
+        parseDefinition();
         List<String> validatedErrors = definitionParser.getValidatedErrors();
+
         if (!validatedErrors.isEmpty()) {
             System.err.println(String.format("生成%s代码失败，解析定义文件%s共发现%d条错误。", supportLanguage(), definitionParser.getDefinitionPaths(), validatedErrors.size()));
             for (int i = 1; i <= validatedErrors.size(); i++) {
@@ -105,8 +110,7 @@ public abstract class Generator {
                 continue;
             }
             Template template = templates.get(classDefinition.getClass());
-            String packageName = classDefinition.getPackageName();
-            File destFilePath = new File(codePath + File.separator + packageName.replace(".", File.separator));
+            File destFilePath = new File(codePath + File.separator + classDefinition.getFullPackageName().replace(".", File.separator));
             if (!destFilePath.exists() && !destFilePath.mkdirs()) {
                 logger.info("创建目录[{}]失败", destFilePath);
                 continue;
@@ -164,12 +168,12 @@ public abstract class Generator {
 
     protected void processBeanFieldImports(BeanDefinition beanDefinition, FieldDefinition fieldDefinition) {
         ClassDefinition fieldClass = definitionParser.getClass(fieldDefinition.getType());
-        if (fieldClass != null && !fieldClass.getPackageName().equals(beanDefinition.getPackageName())) {
+        if (fieldClass != null && !fieldClass.getFullPackageName().equals(beanDefinition.getFullPackageName())) {
             beanDefinition.getImports().add(fieldClass.getFullName());
         }
 
         BeanDefinition fieldValueBean = fieldDefinition.getValueBean();
-        if (fieldValueBean != null && !fieldValueBean.getPackageName().equals(beanDefinition.getPackageName())) {
+        if (fieldValueBean != null && !fieldValueBean.getFullPackageName().equals(beanDefinition.getFullPackageName())) {
             beanDefinition.getImports().add(fieldValueBean.getFullName());
         }
     }

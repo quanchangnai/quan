@@ -77,12 +77,12 @@ public class CSharpMessageGenerator extends MessageGenerator {
     @Override
     protected void processBeanFieldImports(BeanDefinition beanDefinition, FieldDefinition fieldDefinition) {
         ClassDefinition fieldClass = definitionParser.getClass(fieldDefinition.getType());
-        if (fieldClass != null && !fieldClass.getPackageName().equals(beanDefinition.getPackageName())) {
-            beanDefinition.getImports().add(fieldClass.getPackageName());
+        if (fieldClass != null && !fieldClass.getFullPackageName().equals(beanDefinition.getFullPackageName())) {
+            beanDefinition.getImports().add(fieldClass.getFullPackageName());
         }
         BeanDefinition fieldValueBean = fieldDefinition.getValueBean();
-        if (fieldValueBean != null && !fieldValueBean.getPackageName().equals(beanDefinition.getPackageName())) {
-            beanDefinition.getImports().add(fieldValueBean.getPackageName());
+        if (fieldValueBean != null && !fieldValueBean.getFullPackageName().equals(beanDefinition.getFullPackageName())) {
+            beanDefinition.getImports().add(fieldValueBean.getFullPackageName());
         }
     }
 
@@ -90,7 +90,7 @@ public class CSharpMessageGenerator extends MessageGenerator {
 
         String definitionPath = "generator\\src\\test\\java\\quan\\generator\\message";
         String destPath = "message";
-        String packagePrefix = "MessageCS.test";
+        String packagePrefix = "MessageCS.Test";
 
         CSharpMessageGenerator messageGenerator = new CSharpMessageGenerator(destPath);
         messageGenerator.useXmlDefinitionParser(definitionPath, packagePrefix);

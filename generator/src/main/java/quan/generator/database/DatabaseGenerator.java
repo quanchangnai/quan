@@ -62,7 +62,7 @@ public class DatabaseGenerator extends Generator {
     }
 
     @Override
-    public DefinitionCategory category() {
+    public final DefinitionCategory category() {
         return DefinitionCategory.data;
     }
 

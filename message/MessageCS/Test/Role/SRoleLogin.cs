@@ -60,7 +60,7 @@ namespace MessageCS.Test.Role
 		private UserInfo UserInfo { get; set; }
 
 
-        public SRoleLogin(): base(222)
+        public SRoleLogin(): base(13080)
 		{
 		}
 

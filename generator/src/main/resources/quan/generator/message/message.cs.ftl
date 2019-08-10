@@ -6,7 +6,7 @@ using Buffer = MessageCS.Buffer;
 using ${import};
 </#list>
 
-namespace ${packageName}
+namespace ${fullPackageName}
 {
 	/// <summary>
 	<#if comment !="">

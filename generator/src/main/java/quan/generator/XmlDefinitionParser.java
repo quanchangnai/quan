@@ -29,17 +29,7 @@ public class XmlDefinitionParser extends DefinitionParser {
         if (rootElement == null || !rootElement.getName().equals("package")) {
             return Collections.EMPTY_LIST;
         }
-
-        String fileName = definitionFile.getName().substring(0, definitionFile.getName().lastIndexOf("."));
-
-        String packageName = fileName;
-        if (packagePrefix != null) {
-            packageName = packagePrefix + "." + fileName;
-        }
-        String enumPackageName = packageName;
-        if (enumPackagePrefix != null) {
-            enumPackageName = enumPackagePrefix + "." + fileName;
-        }
+        String packageName = definitionFile.getName().substring(0, definitionFile.getName().lastIndexOf("."));
 
         List<ClassDefinition> classDefinitions = new ArrayList<>();
         for (int i = 0; i < rootElement.nodeCount(); i++) {
@@ -58,10 +48,11 @@ public class XmlDefinitionParser extends DefinitionParser {
             classDefinition.setDefinitionText(classElement.asXML());
 
             if (classDefinition instanceof EnumDefinition) {
-                classDefinition.setPackageName(enumPackageName);
+                classDefinition.setPackagePrefix(packagePrefix);
             } else {
-                classDefinition.setPackageName(packageName);
+                classDefinition.setPackagePrefix(enumPackagePrefix == null ? packagePrefix : enumPackagePrefix);
             }
+            classDefinition.setPackageName(packageName);
 
             classDefinition.setName(classElement.attributeValue("name"));
             classDefinition.setLang(classElement.attributeValue("lang"));
@@ -92,7 +83,7 @@ public class XmlDefinitionParser extends DefinitionParser {
                 break;
             case "message":
                 if (category == DefinitionCategory.message) {
-                    classDefinition = new MessageDefinition(classElement.attributeValue("id"));
+                    classDefinition = new MessageDefinition();
                 }
                 break;
             case "data":

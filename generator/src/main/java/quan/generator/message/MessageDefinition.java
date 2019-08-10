@@ -1,30 +1,23 @@
 package quan.generator.message;
 
-import org.apache.commons.lang3.StringUtils;
 import quan.generator.BeanDefinition;
 import quan.generator.DefinitionCategory;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by quanchangnai on 2017/7/6.
  */
 public class MessageDefinition extends BeanDefinition {
 
-    private static Map<String, MessageDefinition> messages = new HashMap<>();
+    //保存原始类名，因为C#等其他语言的类型会做转换
+    private String originalName;
 
-    private String id;
+    private int id;
 
     {
-        category = DefinitionCategory.data;
+        category = DefinitionCategory.message;
     }
 
     public MessageDefinition() {
-    }
-
-    public MessageDefinition(String id) {
-        this.id = id;
     }
 
     @Override
@@ -43,37 +36,20 @@ public class MessageDefinition extends BeanDefinition {
     }
 
     public String getId() {
-        return id;
+        return String.valueOf(id);
     }
 
-    public void setId(String id) {
-        if (StringUtils.isBlank(id)) {
-            return;
-        }
-        this.id = id.trim();
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getOriginalName() {
+        return originalName;
     }
 
     @Override
     public void validate() {
-        boolean idIsInt = true;
-        try {
-            Integer.parseInt(id);
-        } catch (NumberFormatException e) {
-            idIsInt = false;
-            addValidatedError(getName4Validate() + "的ID[" + id + "]必须是整数");
-        }
-
-        if (idIsInt) {
-            MessageDefinition other = messages.get(id);
-            if (other != null) {
-                addValidatedError(getName4Validate() + "的ID[" + id + "]不能重复", other);
-            }
-            messages.put(id, this);
-        }
-
         super.validate();
-
+        originalName = getPackageName() + "." + getName();
     }
-
-
 }

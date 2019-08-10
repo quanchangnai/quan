@@ -33,7 +33,7 @@ public class SRoleLogin extends Message {
     private UserInfo userInfo;
 
     public SRoleLogin() {
-        super(222);
+        super(13080);
     }
 
     /**
