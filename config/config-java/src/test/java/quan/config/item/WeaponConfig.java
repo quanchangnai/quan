@@ -16,6 +16,8 @@ public class WeaponConfig extends EquipConfig {
 
     protected List<Reward> rewardList = new ArrayList<>();
 
+    protected Set<Reward> rewardSet = new HashSet<>();
+
     protected Map<Integer, Reward> rewardMap = new HashMap<>();
 
     protected List<Integer> list2 = new ArrayList<>();
@@ -30,6 +32,10 @@ public class WeaponConfig extends EquipConfig {
 
     public List<Reward> getRewardList() {
         return rewardList;
+    }
+
+    public Set<Reward> getRewardSet() {
+        return rewardSet;
     }
 
     public Map<Integer, Reward> getRewardMap() {
@@ -57,6 +63,16 @@ public class WeaponConfig extends EquipConfig {
             }
         }
         rewardList = Collections.unmodifiableList(rewardList);
+
+        JSONArray $rewardSet = object.getJSONArray("rewardSet");
+        if ($rewardSet != null) {
+            for (int i = 0; i < $rewardSet.size(); i++) {
+                Reward $rewardSet$Value = new Reward();
+                $rewardSet$Value.parse($rewardSet.getJSONObject(i));
+                rewardSet.add($rewardSet$Value);
+            }
+        }
+        rewardSet = Collections.unmodifiableSet(rewardSet);
 
         JSONObject $rewardMap = object.getJSONObject("rewardMap");
         if ($rewardMap != null) {
@@ -93,6 +109,7 @@ public class WeaponConfig extends EquipConfig {
                 ",w1=" + w1 +
                 ",w2=" + w2 +
                 ",rewardList=" + rewardList +
+                ",rewardSet=" + rewardSet +
                 ",rewardMap=" + rewardMap +
                 ",list2=" + list2 +
                 '}';
