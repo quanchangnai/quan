@@ -10,7 +10,7 @@ import quan.generator.FieldDefinition;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -20,11 +20,11 @@ import java.util.Set;
  */
 public class ConfigConverter {
 
-    private static SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy.MM.dd hh.mm.ss");
+    private static SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy.MM.dd hh.mm.ss" );
 
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd");
+    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd" );
 
-    private static SimpleDateFormat timeFormat = new SimpleDateFormat("hh.mm.ss");
+    private static SimpleDateFormat timeFormat = new SimpleDateFormat("hh.mm.ss" );
 
     private DefinitionParser definitionParser;
 
@@ -56,17 +56,17 @@ public class ConfigConverter {
         this.definitionParser = definitionParser;
     }
 
-    public  Object convert(FieldDefinition fieldDefinition, String value) {
+    public Object convert(FieldDefinition fieldDefinition, String value) {
         String type = fieldDefinition.getType();
         if (fieldDefinition.isPrimitiveType()) {
             return convertPrimitiveType(fieldDefinition.getType(), value);
         } else if (fieldDefinition.isTimeType()) {
             return convertTimeType(fieldDefinition.getType(), value);
-        } else if (type.equals("list")) {
+        } else if (type.equals("list" )) {
             return convertList(fieldDefinition, value);
-        } else if (type.equals("set")) {
+        } else if (type.equals("set" )) {
             return convertSet(fieldDefinition, value);
-        } else if (type.equals("map")) {
+        } else if (type.equals("map" )) {
             return convertMap(fieldDefinition, value);
         } else if (fieldDefinition.isBeanType()) {
             return convertBean(fieldDefinition.getBean(), value);
@@ -76,7 +76,7 @@ public class ConfigConverter {
         return value;
     }
 
-    public  Object convertColumnBean(FieldDefinition fieldDefinition, JSONObject object, String columnValue) {
+    public Object convertColumnBean(FieldDefinition fieldDefinition, JSONObject object, String columnValue) {
         BeanDefinition beanDefinition = fieldDefinition.getBean();
 
         //Bean类型字段对应1列
@@ -102,7 +102,7 @@ public class ConfigConverter {
     /**
      * 转换枚举字段，支持枚举值或者枚举名
      */
-    public  Object convertEnumType(EnumDefinition enumDefinition, String value) {
+    private Object convertEnumType(EnumDefinition enumDefinition, String value) {
         int enumValue = 0;
         try {
             enumValue = Integer.parseInt(value);
@@ -112,19 +112,19 @@ public class ConfigConverter {
         if (enumValue > 0) {
             FieldDefinition enumValueField = enumDefinition.getField(enumValue);
             if (enumValueField == null) {
-                throw new ConvertException(ConvertException.ErrorType.enumValue);
+                throw new ConvertException(ConvertException.ErrorType.enumValue, value);
             }
             return enumValueField.getName();
         } else if (enumDefinition.getField(value) == null) {
-            throw new ConvertException(ConvertException.ErrorType.enumName);
+            throw new ConvertException(ConvertException.ErrorType.enumName, value);
         }
 
         return value;
     }
 
-    public  Object convertPrimitiveType(String type, String value) {
+    private Object convertPrimitiveType(String type, String value) {
         if (StringUtils.isBlank(value)) {
-            return type.equals("string") ? "" : null;
+            return type.equals("string" ) ? "" : null;
         }
         switch (type) {
             case "bool":
@@ -144,16 +144,16 @@ public class ConfigConverter {
         }
     }
 
-    public  Date convertTimeType(String type, String value) {
+    private Date convertTimeType(String type, String value) {
         if (StringUtils.isBlank(value)) {
             return null;
         }
         try {
-            if (type.equals("datetime")) {
+            if (type.equals("datetime" )) {
                 //日期加时间
                 return dateTimeFormat.parse(value);
             }
-            if (type.equals("date")) {
+            if (type.equals("date" )) {
                 //纯日期
                 return dateFormat.parse(value);
             }
@@ -164,31 +164,53 @@ public class ConfigConverter {
         }
     }
 
-    public  String convertTimeType(String type, Date value) {
+    public String convertTimeType(String type, Date value) {
         if (value == null) {
             return null;
         }
-        if (type.equals("datetime")) {
+        if (type.equals("datetime" )) {
             return dateTimeFormat.format(value);
         }
-        if (type.equals("date")) {
+        if (type.equals("date" )) {
             return dateFormat.format(value);
         }
         return timeFormat.format(value);
 
     }
 
-    public  JSONArray convertList(FieldDefinition fieldDefinition, String value) {
+    private JSONArray convertList(FieldDefinition fieldDefinition, String value) {
+        if (StringUtils.isBlank(value)) {
+            return new JSONArray();
+        }
         String[] values = value.split(fieldDefinition.getEscapedDelimiter());
         return convertArray(fieldDefinition, values);
     }
 
-    public  JSONArray convertArray(FieldDefinition fieldDefinition, String[] values) {
-        JSONArray array = new JSONArray();
-        if (values.length == 1 && values[0].equals("")) {
-            return array;
+    private JSONArray convertSet(FieldDefinition fieldDefinition, String value) {
+        if (StringUtils.isBlank(value)) {
+            return new JSONArray();
         }
 
+        String[] values = value.split(fieldDefinition.getEscapedDelimiter());
+        Set<String> setValues = new HashSet<>();
+        Set<String> duplicateValues = new HashSet<>();
+
+        for (String v : values) {
+            if (setValues.contains(v)) {
+                duplicateValues.add(v);
+            }
+            setValues.add(v);
+        }
+
+        if (!duplicateValues.isEmpty()) {
+            throw new ConvertException(ConvertException.ErrorType.setDuplicateValue, new ArrayList<>(duplicateValues));
+        }
+
+        return convertArray(fieldDefinition, setValues.toArray(new String[0]));
+    }
+
+    private JSONArray convertArray(FieldDefinition fieldDefinition, String[] values) {
+        JSONArray array = new JSONArray();
         for (String v : values) {
             Object o;
             if (fieldDefinition.isPrimitiveValueType()) {
@@ -203,7 +225,29 @@ public class ConfigConverter {
         return array;
     }
 
-    public  JSONObject convertColumnMap(FieldDefinition fieldDefinition, JSONObject rowJson, String value) {
+    public JSONArray convertColumnArray(FieldDefinition fieldDefinition, JSONObject rowJson, String value) {
+        JSONArray array = rowJson.getJSONArray(fieldDefinition.getName());
+        if (array == null) {
+            array = new JSONArray();
+            rowJson.put(fieldDefinition.getName(), array);
+        }
+        if (fieldDefinition.getType().equals("list" )) {
+            array.addAll(convertList(fieldDefinition, value));
+        } else {
+            JSONArray setArray = convertSet(fieldDefinition, value);
+            if (fieldDefinition.getColumnNum() > 1) {
+                Set<Object> set = new HashSet<>(array);
+                set.addAll(setArray);
+                array.clear();
+                array.addAll(set);
+            } else {
+                array.addAll(setArray);
+            }
+        }
+        return array;
+    }
+
+    public JSONObject convertColumnMap(FieldDefinition fieldDefinition, JSONObject rowJson, String value) {
         //map类型字段对应1列
         if (fieldDefinition.getColumnNum() == 1) {
             return convertMap(fieldDefinition, value);
@@ -238,8 +282,10 @@ public class ConfigConverter {
             } catch (Exception ignored) {
             }
             if (objectKey == null) {
-                object.put(null, null);
-                throw new NullPointerException("map" + fieldDefinition.getName4Validate() + "的键不能为空");
+                object.put(null, null);//标记接下来的value作废
+                throw new ConvertException(ConvertException.ErrorType.mapInvalidKey, value);
+            } else if (object.containsKey(objectKey)) {
+                throw new ConvertException(ConvertException.ErrorType.mapDuplicateKey, value);
             }
             object.put(objectKey.toString(), null);
         } else {
@@ -255,7 +301,7 @@ public class ConfigConverter {
             if (objectValue == null) {
                 //value无效删除对应的key
                 object.remove(objectKey);
-                throw new NullPointerException("map" + fieldDefinition.getName4Validate() + "的值不能为空");
+                throw new ConvertException(ConvertException.ErrorType.mapInvalidValue, value);
             }
             object.put(objectKey.toString(), objectValue);
         }
@@ -263,38 +309,48 @@ public class ConfigConverter {
         return object;
     }
 
-    public  JSONArray convertSet(FieldDefinition fieldDefinition, String value) {
-        //set需要去重
-        String[] values = value.split(fieldDefinition.getEscapedDelimiter());
-        Set<String> setValues = new HashSet<>(Arrays.asList(values));
-        return convertArray(fieldDefinition, setValues.toArray(new String[0]));
-    }
-
-    public  JSONObject convertMap(FieldDefinition fieldDefinition, String value) {
+    private JSONObject convertMap(FieldDefinition fieldDefinition, String value) {
         JSONObject object = new JSONObject();
         if (StringUtils.isBlank(value)) {
             return object;
         }
 
         String[] values = value.split(fieldDefinition.getEscapedDelimiter());
+
         for (int i = 0; i < values.length; i = i + 2) {
-            Object k = convertPrimitiveType(fieldDefinition.getKeyType(), values[i]);
-            Object v;
-            if (fieldDefinition.isPrimitiveValueType()) {
-                v = convertPrimitiveType(fieldDefinition.getValueType(), values[i + 1]);
-            } else {
-                v = convertBean(definitionParser.getBean(fieldDefinition.getValueType()), values[i + 1]);
+            String vi = values[i];
+            Object k = null;
+            try {
+                k = convertPrimitiveType(fieldDefinition.getKeyType(), vi);
+            } catch (Exception ignored) {
             }
-            if (k == null || v == null) {
-                throw new NullPointerException("map的键或者值不能为空");
+            if (k == null) {
+                throw new ConvertException(ConvertException.ErrorType.mapInvalidKey, vi);
             }
+            if (object.containsKey(k)) {
+                throw new ConvertException(ConvertException.ErrorType.mapDuplicateKey, vi);
+            }
+
+            Object v = null;
+            try {
+                if (fieldDefinition.isPrimitiveValueType()) {
+                    v = convertPrimitiveType(fieldDefinition.getValueType(), values[i + 1]);
+                } else {
+                    v = convertBean(definitionParser.getBean(fieldDefinition.getValueType()), values[i + 1]);
+                }
+            } catch (Exception ignored) {
+            }
+            if (v == null) {
+                throw new ConvertException(ConvertException.ErrorType.mapInvalidValue, vi);
+            }
+
             object.put(k.toString(), v);
         }
 
         return object;
     }
 
-    public  JSONObject convertBean(BeanDefinition beanDefinition, String value) {
+    private JSONObject convertBean(BeanDefinition beanDefinition, String value) {
         if (StringUtils.isBlank(value)) {
             return null;
         }

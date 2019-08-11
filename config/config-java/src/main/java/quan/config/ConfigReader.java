@@ -49,7 +49,7 @@ public abstract class ConfigReader {
         tablePath = PathUtils.crossPlatPath(tablePath);
         tableFileName = PathUtils.crossPlatPath(tableFileName);
         this.tableFile = new File(tablePath, tableFileName);
-        this.table = tableFileName.substring(0, tableFileName.lastIndexOf("."));
+        this.table = tableFileName.substring(0, tableFileName.lastIndexOf("." ));
         this.configDefinition = configDefinition;
         if (configDefinition != null) {
             converter = new ConfigConverter(configDefinition.getParser());
@@ -138,7 +138,7 @@ public abstract class ConfigReader {
 
             validatedColumns.add(columnName);
 
-            if (fieldType.equals("map") || fieldDefinition.isBeanType()) {
+            if (fieldDefinition.isCollectionType() || fieldDefinition.isBeanType()) {
                 Integer columnNums = mapAndBeanFieldColumnNums.getOrDefault(fieldDefinition, 0);
                 mapAndBeanFieldColumnNums.put(fieldDefinition, columnNums + 1);
             }
@@ -149,7 +149,7 @@ public abstract class ConfigReader {
             if (columnNum != 1 && fieldDefinition.isBeanType() && columnNum != fieldDefinition.getBean().getFields().size()) {
                 validatedErrors.add(String.format("配置[%s]的字段类型[%s]要么对应列数非法，要么单独对应1列，要么按字段拆开对应%s列", table, fieldDefinition.getType(), fieldDefinition.getBean().getFields().size()));
                 fieldDefinition.setColumnNum(0);
-            } else if (columnNum != 1 && columnNum % 2 != 0 && fieldDefinition.getType().equals("map")) {
+            } else if (columnNum != 1 && columnNum % 2 != 0 && fieldDefinition.getType().equals("map" )) {
                 validatedErrors.add(String.format("配置[%s]的字段类型[%s]要么对应列数非法，要么单独对应1列，要么按键值对拆开对应偶数列", table, fieldDefinition.getType()));
                 fieldDefinition.setColumnNum(0);
             } else {
@@ -179,8 +179,10 @@ public abstract class ConfigReader {
         try {
             if (fieldDefinition.isBeanType()) {
                 fieldValue = converter.convertColumnBean(fieldDefinition, rowJson.getJSONObject(fieldDefinition.getName()), columnValue);
-            } else if (fieldDefinition.getType().equals("map")) {
+            } else if (fieldDefinition.getType().equals("map" )) {
                 fieldValue = converter.convertColumnMap(fieldDefinition, rowJson, columnValue);
+            } else if (fieldType.equals("list" ) || fieldType.equals("set" )) {
+                fieldValue = converter.convertColumnArray(fieldDefinition, rowJson, columnValue);
             } else {
                 fieldValue = converter.convert(fieldDefinition, columnValue);
             }
@@ -195,16 +197,7 @@ public abstract class ConfigReader {
             return;
         }
 
-        if (fieldType.equals("list") || fieldType.equals("set")) {
-            JSONArray jsonArray = rowJson.getJSONArray(fieldName);
-            if (jsonArray == null) {
-                rowJson.put(fieldName, fieldValue);
-            } else if (fieldValue instanceof JSONArray) {
-                jsonArray.addAll((JSONArray) fieldValue);
-            }
-        } else {
-            rowJson.put(fieldName, fieldValue);
-        }
+        rowJson.put(fieldName, fieldValue);
 
         //时间类型字段字符串格式
         if (fieldDefinition.isTimeType() && fieldValue instanceof Date) {
@@ -213,20 +206,37 @@ public abstract class ConfigReader {
     }
 
     protected void handleConvertException(Exception e, String columnName, String columnValue, int row, int column) {
+        String commonError = String.format("配置[%s]的第%d行第%d列[%s]数据[%s]错误", table, row, column, columnName, columnValue);
+        if (columnValue.length() > 20) {
+            commonError = String.format("配置[%s]的第%d行第%d列[%s]数据错误", table, row, column, columnName);
+        }
         if (!(e instanceof ConvertException)) {
-            validatedErrors.add(String.format("配置[%s]的第%d行第%d列[%s]数据[%s]格式错误", table, row, column, columnName, columnValue));
+            validatedErrors.add(commonError);
             return;
         }
 
-        ConvertException convertException = (ConvertException) e;
-        switch (convertException.getErrorType()) {
+        ConvertException e1 = (ConvertException) e;
+        switch (e1.getErrorType()) {
             case enumName:
-                validatedErrors.add(String.format("配置[%s]的第%d行第%d列[%s]枚举名[%s]不合法", table, row, column, columnName, columnValue));
+                validatedErrors.add(String.format(commonError + ",枚举名[%s]不合法", e1.getParam(0)));
                 break;
             case enumValue:
-                validatedErrors.add(String.format("配置[%s]的第%d行第%d列[%s]枚举值[%s]不合法", table, row, column, columnName, columnValue));
+                validatedErrors.add(String.format(commonError + ",枚举值[%s]不合法", e1.getParam(0)));
+                break;
+            case setDuplicateValue:
+                validatedErrors.add(String.format(commonError + ",set不能有重复值%s", e1.getParams()));
+                break;
+            case mapInvalidKey:
+                validatedErrors.add(String.format(commonError + ",map不能有无效键[%s]", e1.getParam(0)));
+                break;
+            case mapInvalidValue:
+                validatedErrors.add(String.format(commonError + ",map不能有无效值[%s]", e1.getParam(0)));
+                break;
+            case mapDuplicateKey:
+                validatedErrors.add(String.format(commonError + ",map不能有重复键[%s]", e1.getParam(0)));
                 break;
             default:
+                validatedErrors.add(commonError);
                 break;
         }
     }
