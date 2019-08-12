@@ -281,7 +281,7 @@ public class ConfigDefinition extends BeanDefinition {
         validateFieldType(field);
 
         //校验字段循环依赖
-        validateFieldBeanLoop(field);
+        validateFieldBeanCycle(field);
 
         if (field.getColumn() == null) {
             addValidatedError(getName4Validate("的") + field.getName4Validate() + "对应的列不能为空");
@@ -297,7 +297,7 @@ public class ConfigDefinition extends BeanDefinition {
     }
 
     private void validateFieldDelimiter(FieldDefinition field) {
-        if (field.isLoop()) {
+        if (field.isCycle()) {
             return;
         }
 

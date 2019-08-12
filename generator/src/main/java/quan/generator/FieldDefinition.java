@@ -46,7 +46,7 @@ public class FieldDefinition extends Definition {
     private String ref;
 
     //字段类型依赖是否有循环
-    private boolean loop;
+    private boolean cycle;
 
     //Bean字段对应的列数，读数据校验表头时设置的
     private int columnNum;
@@ -438,12 +438,12 @@ public class FieldDefinition extends Definition {
         return null;
     }
 
-    public boolean isLoop() {
-        return loop;
+    public boolean isCycle() {
+        return cycle;
     }
 
-    public FieldDefinition setLoop(boolean loop) {
-        this.loop = loop;
+    public FieldDefinition setCycle(boolean cycle) {
+        this.cycle = cycle;
         return this;
     }
 

@@ -10,14 +10,18 @@ import java.util.Objects;
  */
 public abstract class Bean {
 
-    protected JSONObject json = new JSONObject();
+    protected JSONObject json;
 
     public String toJson(SerializerFeature... features) {
-        return json.toString(features);
+        if (json != null) {
+            return json.toString(features);
+        } else {
+            return new JSONObject().toString(features);
+        }
     }
 
     public void parse(JSONObject object) {
-        Objects.requireNonNull(object, "参数[object]不能为空");
+        Objects.requireNonNull(object, "参数[object]不能为空" );
         json = object;
     }
 

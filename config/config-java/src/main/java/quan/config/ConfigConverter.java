@@ -20,11 +20,11 @@ import java.util.Set;
  */
 public class ConfigConverter {
 
-    private static SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy.MM.dd hh.mm.ss");
+    private static SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy.MM.dd hh.mm.ss" );
 
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd");
+    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd" );
 
-    private static SimpleDateFormat timeFormat = new SimpleDateFormat("hh.mm.ss");
+    private static SimpleDateFormat timeFormat = new SimpleDateFormat("hh.mm.ss" );
 
     private DefinitionParser definitionParser;
 
@@ -62,11 +62,11 @@ public class ConfigConverter {
             return convertPrimitiveType(fieldDefinition.getType(), value);
         } else if (fieldDefinition.isTimeType()) {
             return convertTimeType(fieldDefinition.getType(), value);
-        } else if (type.equals("list")) {
+        } else if (type.equals("list" )) {
             return convertList(fieldDefinition, value);
-        } else if (type.equals("set")) {
+        } else if (type.equals("set" )) {
             return convertSet(fieldDefinition, value);
-        } else if (type.equals("map")) {
+        } else if (type.equals("map" )) {
             return convertMap(fieldDefinition, value);
         } else if (fieldDefinition.isBeanType()) {
             return convertBean(fieldDefinition.getBean(), value);
@@ -124,7 +124,7 @@ public class ConfigConverter {
 
     private Object convertPrimitiveType(String type, String value) {
         if (StringUtils.isBlank(value)) {
-            return type.equals("string") ? "" : null;
+            return type.equals("string" ) ? "" : null;
         }
         switch (type) {
             case "bool":
@@ -149,11 +149,11 @@ public class ConfigConverter {
             return null;
         }
         try {
-            if (type.equals("datetime")) {
+            if (type.equals("datetime" )) {
                 //日期加时间
                 return dateTimeFormat.parse(value);
             }
-            if (type.equals("date")) {
+            if (type.equals("date" )) {
                 //纯日期
                 return dateFormat.parse(value);
             }
@@ -168,10 +168,10 @@ public class ConfigConverter {
         if (value == null) {
             return null;
         }
-        if (type.equals("datetime")) {
+        if (type.equals("datetime" )) {
             return dateTimeFormat.format(value);
         }
-        if (type.equals("date")) {
+        if (type.equals("date" )) {
             return dateFormat.format(value);
         }
         return timeFormat.format(value);
@@ -231,29 +231,34 @@ public class ConfigConverter {
             array = new JSONArray();
             rowJson.put(fieldDefinition.getName(), array);
         }
-        if (fieldDefinition.getType().equals("list")) {
+
+        if (fieldDefinition.getType().equals("list" )) {
             array.addAll(convertList(fieldDefinition, value));
-        } else {
-            JSONArray setArray = convertSet(fieldDefinition, value);
-            if (fieldDefinition.getColumnNum() == 1) {
-                array.addAll(setArray);
+            return array;
+        }
+
+        //set
+        JSONArray setArray = convertSet(fieldDefinition, value);
+        if (fieldDefinition.getColumnNum() == 1) {
+            array.addAll(setArray);
+            return array;
+        }
+
+        String[] values = value.split(fieldDefinition.getEscapedDelimiter());
+        Set<Object> set = new HashSet<>(array);
+        Set<String> duplicate = new HashSet<>();
+        for (int i = 0; i < setArray.size(); i++) {
+            Object o = setArray.get(i);
+            if (set.contains(o)) {
+                duplicate.add(values[i]);
             } else {
-                String[] values = value.split(fieldDefinition.getEscapedDelimiter());
-                Set<Object> set = new HashSet<>(array);
-                Set<String> duplicate = new HashSet<>();
-                for (int i = 0; i < setArray.size(); i++) {
-                    Object o = setArray.get(i);
-                    if (set.contains(o)) {
-                        duplicate.add(values[i]);
-                    } else {
-                        array.add(o);
-                    }
-                }
-                if (!duplicate.isEmpty()) {
-                    throw new ConvertException(ConvertException.ErrorType.setDuplicateValue, new ArrayList<>(duplicate));
-                }
+                array.add(o);
             }
         }
+        if (!duplicate.isEmpty()) {
+            throw new ConvertException(ConvertException.ErrorType.setDuplicateValue, new ArrayList<>(duplicate));
+        }
+
         return array;
     }
 
