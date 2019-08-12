@@ -8,6 +8,7 @@ import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 import net.sf.cglib.proxy.Enhancer;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,14 +60,21 @@ public class Transactions {
     }
 
     /**
+     * 创建子类代理对象方式实现声明式事务，支持父类热加载，同步执行
+     */
+    public static <T> T proxy(Class<T> clazz) {
+        return proxy(clazz, null);
+    }
+
+    /**
      * 转换字节码方式实现声明式事务
      * 必须要在被转换的类加载之前调用，不支持热加载
      *
      * @param classNamePrefix 全类名的前缀，一般传包名就行
      */
     public synchronized static void transform(String classNamePrefix) {
-        if (classNamePrefix == null || classNamePrefix.trim().equals("" )) {
-            throw new IllegalArgumentException("类名前缀不能为空" );
+        if (StringUtils.isBlank(classNamePrefix)) {
+            throw new IllegalArgumentException("类名前缀不能为空");
         }
 
         MethodDelegation methodDelegation = MethodDelegation.to(TransactionDelegation.class);
@@ -84,14 +92,23 @@ public class Transactions {
 
     }
 
+    /**
+     * 设置慢事务时间阈值
+     */
     public static void setSlowTimeThreshold(int slowTimeThreshold) {
         Transaction.slowTimeThreshold = Math.max(0, slowTimeThreshold);
     }
 
+    /**
+     * 设置事务中的逻辑执行冲突次数阈值(ms)
+     */
     public static void setConflictThreshold(int conflictThreshold) {
         Transaction.conflictThreshold = Math.max(0, conflictThreshold);
     }
 
+    /**
+     * 打印统计信息间隔(秒)
+     */
     public static void setPrintCountInterval(int printCountInterval) {
         Transaction.printCountInterval = Math.max(30, printCountInterval);
     }

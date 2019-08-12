@@ -13,11 +13,18 @@ public class Executor implements ExecutorService {
     protected ThreadPoolExecutor threadPool;
 
     public Executor() {
-        threadPool = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
+        threadPool = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), r -> new ExecutorThread(r, Executor.this));
     }
 
-    public Executor(ThreadPoolExecutor threadPool) {
-        this.threadPool = threadPool;
+
+    private static class ExecutorThread extends Thread {
+        //所属线程池
+        private Executor executor;
+
+        public ExecutorThread(Runnable target, Executor executor) {
+            super(target);
+            this.executor = executor;
+        }
     }
 
     /**
@@ -27,8 +34,19 @@ public class Executor implements ExecutorService {
      */
     public final void execute(Task task) {
         Objects.requireNonNull(task);
-        if (Transaction.isInside()) {
-            Transaction.insideExecute(task);
+
+        boolean isInside = false;
+        Thread currentThread = Thread.currentThread();
+        if (currentThread instanceof ExecutorThread && ((ExecutorThread) currentThread).executor == this) {
+            isInside = true;
+        }
+
+        if (isInside) {
+            if (Transaction.isInside()) {
+                Transaction.insideExecute(task);
+            } else {
+                Transaction.outsideExecute(task);
+            }
         } else {
             threadPool.execute(() -> Transaction.outsideExecute(task));
         }
