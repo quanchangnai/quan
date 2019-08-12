@@ -7,6 +7,7 @@ import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
+import net.sf.cglib.proxy.Enhancer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,37 +24,38 @@ public class Transactions {
 
 
     /**
-     * 设置声明式事务异步执行的线程池，不设置时或设置为空事务将同步执行<br/>
-     * 异步执行时，最外层原始方法返回值将会丢失，同步执行能返回正确结果
+     * 创建代理子类方式实现声明式事务，支持父类热加载
      *
-     * @param executor
-     */
-    public static void setExecutor(Executor executor) {
-        TransactionDelegation.executor = executor;
-    }
-
-
-    /**
-     * 创建子类代理对象方式实现声明式事务，支持父类热加载
-     *
-     * @param superclass 父类型
+     * @param clazz 目标类型
      * @param <T>
      * @return
-     * @throws Exception
      */
-    public synchronized static <T> Class<? extends T> subclass(Class<T> superclass) {
-        Objects.requireNonNull(superclass);
+    public synchronized static <T> Class<? extends T> subclass(Class<T> clazz) {
+        Objects.requireNonNull(clazz);
         MethodDelegation methodDelegation = MethodDelegation.to(TransactionDelegation.class);
 
         ElementMatcher.Junction<MethodDescription> methodMatcher = ElementMatchers.isAnnotatedWith(Transactional.class);
 
         return new ByteBuddy()
-                .subclass(superclass)
+                .subclass(clazz)
                 .method(methodMatcher)
                 .intercept(methodDelegation)
                 .make()
-                .load(superclass.getClassLoader())
+                .load(clazz.getClassLoader())
                 .getLoaded();
+    }
+
+    /**
+     * 创建子类代理对象方式实现声明式事务，支持父类热加载
+     *
+     * @param clazz    目标类型
+     * @param executor 异步线程池为空时将同步执行,同步执行并能返回正确结果，异步执行最外层原始方法返回值将会丢失
+     * @param <T>
+     * @return
+     */
+    public static <T> T proxy(Class<T> clazz, Executor executor) {
+        Objects.requireNonNull(clazz);
+        return (T) Enhancer.create(clazz, new TransactionInterceptor(executor));
     }
 
     /**
@@ -63,8 +65,8 @@ public class Transactions {
      * @param classNamePrefix 全类名的前缀，一般传包名就行
      */
     public synchronized static void transform(String classNamePrefix) {
-        if (classNamePrefix == null || classNamePrefix.trim().equals("")) {
-            throw new IllegalArgumentException("类名前缀不能为空");
+        if (classNamePrefix == null || classNamePrefix.trim().equals("" )) {
+            throw new IllegalArgumentException("类名前缀不能为空" );
         }
 
         MethodDelegation methodDelegation = MethodDelegation.to(TransactionDelegation.class);

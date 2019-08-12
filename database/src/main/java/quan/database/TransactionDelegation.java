@@ -7,9 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicReference;
 
 
 /**
@@ -19,25 +18,17 @@ public class TransactionDelegation {
 
     private static final Logger logger = LoggerFactory.getLogger(TransactionDelegation.class);
 
-    /**
-     * 事务异步执行的线程池
-     */
-    static Executor executor;
 
     @RuntimeType
     public static Object delegate(@SuperCall Callable<?> callable, @Origin Method originMethod) {
-        //被代理的方法的返回结果，同步调用一定能正确返回，异步调用结果会丢失
-        List<Object> delegateResult = new ArrayList<>();
+        //被代理的方法的返回结果
+        AtomicReference<Object> result = new AtomicReference<>();
 
         Task task = () -> {
             try {
                 Object callResult = callable.call();
-                delegateResult.add(callResult);
-                //返回false代表事务执行失败，其他值都表示事务执行成功
-                if (callResult instanceof Boolean) {
-                    return (boolean) callResult;
-                }
-                return true;
+                result.set(callable.call());
+                return result.get() instanceof Boolean ? (boolean) callResult : true;
             } catch (Exception e) {
                 if (!(e instanceof Transaction.BreakdownException)) {
                     logger.error("", e);
@@ -46,49 +37,10 @@ public class TransactionDelegation {
             }
         };
 
-        if (executor != null) {
-            executor.execute(task);
-        } else {
-            Transaction.execute(task);
-        }
+        Transaction.execute(task);
 
-        if (delegateResult.isEmpty()) {
-            return asyncCallDefaultResult(originMethod.getReturnType());
-        } else {
-            return delegateResult.get(0);
-        }
+        return result.get();
 
-    }
-
-    /**
-     * 异步调用无法返回实际结果，给个默认值，防止基本类型报空指针异常
-     *
-     * @param returnType
-     * @return
-     */
-    private static Object asyncCallDefaultResult(Class<?> returnType) {
-        if (returnType == boolean.class || returnType == Boolean.class) {
-            return true;
-        }
-        if (returnType == byte.class || returnType == Byte.class) {
-            return (byte) 0;
-        }
-        if (returnType == short.class || returnType == Short.class) {
-            return (short) 0;
-        }
-        if (returnType == int.class || returnType == Integer.class) {
-            return 0;
-        }
-        if (returnType == long.class || returnType == Long.class) {
-            return 0L;
-        }
-        if (returnType == float.class || returnType == Float.class) {
-            return 0F;
-        }
-        if (returnType == double.class || returnType == Double.class) {
-            return 0D;
-        }
-        return null;
     }
 
 }

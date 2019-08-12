@@ -2,9 +2,9 @@ package quan.database.test;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import quan.database.BerkeleyDB;
 import quan.database.Database;
 import quan.database.Executor;
-import quan.database.MySqlDB;
 import quan.database.Transactions;
 
 /**
@@ -18,17 +18,17 @@ public class DatabaseTest4 {
     static Database database;
 
     static {
-//        database = new BerkeleyDB(".temp/bdb");
+        database = new BerkeleyDB(".temp/bdb" );
 //        database = new MongoDB(new MongoDB.Config().setConnectionString("mongodb://127.0.0.1:27017/test"));
-        database = new MySqlDB(new MySqlDB.Config().setConnectionString("jdbc:mysql://localhost:3306/test?user=root&password=123456&useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai"));
+//        database = new MySqlDB(new MySqlDB.Config().setConnectionString("jdbc:mysql://localhost:3306/test?user=root&password=123456&useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai" ));
     }
 
     static Executor executor = new Executor();
 
     public static void main(String[] args) throws Exception {
-        System.err.println("======================================================");
+        System.err.println("======================================================" );
         test1();
-        System.err.println("======================================================");
+        System.err.println("======================================================" );
 
 //        test2();
 //        System.err.println("=================="====================================);
@@ -39,23 +39,22 @@ public class DatabaseTest4 {
 
 
     private static void test1() throws Exception {
-        Transactions.setExecutor(executor);
-        Class<? extends Role> subclass = Transactions.subclass(Role.class);
+//        Class<? extends Role> subclass = Transactions.subclass(Role.class);
+//        Role role = subclass.getDeclaredConstructor().newInstance();
 
-        Role role = subclass.getDeclaredConstructor().newInstance();
+        Role role = Transactions.proxy(Role.class, executor);
         logger.error("role.getClass:{}", role.getClass());
 
-        Transactions.setExecutor(executor);
-
-        Transactions.transform("quan.database.test.Role2");
-
-        Role2 role2 = new Role2();
 
         role.login1();
 //        role.login2("123456");
 //        role.login3();
 //        role.login4();
+        role.update();
 
+
+//        Transactions.transform("quan.database.test.Role2");
+//        Role2 role2 = new Role2();
 //        role2.login();
 
         Thread.sleep(1000);
@@ -65,7 +64,7 @@ public class DatabaseTest4 {
 
 
     private static void test2() throws Exception {
-        Transactions.transform("quan.database.test.Role");
+        Transactions.transform("quan.database.test.Role" );
 
         Role role = new Role();
         role.login1();
