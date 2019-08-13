@@ -20,6 +20,7 @@ public class Role {
     public boolean login1() {
         System.err.println("login1======================================================" );
         logger.error("currentThread:{}", Thread.currentThread());
+        new Exception().printStackTrace();
         return login2("1111" );
     }
 
@@ -100,6 +101,7 @@ public class Role {
 
     public void update() {
         System.err.println("update======================================================" + Thread.currentThread());
+//        new Exception().printStackTrace();
     }
 
     @Override

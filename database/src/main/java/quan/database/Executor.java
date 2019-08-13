@@ -42,13 +42,9 @@ public class Executor implements ExecutorService {
         }
 
         if (isInside) {
-            if (Transaction.isInside()) {
-                Transaction.insideExecute(task);
-            } else {
-                Transaction.outsideExecute(task);
-            }
+            Transaction.execute(task);
         } else {
-            threadPool.execute(() -> Transaction.outsideExecute(task));
+            execute(() -> Transaction.execute(task));
         }
     }
 
@@ -117,6 +113,5 @@ public class Executor implements ExecutorService {
     public void execute(Runnable task) {
         threadPool.execute(task);
     }
-
 
 }

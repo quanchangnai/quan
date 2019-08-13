@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 
 /**
- * 声明式事务拦截器
+ * cglib声明式事务拦截器
  */
 public class TransactionInterceptor implements MethodInterceptor {
 
@@ -30,11 +30,6 @@ public class TransactionInterceptor implements MethodInterceptor {
 
     @Override
     public Object intercept(Object obj, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
-        //非事务方法
-        if (!method.isAnnotationPresent(Transactional.class)) {
-            return methodProxy.invokeSuper(obj, args);
-        }
-
         //被代理的方法的返回结果，同步调用一定能正确返回，异步调用结果会丢失
         AtomicReference<Object> result = new AtomicReference<>();
 
