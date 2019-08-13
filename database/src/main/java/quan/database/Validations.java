@@ -14,18 +14,18 @@ class Validations {
 
     public static void validateCollectionValue(Object value) {
         Objects.requireNonNull(value);
-        if (value instanceof Bean) {
-            validateBeanRoot((Bean) value);
+        if (value instanceof Entity) {
+            validateBeanRoot((Entity) value);
         }
     }
 
-    public static void validateBeanRoot(Bean bean) {
-        if (bean == null) {
+    public static void validateBeanRoot(Entity entity) {
+        if (entity == null) {
             return;
         }
-        Data root = bean.getRoot();
+        Data root = entity.getRoot();
         if (root != null) {
-            throw new IllegalStateException(bean.getClass().getSimpleName() + "已经受到了" + root.getClass().getSimpleName() + "管理");
+            throw new IllegalStateException(entity.getClass().getSimpleName() + "已经受到了" + root.getClass().getSimpleName() + "管理");
         }
     }
 

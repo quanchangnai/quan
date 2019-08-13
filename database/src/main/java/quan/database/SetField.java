@@ -21,8 +21,8 @@ public final class SetField<E> extends Node implements Set<E>, Field<PSet<E>> {
     @Override
     public void setChildrenLogRoot(Data root) {
         for (E e : getValue()) {
-            if (e instanceof Bean) {
-                ((Bean) e).setLogRoot(root);
+            if (e instanceof Entity) {
+                ((Entity) e).setLogRoot(root);
             }
         }
     }
@@ -94,8 +94,8 @@ public final class SetField<E> extends Node implements Set<E>, Field<PSet<E>> {
         PSet<E> oldData = log.getValue();
         PSet<E> newData = oldData.plus(e);
 
-        if (e instanceof Bean) {
-            ((Bean) e).setLogRoot(getRoot());
+        if (e instanceof Entity) {
+            ((Entity) e).setLogRoot(getRoot());
         }
 
         if (oldData != newData) {
@@ -113,8 +113,8 @@ public final class SetField<E> extends Node implements Set<E>, Field<PSet<E>> {
         PSet<E> newData = oldData.minus(o);
 
         for (E e : oldData) {
-            if (e.equals(o) && e instanceof Bean) {
-                ((Bean) e).setLogRoot(null);
+            if (e.equals(o) && e instanceof Entity) {
+                ((Entity) e).setLogRoot(null);
             }
         }
 
@@ -142,8 +142,8 @@ public final class SetField<E> extends Node implements Set<E>, Field<PSet<E>> {
         PSet<E> newData = oldData.plusAll(c);
 
         for (E e : c) {
-            if (e instanceof Bean) {
-                ((Bean) e).setLogRoot(getRoot());
+            if (e instanceof Entity) {
+                ((Entity) e).setLogRoot(getRoot());
             }
         }
 
@@ -168,8 +168,8 @@ public final class SetField<E> extends Node implements Set<E>, Field<PSet<E>> {
 
         if (oldData != newData) {
             for (E e : oldData) {
-                if (!newData.contains(e) && e instanceof Bean) {
-                    ((Bean) e).setLogRoot(null);
+                if (!newData.contains(e) && e instanceof Entity) {
+                    ((Entity) e).setLogRoot(null);
                 }
             }
             log.setValue(newData);

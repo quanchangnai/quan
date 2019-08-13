@@ -4,7 +4,7 @@ import java.util.*;
 import com.alibaba.fastjson.*;
 import org.pcollections.*;
 import quan.database.*;
-import quan.database.item.ItemBean;
+import quan.database.item.ItemEntity;
 
 /**
  * 角色<br/>
@@ -33,9 +33,9 @@ public class RoleData extends Data<Long> {
     private BaseField<Double> d = new BaseField<>(0D);
 
     //道具
-    private BeanField<ItemBean> item = new BeanField<>();
+    private EntityField<ItemEntity> item = new EntityField<>();
 
-    private MapField<Integer, ItemBean> items = new MapField<>(getRoot());
+    private MapField<Integer, ItemEntity> items = new MapField<>(getRoot());
 
     private SetField<Boolean> set = new SetField<>(getRoot());
 
@@ -43,11 +43,11 @@ public class RoleData extends Data<Long> {
 
     private MapField<Integer, Integer> map = new MapField<>(getRoot());
 
-    private SetField<ItemBean> set2 = new SetField<>(getRoot());
+    private SetField<ItemEntity> set2 = new SetField<>(getRoot());
 
-    private ListField<ItemBean> list2 = new ListField<>(getRoot());
+    private ListField<ItemEntity> list2 = new ListField<>(getRoot());
 
-    private MapField<Integer, ItemBean> map2 = new MapField<>(getRoot());
+    private MapField<Integer, ItemEntity> map2 = new MapField<>(getRoot());
 
 
     private static Cache<Long, RoleData> _cache;
@@ -150,19 +150,19 @@ public class RoleData extends Data<Long> {
     /**
      * 道具
      */
-    public ItemBean getItem() {
+    public ItemEntity getItem() {
         return item.getValue();
     }
 
     /**
      * 道具
      */
-    public RoleData setItem(ItemBean item) {
+    public RoleData setItem(ItemEntity item) {
         this.item.setLogValue(item, getRoot());
         return this;
     }
 
-    public Map<Integer, ItemBean> getItems() {
+    public Map<Integer, ItemEntity> getItems() {
         return items;
     }
 
@@ -178,22 +178,22 @@ public class RoleData extends Data<Long> {
         return map;
     }
 
-    public Set<ItemBean> getSet2() {
+    public Set<ItemEntity> getSet2() {
         return set2;
     }
 
-    public List<ItemBean> getList2() {
+    public List<ItemEntity> getList2() {
         return list2;
     }
 
-    public Map<Integer, ItemBean> getMap2() {
+    public Map<Integer, ItemEntity> getMap2() {
         return map2;
     }
 
 
     @Override
     public void setChildrenLogRoot(Data root) {
-        ItemBean $item = this.item.getValue();
+        ItemEntity $item = this.item.getValue();
         if ($item != null) {
             $item.setLogRoot(root);
         }
@@ -221,7 +221,7 @@ public class RoleData extends Data<Long> {
         object.put("f", f.getValue());
         object.put("d", d.getValue());
 
-        ItemBean $item = item.getValue();
+        ItemEntity $item = item.getValue();
         if ($item != null) {
             object.put("item", $item.encode());
         }
@@ -247,13 +247,13 @@ public class RoleData extends Data<Long> {
         object.put("map", $map);
 
         JSONArray $set2 = new JSONArray();
-        for (ItemBean $set2$Value : set2) {
+        for (ItemEntity $set2$Value : set2) {
             $set2.add($set2$Value.encode());
         }
         object.put("set2", $set2);
 
         JSONArray $list2 = new JSONArray();
-        for (ItemBean $list2$Value : list2) {
+        for (ItemEntity $list2$Value : list2) {
             $list2.add($list2$Value.encode());
         }
         object.put("list2", $list2);
@@ -287,9 +287,9 @@ public class RoleData extends Data<Long> {
 
         JSONObject $item = object.getJSONObject("item");
         if ($item != null) {
-            ItemBean $item$Value = item.getValue();
+            ItemEntity $item$Value = item.getValue();
             if ($item$Value == null) {
-                $item$Value = new ItemBean();
+                $item$Value = new ItemEntity();
                 item.setValue($item$Value);
             }
             $item$Value.decode($item);
@@ -297,9 +297,9 @@ public class RoleData extends Data<Long> {
 
         JSONObject $items$1 = object.getJSONObject("items");
         if ($items$1 != null) {
-            PMap<Integer, ItemBean> $items$2 = Empty.map();
+            PMap<Integer, ItemEntity> $items$2 = Empty.map();
             for (String $items$1_Key : $items$1.keySet()) {
-                ItemBean $items$Value = new ItemBean();
+                ItemEntity $items$Value = new ItemEntity();
                 $items$Value.decode($items$1.getJSONObject($items$1_Key));
                 $items$2 = $items$2.plus(Integer.valueOf($items$1_Key), $items$Value);
             }
@@ -335,9 +335,9 @@ public class RoleData extends Data<Long> {
 
         JSONArray $set2$1 = object.getJSONArray("set2");
         if ($set2$1 != null) {
-            PSet<ItemBean> $set2$2 = Empty.set();
+            PSet<ItemEntity> $set2$2 = Empty.set();
             for (int i = 0; i < $set2$1.size(); i++) {
-                ItemBean $set2$Value = new ItemBean();
+                ItemEntity $set2$Value = new ItemEntity();
                 $set2$Value.decode($set2$1.getJSONObject(i));
                 $set2$2 = $set2$2.plus($set2$Value);
             }
@@ -346,9 +346,9 @@ public class RoleData extends Data<Long> {
 
         JSONArray $list2$1 = object.getJSONArray("list2");
         if ($list2$1 != null) {
-            PVector<ItemBean> $list2$2 = Empty.vector();
+            PVector<ItemEntity> $list2$2 = Empty.vector();
             for (int i = 0; i < $list2$1.size(); i++) {
-                ItemBean $list2$Value = new ItemBean();
+                ItemEntity $list2$Value = new ItemEntity();
                 $list2$Value.decode($list2$1.getJSONObject(i));
                 $list2$2 = $list2$2.plus($list2$Value);
             }
@@ -357,9 +357,9 @@ public class RoleData extends Data<Long> {
 
         JSONObject $map2$1 = object.getJSONObject("map2");
         if ($map2$1 != null) {
-            PMap<Integer, ItemBean> $map2$2 = Empty.map();
+            PMap<Integer, ItemEntity> $map2$2 = Empty.map();
             for (String $map2$1_Key : $map2$1.keySet()) {
-                ItemBean $map2$Value = new ItemBean();
+                ItemEntity $map2$Value = new ItemEntity();
                 $map2$Value.decode($map2$1.getJSONObject($map2$1_Key));
                 $map2$2 = $map2$2.plus(Integer.valueOf($map2$1_Key), $map2$Value);
             }

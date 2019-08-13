@@ -2,7 +2,7 @@ package quan.database.test;
 
 import com.alibaba.fastjson.JSONObject;
 import quan.database.Transaction;
-import quan.database.item.ItemBean;
+import quan.database.item.ItemEntity;
 import quan.database.role.RoleData;
 
 /**
@@ -37,15 +37,15 @@ public class TransactionTest {
 
     private static boolean update1() {
         roleData1.setName("aaa");
-        ItemBean itemBean1 = new ItemBean();
-        itemBean1.setId(1);
-        itemBean1.setName("1");
-        roleData1.setItem(itemBean1);
+        ItemEntity itemEntity1 = new ItemEntity();
+        itemEntity1.setId(1);
+        itemEntity1.setName("1");
+        roleData1.setItem(itemEntity1);
 
-        ItemBean itemBean2 = new ItemBean();
-        itemBean2.setId(100);
-        itemBean2.setName("111");
-        roleData1.getItems().put(itemBean2.getId(), itemBean2);
+        ItemEntity itemEntity2 = new ItemEntity();
+        itemEntity2.setId(100);
+        itemEntity2.setName("111");
+        roleData1.getItems().put(itemEntity2.getId(), itemEntity2);
 
         return true;
     }

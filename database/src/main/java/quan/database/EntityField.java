@@ -3,12 +3,12 @@ package quan.database;
 /**
  * Created by quanchangnai on 2019/5/16.
  */
-public final class BeanField<V extends Bean> extends BaseField<V> {
+public final class EntityField<V extends Entity> extends BaseField<V> {
 
-    public BeanField() {
+    public EntityField() {
     }
 
-    public BeanField(V value) {
+    public EntityField(V value) {
         super(value);
     }
 

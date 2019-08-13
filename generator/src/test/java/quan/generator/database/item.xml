@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <package>
 
-    <bean name="ItemBean">道具
+    <entity name="ItemEntity">道具
         <field name="id" type="int"/>
         <field name="name" type="string"/>
-    </bean>
+    </entity>
 
     <enum name="ItemType">道具类型
         <field name="type1" value="1"/>道具类型1

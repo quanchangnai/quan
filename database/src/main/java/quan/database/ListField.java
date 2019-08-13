@@ -22,8 +22,8 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
     @Override
     public void setChildrenLogRoot(Data root) {
         for (E e : getValue()) {
-            if (e instanceof Bean) {
-                ((Bean) e).setLogRoot(root);
+            if (e instanceof Entity) {
+                ((Entity) e).setLogRoot(root);
             }
         }
     }
@@ -101,8 +101,8 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
         PVector<E> oldData = log.getValue();
         PVector<E> newData = log.getValue().plus(e);
 
-        if (e instanceof Bean) {
-            ((Bean) e).setLogRoot(getRoot());
+        if (e instanceof Entity) {
+            ((Entity) e).setLogRoot(getRoot());
         }
 
         if (oldData != newData) {
@@ -118,8 +118,8 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
 
         PVector<E> oldData = log.getValue();
         for (E e : oldData) {
-            if (e.equals(o) && e instanceof Bean) {
-                ((Bean) e).setLogRoot(null);
+            if (e.equals(o) && e instanceof Entity) {
+                ((Entity) e).setLogRoot(null);
                 break;
             }
         }
@@ -149,8 +149,8 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
         PVector<E> newData = log.getValue().plusAll(c);
 
         for (E e : c) {
-            if (e instanceof Bean) {
-                ((Bean) e).setLogRoot(getRoot());
+            if (e instanceof Entity) {
+                ((Entity) e).setLogRoot(getRoot());
             }
         }
 
@@ -173,8 +173,8 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
         PVector<E> newData = log.getValue().plusAll(index, c);
 
         for (E e : c) {
-            if (e instanceof Bean) {
-                ((Bean) e).setLogRoot(getRoot());
+            if (e instanceof Entity) {
+                ((Entity) e).setLogRoot(getRoot());
             }
         }
 
@@ -194,8 +194,8 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
 
         if (oldData != newData) {
             for (E e : oldData) {
-                if (!newData.contains(e) && e instanceof Bean) {
-                    ((Bean) e).setLogRoot(null);
+                if (!newData.contains(e) && e instanceof Entity) {
+                    ((Entity) e).setLogRoot(null);
                 }
             }
             log.setValue(newData);
@@ -237,13 +237,13 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
             log.setValue(newData);
         }
 
-        if (element instanceof Bean) {
-            ((Bean) element).setLogRoot(getRoot());
+        if (element instanceof Entity) {
+            ((Entity) element).setLogRoot(getRoot());
         }
 
         E oldElement = oldData.get(index);
-        if (oldElement instanceof Bean) {
-            ((Bean) oldElement).setLogRoot(null);
+        if (oldElement instanceof Entity) {
+            ((Entity) oldElement).setLogRoot(null);
         }
 
         return oldElement;
@@ -262,13 +262,13 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
             log.setValue(newData);
         }
 
-        if (element instanceof Bean) {
-            ((Bean) element).setLogRoot(getRoot());
+        if (element instanceof Entity) {
+            ((Entity) element).setLogRoot(getRoot());
         }
 
         E oldElement = oldData.get(index);
-        if (oldElement instanceof Bean) {
-            ((Bean) oldElement).setLogRoot(null);
+        if (oldElement instanceof Entity) {
+            ((Entity) oldElement).setLogRoot(null);
         }
     }
 
@@ -284,8 +284,8 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
         }
 
         E oldElement = oldData.get(index);
-        if (oldElement instanceof Bean) {
-            ((Bean) oldElement).setLogRoot(null);
+        if (oldElement instanceof Entity) {
+            ((Entity) oldElement).setLogRoot(null);
         }
 
         return oldElement;

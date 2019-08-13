@@ -20,8 +20,8 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field<PMap<
 
     public void setChildrenLogRoot(Data root) {
         for (V value : getValue().values()) {
-            if (value instanceof Bean) {
-                ((Bean) value).setLogRoot(root);
+            if (value instanceof Entity) {
+                ((Entity) value).setLogRoot(root);
             }
         }
     }
@@ -93,12 +93,12 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field<PMap<
         V oldValue = log.getValue().get(key);
         log.setValue(log.getValue().plus(key, value));
 
-        if (value instanceof Bean) {
-            ((Bean) value).setLogRoot(getRoot());
+        if (value instanceof Entity) {
+            ((Entity) value).setLogRoot(getRoot());
         }
 
-        if (oldValue instanceof Bean) {
-            ((Bean) value).setLogRoot(null);
+        if (oldValue instanceof Entity) {
+            ((Entity) value).setLogRoot(null);
         }
 
         return oldValue;
@@ -111,8 +111,8 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field<PMap<
         V value = log.getValue().get(key);
         log.setValue(log.getValue().minus(key));
 
-        if (value instanceof Bean) {
-            ((Bean) value).setLogRoot(null);
+        if (value instanceof Entity) {
+            ((Entity) value).setLogRoot(null);
         }
         return value;
     }
@@ -133,12 +133,12 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field<PMap<
 
         for (K key : m.keySet()) {
             V newValue = m.get(key);
-            if (newValue instanceof Bean) {
-                ((Bean) newValue).setLogRoot(getRoot());
+            if (newValue instanceof Entity) {
+                ((Entity) newValue).setLogRoot(getRoot());
             }
             V oldValue = oldData.get(key);
-            if (oldValue instanceof Bean) {
-                ((Bean) oldValue).setLogRoot(null);
+            if (oldValue instanceof Entity) {
+                ((Entity) oldValue).setLogRoot(null);
             }
         }
     }

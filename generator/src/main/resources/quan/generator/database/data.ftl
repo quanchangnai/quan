@@ -13,7 +13,7 @@ import ${import};
 </#if>
  * Created by 自动生成
  */
-public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType ==5>Data<${keyType}></#if> {
+public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionType ==5>Data<${keyType}></#if> {
 
 <#list fields as field>
     <#if field.comment !="">
@@ -50,7 +50,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     private BaseField<${field.classType}> ${field.name} = new BaseField<>(false);
 
     <#else>
-    private BeanField<${field.classType}> ${field.name} = new BeanField<>();
+    private EntityField<${field.classType}> ${field.name} = new EntityField<>();
 
     </#if>
 </#list>

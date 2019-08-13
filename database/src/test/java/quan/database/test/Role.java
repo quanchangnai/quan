@@ -3,7 +3,7 @@ package quan.database.test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.database.Transactional;
-import quan.database.item.ItemBean;
+import quan.database.item.ItemEntity;
 import quan.database.role.RoleData;
 import quan.database.role.RoleType;
 
@@ -37,31 +37,31 @@ public class Role {
         roleData.getSet().add(true);
         roleData.getMap().put(1, 111);
 
-        ItemBean itemBean1 = new ItemBean();
-        itemBean1.setId(111);
-        itemBean1.setName("111" );
-        roleData.setItem(itemBean1);
+        ItemEntity itemEntity1 = new ItemEntity();
+        itemEntity1.setId(111);
+        itemEntity1.setName("111" );
+        roleData.setItem(itemEntity1);
 
-        ItemBean itemBean2 = new ItemBean();
-        itemBean2.setId(222);
-        itemBean2.setName("222" );
-        roleData.getItems().put(itemBean2.getId(), itemBean2);
+        ItemEntity itemEntity2 = new ItemEntity();
+        itemEntity2.setId(222);
+        itemEntity2.setName("222" );
+        roleData.getItems().put(itemEntity2.getId(), itemEntity2);
 
-        ItemBean itemBean3 = new ItemBean();
-        itemBean3.setId(333);
-        itemBean3.setName("333" );
-        roleData.getList2().add(itemBean3);
+        ItemEntity itemEntity3 = new ItemEntity();
+        itemEntity3.setId(333);
+        itemEntity3.setName("333" );
+        roleData.getList2().add(itemEntity3);
 
 
-        ItemBean itemBean4 = new ItemBean();
-        itemBean4.setId(444);
-        itemBean4.setName("444" );
-        roleData.getSet2().add(itemBean4);
+        ItemEntity itemEntity4 = new ItemEntity();
+        itemEntity4.setId(444);
+        itemEntity4.setName("444" );
+        roleData.getSet2().add(itemEntity4);
 
-        ItemBean itemBean5 = new ItemBean();
-        itemBean5.setId(555);
-        itemBean5.setName("555" );
-        roleData.getMap2().put(itemBean5.getId(), itemBean5);
+        ItemEntity itemEntity5 = new ItemEntity();
+        itemEntity5.setId(555);
+        itemEntity5.setName("555" );
+        roleData.getMap2().put(itemEntity5.getId(), itemEntity5);
 
         logger.error("roleData.setName:{}", roleData);
 

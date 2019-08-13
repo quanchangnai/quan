@@ -7,7 +7,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Created by quanchangnai on 2019/5/16.
  */
-public abstract class Data<K> extends Bean implements Comparable<Data<K>> {
+public abstract class Data<K> extends Entity implements Comparable<Data<K>> {
 
     /**
      * 版本号，用于实现乐观锁

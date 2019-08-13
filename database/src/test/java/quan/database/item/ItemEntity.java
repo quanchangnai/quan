@@ -9,7 +9,7 @@ import quan.database.*;
  * 道具<br/>
  * Created by 自动生成
  */
-public class ItemBean extends Bean {
+public class ItemEntity extends Entity {
 
     private BaseField<Integer> id = new BaseField<>(0);
 
@@ -20,7 +20,7 @@ public class ItemBean extends Bean {
         return id.getValue();
     }
 
-    public ItemBean setId(int id) {
+    public ItemEntity setId(int id) {
         this.id.setLogValue(id, getRoot());
         return this;
     }
@@ -29,7 +29,7 @@ public class ItemBean extends Bean {
         return name.getValue();
     }
 
-    public ItemBean setName(String name) {
+    public ItemEntity setName(String name) {
         this.name.setLogValue(name, getRoot());
         return this;
     }
@@ -62,7 +62,7 @@ public class ItemBean extends Bean {
 
     @Override
     public String toString() {
-        return "ItemBean{" +
+        return "ItemEntity{" +
                 "id=" + id +
                 ",name='" + name + '\'' +
                 '}';
