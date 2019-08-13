@@ -77,7 +77,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 
 <#list selfFields as field>
     <#if field.type=="string">
-        ${field.name} = object.getString("${field.name}");
+        ${field.name} = object.getOrDefault("${field.name}", "").toString();
     <#elseif field.type=="bool">
         ${field.name} = object.getBooleanValue("${field.name}");
     <#elseif field.timeType>

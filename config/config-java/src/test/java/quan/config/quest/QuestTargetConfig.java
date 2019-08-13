@@ -28,7 +28,7 @@ public class QuestTargetConfig extends Config {
         super.parse(object);
 
         id = object.getIntValue("id");
-        name = object.getString("name");
+        name = object.getOrDefault("name", "").toString();
     }
 
     @Override

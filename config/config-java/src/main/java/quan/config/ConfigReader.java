@@ -1,6 +1,5 @@
 package quan.config;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -192,8 +191,10 @@ public abstract class ConfigReader {
         }
 
         //索引字段不能为空
-        if (fieldValue == null && configDefinition.isIndexField(fieldDefinition)) {
-            validatedErrors.add(String.format("配置[%s]的第%d行第%d列[%s]的索引值不能为空", table, row, column, columnName));
+        if (fieldValue == null) {
+            if (configDefinition.isIndexField(fieldDefinition)) {
+                validatedErrors.add(String.format("配置[%s]的第%d行第%d列[%s]的索引值不能为空", table, row, column, columnName));
+            }
             return;
         }
 

@@ -124,7 +124,7 @@ public class ConfigConverter {
 
     private Object convertPrimitiveType(String type, String value) {
         if (StringUtils.isBlank(value)) {
-            return type.equals("string" ) ? "" : null;
+            return null;
         }
         switch (type) {
             case "bool":
@@ -149,11 +149,10 @@ public class ConfigConverter {
             return null;
         }
         try {
-            if (type.equals("datetime" )) {
+            if (type.equals("datetime")) {
                 //日期加时间
                 return dateTimeFormat.parse(value);
-            }
-            if (type.equals("date" )) {
+            } else if (type.equals("date")) {
                 //纯日期
                 return dateFormat.parse(value);
             }
@@ -168,10 +167,10 @@ public class ConfigConverter {
         if (value == null) {
             return null;
         }
-        if (type.equals("datetime" )) {
+        if (type.equals("datetime")) {
             return dateTimeFormat.format(value);
         }
-        if (type.equals("date" )) {
+        if (type.equals("date")) {
             return dateFormat.format(value);
         }
         return timeFormat.format(value);
@@ -232,7 +231,7 @@ public class ConfigConverter {
             rowJson.put(fieldDefinition.getName(), array);
         }
 
-        if (fieldDefinition.getType().equals("list" )) {
+        if (fieldDefinition.getType().equals("list")) {
             array.addAll(convertList(fieldDefinition, value));
             return array;
         }

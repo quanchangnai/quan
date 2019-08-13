@@ -71,7 +71,7 @@ public class ItemConfig extends Config {
         super.parse(object);
 
         id = object.getIntValue("id");
-        name = object.getString("name");
+        name = object.getOrDefault("name", "").toString();
 
         String $type = object.getString("type");
         if ($type != null) {

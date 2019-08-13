@@ -125,7 +125,7 @@ public class QuestConfig extends Config {
         super.parse(object);
 
         id = object.getIntValue("id");
-        name = object.getString("name");
+        name = object.getOrDefault("name", "").toString();
 
         String $type = object.getString("type");
         if ($type != null) {
@@ -144,10 +144,10 @@ public class QuestConfig extends Config {
         a2 = object.getIntValue("a2");
         b1 = object.getIntValue("b1");
         b2 = object.getBooleanValue("b2");
-        c1 = object.getString("c1");
+        c1 = object.getOrDefault("c1", "").toString();
         c2 = object.getIntValue("c2");
         c3 = object.getIntValue("c3");
-        d1 = object.getString("d1");
+        d1 = object.getOrDefault("d1", "").toString();
         d2 = object.getIntValue("d2");
         d3 = object.getIntValue("d3");
 
