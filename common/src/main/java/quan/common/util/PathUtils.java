@@ -1,8 +1,5 @@
 package quan.common.util;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
@@ -12,7 +9,7 @@ import java.util.Set;
  */
 public class PathUtils {
 
-    private static final Logger logger = LoggerFactory.getLogger(PathUtils.class);
+//    private static final Logger logger = LoggerFactory.getLogger(PathUtils.class);
 
     /**
      * 转换为当前平台路径
@@ -30,15 +27,11 @@ public class PathUtils {
      */
     public static Set<File> listFiles(File path, String extension) {
         Set<File> childrenFiles = new HashSet<>();
-        try {
-            listFiles(path, extension, childrenFiles);
-        } catch (Exception e) {
-            logger.error("递归列出子文件出错", e);
-        }
+        listFiles(path, extension, childrenFiles);
         return childrenFiles;
     }
 
-    private static void listFiles(File path, String extension, Set<File> childrenFiles) throws Exception {
+    private static void listFiles(File path, String extension, Set<File> childrenFiles) {
         if (path.isDirectory()) {
             File[] files = path.listFiles();
             if (files != null) {
