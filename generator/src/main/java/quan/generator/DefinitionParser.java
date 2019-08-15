@@ -44,7 +44,7 @@ public abstract class DefinitionParser {
 
     public void setDefinitionPaths(List<String> definitionPaths) {
         for (String path : definitionPaths) {
-            path = PathUtils.crossPlatPath(path);
+            path = PathUtils.currentPlatPath(path);
             this.definitionPaths.add(path);
             Set<File> files = PathUtils.listFiles(new File(path), getFileType());
             definitionFiles.addAll(files);

@@ -38,7 +38,7 @@ public abstract class Generator {
         freemarkerCfg.setDefaultEncoding("UTF-8");
         freemarkerCfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
 
-        this.codePath = PathUtils.crossPlatPath(codePath);
+        this.codePath = PathUtils.currentPlatPath(codePath);
         this.freemarkerCfg = freemarkerCfg;
 
         Template enumTemplate = freemarkerCfg.getTemplate("enum." + supportLanguage() + ".ftl");

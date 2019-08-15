@@ -14,7 +14,10 @@ public class PathUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(PathUtils.class);
 
-    public static String crossPlatPath(String path) {
+    /**
+     * 转换为当前平台路径
+     */
+    public static String currentPlatPath(String path) {
         return path.replace("/", File.separator).replace("\\", File.separator);
     }
 

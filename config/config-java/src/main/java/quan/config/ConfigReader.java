@@ -45,8 +45,8 @@ public abstract class ConfigReader {
     }
 
     protected void init(String tablePath, String tableFileName, ConfigDefinition configDefinition) {
-        tablePath = PathUtils.crossPlatPath(tablePath);
-        tableFileName = PathUtils.crossPlatPath(tableFileName);
+        tablePath = PathUtils.currentPlatPath(tablePath);
+        tableFileName = PathUtils.currentPlatPath(tableFileName);
         this.tableFile = new File(tablePath, tableFileName);
         this.table = tableFileName.substring(0, tableFileName.lastIndexOf("." ));
         this.configDefinition = configDefinition;

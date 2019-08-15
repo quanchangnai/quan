@@ -53,7 +53,7 @@ public class ConfigLoader {
     private Map<String, Set<String>> configDescendantsAndMe = new HashMap<>();
 
     public ConfigLoader(String tablePath) {
-        this.tablePath = PathUtils.crossPlatPath(tablePath);
+        this.tablePath = PathUtils.currentPlatPath(tablePath);
     }
 
     public ConfigLoader setTableType(String tableType) {
@@ -302,7 +302,7 @@ public class ConfigLoader {
     public void writeJson(String path, boolean useFullName) {
         Objects.requireNonNull(path, "输出目录不能为空");
 
-        File pathFile = new File(PathUtils.crossPlatPath(path));
+        File pathFile = new File(PathUtils.currentPlatPath(path));
         if (!pathFile.exists()) {
             pathFile.mkdirs();
         }
