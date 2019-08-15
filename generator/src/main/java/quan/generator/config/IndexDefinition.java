@@ -31,12 +31,17 @@ public class IndexDefinition extends Definition {
         return "索引";
     }
 
+    @Override
+    protected String namePattern() {
+        return "^[a-z][a-zA-Z\\d]*";
+    }
+
     public boolean isUnique() {
-        return type.equals("unique") || type.equals("u");
+        return type.equals("unique" ) || type.equals("u" );
     }
 
     public boolean isNormal() {
-        return type.equals("normal") || type.equals("n");
+        return type.equals("normal" ) || type.equals("n" );
     }
 
     public String getType() {

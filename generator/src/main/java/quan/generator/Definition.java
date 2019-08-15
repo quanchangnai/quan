@@ -77,6 +77,8 @@ public abstract class Definition {
 
     public abstract String getDefinitionTypeName();
 
+    protected abstract String namePattern();
+
     @Override
     public String toString() {
         return getClass().getName() + "{" +

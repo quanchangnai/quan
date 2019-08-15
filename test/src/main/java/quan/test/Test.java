@@ -4,6 +4,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Created by quanchangnai on 2019/7/10.
@@ -11,7 +12,7 @@ import java.util.Map;
 public class Test {
 
     public static void main(String[] args) {
-        test1();
+//        test1();
         test2();
 
     }
@@ -36,7 +37,9 @@ public class Test {
     }
 
     private static void test2() {
-
+        String pattern = "^[a-z][a-zA-Z\\d]*";
+        String str = "type1";
+        System.err.println(Pattern.matches(pattern, str));
     }
 
 }

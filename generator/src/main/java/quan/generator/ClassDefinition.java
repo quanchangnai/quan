@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * 类定义
@@ -31,6 +32,17 @@ public abstract class ClassDefinition extends Definition {
 
     //字段名:字段定义
     protected Map<String, FieldDefinition> nameFields = new HashMap<>();
+
+
+    @Override
+    public String getDefinitionTypeName() {
+        return "类";
+    }
+
+    @Override
+    protected String namePattern() {
+        return "^[A-Z][a-zA-Z\\d]*";
+    }
 
     public String getPackagePrefix() {
         return packagePrefix;
@@ -114,7 +126,7 @@ public abstract class ClassDefinition extends Definition {
         if (StringUtils.isBlank(language)) {
             return;
         }
-        for (String lang : language.trim().split(",")) {
+        for (String lang : language.trim().split("," )) {
             this.languages.add(lang.trim());
         }
     }
@@ -125,7 +137,9 @@ public abstract class ClassDefinition extends Definition {
 
     public void validate() {
         if (getName() == null) {
-            addValidatedError(getDefinitionTypeName() + "名不能为空");
+            addValidatedError(getDefinitionTypeName() + "名不能为空" );
+        } else if (!Pattern.matches(namePattern(), getName())) {
+            addValidatedError(getDefinitionTypeName() + "名[" + getName() + "]格式错误" );
         }
 
         if (!languages.isEmpty() && !Language.names().containsAll(languages)) {
@@ -146,11 +160,14 @@ public abstract class ClassDefinition extends Definition {
     protected void validateField(FieldDefinition fieldDefinition) {
         //校验字段名
         if (fieldDefinition.getName() == null) {
-            addValidatedError(getName4Validate("的") + "字段名不能为空");
+            addValidatedError(getName4Validate("的" ) + "字段名不能为空" );
             return;
         }
+        if (!Pattern.matches(fieldDefinition.namePattern(), fieldDefinition.getName())) {
+            addValidatedError(getName4Validate("的" ) + "字段名[" + fieldDefinition.getName() + "]格式错误" );
+        }
         if (nameFields.containsKey(fieldDefinition.getName())) {
-            addValidatedError(getName4Validate("的") + "字段名[" + fieldDefinition.getName() + "]不能重复");
+            addValidatedError(getName4Validate("的" ) + "字段名[" + fieldDefinition.getName() + "]不能重复" );
             return;
         }
         nameFields.put(fieldDefinition.getName(), fieldDefinition);
@@ -175,11 +192,6 @@ public abstract class ClassDefinition extends Definition {
 
         error += position + "。";
         parser.addValidatedError(error);
-    }
-
-    @Override
-    public String getDefinitionTypeName() {
-        return "类";
     }
 
     @Override
