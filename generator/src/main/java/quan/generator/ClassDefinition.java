@@ -41,7 +41,7 @@ public abstract class ClassDefinition extends Definition {
 
     @Override
     protected String namePattern() {
-        return "^[A-Z][a-zA-Z\\d]*";
+        return Constants.classNamePattern;
     }
 
     public String getPackagePrefix() {

@@ -92,7 +92,7 @@ public class Transaction {
     /**
      * 行级锁，数据不受缓存管理时
      */
-    private TreeSet<Lock> notCachedRowLocks = new TreeSet<>();
+    private List<Lock> notCachedRowLocks = new ArrayList<>();
 
     /**
      * 记录Data的版本号
@@ -139,6 +139,9 @@ public class Transaction {
 
 
     void addVersionLog(Data data) {
+        if (data == null) {
+            return;
+        }
         if (data.getCache() != null) {
             data.getCache().checkWorkable();
         }
@@ -380,6 +383,7 @@ public class Transaction {
         }
 
         TreeSet<Integer> rowLockIndexes = new TreeSet<>();
+        TreeSet<Data> notCachedRowLocksIndexes = new TreeSet<>();
         for (Data data : versionLogs.keySet()) {
             Cache cache = data.getCache();
             if (cache != null) {
@@ -387,12 +391,16 @@ public class Transaction {
                 rowLockIndexes.add(LockPool.getLockIndex(cache, data.getKey()));
             } else {
                 //没有注册缓存
-                notCachedRowLocks.add(data.getLock());
+                notCachedRowLocksIndexes.add(data);
             }
         }
 
         for (Integer rowLockIndex : rowLockIndexes) {
             cachedRowLocks.add(LockPool.getLock(rowLockIndex));
+        }
+
+        for (Data data : notCachedRowLocksIndexes) {
+            notCachedRowLocks.add(data.getLock());
         }
 
         //存档时要阻塞

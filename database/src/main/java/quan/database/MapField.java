@@ -3,13 +3,12 @@ package quan.database;
 import org.pcollections.Empty;
 import org.pcollections.PMap;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by quanchangnai on 2019/5/20.
  */
+@SuppressWarnings({"unchecked"})
 public final class MapField<K, V> extends Node implements Map<K, V>, Field<PMap<K, V>> {
 
     private PMap<K, V> data = Empty.map();
@@ -32,12 +31,9 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field<PMap<
 
     @Override
     public PMap<K, V> getValue() {
-        Transaction transaction = Transaction.get();
-        if (transaction != null) {
-            FieldLog<PMap<K, V>> log = (FieldLog<PMap<K, V>>) transaction.getFieldLog(this);
-            if (log != null) {
-                return log.getValue();
-            }
+        FieldLog<PMap<K, V>> log = getLog(false);
+        if (log != null) {
+            return log.getValue();
         }
         return data;
     }
@@ -67,19 +63,19 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field<PMap<
         return getValue().get(key);
     }
 
-    private FieldLog<PMap<K, V>> getOrAddLog() {
-        Transaction transaction = Transaction.get(true);
-
-        Data root = getRoot();
-        if (root != null) {
-            transaction.addVersionLog(root);
+    private FieldLog<PMap<K, V>> getLog(boolean add) {
+        Transaction transaction = Transaction.get(add);
+        if (transaction == null) {
+            return null;
         }
 
         FieldLog<PMap<K, V>> log = (FieldLog<PMap<K, V>>) transaction.getFieldLog(this);
-        if (log == null) {
+        if (add && log == null) {
             log = new FieldLog<>(this, data);
             transaction.addFieldLog(log);
+            transaction.addVersionLog(getRoot());
         }
+
         return log;
     }
 
@@ -88,7 +84,7 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field<PMap<
         Validations.validateMapKey(key);
         Validations.validateCollectionValue(value);
 
-        FieldLog<PMap<K, V>> log = getOrAddLog();
+        FieldLog<PMap<K, V>> log = getLog(true);
 
         V oldValue = log.getValue().get(key);
         log.setValue(log.getValue().plus(key, value));
@@ -106,7 +102,7 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field<PMap<
 
     @Override
     public V remove(Object key) {
-        FieldLog<PMap<K, V>> log = getOrAddLog();
+        FieldLog<PMap<K, V>> log = getLog(true);
 
         V value = log.getValue().get(key);
         log.setValue(log.getValue().minus(key));
@@ -127,7 +123,7 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field<PMap<
             Validations.validateCollectionValue(value);
         }
 
-        FieldLog<PMap<K, V>> log = getOrAddLog();
+        FieldLog<PMap<K, V>> log = getLog(true);
         PMap<K, V> oldData = log.getValue();
         log.setValue(oldData.plusAll(m));
 
@@ -137,7 +133,7 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field<PMap<
                 ((Entity) newValue).setLogRoot(getRoot());
             }
             V oldValue = oldData.get(key);
-            if (oldValue instanceof Entity) {
+            if (oldValue != newValue && oldValue instanceof Entity) {
                 ((Entity) oldValue).setLogRoot(null);
             }
         }
@@ -145,7 +141,7 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field<PMap<
 
     @Override
     public void clear() {
-        FieldLog<PMap<K, V>> log = getOrAddLog();
+        FieldLog<PMap<K, V>> log = getLog(true);
         if (log.getValue().isEmpty()) {
             return;
         }
@@ -153,19 +149,171 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field<PMap<
         log.setValue(Empty.map());
     }
 
+    private Set<K> keySet;
+
     @Override
     public Set<K> keySet() {
-        return getValue().keySet();
+        if (keySet == null) {
+            keySet = new AbstractSet<K>() {
+                @Override
+                public int size() {
+                    return MapField.this.size();
+                }
+
+                @Override
+                public boolean isEmpty() {
+                    return MapField.this.isEmpty();
+                }
+
+                @Override
+                public void clear() {
+                    MapField.this.clear();
+                }
+
+                @Override
+                public boolean contains(Object k) {
+                    return MapField.this.containsKey(k);
+                }
+
+                @Override
+                public Iterator<K> iterator() {
+                    return new Iterator<K>() {
+                        //entrySet iterator
+                        private Iterator<Entry<K, V>> it = entrySet().iterator();
+
+                        @Override
+                        public boolean hasNext() {
+                            return it.hasNext();
+                        }
+
+                        @Override
+                        public K next() {
+                            return it.next().getKey();
+                        }
+
+                        @Override
+                        public void remove() {
+                            it.remove();
+                        }
+                    };
+                }
+            };
+        }
+
+        return keySet;
     }
+
+    private Collection<V> values;
 
     @Override
     public Collection<V> values() {
-        return getValue().values();
+        if (values == null) {
+            values = new AbstractCollection<V>() {
+                @Override
+                public int size() {
+                    return MapField.this.size();
+                }
+
+                @Override
+                public boolean isEmpty() {
+                    return MapField.this.isEmpty();
+                }
+
+                @Override
+                public void clear() {
+                    MapField.this.clear();
+                }
+
+                @Override
+                public boolean contains(Object v) {
+                    return MapField.this.containsValue(v);
+                }
+
+                @Override
+                public Iterator<V> iterator() {
+                    return new Iterator<V>() {
+                        //entrySet iterator
+                        private Iterator<Entry<K, V>> it = entrySet().iterator();
+
+                        @Override
+                        public boolean hasNext() {
+                            return it.hasNext();
+                        }
+
+                        @Override
+                        public V next() {
+                            return it.next().getValue();
+                        }
+
+                        @Override
+                        public void remove() {
+                            it.remove();
+                        }
+                    };
+                }
+            };
+        }
+        return values;
     }
+
+    private Set<Entry<K, V>> entrySet;
 
     @Override
     public Set<Entry<K, V>> entrySet() {
-        return getValue().entrySet();
+        if (entrySet == null)
+            entrySet = new AbstractSet<Entry<K, V>>() {
+                @Override
+                public int size() {
+                    return MapField.this.size();
+                }
+
+                @Override
+                public boolean isEmpty() {
+                    return MapField.this.isEmpty();
+                }
+
+                @Override
+                public void clear() {
+                    MapField.this.clear();
+                }
+
+                @Override
+                public boolean contains(final Object e) {
+                    if (!(e instanceof Entry)) {
+                        return false;
+                    }
+                    V value = get(((Entry<?, ?>) e).getKey());
+                    return value != null && value.equals(((Entry<?, ?>) e).getValue());
+                }
+
+                @Override
+                public Iterator<Entry<K, V>> iterator() {
+                    return new Iterator<Entry<K, V>>() {
+                        private Iterator<Entry<K, V>> it = getValue().entrySet().iterator();
+                        private Entry<K, V> current;
+
+                        @Override
+                        public void remove() {
+                            if (current == null) {
+                                throw new IllegalStateException();
+                            }
+                            MapField.this.remove(current.getKey());
+                        }
+
+                        @Override
+                        public boolean hasNext() {
+                            return it.hasNext();
+                        }
+
+                        @Override
+                        public Entry<K, V> next() {
+                            return current = it.next();
+                        }
+                    };
+                }
+
+            };
+        return entrySet;
     }
 
 

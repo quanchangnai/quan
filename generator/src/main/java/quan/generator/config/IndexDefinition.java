@@ -1,6 +1,7 @@
 package quan.generator.config;
 
 import org.apache.commons.lang3.StringUtils;
+import quan.generator.Constants;
 import quan.generator.Definition;
 import quan.generator.FieldDefinition;
 
@@ -33,7 +34,7 @@ public class IndexDefinition extends Definition {
 
     @Override
     protected String namePattern() {
-        return "^[a-z][a-zA-Z\\d]*";
+        return Constants.fieldNamePattern;
     }
 
     public boolean isUnique() {

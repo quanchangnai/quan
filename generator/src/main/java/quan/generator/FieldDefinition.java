@@ -66,7 +66,7 @@ public class FieldDefinition extends Definition {
 
     @Override
     protected String namePattern() {
-        return "^[a-z][a-zA-Z\\d]*";
+        return Constants.fieldNamePattern;
     }
 
 

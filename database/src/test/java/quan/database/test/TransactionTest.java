@@ -4,16 +4,26 @@ import com.alibaba.fastjson.JSONObject;
 import quan.database.Transaction;
 import quan.database.item.ItemEntity;
 import quan.database.role.RoleData;
+import quan.database.role.RoleData2;
+
+import java.util.*;
 
 /**
  * Created by quanchangnai on 2019/6/22.
  */
 public class TransactionTest {
 
-    private static RoleData roleData1 = new RoleData(1L);
+    private static RoleData roleData1;
 
     public static void main(String[] args) {
 
+//        test1();
+
+        Transaction.execute(TransactionTest::test2);
+    }
+
+    private static void test1() {
+        roleData1 = new RoleData(1L);
 
         Transaction.execute(TransactionTest::update1);
         System.err.println("update1:" + roleData1);
@@ -32,7 +42,6 @@ public class TransactionTest {
         RoleData roleData2 = new RoleData(0L);
         roleData2.decode(jsonObject);
         System.err.println("roleData2:" + roleData2);
-
     }
 
     private static boolean update1() {
@@ -52,6 +61,48 @@ public class TransactionTest {
 
     private static boolean update2() {
         roleData1.getMap().put(111, 222);
+        return true;
+    }
+
+
+    private static boolean test2() {
+        RoleData2 roleData2 = new RoleData2(2L);
+
+        Map<Integer, Integer> map = roleData2.getMap();
+        for (int i = 0; i < 10; i++) {
+            map.put(i, i);
+        }
+
+        map.keySet().remove(1);
+        map.values().remove(2);
+        map.put(11, 11);
+        map.keySet().removeAll(Arrays.asList(3, 4));
+        Iterator<Integer> iterator = map.keySet().iterator();
+        while (iterator.hasNext()) {
+            Integer next = iterator.next();
+            if (next > 5 && next < 8) {
+                iterator.remove();
+            }
+        }
+
+        List<String> list = roleData2.getList();
+        for (int i = 0; i < 10; i++) {
+            list.add(String.valueOf(i));
+        }
+        list.removeAll(Arrays.asList("1", "2"));
+
+        Set<Boolean> set = roleData2.getSet();
+        set.add(true);
+        set.add(false);
+        set.removeAll(Arrays.asList(true));
+
+        ItemEntity itemEntity = new ItemEntity().setId(1).setName("111");
+        roleData2.getItems().put(itemEntity.getId(), itemEntity);
+        roleData2.getItems().remove(itemEntity.getId());
+//        roleData2.getItems().keySet().remove(itemEntity.getId());
+
+        System.err.println("roleData2:" + roleData2.toString());
+        System.err.println("itemEntity.getRoot():" + itemEntity.getRoot());
         return true;
     }
 }
