@@ -60,6 +60,7 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
         return new Iterator<E>() {
             private Iterator<E> it = getValue().iterator();
             private E current;
+            private int index = -1;
 
             @Override
             public boolean hasNext() {
@@ -68,7 +69,11 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
 
             @Override
             public E next() {
-                return current = it.next();
+                current = it.next();
+                if (current != null) {
+                    index++;
+                }
+                return current;
             }
 
             @Override
@@ -76,7 +81,7 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
                 if (current == null) {
                     throw new IllegalStateException();
                 }
-                ListField.this.remove(current);
+                ListField.this.remove(index);
             }
         };
     }

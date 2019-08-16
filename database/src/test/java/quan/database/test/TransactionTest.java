@@ -77,11 +77,11 @@ public class TransactionTest {
         map.values().remove(2);
         map.put(11, 11);
         map.keySet().removeAll(Arrays.asList(3, 4));
-        Iterator<Integer> iterator = map.keySet().iterator();
-        while (iterator.hasNext()) {
-            Integer next = iterator.next();
+        Iterator<Integer> mapIterator = map.keySet().iterator();
+        while (mapIterator.hasNext()) {
+            Integer next = mapIterator.next();
             if (next > 5 && next < 8) {
-                iterator.remove();
+                mapIterator.remove();
             }
         }
 
@@ -90,6 +90,13 @@ public class TransactionTest {
             list.add(String.valueOf(i));
         }
         list.removeAll(Arrays.asList("1", "2"));
+        Iterator<String> listIterator = list.iterator();
+        while (listIterator.hasNext()) {
+            String next = listIterator.next();
+            if (next.equals("6")) {
+                listIterator.remove();
+            }
+        }
 
         Set<Boolean> set = roleData2.getSet();
         set.add(true);
