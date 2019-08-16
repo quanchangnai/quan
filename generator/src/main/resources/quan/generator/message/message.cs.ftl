@@ -9,9 +9,9 @@ using ${import};
 namespace ${fullPackageName}
 {
 	/// <summary>
-	<#if comment !="">
+<#if comment !="">
 	/// ${comment}<br/>
-	</#if>
+</#if>
 	/// Created by 自动生成
 	/// </summary>
     public class ${name} : <#if definitionType ==2>Bean<#elseif definitionType ==3>Message</#if>

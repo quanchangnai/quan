@@ -58,7 +58,6 @@ public abstract class MessageGenerator extends Generator {
                 messageDefinitions.add((MessageDefinition) classDefinition);
             }
         }
-
         //0xFFFFF正好占用3个字节,当前设置了[ID冲突时重新计算]时，100000个坑位用于解决冲突，每次用10000个
         calculateMessageId(messageDefinitions, 1, 0xFFFFF - 100000);
     }
