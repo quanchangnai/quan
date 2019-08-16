@@ -5,93 +5,89 @@ import com.alibaba.fastjson.*;
 import quan.config.*;
 
 /**
+* 武器<br/>
 * Created by 自动生成
 */
 @SuppressWarnings({"unchecked"})
 public class WeaponConfig extends EquipConfig {
 
-    protected int w1;
+    /**
+     * 字段1
+     */
+    public final int w1;
 
-    protected int w2;
+    /**
+     * 字段2
+     */
+    public final int w2;
 
-    protected List<Reward> rewardList = new ArrayList<>();
+    /**
+     * 奖励List
+     */
+    public final List<Reward> rewardList;
 
-    protected Set<Reward> rewardSet = new HashSet<>();
+    /**
+     * 奖励Set
+     */
+    public final Set<Reward> rewardSet;
 
-    protected Map<Integer, Reward> rewardMap = new HashMap<>();
+    /**
+     * 奖励Map
+     */
+    public final Map<Integer, Reward> rewardMap;
 
-    protected List<Integer> list2 = new ArrayList<>();
-
-    public int getW1() {
-        return w1;
-    }
-
-    public int getW2() {
-        return w2;
-    }
-
-    public List<Reward> getRewardList() {
-        return rewardList;
-    }
-
-    public Set<Reward> getRewardSet() {
-        return rewardSet;
-    }
-
-    public Map<Integer, Reward> getRewardMap() {
-        return rewardMap;
-    }
-
-    public List<Integer> getList2() {
-        return list2;
-    }
+    /**
+     * List2
+     */
+    public final List<Integer> list2;
 
 
-    @Override
-    public void parse(JSONObject object) {
-        super.parse(object);
+    public WeaponConfig(JSONObject json) {
+        super(json);
 
-        w1 = object.getIntValue("w1");
-        w2 = object.getIntValue("w2");
+        w1 = json.getIntValue("w1");
+        w2 = json.getIntValue("w2");
 
-        JSONArray $rewardList = object.getJSONArray("rewardList");
-        if ($rewardList != null) {
-            for (int i = 0; i < $rewardList.size(); i++) {
-                Reward $rewardList$Value = new Reward();
-                $rewardList$Value.parse($rewardList.getJSONObject(i));
-                rewardList.add($rewardList$Value);
+        JSONArray $rewardList$1 = json.getJSONArray("rewardList");
+        List<Reward> $rewardList$2 = new ArrayList<>();
+        if ($rewardList$1 != null) {
+            for (int i = 0; i < $rewardList$1.size(); i++) {
+                Reward $rewardList$Value = new Reward($rewardList$1.getJSONObject(i));
+                $rewardList$2.add($rewardList$Value);
             }
         }
-        rewardList = Collections.unmodifiableList(rewardList);
+        rewardList = Collections.unmodifiableList($rewardList$2);
 
-        JSONArray $rewardSet = object.getJSONArray("rewardSet");
-        if ($rewardSet != null) {
-            for (int i = 0; i < $rewardSet.size(); i++) {
-                Reward $rewardSet$Value = new Reward();
-                $rewardSet$Value.parse($rewardSet.getJSONObject(i));
-                rewardSet.add($rewardSet$Value);
+        JSONArray $rewardSet$1 = json.getJSONArray("rewardSet");
+        Set<Reward> $rewardSet$2 = new HashSet<>();
+        if ($rewardSet$1 != null) {
+            for (int i = 0; i < $rewardSet$1.size(); i++) {
+                Reward $rewardSet$Value = new Reward($rewardSet$1.getJSONObject(i));
+                $rewardSet$2.add($rewardSet$Value);
             }
         }
-        rewardSet = Collections.unmodifiableSet(rewardSet);
+        rewardSet = Collections.unmodifiableSet($rewardSet$2);
 
-        JSONObject $rewardMap = object.getJSONObject("rewardMap");
-        if ($rewardMap != null) {
-            for (String $rewardMap$Key : $rewardMap.keySet()) {
-                Reward $rewardMap$Value = new Reward();
-                $rewardMap$Value.parse($rewardMap.getJSONObject($rewardMap$Key));
-                rewardMap.put(Integer.valueOf($rewardMap$Key), $rewardMap$Value);
+        JSONObject $rewardMap$1 = json.getJSONObject("rewardMap");
+        Map<Integer, Reward> $rewardMap$2 = new HashMap();
+        if ($rewardMap$1 != null) {
+            for (String $rewardMap$Key : $rewardMap$1.keySet()) {
+                Reward $rewardMap$Value = new Reward($rewardMap$1.getJSONObject($rewardMap$Key));
+                $rewardMap$2.put(Integer.valueOf($rewardMap$Key), $rewardMap$Value);
             }
         }
-        rewardMap = Collections.unmodifiableMap(rewardMap);
+        rewardMap = Collections.unmodifiableMap($rewardMap$2);
 
-        JSONArray $list2 = object.getJSONArray("list2");
-        if ($list2 != null) {
-            for (int i = 0; i < $list2.size(); i++) {
-                list2.add($list2.getInteger(i));
+        JSONArray $list2$1 = json.getJSONArray("list2");
+        List<Integer> $list2$2 = new ArrayList<>();
+        if ($list2$1 != null) {
+            for (int i = 0; i < $list2$1.size(); i++) {
+                $list2$2.add($list2$1.getInteger(i));
             }
         }
-        list2 = Collections.unmodifiableList(list2);
+        list2 = Collections.unmodifiableList($list2$2);
     }
+
 
     @Override
     public String toString() {
@@ -117,8 +113,8 @@ public class WeaponConfig extends EquipConfig {
     }
 
     @Override
-    public WeaponConfig create() {
-        return new WeaponConfig();
+    protected WeaponConfig create(JSONObject json) {
+        return new WeaponConfig(json);
     }
 
     public static class self {
@@ -128,8 +124,10 @@ public class WeaponConfig extends EquipConfig {
 
         private volatile static List<WeaponConfig> configs = new ArrayList<>();
 
+        //ID
         private volatile static Map<Integer, WeaponConfig> idConfigs = new HashMap<>();
 
+        //部位
         private volatile static Map<Integer, List<WeaponConfig>> positionConfigs = new HashMap<>();
 
         private volatile static Map<Integer, Map<Integer, List<WeaponConfig>>> composite1Configs = new HashMap<>();

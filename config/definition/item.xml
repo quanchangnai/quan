@@ -11,7 +11,7 @@
         <field name="type2" value="2"/>道具类型2
     </enum>
 
-    <config name="ItemConfig" table="道具">道具
+    <config name="ItemConfig" table="道具">
         <field name="id" type="int" column="ID" index="unique"/>
         <field name="name" type="string" column="名字"/>
         <field name="type" type="ItemType" column="类型"/>

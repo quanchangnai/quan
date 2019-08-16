@@ -48,7 +48,7 @@ public abstract class ConfigReader {
         tablePath = PathUtils.currentPlatPath(tablePath);
         tableFileName = PathUtils.currentPlatPath(tableFileName);
         this.tableFile = new File(tablePath, tableFileName);
-        this.table = tableFileName.substring(0, tableFileName.lastIndexOf("." ));
+        this.table = tableFileName.substring(0, tableFileName.lastIndexOf("."));
         this.configDefinition = configDefinition;
         if (configDefinition != null) {
             converter = new ConfigConverter(configDefinition.getParser());
@@ -60,7 +60,7 @@ public abstract class ConfigReader {
     protected void initPrototype() {
         try {
             Class<Config> configClass = (Class<Config>) Class.forName(configDefinition.getFullName());
-            prototype = configClass.getDeclaredConstructor().newInstance();
+            prototype = configClass.getDeclaredConstructor(JSONObject.class).newInstance(new JSONObject());
         } catch (Exception e) {
             logger.error("实例化配置类[{}]失败", configDefinition.getFullName(), e);
         }
@@ -97,8 +97,7 @@ public abstract class ConfigReader {
         readJsons();
 
         for (JSONObject json : jsons) {
-            Config config = prototype.create();
-            config.parse(json);
+            Config config = prototype.create(json);
             configs.add(config);
         }
 
@@ -148,7 +147,7 @@ public abstract class ConfigReader {
             if (columnNum != 1 && fieldDefinition.isBeanType() && columnNum != fieldDefinition.getBean().getFields().size()) {
                 validatedErrors.add(String.format("配置[%s]的字段类型[%s]要么对应列数非法，要么单独对应1列，要么按字段拆开对应%s列", table, fieldDefinition.getType(), fieldDefinition.getBean().getFields().size()));
                 fieldDefinition.setColumnNum(0);
-            } else if (columnNum != 1 && columnNum % 2 != 0 && fieldDefinition.getType().equals("map" )) {
+            } else if (columnNum != 1 && columnNum % 2 != 0 && fieldDefinition.getType().equals("map")) {
                 validatedErrors.add(String.format("配置[%s]的字段类型[%s]要么对应列数非法，要么单独对应1列，要么按键值对拆开对应偶数列", table, fieldDefinition.getType()));
                 fieldDefinition.setColumnNum(0);
             } else {
@@ -178,9 +177,9 @@ public abstract class ConfigReader {
         try {
             if (fieldDefinition.isBeanType()) {
                 fieldValue = converter.convertColumnBean(fieldDefinition, rowJson.getJSONObject(fieldDefinition.getName()), columnValue);
-            } else if (fieldDefinition.getType().equals("map" )) {
+            } else if (fieldDefinition.getType().equals("map")) {
                 fieldValue = converter.convertColumnMap(fieldDefinition, rowJson, columnValue);
-            } else if (fieldType.equals("list" ) || fieldType.equals("set" )) {
+            } else if (fieldType.equals("list") || fieldType.equals("set")) {
                 fieldValue = converter.convertColumnArray(fieldDefinition, rowJson, columnValue);
             } else {
                 fieldValue = converter.convert(fieldDefinition, columnValue);

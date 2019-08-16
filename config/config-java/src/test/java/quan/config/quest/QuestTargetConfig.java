@@ -5,31 +5,30 @@ import com.alibaba.fastjson.*;
 import quan.config.*;
 
 /**
+* QuestTargetConfig<br/>
 * Created by 自动生成
 */
 @SuppressWarnings({"unchecked"})
 public class QuestTargetConfig extends Config {
 
-    protected int id;
+    /**
+     * ID
+     */
+    public final int id;
 
-    protected String name;
+    /**
+     * 名字
+     */
+    public final String name;
 
-    public int getId() {
-        return id;
+
+    public QuestTargetConfig(JSONObject json) {
+        super(json);
+
+        id = json.getIntValue("id");
+        name = json.getOrDefault("name", "").toString();
     }
 
-    public String getName() {
-        return name;
-    }
-
-
-    @Override
-    public void parse(JSONObject object) {
-        super.parse(object);
-
-        id = object.getIntValue("id");
-        name = object.getOrDefault("name", "").toString();
-    }
 
     @Override
     public String toString() {
@@ -41,12 +40,13 @@ public class QuestTargetConfig extends Config {
     }
 
     @Override
-    public QuestTargetConfig create() {
-        return new QuestTargetConfig();
+    protected QuestTargetConfig create(JSONObject json) {
+        return new QuestTargetConfig(json);
     }
 
     private volatile static List<QuestTargetConfig> configs = new ArrayList<>();
 
+    //ID
     private volatile static Map<Integer, QuestTargetConfig> idConfigs = new HashMap<>();
 
 

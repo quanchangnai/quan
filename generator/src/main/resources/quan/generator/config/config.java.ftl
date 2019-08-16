@@ -21,85 +21,57 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 
 <#list selfFields as field>
     <#if field.comment !="">
-    //${field.comment}
-    </#if>
-    <#if field.type=="list">
-    protected ${field.basicType}<${field.classValueType}> ${field.name} = new ArrayList<>();
-    <#elseif field.type=="set">
-    protected ${field.basicType}<${field.classValueType}> ${field.name} = new HashSet<>();
-    <#elseif field.type=="map">
-    protected ${field.basicType}<${field.classKeyType}, ${field.classValueType}> ${field.name} = new HashMap<>();
-    <#elseif  field.timeType>
-    protected ${field.basicType} ${field.name};
-
-    <#if field.comment !="">
-    //${field.comment}
-    </#if>
-    protected String ${field.name}$Str;
-    <#else >
-    protected ${field.basicType} ${field.name};
-    </#if>
-
-</#list>
-<#list selfFields as field>
-    <#if field.comment !="">
     /**
      * ${field.comment}
      */
     </#if>
-    <#if field.type=="list" || field.type=="set">
-    public ${field.basicType}<${field.classValueType}> get${field.name?cap_first}() {
-        return ${field.name};
-    }
+    <#if field.type=="list">
+    public final ${field.basicType}<${field.classValueType}> ${field.name};
+    <#elseif field.type=="set">
+    public final ${field.basicType}<${field.classValueType}> ${field.name};
     <#elseif field.type=="map">
-    public ${field.basicType}<${field.classKeyType}, ${field.classValueType}> get${field.name?cap_first}() {
-        return ${field.name};
-    }
-    <#elseif field.timeType>
-    public ${field.basicType} get${field.name?cap_first}() {
-        return ${field.name};
-    }
+    public final ${field.basicType}<${field.classKeyType}, ${field.classValueType}> ${field.name};
+    <#elseif  field.timeType>
+    public final ${field.basicType} ${field.name};
 
-    public String get${field.name?cap_first}$Str() {
-        return ${field.name}$Str;
-    }
+    <#if field.comment !="">
+    //${field.comment}
+    </#if>
+    public final String ${field.name}$Str;
     <#else >
-    public ${field.basicType} get${field.name?cap_first}() {
-        return ${field.name};
-    }
+    public final ${field.basicType} ${field.name};
     </#if>
 
 </#list>
 
-    @Override
-    public void parse(JSONObject object) {
-        super.parse(object);
+    public ${name}(JSONObject json) {
+        super(json);
 
 <#list selfFields as field>
     <#if field.type=="string">
-        ${field.name} = object.getOrDefault("${field.name}", "").toString();
+        ${field.name} = json.getOrDefault("${field.name}", "").toString();
     <#elseif field.type=="bool">
-        ${field.name} = object.getBooleanValue("${field.name}");
+        ${field.name} = json.getBooleanValue("${field.name}");
     <#elseif field.timeType>
-        ${field.name} = object.getDate("${field.name}");
-        ${field.name}$Str = object.getString("${field.name}$Str");
+        ${field.name} = json.getDate("${field.name}");
+        ${field.name}$Str = json.getOrDefault("${field.name}$Str", "").toString();
     <#elseif field.type=="list" || field.type=="set">
         <#if field_index gt 0 >
 
         </#if>
-        JSONArray $${field.name} = object.getJSONArray("${field.name}");
-        if ($${field.name} != null) {
-            for (int i = 0; i < $${field.name}.size(); i++) {
+        JSONArray $${field.name}$1 = json.getJSONArray("${field.name}");
+        ${field.basicType}<${field.classValueType}> $${field.name}$2 = new ${field.classType}<>();
+        if ($${field.name}$1 != null) {
+            for (int i = 0; i < $${field.name}$1.size(); i++) {
                 <#if field.beanValueType>
-                ${field.classValueType} $${field.name}$Value = new ${field.classValueType}();
-                $${field.name}$Value.parse($${field.name}.getJSONObject(i));
-                ${field.name}.add($${field.name}$Value);
+                ${field.classValueType} $${field.name}$Value = new ${field.classValueType}($${field.name}$1.getJSONObject(i));
+                $${field.name}$2.add($${field.name}$Value);
                 <#else>
-                ${field.name}.add($${field.name}.get${field.classValueType}(i));
+                $${field.name}$2.add($${field.name}$1.get${field.classValueType}(i));
                 </#if>
             }
         }
-        ${field.name} = Collections.unmodifiable${field.basicType}(${field.name});
+        ${field.name} = Collections.unmodifiable${field.basicType}($${field.name}$2);
         <#if field_has_next && (selfFields[field_index+1].primitiveType ||selfFields[field_index+1].timeType) >
 
         </#if>
@@ -107,31 +79,33 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         <#if field_index gt 0 >
 
         </#if>
-        JSONObject $${field.name} = object.getJSONObject("${field.name}");
-        if ($${field.name} != null) {
-            for (String $${field.name}$Key : $${field.name}.keySet()) {
+        JSONObject $${field.name}$1 = json.getJSONObject("${field.name}");
+        Map<${field.classKeyType}, ${field.classValueType}> $${field.name}$2 = new HashMap();
+        if ($${field.name}$1 != null) {
+            for (String $${field.name}$Key : $${field.name}$1.keySet()) {
                 <#if field.beanValueType>
-                ${field.classValueType} $${field.name}$Value = new ${field.classValueType}();
-                $${field.name}$Value.parse($${field.name}.getJSONObject($${field.name}$Key));
-                ${field.name}.put(${field.classKeyType}.valueOf($${field.name}$Key), $${field.name}$Value);
+                ${field.classValueType} $${field.name}$Value = new ${field.classValueType}($${field.name}$1.getJSONObject($${field.name}$Key));
+                $${field.name}$2.put(${field.classKeyType}.valueOf($${field.name}$Key), $${field.name}$Value);
                 <#else>
-                ${field.name}.put(${field.classKeyType}.valueOf($${field.name}$Key), $${field.name}.get${field.classValueType}($${field.name}$Key));
+                $${field.name}$2.put(${field.classKeyType}.valueOf($${field.name}$Key), $${field.name}$1.get${field.classValueType}($${field.name}$Key));
                 </#if>
             }
         }
-        ${field.name} = Collections.unmodifiableMap(${field.name});
+        ${field.name} = Collections.unmodifiableMap($${field.name}$2);
         <#if field_has_next && (selfFields[field_index+1].primitiveType ||selfFields[field_index+1].timeType) >
 
         </#if>
     <#elseif field.builtInType>
-        ${field.name} = object.get${field.type?cap_first}Value("${field.name}");
+        ${field.name} = json.get${field.type?cap_first}Value("${field.name}");
     <#elseif field.enumType>
        <#if field_index gt 0 >
 
         </#if>
-        String $${field.name} = object.getString("${field.name}");
+        String $${field.name} = json.getString("${field.name}");
         if ($${field.name} != null) {
             ${field.name} = ${field.type}.valueOf($${field.name});
+        } else {
+            ${field.name} = null;
         }
          <#if field_has_next && (selfFields[field_index+1].primitiveType ||selfFields[field_index+1].timeType) >
 
@@ -140,10 +114,11 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         <#if field_index gt 0 >
 
         </#if>
-        JSONObject $${field.name} = object.getJSONObject("${field.name}");
+        JSONObject $${field.name} = json.getJSONObject("${field.name}");
         if ($${field.name} != null) {
-            ${field.name} = new ${field.type}();
-            ${field.name}.parse($reward);
+            ${field.name} = new ${field.type}($reward);
+        } else {
+            ${field.name} = null;
         }
         <#if field_has_next && selfFields[field_index+1].primitiveType >
 
@@ -151,6 +126,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     </#if>
 </#list>
     }
+
 
     @Override
     public String toString() {
@@ -366,8 +342,8 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 
  <#if definitionType ==6>
     @Override
-    public ${name} create() {
-        return new ${name}();
+    protected ${name} create(JSONObject json) {
+        return new ${name}(json);
     }
 
     <#if parent??>

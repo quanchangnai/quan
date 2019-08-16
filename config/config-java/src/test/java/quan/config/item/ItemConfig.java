@@ -11,106 +11,101 @@ import quan.config.*;
 @SuppressWarnings({"unchecked"})
 public class ItemConfig extends Config {
 
-    protected int id;
+    /**
+     * ID
+     */
+    public final int id;
 
-    protected String name;
+    /**
+     * 名字
+     */
+    public final String name;
 
-    protected ItemType type;
+    /**
+     * 类型
+     */
+    public final ItemType type;
 
-    protected Reward reward;
+    /**
+     * 奖励
+     */
+    public final Reward reward;
 
-    protected List<Integer> list = new ArrayList<>();
+    /**
+     * List
+     */
+    public final List<Integer> list;
 
-    protected Set<Integer> set = new HashSet<>();
+    /**
+     * Set
+     */
+    public final Set<Integer> set;
 
-    protected Map<Integer, Integer> map = new HashMap<>();
+    /**
+     * Map
+     */
+    public final Map<Integer, Integer> map;
 
-    protected Date effectiveTime;
+    /**
+     * 生效时间
+     */
+    public final Date effectiveTime;
 
-    protected String effectiveTime$Str;
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public ItemType getType() {
-        return type;
-    }
-
-    public Reward getReward() {
-        return reward;
-    }
-
-    public List<Integer> getList() {
-        return list;
-    }
-
-    public Set<Integer> getSet() {
-        return set;
-    }
-
-    public Map<Integer, Integer> getMap() {
-        return map;
-    }
-
-    public Date getEffectiveTime() {
-        return effectiveTime;
-    }
-
-    public String getEffectiveTime$Str() {
-        return effectiveTime$Str;
-    }
+    //生效时间
+    public final String effectiveTime$Str;
 
 
-    @Override
-    public void parse(JSONObject object) {
-        super.parse(object);
+    public ItemConfig(JSONObject json) {
+        super(json);
 
-        id = object.getIntValue("id");
-        name = object.getOrDefault("name", "").toString();
+        id = json.getIntValue("id");
+        name = json.getOrDefault("name", "").toString();
 
-        String $type = object.getString("type");
+        String $type = json.getString("type");
         if ($type != null) {
             type = ItemType.valueOf($type);
+        } else {
+            type = null;
         }
 
-        JSONObject $reward = object.getJSONObject("reward");
+        JSONObject $reward = json.getJSONObject("reward");
         if ($reward != null) {
-            reward = new Reward();
-            reward.parse($reward);
+            reward = new Reward($reward);
+        } else {
+            reward = null;
         }
 
-        JSONArray $list = object.getJSONArray("list");
-        if ($list != null) {
-            for (int i = 0; i < $list.size(); i++) {
-                list.add($list.getInteger(i));
+        JSONArray $list$1 = json.getJSONArray("list");
+        List<Integer> $list$2 = new ArrayList<>();
+        if ($list$1 != null) {
+            for (int i = 0; i < $list$1.size(); i++) {
+                $list$2.add($list$1.getInteger(i));
             }
         }
-        list = Collections.unmodifiableList(list);
+        list = Collections.unmodifiableList($list$2);
 
-        JSONArray $set = object.getJSONArray("set");
-        if ($set != null) {
-            for (int i = 0; i < $set.size(); i++) {
-                set.add($set.getInteger(i));
+        JSONArray $set$1 = json.getJSONArray("set");
+        Set<Integer> $set$2 = new HashSet<>();
+        if ($set$1 != null) {
+            for (int i = 0; i < $set$1.size(); i++) {
+                $set$2.add($set$1.getInteger(i));
             }
         }
-        set = Collections.unmodifiableSet(set);
+        set = Collections.unmodifiableSet($set$2);
 
-        JSONObject $map = object.getJSONObject("map");
-        if ($map != null) {
-            for (String $map$Key : $map.keySet()) {
-                map.put(Integer.valueOf($map$Key), $map.getInteger($map$Key));
+        JSONObject $map$1 = json.getJSONObject("map");
+        Map<Integer, Integer> $map$2 = new HashMap();
+        if ($map$1 != null) {
+            for (String $map$Key : $map$1.keySet()) {
+                $map$2.put(Integer.valueOf($map$Key), $map$1.getInteger($map$Key));
             }
         }
-        map = Collections.unmodifiableMap(map);
+        map = Collections.unmodifiableMap($map$2);
 
-        effectiveTime = object.getDate("effectiveTime");
-        effectiveTime$Str = object.getString("effectiveTime$Str");
+        effectiveTime = json.getDate("effectiveTime");
+        effectiveTime$Str = json.getOrDefault("effectiveTime$Str", "").toString();
     }
+
 
     @Override
     public String toString() {
@@ -128,12 +123,13 @@ public class ItemConfig extends Config {
     }
 
     @Override
-    public ItemConfig create() {
-        return new ItemConfig();
+    protected ItemConfig create(JSONObject json) {
+        return new ItemConfig(json);
     }
 
     private volatile static List<ItemConfig> configs = new ArrayList<>();
 
+    //ID
     private volatile static Map<Integer, ItemConfig> idConfigs = new HashMap<>();
 
 

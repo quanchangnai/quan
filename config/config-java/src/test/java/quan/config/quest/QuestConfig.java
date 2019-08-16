@@ -6,175 +6,164 @@ import quan.config.*;
 import quan.config.item.Reward;
 
 /**
+* 任务<br/>
 * Created by 自动生成
 */
 @SuppressWarnings({"unchecked"})
 public class QuestConfig extends Config {
 
-    protected int id;
+    /**
+     * ID
+     */
+    public final int id;
 
-    protected String name;
+    /**
+     * 名字
+     */
+    public final String name;
 
-    protected QuestType type;
+    /**
+     * 类型
+     */
+    public final QuestType type;
 
-    protected int target;
+    /**
+     * 任务目标
+     */
+    public final int target;
 
-    protected Reward reward;
+    /**
+     * 奖励
+     */
+    public final Reward reward;
 
-    protected int a1;
+    /**
+     * A1
+     */
+    public final int a1;
 
-    protected int a2;
+    /**
+     * A2
+     */
+    public final int a2;
 
-    protected int b1;
+    /**
+     * B1
+     */
+    public final int b1;
 
-    protected boolean b2;
+    /**
+     * B2
+     */
+    public final boolean b2;
 
-    protected String c1;
+    /**
+     * C1
+     */
+    public final String c1;
 
-    protected int c2;
+    /**
+     * C2
+     */
+    public final int c2;
 
-    protected int c3;
+    /**
+     * C3
+     */
+    public final int c3;
 
-    protected String d1;
+    /**
+     * D1
+     */
+    public final String d1;
 
-    protected int d2;
+    /**
+     * D2
+     */
+    public final int d2;
 
-    protected int d3;
+    /**
+     * D3
+     */
+    public final int d3;
 
-    protected Set<Integer> s1 = new HashSet<>();
+    /**
+     * S1
+     */
+    public final Set<Integer> s1;
 
-    protected List<Integer> l1 = new ArrayList<>();
+    /**
+     * L1
+     */
+    public final List<Integer> l1;
 
-    protected Map<Integer, Integer> m1 = new HashMap<>();
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public QuestType getType() {
-        return type;
-    }
-
-    public int getTarget() {
-        return target;
-    }
-
-    public Reward getReward() {
-        return reward;
-    }
-
-    public int getA1() {
-        return a1;
-    }
-
-    public int getA2() {
-        return a2;
-    }
-
-    public int getB1() {
-        return b1;
-    }
-
-    public boolean getB2() {
-        return b2;
-    }
-
-    public String getC1() {
-        return c1;
-    }
-
-    public int getC2() {
-        return c2;
-    }
-
-    public int getC3() {
-        return c3;
-    }
-
-    public String getD1() {
-        return d1;
-    }
-
-    public int getD2() {
-        return d2;
-    }
-
-    public int getD3() {
-        return d3;
-    }
-
-    public Set<Integer> getS1() {
-        return s1;
-    }
-
-    public List<Integer> getL1() {
-        return l1;
-    }
-
-    public Map<Integer, Integer> getM1() {
-        return m1;
-    }
+    /**
+     * M1
+     */
+    public final Map<Integer, Integer> m1;
 
 
-    @Override
-    public void parse(JSONObject object) {
-        super.parse(object);
+    public QuestConfig(JSONObject json) {
+        super(json);
 
-        id = object.getIntValue("id");
-        name = object.getOrDefault("name", "").toString();
+        id = json.getIntValue("id");
+        name = json.getOrDefault("name", "").toString();
 
-        String $type = object.getString("type");
+        String $type = json.getString("type");
         if ($type != null) {
             type = QuestType.valueOf($type);
+        } else {
+            type = null;
         }
 
-        target = object.getIntValue("target");
+        target = json.getIntValue("target");
 
-        JSONObject $reward = object.getJSONObject("reward");
+        JSONObject $reward = json.getJSONObject("reward");
         if ($reward != null) {
-            reward = new Reward();
-            reward.parse($reward);
+            reward = new Reward($reward);
+        } else {
+            reward = null;
         }
 
-        a1 = object.getIntValue("a1");
-        a2 = object.getIntValue("a2");
-        b1 = object.getIntValue("b1");
-        b2 = object.getBooleanValue("b2");
-        c1 = object.getOrDefault("c1", "").toString();
-        c2 = object.getIntValue("c2");
-        c3 = object.getIntValue("c3");
-        d1 = object.getOrDefault("d1", "").toString();
-        d2 = object.getIntValue("d2");
-        d3 = object.getIntValue("d3");
+        a1 = json.getIntValue("a1");
+        a2 = json.getIntValue("a2");
+        b1 = json.getIntValue("b1");
+        b2 = json.getBooleanValue("b2");
+        c1 = json.getOrDefault("c1", "").toString();
+        c2 = json.getIntValue("c2");
+        c3 = json.getIntValue("c3");
+        d1 = json.getOrDefault("d1", "").toString();
+        d2 = json.getIntValue("d2");
+        d3 = json.getIntValue("d3");
 
-        JSONArray $s1 = object.getJSONArray("s1");
-        if ($s1 != null) {
-            for (int i = 0; i < $s1.size(); i++) {
-                s1.add($s1.getInteger(i));
+        JSONArray $s1$1 = json.getJSONArray("s1");
+        Set<Integer> $s1$2 = new HashSet<>();
+        if ($s1$1 != null) {
+            for (int i = 0; i < $s1$1.size(); i++) {
+                $s1$2.add($s1$1.getInteger(i));
             }
         }
-        s1 = Collections.unmodifiableSet(s1);
+        s1 = Collections.unmodifiableSet($s1$2);
 
-        JSONArray $l1 = object.getJSONArray("l1");
-        if ($l1 != null) {
-            for (int i = 0; i < $l1.size(); i++) {
-                l1.add($l1.getInteger(i));
+        JSONArray $l1$1 = json.getJSONArray("l1");
+        List<Integer> $l1$2 = new ArrayList<>();
+        if ($l1$1 != null) {
+            for (int i = 0; i < $l1$1.size(); i++) {
+                $l1$2.add($l1$1.getInteger(i));
             }
         }
-        l1 = Collections.unmodifiableList(l1);
+        l1 = Collections.unmodifiableList($l1$2);
 
-        JSONObject $m1 = object.getJSONObject("m1");
-        if ($m1 != null) {
-            for (String $m1$Key : $m1.keySet()) {
-                m1.put(Integer.valueOf($m1$Key), $m1.getInteger($m1$Key));
+        JSONObject $m1$1 = json.getJSONObject("m1");
+        Map<Integer, Integer> $m1$2 = new HashMap();
+        if ($m1$1 != null) {
+            for (String $m1$Key : $m1$1.keySet()) {
+                $m1$2.put(Integer.valueOf($m1$Key), $m1$1.getInteger($m1$Key));
             }
         }
-        m1 = Collections.unmodifiableMap(m1);
+        m1 = Collections.unmodifiableMap($m1$2);
     }
+
 
     @Override
     public String toString() {
@@ -202,8 +191,8 @@ public class QuestConfig extends Config {
     }
 
     @Override
-    public QuestConfig create() {
-        return new QuestConfig();
+    protected QuestConfig create(JSONObject json) {
+        return new QuestConfig(json);
     }
 
     private volatile static List<QuestConfig> configs = new ArrayList<>();
@@ -216,8 +205,10 @@ public class QuestConfig extends Config {
 
     private volatile static Map<String, Map<Integer, Map<Integer, List<QuestConfig>>>> composite4Configs = new HashMap<>();
 
+    //ID
     private volatile static Map<Integer, QuestConfig> idConfigs = new HashMap<>();
 
+    //类型
     private volatile static Map<QuestType, List<QuestConfig>> typeConfigs = new HashMap<>();
 
 

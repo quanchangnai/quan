@@ -1,5 +1,7 @@
 package quan.config;
 
+import com.alibaba.fastjson.JSONObject;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -10,7 +12,11 @@ import java.util.Map;
 @SuppressWarnings({"unchecked"})
 public abstract class Config extends Bean {
 
-    public abstract Config create();
+    public Config(JSONObject json) {
+        super(json);
+    }
+
+    protected abstract Config create(JSONObject json);
 
     protected static Map unmodifiableMap(Map map) {
         for (Object key : map.keySet()) {

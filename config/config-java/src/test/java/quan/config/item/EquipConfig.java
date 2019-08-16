@@ -5,31 +5,30 @@ import com.alibaba.fastjson.*;
 import quan.config.*;
 
 /**
+* 装备1,装备2<br/>
 * Created by 自动生成
 */
 @SuppressWarnings({"unchecked"})
 public class EquipConfig extends ItemConfig {
 
-    protected int position;
+    /**
+     * 部位
+     */
+    public final int position;
 
-    protected int color;
+    /**
+     * 颜色
+     */
+    public final int color;
 
-    public int getPosition() {
-        return position;
+
+    public EquipConfig(JSONObject json) {
+        super(json);
+
+        position = json.getIntValue("position");
+        color = json.getIntValue("color");
     }
 
-    public int getColor() {
-        return color;
-    }
-
-
-    @Override
-    public void parse(JSONObject object) {
-        super.parse(object);
-
-        position = object.getIntValue("position");
-        color = object.getIntValue("color");
-    }
 
     @Override
     public String toString() {
@@ -49,8 +48,8 @@ public class EquipConfig extends ItemConfig {
     }
 
     @Override
-    public EquipConfig create() {
-        return new EquipConfig();
+    protected EquipConfig create(JSONObject json) {
+        return new EquipConfig(json);
     }
 
     public static class self {
@@ -60,8 +59,10 @@ public class EquipConfig extends ItemConfig {
 
         private volatile static List<EquipConfig> configs = new ArrayList<>();
 
+        //ID
         private volatile static Map<Integer, EquipConfig> idConfigs = new HashMap<>();
 
+        //部位
         private volatile static Map<Integer, List<EquipConfig>> positionConfigs = new HashMap<>();
 
 

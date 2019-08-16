@@ -10,7 +10,7 @@ import java.util.Objects;
  */
 public abstract class Bean {
 
-    protected JSONObject json;
+    private JSONObject json;
 
     public String toJson(SerializerFeature... features) {
         if (json != null) {
@@ -20,9 +20,9 @@ public abstract class Bean {
         }
     }
 
-    public void parse(JSONObject object) {
-        Objects.requireNonNull(object, "参数[object]不能为空" );
-        json = object;
+    public Bean(JSONObject json) {
+        Objects.requireNonNull(json, "参数[json]不能为空");
+        this.json = json;
     }
 
 }

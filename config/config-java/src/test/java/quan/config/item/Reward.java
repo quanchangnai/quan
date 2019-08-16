@@ -11,26 +11,18 @@ import quan.config.*;
 @SuppressWarnings({"unchecked"})
 public class Reward extends Bean {
 
-    protected int itemId;
+    public final int itemId;
 
-    protected int itemNum;
+    public final int itemNum;
 
-    public int getItemId() {
-        return itemId;
+
+    public Reward(JSONObject json) {
+        super(json);
+
+        itemId = json.getIntValue("itemId");
+        itemNum = json.getIntValue("itemNum");
     }
 
-    public int getItemNum() {
-        return itemNum;
-    }
-
-
-    @Override
-    public void parse(JSONObject object) {
-        super.parse(object);
-
-        itemId = object.getIntValue("itemId");
-        itemNum = object.getIntValue("itemNum");
-    }
 
     @Override
     public String toString() {
