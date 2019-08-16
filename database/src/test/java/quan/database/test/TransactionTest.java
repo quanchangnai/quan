@@ -89,6 +89,10 @@ public class TransactionTest {
         for (int i = 0; i < 10; i++) {
             list.add(String.valueOf(i));
         }
+
+        for (String s : list) {
+//            list.remove(s);
+        }
         list.removeAll(Arrays.asList("1", "2"));
         Iterator<String> listIterator = list.iterator();
         while (listIterator.hasNext()) {

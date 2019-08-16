@@ -13,6 +13,8 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
 
     private PVector<E> data = Empty.vector();
 
+    private int modCount;
+
     public ListField(Data root) {
         setRoot(root);
     }
@@ -28,6 +30,7 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
 
     @Override
     public void setValue(PVector<E> data) {
+        modCount++;
         this.data = data;
     }
 
@@ -61,6 +64,7 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
             private Iterator<E> it = getValue().iterator();
             private int cursor;
             private int last = -1;
+            int expectedModCount = modCount;
 
             @Override
             public boolean hasNext() {
@@ -69,6 +73,7 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
 
             @Override
             public E next() {
+                checkConcurrentModification();
                 E current = it.next();
                 if (current != null) {
                     last = cursor;
@@ -82,9 +87,22 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
                 if (last < 0) {
                     throw new IllegalStateException();
                 }
-                ListField.this.remove(last);
-                cursor = last;
-                last--;
+                checkConcurrentModification();
+                try {
+                    ListField.this.remove(last);
+                    cursor = last;
+                    last--;
+                    expectedModCount = modCount;
+                } catch (IndexOutOfBoundsException ex) {
+                    throw new ConcurrentModificationException();
+                }
+
+            }
+
+            private void checkConcurrentModification() {
+                if (modCount != expectedModCount) {
+                    throw new ConcurrentModificationException();
+                }
             }
         };
     }
@@ -120,8 +138,8 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
     public boolean add(E e) {
         Validations.validateCollectionValue(e);
 
+        modCount++;
         FieldLog<PVector<E>> log = getLog(true);
-
         PVector<E> oldData = log.getValue();
         PVector<E> newData = log.getValue().plus(e);
 
@@ -140,6 +158,7 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
     public boolean remove(Object o) {
         FieldLog<PVector<E>> log = getLog(true);
 
+        modCount++;
         PVector<E> oldData = log.getValue();
         for (E e : oldData) {
             if (e.equals(o) && e instanceof Entity) {
@@ -167,6 +186,7 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
             Validations.validateCollectionValue(e);
         }
 
+        modCount++;
         FieldLog<PVector<E>> log = getLog(true);
         PVector<E> oldData = log.getValue();
         log.setValue(log.getValue().plusAll(c));
@@ -187,6 +207,7 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
             Validations.validateCollectionValue(e);
         }
 
+        modCount++;
         FieldLog<PVector<E>> log = getLog(true);
         PVector<E> oldData = log.getValue();
         log.setValue(log.getValue().plusAll(index, c));
@@ -218,6 +239,7 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
         if (log.getValue().isEmpty()) {
             return;
         }
+        modCount++;
         setChildrenLogRoot(null);
         log.setValue(Empty.vector());
     }
@@ -231,6 +253,7 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
     public boolean retainAll(Collection<?> c) {
         Objects.requireNonNull(c);
         boolean modified = false;
+        modCount++;
         Iterator<E> iterator = iterator();
         while (iterator.hasNext())
             if (!c.contains(iterator.next())) {
@@ -244,6 +267,7 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
     public E set(int index, E element) {
         Validations.validateCollectionValue(element);
 
+        modCount++;
         FieldLog<PVector<E>> log = getLog(true);
         PVector<E> oldData = log.getValue();
         log.setValue(log.getValue().with(index, element));
@@ -263,6 +287,8 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
     @Override
     public void add(int index, E element) {
         Validations.validateCollectionValue(element);
+
+        modCount++;
         FieldLog<PVector<E>> log = getLog(true);
         log.setValue(log.getValue().plus(index, element));
     }
@@ -271,6 +297,7 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
     public E remove(int index) {
         FieldLog<PVector<E>> log = getLog(true);
 
+        modCount++;
         PVector<E> oldData = log.getValue();
         log.setValue(log.getValue().minus(index));
 
