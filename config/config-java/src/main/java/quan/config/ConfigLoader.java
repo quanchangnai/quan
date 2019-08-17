@@ -33,6 +33,8 @@ public class ConfigLoader {
     //配置表所在目录
     private String tablePath;
 
+    private String packagePrefix = "";
+
     //配置表类型,csv xls xlsx等
     private String tableType = "csv";
 
@@ -70,7 +72,7 @@ public class ConfigLoader {
     /**
      * 使用XML配置解析器，只有加载以配置全类名作为JSON文件名时可以为空
      */
-    public DefinitionParser useXmlDefinitionParser(List<String> definitionPaths, String packagePrefix) {
+    public DefinitionParser useXmlDefinition(List<String> definitionPaths, String packagePrefix) {
         definitionParser = new XmlDefinitionParser();
         definitionParser.setCategory(DefinitionCategory.config);
         definitionParser.setDefinitionPaths(definitionPaths);
@@ -81,8 +83,16 @@ public class ConfigLoader {
     /**
      * 使用XML配置解析器，只有加载以配置全类名作为JSON文件名时可以为空
      */
-    public DefinitionParser useXmlDefinitionParser(String definitionPath, String packagePrefix) {
-        return useXmlDefinitionParser(Collections.singletonList(definitionPath), packagePrefix);
+    public DefinitionParser useXmlDefinition(String definitionPath, String packagePrefix) {
+        return useXmlDefinition(Collections.singletonList(definitionPath), packagePrefix);
+    }
+
+    /**
+     * 不使用配置定义加载配置
+     */
+    public void notUseDefinition(String packagePrefix) {
+        this.packagePrefix = packagePrefix;
+        definitionParser = null;
     }
 
     /**
@@ -197,7 +207,7 @@ public class ConfigLoader {
     }
 
     private boolean isJsonAndNoDefinition() {
-        return tableType.equals("json") && definitionParser.getTableConfigs().isEmpty();
+        return tableType.equals("json") && definitionParser == null;
     }
 
     /**
@@ -212,10 +222,14 @@ public class ConfigLoader {
         List<Config> configs = new ArrayList<>();
 
         for (File jsonFile : jsonFiles) {
-            String configFullName = jsonFile.getName().substring(0, jsonFile.getName().lastIndexOf("."));
+            String configPackageAndName = jsonFile.getName().substring(0, jsonFile.getName().lastIndexOf("."));
+            String configFullName = configPackageAndName;
+            if (!StringUtils.isBlank(packagePrefix)) {
+                configFullName = packagePrefix + "." + configPackageAndName;
+            }
             configDescendantsAndMe.computeIfAbsent(configFullName, k -> new HashSet<>());
 
-            ConfigReader reader = getOrCreateReader(configFullName);
+            ConfigReader reader = getOrCreateReader(configPackageAndName);
             Config prototype = reader.getPrototype();
             if (prototype != null) {
                 configs.add(prototype);
@@ -227,7 +241,11 @@ public class ConfigLoader {
                 if (!config1.getClass().isAssignableFrom(config2.getClass())) {
                     continue;
                 }
-                configDescendantsAndMe.get(config1.getClass().getName()).add(config2.getClass().getName());
+                String config2Name = config2.getClass().getName();
+                if (!StringUtils.isBlank(packagePrefix)) {
+                    config2Name = config2.getClass().getName().substring(packagePrefix.length() + 1);
+                }
+                configDescendantsAndMe.get(config1.getClass().getName()).add(config2Name);
             }
         }
 
@@ -248,8 +266,9 @@ public class ConfigLoader {
      * 通过配置定义加载
      */
     private void loadByDefinition() {
-        Set<ConfigDefinition> configDefinitions = new HashSet<>(definitionParser.getTableConfigs().values());
+        Objects.requireNonNull(definitionParser, "配置定义解析器不能为空");
 
+        Set<ConfigDefinition> configDefinitions = new HashSet<>(definitionParser.getTableConfigs().values());
         //配置对应的已索引JSON数据
         Map<ConfigDefinition, Map<IndexDefinition, Map>> configIndexedJsonsAll = new HashMap<>();
 
@@ -296,12 +315,15 @@ public class ConfigLoader {
     }
 
     public void writeJson(String path) {
-        writeJson(path, false);
+        writeJson(path, true);
     }
 
-    public void writeJson(String path, boolean useFullName) {
-        Objects.requireNonNull(path, "输出目录不能为空");
+    public void writeJson(String path, boolean useSimpleName) {
+        if (definitionParser == null) {
+            return;
+        }
 
+        Objects.requireNonNull(path, "输出目录不能为空");
         File pathFile = new File(PathUtils.currentPlatPath(path));
         if (!pathFile.exists()) {
             pathFile.mkdirs();
@@ -322,8 +344,8 @@ public class ConfigLoader {
             }
 
             String configName = configDefinition.getName();
-            if (useFullName) {
-                configName = configDefinition.getFullName();
+            if (!useSimpleName) {
+                configName = configDefinition.getPackageName() + "." + configDefinition.getName();
             }
             try (FileOutputStream fileOutputStream = new FileOutputStream(new File(pathFile, configName + ".json"))) {
                 JSON.writeJSONString(fileOutputStream, rows, SerializerFeature.PrettyFormat);
@@ -339,6 +361,9 @@ public class ConfigLoader {
      * @param table Json的表名实际上就是配置名
      */
     private ConfigDefinition getConfigByTable(String table) {
+        if (definitionParser == null) {
+            return null;
+        }
         if (tableType.equals("json")) {
             return definitionParser.getConfig(table);
         } else {
@@ -670,18 +695,23 @@ public class ConfigLoader {
         LinkedHashMap<String, ConfigReader> reloadReaders = new LinkedHashMap<>();
 
         for (File jsonFile : jsonFiles) {
-            String configFullName = jsonFile.getName().substring(0, jsonFile.getName().lastIndexOf("."));
-            String configName = configFullName.substring(configFullName.lastIndexOf(".") + 1);
+            String configPackageAndName = jsonFile.getName().substring(0, jsonFile.getName().lastIndexOf("."));
+            String configFullName = configPackageAndName;
+            if (!StringUtils.isBlank(packagePrefix)) {
+                configFullName = packagePrefix + "." + configPackageAndName;
+            }
+            String configName = configPackageAndName.substring(0, configPackageAndName.lastIndexOf("."));
             if (!configNames.contains(configName)) {
                 continue;
             }
-            ConfigReader configReader = readers.get(configFullName);
+
+            ConfigReader configReader = readers.get(configPackageAndName);
             if (configReader == null) {
                 logger.error("重加载[{}]失败，对应配置从未被加载", configName);
                 continue;
             }
             configReader.clear();
-            reloadReaders.put(configName, configReader);
+            reloadReaders.put(configPackageAndName, configReader);
 
             Set<String> descendantsAndMe = configDescendantsAndMe.get(configFullName);
 
@@ -745,10 +775,18 @@ public class ConfigLoader {
             case "xlsx":
                 configReader = new ExcelConfigReader(tablePath, table + "." + tableType, configDefinition);
                 break;
-            case "json":
-                String configFullName = configDefinition == null ? table : configDefinition.getFullName();
+            case "json": {
+                String configFullName;
+                if (configDefinition != null) {
+                    configFullName = configDefinition.getFullName();
+                } else if (!StringUtils.isBlank(packagePrefix)) {
+                    configFullName = packagePrefix + "." + table;
+                } else {
+                    configFullName = table;
+                }
                 configReader = new JsonConfigReader(tablePath, table + "." + tableType, configFullName);
                 break;
+            }
 
         }
 

@@ -27,14 +27,15 @@ public class ConfigTest {
 
 
         ConfigLoader configLoader = new ConfigLoader(tablePath);
-        configLoader.useXmlDefinitionParser(definitionPaths, "quan.config");
+        configLoader.useXmlDefinition(definitionPaths, "quan.config");
+//        configLoader.notUseDefinition("quan.config");
         configLoader.setLoadType(LoadType.validateAndLoad);
         configLoader.setValidatorsPackage("quan");
         configLoader.setTableType(tableType);
 
         loadConfig(configLoader);
 
-        writeJson(configLoader, true);
+        writeJson(configLoader, false);
 
         reloadAllConfig(configLoader);
 
@@ -59,13 +60,13 @@ public class ConfigTest {
         System.err.println();
     }
 
-    private static void writeJson(ConfigLoader configLoader, boolean useFullName) {
+    private static void writeJson(ConfigLoader configLoader, boolean useSimpleName) {
         if (configLoader.getTableType().equals("json")) {
             return;
         }
         System.err.println("writeJson()=============");
         long startTime = System.currentTimeMillis();
-        configLoader.writeJson("config\\json", useFullName);
+        configLoader.writeJson("config\\json", useSimpleName);
         System.err.println("writeJson()耗时:" + (System.currentTimeMillis() - startTime));
         System.err.println();
     }
