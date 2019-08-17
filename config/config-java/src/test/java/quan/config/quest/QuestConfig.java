@@ -66,65 +66,65 @@ public class QuestConfig extends Config {
     protected final Map<Integer, Integer> m1;
 
 
-    public QuestConfig(JSONObject $json$) {
-        super($json$);
+    public QuestConfig(JSONObject json) {
+        super(json);
 
-        id = $json$.getIntValue("id");
-        name = $json$.getOrDefault("name", "").toString();
+        this.id = json.getIntValue("id");
+        this.name = json.getOrDefault("name", "").toString();
 
-        String $type = $json$.getString("type");
+        String $type = json.getString("type");
         if ($type != null) {
-            type = QuestType.valueOf($type);
+            this.type = QuestType.valueOf($type);
         } else {
-            type = null;
+            this.type = null;
         }
 
-        target = $json$.getIntValue("target");
+        this.target = json.getIntValue("target");
 
-        JSONObject $reward = $json$.getJSONObject("reward");
+        JSONObject $reward = json.getJSONObject("reward");
         if ($reward != null) {
-            reward = new Reward($reward);
+            this.reward = new Reward($reward);
         } else {
-            reward = null;
+            this.reward = null;
         }
 
-        a1 = $json$.getIntValue("a1");
-        a2 = $json$.getIntValue("a2");
-        b1 = $json$.getIntValue("b1");
-        b2 = $json$.getBooleanValue("b2");
-        c1 = $json$.getOrDefault("c1", "").toString();
-        c2 = $json$.getIntValue("c2");
-        c3 = $json$.getIntValue("c3");
-        d1 = $json$.getOrDefault("d1", "").toString();
-        d2 = $json$.getIntValue("d2");
-        d3 = $json$.getIntValue("d3");
+        this.a1 = json.getIntValue("a1");
+        this.a2 = json.getIntValue("a2");
+        this.b1 = json.getIntValue("b1");
+        this.b2 = json.getBooleanValue("b2");
+        this.c1 = json.getOrDefault("c1", "").toString();
+        this.c2 = json.getIntValue("c2");
+        this.c3 = json.getIntValue("c3");
+        this.d1 = json.getOrDefault("d1", "").toString();
+        this.d2 = json.getIntValue("d2");
+        this.d3 = json.getIntValue("d3");
 
-        JSONArray $s1$1 = $json$.getJSONArray("s1");
+        JSONArray $s1$1 = json.getJSONArray("s1");
         Set<Integer> $s1$2 = new HashSet<>();
         if ($s1$1 != null) {
             for (int i = 0; i < $s1$1.size(); i++) {
                 $s1$2.add($s1$1.getInteger(i));
             }
         }
-        s1 = Collections.unmodifiableSet($s1$2);
+        this.s1 = Collections.unmodifiableSet($s1$2);
 
-        JSONArray $l1$1 = $json$.getJSONArray("l1");
+        JSONArray $l1$1 = json.getJSONArray("l1");
         List<Integer> $l1$2 = new ArrayList<>();
         if ($l1$1 != null) {
             for (int i = 0; i < $l1$1.size(); i++) {
                 $l1$2.add($l1$1.getInteger(i));
             }
         }
-        l1 = Collections.unmodifiableList($l1$2);
+        this.l1 = Collections.unmodifiableList($l1$2);
 
-        JSONObject $m1$1 = $json$.getJSONObject("m1");
+        JSONObject $m1$1 = json.getJSONObject("m1");
         Map<Integer, Integer> $m1$2 = new HashMap<>();
         if ($m1$1 != null) {
             for (String $m1$Key : $m1$1.keySet()) {
                 $m1$2.put(Integer.valueOf($m1$Key), $m1$1.getInteger($m1$Key));
             }
         }
-        m1 = Collections.unmodifiableMap($m1$2);
+        this.m1 = Collections.unmodifiableMap($m1$2);
     }
 
     /**
@@ -255,8 +255,8 @@ public class QuestConfig extends Config {
 
 
     @Override
-    protected QuestConfig create(JSONObject $json$) {
-        return new QuestConfig($json$);
+    protected QuestConfig create(JSONObject json) {
+        return new QuestConfig(json);
     }
 
     @Override

@@ -155,7 +155,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
 
     @Override
     public JSONObject encode() {
-        JSONObject $json$ = new JSONObject();
+        JSONObject json = new JSONObject();
 
 <#list fields as field>
     <#if field.type == "list" || field.type == "set">
@@ -164,13 +164,13 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
         </#if>
         JSONArray $${field.name} = new JSONArray();
         <#if !field.builtInValueType>
-        for (${field.classValueType} $${field.name}$Value : ${field.name}) {
+        for (${field.classValueType} $${field.name}$Value : this.${field.name}) {
             $${field.name}.add($${field.name}$Value.encode());
         }
         <#else>
-        $${field.name}.addAll(${field.name});
+        $${field.name}.addAll(this.${field.name});
         </#if>
-        $json$.put("${field.name}", $${field.name});
+        json.put("${field.name}", $${field.name});
         <#if field_has_next && (fields[field_index+1].enumType || fields[field_index+1].primitiveType) >
 
         </#if>
@@ -179,26 +179,26 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
 
         </#if>
         JSONObject $${field.name} = new JSONObject();
-        for (${field.classKeyType} $${field.name}$Key : ${field.name}.keySet()) {
+        for (${field.classKeyType} $${field.name}$Key : this.${field.name}.keySet()) {
         <#if !field.builtInValueType>
-            $${field.name}.put(String.valueOf($${field.name}$Key), ${field.name}.get($${field.name}$Key).encode());
+            $${field.name}.put(String.valueOf($${field.name}$Key), this.${field.name}.get($${field.name}$Key).encode());
         <#else>
-            $${field.name}.put(String.valueOf($${field.name}$Key), ${field.name}.get($${field.name}$Key));
+            $${field.name}.put(String.valueOf($${field.name}$Key), this.${field.name}.get($${field.name}$Key));
         </#if>
         }
-        $json$.put("${field.name}", $${field.name});
+        json.put("${field.name}", $${field.name});
         <#if field_has_next && (fields[field_index+1].enumType || fields[field_index+1].primitiveType) >
 
         </#if>
     <#elseif field.builtInType || field.enumType>
-        $json$.put("${field.name}", ${field.name}.getValue());
+        json.put("${field.name}", this.${field.name}.getValue());
     <#else>
         <#if field_index gt 0 >
 
         </#if>
-        ${field.type} $${field.name} = ${field.name}.getValue();
+        ${field.type} $${field.name} = this.${field.name}.getValue();
         if ($${field.name} != null) {
-            $json$.put("${field.name}", $${field.name}.encode());
+            json.put("${field.name}", $${field.name}.encode());
         }
         <#if field_has_next && (fields[field_index+1].enumType || fields[field_index+1].primitiveType) >
 
@@ -206,17 +206,17 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
     </#if>
 </#list>
 
-        return $json$;
+        return json;
     }
 
     @Override
-    public void decode(JSONObject $json$) {
+    public void decode(JSONObject json) {
 <#list fields as field>
     <#if field.type == "list">
         <#if field_index gt 0 >
 
         </#if>
-        JSONArray $${field.name}$1 = $json$.getJSONArray("${field.name}");
+        JSONArray $${field.name}$1 = json.getJSONArray("${field.name}");
         if ($${field.name}$1 != null) {
             PVector<${field.classValueType}> $${field.name}$2 = Empty.vector();
             for (int i = 0; i < $${field.name}$1.size(); i++) {
@@ -228,7 +228,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
                 $${field.name}$2 = $${field.name}$2.plus($${field.name}$1.get${field.classValueType}(i));
         </#if>
             }
-            ${field.name}.setValue($${field.name}$2);
+            this.${field.name}.setValue($${field.name}$2);
         }
         <#if field_has_next && (fields[field_index+1].enumType || fields[field_index+1].primitiveType && fields[field_index+1].type!="string")>
 
@@ -237,7 +237,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
         <#if field_index gt 0 >
 
         </#if>
-        JSONArray $${field.name}$1 = $json$.getJSONArray("${field.name}");
+        JSONArray $${field.name}$1 = json.getJSONArray("${field.name}");
         if ($${field.name}$1 != null) {
             PSet<${field.classValueType}> $${field.name}$2 = Empty.set();
             for (int i = 0; i < $${field.name}$1.size(); i++) {
@@ -249,7 +249,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
                 $${field.name}$2 = $${field.name}$2.plus($${field.name}$1.get${field.classValueType}(i));
         </#if>
             }
-            ${field.name}.setValue($${field.name}$2);
+            this.${field.name}.setValue($${field.name}$2);
         }
         <#if field_has_next && (fields[field_index+1].enumType || fields[field_index+1].primitiveType && fields[field_index+1].type!="string")>
 
@@ -258,49 +258,39 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
         <#if field_index gt 0 >
 
         </#if>
-        JSONObject $${field.name}$1 = $json$.getJSONObject("${field.name}");
+        JSONObject $${field.name}$1 = json.getJSONObject("${field.name}");
         if ($${field.name}$1 != null) {
             PMap<${field.classKeyType}, ${field.classValueType}> $${field.name}$2 = Empty.map();
-            for (String $${field.name}$1_Key : $${field.name}$1.keySet()) {
+            for (String $${field.name}$Key : $${field.name}$1.keySet()) {
         <#if !field.builtInValueType>
                 ${field.classValueType} $${field.name}$Value = new ${field.classValueType}();
-                $${field.name}$Value.decode($${field.name}$1.getJSONObject($${field.name}$1_Key));
-                $${field.name}$2 = $${field.name}$2.plus(${field.classKeyType}.valueOf($${field.name}$1_Key), $${field.name}$Value);
+                $${field.name}$Value.decode($${field.name}$1.getJSONObject($${field.name}$Key));
+                $${field.name}$2 = $${field.name}$2.plus(${field.classKeyType}.valueOf($${field.name}$Key), $${field.name}$Value);
         <#else>
-                $${field.name}$2 = $${field.name}$2.plus(${field.classKeyType}.valueOf($${field.name}$1_Key), $${field.name}$1.get${field.classValueType}($${field.name}$1_Key));
+                $${field.name}$2 = $${field.name}$2.plus(${field.classKeyType}.valueOf($${field.name}$Key), $${field.name}$1.get${field.classValueType}($${field.name}$Key));
         </#if>
             }
-            ${field.name}.setValue($${field.name}$2);
+            this.${field.name}.setValue($${field.name}$2);
         }
         <#if field_has_next && (fields[field_index+1].enumType || fields[field_index+1].primitiveType && fields[field_index+1].type!="string")>
 
         </#if>
     <#elseif field.type=="int" || field.enumType>
-        ${field.name}.setValue($json$.getIntValue("${field.name}"));
+        this.${field.name}.setValue(json.getIntValue("${field.name}"));
     <#elseif field.type=="string">
-        <#if field_index gt 0 >
-
-        </#if>
-        String $${field.name} = $json$.getString("${field.name}");
-        if ($${field.name} == null) {
-            $${field.name} = "";
-        }
-        ${field.name}.setValue($${field.name});
-        <#if field_has_next && (fields[field_index+1].enumType || fields[field_index+1].primitiveType && fields[field_index+1].type!="string")>
-
-        </#if>
+        this.${field.name}.setValue(json.getOrDefault("${field.name}","").toString());
     <#elseif field.builtInType>
-        ${field.name}.setValue($json$.get${field.classType}Value("${field.name}"));
+        this.${field.name}.setValue(json.get${field.classType}Value("${field.name}"));
     <#else>
         <#if field_index gt 0 >
 
         </#if>
-        JSONObject $${field.name} = $json$.getJSONObject("${field.name}");
+        JSONObject $${field.name} = json.getJSONObject("${field.name}");
         if ($${field.name} != null) {
-            ${field.classType} $${field.name}$Value = ${field.name}.getValue();
+            ${field.classType} $${field.name}$Value = this.${field.name}.getValue();
             if ($${field.name}$Value == null) {
                 $${field.name}$Value = new ${field.classType}();
-                ${field.name}.setValue($${field.name}$Value);
+                this.${field.name}.setValue($${field.name}$Value);
             }
             $${field.name}$Value.decode($${field.name});
         }

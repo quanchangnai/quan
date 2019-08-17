@@ -92,131 +92,121 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 
 </#if>
     @Override
-    public void encode(Buffer $buffer) throws IOException {
-        super.encode($buffer);
+    public void encode(Buffer buffer) throws IOException {
+        super.encode(buffer);
 
 <#list fields as field>
     <#if field.type=="set" || field.type=="list">
         <#if field_index gt 0>
 
         </#if>
-        $buffer.writeInt(${field.name}.size());
-        for (${field.basicValueType} $${field.name}$Value : ${field.name}) {
+        buffer.writeInt(this.${field.name}.size());
+        for (${field.basicValueType} $${field.name}$Value : this.${field.name}) {
         <#if field.builtInValueType>
-            $buffer.write${field.valueType?cap_first}($${field.name}$Value);
+            buffer.write${field.valueType?cap_first}($${field.name}$Value);
         <#else>
-            $${field.name}$Value.encode($buffer);
+            $${field.name}$Value.encode(buffer);
         </#if>
         }
-        <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || !fields[field_index+1].optional) >
+        <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType|| fields[field_index+1].enumType || !fields[field_index+1].optional) >
 
         </#if>
     <#elseif field.type=="map">
         <#if field_index gt 0>
 
         </#if>
-        $buffer.writeInt(${field.name}.size());
-        for (${field.basicKeyType} $${field.name}$Key : ${field.name}.keySet()) {
-            $buffer.write${field.keyType?cap_first}($${field.name}$Key);
+        buffer.writeInt(this.${field.name}.size());
+        for (${field.basicKeyType} $${field.name}$Key : this.${field.name}.keySet()) {
+            buffer.write${field.keyType?cap_first}($${field.name}$Key);
         <#if field.builtInValueType>
-            $buffer.write${field.valueType?cap_first}(${field.name}.get($${field.name}$Key));
+            buffer.write${field.valueType?cap_first}(this.${field.name}.get($${field.name}$Key));
         <#else>
-            ${field.name}.get($${field.name}$Key).encode($buffer);
+            this.${field.name}.get($${field.name}$Key).encode(buffer);
         </#if>
         }
-        <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || !fields[field_index+1].optional) >
+        <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType|| fields[field_index+1].enumType || !fields[field_index+1].optional) >
 
         </#if>
     <#elseif field.builtInType>
-        $buffer.write${field.type?cap_first}(${field.name});
+        buffer.write${field.type?cap_first}(this.${field.name});
     <#elseif field.enumType>
-        <#if field_index gt 0>
-
-        </#if>
-        if(${field.name} != null) {
-            $buffer.writeInt(${field.name}.getValue());
-        }else {
-            $buffer.writeInt(0);
-        }
-        <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || !fields[field_index+1].optional) >
-
-        </#if>
+        buffer.writeInt(this.${field.name} == null ? 0 : this.${field.name}.getValue());
     <#elseif field.optional>
         <#if field_index gt 0>
 
         </#if>
-        $buffer.writeBool(${field.name} != null);
-        if (${field.name} != null) {
-            ${field.name}.encode($buffer);
+        buffer.writeBool(this.${field.name} != null);
+        if (this.${field.name} != null) {
+            this.${field.name}.encode(buffer);
         }
-        <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || !fields[field_index+1].optional) >
+        <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || fields[field_index+1].enumType || !fields[field_index+1].optional) >
 
         </#if>
     <#else>
-        ${field.name}.encode($buffer);
+        this.${field.name}.encode(buffer);
     </#if>
 </#list>
     }
 
     @Override
-    public void decode(Buffer $buffer) throws IOException {
-        super.decode($buffer);
+    public void decode(Buffer buffer) throws IOException {
+        super.decode(buffer);
 
 <#list fields as field>
     <#if field.type=="set" || field.type=="list">
         <#if field_index gt 0>
 
         </#if>
-        int $${field.name}$Size = $buffer.readInt();
+        int $${field.name}$Size = buffer.readInt();
         for (int i = 0; i < $${field.name}$Size; i++) {
         <#if field.builtInValueType>
-            ${field.name}.add($buffer.read${field.valueType?cap_first}());
+            this.${field.name}.add(buffer.read${field.valueType?cap_first}());
         <#else>
             ${field.valueType} $${field.name}$Value = new ${field.valueType}();
-            $${field.name}$Value.decode($buffer);
-            ${field.name}.add($${field.name}$Value);
+            $${field.name}$Value.decode(buffer);
+            this.${field.name}.add($${field.name}$Value);
         </#if>
         }
-        <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || !fields[field_index+1].optional) >
+        <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType|| fields[field_index+1].enumType || !fields[field_index+1].optional) >
 
         </#if>
     <#elseif field.type=="map">
         <#if field_index gt 0>
 
         </#if>
-        int $${field.name}$Size = $buffer.readInt();
+        int $${field.name}$Size = buffer.readInt();
         for (int i = 0; i < $${field.name}$Size; i++) {
         <#if field.builtInValueType>
-            ${field.name}.put($buffer.read${field.keyType?cap_first}(), $buffer.read${field.valueType?cap_first}());
+            this.${field.name}.put(buffer.read${field.keyType?cap_first}(), buffer.read${field.valueType?cap_first}());
         <#else>
-            ${field.basicKeyType} $${field.name}$Key = $buffer.read${field.keyType?cap_first}();
+            ${field.basicKeyType} $${field.name}$Key = buffer.read${field.keyType?cap_first}();
             ${field.basicValueType} $${field.name}$Value = new ${field.valueType}();
-            $${field.name}$Value.decode($buffer);
-            ${field.name}.put($${field.name}$Key, $${field.name}$Value);
+            $${field.name}$Value.decode(buffer);
+            this.${field.name}.put($${field.name}$Key, $${field.name}$Value);
         </#if>
         }
-        <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || !fields[field_index+1].optional) >
+        <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType|| fields[field_index+1].enumType || !fields[field_index+1].optional) >
 
         </#if>
     <#elseif field.builtInType>
-        ${field.name} = $buffer.read${field.type?cap_first}();
+        this.${field.name} = buffer.read${field.type?cap_first}();
     <#elseif field.enumType>
-        ${field.name} = ${field.type}.valueOf($buffer.readInt());
+        this.${field.name} = ${field.type}.valueOf(buffer.readInt());
     <#elseif field.optional>
         <#if field_index gt 0>
 
         </#if>
-        if ($buffer.readBool()) {
-            if (${field.name} == null) {
-                ${field.name} = new ${field.type}();
+        if (buffer.readBool()) {
+            if (this.${field.name} == null) {
+                this.${field.name} = new ${field.type}();
             }
-            ${field.name}.decode($buffer);
+            this.${field.name}.decode(buffer);
         }
-        <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || !fields[field_index+1].optional) >
+        <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType|| fields[field_index+1].enumType || !fields[field_index+1].optional) >
 
         </#if>
     <#else>
-        ${field.name}.decode($buffer);
+        this.${field.name}.decode(buffer);
     </#if>
 </#list>
     }

@@ -38,55 +38,55 @@ public class ItemConfig extends Config {
     protected final String effectiveTime$Str;
 
 
-    public ItemConfig(JSONObject $json$) {
-        super($json$);
+    public ItemConfig(JSONObject json) {
+        super(json);
 
-        id = $json$.getIntValue("id");
-        name = $json$.getOrDefault("name", "").toString();
+        this.id = json.getIntValue("id");
+        this.name = json.getOrDefault("name", "").toString();
 
-        String $type = $json$.getString("type");
+        String $type = json.getString("type");
         if ($type != null) {
-            type = ItemType.valueOf($type);
+            this.type = ItemType.valueOf($type);
         } else {
-            type = null;
+            this.type = null;
         }
 
-        JSONObject $reward = $json$.getJSONObject("reward");
+        JSONObject $reward = json.getJSONObject("reward");
         if ($reward != null) {
-            reward = new Reward($reward);
+            this.reward = new Reward($reward);
         } else {
-            reward = null;
+            this.reward = null;
         }
 
-        JSONArray $list$1 = $json$.getJSONArray("list");
+        JSONArray $list$1 = json.getJSONArray("list");
         List<Integer> $list$2 = new ArrayList<>();
         if ($list$1 != null) {
             for (int i = 0; i < $list$1.size(); i++) {
                 $list$2.add($list$1.getInteger(i));
             }
         }
-        list = Collections.unmodifiableList($list$2);
+        this.list = Collections.unmodifiableList($list$2);
 
-        JSONArray $set$1 = $json$.getJSONArray("set");
+        JSONArray $set$1 = json.getJSONArray("set");
         Set<Integer> $set$2 = new HashSet<>();
         if ($set$1 != null) {
             for (int i = 0; i < $set$1.size(); i++) {
                 $set$2.add($set$1.getInteger(i));
             }
         }
-        set = Collections.unmodifiableSet($set$2);
+        this.set = Collections.unmodifiableSet($set$2);
 
-        JSONObject $map$1 = $json$.getJSONObject("map");
+        JSONObject $map$1 = json.getJSONObject("map");
         Map<Integer, Integer> $map$2 = new HashMap<>();
         if ($map$1 != null) {
             for (String $map$Key : $map$1.keySet()) {
                 $map$2.put(Integer.valueOf($map$Key), $map$1.getInteger($map$Key));
             }
         }
-        map = Collections.unmodifiableMap($map$2);
+        this.map = Collections.unmodifiableMap($map$2);
 
-        effectiveTime = $json$.getDate("effectiveTime");
-        effectiveTime$Str = $json$.getOrDefault("effectiveTime$Str", "").toString();
+        this.effectiveTime = json.getDate("effectiveTime");
+        this.effectiveTime$Str = json.getOrDefault("effectiveTime$Str", "").toString();
     }
 
     /**
@@ -154,8 +154,8 @@ public class ItemConfig extends Config {
 
 
     @Override
-    protected ItemConfig create(JSONObject $json$) {
-        return new ItemConfig($json$);
+    protected ItemConfig create(JSONObject json) {
+        return new ItemConfig(json);
     }
 
     @Override

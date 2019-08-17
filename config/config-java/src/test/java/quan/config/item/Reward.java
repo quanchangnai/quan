@@ -15,11 +15,11 @@ public class Reward extends Bean {
     protected final int itemNum;
 
 
-    public Reward(JSONObject $json$) {
-        super($json$);
+    public Reward(JSONObject json) {
+        super(json);
 
-        itemId = $json$.getIntValue("itemId");
-        itemNum = $json$.getIntValue("itemNum");
+        this.itemId = json.getIntValue("itemId");
+        this.itemNum = json.getIntValue("itemNum");
     }
 
     public final int getItemId() {

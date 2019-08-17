@@ -29,13 +29,13 @@ public class WeaponConfig extends EquipConfig {
     protected final List<Integer> list2;
 
 
-    public WeaponConfig(JSONObject $json$) {
-        super($json$);
+    public WeaponConfig(JSONObject json) {
+        super(json);
 
-        w1 = $json$.getIntValue("w1");
-        w2 = $json$.getIntValue("w2");
+        this.w1 = json.getIntValue("w1");
+        this.w2 = json.getIntValue("w2");
 
-        JSONArray $rewardList$1 = $json$.getJSONArray("rewardList");
+        JSONArray $rewardList$1 = json.getJSONArray("rewardList");
         List<Reward> $rewardList$2 = new ArrayList<>();
         if ($rewardList$1 != null) {
             for (int i = 0; i < $rewardList$1.size(); i++) {
@@ -43,9 +43,9 @@ public class WeaponConfig extends EquipConfig {
                 $rewardList$2.add($rewardList$Value);
             }
         }
-        rewardList = Collections.unmodifiableList($rewardList$2);
+        this.rewardList = Collections.unmodifiableList($rewardList$2);
 
-        JSONArray $rewardSet$1 = $json$.getJSONArray("rewardSet");
+        JSONArray $rewardSet$1 = json.getJSONArray("rewardSet");
         Set<Reward> $rewardSet$2 = new HashSet<>();
         if ($rewardSet$1 != null) {
             for (int i = 0; i < $rewardSet$1.size(); i++) {
@@ -53,9 +53,9 @@ public class WeaponConfig extends EquipConfig {
                 $rewardSet$2.add($rewardSet$Value);
             }
         }
-        rewardSet = Collections.unmodifiableSet($rewardSet$2);
+        this.rewardSet = Collections.unmodifiableSet($rewardSet$2);
 
-        JSONObject $rewardMap$1 = $json$.getJSONObject("rewardMap");
+        JSONObject $rewardMap$1 = json.getJSONObject("rewardMap");
         Map<Integer, Reward> $rewardMap$2 = new HashMap<>();
         if ($rewardMap$1 != null) {
             for (String $rewardMap$Key : $rewardMap$1.keySet()) {
@@ -63,16 +63,16 @@ public class WeaponConfig extends EquipConfig {
                 $rewardMap$2.put(Integer.valueOf($rewardMap$Key), $rewardMap$Value);
             }
         }
-        rewardMap = Collections.unmodifiableMap($rewardMap$2);
+        this.rewardMap = Collections.unmodifiableMap($rewardMap$2);
 
-        JSONArray $list2$1 = $json$.getJSONArray("list2");
+        JSONArray $list2$1 = json.getJSONArray("list2");
         List<Integer> $list2$2 = new ArrayList<>();
         if ($list2$1 != null) {
             for (int i = 0; i < $list2$1.size(); i++) {
                 $list2$2.add($list2$1.getInteger(i));
             }
         }
-        list2 = Collections.unmodifiableList($list2$2);
+        this.list2 = Collections.unmodifiableList($list2$2);
     }
 
     /**
@@ -119,8 +119,8 @@ public class WeaponConfig extends EquipConfig {
 
 
     @Override
-    protected WeaponConfig create(JSONObject $json$) {
-        return new WeaponConfig($json$);
+    protected WeaponConfig create(JSONObject json) {
+        return new WeaponConfig(json);
     }
 
     @Override

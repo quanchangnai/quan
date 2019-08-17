@@ -17,11 +17,11 @@ public class EquipConfig extends ItemConfig {
     protected final int color;
 
 
-    public EquipConfig(JSONObject $json$) {
-        super($json$);
+    public EquipConfig(JSONObject json) {
+        super(json);
 
-        position = $json$.getIntValue("position");
-        color = $json$.getIntValue("color");
+        this.position = json.getIntValue("position");
+        this.color = json.getIntValue("color");
     }
 
     /**
@@ -40,8 +40,8 @@ public class EquipConfig extends ItemConfig {
 
 
     @Override
-    protected EquipConfig create(JSONObject $json$) {
-        return new EquipConfig($json$);
+    protected EquipConfig create(JSONObject json) {
+        return new EquipConfig(json);
     }
 
     @Override

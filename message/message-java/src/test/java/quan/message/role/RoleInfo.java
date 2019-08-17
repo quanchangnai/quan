@@ -147,69 +147,63 @@ public class RoleInfo extends Bean {
     }
 
     @Override
-    public void encode(Buffer $buffer) throws IOException {
-        super.encode($buffer);
+    public void encode(Buffer buffer) throws IOException {
+        super.encode(buffer);
 
-        $buffer.writeLong(id);
-        $buffer.writeString(roleName);
+        buffer.writeLong(this.id);
+        buffer.writeString(this.roleName);
+        buffer.writeInt(this.roleType == null ? 0 : this.roleType.getValue());
+        buffer.writeBool(this.b);
+        buffer.writeShort(this.s);
+        buffer.writeInt(this.i);
+        buffer.writeFloat(this.f);
+        buffer.writeDouble(this.d);
+        buffer.writeBytes(this.data);
 
-        if(roleType != null) {
-            $buffer.writeInt(roleType.getValue());
-        }else {
-            $buffer.writeInt(0);
+        buffer.writeInt(this.list.size());
+        for (int $list$Value : this.list) {
+            buffer.writeInt($list$Value);
         }
 
-        $buffer.writeBool(b);
-        $buffer.writeShort(s);
-        $buffer.writeInt(i);
-        $buffer.writeFloat(f);
-        $buffer.writeDouble(d);
-        $buffer.writeBytes(data);
-
-        $buffer.writeInt(list.size());
-        for (int $list$Value : list) {
-            $buffer.writeInt($list$Value);
+        buffer.writeInt(this.set.size());
+        for (int $set$Value : this.set) {
+            buffer.writeInt($set$Value);
         }
 
-        $buffer.writeInt(set.size());
-        for (int $set$Value : set) {
-            $buffer.writeInt($set$Value);
-        }
-
-        $buffer.writeInt(map.size());
-        for (int $map$Key : map.keySet()) {
-            $buffer.writeInt($map$Key);
-            $buffer.writeInt(map.get($map$Key));
+        buffer.writeInt(this.map.size());
+        for (int $map$Key : this.map.keySet()) {
+            buffer.writeInt($map$Key);
+            buffer.writeInt(this.map.get($map$Key));
         }
     }
 
     @Override
-    public void decode(Buffer $buffer) throws IOException {
-        super.decode($buffer);
+    public void decode(Buffer buffer) throws IOException {
+        super.decode(buffer);
 
-        id = $buffer.readLong();
-        roleName = $buffer.readString();
-        roleType = RoleType.valueOf($buffer.readInt());
-        b = $buffer.readBool();
-        s = $buffer.readShort();
-        i = $buffer.readInt();
-        f = $buffer.readFloat();
-        d = $buffer.readDouble();
-        data = $buffer.readBytes();
+        this.id = buffer.readLong();
+        this.roleName = buffer.readString();
+        this.roleType = RoleType.valueOf(buffer.readInt());
+        this.b = buffer.readBool();
+        this.s = buffer.readShort();
+        this.i = buffer.readInt();
+        this.f = buffer.readFloat();
+        this.d = buffer.readDouble();
+        this.data = buffer.readBytes();
 
-        int $list$Size = $buffer.readInt();
+        int $list$Size = buffer.readInt();
         for (int i = 0; i < $list$Size; i++) {
-            list.add($buffer.readInt());
+            this.list.add(buffer.readInt());
         }
 
-        int $set$Size = $buffer.readInt();
+        int $set$Size = buffer.readInt();
         for (int i = 0; i < $set$Size; i++) {
-            set.add($buffer.readInt());
+            this.set.add(buffer.readInt());
         }
 
-        int $map$Size = $buffer.readInt();
+        int $map$Size = buffer.readInt();
         for (int i = 0; i < $map$Size; i++) {
-            map.put($buffer.readInt(), $buffer.readInt());
+            this.map.put(buffer.readInt(), buffer.readInt());
         }
     }
 

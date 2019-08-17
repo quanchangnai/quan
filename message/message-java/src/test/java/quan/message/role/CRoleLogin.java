@@ -130,70 +130,70 @@ public class CRoleLogin extends Message {
     }
 
     @Override
-    public void encode(Buffer $buffer) throws IOException {
-        super.encode($buffer);
+    public void encode(Buffer buffer) throws IOException {
+        super.encode(buffer);
 
-        $buffer.writeLong(roleId);
-        $buffer.writeString(roleName);
-        roleInfo.encode($buffer);
+        buffer.writeLong(this.roleId);
+        buffer.writeString(this.roleName);
+        this.roleInfo.encode(buffer);
 
-        $buffer.writeInt(roleInfoList.size());
-        for (RoleInfo $roleInfoList$Value : roleInfoList) {
-            $roleInfoList$Value.encode($buffer);
+        buffer.writeInt(this.roleInfoList.size());
+        for (RoleInfo $roleInfoList$Value : this.roleInfoList) {
+            $roleInfoList$Value.encode(buffer);
         }
 
-        $buffer.writeInt(roleInfoSet.size());
-        for (RoleInfo $roleInfoSet$Value : roleInfoSet) {
-            $roleInfoSet$Value.encode($buffer);
+        buffer.writeInt(this.roleInfoSet.size());
+        for (RoleInfo $roleInfoSet$Value : this.roleInfoSet) {
+            $roleInfoSet$Value.encode(buffer);
         }
 
-        $buffer.writeInt(roleInfoMap.size());
-        for (long $roleInfoMap$Key : roleInfoMap.keySet()) {
-            $buffer.writeLong($roleInfoMap$Key);
-            roleInfoMap.get($roleInfoMap$Key).encode($buffer);
+        buffer.writeInt(this.roleInfoMap.size());
+        for (long $roleInfoMap$Key : this.roleInfoMap.keySet()) {
+            buffer.writeLong($roleInfoMap$Key);
+            this.roleInfoMap.get($roleInfoMap$Key).encode(buffer);
         }
 
-        $buffer.writeBool(userInfo != null);
-        if (userInfo != null) {
-            userInfo.encode($buffer);
+        buffer.writeBool(this.userInfo != null);
+        if (this.userInfo != null) {
+            this.userInfo.encode(buffer);
         }
     }
 
     @Override
-    public void decode(Buffer $buffer) throws IOException {
-        super.decode($buffer);
+    public void decode(Buffer buffer) throws IOException {
+        super.decode(buffer);
 
-        roleId = $buffer.readLong();
-        roleName = $buffer.readString();
-        roleInfo.decode($buffer);
+        this.roleId = buffer.readLong();
+        this.roleName = buffer.readString();
+        this.roleInfo.decode(buffer);
 
-        int $roleInfoList$Size = $buffer.readInt();
+        int $roleInfoList$Size = buffer.readInt();
         for (int i = 0; i < $roleInfoList$Size; i++) {
             RoleInfo $roleInfoList$Value = new RoleInfo();
-            $roleInfoList$Value.decode($buffer);
-            roleInfoList.add($roleInfoList$Value);
+            $roleInfoList$Value.decode(buffer);
+            this.roleInfoList.add($roleInfoList$Value);
         }
 
-        int $roleInfoSet$Size = $buffer.readInt();
+        int $roleInfoSet$Size = buffer.readInt();
         for (int i = 0; i < $roleInfoSet$Size; i++) {
             RoleInfo $roleInfoSet$Value = new RoleInfo();
-            $roleInfoSet$Value.decode($buffer);
-            roleInfoSet.add($roleInfoSet$Value);
+            $roleInfoSet$Value.decode(buffer);
+            this.roleInfoSet.add($roleInfoSet$Value);
         }
 
-        int $roleInfoMap$Size = $buffer.readInt();
+        int $roleInfoMap$Size = buffer.readInt();
         for (int i = 0; i < $roleInfoMap$Size; i++) {
-            long $roleInfoMap$Key = $buffer.readLong();
+            long $roleInfoMap$Key = buffer.readLong();
             RoleInfo $roleInfoMap$Value = new RoleInfo();
-            $roleInfoMap$Value.decode($buffer);
-            roleInfoMap.put($roleInfoMap$Key, $roleInfoMap$Value);
+            $roleInfoMap$Value.decode(buffer);
+            this.roleInfoMap.put($roleInfoMap$Key, $roleInfoMap$Value);
         }
 
-        if ($buffer.readBool()) {
-            if (userInfo == null) {
-                userInfo = new UserInfo();
+        if (buffer.readBool()) {
+            if (this.userInfo == null) {
+                this.userInfo = new UserInfo();
             }
-            userInfo.decode($buffer);
+            this.userInfo.decode(buffer);
         }
     }
 

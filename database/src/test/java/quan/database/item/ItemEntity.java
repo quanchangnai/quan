@@ -41,23 +41,18 @@ public class ItemEntity extends Entity {
 
     @Override
     public JSONObject encode() {
-        JSONObject $json$ = new JSONObject();
+        JSONObject json = new JSONObject();
 
-        $json$.put("id", id.getValue());
-        $json$.put("name", name.getValue());
+        json.put("id", this.id.getValue());
+        json.put("name", this.name.getValue());
 
-        return $json$;
+        return json;
     }
 
     @Override
-    public void decode(JSONObject $json$) {
-        id.setValue($json$.getIntValue("id"));
-
-        String $name = $json$.getString("name");
-        if ($name == null) {
-            $name = "";
-        }
-        name.setValue($name);
+    public void decode(JSONObject json) {
+        this.id.setValue(json.getIntValue("id"));
+        this.name.setValue(json.getOrDefault("name","").toString());
     }
 
     @Override
