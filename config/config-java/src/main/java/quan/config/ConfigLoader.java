@@ -33,10 +33,11 @@ public class ConfigLoader {
     //配置表所在目录
     private String tablePath;
 
-    private String packagePrefix = "";
-
     //配置表类型,csv xls xlsx等
     private String tableType = "csv";
+
+    //包名前缀，在不使用配置定义加载JSON格式配置时需要
+    private String packagePrefix = "";
 
     private LoadType loadType = LoadType.validateAndLoad;
 
@@ -177,9 +178,9 @@ public class ConfigLoader {
 
     /**
      * 加载全部配置<br/>
-     * 有配置定义时加载JSON格式配置，JSON文件名是配置类名<br/>
-     * 没有配置定义时加载JSON格式配置，JSON文件名必须是配置全类名<br/>
-     * 其他情况的配置表不变
+     * 有配置定义时加载JSON格式配置，JSON文件名是[配置类名.json]<br/>
+     * 没有配置定义时加载JSON格式配置，JSON文件名必须是[配置包名.类名.json]，包名不含前缀<br/>
+     * 其他情况时配置表保持原样
      */
     public void load() {
         if (loaded) {
@@ -188,14 +189,12 @@ public class ConfigLoader {
         loaded = true;
         validatedErrors.clear();
 
-        //解析定义文件
-        parseDefinition();
-
         if (isJsonAndNoDefinition()) {
-            //没有配置定义直接加载JSON
+            //没有配置定义直接加载JSON格式配置
             loadJsonOnNoDefinition();
         } else {
             //通过配置定义加载或者校验
+            parseDefinition();
             loadByDefinition();
         }
 

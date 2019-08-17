@@ -9,6 +9,6 @@ public abstract class Entity extends Node {
 
     public abstract JSONObject encode();
 
-    public abstract void decode(JSONObject object);
+    public abstract void decode(JSONObject json);
 
 }

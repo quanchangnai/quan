@@ -68,21 +68,21 @@ public class UserInfo extends Bean {
     }
 
     @Override
-    public void encode(Buffer buffer) throws IOException {
-        super.encode(buffer);
+    public void encode(Buffer $buffer) throws IOException {
+        super.encode($buffer);
 
-        buffer.writeLong(id);
-        buffer.writeString(name);
-        buffer.writeInt(level);
+        $buffer.writeLong(id);
+        $buffer.writeString(name);
+        $buffer.writeInt(level);
     }
 
     @Override
-    public void decode(Buffer buffer) throws IOException {
-        super.decode(buffer);
+    public void decode(Buffer $buffer) throws IOException {
+        super.decode($buffer);
 
-        id = buffer.readLong();
-        name = buffer.readString();
-        level = buffer.readInt();
+        id = $buffer.readLong();
+        name = $buffer.readString();
+        level = $buffer.readInt();
     }
 
     @Override

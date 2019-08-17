@@ -8,7 +8,6 @@ import quan.config.*;
 * 道具<br/>
 * Created by 自动生成
 */
-@SuppressWarnings({"unchecked"})
 public class ItemConfig extends Config {
 
     //ID
@@ -39,27 +38,27 @@ public class ItemConfig extends Config {
     protected final String effectiveTime$Str;
 
 
-    public ItemConfig(JSONObject json) {
-        super(json);
+    public ItemConfig(JSONObject $json$) {
+        super($json$);
 
-        id = json.getIntValue("id");
-        name = json.getOrDefault("name", "").toString();
+        id = $json$.getIntValue("id");
+        name = $json$.getOrDefault("name", "").toString();
 
-        String $type = json.getString("type");
+        String $type = $json$.getString("type");
         if ($type != null) {
             type = ItemType.valueOf($type);
         } else {
             type = null;
         }
 
-        JSONObject $reward = json.getJSONObject("reward");
+        JSONObject $reward = $json$.getJSONObject("reward");
         if ($reward != null) {
             reward = new Reward($reward);
         } else {
             reward = null;
         }
 
-        JSONArray $list$1 = json.getJSONArray("list");
+        JSONArray $list$1 = $json$.getJSONArray("list");
         List<Integer> $list$2 = new ArrayList<>();
         if ($list$1 != null) {
             for (int i = 0; i < $list$1.size(); i++) {
@@ -68,7 +67,7 @@ public class ItemConfig extends Config {
         }
         list = Collections.unmodifiableList($list$2);
 
-        JSONArray $set$1 = json.getJSONArray("set");
+        JSONArray $set$1 = $json$.getJSONArray("set");
         Set<Integer> $set$2 = new HashSet<>();
         if ($set$1 != null) {
             for (int i = 0; i < $set$1.size(); i++) {
@@ -77,8 +76,8 @@ public class ItemConfig extends Config {
         }
         set = Collections.unmodifiableSet($set$2);
 
-        JSONObject $map$1 = json.getJSONObject("map");
-        Map<Integer, Integer> $map$2 = new HashMap();
+        JSONObject $map$1 = $json$.getJSONObject("map");
+        Map<Integer, Integer> $map$2 = new HashMap<>();
         if ($map$1 != null) {
             for (String $map$Key : $map$1.keySet()) {
                 $map$2.put(Integer.valueOf($map$Key), $map$1.getInteger($map$Key));
@@ -86,8 +85,8 @@ public class ItemConfig extends Config {
         }
         map = Collections.unmodifiableMap($map$2);
 
-        effectiveTime = json.getDate("effectiveTime");
-        effectiveTime$Str = json.getOrDefault("effectiveTime$Str", "").toString();
+        effectiveTime = $json$.getDate("effectiveTime");
+        effectiveTime$Str = $json$.getOrDefault("effectiveTime$Str", "").toString();
     }
 
     /**
@@ -155,8 +154,8 @@ public class ItemConfig extends Config {
 
 
     @Override
-    protected ItemConfig create(JSONObject json) {
-        return new ItemConfig(json);
+    protected ItemConfig create(JSONObject $json$) {
+        return new ItemConfig($json$);
     }
 
     @Override
@@ -193,6 +192,7 @@ public class ItemConfig extends Config {
     }
 
 
+    @SuppressWarnings({"unchecked"})
     public static List<String> index(List<ItemConfig> configs) {
         Map<Integer, ItemConfig> idConfigs = new HashMap<>();
 

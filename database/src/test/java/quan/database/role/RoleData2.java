@@ -206,83 +206,83 @@ public class RoleData2 extends Data<Long> {
 
     @Override
     public JSONObject encode() {
-        JSONObject object = new JSONObject();
+        JSONObject $json$ = new JSONObject();
 
-        object.put("id", id.getValue());
-        object.put("name", name.getValue());
-        object.put("bo", bo.getValue());
-        object.put("by", by.getValue());
-        object.put("s", s.getValue());
-        object.put("i", i.getValue());
-        object.put("f", f.getValue());
-        object.put("d", d.getValue());
+        $json$.put("id", id.getValue());
+        $json$.put("name", name.getValue());
+        $json$.put("bo", bo.getValue());
+        $json$.put("by", by.getValue());
+        $json$.put("s", s.getValue());
+        $json$.put("i", i.getValue());
+        $json$.put("f", f.getValue());
+        $json$.put("d", d.getValue());
 
         ItemEntity $item = item.getValue();
         if ($item != null) {
-            object.put("item", $item.encode());
+            $json$.put("item", $item.encode());
         }
 
-        object.put("itemType", itemType.getValue());
+        $json$.put("itemType", itemType.getValue());
 
         JSONObject $items = new JSONObject();
         for (Integer $items$Key : items.keySet()) {
             $items.put(String.valueOf($items$Key), items.get($items$Key).encode());
         }
-        object.put("items", $items);
+        $json$.put("items", $items);
 
         JSONArray $set = new JSONArray();
         $set.addAll(set);
-        object.put("set", $set);
+        $json$.put("set", $set);
 
         JSONArray $list = new JSONArray();
         $list.addAll(list);
-        object.put("list", $list);
+        $json$.put("list", $list);
 
         JSONObject $map = new JSONObject();
         for (Integer $map$Key : map.keySet()) {
             $map.put(String.valueOf($map$Key), map.get($map$Key));
         }
-        object.put("map", $map);
+        $json$.put("map", $map);
 
         JSONArray $set2 = new JSONArray();
         for (ItemEntity $set2$Value : set2) {
             $set2.add($set2$Value.encode());
         }
-        object.put("set2", $set2);
+        $json$.put("set2", $set2);
 
         JSONArray $list2 = new JSONArray();
         for (ItemEntity $list2$Value : list2) {
             $list2.add($list2$Value.encode());
         }
-        object.put("list2", $list2);
+        $json$.put("list2", $list2);
 
         JSONObject $map2 = new JSONObject();
         for (Integer $map2$Key : map2.keySet()) {
             $map2.put(String.valueOf($map2$Key), map2.get($map2$Key).encode());
         }
-        object.put("map2", $map2);
+        $json$.put("map2", $map2);
 
-        return object;
+        return $json$;
     }
 
     @Override
-    public void decode(JSONObject object) {
-        id.setValue(object.getLongValue("id"));
+    public void decode(JSONObject $json$) {
+        id.setValue($json$.getLongValue("id"));
 
-        String $name = object.getString("name");
+        String $name = $json$.getString("name");
         if ($name == null) {
             $name = "";
         }
         name.setValue($name);
 
-        bo.setValue(object.getBooleanValue("bo"));
-        by.setValue(object.getByteValue("by"));
-        s.setValue(object.getShortValue("s"));
-        i.setValue(object.getIntValue("i"));
-        f.setValue(object.getFloatValue("f"));
-        d.setValue(object.getDoubleValue("d"));
+        bo.setValue($json$.getBooleanValue("bo"));
+        by.setValue($json$.getByteValue("by"));
+        s.setValue($json$.getShortValue("s"));
+        i.setValue($json$.getIntValue("i"));
+        f.setValue($json$.getFloatValue("f"));
+        d.setValue($json$.getDoubleValue("d"));
 
-        JSONObject $item = object.getJSONObject("item");
+        JSONObject $item = $json$.getJSONObject("item");
         if ($item != null) {
             ItemEntity $item$Value = item.getValue();
             if ($item$Value == null) {
@@ -292,9 +292,9 @@ public class RoleData2 extends Data<Long> {
             $item$Value.decode($item);
         }
 
-        itemType.setValue(object.getIntValue("itemType"));
+        itemType.setValue($json$.getIntValue("itemType"));
 
-        JSONObject $items$1 = object.getJSONObject("items");
+        JSONObject $items$1 = $json$.getJSONObject("items");
         if ($items$1 != null) {
             PMap<Integer, ItemEntity> $items$2 = Empty.map();
             for (String $items$1_Key : $items$1.keySet()) {
@@ -305,7 +305,7 @@ public class RoleData2 extends Data<Long> {
             items.setValue($items$2);
         }
 
-        JSONArray $set$1 = object.getJSONArray("set");
+        JSONArray $set$1 = $json$.getJSONArray("set");
         if ($set$1 != null) {
             PSet<Boolean> $set$2 = Empty.set();
             for (int i = 0; i < $set$1.size(); i++) {
@@ -314,7 +314,7 @@ public class RoleData2 extends Data<Long> {
             set.setValue($set$2);
         }
 
-        JSONArray $list$1 = object.getJSONArray("list");
+        JSONArray $list$1 = $json$.getJSONArray("list");
         if ($list$1 != null) {
             PVector<String> $list$2 = Empty.vector();
             for (int i = 0; i < $list$1.size(); i++) {
@@ -323,7 +323,7 @@ public class RoleData2 extends Data<Long> {
             list.setValue($list$2);
         }
 
-        JSONObject $map$1 = object.getJSONObject("map");
+        JSONObject $map$1 = $json$.getJSONObject("map");
         if ($map$1 != null) {
             PMap<Integer, Integer> $map$2 = Empty.map();
             for (String $map$1_Key : $map$1.keySet()) {
@@ -332,7 +332,7 @@ public class RoleData2 extends Data<Long> {
             map.setValue($map$2);
         }
 
-        JSONArray $set2$1 = object.getJSONArray("set2");
+        JSONArray $set2$1 = $json$.getJSONArray("set2");
         if ($set2$1 != null) {
             PSet<ItemEntity> $set2$2 = Empty.set();
             for (int i = 0; i < $set2$1.size(); i++) {
@@ -343,7 +343,7 @@ public class RoleData2 extends Data<Long> {
             set2.setValue($set2$2);
         }
 
-        JSONArray $list2$1 = object.getJSONArray("list2");
+        JSONArray $list2$1 = $json$.getJSONArray("list2");
         if ($list2$1 != null) {
             PVector<ItemEntity> $list2$2 = Empty.vector();
             for (int i = 0; i < $list2$1.size(); i++) {
@@ -354,7 +354,7 @@ public class RoleData2 extends Data<Long> {
             list2.setValue($list2$2);
         }
 
-        JSONObject $map2$1 = object.getJSONObject("map2");
+        JSONObject $map2$1 = $json$.getJSONObject("map2");
         if ($map2$1 != null) {
             PMap<Integer, ItemEntity> $map2$2 = Empty.map();
             for (String $map2$1_Key : $map2$1.keySet()) {

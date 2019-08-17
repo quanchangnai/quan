@@ -89,6 +89,5 @@ public abstract class Data<K> extends Entity implements Comparable<Data<K>> {
     }
 
     public abstract K getKey();
-
-
+    
 }

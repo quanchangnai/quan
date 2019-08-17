@@ -8,7 +8,6 @@ import quan.config.*;
 * 武器<br/>
 * Created by 自动生成
 */
-@SuppressWarnings({"unchecked"})
 public class WeaponConfig extends EquipConfig {
 
     //字段1
@@ -30,13 +29,13 @@ public class WeaponConfig extends EquipConfig {
     protected final List<Integer> list2;
 
 
-    public WeaponConfig(JSONObject json) {
-        super(json);
+    public WeaponConfig(JSONObject $json$) {
+        super($json$);
 
-        w1 = json.getIntValue("w1");
-        w2 = json.getIntValue("w2");
+        w1 = $json$.getIntValue("w1");
+        w2 = $json$.getIntValue("w2");
 
-        JSONArray $rewardList$1 = json.getJSONArray("rewardList");
+        JSONArray $rewardList$1 = $json$.getJSONArray("rewardList");
         List<Reward> $rewardList$2 = new ArrayList<>();
         if ($rewardList$1 != null) {
             for (int i = 0; i < $rewardList$1.size(); i++) {
@@ -46,7 +45,7 @@ public class WeaponConfig extends EquipConfig {
         }
         rewardList = Collections.unmodifiableList($rewardList$2);
 
-        JSONArray $rewardSet$1 = json.getJSONArray("rewardSet");
+        JSONArray $rewardSet$1 = $json$.getJSONArray("rewardSet");
         Set<Reward> $rewardSet$2 = new HashSet<>();
         if ($rewardSet$1 != null) {
             for (int i = 0; i < $rewardSet$1.size(); i++) {
@@ -56,8 +55,8 @@ public class WeaponConfig extends EquipConfig {
         }
         rewardSet = Collections.unmodifiableSet($rewardSet$2);
 
-        JSONObject $rewardMap$1 = json.getJSONObject("rewardMap");
-        Map<Integer, Reward> $rewardMap$2 = new HashMap();
+        JSONObject $rewardMap$1 = $json$.getJSONObject("rewardMap");
+        Map<Integer, Reward> $rewardMap$2 = new HashMap<>();
         if ($rewardMap$1 != null) {
             for (String $rewardMap$Key : $rewardMap$1.keySet()) {
                 Reward $rewardMap$Value = new Reward($rewardMap$1.getJSONObject($rewardMap$Key));
@@ -66,7 +65,7 @@ public class WeaponConfig extends EquipConfig {
         }
         rewardMap = Collections.unmodifiableMap($rewardMap$2);
 
-        JSONArray $list2$1 = json.getJSONArray("list2");
+        JSONArray $list2$1 = $json$.getJSONArray("list2");
         List<Integer> $list2$2 = new ArrayList<>();
         if ($list2$1 != null) {
             for (int i = 0; i < $list2$1.size(); i++) {
@@ -120,8 +119,8 @@ public class WeaponConfig extends EquipConfig {
 
 
     @Override
-    protected WeaponConfig create(JSONObject json) {
-        return new WeaponConfig(json);
+    protected WeaponConfig create(JSONObject $json$) {
+        return new WeaponConfig($json$);
     }
 
     @Override
@@ -210,6 +209,7 @@ public class WeaponConfig extends EquipConfig {
         }
 
 
+        @SuppressWarnings({"unchecked"})
         public static List<String> index(List<WeaponConfig> configs) {
             Map<Integer, WeaponConfig> idConfigs = new HashMap<>();
             Map<Integer, List<WeaponConfig>> positionConfigs = new HashMap<>();

@@ -155,7 +155,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
 
     @Override
     public JSONObject encode() {
-        JSONObject object = new JSONObject();
+        JSONObject $json$ = new JSONObject();
 
 <#list fields as field>
     <#if field.type == "list" || field.type == "set">
@@ -170,7 +170,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
         <#else>
         $${field.name}.addAll(${field.name});
         </#if>
-        object.put("${field.name}", $${field.name});
+        $json$.put("${field.name}", $${field.name});
         <#if field_has_next && (fields[field_index+1].enumType || fields[field_index+1].primitiveType) >
 
         </#if>
@@ -186,19 +186,19 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
             $${field.name}.put(String.valueOf($${field.name}$Key), ${field.name}.get($${field.name}$Key));
         </#if>
         }
-        object.put("${field.name}", $${field.name});
+        $json$.put("${field.name}", $${field.name});
         <#if field_has_next && (fields[field_index+1].enumType || fields[field_index+1].primitiveType) >
 
         </#if>
     <#elseif field.builtInType || field.enumType>
-        object.put("${field.name}", ${field.name}.getValue());
+        $json$.put("${field.name}", ${field.name}.getValue());
     <#else>
         <#if field_index gt 0 >
 
         </#if>
         ${field.type} $${field.name} = ${field.name}.getValue();
         if ($${field.name} != null) {
-            object.put("${field.name}", $${field.name}.encode());
+            $json$.put("${field.name}", $${field.name}.encode());
         }
         <#if field_has_next && (fields[field_index+1].enumType || fields[field_index+1].primitiveType) >
 
@@ -206,17 +206,17 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
     </#if>
 </#list>
 
-        return object;
+        return $json$;
     }
 
     @Override
-    public void decode(JSONObject object) {
+    public void decode(JSONObject $json$) {
 <#list fields as field>
     <#if field.type == "list">
         <#if field_index gt 0 >
 
         </#if>
-        JSONArray $${field.name}$1 = object.getJSONArray("${field.name}");
+        JSONArray $${field.name}$1 = $json$.getJSONArray("${field.name}");
         if ($${field.name}$1 != null) {
             PVector<${field.classValueType}> $${field.name}$2 = Empty.vector();
             for (int i = 0; i < $${field.name}$1.size(); i++) {
@@ -237,7 +237,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
         <#if field_index gt 0 >
 
         </#if>
-        JSONArray $${field.name}$1 = object.getJSONArray("${field.name}");
+        JSONArray $${field.name}$1 = $json$.getJSONArray("${field.name}");
         if ($${field.name}$1 != null) {
             PSet<${field.classValueType}> $${field.name}$2 = Empty.set();
             for (int i = 0; i < $${field.name}$1.size(); i++) {
@@ -258,7 +258,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
         <#if field_index gt 0 >
 
         </#if>
-        JSONObject $${field.name}$1 = object.getJSONObject("${field.name}");
+        JSONObject $${field.name}$1 = $json$.getJSONObject("${field.name}");
         if ($${field.name}$1 != null) {
             PMap<${field.classKeyType}, ${field.classValueType}> $${field.name}$2 = Empty.map();
             for (String $${field.name}$1_Key : $${field.name}$1.keySet()) {
@@ -276,12 +276,12 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
 
         </#if>
     <#elseif field.type=="int" || field.enumType>
-        ${field.name}.setValue(object.getIntValue("${field.name}"));
+        ${field.name}.setValue($json$.getIntValue("${field.name}"));
     <#elseif field.type=="string">
         <#if field_index gt 0 >
 
         </#if>
-        String $${field.name} = object.getString("${field.name}");
+        String $${field.name} = $json$.getString("${field.name}");
         if ($${field.name} == null) {
             $${field.name} = "";
         }
@@ -290,12 +290,12 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
 
         </#if>
     <#elseif field.builtInType>
-        ${field.name}.setValue(object.get${field.classType}Value("${field.name}"));
+        ${field.name}.setValue($json$.get${field.classType}Value("${field.name}"));
     <#else>
         <#if field_index gt 0 >
 
         </#if>
-        JSONObject $${field.name} = object.getJSONObject("${field.name}");
+        JSONObject $${field.name} = $json$.getJSONObject("${field.name}");
         if ($${field.name} != null) {
             ${field.classType} $${field.name}$Value = ${field.name}.getValue();
             if ($${field.name}$Value == null) {

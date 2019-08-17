@@ -14,6 +14,7 @@ import java.util.function.Function;
 /**
  * Created by quanchangnai on 2019/6/21.
  */
+@SuppressWarnings({"unchecked"})
 public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
@@ -172,7 +173,6 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
             dirty.put(key, row);
         }
     }
-
 
     public V get(K key) {
         Objects.requireNonNull(key, "主键不能为空");
@@ -333,7 +333,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
 
             dirty.clear();
         } catch (Exception e) {
-            logger.error("存档发生异常", e);
+            logger.error("存档出错", e);
         }
 
         long costTime = System.currentTimeMillis() - startTime;

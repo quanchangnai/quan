@@ -8,7 +8,6 @@ import quan.config.*;
 * QuestTargetConfig<br/>
 * Created by 自动生成
 */
-@SuppressWarnings({"unchecked"})
 public class QuestTargetConfig extends Config {
 
     //ID
@@ -18,11 +17,11 @@ public class QuestTargetConfig extends Config {
     protected final String name;
 
 
-    public QuestTargetConfig(JSONObject json) {
-        super(json);
+    public QuestTargetConfig(JSONObject $json$) {
+        super($json$);
 
-        id = json.getIntValue("id");
-        name = json.getOrDefault("name", "").toString();
+        id = $json$.getIntValue("id");
+        name = $json$.getOrDefault("name", "").toString();
     }
 
     /**
@@ -41,8 +40,8 @@ public class QuestTargetConfig extends Config {
 
 
     @Override
-    protected QuestTargetConfig create(JSONObject json) {
-        return new QuestTargetConfig(json);
+    protected QuestTargetConfig create(JSONObject $json$) {
+        return new QuestTargetConfig($json$);
     }
 
     @Override
@@ -73,6 +72,7 @@ public class QuestTargetConfig extends Config {
     }
 
 
+    @SuppressWarnings({"unchecked"})
     public static List<String> index(List<QuestTargetConfig> configs) {
         Map<Integer, QuestTargetConfig> idConfigs = new HashMap<>();
 

@@ -8,7 +8,6 @@ import quan.config.*;
 * 装备1,装备2<br/>
 * Created by 自动生成
 */
-@SuppressWarnings({"unchecked"})
 public class EquipConfig extends ItemConfig {
 
     //部位
@@ -18,11 +17,11 @@ public class EquipConfig extends ItemConfig {
     protected final int color;
 
 
-    public EquipConfig(JSONObject json) {
-        super(json);
+    public EquipConfig(JSONObject $json$) {
+        super($json$);
 
-        position = json.getIntValue("position");
-        color = json.getIntValue("color");
+        position = $json$.getIntValue("position");
+        color = $json$.getIntValue("color");
     }
 
     /**
@@ -41,8 +40,8 @@ public class EquipConfig extends ItemConfig {
 
 
     @Override
-    protected EquipConfig create(JSONObject json) {
-        return new EquipConfig(json);
+    protected EquipConfig create(JSONObject $json$) {
+        return new EquipConfig($json$);
     }
 
     @Override
@@ -97,6 +96,7 @@ public class EquipConfig extends ItemConfig {
         }
 
 
+        @SuppressWarnings({"unchecked"})
         public static List<String> index(List<EquipConfig> configs) {
             Map<Integer, EquipConfig> idConfigs = new HashMap<>();
             Map<Integer, List<EquipConfig>> positionConfigs = new HashMap<>();

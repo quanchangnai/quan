@@ -13,7 +13,6 @@ import ${import};
 </#if>
 * Created by 自动生成
 */
-@SuppressWarnings({"unchecked"})
 public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType ==6 && (!parent?? || parent=="")>Config<#elseif definitionType ==6>${parent}</#if> {
 <#if !selfFields??>
     <#assign selfFields = fields>
@@ -42,22 +41,22 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 
 </#list>
 
-    public ${name}(JSONObject json) {
-        super(json);
+    public ${name}(JSONObject $json$) {
+        super($json$);
 
 <#list selfFields as field>
     <#if field.type=="string">
-        ${field.name} = json.getOrDefault("${field.name}", "").toString();
+        ${field.name} = $json$.getOrDefault("${field.name}", "").toString();
     <#elseif field.type=="bool">
-        ${field.name} = json.getBooleanValue("${field.name}");
+        ${field.name} = $json$.getBooleanValue("${field.name}");
     <#elseif field.timeType>
-        ${field.name} = json.getDate("${field.name}");
-        ${field.name}$Str = json.getOrDefault("${field.name}$Str", "").toString();
+        ${field.name} = $json$.getDate("${field.name}");
+        ${field.name}$Str = $json$.getOrDefault("${field.name}$Str", "").toString();
     <#elseif field.type=="list" || field.type=="set">
         <#if field_index gt 0 >
 
         </#if>
-        JSONArray $${field.name}$1 = json.getJSONArray("${field.name}");
+        JSONArray $${field.name}$1 = $json$.getJSONArray("${field.name}");
         ${field.basicType}<${field.classValueType}> $${field.name}$2 = new ${field.classType}<>();
         if ($${field.name}$1 != null) {
             for (int i = 0; i < $${field.name}$1.size(); i++) {
@@ -77,8 +76,8 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         <#if field_index gt 0 >
 
         </#if>
-        JSONObject $${field.name}$1 = json.getJSONObject("${field.name}");
-        Map<${field.classKeyType}, ${field.classValueType}> $${field.name}$2 = new HashMap();
+        JSONObject $${field.name}$1 = $json$.getJSONObject("${field.name}");
+        Map<${field.classKeyType}, ${field.classValueType}> $${field.name}$2 = new HashMap<>();
         if ($${field.name}$1 != null) {
             for (String $${field.name}$Key : $${field.name}$1.keySet()) {
                 <#if field.beanValueType>
@@ -94,12 +93,12 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 
         </#if>
     <#elseif field.builtInType>
-        ${field.name} = json.get${field.type?cap_first}Value("${field.name}");
+        ${field.name} = $json$.get${field.type?cap_first}Value("${field.name}");
     <#elseif field.enumType>
        <#if field_index gt 0 >
 
         </#if>
-        String $${field.name} = json.getString("${field.name}");
+        String $${field.name} = $json$.getString("${field.name}");
         if ($${field.name} != null) {
             ${field.name} = ${field.type}.valueOf($${field.name});
         } else {
@@ -112,7 +111,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         <#if field_index gt 0 >
 
         </#if>
-        JSONObject $${field.name} = json.getJSONObject("${field.name}");
+        JSONObject $${field.name} = $json$.getJSONObject("${field.name}");
         if ($${field.name} != null) {
             ${field.name} = new ${field.type}($reward);
         } else {
@@ -162,8 +161,8 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 
  <#if definitionType ==6>
     @Override
-    protected ${name} create(JSONObject json) {
-        return new ${name}(json);
+    protected ${name} create(JSONObject $json$) {
+        return new ${name}($json$);
     }
 </#if>
 
@@ -300,6 +299,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         </#if>
     </#list>
 
+    ${tab}@SuppressWarnings({"unchecked"})
     ${tab}public static List<String> index(List<${name}> configs) {
     <#list indexes as index>
         <#if index.unique && index.fields?size==1>

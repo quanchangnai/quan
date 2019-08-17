@@ -5,6 +5,7 @@ import java.util.Objects;
 /**
  * Created by quanchangnai on 2019/6/24.
  */
+@SuppressWarnings({"unchecked"})
 class DataLog {
 
     private Key key;
