@@ -11,9 +11,9 @@ import quan.config.*;
 @SuppressWarnings({"unchecked"})
 public class Reward extends Bean {
 
-    public final int itemId;
+    protected final int itemId;
 
-    public final int itemNum;
+    protected final int itemNum;
 
 
     public Reward(JSONObject json) {
@@ -22,6 +22,15 @@ public class Reward extends Bean {
         itemId = json.getIntValue("itemId");
         itemNum = json.getIntValue("itemNum");
     }
+
+    public final int getItemId() {
+        return itemId;
+    }
+
+    public final int getItemNum() {
+        return itemNum;
+    }
+
 
 
     @Override
@@ -32,5 +41,6 @@ public class Reward extends Bean {
                 '}';
 
     }
+
 
 }

@@ -11,15 +11,11 @@ import quan.config.*;
 @SuppressWarnings({"unchecked"})
 public class QuestTargetConfig extends Config {
 
-    /**
-     * ID
-     */
-    public final int id;
+    //ID
+    protected final int id;
 
-    /**
-     * 名字
-     */
-    public final String name;
+    //名字
+    protected final String name;
 
 
     public QuestTargetConfig(JSONObject json) {
@@ -29,6 +25,25 @@ public class QuestTargetConfig extends Config {
         name = json.getOrDefault("name", "").toString();
     }
 
+    /**
+     * ID
+     */
+    public final int getId() {
+        return id;
+    }
+
+    /**
+     * 名字
+     */
+    public final String getName() {
+        return name;
+    }
+
+
+    @Override
+    protected QuestTargetConfig create(JSONObject json) {
+        return new QuestTargetConfig(json);
+    }
 
     @Override
     public String toString() {
@@ -39,16 +54,11 @@ public class QuestTargetConfig extends Config {
 
     }
 
-    @Override
-    protected QuestTargetConfig create(JSONObject json) {
-        return new QuestTargetConfig(json);
-    }
 
     private volatile static List<QuestTargetConfig> configs = new ArrayList<>();
 
     //ID
     private volatile static Map<Integer, QuestTargetConfig> idConfigs = new HashMap<>();
-
 
     public static List<QuestTargetConfig> getConfigs() {
         return configs;

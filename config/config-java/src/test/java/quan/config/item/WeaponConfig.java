@@ -11,35 +11,23 @@ import quan.config.*;
 @SuppressWarnings({"unchecked"})
 public class WeaponConfig extends EquipConfig {
 
-    /**
-     * 字段1
-     */
-    public final int w1;
+    //字段1
+    protected final int w1;
 
-    /**
-     * 字段2
-     */
-    public final int w2;
+    //字段2
+    protected final int w2;
 
-    /**
-     * 奖励List
-     */
-    public final List<Reward> rewardList;
+    //奖励List
+    protected final List<Reward> rewardList;
 
-    /**
-     * 奖励Set
-     */
-    public final Set<Reward> rewardSet;
+    //奖励Set
+    protected final Set<Reward> rewardSet;
 
-    /**
-     * 奖励Map
-     */
-    public final Map<Integer, Reward> rewardMap;
+    //奖励Map
+    protected final Map<Integer, Reward> rewardMap;
 
-    /**
-     * List2
-     */
-    public final List<Integer> list2;
+    //List2
+    protected final List<Integer> list2;
 
 
     public WeaponConfig(JSONObject json) {
@@ -88,6 +76,53 @@ public class WeaponConfig extends EquipConfig {
         list2 = Collections.unmodifiableList($list2$2);
     }
 
+    /**
+     * 字段1
+     */
+    public final int getW1() {
+        return w1;
+    }
+
+    /**
+     * 字段2
+     */
+    public final int getW2() {
+        return w2;
+    }
+
+    /**
+     * 奖励List
+     */
+    public final List<Reward> getRewardList() {
+        return rewardList;
+    }
+
+    /**
+     * 奖励Set
+     */
+    public final Set<Reward> getRewardSet() {
+        return rewardSet;
+    }
+
+    /**
+     * 奖励Map
+     */
+    public final Map<Integer, Reward> getRewardMap() {
+        return rewardMap;
+    }
+
+    /**
+     * List2
+     */
+    public final List<Integer> getList2() {
+        return list2;
+    }
+
+
+    @Override
+    protected WeaponConfig create(JSONObject json) {
+        return new WeaponConfig(json);
+    }
 
     @Override
     public String toString() {
@@ -112,10 +147,6 @@ public class WeaponConfig extends EquipConfig {
 
     }
 
-    @Override
-    protected WeaponConfig create(JSONObject json) {
-        return new WeaponConfig(json);
-    }
 
     public static class self {
 
@@ -133,7 +164,6 @@ public class WeaponConfig extends EquipConfig {
         private volatile static Map<Integer, Map<Integer, List<WeaponConfig>>> composite1Configs = new HashMap<>();
 
         private volatile static Map<Integer, Map<Integer, WeaponConfig>> composite2Configs = new HashMap<>();
-
 
         public static List<WeaponConfig> getConfigs() {
             return configs;

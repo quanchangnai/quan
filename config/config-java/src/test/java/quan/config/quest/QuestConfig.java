@@ -12,95 +12,59 @@ import quan.config.item.Reward;
 @SuppressWarnings({"unchecked"})
 public class QuestConfig extends Config {
 
-    /**
-     * ID
-     */
-    public final int id;
+    //ID
+    protected final int id;
 
-    /**
-     * 名字
-     */
-    public final String name;
+    //名字
+    protected final String name;
 
-    /**
-     * 类型
-     */
-    public final QuestType type;
+    //类型
+    protected final QuestType type;
 
-    /**
-     * 任务目标
-     */
-    public final int target;
+    //任务目标
+    protected final int target;
 
-    /**
-     * 奖励
-     */
-    public final Reward reward;
+    //奖励
+    protected final Reward reward;
 
-    /**
-     * A1
-     */
-    public final int a1;
+    //A1
+    protected final int a1;
 
-    /**
-     * A2
-     */
-    public final int a2;
+    //A2
+    protected final int a2;
 
-    /**
-     * B1
-     */
-    public final int b1;
+    //B1
+    protected final int b1;
 
-    /**
-     * B2
-     */
-    public final boolean b2;
+    //B2
+    protected final boolean b2;
 
-    /**
-     * C1
-     */
-    public final String c1;
+    //C1
+    protected final String c1;
 
-    /**
-     * C2
-     */
-    public final int c2;
+    //C2
+    protected final int c2;
 
-    /**
-     * C3
-     */
-    public final int c3;
+    //C3
+    protected final int c3;
 
-    /**
-     * D1
-     */
-    public final String d1;
+    //D1
+    protected final String d1;
 
-    /**
-     * D2
-     */
-    public final int d2;
+    //D2
+    protected final int d2;
 
-    /**
-     * D3
-     */
-    public final int d3;
+    //D3
+    protected final int d3;
 
-    /**
-     * S1
-     */
-    public final Set<Integer> s1;
+    //S1
+    protected final Set<Integer> s1;
 
-    /**
-     * L1
-     */
-    public final List<Integer> l1;
+    //L1
+    protected final List<Integer> l1;
 
-    /**
-     * M1
-     */
-    public final Map<Integer, Integer> m1;
+    //M1
+    protected final Map<Integer, Integer> m1;
 
 
     public QuestConfig(JSONObject json) {
@@ -164,6 +128,137 @@ public class QuestConfig extends Config {
         m1 = Collections.unmodifiableMap($m1$2);
     }
 
+    /**
+     * ID
+     */
+    public final int getId() {
+        return id;
+    }
+
+    /**
+     * 名字
+     */
+    public final String getName() {
+        return name;
+    }
+
+    /**
+     * 类型
+     */
+    public final QuestType getType() {
+        return type;
+    }
+
+    /**
+     * 任务目标
+     */
+    public final int getTarget() {
+        return target;
+    }
+
+    /**
+     * 奖励
+     */
+    public final Reward getReward() {
+        return reward;
+    }
+
+    /**
+     * A1
+     */
+    public final int getA1() {
+        return a1;
+    }
+
+    /**
+     * A2
+     */
+    public final int getA2() {
+        return a2;
+    }
+
+    /**
+     * B1
+     */
+    public final int getB1() {
+        return b1;
+    }
+
+    /**
+     * B2
+     */
+    public final boolean getB2() {
+        return b2;
+    }
+
+    /**
+     * C1
+     */
+    public final String getC1() {
+        return c1;
+    }
+
+    /**
+     * C2
+     */
+    public final int getC2() {
+        return c2;
+    }
+
+    /**
+     * C3
+     */
+    public final int getC3() {
+        return c3;
+    }
+
+    /**
+     * D1
+     */
+    public final String getD1() {
+        return d1;
+    }
+
+    /**
+     * D2
+     */
+    public final int getD2() {
+        return d2;
+    }
+
+    /**
+     * D3
+     */
+    public final int getD3() {
+        return d3;
+    }
+
+    /**
+     * S1
+     */
+    public final Set<Integer> getS1() {
+        return s1;
+    }
+
+    /**
+     * L1
+     */
+    public final List<Integer> getL1() {
+        return l1;
+    }
+
+    /**
+     * M1
+     */
+    public final Map<Integer, Integer> getM1() {
+        return m1;
+    }
+
+
+    @Override
+    protected QuestConfig create(JSONObject json) {
+        return new QuestConfig(json);
+    }
 
     @Override
     public String toString() {
@@ -190,10 +285,6 @@ public class QuestConfig extends Config {
 
     }
 
-    @Override
-    protected QuestConfig create(JSONObject json) {
-        return new QuestConfig(json);
-    }
 
     private volatile static List<QuestConfig> configs = new ArrayList<>();
 
@@ -210,7 +301,6 @@ public class QuestConfig extends Config {
 
     //类型
     private volatile static Map<QuestType, List<QuestConfig>> typeConfigs = new HashMap<>();
-
 
     public static List<QuestConfig> getConfigs() {
         return configs;

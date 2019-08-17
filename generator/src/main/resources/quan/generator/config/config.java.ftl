@@ -21,25 +21,23 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 
 <#list selfFields as field>
     <#if field.comment !="">
-    /**
-     * ${field.comment}
-     */
+    //${field.comment}
     </#if>
     <#if field.type=="list">
-    public final ${field.basicType}<${field.classValueType}> ${field.name};
+    protected final ${field.basicType}<${field.classValueType}> ${field.name};
     <#elseif field.type=="set">
-    public final ${field.basicType}<${field.classValueType}> ${field.name};
+    protected final ${field.basicType}<${field.classValueType}> ${field.name};
     <#elseif field.type=="map">
-    public final ${field.basicType}<${field.classKeyType}, ${field.classValueType}> ${field.name};
+    protected final ${field.basicType}<${field.classKeyType}, ${field.classValueType}> ${field.name};
     <#elseif  field.timeType>
-    public final ${field.basicType} ${field.name};
+    protected final ${field.basicType} ${field.name};
 
     <#if field.comment !="">
     //${field.comment}
     </#if>
-    public final String ${field.name}$Str;
+    protected final String ${field.name}$Str;
     <#else >
-    public final ${field.basicType} ${field.name};
+    protected final ${field.basicType} ${field.name};
     </#if>
 
 </#list>
@@ -127,6 +125,47 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 </#list>
     }
 
+<#list selfFields as field>
+    <#if field.comment !="">
+    /**
+     * ${field.comment}
+     */
+    </#if>
+    <#if field.type=="list" || field.type=="set">
+    public final ${field.basicType}<${field.classValueType}> get${field.name?cap_first}() {
+        return ${field.name};
+    }
+    <#elseif field.type=="map">
+    public final ${field.basicType}<${field.classKeyType}, ${field.classValueType}> get${field.name?cap_first}() {
+        return ${field.name};
+    }
+    <#elseif field.timeType>
+    public final ${field.basicType} get${field.name?cap_first}() {
+        return ${field.name};
+    }
+
+    <#if field.comment !="">
+    /**
+     * ${field.comment}
+     */
+    </#if>
+    public final String get${field.name?cap_first}$Str() {
+        return ${field.name}$Str;
+    }
+    <#else >
+    public final ${field.basicType} get${field.name?cap_first}() {
+        return ${field.name};
+    }
+    </#if>
+
+</#list>
+
+ <#if definitionType ==6>
+    @Override
+    protected ${name} create(JSONObject json) {
+        return new ${name}(json);
+    }
+</#if>
 
     @Override
     public String toString() {
@@ -147,6 +186,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
                 '}';
 
     }
+
 <#macro indexer tab>
     ${tab}private volatile static List<${name}> configs = new ArrayList<>();
 
@@ -174,7 +214,6 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 
         </#if>
     </#list>
-
     ${tab}public static List<${name}> getConfigs() {
         ${tab}return configs;
     ${tab}}
@@ -341,22 +380,17 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     </#macro>
 
  <#if definitionType ==6>
-    @Override
-    protected ${name} create(JSONObject json) {
-        return new ${name}(json);
-    }
-
     <#if parent??>
     public static class self {
 
         private self() {
         }
 
-            <@indexer tab="    "/>
+        <@indexer tab="    "/>
 
     }
     <#else>
-<@indexer tab=""/>
+        <@indexer tab=""/>
     </#if>
 
 </#if>

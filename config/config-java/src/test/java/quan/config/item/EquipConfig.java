@@ -11,15 +11,11 @@ import quan.config.*;
 @SuppressWarnings({"unchecked"})
 public class EquipConfig extends ItemConfig {
 
-    /**
-     * 部位
-     */
-    public final int position;
+    //部位
+    protected final int position;
 
-    /**
-     * 颜色
-     */
-    public final int color;
+    //颜色
+    protected final int color;
 
 
     public EquipConfig(JSONObject json) {
@@ -29,6 +25,25 @@ public class EquipConfig extends ItemConfig {
         color = json.getIntValue("color");
     }
 
+    /**
+     * 部位
+     */
+    public final int getPosition() {
+        return position;
+    }
+
+    /**
+     * 颜色
+     */
+    public final int getColor() {
+        return color;
+    }
+
+
+    @Override
+    protected EquipConfig create(JSONObject json) {
+        return new EquipConfig(json);
+    }
 
     @Override
     public String toString() {
@@ -47,10 +62,6 @@ public class EquipConfig extends ItemConfig {
 
     }
 
-    @Override
-    protected EquipConfig create(JSONObject json) {
-        return new EquipConfig(json);
-    }
 
     public static class self {
 
@@ -64,7 +75,6 @@ public class EquipConfig extends ItemConfig {
 
         //部位
         private volatile static Map<Integer, List<EquipConfig>> positionConfigs = new HashMap<>();
-
 
         public static List<EquipConfig> getConfigs() {
             return configs;

@@ -11,48 +11,32 @@ import quan.config.*;
 @SuppressWarnings({"unchecked"})
 public class ItemConfig extends Config {
 
-    /**
-     * ID
-     */
-    public final int id;
+    //ID
+    protected final int id;
 
-    /**
-     * 名字
-     */
-    public final String name;
+    //名字
+    protected final String name;
 
-    /**
-     * 类型
-     */
-    public final ItemType type;
+    //类型
+    protected final ItemType type;
 
-    /**
-     * 奖励
-     */
-    public final Reward reward;
+    //奖励
+    protected final Reward reward;
 
-    /**
-     * List
-     */
-    public final List<Integer> list;
+    //List
+    protected final List<Integer> list;
 
-    /**
-     * Set
-     */
-    public final Set<Integer> set;
+    //Set
+    protected final Set<Integer> set;
 
-    /**
-     * Map
-     */
-    public final Map<Integer, Integer> map;
-
-    /**
-     * 生效时间
-     */
-    public final Date effectiveTime;
+    //Map
+    protected final Map<Integer, Integer> map;
 
     //生效时间
-    public final String effectiveTime$Str;
+    protected final Date effectiveTime;
+
+    //生效时间
+    protected final String effectiveTime$Str;
 
 
     public ItemConfig(JSONObject json) {
@@ -106,6 +90,74 @@ public class ItemConfig extends Config {
         effectiveTime$Str = json.getOrDefault("effectiveTime$Str", "").toString();
     }
 
+    /**
+     * ID
+     */
+    public final int getId() {
+        return id;
+    }
+
+    /**
+     * 名字
+     */
+    public final String getName() {
+        return name;
+    }
+
+    /**
+     * 类型
+     */
+    public final ItemType getType() {
+        return type;
+    }
+
+    /**
+     * 奖励
+     */
+    public final Reward getReward() {
+        return reward;
+    }
+
+    /**
+     * List
+     */
+    public final List<Integer> getList() {
+        return list;
+    }
+
+    /**
+     * Set
+     */
+    public final Set<Integer> getSet() {
+        return set;
+    }
+
+    /**
+     * Map
+     */
+    public final Map<Integer, Integer> getMap() {
+        return map;
+    }
+
+    /**
+     * 生效时间
+     */
+    public final Date getEffectiveTime() {
+        return effectiveTime;
+    }
+
+    /**
+     * 生效时间
+     */
+    public final String getEffectiveTime$Str() {
+        return effectiveTime$Str;
+    }
+
+
+    @Override
+    protected ItemConfig create(JSONObject json) {
+        return new ItemConfig(json);
+    }
 
     @Override
     public String toString() {
@@ -122,16 +174,11 @@ public class ItemConfig extends Config {
 
     }
 
-    @Override
-    protected ItemConfig create(JSONObject json) {
-        return new ItemConfig(json);
-    }
 
     private volatile static List<ItemConfig> configs = new ArrayList<>();
 
     //ID
     private volatile static Map<Integer, ItemConfig> idConfigs = new HashMap<>();
-
 
     public static List<ItemConfig> getConfigs() {
         return configs;
