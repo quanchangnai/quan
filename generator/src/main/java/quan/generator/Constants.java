@@ -11,6 +11,11 @@ import java.util.Set;
 public class Constants {
 
     /**
+     * 包名格式
+     */
+    public static final String packageNamePattern = "^([a-z][a-z\\d]*)(\\.[a-z][a-z\\d]*)*";
+
+    /**
      * 类名格式
      */
     public static final String classNamePattern = "^[A-Z][a-zA-Z\\d]*";
@@ -19,6 +24,7 @@ public class Constants {
      * 字段名格式
      */
     public static final String fieldNamePattern = "^[a-z][a-zA-Z\\d]*";
+
 
     private static Set<String> unmodifiableSet(String... params) {
         return Collections.unmodifiableSet(new HashSet<>(Arrays.asList(params)));

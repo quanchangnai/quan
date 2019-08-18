@@ -202,7 +202,7 @@ public class ConfigDefinition extends BeanDefinition {
         tables.addAll(Arrays.asList(table.split(",")));
         for (String t : tables) {
             ConfigDefinition other = parser.getTableConfigs().get(t);
-            if (other != null) {
+            if (other != null && !getName().equals(other.getName())) {
                 addValidatedError(getName4Validate() + other.getName4Validate() + "和表格[" + t + "]不能多对一", other);
             }
             parser.getTableConfigs().put(t, this);

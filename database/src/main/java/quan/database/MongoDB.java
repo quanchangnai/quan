@@ -30,6 +30,10 @@ public class MongoDB extends Database {
 
     private Map<String, MongoCollection> collections = new HashMap<>();
 
+    public MongoDB(String connectionString) {
+        super(new Config().setConnectionString(connectionString));
+    }
+
     public MongoDB(Config config) {
         super(config);
     }
