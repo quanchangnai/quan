@@ -98,12 +98,8 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
        <#if field_index gt 0 >
 
         </#if>
-        String $${field.name} = json.getString("${field.name}");
-        if ($${field.name} != null) {
-            this.${field.name} = ${field.type}.valueOf($${field.name});
-        } else {
-            this.${field.name} = null;
-        }
+        int $${field.name} = json.getIntValue("${field.name}");
+        this.${field.name} = $${field.name} > 0 ? ${field.type}.valueOf($${field.name}) : null;
          <#if field_has_next && (selfFields[field_index+1].primitiveType ||selfFields[field_index+1].timeType) >
 
         </#if>

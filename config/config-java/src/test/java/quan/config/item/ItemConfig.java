@@ -44,12 +44,8 @@ public class ItemConfig extends Config {
         this.id = json.getIntValue("id");
         this.name = json.getOrDefault("name", "").toString();
 
-        String $type = json.getString("type");
-        if ($type != null) {
-            this.type = ItemType.valueOf($type);
-        } else {
-            this.type = null;
-        }
+        int $type = json.getIntValue("type");
+        this.type = $type > 0 ? ItemType.valueOf($type) : null;
 
         JSONObject $reward = json.getJSONObject("reward");
         if ($reward != null) {

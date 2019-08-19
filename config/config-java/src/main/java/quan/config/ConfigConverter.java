@@ -20,11 +20,11 @@ import java.util.Set;
  */
 public class ConfigConverter {
 
-    private static SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy.MM.dd hh.mm.ss" );
+    private static SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy.MM.dd hh.mm.ss");
 
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd" );
+    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd");
 
-    private static SimpleDateFormat timeFormat = new SimpleDateFormat("hh.mm.ss" );
+    private static SimpleDateFormat timeFormat = new SimpleDateFormat("hh.mm.ss");
 
     private DefinitionParser definitionParser;
 
@@ -62,11 +62,11 @@ public class ConfigConverter {
             return convertPrimitiveType(fieldDefinition.getType(), value);
         } else if (fieldDefinition.isTimeType()) {
             return convertTimeType(fieldDefinition.getType(), value);
-        } else if (type.equals("list" )) {
+        } else if (type.equals("list")) {
             return convertList(fieldDefinition, value);
-        } else if (type.equals("set" )) {
+        } else if (type.equals("set")) {
             return convertSet(fieldDefinition, value);
-        } else if (type.equals("map" )) {
+        } else if (type.equals("map")) {
             return convertMap(fieldDefinition, value);
         } else if (fieldDefinition.isBeanType()) {
             return convertBean(fieldDefinition.getBean(), value);
@@ -109,17 +109,23 @@ public class ConfigConverter {
         } catch (NumberFormatException ignored) {
         }
 
+        FieldDefinition enumField;
+
         if (enumValue > 0) {
-            FieldDefinition enumValueField = enumDefinition.getField(enumValue);
-            if (enumValueField == null) {
+            enumField = enumDefinition.getField(enumValue);
+            if (enumField == null) {
                 throw new ConvertException(ConvertException.ErrorType.enumValue, value);
             }
-            return enumValueField.getName();
-        } else if (enumDefinition.getField(value) == null) {
-            throw new ConvertException(ConvertException.ErrorType.enumName, value);
+            return enumValue;
         }
 
-        return value;
+        enumField = enumDefinition.getField(value);
+        if (enumField == null) {
+            throw new ConvertException(ConvertException.ErrorType.enumName, value);
+        }
+        enumValue = Integer.parseInt(enumField.getValue());
+
+        return enumValue;
     }
 
     private Object convertPrimitiveType(String type, String value) {

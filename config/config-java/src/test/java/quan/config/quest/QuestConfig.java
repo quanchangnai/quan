@@ -72,12 +72,8 @@ public class QuestConfig extends Config {
         this.id = json.getIntValue("id");
         this.name = json.getOrDefault("name", "").toString();
 
-        String $type = json.getString("type");
-        if ($type != null) {
-            this.type = QuestType.valueOf($type);
-        } else {
-            this.type = null;
-        }
+        int $type = json.getIntValue("type");
+        this.type = $type > 0 ? QuestType.valueOf($type) : null;
 
         this.target = json.getIntValue("target");
 
