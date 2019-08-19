@@ -102,6 +102,8 @@ public class TransactionTest {
             }
         }
 
+        System.err.println("list.indexOf:" + list.indexOf("8"));
+
         Set<Boolean> set = roleData2.getSet();
         set.add(true);
         set.add(false);

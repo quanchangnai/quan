@@ -58,53 +58,64 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
         return getValue().contains(o);
     }
 
+
+    private class It implements Iterator<E> {
+
+        int cursor;
+
+        int last = -1;
+
+        int expectedModCount = modCount;
+
+        @Override
+        public boolean hasNext() {
+            return cursor != size();
+        }
+
+        @Override
+        public E next() {
+            checkConcurrentModification();
+            try {
+                E next = get(cursor);
+                last = cursor;
+                cursor++;
+                return next;
+            } catch (IndexOutOfBoundsException e) {
+                checkConcurrentModification();
+                throw new NoSuchElementException();
+            }
+
+        }
+
+        @Override
+        public void remove() {
+            if (last < 0) {
+                throw new IllegalStateException();
+            }
+            checkConcurrentModification();
+            try {
+                ListField.this.remove(last);
+                if (last < cursor) {
+                    cursor--;
+                }
+                last--;
+                expectedModCount = modCount;
+            } catch (IndexOutOfBoundsException ex) {
+                throw new ConcurrentModificationException();
+            }
+
+        }
+
+        void checkConcurrentModification() {
+            if (modCount != expectedModCount) {
+                throw new ConcurrentModificationException();
+            }
+        }
+    }
+
     @Override
     public Iterator<E> iterator() {
-        return new Iterator<E>() {
-            private Iterator<E> it = getValue().iterator();
-            private int cursor;
-            private int last = -1;
-            int expectedModCount = modCount;
-
-            @Override
-            public boolean hasNext() {
-                return it.hasNext();
-            }
-
-            @Override
-            public E next() {
-                checkConcurrentModification();
-                E current = it.next();
-                if (current != null) {
-                    last = cursor;
-                    cursor++;
-                }
-                return current;
-            }
-
-            @Override
-            public void remove() {
-                if (last < 0) {
-                    throw new IllegalStateException();
-                }
-                checkConcurrentModification();
-                try {
-                    ListField.this.remove(last);
-                    cursor = last;
-                    last--;
-                    expectedModCount = modCount;
-                } catch (IndexOutOfBoundsException ex) {
-                    throw new ConcurrentModificationException();
-                }
-
-            }
-
-            private void checkConcurrentModification() {
-                if (modCount != expectedModCount) {
-                    throw new ConcurrentModificationException();
-                }
-            }
-        };
+        return new It();
     }
 
     @Override
@@ -141,17 +152,13 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
         modCount++;
         FieldLog<PVector<E>> log = getLog(true);
         PVector<E> oldData = log.getValue();
-        PVector<E> newData = log.getValue().plus(e);
+        log.setValue(log.getValue().plus(e));
 
         if (e instanceof Entity) {
             ((Entity) e).setLogRoot(getRoot());
         }
 
-        if (oldData != newData) {
-            log.setValue(newData);
-            return true;
-        }
-        return false;
+        return oldData != log.getValue();
     }
 
     @Override
@@ -160,16 +167,15 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
 
         modCount++;
         PVector<E> oldData = log.getValue();
-        for (E e : oldData) {
-            if (e.equals(o) && e instanceof Entity) {
-                ((Entity) e).setLogRoot(null);
-                break;
-            }
-        }
-        PVector<E> newData = log.getValue().minus(o);
+        log.setValue(log.getValue().minus(o));
 
-        if (oldData != newData) {
-            log.setValue(newData);
+        if (oldData != log.getValue()) {
+            for (E e : oldData) {
+                if (e.equals(o) && e instanceof Entity) {
+                    ((Entity) e).setLogRoot(null);
+                    break;
+                }
+            }
             return true;
         }
         return false;
@@ -264,16 +270,16 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
     }
 
     @Override
-    public E set(int index, E element) {
-        Validations.validateCollectionValue(element);
+    public E set(int index, E e) {
+        Validations.validateCollectionValue(e);
 
         modCount++;
         FieldLog<PVector<E>> log = getLog(true);
         PVector<E> oldData = log.getValue();
-        log.setValue(log.getValue().with(index, element));
+        log.setValue(log.getValue().with(index, e));
 
-        if (element instanceof Entity) {
-            ((Entity) element).setLogRoot(getRoot());
+        if (e instanceof Entity) {
+            ((Entity) e).setLogRoot(getRoot());
         }
 
         E old = oldData.get(index);
@@ -285,12 +291,16 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
     }
 
     @Override
-    public void add(int index, E element) {
-        Validations.validateCollectionValue(element);
+    public void add(int index, E e) {
+        Validations.validateCollectionValue(e);
 
         modCount++;
         FieldLog<PVector<E>> log = getLog(true);
-        log.setValue(log.getValue().plus(index, element));
+        log.setValue(log.getValue().plus(index, e));
+
+        if (e instanceof Entity) {
+            ((Entity) e).setLogRoot(getRoot());
+        }
     }
 
     @Override
@@ -319,21 +329,87 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
         return getValue().lastIndexOf(o);
     }
 
+    private class ListIt extends It implements ListIterator<E> {
+
+        public ListIt(int index) {
+            cursor = index;
+        }
+
+        @Override
+        public boolean hasPrevious() {
+            return cursor != 0;
+        }
+
+        @Override
+        public E previous() {
+            checkConcurrentModification();
+            try {
+                E previous = get(cursor - 1);
+                last = --cursor;
+                return previous;
+            } catch (IndexOutOfBoundsException e) {
+                checkConcurrentModification();
+                throw new NoSuchElementException();
+            }
+        }
+
+        @Override
+        public int nextIndex() {
+            return cursor;
+        }
+
+        @Override
+        public int previousIndex() {
+            return cursor - 1;
+        }
+
+        @Override
+        public void set(E e) {
+            if (last < 0) {
+                throw new IllegalStateException();
+            }
+            checkConcurrentModification();
+
+            try {
+                ListField.this.set(last, e);
+                expectedModCount = modCount;
+            } catch (IndexOutOfBoundsException ex) {
+                throw new ConcurrentModificationException();
+            }
+        }
+
+        @Override
+        public void add(E e) {
+            checkConcurrentModification();
+
+            try {
+                ListField.this.add(cursor, e);
+                last = -1;
+                cursor++;
+                expectedModCount = modCount;
+            } catch (IndexOutOfBoundsException ex) {
+                throw new ConcurrentModificationException();
+            }
+        }
+    }
+
     @Override
     public ListIterator<E> listIterator() {
-        return getValue().listIterator();
+        return new ListIt(0);
     }
 
     @Override
     public ListIterator<E> listIterator(int index) {
-        return getValue().listIterator(index);
+        if (index < 0 || index > size()) {
+            throw new IndexOutOfBoundsException("index: " + index + ", size: " + size());
+        }
+        return new ListIt(index);
     }
 
     @Override
     public List<E> subList(int fromIndex, int toIndex) {
         return getValue().subList(fromIndex, toIndex);
     }
-
 
     @Override
     public String toString() {
