@@ -20,12 +20,12 @@ public class MessageFactory {
 
     public void register(Message message) {
         if (prototypes.containsKey(message.getId())) {
-            throw new RuntimeException("消息ID重复:" + message.getId());
+            throw new IllegalArgumentException("消息ID重复:" + message.getId());
         }
         prototypes.put(message.getId(), message);
     }
 
-    public void autoRegister(String packageName) {
+    public void register(String packageName) {
         Set<Class<?>> messageClasses = ClassUtils.loadClasses(packageName, Message.class);
         for (Class<?> messageClass : messageClasses) {
             try {
