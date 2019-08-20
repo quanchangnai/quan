@@ -1,16 +1,14 @@
 package quan.config.quest;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import quan.config.Config;
+import java.util.*;
+import com.alibaba.fastjson.*;
+import quan.config.*;
 import quan.config.item.Reward;
 
-import java.util.*;
-
 /**
- * 任务<br/>
- * Created by 自动生成
- */
+* 任务<br/>
+* Created by 自动生成
+*/
 public class QuestConfig extends Config {
 
     //ID
@@ -283,21 +281,21 @@ public class QuestConfig extends Config {
     }
 
 
-    private volatile static List<QuestConfig> configs = new ArrayList<>();
+    private static volatile List<QuestConfig> configs = new ArrayList<>();
 
-    private volatile static Map<Integer, Map<Integer, QuestConfig>> composite1Configs = new HashMap<>();
+    private static volatile Map<Integer, Map<Integer, QuestConfig>> composite1Configs = new HashMap<>();
 
-    private volatile static Map<Integer, Map<Boolean, List<QuestConfig>>> composite2Configs = new HashMap<>();
+    private static volatile Map<Integer, Map<Boolean, List<QuestConfig>>> composite2Configs = new HashMap<>();
 
-    private volatile static Map<String, Map<Integer, Map<Integer, QuestConfig>>> composite3Configs = new HashMap<>();
+    private static volatile Map<String, Map<Integer, Map<Integer, QuestConfig>>> composite3Configs = new HashMap<>();
 
-    private volatile static Map<String, Map<Integer, Map<Integer, List<QuestConfig>>>> composite4Configs = new HashMap<>();
+    private static volatile Map<String, Map<Integer, Map<Integer, List<QuestConfig>>>> composite4Configs = new HashMap<>();
 
     //ID
-    private volatile static Map<Integer, QuestConfig> idConfigs = new HashMap<>();
+    private static volatile Map<Integer, QuestConfig> idConfigs = new HashMap<>();
 
     //类型
-    private volatile static Map<QuestType, List<QuestConfig>> typeConfigs = new HashMap<>();
+    private static volatile Map<QuestType, List<QuestConfig>> typeConfigs = new HashMap<>();
 
     public static List<QuestConfig> getConfigs() {
         return configs;

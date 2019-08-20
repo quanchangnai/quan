@@ -10,7 +10,7 @@ import java.util.Objects;
  */
 public abstract class Bean {
 
-    private JSONObject json;
+    private final JSONObject json;
 
     public Bean(JSONObject json) {
         Objects.requireNonNull(json, "参数[json]不能为空");

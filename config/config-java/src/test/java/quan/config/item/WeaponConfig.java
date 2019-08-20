@@ -152,17 +152,17 @@ public class WeaponConfig extends EquipConfig {
         private self() {
         }
 
-        private volatile static List<WeaponConfig> configs = new ArrayList<>();
+        private static volatile List<WeaponConfig> configs = new ArrayList<>();
 
         //ID
-        private volatile static Map<Integer, WeaponConfig> idConfigs = new HashMap<>();
+        private static volatile Map<Integer, WeaponConfig> idConfigs = new HashMap<>();
 
         //部位
-        private volatile static Map<Integer, List<WeaponConfig>> positionConfigs = new HashMap<>();
+        private static volatile Map<Integer, List<WeaponConfig>> positionConfigs = new HashMap<>();
 
-        private volatile static Map<Integer, Map<Integer, List<WeaponConfig>>> composite1Configs = new HashMap<>();
+        private static volatile Map<Integer, Map<Integer, List<WeaponConfig>>> composite1Configs = new HashMap<>();
 
-        private volatile static Map<Integer, Map<Integer, WeaponConfig>> composite2Configs = new HashMap<>();
+        private static volatile Map<Integer, Map<Integer, WeaponConfig>> composite2Configs = new HashMap<>();
 
         public static List<WeaponConfig> getConfigs() {
             return configs;

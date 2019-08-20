@@ -4,7 +4,7 @@ namespace ConfigCS
 {
     public class Bean
     {
-        private JObject _json;
+        private readonly JObject _json;
 
         public Bean(JObject json)
         {

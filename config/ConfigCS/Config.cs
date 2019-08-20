@@ -4,7 +4,7 @@ namespace ConfigCS
 {
     public abstract class Config : Bean
     {
-        public Config(JObject json) : base(json)
+        protected Config(JObject json) : base(json)
         {
         }
 

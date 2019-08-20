@@ -59,7 +59,6 @@
     <Compile Include="Test\Item\Reward.cs" />
     <Compile Include="Test\Item\WeaponConfig.cs" />
     <Compile Include="Test\Quest\QuestConfig.cs" />
-    <Compile Include="Test\Quest\QuestConfig2.cs" />
     <Compile Include="Test\Quest\QuestTargetConfig.cs" />
     <Compile Include="Test\Quest\QuestType.cs" />
   </ItemGroup>

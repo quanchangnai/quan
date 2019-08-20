@@ -180,7 +180,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     }
 
 <#macro indexer tab>
-    ${tab}private static volatile  List<${name}> configs = new ArrayList<>();
+    ${tab}private static volatile List<${name}> configs = new ArrayList<>();
 
     <#list indexes as index>
         <#if index.comment !="">

@@ -67,13 +67,13 @@ public class EquipConfig extends ItemConfig {
         private self() {
         }
 
-        private volatile static List<EquipConfig> configs = new ArrayList<>();
+        private static volatile List<EquipConfig> configs = new ArrayList<>();
 
         //ID
-        private volatile static Map<Integer, EquipConfig> idConfigs = new HashMap<>();
+        private static volatile Map<Integer, EquipConfig> idConfigs = new HashMap<>();
 
         //部位
-        private volatile static Map<Integer, List<EquipConfig>> positionConfigs = new HashMap<>();
+        private static volatile Map<Integer, List<EquipConfig>> positionConfigs = new HashMap<>();
 
         public static List<EquipConfig> getConfigs() {
             return configs;

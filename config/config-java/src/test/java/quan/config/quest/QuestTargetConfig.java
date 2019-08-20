@@ -54,10 +54,10 @@ public class QuestTargetConfig extends Config {
     }
 
 
-    private volatile static List<QuestTargetConfig> configs = new ArrayList<>();
+    private static volatile List<QuestTargetConfig> configs = new ArrayList<>();
 
     //ID
-    private volatile static Map<Integer, QuestTargetConfig> idConfigs = new HashMap<>();
+    private static volatile Map<Integer, QuestTargetConfig> idConfigs = new HashMap<>();
 
     public static List<QuestTargetConfig> getConfigs() {
         return configs;

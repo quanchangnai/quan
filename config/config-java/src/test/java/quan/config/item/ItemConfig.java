@@ -34,7 +34,6 @@ public class ItemConfig extends Config {
     //生效时间
     protected final Date effectiveTime;
 
-    //生效时间
     protected final String effectiveTime$Str;
 
 
@@ -170,10 +169,10 @@ public class ItemConfig extends Config {
     }
 
 
-    private volatile static List<ItemConfig> configs = new ArrayList<>();
+    private static volatile List<ItemConfig> configs = new ArrayList<>();
 
     //ID
-    private volatile static Map<Integer, ItemConfig> idConfigs = new HashMap<>();
+    private static volatile Map<Integer, ItemConfig> idConfigs = new HashMap<>();
 
     public static List<ItemConfig> getConfigs() {
         return configs;
