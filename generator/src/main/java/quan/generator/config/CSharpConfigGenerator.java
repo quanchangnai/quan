@@ -25,9 +25,9 @@ public class CSharpConfigGenerator extends ConfigGenerator {
         BASIC_TYPES.put("float", "float");
         BASIC_TYPES.put("double", "double");
         BASIC_TYPES.put("string", "string");
-        BASIC_TYPES.put("set", "HashSet");
-        BASIC_TYPES.put("list", "List");
-        BASIC_TYPES.put("map", "Dictionary");
+        BASIC_TYPES.put("set", "ISet");
+        BASIC_TYPES.put("list", "IList");
+        BASIC_TYPES.put("map", "IDictionary");
         BASIC_TYPES.put("date", "DateTime");
         BASIC_TYPES.put("time", "DateTime");
         BASIC_TYPES.put("datetime", "DateTime");

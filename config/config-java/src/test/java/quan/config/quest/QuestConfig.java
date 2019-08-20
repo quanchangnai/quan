@@ -1,14 +1,16 @@
 package quan.config.quest;
 
-import java.util.*;
-import com.alibaba.fastjson.*;
-import quan.config.*;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import quan.config.Config;
 import quan.config.item.Reward;
 
+import java.util.*;
+
 /**
-* 任务<br/>
-* Created by 自动生成
-*/
+ * 任务<br/>
+ * Created by 自动生成
+ */
 public class QuestConfig extends Config {
 
     //ID
