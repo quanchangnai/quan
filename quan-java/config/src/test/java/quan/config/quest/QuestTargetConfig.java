@@ -90,8 +90,11 @@ public class QuestTargetConfig extends Config {
             }
         }
 
-        QuestTargetConfig.configs = Collections.unmodifiableList(configs);
-        QuestTargetConfig.idConfigs = unmodifiableMap(idConfigs);
+        configs = Collections.unmodifiableList(configs);
+        idConfigs = unmodifiableMap(idConfigs);
+
+        QuestTargetConfig.configs = configs;
+        QuestTargetConfig.idConfigs = idConfigs;
 
         return errors;
     }

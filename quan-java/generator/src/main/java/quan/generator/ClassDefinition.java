@@ -41,7 +41,7 @@ public abstract class ClassDefinition extends Definition {
 
     @Override
     protected String namePattern() {
-        return Constants.classNamePattern;
+        return Constants.CLASS_NAME_PATTERN;
     }
 
     public String getPackagePrefix() {

@@ -355,17 +355,14 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     </#list>
         ${tab}}
 
-    <#if parent??>
-        ${tab}${name}.self.configs = Collections.unmodifiableList(configs);
-    <#else>
-        ${tab}${name}.configs = Collections.unmodifiableList(configs);
-    </#if>
+        ${tab}configs = Collections.unmodifiableList(configs);
     <#list indexes as index>
-        <#if parent??>
-        ${tab}${name}.self.${index.name}Configs = unmodifiableMap(${index.name}Configs);
-        <#else>
-        ${tab}${name}.${index.name}Configs = unmodifiableMap(${index.name}Configs);
-        </#if>
+        ${tab}${index.name}Configs = unmodifiableMap(${index.name}Configs);
+    </#list>
+
+        ${tab}${name}.<#if parent??>self.</#if>configs = configs;
+    <#list indexes as index>
+        ${tab}${name}.<#if parent??>self.</#if>${index.name}Configs = ${index.name}Configs;
     </#list>
 
         ${tab}return errors;

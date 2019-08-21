@@ -180,8 +180,8 @@ public class BeanDefinition extends ClassDefinition {
         }
         for (int i = 0; i < delimiter.length(); i++) {
             String s = String.valueOf(delimiter.charAt(i));
-            if (!Constants.legalDelimiters.contains(s)) {
-                addValidatedError(getName4Validate() + "的分隔符[" + delimiter + "]非法,合法分隔符" + Constants.legalDelimiters);
+            if (!Constants.LEGAL_DELIMITERS.contains(s)) {
+                addValidatedError(getName4Validate() + "的分隔符[" + delimiter + "]非法,合法分隔符" + Constants.LEGAL_DELIMITERS);
             }
         }
     }

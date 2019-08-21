@@ -140,23 +140,25 @@ namespace ConfigCS.Test.Item
 
         public static ItemConfig GetById(int id)
         {
-            return _idConfigs.ContainsKey(id) ? _idConfigs[id] : null;
+            _idConfigs.TryGetValue(id, out var result);
+             return result;
         }
 
 
-        public static void Index(List<ItemConfig> configs)
+        public static void Index(IList<ItemConfig> configs)
         {
-            var idConfigs = new Dictionary<int, ItemConfig>();
+            IDictionary<int, ItemConfig> idConfigs = new Dictionary<int, ItemConfig>();
 
             foreach (var config in configs)
             {
                 idConfigs[config.Id] = config;
-
             }
 
-            _configs = configs.ToImmutableList();
-            _idConfigs = idConfigs.ToImmutableDictionary();
+            configs = configs.ToImmutableList();
+            idConfigs = ToImmutableDictionary(idConfigs);
 
+            _configs = configs;
+            _idConfigs = idConfigs;
         }
     }
 }

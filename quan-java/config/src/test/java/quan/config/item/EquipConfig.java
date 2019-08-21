@@ -117,9 +117,13 @@ public class EquipConfig extends ItemConfig {
                 positionConfigs.computeIfAbsent(config.position, k -> new ArrayList<>()).add(config);
             }
 
-            EquipConfig.self.configs = Collections.unmodifiableList(configs);
-            EquipConfig.self.idConfigs = unmodifiableMap(idConfigs);
-            EquipConfig.self.positionConfigs = unmodifiableMap(positionConfigs);
+            configs = Collections.unmodifiableList(configs);
+            idConfigs = unmodifiableMap(idConfigs);
+            positionConfigs = unmodifiableMap(positionConfigs);
+
+            EquipConfig.self.configs = configs;
+            EquipConfig.self.idConfigs = idConfigs;
+            EquipConfig.self.positionConfigs = positionConfigs;
 
             return errors;
         }

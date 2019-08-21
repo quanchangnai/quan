@@ -243,11 +243,17 @@ public class WeaponConfig extends EquipConfig {
                 }
             }
 
-            WeaponConfig.self.configs = Collections.unmodifiableList(configs);
-            WeaponConfig.self.idConfigs = unmodifiableMap(idConfigs);
-            WeaponConfig.self.positionConfigs = unmodifiableMap(positionConfigs);
-            WeaponConfig.self.composite1Configs = unmodifiableMap(composite1Configs);
-            WeaponConfig.self.composite2Configs = unmodifiableMap(composite2Configs);
+            configs = Collections.unmodifiableList(configs);
+            idConfigs = unmodifiableMap(idConfigs);
+            positionConfigs = unmodifiableMap(positionConfigs);
+            composite1Configs = unmodifiableMap(composite1Configs);
+            composite2Configs = unmodifiableMap(composite2Configs);
+
+            WeaponConfig.self.configs = configs;
+            WeaponConfig.self.idConfigs = idConfigs;
+            WeaponConfig.self.positionConfigs = positionConfigs;
+            WeaponConfig.self.composite1Configs = composite1Configs;
+            WeaponConfig.self.composite2Configs = composite2Configs;
 
             return errors;
         }

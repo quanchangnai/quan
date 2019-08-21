@@ -205,8 +205,11 @@ public class ItemConfig extends Config {
             }
         }
 
-        ItemConfig.configs = Collections.unmodifiableList(configs);
-        ItemConfig.idConfigs = unmodifiableMap(idConfigs);
+        configs = Collections.unmodifiableList(configs);
+        idConfigs = unmodifiableMap(idConfigs);
+
+        ItemConfig.configs = configs;
+        ItemConfig.idConfigs = idConfigs;
 
         return errors;
     }

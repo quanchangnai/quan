@@ -79,7 +79,8 @@ namespace ConfigCS.Test.Item
 
             public static EquipConfig GetById(int id)
             {
-                return _idConfigs.ContainsKey(id) ? _idConfigs[id] : null;
+                _idConfigs.TryGetValue(id, out var result);
+                 return result;
             }
 
             public static IDictionary<int, IList<EquipConfig>> GetPositionConfigs() 
@@ -89,33 +90,31 @@ namespace ConfigCS.Test.Item
 
             public static IList<EquipConfig> GetByPosition(int position)
             {
-                return _positionConfigs.ContainsKey(position) ? _positionConfigs[position] : ImmutableList<EquipConfig>.Empty;
+                _positionConfigs.TryGetValue(position, out var result);
+                return result ?? ImmutableList<EquipConfig>.Empty;
             }
 
 
-            public static void Index(List<EquipConfig> configs)
+            public static void Index(IList<EquipConfig> configs)
             {
-                var idConfigs = new Dictionary<int, EquipConfig>();
-                var positionConfigs = new Dictionary<int, IList<EquipConfig>>();
+                IDictionary<int, EquipConfig> idConfigs = new Dictionary<int, EquipConfig>();
+                IDictionary<int, IList<EquipConfig>> positionConfigs = new Dictionary<int, IList<EquipConfig>>();
 
                 foreach (var config in configs)
                 {
                     idConfigs[config.Id] = config;
 
-
-                    if (!positionConfigs.ContainsKey(config.Position))
-                    {
-                        positionConfigs.Add(config.Position, new List<EquipConfig>());
-                    }
-
+                    if (!positionConfigs.ContainsKey(config.Position)) positionConfigs[config.Position] = new List<EquipConfig>();
                     positionConfigs[config.Position].Add(config);
-
                 }
 
-                _configs = configs.ToImmutableList();
-                _idConfigs = idConfigs.ToImmutableDictionary();
-                _positionConfigs = positionConfigs.ToImmutableDictionary();
+                configs = configs.ToImmutableList();
+                idConfigs = ToImmutableDictionary(idConfigs);
+                positionConfigs = ToImmutableDictionary(positionConfigs);
 
+                _configs = configs;
+                _idConfigs = idConfigs;
+                _positionConfigs = positionConfigs;
             }
         }
     }

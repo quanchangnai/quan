@@ -64,23 +64,25 @@ namespace ConfigCS.Test.Quest
 
         public static QuestTargetConfig GetById(int id)
         {
-            return _idConfigs.ContainsKey(id) ? _idConfigs[id] : null;
+            _idConfigs.TryGetValue(id, out var result);
+             return result;
         }
 
 
-        public static void Index(List<QuestTargetConfig> configs)
+        public static void Index(IList<QuestTargetConfig> configs)
         {
-            var idConfigs = new Dictionary<int, QuestTargetConfig>();
+            IDictionary<int, QuestTargetConfig> idConfigs = new Dictionary<int, QuestTargetConfig>();
 
             foreach (var config in configs)
             {
                 idConfigs[config.Id] = config;
-
             }
 
-            _configs = configs.ToImmutableList();
-            _idConfigs = idConfigs.ToImmutableDictionary();
+            configs = configs.ToImmutableList();
+            idConfigs = ToImmutableDictionary(idConfigs);
 
+            _configs = configs;
+            _idConfigs = idConfigs;
         }
     }
 }

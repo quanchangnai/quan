@@ -327,8 +327,8 @@ public class ConfigDefinition extends BeanDefinition {
         for (int i = 0; i < delimiter.length(); i++) {
             String s = String.valueOf(delimiter.charAt(i));
             delimiters.add(s);
-            if (!Constants.legalDelimiters.contains(s)) {
-                addValidatedError(getName4Validate("的") + field.getName4Validate() + "的分隔符[" + delimiter + "]非法,合法分隔符" + Constants.legalDelimiters);
+            if (!Constants.LEGAL_DELIMITERS.contains(s)) {
+                addValidatedError(getName4Validate("的") + field.getName4Validate() + "的分隔符[" + delimiter + "]非法,合法分隔符" + Constants.LEGAL_DELIMITERS);
             }
         }
 
@@ -380,7 +380,7 @@ public class ConfigDefinition extends BeanDefinition {
                 continue;
             }
             if (!selfField.isPrimitiveType() && !selfField.isEnumType()) {
-                addValidatedError(getName4Validate("的") + selfField.getName4Validate() + "类型[" + selfField.getType() + "]不支持索引，允许的类型为" + Constants.primitiveTypes + "或枚举");
+                addValidatedError(getName4Validate("的") + selfField.getName4Validate() + "类型[" + selfField.getType() + "]不支持索引，允许的类型为" + Constants.PRIMITIVE_TYPES + "或枚举");
                 continue;
             }
             IndexDefinition indexDefinition = new IndexDefinition();
@@ -453,7 +453,7 @@ public class ConfigDefinition extends BeanDefinition {
                 continue;
             }
             if (!fieldDefinition.isPrimitiveType() && !fieldDefinition.isEnumType()) {
-                addValidatedError(getName4Validate("的") + indexDefinition.getName4Validate() + "字段[" + fieldName + "]类型[" + fieldDefinition.getType() + "]非法，允许的类型为" + Constants.primitiveTypes + "或枚举");
+                addValidatedError(getName4Validate("的") + indexDefinition.getName4Validate() + "字段[" + fieldName + "]类型[" + fieldDefinition.getType() + "]非法，允许的类型为" + Constants.PRIMITIVE_TYPES + "或枚举");
             }
             if (!indexDefinition.addField(fieldDefinition)) {
                 addValidatedError(getName4Validate("的") + indexDefinition.getName4Validate() + "字段[" + fieldNames + "]不能重复");
@@ -472,7 +472,7 @@ public class ConfigDefinition extends BeanDefinition {
             if (i > 0) {
                 escapedDelimiter.append("|");
             }
-            if (Constants.needEscapeChars.contains(s)) {
+            if (Constants.NEED_ESCAPE_CHARS.contains(s)) {
                 escapedDelimiter.append("\\");
             }
             escapedDelimiter.append(s);

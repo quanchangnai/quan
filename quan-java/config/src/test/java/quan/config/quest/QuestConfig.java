@@ -421,13 +421,21 @@ public class QuestConfig extends Config {
             typeConfigs.computeIfAbsent(config.type, k -> new ArrayList<>()).add(config);
         }
 
-        QuestConfig.configs = Collections.unmodifiableList(configs);
-        QuestConfig.composite1Configs = unmodifiableMap(composite1Configs);
-        QuestConfig.composite2Configs = unmodifiableMap(composite2Configs);
-        QuestConfig.composite3Configs = unmodifiableMap(composite3Configs);
-        QuestConfig.composite4Configs = unmodifiableMap(composite4Configs);
-        QuestConfig.idConfigs = unmodifiableMap(idConfigs);
-        QuestConfig.typeConfigs = unmodifiableMap(typeConfigs);
+        configs = Collections.unmodifiableList(configs);
+        composite1Configs = unmodifiableMap(composite1Configs);
+        composite2Configs = unmodifiableMap(composite2Configs);
+        composite3Configs = unmodifiableMap(composite3Configs);
+        composite4Configs = unmodifiableMap(composite4Configs);
+        idConfigs = unmodifiableMap(idConfigs);
+        typeConfigs = unmodifiableMap(typeConfigs);
+
+        QuestConfig.configs = configs;
+        QuestConfig.composite1Configs = composite1Configs;
+        QuestConfig.composite2Configs = composite2Configs;
+        QuestConfig.composite3Configs = composite3Configs;
+        QuestConfig.composite4Configs = composite4Configs;
+        QuestConfig.idConfigs = idConfigs;
+        QuestConfig.typeConfigs = typeConfigs;
 
         return errors;
     }

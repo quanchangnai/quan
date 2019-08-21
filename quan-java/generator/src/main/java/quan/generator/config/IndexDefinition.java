@@ -34,7 +34,7 @@ public class IndexDefinition extends Definition {
 
     @Override
     protected String namePattern() {
-        return Constants.fieldNamePattern;
+        return Constants.FIELD_NAME_PATTERN;
     }
 
     public boolean isUnique() {

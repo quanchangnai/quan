@@ -153,7 +153,8 @@ namespace ConfigCS.Test.Item
 
             public static WeaponConfig GetById(int id)
             {
-                return _idConfigs.ContainsKey(id) ? _idConfigs[id] : null;
+                _idConfigs.TryGetValue(id, out var result);
+                 return result;
             }
 
             public static IDictionary<int, IList<WeaponConfig>> GetPositionConfigs() 
@@ -163,7 +164,8 @@ namespace ConfigCS.Test.Item
 
             public static IList<WeaponConfig> GetByPosition(int position)
             {
-                return _positionConfigs.ContainsKey(position) ? _positionConfigs[position] : ImmutableList<WeaponConfig>.Empty;
+                _positionConfigs.TryGetValue(position, out var result);
+                return result ?? ImmutableList<WeaponConfig>.Empty;
             }
 
             public static IDictionary<int, IDictionary<int, IList<WeaponConfig>>> GetComposite1Configs()
@@ -173,13 +175,14 @@ namespace ConfigCS.Test.Item
 
             public static IDictionary<int, IList<WeaponConfig>> GetByComposite1(int color)
             {
-                return _composite1Configs.ContainsKey(color) ? _composite1Configs[color] : ImmutableDictionary<int, IList<WeaponConfig>>.Empty;
+                _composite1Configs.TryGetValue(color, out var result);
+                return result ?? ImmutableDictionary<int, IList<WeaponConfig>>.Empty;
             }
 
             public static IList<WeaponConfig> GetByComposite1(int color, int w1)
             {
-                var composite1Configs = GetByComposite1(color);
-                return composite1Configs.ContainsKey(w1) ? composite1Configs[w1] : ImmutableList<WeaponConfig>.Empty;
+                GetByComposite1(color).TryGetValue(w1, out var result);
+                return result ?? ImmutableList<WeaponConfig>.Empty;
             }
 
             public static IDictionary<int, IDictionary<int, WeaponConfig>> GetComposite2Configs() 
@@ -189,64 +192,50 @@ namespace ConfigCS.Test.Item
 
             public static IDictionary<int, WeaponConfig> GetByComposite2(int w1)
             {
-                return _composite2Configs.ContainsKey(w1) ? _composite2Configs[w1] : ImmutableDictionary<int, WeaponConfig>.Empty;
+                _composite2Configs.TryGetValue(w1, out var result);
+                return result ?? ImmutableDictionary<int, WeaponConfig>.Empty;
             }
 
             public static WeaponConfig GetByComposite2(int w1, int w2)
             {
-                var composite2Configs = GetByComposite2(w1);
-                return composite2Configs.ContainsKey(w1) ? composite2Configs[w2] : null;
+                GetByComposite2(w1).TryGetValue(w2, out var result);
+                return result;
             }
 
 
-            public static void Index(List<WeaponConfig> configs)
+            public static void Index(IList<WeaponConfig> configs)
             {
-                var idConfigs = new Dictionary<int, WeaponConfig>();
-                var positionConfigs = new Dictionary<int, IList<WeaponConfig>>();
-                var composite1Configs = new Dictionary<int, IDictionary<int, IList<WeaponConfig>>>();
-                var composite2Configs = new Dictionary<int, IDictionary<int, WeaponConfig>>();
+                IDictionary<int, WeaponConfig> idConfigs = new Dictionary<int, WeaponConfig>();
+                IDictionary<int, IList<WeaponConfig>> positionConfigs = new Dictionary<int, IList<WeaponConfig>>();
+                IDictionary<int, IDictionary<int, IList<WeaponConfig>>> composite1Configs = new Dictionary<int, IDictionary<int, IList<WeaponConfig>>>();
+                IDictionary<int, IDictionary<int, WeaponConfig>> composite2Configs = new Dictionary<int, IDictionary<int, WeaponConfig>>();
 
                 foreach (var config in configs)
                 {
                     idConfigs[config.Id] = config;
 
-
-                    if (!positionConfigs.ContainsKey(config.Position))
-                    {
-                        positionConfigs.Add(config.Position, new List<WeaponConfig>());
-                    }
-
+                    if (!positionConfigs.ContainsKey(config.Position)) positionConfigs[config.Position] = new List<WeaponConfig>();
                     positionConfigs[config.Position].Add(config);
 
-
-                    if (!composite1Configs.ContainsKey(config.Color))
-                    {
-                        composite1Configs.Add(config.Color, new Dictionary<int, IList<WeaponConfig>>());
-                    }
-
-                    if (!composite1Configs[config.Color].ContainsKey(config.W1))
-                    {
-                        composite1Configs[config.Color][config.W1] = new List<WeaponConfig>();
-                    }
-
+                    if (!composite1Configs.ContainsKey(config.Color))     composite1Configs[config.Color] = new Dictionary<int, IList<WeaponConfig>>();
+                    if (!composite1Configs[config.Color].ContainsKey(config.W1))     composite1Configs[config.Color][config.W1] = new List<WeaponConfig>();
                     composite1Configs[config.Color][config.W1].Add(config);
 
-
-                    if (!composite2Configs.ContainsKey(config.W1))
-                    {
-                        composite2Configs.Add(config.W1, new Dictionary<int, WeaponConfig>());
-                    }
-
+                    if (!composite2Configs.ContainsKey(config.W1))     composite2Configs[config.W1] = new Dictionary<int, WeaponConfig>();
                     composite2Configs[config.W1][config.W2] = config;
-
                 }
 
-                _configs = configs.ToImmutableList();
-                _idConfigs = idConfigs.ToImmutableDictionary();
-                _positionConfigs = positionConfigs.ToImmutableDictionary();
-                _composite1Configs = composite1Configs.ToImmutableDictionary();
-                _composite2Configs = composite2Configs.ToImmutableDictionary();
+                configs = configs.ToImmutableList();
+                idConfigs = ToImmutableDictionary(idConfigs);
+                positionConfigs = ToImmutableDictionary(positionConfigs);
+                composite1Configs = ToImmutableDictionary(composite1Configs);
+                composite2Configs = ToImmutableDictionary(composite2Configs);
 
+                _configs = configs;
+                _idConfigs = idConfigs;
+                _positionConfigs = positionConfigs;
+                _composite1Configs = composite1Configs;
+                _composite2Configs = composite2Configs;
             }
         }
     }

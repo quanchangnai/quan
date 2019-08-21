@@ -66,7 +66,7 @@ public class FieldDefinition extends Definition {
 
     @Override
     protected String namePattern() {
-        return Constants.fieldNamePattern;
+        return Constants.FIELD_NAME_PATTERN;
     }
 
 
@@ -114,11 +114,11 @@ public class FieldDefinition extends Definition {
     }
 
     public boolean isCollectionType() {
-        return Constants.collectionTypes.contains(type);
+        return Constants.COLLECTION_TYPES.contains(type);
     }
 
     public boolean isPrimitiveType() {
-        return Constants.primitiveTypes.contains(type);
+        return Constants.PRIMITIVE_TYPES.contains(type);
     }
 
     public boolean isEnumType() {
@@ -146,7 +146,7 @@ public class FieldDefinition extends Definition {
     }
 
     public boolean isTimeType() {
-        return Constants.timeTypes.contains(type);
+        return Constants.TIME_TYPES.contains(type);
     }
 
     /**
@@ -195,7 +195,7 @@ public class FieldDefinition extends Definition {
     }
 
     public boolean isPrimitiveKeyType() {
-        return Constants.primitiveTypes.contains(keyType);
+        return Constants.PRIMITIVE_TYPES.contains(keyType);
     }
 
 

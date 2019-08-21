@@ -220,13 +220,14 @@ namespace ConfigCS.Test.Quest
 
         public static IDictionary<int, QuestConfig> GetByComposite1(int a1)
         {
-            return _composite1Configs.ContainsKey(a1) ? _composite1Configs[a1] : ImmutableDictionary<int, QuestConfig>.Empty;
+            _composite1Configs.TryGetValue(a1, out var result);
+            return result ?? ImmutableDictionary<int, QuestConfig>.Empty;
         }
 
         public static QuestConfig GetByComposite1(int a1, int a2)
         {
-            var composite1Configs = GetByComposite1(a1);
-            return composite1Configs.ContainsKey(a1) ? composite1Configs[a2] : null;
+            GetByComposite1(a1).TryGetValue(a2, out var result);
+            return result;
         }
 
         public static IDictionary<int, IDictionary<bool, IList<QuestConfig>>> GetComposite2Configs()
@@ -236,13 +237,14 @@ namespace ConfigCS.Test.Quest
 
         public static IDictionary<bool, IList<QuestConfig>> GetByComposite2(int b1)
         {
-            return _composite2Configs.ContainsKey(b1) ? _composite2Configs[b1] : ImmutableDictionary<bool, IList<QuestConfig>>.Empty;
+            _composite2Configs.TryGetValue(b1, out var result);
+            return result ?? ImmutableDictionary<bool, IList<QuestConfig>>.Empty;
         }
 
         public static IList<QuestConfig> GetByComposite2(int b1, bool b2)
         {
-            var composite2Configs = GetByComposite2(b1);
-            return composite2Configs.ContainsKey(b2) ? composite2Configs[b2] : ImmutableList<QuestConfig>.Empty;
+            GetByComposite2(b1).TryGetValue(b2, out var result);
+            return result ?? ImmutableList<QuestConfig>.Empty;
         }
 
         public static IDictionary<string, IDictionary<int, IDictionary<int, QuestConfig>>> GetComposite3Configs()
@@ -252,19 +254,20 @@ namespace ConfigCS.Test.Quest
 
         public static IDictionary<int, IDictionary<int, QuestConfig>> GetByComposite3(string c1)
         {
-            return _composite3Configs.ContainsKey(c1) ? _composite3Configs[c1] : ImmutableDictionary<int, IDictionary<int, QuestConfig>>.Empty;
+            _composite3Configs.TryGetValue(c1, out var result);
+            return result ?? ImmutableDictionary<int, IDictionary<int, QuestConfig>>.Empty;
         }
 
         public static IDictionary<int, QuestConfig> GetByComposite3(string c1, int c2)
         {
-            var composite3Configs = GetByComposite3(c1);
-            return composite3Configs.ContainsKey(c2) ? composite3Configs[c2] : ImmutableDictionary<int, QuestConfig>.Empty;
+            GetByComposite3(c1).TryGetValue(c2, out var result);
+            return result ?? ImmutableDictionary<int, QuestConfig>.Empty;
         }
 
         public static QuestConfig GetByComposite3(string c1, int c2, int c3)
         {
-            var composite3Configs = GetByComposite3(c1, c2);
-            return composite3Configs.ContainsKey(c3) ? composite3Configs[c3] : null;
+            GetByComposite3(c1, c2).TryGetValue(c3, out var result);
+            return result;
         }
 
         public static IDictionary<string, IDictionary<int, IDictionary<int, IList<QuestConfig>>>> GetComposite4Configs()
@@ -274,19 +277,20 @@ namespace ConfigCS.Test.Quest
 
         public static IDictionary<int, IDictionary<int, IList<QuestConfig>>> GetByComposite4(string d1)
         {
-            return _composite4Configs.ContainsKey(d1) ? _composite4Configs[d1] : ImmutableDictionary<int, IDictionary<int, IList<QuestConfig>>>.Empty;
+            _composite4Configs.TryGetValue(d1, out var result);
+            return result ?? ImmutableDictionary<int, IDictionary<int, IList<QuestConfig>>>.Empty;
         }
 
         public static IDictionary<int, IList<QuestConfig>> GetByComposite4(string d1, int d2)
         {
-            var composite4Configs = GetByComposite4(d1);
-            return composite4Configs.ContainsKey(d2) ? composite4Configs[d2] : ImmutableDictionary<int, IList<QuestConfig>>.Empty;
+            GetByComposite4(d1).TryGetValue(d2, out var result);
+            return result ?? ImmutableDictionary<int, IList<QuestConfig>>.Empty;
         }
 
         public static IList<QuestConfig> GetByComposite4(string d1, int d2, int d3)
         {
-            var composite4Configs = GetByComposite4(d1, d2);
-            return composite4Configs.ContainsKey(d3) ? composite4Configs[d3] : ImmutableList<QuestConfig>.Empty;
+            GetByComposite4(d1, d2).TryGetValue(d3, out var result);
+            return result ?? ImmutableList<QuestConfig>.Empty;
         }
 
         public static IDictionary<int, QuestConfig> GetIdConfigs() 
@@ -296,7 +300,8 @@ namespace ConfigCS.Test.Quest
 
         public static QuestConfig GetById(int id)
         {
-            return _idConfigs.ContainsKey(id) ? _idConfigs[id] : null;
+            _idConfigs.TryGetValue(id, out var result);
+             return result;
         }
 
         public static IDictionary<QuestType, IList<QuestConfig>> GetTypeConfigs() 
@@ -306,93 +311,59 @@ namespace ConfigCS.Test.Quest
 
         public static IList<QuestConfig> GetByType(QuestType type)
         {
-            return _typeConfigs.ContainsKey(type) ? _typeConfigs[type] : ImmutableList<QuestConfig>.Empty;
+            _typeConfigs.TryGetValue(type, out var result);
+            return result ?? ImmutableList<QuestConfig>.Empty;
         }
 
 
-        public static void Index(List<QuestConfig> configs)
+        public static void Index(IList<QuestConfig> configs)
         {
-            var composite1Configs = new Dictionary<int, IDictionary<int, QuestConfig>>();
-            var composite2Configs = new Dictionary<int, IDictionary<bool, IList<QuestConfig>>>();
-            var composite3Configs = new Dictionary<string, IDictionary<int, IDictionary<int, QuestConfig>>>();
-            var composite4Configs = new Dictionary<string, IDictionary<int, IDictionary<int, IList<QuestConfig>>>>();
-            var idConfigs = new Dictionary<int, QuestConfig>();
-            var typeConfigs = new Dictionary<QuestType, IList<QuestConfig>>();
+            IDictionary<int, IDictionary<int, QuestConfig>> composite1Configs = new Dictionary<int, IDictionary<int, QuestConfig>>();
+            IDictionary<int, IDictionary<bool, IList<QuestConfig>>> composite2Configs = new Dictionary<int, IDictionary<bool, IList<QuestConfig>>>();
+            IDictionary<string, IDictionary<int, IDictionary<int, QuestConfig>>> composite3Configs = new Dictionary<string, IDictionary<int, IDictionary<int, QuestConfig>>>();
+            IDictionary<string, IDictionary<int, IDictionary<int, IList<QuestConfig>>>> composite4Configs = new Dictionary<string, IDictionary<int, IDictionary<int, IList<QuestConfig>>>>();
+            IDictionary<int, QuestConfig> idConfigs = new Dictionary<int, QuestConfig>();
+            IDictionary<QuestType, IList<QuestConfig>> typeConfigs = new Dictionary<QuestType, IList<QuestConfig>>();
 
             foreach (var config in configs)
             {
-                if (!composite1Configs.ContainsKey(config.A1))
-                {
-                    composite1Configs.Add(config.A1, new Dictionary<int, QuestConfig>());
-                }
-
+                if (!composite1Configs.ContainsKey(config.A1)) composite1Configs[config.A1] = new Dictionary<int, QuestConfig>();
                 composite1Configs[config.A1][config.A2] = config;
 
-
-                if (!composite2Configs.ContainsKey(config.B1))
-                {
-                    composite2Configs.Add(config.B1, new Dictionary<bool, IList<QuestConfig>>());
-                }
-
-                if (!composite2Configs[config.B1].ContainsKey(config.B2))
-                {
-                    composite2Configs[config.B1][config.B2] = new List<QuestConfig>();
-                }
-
+                if (!composite2Configs.ContainsKey(config.B1)) composite2Configs[config.B1] = new Dictionary<bool, IList<QuestConfig>>();
+                if (!composite2Configs[config.B1].ContainsKey(config.B2)) composite2Configs[config.B1][config.B2] = new List<QuestConfig>();
                 composite2Configs[config.B1][config.B2].Add(config);
 
-
-                if (!composite3Configs.ContainsKey(config.C1))
-                {
-                    composite3Configs.Add(config.C1, new Dictionary<int, IDictionary<int, QuestConfig>>());
-                }
-
-                if (!composite3Configs[config.C1].ContainsKey(config.C3))
-                {
-                    composite3Configs[config.C1].Add(config.C2, new Dictionary<int, QuestConfig>());
-                }
-
+                if (!composite3Configs.ContainsKey(config.C1)) composite3Configs[config.C1] = new Dictionary<int, IDictionary<int, QuestConfig>>();
+                if (!composite3Configs[config.C1].ContainsKey(config.C3)) composite3Configs[config.C1][config.C2] = new Dictionary<int, QuestConfig>();
                 composite3Configs[config.C1][config.C2][config.C3] = config;
 
-
-                if (!composite4Configs.ContainsKey(config.D1))
-                {
-                    composite4Configs.Add(config.D1, new Dictionary<int, IDictionary<int, IList<QuestConfig>>>());
-                }
-
-                if (!composite4Configs[config.D1].ContainsKey(config.D2))
-                {
-                        composite4Configs[config.D1].Add(config.D2, new Dictionary<int, IList<QuestConfig>>());
-                }
-
-                if (!composite4Configs[config.D1][config.D2].ContainsKey(config.D3))
-                {
-                        composite4Configs[config.D1][config.D2].Add(config.D3, new List<QuestConfig>());
-                }
-
+                if (!composite4Configs.ContainsKey(config.D1)) composite4Configs[config.D1] = new Dictionary<int, IDictionary<int, IList<QuestConfig>>>();
+                if (!composite4Configs[config.D1].ContainsKey(config.D2)) composite4Configs[config.D1][config.D2] = new Dictionary<int, IList<QuestConfig>>();
+                if (!composite4Configs[config.D1][config.D2].ContainsKey(config.D3)) composite4Configs[config.D1][config.D2][config.D3] = new List<QuestConfig>();
                 composite4Configs[config.D1][config.D2][config.D3].Add(config);
-
 
                 idConfigs[config.Id] = config;
 
-
-                if (!typeConfigs.ContainsKey(config.Type))
-                {
-                    typeConfigs.Add(config.Type, new List<QuestConfig>());
-                }
-
+                if (!typeConfigs.ContainsKey(config.Type)) typeConfigs[config.Type] = new List<QuestConfig>();
                 typeConfigs[config.Type].Add(config);
-
             }
 
-            _configs = configs.ToImmutableList();
-            _composite1Configs = composite1Configs.ToImmutableDictionary();
-            _composite2Configs = composite2Configs.ToImmutableDictionary();
-            _composite3Configs = composite3Configs.ToImmutableDictionary();
-            _composite4Configs = composite4Configs.ToImmutableDictionary();
-            _idConfigs = idConfigs.ToImmutableDictionary();
-            _typeConfigs = typeConfigs.ToImmutableDictionary();
+            configs = configs.ToImmutableList();
+            composite1Configs = ToImmutableDictionary(composite1Configs);
+            composite2Configs = ToImmutableDictionary(composite2Configs);
+            composite3Configs = ToImmutableDictionary(composite3Configs);
+            composite4Configs = ToImmutableDictionary(composite4Configs);
+            idConfigs = ToImmutableDictionary(idConfigs);
+            typeConfigs = ToImmutableDictionary(typeConfigs);
 
+            _configs = configs;
+            _composite1Configs = composite1Configs;
+            _composite2Configs = composite2Configs;
+            _composite3Configs = composite3Configs;
+            _composite4Configs = composite4Configs;
+            _idConfigs = idConfigs;
+            _typeConfigs = typeConfigs;
         }
     }
 }
