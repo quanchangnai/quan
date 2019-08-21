@@ -10,5 +10,5 @@ bin
 obj
 .vs
 *.DotSettings.user
-/config/json
-/packages
+/quan-java/config/json
+/quan-cs/packages

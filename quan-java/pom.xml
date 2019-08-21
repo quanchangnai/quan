@@ -14,8 +14,8 @@
         <module>generator</module>
         <module>database</module>
         <module>common</module>
-        <module>message/message-java</module>
-        <module>config/config-java</module>
+        <module>message</module>
+        <module>config</module>
         <module>test</module>
     </modules>
 

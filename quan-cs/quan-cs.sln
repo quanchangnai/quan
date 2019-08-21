@@ -1,8 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageCS", "message\MessageCS\MessageCS.csproj", "{383CEE75-952D-4820-9611-5C0869879A07}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageCS", "MessageCS\MessageCS.csproj", "{383CEE75-952D-4820-9611-5C0869879A07}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigCS", "config\ConfigCS\ConfigCS.csproj", "{F18047DA-C9D2-468F-BE2F-82913446757D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigCS", "ConfigCS\ConfigCS.csproj", "{F18047DA-C9D2-468F-BE2F-82913446757D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
