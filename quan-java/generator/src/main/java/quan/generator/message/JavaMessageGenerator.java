@@ -70,7 +70,7 @@ public class JavaMessageGenerator extends MessageGenerator {
 
 
     public static void main(String[] args) throws Exception {
-        String definitionPath = "generator\\src\\test\\java\\quan\\generator\\message";
+        String definitionPath = "generator\\definition\\message";
         String codePath = "message\\src\\test\\java";
         String packagePrefix = "quan.message";
 

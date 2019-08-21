@@ -103,7 +103,7 @@ public class DatabaseGenerator extends Generator {
 
     public static void main(String[] args) throws Exception {
 
-        String definitionPath = "generator\\src\\test\\java\\quan\\generator\\database";
+        String definitionPath = "generator\\definition\\database";
         String codePath = "database\\src\\test\\java";
         String packagePrefix = "quan.database";
 

@@ -64,7 +64,7 @@ public class JavaConfigGenerator extends ConfigGenerator {
     public static void main(String[] args) throws Exception {
 
         List<String> definitionPaths = new ArrayList<>();
-        definitionPaths.add("config\\definition");
+        definitionPaths.add("generator\\definition\\config");
         String codePath = "config\\src\\test\\java";
         String packagePrefix = "quan.config";
 

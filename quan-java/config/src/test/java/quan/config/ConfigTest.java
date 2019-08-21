@@ -16,7 +16,7 @@ public class ConfigTest {
 
     public static void main(String[] args) throws Exception {
         List<String> definitionPaths = new ArrayList<>();
-        definitionPaths.add("config\\definition");
+        definitionPaths.add("generator\\definition\\config");
 
 //        String tableType = "csv";
 //        String tablePath = "config\\csv";

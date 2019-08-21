@@ -74,7 +74,7 @@ public class CSharpConfigGenerator extends ConfigGenerator {
     public static void main(String[] args) throws Exception {
 
         List<String> definitionPaths = new ArrayList<>();
-        definitionPaths.add("config\\definition");
+        definitionPaths.add("generator\\definition\\config");
         String codePath = "..\\quan-cs";
         String packagePrefix = "ConfigCS.Test";
 
