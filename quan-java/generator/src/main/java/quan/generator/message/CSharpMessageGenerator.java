@@ -68,7 +68,7 @@ public class CSharpMessageGenerator extends MessageGenerator {
     public static void main(String[] args) throws Exception {
 
         String definitionPath = "generator\\src\\test\\java\\quan\\generator\\message";
-        String codePath = "message";
+        String codePath = "..\\quan-cs";
         String packagePrefix = "MessageCS.Test";
 
         CSharpMessageGenerator messageGenerator = new CSharpMessageGenerator(codePath);
