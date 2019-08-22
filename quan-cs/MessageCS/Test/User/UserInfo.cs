@@ -6,7 +6,7 @@ using Buffer = MessageCS.Buffer;
 namespace MessageCS.Test.User
 {
 	/// <summary>
-	/// Created by 自动生成
+	/// 自动生成
 	/// </summary>
     public class UserInfo : Bean
     {

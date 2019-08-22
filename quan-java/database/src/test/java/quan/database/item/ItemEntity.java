@@ -7,7 +7,7 @@ import quan.database.*;
 
 /**
  * 道具<br/>
- * Created by 自动生成
+ * 自动生成
  */
 public class ItemEntity extends Entity {
 

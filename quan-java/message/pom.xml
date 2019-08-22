@@ -11,6 +11,9 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>message</artifactId>
 
+    <build>
+        <finalName>quan-message</finalName>
+    </build>
 
     <dependencies>
         <dependency>

@@ -11,6 +11,10 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>config</artifactId>
 
+    <build>
+        <finalName>quan-config</finalName>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>quan</groupId>

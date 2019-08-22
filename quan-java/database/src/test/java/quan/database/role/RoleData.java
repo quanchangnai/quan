@@ -8,7 +8,7 @@ import quan.database.item.ItemEntity;
 
 /**
  * 角色<br/>
- * Created by 自动生成
+ * 自动生成
  */
 public class RoleData extends Data<Long> {
 

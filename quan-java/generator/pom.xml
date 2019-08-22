@@ -7,9 +7,13 @@
         <groupId>quan</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
 
+    <modelVersion>4.0.0</modelVersion>
     <artifactId>generator</artifactId>
+
+    <build>
+        <finalName>quan-generator</finalName>
+    </build>
 
     <dependencies>
         <dependency>

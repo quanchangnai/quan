@@ -5,7 +5,7 @@ import java.io.IOException;
 import quan.message.*;
 
 /**
- * Created by 自动生成
+ * 自动生成
  */
 public class UserInfo extends Bean {
 

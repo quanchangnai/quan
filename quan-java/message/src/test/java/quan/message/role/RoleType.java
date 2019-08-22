@@ -2,7 +2,7 @@ package quan.message.role;
 
 /**
  * 角色类型<br/>
- * Created by 自动生成
+ * 自动生成
  */
 public enum RoleType {
 

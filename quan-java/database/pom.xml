@@ -7,11 +7,13 @@
         <groupId>quan</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
 
-    <groupId>quan</groupId>
+    <modelVersion>4.0.0</modelVersion>
     <artifactId>database</artifactId>
-    <version>1.0-SNAPSHOT</version>
+
+    <build>
+        <finalName>quan-database</finalName>
+    </build>
 
     <dependencies>
         <dependency>

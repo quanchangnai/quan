@@ -9,7 +9,7 @@ import quan.database.item.ItemType;
 
 /**
  * 角色2<br/>
- * Created by 自动生成
+ * 自动生成
  */
 public class RoleData2 extends Data<Long> {
 

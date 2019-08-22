@@ -8,7 +8,7 @@ namespace MessageCS.Test.Role
 {
 	/// <summary>
 	/// 角色登录<br/>
-	/// Created by 自动生成
+	/// 自动生成
 	/// </summary>
     public class SRoleLogin : Message
     {

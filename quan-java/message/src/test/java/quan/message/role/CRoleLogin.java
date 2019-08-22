@@ -7,7 +7,7 @@ import quan.message.*;
 
 /**
  * 角色登录<br/>
- * Created by 自动生成
+ * 自动生成
  */
 public class CRoleLogin extends Message {
 

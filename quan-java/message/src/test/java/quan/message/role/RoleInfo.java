@@ -6,7 +6,7 @@ import quan.message.*;
 
 /**
  * 角色信息<br/>
- * Created by 自动生成
+ * 自动生成
  */
 public class RoleInfo extends Bean {
 
