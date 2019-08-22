@@ -8,7 +8,7 @@ namespace ConfigCS.Test.Item
 {
     /// <summary>
 	/// 武器<br/>
-	/// Created by 自动生成
+	/// 自动生成
 	/// </summary>
     public class WeaponConfig : EquipConfig
     {
@@ -125,16 +125,13 @@ namespace ConfigCS.Test.Item
 
         public new static class self 
         {
+            // 所有WeaponConfig
             private static volatile IList<WeaponConfig> _configs = new List<WeaponConfig>();
 
-            /// <summary>
-            /// ID
-            /// </summary>
+            // ID
             private static volatile IDictionary<int, WeaponConfig> _idConfigs = new Dictionary<int, WeaponConfig>();
 
-            /// <summary>
-            /// 部位
-            /// </summary>
+            // 部位
             private static volatile IDictionary<int, IList<WeaponConfig>> _positionConfigs = new Dictionary<int, IList<WeaponConfig>>();
 
             private static volatile IDictionary<int, IDictionary<int, IList<WeaponConfig>>> _composite1Configs = new Dictionary<int, IDictionary<int, IList<WeaponConfig>>>();
@@ -154,7 +151,7 @@ namespace ConfigCS.Test.Item
             public static WeaponConfig GetById(int id)
             {
                 _idConfigs.TryGetValue(id, out var result);
-                 return result;
+                return result;
             }
 
             public static IDictionary<int, IList<WeaponConfig>> GetPositionConfigs() 
@@ -212,17 +209,10 @@ namespace ConfigCS.Test.Item
 
                 foreach (var config in configs)
                 {
-                    idConfigs[config.Id] = config;
-
-                    if (!positionConfigs.ContainsKey(config.Position)) positionConfigs[config.Position] = new List<WeaponConfig>();
-                    positionConfigs[config.Position].Add(config);
-
-                    if (!composite1Configs.ContainsKey(config.Color))     composite1Configs[config.Color] = new Dictionary<int, IList<WeaponConfig>>();
-                    if (!composite1Configs[config.Color].ContainsKey(config.W1))     composite1Configs[config.Color][config.W1] = new List<WeaponConfig>();
-                    composite1Configs[config.Color][config.W1].Add(config);
-
-                    if (!composite2Configs.ContainsKey(config.W1))     composite2Configs[config.W1] = new Dictionary<int, WeaponConfig>();
-                    composite2Configs[config.W1][config.W2] = config;
+                    Config.Index(idConfigs, config, config.Id);
+                    Config.Index(positionConfigs, config, config.Position);
+                    Config.Index(composite1Configs, config, config.Color, config.W1);
+                    Config.Index(composite2Configs, config, config.W1, config.W2);
                 }
 
                 configs = configs.ToImmutableList();

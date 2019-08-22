@@ -6,7 +6,7 @@ import quan.config.*;
 
 /**
 * QuestTargetConfig<br/>
-* Created by 自动生成
+* 自动生成
 */
 public class QuestTargetConfig extends Config {
 
@@ -54,6 +54,7 @@ public class QuestTargetConfig extends Config {
     }
 
 
+    // 所有QuestTargetConfig
     private static volatile List<QuestTargetConfig> configs = new ArrayList<>();
 
     //ID
@@ -77,17 +78,9 @@ public class QuestTargetConfig extends Config {
         Map<Integer, QuestTargetConfig> idConfigs = new HashMap<>();
 
         List<String> errors = new ArrayList<>();
-        QuestTargetConfig oldConfig;
 
         for (QuestTargetConfig config : configs) {
-            oldConfig = idConfigs.put(config.id, config);
-            if (oldConfig != null) {
-                String repeatedConfigs = config.getClass().getSimpleName();
-                if (oldConfig.getClass() != config.getClass()) {
-                    repeatedConfigs += "," + oldConfig.getClass().getSimpleName();
-                }
-                errors.add(String.format("配置[%s]有重复数据[%s = %s]", repeatedConfigs, "id", config.id));
-            }
+            index(idConfigs, errors, config, true, Arrays.asList("id"), config.id);
         }
 
         configs = Collections.unmodifiableList(configs);

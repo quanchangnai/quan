@@ -11,7 +11,7 @@ import ${import};
 <#if comment !="">
  * ${comment}<br/>
 </#if>
- * Created by 自动生成
+ * 自动生成
  */
 public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionType ==5>Data<${keyType}></#if> {
 

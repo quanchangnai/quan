@@ -11,7 +11,7 @@ import ${import};
 <#if comment !="">
 * ${comment}<br/>
 </#if>
-* Created by 自动生成
+* 自动生成
 */
 public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType ==6 && (!parent?? || parent=="")>Config<#elseif definitionType ==6>${parent}</#if> {
 <#if !selfFields??>
@@ -180,6 +180,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     }
 
 <#macro indexer tab>
+    ${tab}// 所有${name}
     ${tab}private static volatile List<${name}> configs = new ArrayList<>();
 
     <#list indexes as index>
@@ -311,46 +312,15 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     </#list>
 
         ${tab}List<String> errors = new ArrayList<>();
-        ${tab}${name} oldConfig;
 
         ${tab}for (${name} config : configs) {
     <#list indexes as index>
-        <#if index.unique && index.fields?size==1>
-            ${tab}oldConfig = ${index.name}Configs.put(config.${index.fields[0].name}, config);
-            ${tab}if (oldConfig != null) {
-                ${tab}String repeatedConfigs = config.getClass().getSimpleName();
-                ${tab}if (oldConfig.getClass() != config.getClass()) {
-                    ${tab}repeatedConfigs += "," + oldConfig.getClass().getSimpleName();
-                ${tab}}
-                ${tab}errors.add(String.format("配置[%s]有重复数据[%s = %s]", repeatedConfigs, "${index.fields[0].name}", config.${index.fields[0].name}));
-            ${tab}}
-        <#elseif index.normal && index.fields?size==1>
-            ${tab}${index.name}Configs.computeIfAbsent(config.${index.fields[0].name}, k -> new ArrayList<>()).add(config);
-        <#elseif index.unique && index.fields?size==2>
-            ${tab}oldConfig = ${index.name}Configs.computeIfAbsent(config.${index.fields[0].name}, k -> new HashMap<>()).put(config.${index.fields[1].name}, config);
-            ${tab}if (oldConfig != null) {
-                ${tab}String repeatedConfigs = config.getClass().getSimpleName();
-                ${tab}if (oldConfig.getClass() != config.getClass()) {
-                    ${tab}repeatedConfigs += "," + oldConfig.getClass().getSimpleName();
-                ${tab}}
-                ${tab}errors.add(String.format("配置[%s]有重复数据[%s,%s = %s,%s]", repeatedConfigs, "${index.fields[0].name}", "${index.fields[1].name}", config.${index.fields[0].name}, config.${index.fields[1].name}));
-            ${tab}}
-        <#elseif index.normal && index.fields?size==2>
-            ${tab}${index.name}Configs.computeIfAbsent(config.${index.fields[0].name}, k -> new HashMap<>()).computeIfAbsent(config.${index.fields[1].name}, k -> new ArrayList<>()).add(config);
-        <#elseif index.unique && index.fields?size==3>
-            ${tab}oldConfig = ${index.name}Configs.computeIfAbsent(config.${index.fields[0].name}, k -> new HashMap<>()).computeIfAbsent(config.${index.fields[1].name}, k -> new HashMap<>()).put(config.${index.fields[2].name}, config);
-            ${tab}if (oldConfig != null) {
-                ${tab}String repeatedConfigs = config.getClass().getSimpleName();
-                ${tab}if (oldConfig.getClass() != config.getClass()) {
-                    ${tab}repeatedConfigs += "," + oldConfig.getClass().getSimpleName();
-                ${tab}}
-                ${tab}errors.add(String.format("配置[%s]有重复数据[%s,%s,%s = %s,%s,%s]", repeatedConfigs, "${index.fields[0].name}", "${index.fields[1].name}", "${index.fields[2].name}", config.${index.fields[0].name}, config.${index.fields[1].name}, config.${index.fields[2].name}));
-            }
-        <#elseif index.normal && index.fields?size==3>
-            ${tab}${index.name}Configs.computeIfAbsent(config.${index.fields[0].name}, k -> new HashMap<>()).computeIfAbsent(config.${index.fields[1].name}, k -> new HashMap<>()).computeIfAbsent(config.${index.fields[2].name}, k -> new ArrayList<>()).add(config);
-        </#if>
-        <#if index_index<indexes?size-1>
-
+        <#if index.fields?size==1>
+            ${tab}<#if parent??>Config.</#if>index(${index.name}Configs, errors, config, ${index.unique?c}, Arrays.asList("${index.fields[0].name}"), config.${index.fields[0].name});
+        <#elseif index.fields?size==2>
+            ${tab}<#if parent??>Config.</#if>index(${index.name}Configs, errors, config, ${index.unique?c}, Arrays.asList("${index.fields[0].name}", "${index.fields[1].name}"), config.${index.fields[0].name}, config.${index.fields[1].name});
+        <#elseif index.fields?size==3>
+            ${tab}<#if parent??>Config.</#if>index(${index.name}Configs, errors, config, ${index.unique?c}, Arrays.asList("${index.fields[0].name}", "${index.fields[1].name}", "${index.fields[2].name}"), config.${index.fields[0].name}, config.${index.fields[1].name}, config.${index.fields[2].name});
         </#if>
     </#list>
         ${tab}}

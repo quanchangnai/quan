@@ -8,7 +8,7 @@ namespace ConfigCS.Test.Item
 {
     /// <summary>
 	/// 道具<br/>
-	/// Created by 自动生成
+	/// 自动生成
 	/// </summary>
     public class ItemConfig : Config
     {
@@ -121,11 +121,10 @@ namespace ConfigCS.Test.Item
         }
 
 
+        // 所有ItemConfig
         private static volatile IList<ItemConfig> _configs = new List<ItemConfig>();
 
-        /// <summary>
-        /// ID
-        /// </summary>
+        // ID
         private static volatile IDictionary<int, ItemConfig> _idConfigs = new Dictionary<int, ItemConfig>();
 
         public static IList<ItemConfig> GetConfigs() 
@@ -141,7 +140,7 @@ namespace ConfigCS.Test.Item
         public static ItemConfig GetById(int id)
         {
             _idConfigs.TryGetValue(id, out var result);
-             return result;
+            return result;
         }
 
 
@@ -151,7 +150,7 @@ namespace ConfigCS.Test.Item
 
             foreach (var config in configs)
             {
-                idConfigs[config.Id] = config;
+                Index(idConfigs, config, config.Id);
             }
 
             configs = configs.ToImmutableList();

@@ -9,7 +9,7 @@ namespace ConfigCS.Test.Quest
 {
     /// <summary>
 	/// 任务<br/>
-	/// Created by 自动生成
+	/// 自动生成
 	/// </summary>
     public class QuestConfig : Config
     {
@@ -188,6 +188,7 @@ namespace ConfigCS.Test.Quest
         }
 
 
+        // 所有QuestConfig
         private static volatile IList<QuestConfig> _configs = new List<QuestConfig>();
 
         private static volatile IDictionary<int, IDictionary<int, QuestConfig>> _composite1Configs = new Dictionary<int, IDictionary<int, QuestConfig>>();
@@ -198,14 +199,10 @@ namespace ConfigCS.Test.Quest
 
         private static volatile IDictionary<string, IDictionary<int, IDictionary<int, IList<QuestConfig>>>> _composite4Configs = new Dictionary<string, IDictionary<int, IDictionary<int, IList<QuestConfig>>>>();
 
-        /// <summary>
-        /// ID
-        /// </summary>
+        // ID
         private static volatile IDictionary<int, QuestConfig> _idConfigs = new Dictionary<int, QuestConfig>();
 
-        /// <summary>
-        /// 类型
-        /// </summary>
+        // 类型
         private static volatile IDictionary<QuestType, IList<QuestConfig>> _typeConfigs = new Dictionary<QuestType, IList<QuestConfig>>();
 
         public static IList<QuestConfig> GetConfigs() 
@@ -301,7 +298,7 @@ namespace ConfigCS.Test.Quest
         public static QuestConfig GetById(int id)
         {
             _idConfigs.TryGetValue(id, out var result);
-             return result;
+            return result;
         }
 
         public static IDictionary<QuestType, IList<QuestConfig>> GetTypeConfigs() 
@@ -327,26 +324,12 @@ namespace ConfigCS.Test.Quest
 
             foreach (var config in configs)
             {
-                if (!composite1Configs.ContainsKey(config.A1)) composite1Configs[config.A1] = new Dictionary<int, QuestConfig>();
-                composite1Configs[config.A1][config.A2] = config;
-
-                if (!composite2Configs.ContainsKey(config.B1)) composite2Configs[config.B1] = new Dictionary<bool, IList<QuestConfig>>();
-                if (!composite2Configs[config.B1].ContainsKey(config.B2)) composite2Configs[config.B1][config.B2] = new List<QuestConfig>();
-                composite2Configs[config.B1][config.B2].Add(config);
-
-                if (!composite3Configs.ContainsKey(config.C1)) composite3Configs[config.C1] = new Dictionary<int, IDictionary<int, QuestConfig>>();
-                if (!composite3Configs[config.C1].ContainsKey(config.C3)) composite3Configs[config.C1][config.C2] = new Dictionary<int, QuestConfig>();
-                composite3Configs[config.C1][config.C2][config.C3] = config;
-
-                if (!composite4Configs.ContainsKey(config.D1)) composite4Configs[config.D1] = new Dictionary<int, IDictionary<int, IList<QuestConfig>>>();
-                if (!composite4Configs[config.D1].ContainsKey(config.D2)) composite4Configs[config.D1][config.D2] = new Dictionary<int, IList<QuestConfig>>();
-                if (!composite4Configs[config.D1][config.D2].ContainsKey(config.D3)) composite4Configs[config.D1][config.D2][config.D3] = new List<QuestConfig>();
-                composite4Configs[config.D1][config.D2][config.D3].Add(config);
-
-                idConfigs[config.Id] = config;
-
-                if (!typeConfigs.ContainsKey(config.Type)) typeConfigs[config.Type] = new List<QuestConfig>();
-                typeConfigs[config.Type].Add(config);
+                Index(composite1Configs, config, config.A1, config.A2);
+                Index(composite2Configs, config, config.B1, config.B2);
+                Index(composite3Configs, config, config.C1, config.C2, config.C3);
+                Index(composite4Configs, config, config.D1, config.D2, config.D3);
+                Index(idConfigs, config, config.Id);
+                Index(typeConfigs, config, config.Type);
             }
 
             configs = configs.ToImmutableList();

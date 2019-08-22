@@ -8,7 +8,7 @@ namespace ConfigCS.Test.Item
 {
     /// <summary>
 	/// 装备1,装备2<br/>
-	/// Created by 自动生成
+	/// 自动生成
 	/// </summary>
     public class EquipConfig : ItemConfig
     {
@@ -55,16 +55,13 @@ namespace ConfigCS.Test.Item
 
         public static class self 
         {
+            // 所有EquipConfig
             private static volatile IList<EquipConfig> _configs = new List<EquipConfig>();
 
-            /// <summary>
-            /// ID
-            /// </summary>
+            // ID
             private static volatile IDictionary<int, EquipConfig> _idConfigs = new Dictionary<int, EquipConfig>();
 
-            /// <summary>
-            /// 部位
-            /// </summary>
+            // 部位
             private static volatile IDictionary<int, IList<EquipConfig>> _positionConfigs = new Dictionary<int, IList<EquipConfig>>();
 
             public static IList<EquipConfig> GetConfigs() 
@@ -80,7 +77,7 @@ namespace ConfigCS.Test.Item
             public static EquipConfig GetById(int id)
             {
                 _idConfigs.TryGetValue(id, out var result);
-                 return result;
+                return result;
             }
 
             public static IDictionary<int, IList<EquipConfig>> GetPositionConfigs() 
@@ -102,10 +99,8 @@ namespace ConfigCS.Test.Item
 
                 foreach (var config in configs)
                 {
-                    idConfigs[config.Id] = config;
-
-                    if (!positionConfigs.ContainsKey(config.Position)) positionConfigs[config.Position] = new List<EquipConfig>();
-                    positionConfigs[config.Position].Add(config);
+                    Config.Index(idConfigs, config, config.Id);
+                    Config.Index(positionConfigs, config, config.Position);
                 }
 
                 configs = configs.ToImmutableList();

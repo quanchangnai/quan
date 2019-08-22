@@ -8,7 +8,7 @@ namespace ConfigCS.Test.Quest
 {
     /// <summary>
 	/// QuestTargetConfig<br/>
-	/// Created by 自动生成
+	/// 自动生成
 	/// </summary>
     public class QuestTargetConfig : Config
     {
@@ -45,11 +45,10 @@ namespace ConfigCS.Test.Quest
         }
 
 
+        // 所有QuestTargetConfig
         private static volatile IList<QuestTargetConfig> _configs = new List<QuestTargetConfig>();
 
-        /// <summary>
-        /// ID
-        /// </summary>
+        // ID
         private static volatile IDictionary<int, QuestTargetConfig> _idConfigs = new Dictionary<int, QuestTargetConfig>();
 
         public static IList<QuestTargetConfig> GetConfigs() 
@@ -65,7 +64,7 @@ namespace ConfigCS.Test.Quest
         public static QuestTargetConfig GetById(int id)
         {
             _idConfigs.TryGetValue(id, out var result);
-             return result;
+            return result;
         }
 
 
@@ -75,7 +74,7 @@ namespace ConfigCS.Test.Quest
 
             foreach (var config in configs)
             {
-                idConfigs[config.Id] = config;
+                Index(idConfigs, config, config.Id);
             }
 
             configs = configs.ToImmutableList();

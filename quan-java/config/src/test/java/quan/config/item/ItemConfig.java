@@ -6,7 +6,7 @@ import quan.config.*;
 
 /**
 * 道具<br/>
-* Created by 自动生成
+* 自动生成
 */
 public class ItemConfig extends Config {
 
@@ -169,6 +169,7 @@ public class ItemConfig extends Config {
     }
 
 
+    // 所有ItemConfig
     private static volatile List<ItemConfig> configs = new ArrayList<>();
 
     //ID
@@ -192,17 +193,9 @@ public class ItemConfig extends Config {
         Map<Integer, ItemConfig> idConfigs = new HashMap<>();
 
         List<String> errors = new ArrayList<>();
-        ItemConfig oldConfig;
 
         for (ItemConfig config : configs) {
-            oldConfig = idConfigs.put(config.id, config);
-            if (oldConfig != null) {
-                String repeatedConfigs = config.getClass().getSimpleName();
-                if (oldConfig.getClass() != config.getClass()) {
-                    repeatedConfigs += "," + oldConfig.getClass().getSimpleName();
-                }
-                errors.add(String.format("配置[%s]有重复数据[%s = %s]", repeatedConfigs, "id", config.id));
-            }
+            index(idConfigs, errors, config, true, Arrays.asList("id"), config.id);
         }
 
         configs = Collections.unmodifiableList(configs);

@@ -6,7 +6,7 @@ import quan.config.*;
 
 /**
 * 奖励<br/>
-* Created by 自动生成
+* 自动生成
 */
 public class Reward extends Bean {
 

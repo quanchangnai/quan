@@ -2,7 +2,7 @@ package quan.config.item;
 
 /**
  * 道具类型<br/>
- * Created by 自动生成
+ * 自动生成
  */
 public enum ItemType {
 

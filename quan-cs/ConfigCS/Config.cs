@@ -13,6 +13,71 @@ namespace ConfigCS
         protected abstract Config Create(JObject json);
 
 
+        protected static void Index<TKey, TValue>(IDictionary<TKey, TValue> configs, TValue config, TKey key)
+        {
+            configs[key] = config;
+        }
+
+        protected static void Index<TKey, TValue>(IDictionary<TKey, IList<TValue>> configs, TValue config, TKey key)
+        {
+            configs.TryGetValue(key, out var list);
+            if (list == null)
+            {
+                list = new List<TValue>();
+                configs[key] = list;
+            }
+
+            list.Add(config);
+        }
+
+        protected static void Index<TKey1, TKey2, TValue>(IDictionary<TKey1, IDictionary<TKey2, TValue>> configs, TValue config, TKey1 key1, TKey2 key2)
+        {
+            configs.TryGetValue(key1, out var dict);
+            if (dict == null)
+            {
+                dict = new Dictionary<TKey2, TValue>();
+                configs[key1] = dict;
+            }
+
+            Index(dict, config, key2);
+        }
+
+        protected static void Index<TKey1, TKey2, TValue>(IDictionary<TKey1, IDictionary<TKey2, IList<TValue>>> configs, TValue config, TKey1 key1, TKey2 key2)
+        {
+            configs.TryGetValue(key1, out var dict);
+            if (dict == null)
+            {
+                dict = new Dictionary<TKey2, IList<TValue>>();
+                configs[key1] = dict;
+            }
+
+            Index(dict, config, key2);
+        }
+
+        protected static void Index<TKey1, TKey2, TKey3, TValue>(IDictionary<TKey1, IDictionary<TKey2, IDictionary<TKey3, TValue>>> configs, TValue config, TKey1 key1, TKey2 key2, TKey3 key3)
+        {
+            configs.TryGetValue(key1, out var dict);
+            if (dict == null)
+            {
+                dict = new Dictionary<TKey2, IDictionary<TKey3, TValue>>();
+                configs[key1] = dict;
+            }
+
+            Index(dict, config, key2, key3);
+        }
+
+        protected static void Index<TKey1, TKey2, TKey3, TValue>(IDictionary<TKey1, IDictionary<TKey2, IDictionary<TKey3, IList<TValue>>>> configs, TValue config, TKey1 key1, TKey2 key2, TKey3 key3)
+        {
+            configs.TryGetValue(key1, out var dict);
+            if (dict == null)
+            {
+                dict = new Dictionary<TKey2, IDictionary<TKey3, IList<TValue>>>();
+                configs[key1] = dict;
+            }
+
+            Index(dict, config, key2, key3);
+        }
+
         protected static IDictionary<TKey, TValue> ToImmutableDictionary<TKey, TValue>(IDictionary<TKey, TValue> dictionary)
         {
             return dictionary.ToImmutableDictionary();
@@ -45,14 +110,7 @@ namespace ConfigCS
             var keys1 = new List<TKey1>(dictionary.Keys);
             foreach (var key1 in keys1)
             {
-                var value1 = dictionary[key1];
-                var keys2 = new List<TKey2>(value1.Keys);
-                foreach (var key2 in keys2)
-                {
-                    value1[key2] = value1[key2].ToImmutableList();
-                }
-
-                dictionary[key1] = value1.ToImmutableDictionary();
+                dictionary[key1] = ToImmutableDictionary(dictionary[key1]);
             }
 
             return dictionary.ToImmutableDictionary();
@@ -63,14 +121,7 @@ namespace ConfigCS
             var keys1 = new List<TKey1>(dictionary.Keys);
             foreach (var key1 in keys1)
             {
-                var value1 = dictionary[key1];
-                var keys2 = new List<TKey2>(value1.Keys);
-                foreach (var key2 in keys2)
-                {
-                    value1[key2] = value1[key2].ToImmutableDictionary();
-                }
-
-                dictionary[key1] = value1.ToImmutableDictionary();
+                dictionary[key1] = ToImmutableDictionary(dictionary[key1]);
             }
 
             return dictionary.ToImmutableDictionary();
@@ -81,21 +132,7 @@ namespace ConfigCS
             var keys1 = new List<TKey1>(dictionary.Keys);
             foreach (var key1 in keys1)
             {
-                var value1 = dictionary[key1];
-                var keys2 = new List<TKey2>(value1.Keys);
-                foreach (var key2 in keys2)
-                {
-                    var value2 = value1[key2];
-                    var keys3 = new List<TKey3>(value2.Keys);
-                    foreach (var key3 in keys3)
-                    {
-                        value2[key3] = value2[key3].ToImmutableList();
-                    }
-
-                    value1[key2] = value2.ToImmutableDictionary();
-                }
-
-                dictionary[key1] = value1.ToImmutableDictionary();
+                dictionary[key1] = ToImmutableDictionary(dictionary[key1]);
             }
 
             return dictionary.ToImmutableDictionary();

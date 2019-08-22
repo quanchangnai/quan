@@ -4,7 +4,7 @@ namespace ${fullPackageName}
     <#if comment !="">
     /// ${comment}<br/>
     </#if>
-    /// Created by 自动生成
+    /// 自动生成
     /// </summary>
     public enum ${name} {
 

@@ -6,7 +6,7 @@ package ${fullPackageName};
 <#if comment !="">
  * ${comment}<br/>
 </#if>
- * Created by 自动生成
+ * 自动生成
  */
 public enum ${name} {
 

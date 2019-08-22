@@ -2,7 +2,7 @@ namespace ConfigCS.Test.Quest
 {
     /// <summary>
     /// 任务类型<br/>
-    /// Created by 自动生成
+    /// 自动生成
     /// </summary>
     public enum QuestType {
 

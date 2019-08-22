@@ -6,7 +6,7 @@ import quan.config.*;
 
 /**
 * 武器<br/>
-* Created by 自动生成
+* 自动生成
 */
 public class WeaponConfig extends EquipConfig {
 
@@ -152,6 +152,7 @@ public class WeaponConfig extends EquipConfig {
         private self() {
         }
 
+        // 所有WeaponConfig
         private static volatile List<WeaponConfig> configs = new ArrayList<>();
 
         //ID
@@ -217,30 +218,12 @@ public class WeaponConfig extends EquipConfig {
             Map<Integer, Map<Integer, WeaponConfig>> composite2Configs = new HashMap<>();
 
             List<String> errors = new ArrayList<>();
-            WeaponConfig oldConfig;
 
             for (WeaponConfig config : configs) {
-                oldConfig = idConfigs.put(config.id, config);
-                if (oldConfig != null) {
-                    String repeatedConfigs = config.getClass().getSimpleName();
-                    if (oldConfig.getClass() != config.getClass()) {
-                        repeatedConfigs += "," + oldConfig.getClass().getSimpleName();
-                    }
-                    errors.add(String.format("配置[%s]有重复数据[%s = %s]", repeatedConfigs, "id", config.id));
-                }
-
-                positionConfigs.computeIfAbsent(config.position, k -> new ArrayList<>()).add(config);
-
-                composite1Configs.computeIfAbsent(config.color, k -> new HashMap<>()).computeIfAbsent(config.w1, k -> new ArrayList<>()).add(config);
-
-                oldConfig = composite2Configs.computeIfAbsent(config.w1, k -> new HashMap<>()).put(config.w2, config);
-                if (oldConfig != null) {
-                    String repeatedConfigs = config.getClass().getSimpleName();
-                    if (oldConfig.getClass() != config.getClass()) {
-                        repeatedConfigs += "," + oldConfig.getClass().getSimpleName();
-                    }
-                    errors.add(String.format("配置[%s]有重复数据[%s,%s = %s,%s]", repeatedConfigs, "w1", "w2", config.w1, config.w2));
-                }
+                Config.index(idConfigs, errors, config, true, Arrays.asList("id"), config.id);
+                Config.index(positionConfigs, errors, config, false, Arrays.asList("position"), config.position);
+                Config.index(composite1Configs, errors, config, false, Arrays.asList("color", "w1"), config.color, config.w1);
+                Config.index(composite2Configs, errors, config, true, Arrays.asList("w1", "w2"), config.w1, config.w2);
             }
 
             configs = Collections.unmodifiableList(configs);

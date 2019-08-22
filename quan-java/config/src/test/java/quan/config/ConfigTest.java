@@ -102,7 +102,7 @@ public class ConfigTest {
 
     private static void reloadByTableName(ConfigLoader configLoader) throws Exception {
         Thread.sleep(5000);
-        List<String> reloadConfigs = Arrays.asList("ItemConfig", "WeaponConfig");
+        List<String> reloadConfigs = Arrays.asList("道具", "装备1");
         System.err.println("reloadByTableName()=============" + reloadConfigs);
         long startTime = System.currentTimeMillis();
         try {

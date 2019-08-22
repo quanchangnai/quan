@@ -10,7 +10,7 @@ import ${import};
 <#if comment !="">
  * ${comment}<br/>
 </#if>
- * Created by 自动生成
+ * 自动生成
  */
 public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType ==3>Message</#if> {
 

@@ -7,7 +7,7 @@ import quan.config.item.Reward;
 
 /**
 * 任务<br/>
-* Created by 自动生成
+* 自动生成
 */
 public class QuestConfig extends Config {
 
@@ -281,6 +281,7 @@ public class QuestConfig extends Config {
     }
 
 
+    // 所有QuestConfig
     private static volatile List<QuestConfig> configs = new ArrayList<>();
 
     private static volatile Map<Integer, Map<Integer, QuestConfig>> composite1Configs = new HashMap<>();
@@ -384,41 +385,14 @@ public class QuestConfig extends Config {
         Map<QuestType, List<QuestConfig>> typeConfigs = new HashMap<>();
 
         List<String> errors = new ArrayList<>();
-        QuestConfig oldConfig;
 
         for (QuestConfig config : configs) {
-            oldConfig = composite1Configs.computeIfAbsent(config.a1, k -> new HashMap<>()).put(config.a2, config);
-            if (oldConfig != null) {
-                String repeatedConfigs = config.getClass().getSimpleName();
-                if (oldConfig.getClass() != config.getClass()) {
-                    repeatedConfigs += "," + oldConfig.getClass().getSimpleName();
-                }
-                errors.add(String.format("配置[%s]有重复数据[%s,%s = %s,%s]", repeatedConfigs, "a1", "a2", config.a1, config.a2));
-            }
-
-            composite2Configs.computeIfAbsent(config.b1, k -> new HashMap<>()).computeIfAbsent(config.b2, k -> new ArrayList<>()).add(config);
-
-            oldConfig = composite3Configs.computeIfAbsent(config.c1, k -> new HashMap<>()).computeIfAbsent(config.c2, k -> new HashMap<>()).put(config.c3, config);
-            if (oldConfig != null) {
-                String repeatedConfigs = config.getClass().getSimpleName();
-                if (oldConfig.getClass() != config.getClass()) {
-                    repeatedConfigs += "," + oldConfig.getClass().getSimpleName();
-                }
-                errors.add(String.format("配置[%s]有重复数据[%s,%s,%s = %s,%s,%s]", repeatedConfigs, "c1", "c2", "c3", config.c1, config.c2, config.c3));
-            }
-
-            composite4Configs.computeIfAbsent(config.d1, k -> new HashMap<>()).computeIfAbsent(config.d2, k -> new HashMap<>()).computeIfAbsent(config.d3, k -> new ArrayList<>()).add(config);
-
-            oldConfig = idConfigs.put(config.id, config);
-            if (oldConfig != null) {
-                String repeatedConfigs = config.getClass().getSimpleName();
-                if (oldConfig.getClass() != config.getClass()) {
-                    repeatedConfigs += "," + oldConfig.getClass().getSimpleName();
-                }
-                errors.add(String.format("配置[%s]有重复数据[%s = %s]", repeatedConfigs, "id", config.id));
-            }
-
-            typeConfigs.computeIfAbsent(config.type, k -> new ArrayList<>()).add(config);
+            index(composite1Configs, errors, config, true, Arrays.asList("a1", "a2"), config.a1, config.a2);
+            index(composite2Configs, errors, config, false, Arrays.asList("b1", "b2"), config.b1, config.b2);
+            index(composite3Configs, errors, config, true, Arrays.asList("c1", "c2", "c3"), config.c1, config.c2, config.c3);
+            index(composite4Configs, errors, config, false, Arrays.asList("d1", "d2", "d3"), config.d1, config.d2, config.d3);
+            index(idConfigs, errors, config, true, Arrays.asList("id"), config.id);
+            index(typeConfigs, errors, config, false, Arrays.asList("type"), config.type);
         }
 
         configs = Collections.unmodifiableList(configs);

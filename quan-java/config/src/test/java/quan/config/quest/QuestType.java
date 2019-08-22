@@ -2,7 +2,7 @@ package quan.config.quest;
 
 /**
  * 任务类型<br/>
- * Created by 自动生成
+ * 自动生成
  */
 public enum QuestType {
 

@@ -8,7 +8,7 @@ namespace ConfigCS.Test.Item
 {
     /// <summary>
 	/// 奖励<br/>
-	/// Created by 自动生成
+	/// 自动生成
 	/// </summary>
     public class Reward : Bean
     {

@@ -13,7 +13,7 @@ namespace ${fullPackageName}
 <#if comment !="">
 	/// ${comment}<br/>
 </#if>
-	/// Created by 自动生成
+	/// 自动生成
 	/// </summary>
     public class ${name} : <#if definitionType ==2>Bean<#elseif definitionType ==6 && (!parent?? || parent=="")>Config<#elseif definitionType ==6>${parent}</#if>
     {
@@ -131,13 +131,12 @@ namespace ${fullPackageName}
         }
 
 <#macro indexer tab>
+        ${tab}// 所有${name}
         ${tab}private static volatile IList<${name}> _configs = new List<${name}>();
 
     <#list indexes as index>
         <#if index.comment !="">
-        ${tab}/// <summary>
-        ${tab}/// ${index.comment}
-        ${tab}/// </summary>
+        ${tab}// ${index.comment}
         </#if>
         <#if index.unique && index.fields?size==1>
         ${tab}private static volatile IDictionary<${index.fields[0].classType}, ${name}> _${index.name}Configs = new Dictionary<${index.fields[0].classType}, ${name}>();
@@ -174,7 +173,7 @@ namespace ${fullPackageName}
         ${tab}public static ${name} GetBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name})
         ${tab}{
             ${tab}_${index.name}Configs.TryGetValue(${index.fields[0].name}, out var result);
-            ${tab} return result;
+            ${tab}return result;
         ${tab}}
 
         <#elseif index.normal && index.fields?size==1>
@@ -297,30 +296,12 @@ namespace ${fullPackageName}
             ${tab}foreach (var config in configs)
             ${tab}{
     <#list indexes as index>
-        <#if index.unique && index.fields?size==1>
-                ${tab}${index.name}Configs[config.${index.fields[0].name?cap_first}] = config;
-        <#elseif index.normal && index.fields?size==1>
-                ${tab}if (!${index.name}Configs.ContainsKey(config.${index.fields[0].name?cap_first})) ${index.name}Configs[config.${index.fields[0].name?cap_first}] = new List<${name}>();
-                ${tab}${index.name}Configs[config.${index.fields[0].name?cap_first}].Add(config);
-        <#elseif index.unique && index.fields?size==2>
-                ${tab}if (!${index.name}Configs.ContainsKey(config.${index.fields[0].name?cap_first})) ${tab}${index.name}Configs[config.${index.fields[0].name?cap_first}] = new Dictionary<${index.fields[1].type}, ${name}>();
-                ${tab}${index.name}Configs[config.${index.fields[0].name?cap_first}][config.${index.fields[1].name?cap_first}] = config;
-        <#elseif index.normal && index.fields?size==2>
-                ${tab}if (!${index.name}Configs.ContainsKey(config.${index.fields[0].name?cap_first})) ${tab}${index.name}Configs[config.${index.fields[0].name?cap_first}] = new Dictionary<${index.fields[1].type}, IList<${name}>>();
-                ${tab}if (!${index.name}Configs[config.${index.fields[0].name?cap_first}].ContainsKey(config.${index.fields[1].name?cap_first})) ${tab}${index.name}Configs[config.${index.fields[0].name?cap_first}][config.${index.fields[1].name?cap_first}] = new List<${name}>();
-                ${tab}${index.name}Configs[config.${index.fields[0].name?cap_first}][config.${index.fields[1].name?cap_first}].Add(config);
-        <#elseif index.unique && index.fields?size==3>
-                ${tab}if (!${index.name}Configs.ContainsKey(config.${index.fields[0].name?cap_first})) ${tab}${index.name}Configs[config.${index.fields[0].name?cap_first}] = new Dictionary<${index.fields[1].type}, IDictionary<${index.fields[2].type}, ${name}>>();
-                ${tab}if (!${index.name}Configs[config.${index.fields[0].name?cap_first}].ContainsKey(config.${index.fields[2].name?cap_first})) ${tab}${index.name}Configs[config.${index.fields[0].name?cap_first}][config.${index.fields[1].name?cap_first}] = new Dictionary<${index.fields[2].type}, ${name}>();
-                ${tab}${index.name}Configs[config.${index.fields[0].name?cap_first}][config.${index.fields[1].name?cap_first}][config.${index.fields[2].name?cap_first}] = config;
-        <#elseif index.normal && index.fields?size==3>
-                ${tab}if (!${index.name}Configs.ContainsKey(config.${index.fields[0].name?cap_first})) ${tab}${index.name}Configs[config.${index.fields[0].name?cap_first}] = new Dictionary<${index.fields[1].type}, IDictionary<${index.fields[2].type}, IList<${name}>>>();
-                ${tab}if (!${index.name}Configs[config.${index.fields[0].name?cap_first}].ContainsKey(config.${index.fields[1].name?cap_first})) ${tab}${index.name}Configs[config.${index.fields[0].name?cap_first}][config.${index.fields[1].name?cap_first}] = new Dictionary<${index.fields[2].type}, IList<${name}>>();
-                ${tab}if (!${index.name}Configs[config.${index.fields[0].name?cap_first}][config.${index.fields[1].name?cap_first}].ContainsKey(config.${index.fields[2].name?cap_first})) ${tab}${index.name}Configs[config.${index.fields[0].name?cap_first}][config.${index.fields[1].name?cap_first}][config.${index.fields[2].name?cap_first}] = new List<${name}>();
-                ${tab}${index.name}Configs[config.${index.fields[0].name?cap_first}][config.${index.fields[1].name?cap_first}][config.${index.fields[2].name?cap_first}].Add(config);
-        </#if>
-        <#if index_index<indexes?size-1>
-
+        <#if index.fields?size==1>
+                ${tab}<#if parent??>Config.</#if>Index(${index.name}Configs, config, config.${index.fields[0].name?cap_first});
+        <#elseif index.fields?size==2>
+                ${tab}<#if parent??>Config.</#if>Index(${index.name}Configs, config, config.${index.fields[0].name?cap_first}, config.${index.fields[1].name?cap_first});
+        <#elseif index.fields?size==3>
+                ${tab}<#if parent??>Config.</#if>Index(${index.name}Configs, config, config.${index.fields[0].name?cap_first}, config.${index.fields[1].name?cap_first}, config.${index.fields[2].name?cap_first});
         </#if>
     </#list>
             ${tab}}
