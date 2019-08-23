@@ -6,6 +6,7 @@ import java.util.Collection;
 /**
  * Created by quanchangnai on 2019/6/26.
  */
+@SuppressWarnings({"unchecked"})
 public class MethodUtils {
 
     private static boolean validateCaller = true;

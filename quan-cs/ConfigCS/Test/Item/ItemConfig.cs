@@ -127,12 +127,12 @@ namespace ConfigCS.Test.Item
         // ID
         private static volatile IDictionary<int, ItemConfig> _idConfigs = new Dictionary<int, ItemConfig>();
 
-        public static IList<ItemConfig> GetConfigs() 
+        public static IList<ItemConfig> GetConfigs()
         {
             return _configs;
         }
 
-        public static IDictionary<int, ItemConfig> GetIdConfigs() 
+        public static IDictionary<int, ItemConfig> GetIdConfigs()
         {
             return _idConfigs;
         }

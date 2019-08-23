@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 
 namespace ConfigCS
 {
@@ -100,7 +99,7 @@ namespace ConfigCS
             var configType = Type.GetType(configFullName);
             if (configType == null)
             {
-                Console.WriteLine("加载配置[{0}]出错，类[{1}]不存在", configName, configFullName);
+                Console.WriteLine("加载配置[{0}]出错，配置类[{1}]不存在", configName, configFullName);
                 return;
             }
 
@@ -114,35 +113,20 @@ namespace ConfigCS
                 }
             }
 
-            MethodBase indexMethod = null;
-
             try
             {
-                var indexParams = new[] {typeof(IList<>).MakeGenericType(configType)};
-                indexMethod = Type.GetType(configFullName + "+self")?.GetMethod("Index", indexParams);
+                var indexMethod = Type.GetType(configFullName)?.GetMethod("Index", new[] {typeof(IList<>).MakeGenericType(configType)});
                 if (indexMethod == null)
                 {
-                    indexMethod = Type.GetType(configFullName)?.GetMethod("Index", indexParams);
+                    Console.WriteLine("加载配置[{0}]出错，配置类[{1}]没有索引方法", configName, configFullName);
+                    return;
                 }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
 
-            if (indexMethod == null)
-            {
-                Console.WriteLine("加载配置[{0}]类出错，没有索引方法", configName);
-                return;
-            }
-
-            try
-            {
                 indexMethod.Invoke(null, new[] {configs});
             }
             catch (Exception e)
             {
-                Console.WriteLine("调用配置[{0}]的索引方法出错", configName);
+                Console.WriteLine("加载配置[{0}]出错，调用配置类[{1}]的索引方法出错", configName, configFullName);
                 Console.WriteLine(e);
             }
         }

@@ -2,7 +2,6 @@ package quan.network.connection;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import quan.common.util.MethodUtils;
 import quan.network.handler.HandlerChain;
 import quan.network.handler.HandlerContext;
 import quan.network.util.TaskExecutor;
@@ -271,7 +270,6 @@ public class Connection {
      * @param msg
      */
     public void send(ByteBuffer msg) {
-        MethodUtils.validateCallerClass(HandlerContext.class);
         if (executor.isInMyThread()) {
             send0(msg);
         } else {
@@ -294,7 +292,6 @@ public class Connection {
      * 关闭连接，不能在具体逻辑中直接调用，具体逻辑中应该调用{@link HandlerContext#close()}
      */
     public void close() {
-        MethodUtils.validateCallerClass(HandlerContext.class);
         try {
             if (!this.isConnected()) {
                 return;

@@ -130,203 +130,194 @@ namespace ${fullPackageName}
                    '}';
         }
 
-<#macro indexer tab>
-        ${tab}// 所有${name}
-        ${tab}private static volatile IList<${name}> _configs = new List<${name}>();
+
+<#if definitionType ==6>
+        // 所有${name}
+        private static volatile IList<${name}> _configs = new List<${name}>();
 
     <#list indexes as index>
         <#if index.comment !="">
-        ${tab}// ${index.comment}
+        // ${index.comment}
         </#if>
         <#if index.unique && index.fields?size==1>
-        ${tab}private static volatile IDictionary<${index.fields[0].classType}, ${name}> _${index.name}Configs = new Dictionary<${index.fields[0].classType}, ${name}>();
+        private static volatile IDictionary<${index.fields[0].classType}, ${name}> _${index.name}Configs = new Dictionary<${index.fields[0].classType}, ${name}>();
 
         <#elseif index.normal && index.fields?size==1>
-        ${tab}private static volatile IDictionary<${index.fields[0].classType}, IList<${name}>> _${index.name}Configs = new Dictionary<${index.fields[0].classType}, IList<${name}>>();
+        private static volatile IDictionary<${index.fields[0].classType}, IList<${name}>> _${index.name}Configs = new Dictionary<${index.fields[0].classType}, IList<${name}>>();
 
         <#elseif index.unique && index.fields?size==2>
-        ${tab}private static volatile IDictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, ${name}>> _${index.name}Configs = new Dictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, ${name}>>();
+        private static volatile IDictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, ${name}>> _${index.name}Configs = new Dictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, ${name}>>();
 
         <#elseif index.normal && index.fields?size==2>
-        ${tab}private static volatile IDictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, IList<${name}>>> _${index.name}Configs = new Dictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, IList<${name}>>>();
+        private static volatile IDictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, IList<${name}>>> _${index.name}Configs = new Dictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, IList<${name}>>>();
 
         <#elseif index.unique && index.fields?size==3>
-        ${tab}private static volatile IDictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, IDictionary<${index.fields[2].classType}, ${name}>>> _${index.name}Configs = new Dictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, IDictionary<${index.fields[2].classType}, ${name}>>>();
+        private static volatile IDictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, IDictionary<${index.fields[2].classType}, ${name}>>> _${index.name}Configs = new Dictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, IDictionary<${index.fields[2].classType}, ${name}>>>();
 
         <#elseif index.normal && index.fields?size==3>
-        ${tab}private static volatile IDictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, IDictionary<${index.fields[2].classType}, IList<${name}>>>> _${index.name}Configs = new Dictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, IDictionary<${index.fields[2].classType}, IList<${name}>>>>();
+        private static volatile IDictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, IDictionary<${index.fields[2].classType}, IList<${name}>>>> _${index.name}Configs = new Dictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, IDictionary<${index.fields[2].classType}, IList<${name}>>>>();
 
         </#if>
     </#list>
-        ${tab}public static IList<${name}> GetConfigs() 
-        ${tab}{
-            ${tab}return _configs;
-        ${tab}}
+        public <#if parent??>new </#if>static IList<${name}> GetConfigs()
+        {
+            return _configs;
+        }
 
     <#list indexes as index>
+        <#assign newMethod><#if !isSelfIndex(index)>new <#else></#if></#assign>
         <#if index.unique && index.fields?size==1>
-        ${tab}public static IDictionary<${index.fields[0].classType}, ${name}> Get${index.name?cap_first}Configs() 
-        ${tab}{
-            ${tab}return _${index.name}Configs;
-        ${tab}}
+        public ${newMethod}static IDictionary<${index.fields[0].classType}, ${name}> Get${index.name?cap_first}Configs()
+        {
+            return _${index.name}Configs;
+        }
 
-        ${tab}public static ${name} GetBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name})
-        ${tab}{
-            ${tab}_${index.name}Configs.TryGetValue(${index.fields[0].name}, out var result);
-            ${tab}return result;
-        ${tab}}
+        public ${newMethod}static ${name} GetBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name})
+        {
+            _${index.name}Configs.TryGetValue(${index.fields[0].name}, out var result);
+            return result;
+        }
 
         <#elseif index.normal && index.fields?size==1>
-        ${tab}public static IDictionary<${index.fields[0].classType}, IList<${name}>> Get${index.name?cap_first}Configs() 
-        ${tab}{
-            ${tab}return _${index.name}Configs;
-        ${tab}}
+        public ${newMethod}static IDictionary<${index.fields[0].classType}, IList<${name}>> Get${index.name?cap_first}Configs()
+        {
+            return _${index.name}Configs;
+        }
 
-        ${tab}public static IList<${name}> GetBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name})
-        ${tab}{
-            ${tab}_${index.name}Configs.TryGetValue(${index.fields[0].name}, out var result);
-            ${tab}return result ?? ImmutableList<${name}>.Empty;
-        ${tab}}
+        public ${newMethod}static IList<${name}> GetBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name})
+        {
+            _${index.name}Configs.TryGetValue(${index.fields[0].name}, out var result);
+            return result ?? ImmutableList<${name}>.Empty;
+        }
 
         <#elseif index.unique && index.fields?size==2>
-        ${tab}public static IDictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, ${name}>> Get${index.name?cap_first}Configs() 
-        ${tab}{
-            ${tab}return _${index.name}Configs;
-        ${tab}}
+        public ${newMethod}static IDictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, ${name}>> Get${index.name?cap_first}Configs()
+        {
+            return _${index.name}Configs;
+        }
 
-        ${tab}public static IDictionary<${index.fields[1].classType}, ${name}> GetBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name})
-        ${tab}{
-            ${tab}_${index.name}Configs.TryGetValue(${index.fields[0].name}, out var result);
-            ${tab}return result ?? ImmutableDictionary<${index.fields[1].classType}, ${name}>.Empty;
-        ${tab}}
+        public ${newMethod}static IDictionary<${index.fields[1].classType}, ${name}> GetBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name})
+        {
+            _${index.name}Configs.TryGetValue(${index.fields[0].name}, out var result);
+            return result ?? ImmutableDictionary<${index.fields[1].classType}, ${name}>.Empty;
+        }
 
-        ${tab}public static ${name} GetBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name})
-        ${tab}{
-            ${tab}GetBy${index.name?cap_first}(${index.fields[0].name}).TryGetValue(${index.fields[1].name}, out var result);
-            ${tab}return result;
-        ${tab}}
+        public ${newMethod}static ${name} GetBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name})
+        {
+            GetBy${index.name?cap_first}(${index.fields[0].name}).TryGetValue(${index.fields[1].name}, out var result);
+            return result;
+        }
 
         <#elseif index.normal && index.fields?size==2>
-        ${tab}public static IDictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, IList<${name}>>> Get${index.name?cap_first}Configs()
-        ${tab}{
-            ${tab}return _${index.name}Configs;
-        ${tab}}
+        public ${newMethod}static IDictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, IList<${name}>>> Get${index.name?cap_first}Configs()
+        {
+            return _${index.name}Configs;
+        }
 
-        ${tab}public static IDictionary<${index.fields[1].classType}, IList<${name}>> GetBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name})
-        ${tab}{
-            ${tab}_${index.name}Configs.TryGetValue(${index.fields[0].name}, out var result);
-            ${tab}return result ?? ImmutableDictionary<${index.fields[1].classType}, IList<${name}>>.Empty;
-        ${tab}}
+        public ${newMethod}static IDictionary<${index.fields[1].classType}, IList<${name}>> GetBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name})
+        {
+            _${index.name}Configs.TryGetValue(${index.fields[0].name}, out var result);
+            return result ?? ImmutableDictionary<${index.fields[1].classType}, IList<${name}>>.Empty;
+        }
 
-        ${tab}public static IList<${name}> GetBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name})
-        ${tab}{
-            ${tab}GetBy${index.name?cap_first}(${index.fields[0].name}).TryGetValue(${index.fields[1].name}, out var result);
-            ${tab}return result ?? ImmutableList<${name}>.Empty;
-        ${tab}}
+        public ${newMethod}static IList<${name}> GetBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name})
+        {
+            GetBy${index.name?cap_first}(${index.fields[0].name}).TryGetValue(${index.fields[1].name}, out var result);
+            return result ?? ImmutableList<${name}>.Empty;
+        }
 
         <#elseif index.unique && index.fields?size==3>
-        ${tab}public static IDictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, IDictionary<${index.fields[2].classType}, ${name}>>> Get${index.name?cap_first}Configs()
-        ${tab}{
-            ${tab}return _${index.name}Configs;
-        ${tab}}
+        public ${newMethod}static IDictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, IDictionary<${index.fields[2].classType}, ${name}>>> Get${index.name?cap_first}Configs()
+        {
+            return _${index.name}Configs;
+        }
 
-        ${tab}public static IDictionary<${index.fields[1].classType}, IDictionary<${index.fields[2].classType}, ${name}>> GetBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name})
-        ${tab}{
-            ${tab}_${index.name}Configs.TryGetValue(${index.fields[0].name}, out var result);
-            ${tab}return result ?? ImmutableDictionary<${index.fields[1].classType}, IDictionary<${index.fields[2].classType}, ${name}>>.Empty;
-        ${tab}}
+        public ${newMethod}static IDictionary<${index.fields[1].classType}, IDictionary<${index.fields[2].classType}, ${name}>> GetBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name})
+        {
+            _${index.name}Configs.TryGetValue(${index.fields[0].name}, out var result);
+            return result ?? ImmutableDictionary<${index.fields[1].classType}, IDictionary<${index.fields[2].classType}, ${name}>>.Empty;
+        }
 
-        ${tab}public static IDictionary<${index.fields[2].classType}, ${name}> GetBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name})
-        ${tab}{
-            ${tab}GetBy${index.name?cap_first}(${index.fields[0].name}).TryGetValue(${index.fields[1].name}, out var result);
-            ${tab}return result ?? ImmutableDictionary<${index.fields[2].classType}, ${name}>.Empty;
-        ${tab}}
+        public ${newMethod}static IDictionary<${index.fields[2].classType}, ${name}> GetBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name})
+        {
+            GetBy${index.name?cap_first}(${index.fields[0].name}).TryGetValue(${index.fields[1].name}, out var result);
+            return result ?? ImmutableDictionary<${index.fields[2].classType}, ${name}>.Empty;
+        }
 
-        ${tab}public static ${name} GetBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name}, ${index.fields[2].basicType} ${index.fields[2].name})
-        ${tab}{
-            ${tab}GetBy${index.name?cap_first}(${index.fields[0].name}, ${index.fields[1].name}).TryGetValue(${index.fields[2].name}, out var result);
-            ${tab}return result;
-        ${tab}}
+        public  ${newMethod}static ${name} GetBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name}, ${index.fields[2].basicType} ${index.fields[2].name})
+        {
+            GetBy${index.name?cap_first}(${index.fields[0].name}, ${index.fields[1].name}).TryGetValue(${index.fields[2].name}, out var result);
+            return result;
+        }
 
         <#elseif index.normal && index.fields?size==3>
-        ${tab}public static IDictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, IDictionary<${index.fields[2].classType}, IList<${name}>>>> Get${index.name?cap_first}Configs()
-        ${tab}{
-            ${tab}return _${index.name}Configs;
-        ${tab}}
+        public ${newMethod}static IDictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, IDictionary<${index.fields[2].classType}, IList<${name}>>>> Get${index.name?cap_first}Configs()
+        {
+            return _${index.name}Configs;
+        }
 
-        ${tab}public static IDictionary<${index.fields[1].classType}, IDictionary<${index.fields[2].classType}, IList<${name}>>> GetBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name})
-        ${tab}{
-            ${tab}_${index.name}Configs.TryGetValue(${index.fields[0].name}, out var result);
-            ${tab}return result ?? ImmutableDictionary<${index.fields[1].classType}, IDictionary<${index.fields[2].classType}, IList<${name}>>>.Empty;
-        ${tab}}
+        public ${newMethod}static IDictionary<${index.fields[1].classType}, IDictionary<${index.fields[2].classType}, IList<${name}>>> GetBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name})
+        {
+            _${index.name}Configs.TryGetValue(${index.fields[0].name}, out var result);
+            return result ?? ImmutableDictionary<${index.fields[1].classType}, IDictionary<${index.fields[2].classType}, IList<${name}>>>.Empty;
+        }
 
-        ${tab}public static IDictionary<${index.fields[2].classType}, IList<${name}>> GetBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name})
-        ${tab}{
-            ${tab}GetBy${index.name?cap_first}(${index.fields[0].name}).TryGetValue(${index.fields[1].name}, out var result);
-            ${tab}return result ?? ImmutableDictionary<${index.fields[2].classType}, IList<${name}>>.Empty;
-        ${tab}}
+        public ${newMethod}static IDictionary<${index.fields[2].classType}, IList<${name}>> GetBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name})
+        {
+            GetBy${index.name?cap_first}(${index.fields[0].name}).TryGetValue(${index.fields[1].name}, out var result);
+            return result ?? ImmutableDictionary<${index.fields[2].classType}, IList<${name}>>.Empty;
+        }
 
-        ${tab}public static IList<${name}> GetBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name}, ${index.fields[2].basicType} ${index.fields[2].name})
-        ${tab}{
-            ${tab}GetBy${index.name?cap_first}(${index.fields[0].name}, ${index.fields[1].name}).TryGetValue(${index.fields[2].name}, out var result);
-            ${tab}return result ?? ImmutableList<${name}>.Empty;
-        ${tab}}
+        public ${newMethod}static IList<${name}> GetBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name}, ${index.fields[2].basicType} ${index.fields[2].name})
+        {
+            GetBy${index.name?cap_first}(${index.fields[0].name}, ${index.fields[1].name}).TryGetValue(${index.fields[2].name}, out var result);
+            return result ?? ImmutableList<${name}>.Empty;
+        }
 
         </#if>
     </#list>
 
-        ${tab}public static void Index(IList<${name}> configs)
-        ${tab}{
+        public static void Index(IList<${name}> configs)
+        {
     <#list indexes as index>
         <#if index.unique && index.fields?size==1>
-            ${tab}IDictionary<${index.fields[0].classType}, ${name}> ${index.name}Configs = new Dictionary<${index.fields[0].classType}, ${name}>();
+            IDictionary<${index.fields[0].classType}, ${name}> ${index.name}Configs = new Dictionary<${index.fields[0].classType}, ${name}>();
         <#elseif index.normal && index.fields?size==1>
-            ${tab}IDictionary<${index.fields[0].classType}, IList<${name}>> ${index.name}Configs = new Dictionary<${index.fields[0].classType}, IList<${name}>>();
+            IDictionary<${index.fields[0].classType}, IList<${name}>> ${index.name}Configs = new Dictionary<${index.fields[0].classType}, IList<${name}>>();
         <#elseif index.unique && index.fields?size==2>
-            ${tab}IDictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, ${name}>> ${index.name}Configs = new Dictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, ${name}>>();
+            IDictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, ${name}>> ${index.name}Configs = new Dictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, ${name}>>();
         <#elseif index.normal && index.fields?size==2>
-            ${tab}IDictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, IList<${name}>>> ${index.name}Configs = new Dictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, IList<${name}>>>();
+            IDictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, IList<${name}>>> ${index.name}Configs = new Dictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, IList<${name}>>>();
         <#elseif index.unique && index.fields?size==3>
-            ${tab}IDictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, IDictionary<${index.fields[2].classType}, ${name}>>> ${index.name}Configs = new Dictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, IDictionary<${index.fields[2].classType}, ${name}>>>();
+            IDictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, IDictionary<${index.fields[2].classType}, ${name}>>> ${index.name}Configs = new Dictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, IDictionary<${index.fields[2].classType}, ${name}>>>();
         <#elseif index.normal && index.fields?size==3>
-            ${tab}IDictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, IDictionary<${index.fields[2].classType}, IList<${name}>>>> ${index.name}Configs = new Dictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, IDictionary<${index.fields[2].classType}, IList<${name}>>>>();
+            IDictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, IDictionary<${index.fields[2].classType}, IList<${name}>>>> ${index.name}Configs = new Dictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, IDictionary<${index.fields[2].classType}, IList<${name}>>>>();
         </#if>
     </#list>
 
-            ${tab}foreach (var config in configs)
-            ${tab}{
+            foreach (var config in configs)
+            {
     <#list indexes as index>
         <#if index.fields?size==1>
-                ${tab}<#if parent??>Config.</#if>Index(${index.name}Configs, config, config.${index.fields[0].name?cap_first});
+                <#if parent??>Config.</#if>Index(${index.name}Configs, config, config.${index.fields[0].name?cap_first});
         <#elseif index.fields?size==2>
-                ${tab}<#if parent??>Config.</#if>Index(${index.name}Configs, config, config.${index.fields[0].name?cap_first}, config.${index.fields[1].name?cap_first});
+                <#if parent??>Config.</#if>Index(${index.name}Configs, config, config.${index.fields[0].name?cap_first}, config.${index.fields[1].name?cap_first});
         <#elseif index.fields?size==3>
-                ${tab}<#if parent??>Config.</#if>Index(${index.name}Configs, config, config.${index.fields[0].name?cap_first}, config.${index.fields[1].name?cap_first}, config.${index.fields[2].name?cap_first});
+                <#if parent??>Config.</#if>Index(${index.name}Configs, config, config.${index.fields[0].name?cap_first}, config.${index.fields[1].name?cap_first}, config.${index.fields[2].name?cap_first});
         </#if>
     </#list>
-            ${tab}}
+            }
 
-            ${tab}configs = configs.ToImmutableList();
+            configs = configs.ToImmutableList();
     <#list indexes as index>
-            ${tab}${index.name}Configs = ToImmutableDictionary(${index.name}Configs);
+            ${index.name}Configs = ToImmutableDictionary(${index.name}Configs);
     </#list>
 
-            ${tab}_configs = configs;
+            _configs = configs;
     <#list indexes as index>
-            ${tab}_${index.name}Configs = ${index.name}Configs;
+            _${index.name}Configs = ${index.name}Configs;
     </#list>
-        ${tab}}
-    </#macro>
-
-<#if definitionType ==6>
-    <#if parent??>
-        public<#if parentConfig.parent??> new</#if> static class self 
-        {
-        <@indexer tab="    "/>
         }
-    <#else>
-        <@indexer tab=""/>
-    </#if>
 </#if>
     }
 }

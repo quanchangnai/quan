@@ -51,12 +51,12 @@ namespace ConfigCS.Test.Quest
         // ID
         private static volatile IDictionary<int, QuestTargetConfig> _idConfigs = new Dictionary<int, QuestTargetConfig>();
 
-        public static IList<QuestTargetConfig> GetConfigs() 
+        public static IList<QuestTargetConfig> GetConfigs()
         {
             return _configs;
         }
 
-        public static IDictionary<int, QuestTargetConfig> GetIdConfigs() 
+        public static IDictionary<int, QuestTargetConfig> GetIdConfigs()
         {
             return _idConfigs;
         }

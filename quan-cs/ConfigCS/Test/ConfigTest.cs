@@ -18,6 +18,8 @@ namespace ConfigCS.Test
             {
                 Console.WriteLine("{0} = {1} = {2}", config.Name, config.EffectiveTime, config.EffectiveTime_Str);
             }
+
+            EquipConfig.GetIdConfigs();
         }
     }
 }

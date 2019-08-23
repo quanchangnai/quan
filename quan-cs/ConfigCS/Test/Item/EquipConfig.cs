@@ -53,64 +53,61 @@ namespace ConfigCS.Test.Item
         }
 
 
-        public static class self 
+        // 所有EquipConfig
+        private static volatile IList<EquipConfig> _configs = new List<EquipConfig>();
+
+        // ID
+        private static volatile IDictionary<int, EquipConfig> _idConfigs = new Dictionary<int, EquipConfig>();
+
+        // 部位
+        private static volatile IDictionary<int, IList<EquipConfig>> _positionConfigs = new Dictionary<int, IList<EquipConfig>>();
+
+        public new static IList<EquipConfig> GetConfigs()
         {
-            // 所有EquipConfig
-            private static volatile IList<EquipConfig> _configs = new List<EquipConfig>();
+            return _configs;
+        }
 
-            // ID
-            private static volatile IDictionary<int, EquipConfig> _idConfigs = new Dictionary<int, EquipConfig>();
+        public new static IDictionary<int, EquipConfig> GetIdConfigs()
+        {
+            return _idConfigs;
+        }
 
-            // 部位
-            private static volatile IDictionary<int, IList<EquipConfig>> _positionConfigs = new Dictionary<int, IList<EquipConfig>>();
+        public new static EquipConfig GetById(int id)
+        {
+            _idConfigs.TryGetValue(id, out var result);
+            return result;
+        }
 
-            public static IList<EquipConfig> GetConfigs() 
+        public static IDictionary<int, IList<EquipConfig>> GetPositionConfigs()
+        {
+            return _positionConfigs;
+        }
+
+        public static IList<EquipConfig> GetByPosition(int position)
+        {
+            _positionConfigs.TryGetValue(position, out var result);
+            return result ?? ImmutableList<EquipConfig>.Empty;
+        }
+
+
+        public static void Index(IList<EquipConfig> configs)
+        {
+            IDictionary<int, EquipConfig> idConfigs = new Dictionary<int, EquipConfig>();
+            IDictionary<int, IList<EquipConfig>> positionConfigs = new Dictionary<int, IList<EquipConfig>>();
+
+            foreach (var config in configs)
             {
-                return _configs;
+                Config.Index(idConfigs, config, config.Id);
+                Config.Index(positionConfigs, config, config.Position);
             }
 
-            public static IDictionary<int, EquipConfig> GetIdConfigs() 
-            {
-                return _idConfigs;
-            }
+            configs = configs.ToImmutableList();
+            idConfigs = ToImmutableDictionary(idConfigs);
+            positionConfigs = ToImmutableDictionary(positionConfigs);
 
-            public static EquipConfig GetById(int id)
-            {
-                _idConfigs.TryGetValue(id, out var result);
-                return result;
-            }
-
-            public static IDictionary<int, IList<EquipConfig>> GetPositionConfigs() 
-            {
-                return _positionConfigs;
-            }
-
-            public static IList<EquipConfig> GetByPosition(int position)
-            {
-                _positionConfigs.TryGetValue(position, out var result);
-                return result ?? ImmutableList<EquipConfig>.Empty;
-            }
-
-
-            public static void Index(IList<EquipConfig> configs)
-            {
-                IDictionary<int, EquipConfig> idConfigs = new Dictionary<int, EquipConfig>();
-                IDictionary<int, IList<EquipConfig>> positionConfigs = new Dictionary<int, IList<EquipConfig>>();
-
-                foreach (var config in configs)
-                {
-                    Config.Index(idConfigs, config, config.Id);
-                    Config.Index(positionConfigs, config, config.Position);
-                }
-
-                configs = configs.ToImmutableList();
-                idConfigs = ToImmutableDictionary(idConfigs);
-                positionConfigs = ToImmutableDictionary(positionConfigs);
-
-                _configs = configs;
-                _idConfigs = idConfigs;
-                _positionConfigs = positionConfigs;
-            }
+            _configs = configs;
+            _idConfigs = idConfigs;
+            _positionConfigs = positionConfigs;
         }
     }
 }

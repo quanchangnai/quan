@@ -146,6 +146,10 @@ public class ConfigDefinition extends BeanDefinition {
         selfIndexes.add(indexDefinition);
     }
 
+    public boolean isSelfIndex(IndexDefinition indexDefinition) {
+        return selfIndexes.contains(indexDefinition);
+    }
+
     public IndexDefinition getIndexByField1(FieldDefinition field1) {
         for (IndexDefinition index : indexes) {
             if (index.getFields().get(0) == field1) {

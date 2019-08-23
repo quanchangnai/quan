@@ -15,27 +15,16 @@ import java.util.List;
 public class ConfigTest {
 
     public static void main(String[] args) throws Exception {
-        List<String> definitionPaths = new ArrayList<>();
-        definitionPaths.add("generator\\definition\\config");
-
-//        String tableType = "csv";
-//        String tablePath = "config\\csv";
-        String tableType = "xlsx";
-        String tablePath = "config\\excel";
-//        String tableType = "json";
-//        String tablePath = "config\\json";
 
 
-        ConfigLoader configLoader = new ConfigLoader(tablePath);
-        configLoader.useXmlDefinition(definitionPaths, "quan.config");
-//        configLoader.notUseDefinition("quan.config");
-        configLoader.setLoadType(LoadType.validateAndLoad);
-        configLoader.setValidatorsPackage("quan");
-        configLoader.setTableType(tableType);
+        ConfigLoader configLoader = newWithDefinitionConfigLoader();
+//        ConfigLoader configLoader = newWithoutDefinitionConfigLoader();
 
         loadConfig(configLoader);
 
-        writeJson(configLoader, false);
+        if (configLoader instanceof WithDefinitionConfigLoader) {
+            writeJson((WithDefinitionConfigLoader) configLoader, true);
+        }
 
         reloadAllConfig(configLoader);
 
@@ -43,15 +32,41 @@ public class ConfigTest {
 
         reloadByTableName(configLoader);
 
-        reloadByOriginalName(configLoader);
+        if (configLoader instanceof WithDefinitionConfigLoader) {
+            reloadByOriginalName((WithDefinitionConfigLoader) configLoader);
+        }
 
+    }
+
+    private static ConfigLoader newWithDefinitionConfigLoader() {
+        List<String> definitionPaths = new ArrayList<>();
+        definitionPaths.add("generator\\definition\\config");
+
+//        String tableType = "csv";
+//        String tablePath = "config\\csv";
+        String tableType = "xlsx";
+        String tablePath = "config\\excel";
+
+        WithDefinitionConfigLoader configLoader = new WithDefinitionConfigLoader(tablePath);
+        configLoader.useXmlDefinition(definitionPaths, "quan.config");
+        configLoader.setValidatorsPackage("quan");
+        configLoader.setTableType(tableType);
+
+        return configLoader;
+    }
+    private static ConfigLoader newWithoutDefinitionConfigLoader() {
+        String tablePath = "config\\json";
+        WithoutDefinitionConfigLoader configLoader = new WithoutDefinitionConfigLoader(tablePath);
+        configLoader.setValidatorsPackage("quan");
+        configLoader.setPackagePrefix("quan.config");
+        return configLoader;
     }
 
     private static void loadConfig(ConfigLoader configLoader) throws Exception {
         System.err.println("configLoader.loadConfig()=============");
         long startTime = System.currentTimeMillis();
         try {
-            configLoader.load();
+            configLoader.loadAll();
         } catch (ValidatedException e) {
             printErrors(e);
         }
@@ -60,13 +75,13 @@ public class ConfigTest {
         System.err.println();
     }
 
-    private static void writeJson(ConfigLoader configLoader, boolean useSimpleName) {
+    private static void writeJson(WithDefinitionConfigLoader configLoader, boolean useNameWithPackage) {
         if (configLoader.getTableType().equals("json")) {
             return;
         }
         System.err.println("writeJson()=============");
         long startTime = System.currentTimeMillis();
-        configLoader.writeJson("config\\json", useSimpleName);
+        configLoader.writeJson("config\\json", useNameWithPackage);
         System.err.println("writeJson()耗时:" + (System.currentTimeMillis() - startTime));
         System.err.println();
     }
@@ -115,7 +130,7 @@ public class ConfigTest {
         System.err.println();
     }
 
-    private static void reloadByOriginalName(ConfigLoader configLoader) throws Exception {
+    private static void reloadByOriginalName(WithDefinitionConfigLoader configLoader) throws Exception {
         Thread.sleep(5000);
         List<String> reloadConfigs = Arrays.asList("道具", "武器");
         System.err.println("reloadByOriginalName()=============" + reloadConfigs);

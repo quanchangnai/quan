@@ -205,12 +205,12 @@ namespace ConfigCS.Test.Quest
         // 类型
         private static volatile IDictionary<QuestType, IList<QuestConfig>> _typeConfigs = new Dictionary<QuestType, IList<QuestConfig>>();
 
-        public static IList<QuestConfig> GetConfigs() 
+        public static IList<QuestConfig> GetConfigs()
         {
             return _configs;
         }
 
-        public static IDictionary<int, IDictionary<int, QuestConfig>> GetComposite1Configs() 
+        public static IDictionary<int, IDictionary<int, QuestConfig>> GetComposite1Configs()
         {
             return _composite1Configs;
         }
@@ -261,7 +261,7 @@ namespace ConfigCS.Test.Quest
             return result ?? ImmutableDictionary<int, QuestConfig>.Empty;
         }
 
-        public static QuestConfig GetByComposite3(string c1, int c2, int c3)
+        public  static QuestConfig GetByComposite3(string c1, int c2, int c3)
         {
             GetByComposite3(c1, c2).TryGetValue(c3, out var result);
             return result;
@@ -290,7 +290,7 @@ namespace ConfigCS.Test.Quest
             return result ?? ImmutableList<QuestConfig>.Empty;
         }
 
-        public static IDictionary<int, QuestConfig> GetIdConfigs() 
+        public static IDictionary<int, QuestConfig> GetIdConfigs()
         {
             return _idConfigs;
         }
@@ -301,7 +301,7 @@ namespace ConfigCS.Test.Quest
             return result;
         }
 
-        public static IDictionary<QuestType, IList<QuestConfig>> GetTypeConfigs() 
+        public static IDictionary<QuestType, IList<QuestConfig>> GetTypeConfigs()
         {
             return _typeConfigs;
         }
