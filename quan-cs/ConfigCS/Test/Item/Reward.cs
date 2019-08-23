@@ -18,10 +18,10 @@ namespace ConfigCS.Test.Item
         public readonly int ItemNum;
 
 
-        public Reward(JObject json): base(json)
+        public Reward(JObject json) : base(json)
         {
-            ItemId = json["itemId"]?.Value<int>()?? default;
-            ItemNum = json["itemNum"]?.Value<int>()?? default;
+            ItemId = json["itemId"]?.Value<int>() ?? default;
+            ItemNum = json["itemNum"]?.Value<int>() ?? default;
         }
 
 

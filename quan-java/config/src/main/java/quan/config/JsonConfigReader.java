@@ -3,6 +3,7 @@ package quan.config;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.util.List;
 
@@ -12,11 +13,11 @@ import java.util.List;
 @SuppressWarnings({"unchecked"})
 public class JsonConfigReader extends ConfigReader {
 
-    private String configFullName;
+    private final String configFullName;
 
-    public JsonConfigReader(String tablePath, String table, String configFullName) {
+    public JsonConfigReader(File jsonFile, String configFullName) {
         this.configFullName = configFullName;
-        super.init(tablePath, table, null);
+        super.init(jsonFile, null);
     }
 
     @Override

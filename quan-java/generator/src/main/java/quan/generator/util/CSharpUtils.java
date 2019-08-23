@@ -12,12 +12,12 @@ import quan.generator.FieldDefinition;
 public class CSharpUtils {
 
     /**
-     * C#命名空间首字母大写
+     * C#命名空间首字母大写驼峰格式
      *
      * @param packageName
      * @return
      */
-    public static String namespace(String packageName) {
+    public static String toCapitalCamel(String packageName) {
         StringBuilder namespace = new StringBuilder();
         for (int i = 0; i < packageName.length(); i++) {
             String c = String.valueOf(packageName.charAt(i));

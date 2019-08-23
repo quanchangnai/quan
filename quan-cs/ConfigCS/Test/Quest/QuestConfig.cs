@@ -105,23 +105,23 @@ namespace ConfigCS.Test.Quest
         public readonly IDictionary<int, int> M1;
 
 
-        public QuestConfig(JObject json): base(json)
+        public QuestConfig(JObject json) : base(json)
         {
-            Id = json["id"]?.Value<int>()?? default;
-            Name = json["name"]?.Value<string>()?? "";
-            Type = (QuestType) (json["type"]?.Value<int>()?? default);
-            Target = json["target"]?.Value<int>()?? default;
+            Id = json["id"]?.Value<int>() ?? default;
+            Name = json["name"]?.Value<string>() ?? "";
+            Type = (QuestType) (json["type"]?.Value<int>() ?? default);
+            Target = json["target"]?.Value<int>() ?? default;
             Reward = json.ContainsKey("reward") ? new Reward(json["reward"].Value<JObject>()) : null;
-            A1 = json["a1"]?.Value<int>()?? default;
-            A2 = json["a2"]?.Value<int>()?? default;
-            B1 = json["b1"]?.Value<int>()?? default;
-            B2 = json["b2"]?.Value<bool>()?? default;
-            C1 = json["c1"]?.Value<string>()?? "";
-            C2 = json["c2"]?.Value<int>()?? default;
-            C3 = json["c3"]?.Value<int>()?? default;
-            D1 = json["d1"]?.Value<string>()?? "";
-            D2 = json["d2"]?.Value<int>()?? default;
-            D3 = json["d3"]?.Value<int>()?? default;
+            A1 = json["a1"]?.Value<int>() ?? default;
+            A2 = json["a2"]?.Value<int>() ?? default;
+            B1 = json["b1"]?.Value<int>() ?? default;
+            B2 = json["b2"]?.Value<bool>() ?? default;
+            C1 = json["c1"]?.Value<string>() ?? "";
+            C2 = json["c2"]?.Value<int>() ?? default;
+            C3 = json["c3"]?.Value<int>() ?? default;
+            D1 = json["d1"]?.Value<string>() ?? "";
+            D2 = json["d2"]?.Value<int>() ?? default;
+            D3 = json["d3"]?.Value<int>() ?? default;
 
             var s11 = json["s1"]?.Value<JArray>();
             var s12 = ImmutableHashSet<int>.Empty;
@@ -149,15 +149,15 @@ namespace ConfigCS.Test.Quest
             var m12 = ImmutableDictionary<int, int>.Empty;
             if (m11 != null)
             {
-                foreach (var m1Prop in m11.Properties())
+                foreach (var m1KeyValue in m11)
                 {
-                    m12.Add(int.Parse(m1Prop.Name), m1Prop.Value<int>());
+                    m12.Add(int.Parse(m1KeyValue.Key), m1KeyValue.Value.Value<int>());
                 }
             }
             M1 = m12;
         }
 
-        protected override Config Create(JObject json) 
+        protected internal override Config Create(JObject json)
         {
             return new QuestConfig(json);
         }

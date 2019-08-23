@@ -43,7 +43,7 @@ namespace ${fullPackageName}
 
 </#list>
 
-        public ${name}(JObject json): base(json)
+        public ${name}(JObject json) : base(json)
         {
 <#list selfFields as field>
     <#if field.type=="list" || field.type=="set">
@@ -75,12 +75,12 @@ namespace ${fullPackageName}
             var ${field.name}2 = ImmutableDictionary<${field.classKeyType}, ${field.classValueType}>.Empty;
             if (${field.name}1 != null)
             {
-                foreach (var ${field.name}Prop in ${field.name}1.Properties())
+                foreach (var ${field.name}KeyValue in ${field.name}1)
                 {
                 <#if field.beanValueType>
-                    ${field.name}2.Add(${field.classKeyType}.Parse(${field.name}Prop.Name), new ${field.classValueType}(${field.name}Prop.Value<JObject>()));
+                    ${field.name}2.Add(${field.classKeyType}.Parse(${field.name}KeyValue.Key), new ${field.classValueType}(${field.name}KeyValue.Value.Value<JObject>()));
                 <#else>
-                    ${field.name}2.Add(${field.classKeyType}.Parse(${field.name}Prop.Name), ${field.name}Prop.Value<${field.classValueType}>());
+                    ${field.name}2.Add(${field.classKeyType}.Parse(${field.name}KeyValue.Key), ${field.name}KeyValue.Value.Value<${field.classValueType}>());
                 </#if>
                 }
             }
@@ -89,14 +89,14 @@ namespace ${fullPackageName}
 
         </#if>
     <#elseif field.timeType>
-            ${field.name?cap_first} = json["${field.name}"]?.Value<DateTime>()?? default;
-            ${field.name?cap_first}_Str = json["${field.name}$Str"]?.Value<string>()?? "";
+            ${field.name?cap_first} = ToDateTime(json["${field.name}"]?.Value<long>() ?? default);
+            ${field.name?cap_first}_Str = json["${field.name}$Str"]?.Value<string>() ?? "";
     <#elseif field.type=="string">
-            ${field.name?cap_first} = json["${field.name}"]?.Value<${field.type}>()?? "";
+            ${field.name?cap_first} = json["${field.name}"]?.Value<${field.type}>() ?? "";
     <#elseif field.builtInType>
-            ${field.name?cap_first} = json["${field.name}"]?.Value<${field.type}>()?? default;
+            ${field.name?cap_first} = json["${field.name}"]?.Value<${field.type}>() ?? default;
     <#elseif field.enumType>
-            ${field.name?cap_first} = (${field.type}) (json["${field.name}"]?.Value<int>()?? default);
+            ${field.name?cap_first} = (${field.type}) (json["${field.name}"]?.Value<int>() ?? default);
     <#else>
             ${field.name?cap_first} = json.ContainsKey("${field.name}") ? new ${field.type}(json["${field.name}"].Value<JObject>()) : null;
     </#if>
@@ -104,7 +104,7 @@ namespace ${fullPackageName}
         }
 
  <#if definitionType ==6>
-        protected override Config Create(JObject json) 
+        protected internal override Config Create(JObject json)
         {
             return new ${name}(json);
         }

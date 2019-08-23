@@ -57,7 +57,7 @@ public class CSharpMessageGenerator extends MessageGenerator {
     }
 
     protected void processClassSelf(ClassDefinition classDefinition) {
-        classDefinition.setPackageName(CSharpUtils.namespace(classDefinition.getPackageName()));
+        classDefinition.setPackageName(CSharpUtils.toCapitalCamel(classDefinition.getPackageName()));
     }
 
     @Override

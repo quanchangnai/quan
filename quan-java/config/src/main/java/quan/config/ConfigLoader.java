@@ -43,17 +43,17 @@ public class ConfigLoader {
 
     private int bodyRowNum;
 
-    private Map<String, ConfigReader> readers = new HashMap<>();
+    private final Map<String, ConfigReader> readers = new HashMap<>();
 
     //自定义的配置校验器
-    private Set<ConfigValidator> validators = new HashSet<>();
+    private final Set<ConfigValidator> validators = new HashSet<>();
 
-    private LinkedHashSet<String> validatedErrors = new LinkedHashSet<>();
+    private final LinkedHashSet<String> validatedErrors = new LinkedHashSet<>();
 
     private boolean loaded;
 
-    //配置全类名:配置全类名加上所有后代类全类名
-    private Map<String, Set<String>> configDescendantsAndMe = new HashMap<>();
+    //配置全类名:所有子孙配置[命名空间.类名]，包含自己
+    private final Map<String, Set<String>> configDescendants = new HashMap<>();
 
     public ConfigLoader(String tablePath) {
         this.tablePath = PathUtils.currentPlatPath(tablePath);
@@ -221,14 +221,12 @@ public class ConfigLoader {
         List<Config> configs = new ArrayList<>();
 
         for (File jsonFile : jsonFiles) {
-            String configPackageAndName = jsonFile.getName().substring(0, jsonFile.getName().lastIndexOf("."));
-            String configFullName = configPackageAndName;
-            if (!StringUtils.isBlank(packagePrefix)) {
-                configFullName = packagePrefix + "." + configPackageAndName;
-            }
-            configDescendantsAndMe.computeIfAbsent(configFullName, k -> new HashSet<>());
+            String configNameWithPackage = jsonFile.getName().substring(0, jsonFile.getName().lastIndexOf("."));
+            String configFullName = StringUtils.isBlank(packagePrefix) ? configNameWithPackage : packagePrefix + "." + configNameWithPackage;
 
-            ConfigReader reader = getOrCreateReader(configPackageAndName);
+            configDescendants.computeIfAbsent(configFullName, k -> new HashSet<>());
+
+            ConfigReader reader = getReader(configNameWithPackage);
             Config prototype = reader.getPrototype();
             if (prototype != null) {
                 configs.add(prototype);
@@ -240,17 +238,16 @@ public class ConfigLoader {
                 if (!config1.getClass().isAssignableFrom(config2.getClass())) {
                     continue;
                 }
-                String config2Name = config2.getClass().getName();
+                String config2NameWithPackage = config2.getClass().getName();
                 if (!StringUtils.isBlank(packagePrefix)) {
-                    config2Name = config2.getClass().getName().substring(packagePrefix.length() + 1);
+                    config2NameWithPackage = config2.getClass().getName().substring(packagePrefix.length() + 1);
                 }
-                configDescendantsAndMe.get(config1.getClass().getName()).add(config2Name);
+                configDescendants.get(config1.getClass().getName()).add(config2NameWithPackage);
             }
         }
 
-        for (String configFullName : configDescendantsAndMe.keySet()) {
-            Set<String> descendantsAndMe = configDescendantsAndMe.get(configFullName);
-            load(configFullName, descendantsAndMe, true);
+        for (String configFullName : configDescendants.keySet()) {
+            load(configFullName, configDescendants.get(configFullName), true);
         }
 
         if (needValidate()) {
@@ -388,7 +385,7 @@ public class ConfigLoader {
         Map<JSONObject, String> jsonTables = new HashMap();
 
         for (String table : getConfigTables(configDefinition)) {
-            ConfigReader configReader = getOrCreateReader(table);
+            ConfigReader configReader = getReader(table);
             List<JSONObject> tableJsons = configReader.readJsons();
 
             for (JSONObject json : tableJsons) {
@@ -461,7 +458,7 @@ public class ConfigLoader {
 
     private void validateRef(ConfigDefinition configDefinition, Map<ConfigDefinition, Map<IndexDefinition, Map>> configIndexedJsonsAll) {
         for (String table : getConfigTables(configDefinition)) {
-            List<JSONObject> tableJsons = getOrCreateReader(table).readJsons();
+            List<JSONObject> tableJsons = getReader(table).readJsons();
             for (int i = 0; i < tableJsons.size(); i++) {
                 JSONObject json = tableJsons.get(i);
                 configDefinition.getFields();
@@ -560,7 +557,7 @@ public class ConfigLoader {
         String configName = configFullName.substring(configFullName.lastIndexOf(".") + 1);
         List<Config> configs = new ArrayList<>();
         for (String table : configTables) {
-            ConfigReader configReader = getOrCreateReader(table);
+            ConfigReader configReader = getReader(table);
             configs.addAll(configReader.readObjects());
         }
 
@@ -694,27 +691,23 @@ public class ConfigLoader {
         LinkedHashMap<String, ConfigReader> reloadReaders = new LinkedHashMap<>();
 
         for (File jsonFile : jsonFiles) {
-            String configPackageAndName = jsonFile.getName().substring(0, jsonFile.getName().lastIndexOf("."));
-            String configFullName = configPackageAndName;
-            if (!StringUtils.isBlank(packagePrefix)) {
-                configFullName = packagePrefix + "." + configPackageAndName;
-            }
-            String configName = configPackageAndName.substring(0, configPackageAndName.lastIndexOf("."));
+            String configNameWithPackage = jsonFile.getName().substring(0, jsonFile.getName().lastIndexOf("."));
+            String configFullName = StringUtils.isBlank(packagePrefix) ? configNameWithPackage : packagePrefix + "." + configNameWithPackage;
+            String configName = configNameWithPackage.substring(configNameWithPackage.lastIndexOf(".") + 1);
+
             if (!configNames.contains(configName)) {
                 continue;
             }
 
-            ConfigReader configReader = readers.get(configPackageAndName);
+            ConfigReader configReader = readers.get(configNameWithPackage);
             if (configReader == null) {
                 logger.error("重加载[{}]失败，对应配置从未被加载", configName);
                 continue;
             }
             configReader.clear();
-            reloadReaders.put(configPackageAndName, configReader);
+            reloadReaders.put(configName, configReader);
 
-            Set<String> descendantsAndMe = configDescendantsAndMe.get(configFullName);
-
-            load(configFullName, descendantsAndMe, true);
+            load(configFullName, configDescendants.get(configFullName), true);
         }
 
         for (String configName : configNames) {
@@ -765,14 +758,15 @@ public class ConfigLoader {
 
     private ConfigReader createReader(String table) {
         ConfigReader configReader = null;
+        File tableFile = new File(tablePath, table + "." + tableType);
         ConfigDefinition configDefinition = getConfigByTable(table);
         switch (tableType) {
             case "csv":
-                configReader = new CSVConfigReader(tablePath, table + "." + tableType, configDefinition);
+                configReader = new CSVConfigReader(tableFile, configDefinition);
                 break;
             case "xls":
             case "xlsx":
-                configReader = new ExcelConfigReader(tablePath, table + "." + tableType, configDefinition);
+                configReader = new ExcelConfigReader(tableFile, configDefinition);
                 break;
             case "json": {
                 String configFullName;
@@ -783,7 +777,7 @@ public class ConfigLoader {
                 } else {
                     configFullName = table;
                 }
-                configReader = new JsonConfigReader(tablePath, table + "." + tableType, configFullName);
+                configReader = new JsonConfigReader(tableFile, configFullName);
                 break;
             }
 
@@ -796,7 +790,7 @@ public class ConfigLoader {
         return configReader;
     }
 
-    private ConfigReader getOrCreateReader(String table) {
+    private ConfigReader getReader(String table) {
         ConfigReader configReader = readers.get(table);
         if (configReader == null) {
             configReader = createReader(table);

@@ -10,7 +10,7 @@ namespace ConfigCS
         {
         }
 
-        protected abstract Config Create(JObject json);
+        protected internal abstract Config Create(JObject json);
 
 
         protected static void Index<TKey, TValue>(IDictionary<TKey, TValue> configs, TValue config, TKey key)

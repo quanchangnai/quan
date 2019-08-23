@@ -24,13 +24,13 @@ namespace ConfigCS.Test.Quest
         public readonly string Name;
 
 
-        public QuestTargetConfig(JObject json): base(json)
+        public QuestTargetConfig(JObject json) : base(json)
         {
-            Id = json["id"]?.Value<int>()?? default;
-            Name = json["name"]?.Value<string>()?? "";
+            Id = json["id"]?.Value<int>() ?? default;
+            Name = json["name"]?.Value<string>() ?? "";
         }
 
-        protected override Config Create(JObject json) 
+        protected internal override Config Create(JObject json)
         {
             return new QuestTargetConfig(json);
         }

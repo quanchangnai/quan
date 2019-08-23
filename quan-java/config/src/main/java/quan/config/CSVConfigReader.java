@@ -6,6 +6,7 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import quan.generator.config.ConfigDefinition;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -16,8 +17,8 @@ import java.util.List;
  */
 public class CSVConfigReader extends ConfigReader {
 
-    public CSVConfigReader(String tablePath, String table, ConfigDefinition configDefinition) {
-        super(tablePath, table, configDefinition);
+    public CSVConfigReader(File tableFile, ConfigDefinition configDefinition) {
+        super(tableFile, configDefinition);
     }
 
     @Override

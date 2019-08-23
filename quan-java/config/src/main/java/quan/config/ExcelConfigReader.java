@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.poi.ss.usermodel.*;
 import quan.generator.config.ConfigDefinition;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +16,8 @@ public class ExcelConfigReader extends ConfigReader {
 
     private static final DataFormatter dataFormatter = new DataFormatter();
 
-    public ExcelConfigReader(String tablePath, String table, ConfigDefinition configDefinition) {
-        super(tablePath, table, configDefinition);
+    public ExcelConfigReader(File tableFile, ConfigDefinition configDefinition) {
+        super(tableFile, configDefinition);
     }
 
     @Override

@@ -3,7 +3,6 @@ package quan.config;
 import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import quan.common.util.PathUtils;
 import quan.generator.FieldDefinition;
 import quan.generator.config.ConfigDefinition;
 
@@ -40,15 +39,13 @@ public abstract class ConfigReader {
     protected ConfigReader() {
     }
 
-    public ConfigReader(String tablePath, String table, ConfigDefinition configDefinition) {
-        init(tablePath, table, configDefinition);
+    public ConfigReader(File tableFile, ConfigDefinition configDefinition) {
+        init(tableFile, configDefinition);
     }
 
-    protected void init(String tablePath, String tableFileName, ConfigDefinition configDefinition) {
-        tablePath = PathUtils.currentPlatPath(tablePath);
-        tableFileName = PathUtils.currentPlatPath(tableFileName);
-        this.tableFile = new File(tablePath, tableFileName);
-        this.table = tableFileName.substring(0, tableFileName.lastIndexOf("."));
+    protected void init(File tableFile, ConfigDefinition configDefinition) {
+        this.tableFile = tableFile;
+        this.table = tableFile.getName().substring(0, tableFile.getName().lastIndexOf("."));
         this.configDefinition = configDefinition;
         if (configDefinition != null) {
             converter = new ConfigConverter(configDefinition.getParser());
@@ -97,8 +94,7 @@ public abstract class ConfigReader {
         readJsons();
 
         for (JSONObject json : jsons) {
-            Config config = prototype.create(json);
-            configs.add(config);
+            configs.add(prototype.create(json));
         }
 
         return configs;

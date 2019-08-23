@@ -56,11 +56,11 @@ namespace ConfigCS.Test.Item
         public readonly string EffectiveTime_Str;
 
 
-        public ItemConfig(JObject json): base(json)
+        public ItemConfig(JObject json) : base(json)
         {
-            Id = json["id"]?.Value<int>()?? default;
-            Name = json["name"]?.Value<string>()?? "";
-            Type = (ItemType) (json["type"]?.Value<int>()?? default);
+            Id = json["id"]?.Value<int>() ?? default;
+            Name = json["name"]?.Value<string>() ?? "";
+            Type = (ItemType) (json["type"]?.Value<int>() ?? default);
             Reward = json.ContainsKey("reward") ? new Reward(json["reward"].Value<JObject>()) : null;
 
             var list1 = json["list"]?.Value<JArray>();
@@ -89,18 +89,18 @@ namespace ConfigCS.Test.Item
             var map2 = ImmutableDictionary<int, int>.Empty;
             if (map1 != null)
             {
-                foreach (var mapProp in map1.Properties())
+                foreach (var mapKeyValue in map1)
                 {
-                    map2.Add(int.Parse(mapProp.Name), mapProp.Value<int>());
+                    map2.Add(int.Parse(mapKeyValue.Key), mapKeyValue.Value.Value<int>());
                 }
             }
             Map = map2;
 
-            EffectiveTime = json["effectiveTime"]?.Value<DateTime>()?? default;
-            EffectiveTime_Str = json["effectiveTime$Str"]?.Value<string>()?? "";
+            EffectiveTime = ToDateTime(json["effectiveTime"]?.Value<long>() ?? default);
+            EffectiveTime_Str = json["effectiveTime$Str"]?.Value<string>() ?? "";
         }
 
-        protected override Config Create(JObject json) 
+        protected internal override Config Create(JObject json)
         {
             return new ItemConfig(json);
         }

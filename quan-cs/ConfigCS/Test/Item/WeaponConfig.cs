@@ -44,10 +44,10 @@ namespace ConfigCS.Test.Item
         public readonly IList<int> List2;
 
 
-        public WeaponConfig(JObject json): base(json)
+        public WeaponConfig(JObject json) : base(json)
         {
-            W1 = json["w1"]?.Value<int>()?? default;
-            W2 = json["w2"]?.Value<int>()?? default;
+            W1 = json["w1"]?.Value<int>() ?? default;
+            W2 = json["w2"]?.Value<int>() ?? default;
 
             var rewardList1 = json["rewardList"]?.Value<JArray>();
             var rewardList2 = ImmutableList<Reward>.Empty;
@@ -75,9 +75,9 @@ namespace ConfigCS.Test.Item
             var rewardMap2 = ImmutableDictionary<int, Reward>.Empty;
             if (rewardMap1 != null)
             {
-                foreach (var rewardMapProp in rewardMap1.Properties())
+                foreach (var rewardMapKeyValue in rewardMap1)
                 {
-                    rewardMap2.Add(int.Parse(rewardMapProp.Name), new Reward(rewardMapProp.Value<JObject>()));
+                    rewardMap2.Add(int.Parse(rewardMapKeyValue.Key), new Reward(rewardMapKeyValue.Value.Value<JObject>()));
                 }
             }
             RewardMap = rewardMap2;
@@ -94,7 +94,7 @@ namespace ConfigCS.Test.Item
             List2 = list22;
         }
 
-        protected override Config Create(JObject json) 
+        protected internal override Config Create(JObject json)
         {
             return new WeaponConfig(json);
         }

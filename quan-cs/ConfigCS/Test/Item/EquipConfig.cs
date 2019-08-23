@@ -24,13 +24,13 @@ namespace ConfigCS.Test.Item
         public readonly int Color;
 
 
-        public EquipConfig(JObject json): base(json)
+        public EquipConfig(JObject json) : base(json)
         {
-            Position = json["position"]?.Value<int>()?? default;
-            Color = json["color"]?.Value<int>()?? default;
+            Position = json["position"]?.Value<int>() ?? default;
+            Color = json["color"]?.Value<int>() ?? default;
         }
 
-        protected override Config Create(JObject json) 
+        protected internal override Config Create(JObject json)
         {
             return new EquipConfig(json);
         }
