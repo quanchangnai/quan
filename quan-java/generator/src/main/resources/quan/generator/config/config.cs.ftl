@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using Newtonsoft.Json.Linq;
-using ConfigCS;
+using Quan.Config;
 <#list imports as import>
 using ${import};
 </#list>
@@ -15,7 +15,7 @@ namespace ${fullPackageName}
 </#if>
 	/// 自动生成
 	/// </summary>
-    public class ${name} : <#if definitionType ==2>Bean<#elseif definitionType ==6 && (!parent?? || parent=="")>Config<#elseif definitionType ==6>${parent}</#if>
+    public class ${name} : <#if definitionType ==2>Bean<#elseif definitionType ==6 && (!parent?? || parent=="")>ConfigBase<#elseif definitionType ==6>${parent}</#if>
     {
 <#if !selfFields??>
     <#assign selfFields = fields>
@@ -104,7 +104,7 @@ namespace ${fullPackageName}
         }
 
  <#if definitionType ==6>
-        protected internal override Config Create(JObject json)
+        protected override ConfigBase Create(JObject json)
         {
             return new ${name}(json);
         }
@@ -299,11 +299,11 @@ namespace ${fullPackageName}
             {
     <#list indexes as index>
         <#if index.fields?size==1>
-                <#if parent??>Config.</#if>Index(${index.name}Configs, config, config.${index.fields[0].name?cap_first});
+                <#if parent??>ConfigBase.</#if>Index(${index.name}Configs, config, config.${index.fields[0].name?cap_first});
         <#elseif index.fields?size==2>
-                <#if parent??>Config.</#if>Index(${index.name}Configs, config, config.${index.fields[0].name?cap_first}, config.${index.fields[1].name?cap_first});
+                <#if parent??>ConfigBase.</#if>Index(${index.name}Configs, config, config.${index.fields[0].name?cap_first}, config.${index.fields[1].name?cap_first});
         <#elseif index.fields?size==3>
-                <#if parent??>Config.</#if>Index(${index.name}Configs, config, config.${index.fields[0].name?cap_first}, config.${index.fields[1].name?cap_first}, config.${index.fields[2].name?cap_first});
+                <#if parent??>ConfigBase.</#if>Index(${index.name}Configs, config, config.${index.fields[0].name?cap_first}, config.${index.fields[1].name?cap_first}, config.${index.fields[2].name?cap_first});
         </#if>
     </#list>
             }

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using MessageCS;
-using Buffer = MessageCS.Buffer;
+using Quan.Message;
+using Buffer = Quan.Message.Buffer;
 <#list imports as import>
 using ${import};
 </#list>
@@ -14,7 +14,7 @@ namespace ${fullPackageName}
 </#if>
 	/// 自动生成
 	/// </summary>
-    public class ${name} : <#if definitionType ==2>Bean<#elseif definitionType ==3>Message</#if>
+    public class ${name} : <#if definitionType ==2>Bean<#elseif definitionType ==3>MessageBase</#if>
     {
 <#if definitionType ==3>
 		/// <summary>
@@ -106,7 +106,7 @@ namespace ${fullPackageName}
 		{
 		}
 
-		public override Message Create()
+		public override MessageBase Create()
 		{
 			return new ${name}();
 		}

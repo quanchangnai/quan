@@ -22,9 +22,7 @@ public class ConfigTest {
 
         loadConfig(configLoader);
 
-        if (configLoader instanceof WithDefinitionConfigLoader) {
-            writeJson((WithDefinitionConfigLoader) configLoader, true);
-        }
+        writeJson(configLoader);
 
         reloadAllConfig(configLoader);
 
@@ -32,9 +30,7 @@ public class ConfigTest {
 
         reloadByTableName(configLoader);
 
-        if (configLoader instanceof WithDefinitionConfigLoader) {
-            reloadByOriginalName((WithDefinitionConfigLoader) configLoader);
-        }
+        reloadByOriginalName(configLoader);
 
     }
 
@@ -54,6 +50,7 @@ public class ConfigTest {
 
         return configLoader;
     }
+
     private static ConfigLoader newWithoutDefinitionConfigLoader() {
         String tablePath = "config\\json";
         WithoutDefinitionConfigLoader configLoader = new WithoutDefinitionConfigLoader(tablePath);
@@ -75,13 +72,19 @@ public class ConfigTest {
         System.err.println();
     }
 
-    private static void writeJson(WithDefinitionConfigLoader configLoader, boolean useNameWithPackage) {
+    private static void writeJson(ConfigLoader configLoader) {
         if (configLoader.getTableType().equals("json")) {
             return;
         }
+        if (!(configLoader instanceof WithDefinitionConfigLoader)) {
+            return;
+        }
+
+        WithDefinitionConfigLoader configLoader1 = (WithDefinitionConfigLoader) configLoader;
+
         System.err.println("writeJson()=============");
         long startTime = System.currentTimeMillis();
-        configLoader.writeJson("config\\json", useNameWithPackage);
+        configLoader1.writeJson("config\\json", true);
         System.err.println("writeJson()耗时:" + (System.currentTimeMillis() - startTime));
         System.err.println();
     }
@@ -130,13 +133,18 @@ public class ConfigTest {
         System.err.println();
     }
 
-    private static void reloadByOriginalName(WithDefinitionConfigLoader configLoader) throws Exception {
+    private static void reloadByOriginalName(ConfigLoader configLoader) throws Exception {
+        if (!(configLoader instanceof WithDefinitionConfigLoader)) {
+            return;
+        }
+
+        WithDefinitionConfigLoader configLoader1 = (WithDefinitionConfigLoader) configLoader;
         Thread.sleep(5000);
         List<String> reloadConfigs = Arrays.asList("道具", "武器");
         System.err.println("reloadByOriginalName()=============" + reloadConfigs);
         long startTime = System.currentTimeMillis();
         try {
-            configLoader.reloadByOriginalName(reloadConfigs);
+            configLoader1.reloadByOriginalName(reloadConfigs);
         } catch (ValidatedException e) {
             printErrors(e);
         }

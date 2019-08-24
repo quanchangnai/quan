@@ -69,7 +69,7 @@ public class CSharpMessageGenerator extends MessageGenerator {
 
         String definitionPath = "generator\\definition\\message";
         String codePath = "..\\quan-cs";
-        String packagePrefix = "MessageCS.Test";
+        String packagePrefix = "Test.Message";
 
         CSharpMessageGenerator messageGenerator = new CSharpMessageGenerator(codePath);
         messageGenerator.useXmlDefinitionParser(definitionPath, packagePrefix);
