@@ -20,7 +20,7 @@ public class WithoutDefinitionConfigLoader extends ConfigLoader {
     private final Map<String, Set<String>> configDescendants = new HashMap<>();
 
     {
-        tableType = "json";
+        tableType = TableType.json;
     }
 
     public WithoutDefinitionConfigLoader(String tablePath) {
@@ -58,7 +58,7 @@ public class WithoutDefinitionConfigLoader extends ConfigLoader {
      * 初始化配置类对应的后代子孙类，包含自己
      */
     private void initConfigDescendants() {
-        Set<File> tableFiles = PathUtils.listFiles(new File(tablePath), tableType);
+        Set<File> tableFiles = PathUtils.listFiles(new File(tablePath), tableType.name());
         List<Config> configs = new ArrayList<>();
 
         for (File tableFile : tableFiles) {
@@ -91,7 +91,7 @@ public class WithoutDefinitionConfigLoader extends ConfigLoader {
 
     @Override
     protected void reloadByConfigName0(Collection<String> configNames) {
-        Set<File> tableFiles = PathUtils.listFiles(new File(tablePath), tableType);
+        Set<File> tableFiles = PathUtils.listFiles(new File(tablePath), tableType.name());
         LinkedHashMap<String, ConfigReader> reloadReaders = new LinkedHashMap<>();
 
         for (File tableFile : tableFiles) {

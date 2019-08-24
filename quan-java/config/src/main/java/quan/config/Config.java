@@ -34,21 +34,22 @@ public abstract class Config extends Bean {
             return;
         }
 
-        String repeatedConfigs = config.getClass().getSimpleName();
+        String duplicatedConfig = config.getClass().getSimpleName();
         if (old.getClass() != config.getClass()) {
-            repeatedConfigs += "," + old.getClass().getSimpleName();
+            duplicatedConfig += "," + old.getClass().getSimpleName();
         }
-        List<Object> errorParams = new ArrayList<>();
-        errorParams.add(repeatedConfigs);
 
-        errorParams.add(String.join(",", keyNames));
         List<String> keysList = new ArrayList<>();
-        for (int i = 0; i < keys.length; i++) {
-            keysList.add(keys[i].toString());
+        for (Object key : keys) {
+            keysList.add(key.toString());
         }
-        errorParams.add(String.join(",", keysList));
 
-        errors.add(String.format("配置[%s]有重复数据[%s = %s]", errorParams.toArray()));
+        List<Object> params = new ArrayList<>();
+        params.add(duplicatedConfig);
+        params.add(String.join(",", keyNames));
+        params.add(String.join(",", keysList));
+
+        errors.add(String.format("配置[%s]有重复数据[%s = %s]", params.toArray()));
     }
 
     protected static Map unmodifiableMap(Map map) {

@@ -16,9 +16,12 @@ public class ConfigTest {
 
     public static void main(String[] args) throws Exception {
 
-
-        ConfigLoader configLoader = newWithDefinitionConfigLoader();
-//        ConfigLoader configLoader = newWithoutDefinitionConfigLoader();
+        ConfigLoader configLoader;
+        if (true) {
+            configLoader = newWithDefinitionConfigLoader();
+        } else {
+            configLoader = newWithoutDefinitionConfigLoader();
+        }
 
         loadConfig(configLoader);
 
@@ -38,9 +41,9 @@ public class ConfigTest {
         List<String> definitionPaths = new ArrayList<>();
         definitionPaths.add("generator\\definition\\config");
 
-//        String tableType = "csv";
+//        TableType tableType = TableType.csv;
 //        String tablePath = "config\\csv";
-        String tableType = "xlsx";
+        TableType tableType = TableType.xlsx;
         String tablePath = "config\\excel";
 
         WithDefinitionConfigLoader configLoader = new WithDefinitionConfigLoader(tablePath);
@@ -73,7 +76,7 @@ public class ConfigTest {
     }
 
     private static void writeJson(ConfigLoader configLoader) {
-        if (configLoader.getTableType().equals("json")) {
+        if (configLoader.getTableType() == TableType.json) {
             return;
         }
         if (!(configLoader instanceof WithDefinitionConfigLoader)) {

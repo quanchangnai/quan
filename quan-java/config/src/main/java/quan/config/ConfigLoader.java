@@ -21,8 +21,8 @@ public abstract class ConfigLoader {
     //配置表所在目录
     protected String tablePath;
 
-    //配置表类型,csv xls xlsx等
-    protected String tableType;
+    //配置表类型
+    protected TableType tableType;
 
     //加载类型，加载或者校验
     protected LoadType loadType = LoadType.validateAndLoad;
@@ -47,12 +47,12 @@ public abstract class ConfigLoader {
         return this;
     }
 
-    public void setTableType(String tableType) {
+    public void setTableType(TableType tableType) {
         Objects.requireNonNull(tableType, "配置表类型不能为空");
         this.tableType = tableType;
     }
 
-    public String getTableType() {
+    public TableType getTableType() {
         return tableType;
     }
 
@@ -122,7 +122,7 @@ public abstract class ConfigLoader {
     /**
      * 加载配置到类索引
      */
-    protected void load(String configFullName, Set<String> configTables, boolean validate) {
+    protected void load(String configFullName, Collection<String> configTables, boolean validate) {
         if (!needLoad()) {
             return;
         }

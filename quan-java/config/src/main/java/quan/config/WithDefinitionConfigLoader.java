@@ -27,17 +27,11 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
     private int bodyRowNum;
 
     {
-        tableType = "csv";
+        tableType = TableType.csv;
     }
 
     public WithDefinitionConfigLoader(String tablePath) {
         super(tablePath);
-    }
-
-    public void setTableType(String tableType) {
-        Objects.requireNonNull(tableType, "表格类型不能为空");
-        this.tableType = tableType;
-        readers.clear();
     }
 
     /**
@@ -172,13 +166,10 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
     /**
      * 通过表名查找配置定义
      *
-     * @param table Json的表名实际上就是配置名
+     * @param table Json的表名实际上就是配置类名
      */
     private ConfigDefinition getConfigByTable(String table) {
-        if (definitionParser == null) {
-            return null;
-        }
-        if (tableType.equals("json")) {
+        if (tableType == TableType.json) {
             return definitionParser.getConfig(table);
         } else {
             return definitionParser.getTableConfigs().get(table);
@@ -188,11 +179,12 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
     /**
      * 配置的所有分表和子表
      */
-    private Set<String> getConfigTables(ConfigDefinition configDefinition) {
-        if (tableType.equals("json")) {
+    private Collection<String> getConfigTables(ConfigDefinition configDefinition) {
+        if (tableType == TableType.json) {
+            //Json的表名实际上就是配置类名
             return configDefinition.getDescendantsAndMe();
         } else {
-            return new HashSet<>(configDefinition.getAllTables());
+            return configDefinition.getAllTables();
         }
     }
 
@@ -279,7 +271,6 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
             List<JSONObject> tableJsons = getReader(table).readJsons();
             for (int i = 0; i < tableJsons.size(); i++) {
                 JSONObject json = tableJsons.get(i);
-                configDefinition.getFields();
                 for (String fieldName : json.keySet()) {
                     FieldDefinition field = configDefinition.getField(fieldName);
                     if (field == null) {
@@ -365,6 +356,11 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
         }
     }
 
+    @Override
+    protected void checkReload() {
+        super.checkReload();
+        Objects.requireNonNull(definitionParser, "配置定义解析器不能为空");
+    }
 
     /**
      * 通过配置类名重加载，部分加载不校验依赖
@@ -448,25 +444,22 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
     protected ConfigReader createReader(String table) {
         ConfigReader configReader = null;
         File tableFile = new File(tablePath, table + "." + tableType);
-        ConfigDefinition configDefinition = Objects.requireNonNull(getConfigByTable(table));
+        ConfigDefinition configDefinition = getConfigByTable(table);
         switch (tableType) {
-            case "csv":
+            case csv:
                 configReader = new CSVConfigReader(tableFile, configDefinition);
                 break;
-            case "xls":
-            case "xlsx":
+            case xls:
+            case xlsx:
                 configReader = new ExcelConfigReader(tableFile, configDefinition);
                 break;
-            case "json": {
+            case json: {
                 configReader = new JsonConfigReader(tableFile, configDefinition.getFullName());
                 break;
             }
-
         }
 
-        if (configReader != null && bodyRowNum > 0) {
-            configReader.setBodyRowNum(bodyRowNum);
-        }
+        configReader.setBodyRowNum(bodyRowNum);
 
         return configReader;
     }
