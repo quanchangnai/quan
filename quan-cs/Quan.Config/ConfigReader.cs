@@ -21,7 +21,7 @@ namespace Quan.Config
         /// <summary>
         /// 配置类所在的程序集，用于通过类名反射加载类
         /// </summary>
-        private HashSet<string> _configAssemblies;
+        private readonly HashSet<string> _configAssemblies;
 
         public ConfigBase Prototype { get; private set; }
 
