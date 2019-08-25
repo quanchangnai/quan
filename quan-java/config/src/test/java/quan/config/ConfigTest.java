@@ -18,9 +18,9 @@ public class ConfigTest {
 
         ConfigLoader configLoader;
         if (true) {
-            configLoader = newWithDefinitionConfigLoader();
+            configLoader = withDefinitionConfigLoader();
         } else {
-            configLoader = newWithoutDefinitionConfigLoader();
+            configLoader = withoutDefinitionConfigLoader();
         }
 
         loadConfig(configLoader);
@@ -37,7 +37,7 @@ public class ConfigTest {
 
     }
 
-    private static ConfigLoader newWithDefinitionConfigLoader() {
+    private static ConfigLoader withDefinitionConfigLoader() {
         List<String> definitionPaths = new ArrayList<>();
         definitionPaths.add("generator\\definition\\config");
 
@@ -54,7 +54,7 @@ public class ConfigTest {
         return configLoader;
     }
 
-    private static ConfigLoader newWithoutDefinitionConfigLoader() {
+    private static ConfigLoader withoutDefinitionConfigLoader() {
         String tablePath = "config\\json";
         WithoutDefinitionConfigLoader configLoader = new WithoutDefinitionConfigLoader(tablePath);
         configLoader.setValidatorsPackage("quan");
@@ -122,12 +122,18 @@ public class ConfigTest {
     }
 
     private static void reloadByTableName(ConfigLoader configLoader) throws Exception {
+        if (!(configLoader instanceof WithDefinitionConfigLoader)) {
+            return;
+        }
+
+        WithDefinitionConfigLoader configLoader1 = (WithDefinitionConfigLoader) configLoader;
+
         Thread.sleep(5000);
         List<String> reloadConfigs = Arrays.asList("道具", "装备1");
         System.err.println("reloadByTableName()=============" + reloadConfigs);
         long startTime = System.currentTimeMillis();
         try {
-            configLoader.reloadByTableName(reloadConfigs);
+            configLoader1.reloadByTableName(reloadConfigs);
         } catch (ValidatedException e) {
             printErrors(e);
         }

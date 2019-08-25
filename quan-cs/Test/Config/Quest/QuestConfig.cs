@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using Newtonsoft.Json.Linq;
+using Quan.Common;
 using Quan.Config;
 using Test.Config.Item;
 
@@ -129,7 +130,7 @@ namespace Test.Config.Quest
             {
                 foreach (var s1Value in s11)
                 {
-                    s12.Add(s1Value.Value<int>());
+                    s12 =s12.Add(s1Value.Value<int>());
                 }
             }
             S1 = s12;
@@ -140,7 +141,7 @@ namespace Test.Config.Quest
             {
                 foreach (var l1Value in l11)
                 {
-                    l12.Add(l1Value.Value<int>());
+                    l12 =l12.Add(l1Value.Value<int>());
                 }
             }
             L1 = l12;
@@ -151,7 +152,7 @@ namespace Test.Config.Quest
             {
                 foreach (var m1KeyValue in m11)
                 {
-                    m12.Add(int.Parse(m1KeyValue.Key), m1KeyValue.Value.Value<int>());
+                    m12 = m12.Add(int.Parse(m1KeyValue.Key), m1KeyValue.Value.Value<int>());
                 }
             }
             M1 = m12;
@@ -166,24 +167,24 @@ namespace Test.Config.Quest
         public override string ToString()
         {
             return "QuestConfig{" +
-                   "Id=" + Id +
+                   "Id=" + Id.ToString2() +
                    ",Name='" + Name + '\'' +
-                   ",Type=" + Type +
-                   ",Target=" + Target +
-                   ",Reward=" + Reward +
-                   ",A1=" + A1 +
-                   ",A2=" + A2 +
-                   ",B1=" + B1 +
-                   ",B2=" + B2 +
+                   ",Type=" + Type.ToString2() +
+                   ",Target=" + Target.ToString2() +
+                   ",Reward=" + Reward.ToString2() +
+                   ",A1=" + A1.ToString2() +
+                   ",A2=" + A2.ToString2() +
+                   ",B1=" + B1.ToString2() +
+                   ",B2=" + B2.ToString2() +
                    ",C1='" + C1 + '\'' +
-                   ",C2=" + C2 +
-                   ",C3=" + C3 +
+                   ",C2=" + C2.ToString2() +
+                   ",C3=" + C3.ToString2() +
                    ",D1='" + D1 + '\'' +
-                   ",D2=" + D2 +
-                   ",D3=" + D3 +
-                   ",S1=" + S1 +
-                   ",L1=" + L1 +
-                   ",M1=" + M1 +
+                   ",D2=" + D2.ToString2() +
+                   ",D3=" + D3.ToString2() +
+                   ",S1=" + S1.ToString2() +
+                   ",L1=" + L1.ToString2() +
+                   ",M1=" + M1.ToString2() +
                    '}';
         }
 

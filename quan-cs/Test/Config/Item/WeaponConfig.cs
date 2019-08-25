@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using Newtonsoft.Json.Linq;
+using Quan.Common;
 using Quan.Config;
 
 namespace Test.Config.Item
@@ -55,7 +56,7 @@ namespace Test.Config.Item
             {
                 foreach (var rewardListValue in rewardList1)
                 {
-                    rewardList2.Add(new Reward(rewardListValue.Value<JObject>()));
+                    rewardList2 =rewardList2.Add(new Reward(rewardListValue.Value<JObject>()));
                 }
             }
             RewardList = rewardList2;
@@ -66,7 +67,7 @@ namespace Test.Config.Item
             {
                 foreach (var rewardSetValue in rewardSet1)
                 {
-                    rewardSet2.Add(new Reward(rewardSetValue.Value<JObject>()));
+                    rewardSet2 =rewardSet2.Add(new Reward(rewardSetValue.Value<JObject>()));
                 }
             }
             RewardSet = rewardSet2;
@@ -77,7 +78,7 @@ namespace Test.Config.Item
             {
                 foreach (var rewardMapKeyValue in rewardMap1)
                 {
-                    rewardMap2.Add(int.Parse(rewardMapKeyValue.Key), new Reward(rewardMapKeyValue.Value.Value<JObject>()));
+                    rewardMap2 = rewardMap2.Add(int.Parse(rewardMapKeyValue.Key), new Reward(rewardMapKeyValue.Value.Value<JObject>()));
                 }
             }
             RewardMap = rewardMap2;
@@ -88,7 +89,7 @@ namespace Test.Config.Item
             {
                 foreach (var list2Value in list21)
                 {
-                    list22.Add(list2Value.Value<int>());
+                    list22 =list22.Add(list2Value.Value<int>());
                 }
             }
             List2 = list22;
@@ -103,22 +104,22 @@ namespace Test.Config.Item
         public override string ToString()
         {
             return "WeaponConfig{" +
-                   "Id=" + Id +
+                   "Id=" + Id.ToString2() +
                    ",Name='" + Name + '\'' +
-                   ",Type=" + Type +
-                   ",Reward=" + Reward +
-                   ",List=" + List +
-                   ",Set=" + Set +
-                   ",Map=" + Map +
-                   ",EffectiveTime='" + EffectiveTime_Str + '\'' +
-                   ",Position=" + Position +
-                   ",Color=" + Color +
-                   ",W1=" + W1 +
-                   ",W2=" + W2 +
-                   ",RewardList=" + RewardList +
-                   ",RewardSet=" + RewardSet +
-                   ",RewardMap=" + RewardMap +
-                   ",List2=" + List2 +
+                   ",Type=" + Type.ToString2() +
+                   ",Reward=" + Reward.ToString2() +
+                   ",List=" + List.ToString2() +
+                   ",Set=" + Set.ToString2() +
+                   ",Map=" + Map.ToString2() +
+                   ",EffectiveTime=" + EffectiveTime.ToString2() +
+                   ",Position=" + Position.ToString2() +
+                   ",Color=" + Color.ToString2() +
+                   ",W1=" + W1.ToString2() +
+                   ",W2=" + W2.ToString2() +
+                   ",RewardList=" + RewardList.ToString2() +
+                   ",RewardSet=" + RewardSet.ToString2() +
+                   ",RewardMap=" + RewardMap.ToString2() +
+                   ",List2=" + List2.ToString2() +
                    '}';
         }
 

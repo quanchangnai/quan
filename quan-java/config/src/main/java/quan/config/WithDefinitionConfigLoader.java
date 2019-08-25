@@ -368,26 +368,29 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
      * @param configNames 配置类名
      */
     @Override
-    protected void reloadByConfigName0(Collection<String> configNames) {
-        Set<String> needReloadTables = new LinkedHashSet<>();
+    public void reloadByConfigName(Collection<String> configNames) {
+        checkReload();
+        validatedErrors.clear();
+
+        Set<String> tableNames = new LinkedHashSet<>();
         for (String configName : configNames) {
             ConfigDefinition configDefinition = definitionParser.getConfig(configName);
             if (configDefinition == null) {
                 logger.error("重加载[{}]失败，不存在该配置", configName);
                 continue;
             }
-            needReloadTables.addAll(getConfigTables(configDefinition));
+            tableNames.addAll(getConfigTables(configDefinition));
         }
-        reloadByTableName(needReloadTables);
+        reloadByTableName(tableNames);
     }
 
     /**
-     * 通过表名重加载
-     *
-     * @param tableNames 表格转成JSON格式后使用的表名实际上是[配置类名.json]
+     * 通过表名重加载,表格转成JSON格式后使用的表名实际上是配置类名
      */
-    @Override
-    protected void reloadByTableName0(Collection<String> tableNames) {
+    public void reloadByTableName(Collection<String> tableNames) {
+        checkReload();
+        validatedErrors.clear();
+
         Set<ConfigDefinition> needReloadConfigs = new LinkedHashSet<>();
         Set<ConfigReader> reloadReaders = new LinkedHashSet<>();
 
@@ -417,12 +420,14 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
                 this.validatedErrors.addAll(errors);
             }
         }
+
+        if (!validatedErrors.isEmpty()) {
+            throw new ValidatedException(validatedErrors);
+        }
     }
 
     /**
-     * 通过表格原名重加载，在有配置定义的时候才能支持
-     *
-     * @param originalNames 表格原名，表格转成JSON格式后使用的表名实际上是配置类名
+     * 通过表格原名重加载
      */
     public void reloadByOriginalName(Collection<String> originalNames) {
         checkReload();

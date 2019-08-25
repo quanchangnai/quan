@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using Newtonsoft.Json.Linq;
+using Quan.Common;
 using Quan.Config;
 <#list imports as import>
 using ${import};
@@ -57,9 +58,9 @@ namespace ${fullPackageName}
                 foreach (var ${field.name}Value in ${field.name}1)
                 {
                 <#if field.beanValueType>
-                    ${field.name}2.Add(new ${field.classValueType}(${field.name}Value.Value<JObject>()));
+                    ${field.name}2 =${field.name}2.Add(new ${field.classValueType}(${field.name}Value.Value<JObject>()));
                 <#else>
-                    ${field.name}2.Add(${field.name}Value.Value<${field.valueType}>());
+                    ${field.name}2 =${field.name}2.Add(${field.name}Value.Value<${field.valueType}>());
                 </#if>
                 }
             }
@@ -78,9 +79,9 @@ namespace ${fullPackageName}
                 foreach (var ${field.name}KeyValue in ${field.name}1)
                 {
                 <#if field.beanValueType>
-                    ${field.name}2.Add(${field.classKeyType}.Parse(${field.name}KeyValue.Key), new ${field.classValueType}(${field.name}KeyValue.Value.Value<JObject>()));
+                    ${field.name}2 = ${field.name}2.Add(${field.classKeyType}.Parse(${field.name}KeyValue.Key), new ${field.classValueType}(${field.name}KeyValue.Value.Value<JObject>()));
                 <#else>
-                    ${field.name}2.Add(${field.classKeyType}.Parse(${field.name}KeyValue.Key), ${field.name}KeyValue.Value.Value<${field.classValueType}>());
+                    ${field.name}2 = ${field.name}2.Add(${field.classKeyType}.Parse(${field.name}KeyValue.Key), ${field.name}KeyValue.Value.Value<${field.classValueType}>());
                 </#if>
                 }
             }
@@ -121,10 +122,8 @@ namespace ${fullPackageName}
                 </#if>
                 <#if field.type == "string">
                    <#lt>${field.name?cap_first}='" + ${field.name?cap_first} + '\'' +
-                <#elseif field.timeType>
-                   <#lt>${field.name?cap_first}='" + ${field.name?cap_first}_Str + '\'' +
                 <#else>
-                   <#lt>${field.name?cap_first}=" + ${field.name?cap_first} +
+                   <#lt>${field.name?cap_first}=" + ${field.name?cap_first}.ToString2() +
                 </#if>
             </#list>
                    '}';

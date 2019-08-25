@@ -90,7 +90,10 @@ public class WithoutDefinitionConfigLoader extends ConfigLoader {
     }
 
     @Override
-    protected void reloadByConfigName0(Collection<String> configNames) {
+    public void reloadByConfigName(Collection<String> configNames) {
+        checkReload();
+        validatedErrors.clear();
+
         Set<File> tableFiles = PathUtils.listFiles(new File(tablePath), tableType.name());
         LinkedHashMap<String, ConfigReader> reloadReaders = new LinkedHashMap<>();
 
@@ -126,14 +129,6 @@ public class WithoutDefinitionConfigLoader extends ConfigLoader {
                 this.validatedErrors.addAll(errors);
             }
         }
-    }
-
-    /**
-     * 通过表名重加载
-     */
-    @Override
-    protected void reloadByTableName0(Collection<String> tableNames) {
-        reloadByConfigName0(tableNames);
     }
 
     @Override

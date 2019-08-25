@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Quan.Common;
 using Quan.Message;
 using Buffer = Quan.Message.Buffer;
 using Test.Message.User;
@@ -143,13 +144,13 @@ namespace Test.Message.Role
 		public override string ToString()
 		{
 			return "CRoleLogin{" +
-					"roleId=" + RoleId +
+					"roleId=" + RoleId.ToString2() +
 					",roleName='" + RoleName + '\'' +
-					",roleInfo=" + RoleInfo +
-					",roleInfoList=" + ToString(RoleInfoList) +
-					",roleInfoSet=" + ToString(RoleInfoSet) +
-					",roleInfoMap=" + ToString(RoleInfoMap) +
-					",userInfo=" + UserInfo +
+					",roleInfo=" + RoleInfo.ToString2() +
+					",roleInfoList=" + RoleInfoList.ToString2() +
+					",roleInfoSet=" + RoleInfoSet.ToString2() +
+					",roleInfoMap=" + RoleInfoMap.ToString2() +
+					",userInfo=" + UserInfo.ToString2() +
 					'}';
 		}
     }

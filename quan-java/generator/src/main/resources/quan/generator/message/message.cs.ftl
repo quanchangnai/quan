@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Quan.Common;
 using Quan.Message;
 using Buffer = Quan.Message.Buffer;
 <#list imports as import>
@@ -241,11 +242,11 @@ namespace ${fullPackageName}
 				<#if field.type == "string">
 					<#lt>${field.name}='" + ${field.name?cap_first} + '\'' +
 				<#elseif field.type == "bytes">
-					<#lt>${field.name}=" + Convert.ToBase64String(${field.name?cap_first}) +
+					<#lt>${field.name}=" + ${field.name?cap_first}.ToString2() +
 				<#elseif field.collectionType>
-					<#lt>${field.name}=" + ToString(${field.name?cap_first}) +
+					<#lt>${field.name}=" + ${field.name?cap_first}.ToString2() +
 				<#else>
-					<#lt>${field.name}=" + ${field.name?cap_first} +
+					<#lt>${field.name}=" + ${field.name?cap_first}.ToString2() +
 				</#if>
 			</#list>
 					'}';

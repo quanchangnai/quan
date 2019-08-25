@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using Newtonsoft.Json.Linq;
+using Quan.Common;
 using Quan.Config;
 
 namespace Test.Config.Item
@@ -69,7 +70,7 @@ namespace Test.Config.Item
             {
                 foreach (var listValue in list1)
                 {
-                    list2.Add(listValue.Value<int>());
+                    list2 =list2.Add(listValue.Value<int>());
                 }
             }
             List = list2;
@@ -80,7 +81,7 @@ namespace Test.Config.Item
             {
                 foreach (var setValue in set1)
                 {
-                    set2.Add(setValue.Value<int>());
+                    set2 =set2.Add(setValue.Value<int>());
                 }
             }
             Set = set2;
@@ -91,7 +92,7 @@ namespace Test.Config.Item
             {
                 foreach (var mapKeyValue in map1)
                 {
-                    map2.Add(int.Parse(mapKeyValue.Key), mapKeyValue.Value.Value<int>());
+                    map2 = map2.Add(int.Parse(mapKeyValue.Key), mapKeyValue.Value.Value<int>());
                 }
             }
             Map = map2;
@@ -109,14 +110,14 @@ namespace Test.Config.Item
         public override string ToString()
         {
             return "ItemConfig{" +
-                   "Id=" + Id +
+                   "Id=" + Id.ToString2() +
                    ",Name='" + Name + '\'' +
-                   ",Type=" + Type +
-                   ",Reward=" + Reward +
-                   ",List=" + List +
-                   ",Set=" + Set +
-                   ",Map=" + Map +
-                   ",EffectiveTime='" + EffectiveTime_Str + '\'' +
+                   ",Type=" + Type.ToString2() +
+                   ",Reward=" + Reward.ToString2() +
+                   ",List=" + List.ToString2() +
+                   ",Set=" + Set.ToString2() +
+                   ",Map=" + Map.ToString2() +
+                   ",EffectiveTime=" + EffectiveTime.ToString2() +
                    '}';
         }
 

@@ -180,37 +180,7 @@ public abstract class ConfigLoader {
     /**
      * 通过配置类名重加载
      */
-    public void reloadByConfigName(Collection<String> configNames) {
-        checkReload();
-        validatedErrors.clear();
-
-        reloadByConfigName0(configNames);
-    }
-
-    /**
-     * 通过配置类名重加载
-     */
-    protected abstract void reloadByConfigName0(Collection<String> configNames);
-
-
-    /**
-     * 通过表名重加载
-     */
-    public void reloadByTableName(Collection<String> tableNames) {
-        checkReload();
-        validatedErrors.clear();
-
-        reloadByTableName0(tableNames);
-
-        if (!validatedErrors.isEmpty()) {
-            throw new ValidatedException(validatedErrors);
-        }
-    }
-
-    /**
-     * 通过表名重加载
-     */
-    protected abstract void reloadByTableName0(Collection<String> tableNames);
+    public abstract void reloadByConfigName(Collection<String> configNames);
 
     protected ConfigReader getReader(String table) {
         ConfigReader configReader = readers.get(table);

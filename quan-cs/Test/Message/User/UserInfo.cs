@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Quan.Common;
 using Quan.Message;
 using Buffer = Quan.Message.Buffer;
 
@@ -54,9 +55,9 @@ namespace Test.Message.User
 		public override string ToString()
 		{
 			return "UserInfo{" +
-					"id=" + Id +
+					"id=" + Id.ToString2() +
 					",name='" + Name + '\'' +
-					",level=" + Level +
+					",level=" + Level.ToString2() +
 					'}';
 		}
     }

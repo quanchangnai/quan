@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quan.Config", "Quan.Config\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{CBE301C5-52F6-4BAF-8B3B-43839AB4D827}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quan.Common", "Quan.Common\Quan.Common.csproj", "{F6473BDA-D605-4D68-B946-DD49D4794F0C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{CBE301C5-52F6-4BAF-8B3B-43839AB4D827}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CBE301C5-52F6-4BAF-8B3B-43839AB4D827}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CBE301C5-52F6-4BAF-8B3B-43839AB4D827}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6473BDA-D605-4D68-B946-DD49D4794F0C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6473BDA-D605-4D68-B946-DD49D4794F0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6473BDA-D605-4D68-B946-DD49D4794F0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6473BDA-D605-4D68-B946-DD49D4794F0C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

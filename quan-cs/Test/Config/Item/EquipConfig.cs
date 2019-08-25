@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using Newtonsoft.Json.Linq;
+using Quan.Common;
 using Quan.Config;
 
 namespace Test.Config.Item
@@ -39,16 +40,16 @@ namespace Test.Config.Item
         public override string ToString()
         {
             return "EquipConfig{" +
-                   "Id=" + Id +
+                   "Id=" + Id.ToString2() +
                    ",Name='" + Name + '\'' +
-                   ",Type=" + Type +
-                   ",Reward=" + Reward +
-                   ",List=" + List +
-                   ",Set=" + Set +
-                   ",Map=" + Map +
-                   ",EffectiveTime='" + EffectiveTime_Str + '\'' +
-                   ",Position=" + Position +
-                   ",Color=" + Color +
+                   ",Type=" + Type.ToString2() +
+                   ",Reward=" + Reward.ToString2() +
+                   ",List=" + List.ToString2() +
+                   ",Set=" + Set.ToString2() +
+                   ",Map=" + Map.ToString2() +
+                   ",EffectiveTime=" + EffectiveTime.ToString2() +
+                   ",Position=" + Position.ToString2() +
+                   ",Color=" + Color.ToString2() +
                    '}';
         }
 

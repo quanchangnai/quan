@@ -66,6 +66,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Quan.Common\Quan.Common.csproj">
+      <Project>{f6473bda-d605-4d68-b946-dd49d4794f0c}</Project>
+      <Name>Quan.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Quan.Config\Quan.Config.csproj">
       <Project>{f18047da-c9d2-468f-be2f-82913446757d}</Project>
       <Name>Quan.Config</Name>

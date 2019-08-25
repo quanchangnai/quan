@@ -51,11 +51,16 @@
     <Compile Include="ConfigBase.cs" />
     <Compile Include="ConfigLoader.cs" />
     <Compile Include="ConfigReader.cs" />
-    <Compile Include="PathUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Quan.Common\Quan.Common.csproj">
+      <Project>{f6473bda-d605-4d68-b946-dd49d4794f0c}</Project>
+      <Name>Quan.Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

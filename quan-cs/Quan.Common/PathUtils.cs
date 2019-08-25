@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace Quan.Config
+namespace Quan.Common
 {
     public static class PathUtils
     {

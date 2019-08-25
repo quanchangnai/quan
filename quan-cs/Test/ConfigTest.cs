@@ -8,22 +8,21 @@ namespace Test
 {
     public class ConfigTest
     {
-
         public static void Test()
         {
             var jsonPath = "..\\..\\..\\..\\quan-java\\config\\json";
             var namespacePrefix = "Test.Config";
             var assemblyName = Assembly.GetExecutingAssembly().FullName;
-            
-            var configLoader = new ConfigLoader {JsonPath = jsonPath, NamespacePrefix = namespacePrefix,ConfigAssemblies = { assemblyName}};
+
+            var configLoader = new ConfigLoader {JsonPath = jsonPath, NamespacePrefix = namespacePrefix, ConfigAssemblies = {assemblyName}};
             configLoader.Load();
 
             foreach (var config in EquipConfig.GetIdConfigs().Values)
             {
-                Console.WriteLine("{0} = {1} = {2}", config.Name, config.EffectiveTime, config.EffectiveTime_Str);
+                Console.WriteLine(config);
             }
 
-            EquipConfig.GetIdConfigs();
+//            EquipConfig.GetIdConfigs();
         }
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Quan.Common;
 
 namespace Quan.Config
 {
@@ -42,7 +43,7 @@ namespace Quan.Config
 
             foreach (var jsonFile in jsonFiles)
             {
-                var configNameWithPackage = ToCapitalCamel(jsonFile.Name.Substring(0, jsonFile.Name.LastIndexOf(".")));
+                var configNameWithPackage = GetConfigNameWithPackage(jsonFile);
                 _configToJsonFiles[configNameWithPackage] = jsonFile;
 
                 var reader = GetReader(configNameWithPackage);
@@ -122,21 +123,22 @@ namespace Quan.Config
             }
         }
 
-        public static string ToCapitalCamel(string str)
+        protected static string GetConfigNameWithPackage(FileInfo jsonFile)
         {
-            var result = "";
-            for (var i = 0; i < str.Length; i++)
+            var jsonName = jsonFile.Name.Substring(0, jsonFile.Name.LastIndexOf(".", StringComparison.Ordinal));
+            var configNameWithPackage = "";
+            for (var i = 0; i < jsonName.Length; i++)
             {
-                var c = str[i].ToString();
-                if (i == 0 || str[i - 1] == '.')
+                var c = jsonName[i].ToString();
+                if (i == 0 || jsonName[i - 1] == '.')
                 {
                     c = c.ToUpper();
                 }
 
-                result += c;
+                configNameWithPackage += c;
             }
 
-            return result;
+            return configNameWithPackage;
         }
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using Newtonsoft.Json.Linq;
+using Quan.Common;
 using Quan.Config;
 
 namespace Test.Config.Item
@@ -29,8 +30,8 @@ namespace Test.Config.Item
         public override string ToString()
         {
             return "Reward{" +
-                   "ItemId=" + ItemId +
-                   ",ItemNum=" + ItemNum +
+                   "ItemId=" + ItemId.ToString2() +
+                   ",ItemNum=" + ItemNum.ToString2() +
                    '}';
         }
 

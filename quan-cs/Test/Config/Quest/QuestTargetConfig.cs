@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using Newtonsoft.Json.Linq;
+using Quan.Common;
 using Quan.Config;
 
 namespace Test.Config.Quest
@@ -39,7 +40,7 @@ namespace Test.Config.Quest
         public override string ToString()
         {
             return "QuestTargetConfig{" +
-                   "Id=" + Id +
+                   "Id=" + Id.ToString2() +
                    ",Name='" + Name + '\'' +
                    '}';
         }
