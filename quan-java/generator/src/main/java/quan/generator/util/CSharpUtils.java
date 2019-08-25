@@ -30,6 +30,9 @@ public class CSharpUtils {
     }
 
     public static void processBeanFieldImports(DefinitionParser definitionParser, BeanDefinition beanDefinition, FieldDefinition fieldDefinition) {
+        if (fieldDefinition.isTimeType()) {
+            beanDefinition.getImports().add("System");
+        }
         ClassDefinition fieldClass = definitionParser.getClass(fieldDefinition.getType());
         if (fieldClass != null && !fieldClass.getFullPackageName().equals(beanDefinition.getFullPackageName())) {
             beanDefinition.getImports().add(fieldClass.getFullPackageName());

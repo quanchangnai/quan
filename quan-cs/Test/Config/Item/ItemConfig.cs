@@ -1,9 +1,9 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using Newtonsoft.Json.Linq;
 using Quan.Common;
 using Quan.Config;
+using System;
 
 namespace Test.Config.Item
 {
@@ -13,7 +13,6 @@ namespace Test.Config.Item
 	/// </summary>
     public class ItemConfig : ConfigBase
     {
-
         /// <summary>
         /// ID
         /// </summary>

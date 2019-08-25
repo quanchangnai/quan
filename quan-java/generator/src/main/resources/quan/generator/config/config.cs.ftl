@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using Newtonsoft.Json.Linq;
@@ -21,7 +20,6 @@ namespace ${fullPackageName}
 <#if !selfFields??>
     <#assign selfFields = fields>
 </#if>
-
 <#list selfFields as field>
     <#if field.comment !="">
         /// <summary>

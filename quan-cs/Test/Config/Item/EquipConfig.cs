@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using Newtonsoft.Json.Linq;
@@ -13,7 +12,6 @@ namespace Test.Config.Item
 	/// </summary>
     public class EquipConfig : ItemConfig
     {
-
         /// <summary>
         /// 部位
         /// </summary>

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using Newtonsoft.Json.Linq;
@@ -14,7 +13,6 @@ namespace Test.Config.Quest
 	/// </summary>
     public class QuestConfig : ConfigBase
     {
-
         /// <summary>
         /// ID
         /// </summary>
