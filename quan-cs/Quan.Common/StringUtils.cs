@@ -7,19 +7,19 @@ namespace Quan.Common
     {
         public static string ToString2(this object obj)
         {
-            return obj.ToString();
+            return obj == null ? "" : obj.ToString();
         }
 
         public static string ToString2(this byte[] bytes)
         {
-            return Convert.ToBase64String(bytes);
+            return bytes == null ? "" : Convert.ToBase64String(bytes);
         }
 
         public static string ToString2<T>(this ICollection<T> collection)
         {
             if (collection == null)
             {
-                return "null";
+                return "";
             }
 
             var result = "[";
@@ -46,7 +46,7 @@ namespace Quan.Common
         {
             if (dictionary == null)
             {
-                return "null";
+                return "";
             }
 
             var result = "{";
