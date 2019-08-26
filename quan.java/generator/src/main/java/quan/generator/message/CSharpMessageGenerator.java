@@ -1,17 +1,15 @@
-package quan.generator.config;
+package quan.generator.message;
 
 import quan.generator.*;
 import quan.generator.util.CSharpUtils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
- * Created by quanchangnai on 2019/7/11.
+ * Created by quanchangnai on 2017/7/6.
  */
-public class CSharpConfigGenerator extends ConfigGenerator {
+public class CSharpMessageGenerator extends MessageGenerator {
 
     public static final Map<String, String> BASIC_TYPES = new HashMap<>();
 
@@ -25,12 +23,10 @@ public class CSharpConfigGenerator extends ConfigGenerator {
         BASIC_TYPES.put("float", "float");
         BASIC_TYPES.put("double", "double");
         BASIC_TYPES.put("string", "string");
-        BASIC_TYPES.put("set", "ISet");
-        BASIC_TYPES.put("list", "IList");
-        BASIC_TYPES.put("map", "IDictionary");
-        BASIC_TYPES.put("date", "DateTime");
-        BASIC_TYPES.put("time", "DateTime");
-        BASIC_TYPES.put("datetime", "DateTime");
+        BASIC_TYPES.put("set", "HashSet");
+        BASIC_TYPES.put("list", "List");
+        BASIC_TYPES.put("map", "Dictionary");
+        BASIC_TYPES.put("bytes", "byte[]");
 
         CLASS_TYPES.put("bool", "bool");
         CLASS_TYPES.put("short", "short");
@@ -42,9 +38,7 @@ public class CSharpConfigGenerator extends ConfigGenerator {
         CLASS_TYPES.put("set", "HashSet");
         CLASS_TYPES.put("list", "List");
         CLASS_TYPES.put("map", "Dictionary");
-        CLASS_TYPES.put("date", "DateTime");
-        CLASS_TYPES.put("time", "DateTime");
-        CLASS_TYPES.put("datetime", "DateTime");
+        CLASS_TYPES.put("bytes", "byte[]");
     }
 
     {
@@ -52,7 +46,7 @@ public class CSharpConfigGenerator extends ConfigGenerator {
         classTypes.putAll(CLASS_TYPES);
     }
 
-    public CSharpConfigGenerator(String codePath) throws Exception {
+    public CSharpMessageGenerator(String codePath) throws Exception {
         super(codePath);
     }
 
@@ -73,14 +67,13 @@ public class CSharpConfigGenerator extends ConfigGenerator {
 
     public static void main(String[] args) throws Exception {
 
-        List<String> definitionPaths = new ArrayList<>();
-        definitionPaths.add("generator\\definition\\config");
-        String codePath = "..\\quan-cs";
-        String packagePrefix = "Test.Config";
+        String definitionPath = "generator\\definition\\message";
+        String codePath = "..\\quan.cs";
+        String packagePrefix = "Test.Message";
 
-        CSharpConfigGenerator generator = new CSharpConfigGenerator(codePath);
-        generator.useXmlDefinitionParser(definitionPaths, packagePrefix);
+        CSharpMessageGenerator messageGenerator = new CSharpMessageGenerator(codePath);
+        messageGenerator.useXmlDefinitionParser(definitionPath, packagePrefix);
+        messageGenerator.generate();
 
-        generator.generate();
     }
 }

@@ -27,7 +27,7 @@ namespace Quan.Common
             var i = 0;
             foreach (var item in collection)
             {
-                result += ReferenceEquals(item, collection) ? "(this)" : item.ToString2();
+                result += item.ToString2();
 
                 if (i < collection.Count - 1)
                 {
@@ -42,7 +42,7 @@ namespace Quan.Common
             return result;
         }
 
-        public static string ToString2<TK, TV>(this Dictionary<TK, TV> dictionary)
+        public static string ToString2<TK, TV>(this IDictionary<TK, TV> dictionary)
         {
             if (dictionary == null)
             {
@@ -55,10 +55,7 @@ namespace Quan.Common
             foreach (var key in dictionary.Keys)
             {
                 var value = dictionary[key];
-                result += ReferenceEquals(key, dictionary) ? "(this)" : key.ToString2();
-                result += "=" + value.ToString2();
-                result += ReferenceEquals(value, dictionary) ? "(this)" : value.ToString2();
-
+                result += key.ToString2() + "=" + value.ToString2();
                 if (i < dictionary.Count - 1)
                 {
                     result += ", ";

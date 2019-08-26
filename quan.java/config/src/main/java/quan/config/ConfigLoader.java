@@ -41,10 +41,8 @@ public abstract class ConfigLoader {
         this.tablePath = PathUtils.currentPlatPath(tablePath);
     }
 
-    public ConfigLoader setLoadType(LoadType loadType) {
-        Objects.requireNonNull(loadType, "加载类型不能为空");
-        this.loadType = loadType;
-        return this;
+    public LoadType getLoadType() {
+        return loadType;
     }
 
     public void setTableType(TableType tableType) {
@@ -89,6 +87,9 @@ public abstract class ConfigLoader {
         }
     }
 
+    /**
+     * 加载所有配置
+     */
     public void loadAll() {
         if (loaded) {
             throw new IllegalStateException("配置已经加载了，重加载调用reloadXxx方法");

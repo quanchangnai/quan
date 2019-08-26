@@ -43,6 +43,11 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
         }
     }
 
+    public void setLoadType(LoadType loadType) {
+        Objects.requireNonNull(loadType, "加载类型不能为空");
+        this.loadType = loadType;
+    }
+
     /**
      * 使用XML配置解析器
      */

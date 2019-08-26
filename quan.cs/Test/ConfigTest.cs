@@ -10,7 +10,7 @@ namespace Test
     {
         public static void Test()
         {
-            var jsonPath = "..\\..\\..\\..\\quan-java\\config\\json";
+            var jsonPath = "..\\..\\..\\..\\quan.java\\config\\json";
             var namespacePrefix = "Test.Config";
             var assemblyName = Assembly.GetExecutingAssembly().FullName;
 
