@@ -149,6 +149,8 @@ namespace ${fullPackageName}
         <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || !fields[field_index+1].optional) >
 
         </#if>
+	<#elseif field.type=="float"||field.type=="double">
+			buffer.Write${field.type?cap_first}(${field.name?cap_first}<#if field.scale gt 0>, ${field.scale}</#if>);
 	<#elseif field.builtInType>
 		    buffer.Write${field.type?cap_first}(${field.name?cap_first});
 	<#elseif field.enumType>
@@ -208,6 +210,8 @@ namespace ${fullPackageName}
         <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || !fields[field_index+1].optional) >
 
         </#if>
+	<#elseif field.type=="float"||field.type=="double">
+			${field.name?cap_first} = buffer.Read${field.type?cap_first}(<#if field.scale gt 0>${field.scale}</#if>);
 	<#elseif field.builtInType>
 		    ${field.name?cap_first} = buffer.Read${field.type?cap_first}();
 	<#elseif field.enumType>

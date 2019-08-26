@@ -66,8 +66,8 @@ namespace Test.Message.Role
 		    buffer.WriteBool(B);
 		    buffer.WriteShort(S);
 		    buffer.WriteInt(I);
-		    buffer.WriteFloat(F);
-		    buffer.WriteDouble(D);
+			buffer.WriteFloat(F, 2);
+			buffer.WriteDouble(D);
 		    buffer.WriteBytes(Data);
 
 		    buffer.WriteInt(List.Count);
@@ -97,8 +97,8 @@ namespace Test.Message.Role
 		    B = buffer.ReadBool();
 		    S = buffer.ReadShort();
 		    I = buffer.ReadInt();
-		    F = buffer.ReadFloat();
-		    D = buffer.ReadDouble();
+			F = buffer.ReadFloat(2);
+			D = buffer.ReadDouble();
 		    Data = buffer.ReadBytes();
 
 		    var listSize = buffer.ReadInt();

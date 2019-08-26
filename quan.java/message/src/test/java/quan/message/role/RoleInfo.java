@@ -156,7 +156,7 @@ public class RoleInfo extends Bean {
         buffer.writeBool(this.b);
         buffer.writeShort(this.s);
         buffer.writeInt(this.i);
-        buffer.writeFloat(this.f);
+        buffer.writeFloat(this.f, 2);
         buffer.writeDouble(this.d);
         buffer.writeBytes(this.data);
 
@@ -187,7 +187,7 @@ public class RoleInfo extends Bean {
         this.b = buffer.readBool();
         this.s = buffer.readShort();
         this.i = buffer.readInt();
-        this.f = buffer.readFloat();
+        this.f = buffer.readFloat(2);
         this.d = buffer.readDouble();
         this.data = buffer.readBytes();
 

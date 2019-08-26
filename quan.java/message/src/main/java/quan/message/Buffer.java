@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 
 /**
  * 基于VarInt和ZigZag编码的缓冲区，字节顺序采用小端模式<br/>
@@ -61,8 +62,6 @@ public class Buffer {
      * 当前可用的字节数组<br/>
      * 当前正在读数据时：[0,end]<br/>
      * 当前正在写数据时：[0,position)<br/>
-     *
-     * @return
      */
     public byte[] availableBytes() {
         byte[] availableBytes = new byte[available()];
@@ -76,8 +75,6 @@ public class Buffer {
 
     /**
      * 当前可用的字节数
-     *
-     * @return
      */
     public int available() {
         if (reading) {
@@ -92,8 +89,6 @@ public class Buffer {
      * 当前剩余可用的字节数组<br/>
      * 当前正在读数据时：[position,end]<br/>
      * 当前正在写数据时：[0,position)<br/>
-     *
-     * @return
      */
     public byte[] remainingBytes() {
         byte[] remainingBytes = new byte[remaining()];
@@ -107,8 +102,6 @@ public class Buffer {
 
     /**
      * 当前剩余可用的字节数
-     *
-     * @return
      */
     public int remaining() {
         if (reading) {
@@ -121,10 +114,6 @@ public class Buffer {
 
     /**
      * 读取VarInt，bits只能是[8,16,32,64]中的一种
-     *
-     * @param bits
-     * @return
-     * @throws IOException
      */
     protected long readVarInt(int bits) throws IOException {
         if (bits != 16 && bits != 32 && bits != 64) {
@@ -175,7 +164,7 @@ public class Buffer {
         return readVarInt(64);
     }
 
-    public float readFloat() throws IOException {
+    public float readFloat() {
         int position = reading ? this.position : 0;
         int shift = 0;
         int temp = 0;
@@ -202,7 +191,7 @@ public class Buffer {
         }
     }
 
-    public double readDouble() throws IOException {
+    public double readDouble() {
         int position = reading ? this.position : 0;
         int shift = 0;
         long temp = 0;
@@ -231,7 +220,7 @@ public class Buffer {
     }
 
     public String readString() throws IOException {
-        return new String(readBytes(), "UTF-8");
+        return new String(readBytes(), StandardCharsets.UTF_8);
     }
 
     /**
@@ -257,7 +246,7 @@ public class Buffer {
         }
     }
 
-    protected void writeVarInt(long n) throws IOException {
+    protected void writeVarInt(long n) {
         checkCapacity(10);
         //ZigZag编码
         n = (n << 1) ^ (n >> 63);
@@ -279,7 +268,7 @@ public class Buffer {
     }
 
 
-    public void writeBytes(byte[] bytes) throws IOException {
+    public void writeBytes(byte[] bytes) {
         checkCapacity(10 + bytes.length);
         writeInt(bytes.length);
         System.arraycopy(bytes, 0, this.bytes, position, bytes.length);
@@ -287,23 +276,23 @@ public class Buffer {
     }
 
 
-    public void writeBool(boolean b) throws IOException {
+    public void writeBool(boolean b) {
         writeInt(b ? 1 : 0);
     }
 
-    public void writeShort(short n) throws IOException {
+    public void writeShort(short n) {
         writeVarInt(n);
     }
 
-    public void writeInt(int n) throws IOException {
+    public void writeInt(int n) {
         writeVarInt(n);
     }
 
-    public void writeLong(long n) throws IOException {
+    public void writeLong(long n) {
         writeVarInt(n);
     }
 
-    public void writeFloat(float n) throws IOException {
+    public void writeFloat(float n) {
         checkCapacity(4);
         int position = reading ? 0 : this.position;
         int temp = Float.floatToIntBits(n);
@@ -319,7 +308,7 @@ public class Buffer {
         this.position = position;
     }
 
-    public void writeFloat(float n, int scale) throws IOException {
+    public void writeFloat(float n, int scale) {
         if (scale < 0) {
             writeFloat(n);
         } else {
@@ -327,7 +316,7 @@ public class Buffer {
         }
     }
 
-    public void writeDouble(double n) throws IOException {
+    public void writeDouble(double n) {
         checkCapacity(8);
         int position = reading ? 0 : this.position;
         long temp = Double.doubleToLongBits(n);
@@ -343,13 +332,13 @@ public class Buffer {
         this.position = position;
     }
 
-    public void writeDouble(double n, int scale) throws IOException {
+    public void writeDouble(double n, int scale) {
         if (scale < 0) {
             writeDouble(n);
             return;
         }
 
-        n = new BigDecimal(n).setScale(scale, RoundingMode.FLOOR).doubleValue();
+        n = BigDecimal.valueOf(n).setScale(scale, RoundingMode.HALF_EVEN).doubleValue();
         int times = (int) Math.pow(10, scale);
         long threshold = Long.MAX_VALUE / times;
         if (n >= -threshold && n <= threshold) {
@@ -361,8 +350,8 @@ public class Buffer {
     }
 
 
-    public void writeString(String s) throws IOException {
-        writeBytes(s.getBytes("UTF-8"));
+    public void writeString(String s) {
+        writeBytes(s.getBytes(StandardCharsets.UTF_8));
     }
 
 }

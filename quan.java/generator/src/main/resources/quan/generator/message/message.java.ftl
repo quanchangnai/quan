@@ -127,6 +127,8 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType|| fields[field_index+1].enumType || !fields[field_index+1].optional) >
 
         </#if>
+    <#elseif field.type=="float"||field.type=="double">
+        buffer.write${field.type?cap_first}(this.${field.name}<#if field.scale gt 0>, ${field.scale}</#if>);
     <#elseif field.builtInType>
         buffer.write${field.type?cap_first}(this.${field.name});
     <#elseif field.enumType>
@@ -188,6 +190,8 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType|| fields[field_index+1].enumType || !fields[field_index+1].optional) >
 
         </#if>
+    <#elseif field.type=="float"||field.type=="double">
+        this.${field.name} = buffer.read${field.type?cap_first}(<#if field.scale gt 0>${field.scale}</#if>);
     <#elseif field.builtInType>
         this.${field.name} = buffer.read${field.type?cap_first}();
     <#elseif field.enumType>

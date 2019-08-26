@@ -33,6 +33,9 @@ public class FieldDefinition extends Definition {
     //枚举值
     private String value;
 
+    //消息小数类型精度
+    private int scale = -1;
+
     //对应配置表格中的列
     private String column;
 
@@ -42,14 +45,14 @@ public class FieldDefinition extends Definition {
     //配置集合类型字段的分隔符
     private String delimiter;
 
-    //配置引用的字段
+    //配置引用[配置.字段]
     private String ref;
+
+    //配置Bean或者集合类型字段对应的表格列数，校验表头时设置
+    private int columnNum;
 
     //字段类型依赖是否有循环
     private boolean cycle;
-
-    //Bean字段对应的列数，读数据校验表头时设置的
-    private int columnNum;
 
     public FieldDefinition() {
     }
@@ -173,7 +176,7 @@ public class FieldDefinition extends Definition {
     }
 
     public FieldDefinition setOptional(String optional) {
-        if (!StringUtils.isBlank(optional) && optional.trim().equals("true" )) {
+        if (!StringUtils.isBlank(optional) && optional.trim().equals("true")) {
             this.optional = true;
         }
         return this;
@@ -306,6 +309,14 @@ public class FieldDefinition extends Definition {
         this.classValueType = classValueType;
     }
 
+    public int getScale() {
+        return scale;
+    }
+
+    public FieldDefinition setScale(int scale) {
+        this.scale = scale;
+        return this;
+    }
 
     public String getColumn() {
         return column;
@@ -336,9 +347,9 @@ public class FieldDefinition extends Definition {
         if (delimiter != null) {
             return delimiter;
         }
-        if (type.equals("list" ) || type.equals("set" )) {
+        if (type.equals("list") || type.equals("set")) {
             return ";";
-        } else if (type.equals("map" )) {
+        } else if (type.equals("map")) {
             return "*;";
         }
         return null;
@@ -378,21 +389,21 @@ public class FieldDefinition extends Definition {
             return null;
         }
 
-        if (type.equals("map" )) {
-            String[] fieldRefs = ref.split("," );
+        if (type.equals("map")) {
+            String[] fieldRefs = ref.split(",");
             ConfigDefinition refConfig = null;
 
             if (keyRef && fieldRefs.length >= 1) {
-                refConfig = parser.getConfig(fieldRefs[0].split("\\." )[0]);
+                refConfig = parser.getConfig(fieldRefs[0].split("\\.")[0]);
             }
             if (!keyRef && fieldRefs.length == 2) {
-                refConfig = parser.getConfig(fieldRefs[1].split("\\." )[0]);
+                refConfig = parser.getConfig(fieldRefs[1].split("\\.")[0]);
             }
             return refConfig;
         }
 
         //list set 原生类型
-        String[] fieldRefs = ref.split("\\." );
+        String[] fieldRefs = ref.split("\\.");
         if (fieldRefs.length != 2) {
             return null;
         }
@@ -409,19 +420,19 @@ public class FieldDefinition extends Definition {
         if (StringUtils.isBlank(ref)) {
             return null;
         }
-        if (type.equals("map" )) {
-            String[] fieldRefs = ref.split("," );
+        if (type.equals("map")) {
+            String[] fieldRefs = ref.split(",");
             ConfigDefinition refConfig;
 
             if (keyRef && fieldRefs.length >= 1) {
-                String[] fieldKeyRefs = fieldRefs[0].split("\\." );
+                String[] fieldKeyRefs = fieldRefs[0].split("\\.");
                 refConfig = parser.getConfig(fieldKeyRefs[0]);
                 if (refConfig != null) {
                     return refConfig.getField(fieldKeyRefs[1]);
                 }
             }
             if (!keyRef && fieldRefs.length == 2) {
-                String[] fieldValueRefs = fieldRefs[1].split("\\." );
+                String[] fieldValueRefs = fieldRefs[1].split("\\.");
                 refConfig = parser.getConfig(fieldValueRefs[0]);
                 if (refConfig != null) {
                     return refConfig.getField(fieldValueRefs[1]);
@@ -431,7 +442,7 @@ public class FieldDefinition extends Definition {
         }
 
         //list set 原生类型
-        String[] fieldRefs = ref.split("\\." );
+        String[] fieldRefs = ref.split("\\.");
         if (fieldRefs.length != 2) {
             return null;
         }
@@ -465,7 +476,7 @@ public class FieldDefinition extends Definition {
         BeanDefinition beanDefinition = getBean();
         if (beanDefinition != null) {
             return columnNum == 1 || columnNum == beanDefinition.getFields().size();
-        } else if (type.equals("map" )) {
+        } else if (type.equals("map")) {
             return columnNum == 1 || columnNum > 0 && columnNum % 2 == 0;
         }
         return true;

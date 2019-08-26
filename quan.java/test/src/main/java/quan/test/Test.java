@@ -2,7 +2,6 @@ package quan.test;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -15,8 +14,6 @@ public class Test {
     public static void main(String[] args) throws Exception {
 //        test1();
 //        test2();
-
-        System.err.println(new File("").getCanonicalPath());
     }
 
     private static void test1() {
