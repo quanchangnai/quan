@@ -132,38 +132,43 @@ public class ClassUtils {
 
     private static void parseUrl(Set<String> classNames, URL url, String packageName) throws Exception {
         if (url.getProtocol().equals("jar")) {
-            JarURLConnection jarURLConnection = (JarURLConnection) url.openConnection();
-            JarFile jarFile = jarURLConnection.getJarFile();
-            Enumeration<JarEntry> jarEntries = jarFile.entries();
-            while (jarEntries.hasMoreElements()) {
-                JarEntry jarEntry = jarEntries.nextElement();
-                String jarEntryName = jarEntry.getName();
-                if (jarEntryName.endsWith(".class")) {
-                    String className = jarEntryName.substring(0, jarEntryName.lastIndexOf(".class"));
-                    className = className.replace("/", ".");
-                    classNames.add(className);
-                }
-
-            }
+            parseJar(classNames, ((JarURLConnection) url.openConnection()).getJarFile());
         } else if (url.getProtocol().equals("file")) {
-            String rootPath = new File(url.toURI()).getCanonicalPath();
-            rootPath = rootPath.substring(0, rootPath.lastIndexOf(packageName.replace("/", File.separator)));
-            if (!rootPath.endsWith(File.separator)) {
-                rootPath += File.separator;
-            }
-
-            Set<File> classFiles = PathUtils.listFiles(new File(url.toURI()), "class");
-
-            for (File classFile : classFiles) {
-                String filePath = classFile.getCanonicalPath();
-                if (filePath.endsWith(".class")) {
-                    String className = filePath.substring(rootPath.length(), filePath.lastIndexOf(".class"));
-                    className = className.replace(File.separator, ".");
-                    classNames.add(className);
-                }
-            }
+            parsePath(classNames, new File(url.toURI()), packageName);
         } else {
             logger.error("不支持该url protocol:" + url.getProtocol());
+        }
+    }
+
+    private static void parseJar(Set<String> classNames, JarFile jarFile) {
+        Enumeration<JarEntry> jarEntries = jarFile.entries();
+        while (jarEntries.hasMoreElements()) {
+            JarEntry jarEntry = jarEntries.nextElement();
+            String jarEntryName = jarEntry.getName();
+            if (jarEntryName.endsWith(".class")) {
+                String className = jarEntryName.substring(0, jarEntryName.lastIndexOf(".class"));
+                className = className.replace("/", ".");
+                classNames.add(className);
+            }
+        }
+    }
+
+    private static void parsePath(Set<String> classNames, File path, String packageName) throws Exception {
+        String rootPath = path.getCanonicalPath();
+        rootPath = rootPath.substring(0, rootPath.lastIndexOf(packageName.replace("/", File.separator)));
+        if (!rootPath.endsWith(File.separator)) {
+            rootPath += File.separator;
+        }
+
+        Set<File> classFiles = PathUtils.listFiles(path, "class");
+
+        for (File classFile : classFiles) {
+            String classFilePath = classFile.getCanonicalPath();
+            if (classFilePath.endsWith(".class")) {
+                String className = classFilePath.substring(rootPath.length(), classFilePath.lastIndexOf(".class"));
+                className = className.replace(File.separator, ".");
+                classNames.add(className);
+            }
         }
     }
 
