@@ -1,8 +1,6 @@
 package quan.message;
 
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
@@ -308,7 +306,7 @@ public class Buffer {
         this.position = position;
     }
 
-    public void writeFloat(float n, int scale) {
+    public void writeFloat(float n, int scale) throws IOException {
         if (scale < 0) {
             writeFloat(n);
         } else {
@@ -332,20 +330,18 @@ public class Buffer {
         this.position = position;
     }
 
-    public void writeDouble(double n, int scale) {
+    public void writeDouble(double n, int scale) throws IOException {
         if (scale < 0) {
             writeDouble(n);
             return;
         }
-
-        n = BigDecimal.valueOf(n).setScale(scale, RoundingMode.HALF_EVEN).doubleValue();
         int times = (int) Math.pow(10, scale);
         long threshold = Long.MAX_VALUE / times;
-        if (n >= -threshold && n <= threshold) {
-            writeLong((long) Math.floor(n * times));
-        } else {
-            throw new IllegalArgumentException("参数n超出了限定范围[" + -threshold + "," + threshold + "]，无法转换为指定精度的定点型数据");
+        if (n < -threshold || n > threshold) {
+            throw new IOException(String.format("参数[%s]超出了限定范围[%s,%s],无法转换为指定精度[%s]的定点型数据", n, -threshold, threshold, scale));
         }
+
+        writeLong(Math.round(n * times));
 
     }
 

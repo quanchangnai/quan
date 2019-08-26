@@ -404,16 +404,14 @@ namespace Quan.Message
                 return;
             }
 
-            n = Math.Round(n, scale);
             var times = (int) Math.Pow(10, scale);
             var threshold = long.MaxValue / times;
-            if (n >= -threshold && n <= threshold)
+            if (n < -threshold || n > threshold)
             {
-                WriteLong((long) Math.Floor(n * times));
-                return;
+                throw new IOException(string.Format("参数[{0}]超出了限定范围[{1},{2}],无法转换为指定精度[{3}]的定点型数据", n, -threshold, threshold, scale));
             }
 
-            throw new SystemException("参数n超出了限定范围[" + -threshold + "," + threshold + "]，无法转换为指定精度的定点型数据");
+            WriteLong((long) Math.Round(n * times));
         }
 
         public void WriteString(string s)

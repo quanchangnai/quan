@@ -71,7 +71,7 @@ namespace Test
 
             var sRoleLogin1 = new SRoleLogin {RoleId = 1111, RoleName = "张三1111"};
 
-            var roleInfo = new RoleInfo {Id = 1312, RoleName = "李四1123123", F = 343.45356F, D = 4242.54453D};
+            var roleInfo = new RoleInfo {Id = 1312, RoleName = "李四1123123", F = 343.435F, D = 4242.54453D};
 
             sRoleLogin1.RoleInfo = roleInfo;
 
