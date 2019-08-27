@@ -115,7 +115,7 @@ public class ConfigDefinition extends BeanDefinition {
             if (configDefinition == null) {
                 continue;
             }
-            allTables.addAll(Arrays.asList(configDefinition.table.split(",")));
+            allTables.addAll(Arrays.asList(configDefinition.table.split(",",-1)));
         }
 
         return allTables;
@@ -203,7 +203,7 @@ public class ConfigDefinition extends BeanDefinition {
         }
 
         //支持分表
-        tables.addAll(Arrays.asList(table.split(",")));
+        tables.addAll(Arrays.asList(table.split(",",-1)));
         for (String t : tables) {
             ConfigDefinition other = parser.getTableConfigs().get(t);
             if (other != null && !getName().equals(other.getName())) {
@@ -446,7 +446,7 @@ public class ConfigDefinition extends BeanDefinition {
             return;
         }
 
-        String[] fieldNameArray = fieldNames.split(",");
+        String[] fieldNameArray = fieldNames.split(",",-1);
         if (fieldNameArray.length > 3) {
             addValidatedError(getName4Validate("的") + indexDefinition.getName4Validate() + "字段[" + fieldNames + "]不能超过三个");
         }

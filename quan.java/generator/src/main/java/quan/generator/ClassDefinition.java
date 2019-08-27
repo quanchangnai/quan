@@ -126,7 +126,7 @@ public abstract class ClassDefinition extends Definition {
         if (StringUtils.isBlank(language)) {
             return;
         }
-        for (String lang : language.trim().split("," )) {
+        for (String lang : language.trim().split("," ,-1)) {
             this.languages.add(lang.trim());
         }
     }

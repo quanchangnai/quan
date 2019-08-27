@@ -68,7 +68,7 @@ public class BeanDefinition extends ClassDefinition {
             return;
         }
 
-        String[] fieldTypes = field.getTypes().split(":");
+        String[] fieldTypes = field.getTypes().split(":", -1);
         String fieldType = fieldTypes[0];
 
         if (fieldTypes.length == 1 && StringUtils.isBlank(fieldType)) {
@@ -115,7 +115,7 @@ public class BeanDefinition extends ClassDefinition {
         }
 
         if (field.category == DefinitionCategory.message && (fieldType.equals("float") || fieldType.equals("double"))) {
-            boolean patternError = false;
+            boolean patternError = fieldTypes.length != 1 && fieldTypes.length != 2;
             if (fieldTypes.length == 2) {
                 int scale = -1;
                 try {
@@ -131,7 +131,7 @@ public class BeanDefinition extends ClassDefinition {
                 }
             }
             if (patternError) {
-                addValidatedError(getName4Validate("的") + field.getName4Validate() + "类型[" + field.getTypes() + "]格式错误，合法格式[" + fieldType + "]或者[" + fieldType + ":精度0-15]");
+                addValidatedError(getName4Validate("的") + field.getName4Validate() + "类型[" + field.getTypes() + "]格式错误，合法格式[" + fieldType + "]或者[" + fieldType + ":精度(0-15)]");
             }
         }
 
@@ -223,7 +223,7 @@ public class BeanDefinition extends ClassDefinition {
         }
 
         if (!field.getType().equals("map")) {
-            String[] fieldRefs = field.getRef().split("\\.");
+            String[] fieldRefs = field.getRef().split("\\.", -1);
             if (fieldRefs.length != 2) {
                 addValidatedError(getName4Validate() + field.getName4Validate() + "的引用格式错误[" + field.getRef() + "]，正确格式:[配置.字段]");
                 return;
@@ -233,17 +233,17 @@ public class BeanDefinition extends ClassDefinition {
         }
 
         //map类型字段引用校验
-        String[] fieldRefs = field.getRef().split(":");
+        String[] fieldRefs = field.getRef().split(":", -1);
         String refPatternError = getName4Validate("的") + field.getName4Validate() + "类型[map]的引用格式错误[" + field.getRef() + "]，正确格式:[键引用的配置.字段]或者[键引用配置.字段:值引用的配置.字段]";
         if (fieldRefs.length != 1 && fieldRefs.length != 2) {
             addValidatedError(refPatternError);
             return;
         }
 
-        String[] fieldKeyRefs = fieldRefs[0].split("\\.");
+        String[] fieldKeyRefs = fieldRefs[0].split("\\.", -1);
         String[] fieldValueRefs = null;
         if (fieldRefs.length == 2) {
-            fieldValueRefs = fieldRefs[1].split("\\.");
+            fieldValueRefs = fieldRefs[1].split("\\.", -1);
         }
 
         if (fieldKeyRefs.length != 2) {

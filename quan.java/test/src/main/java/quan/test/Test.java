@@ -1,7 +1,9 @@
 package quan.test;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -14,6 +16,10 @@ public class Test {
     public static void main(String[] args) throws Exception {
 //        test1();
 //        test2();
+
+        String str = ":a::";
+        String[] split =str.split(":",-1);
+        System.err.println(Arrays.toString(split));
     }
 
     private static void test1() {

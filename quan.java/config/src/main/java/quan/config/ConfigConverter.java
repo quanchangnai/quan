@@ -187,7 +187,7 @@ public class ConfigConverter {
         if (StringUtils.isBlank(value)) {
             return new JSONArray();
         }
-        String[] values = value.split(fieldDefinition.getEscapedDelimiter());
+        String[] values = value.split(fieldDefinition.getEscapedDelimiter(),-1);
         return convertArray(fieldDefinition, values);
     }
 
@@ -196,7 +196,7 @@ public class ConfigConverter {
             return new JSONArray();
         }
 
-        String[] values = value.split(fieldDefinition.getEscapedDelimiter());
+        String[] values = value.split(fieldDefinition.getEscapedDelimiter(),-1);
         Set<String> setValues = new HashSet<>();
         Set<String> duplicateValues = new HashSet<>();
 
@@ -249,7 +249,7 @@ public class ConfigConverter {
             return array;
         }
 
-        String[] values = value.split(fieldDefinition.getEscapedDelimiter());
+        String[] values = value.split(fieldDefinition.getEscapedDelimiter(),-1);
         Set<Object> set = new HashSet<>(array);
         Set<String> duplicate = new HashSet<>();
         for (int i = 0; i < setArray.size(); i++) {
@@ -335,7 +335,7 @@ public class ConfigConverter {
             return object;
         }
 
-        String[] values = value.split(fieldDefinition.getEscapedDelimiter());
+        String[] values = value.split(fieldDefinition.getEscapedDelimiter(),-1);
 
         for (int i = 0; i < values.length; i = i + 2) {
             String vi = values[i];
@@ -375,7 +375,7 @@ public class ConfigConverter {
             return null;
         }
         JSONObject object = new JSONObject();
-        String[] values = value.split(beanDefinition.getEscapedDelimiter());
+        String[] values = value.split(beanDefinition.getEscapedDelimiter(),-1);
         for (int i = 0; i < beanDefinition.getFields().size(); i++) {
             FieldDefinition fieldDefinition = beanDefinition.getFields().get(i);
             Object v = convert(fieldDefinition, values[i]);

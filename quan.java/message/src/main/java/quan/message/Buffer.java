@@ -342,7 +342,6 @@ public class Buffer {
         }
 
         writeLong(Math.round(n * times));
-
     }
 
 
