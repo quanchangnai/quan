@@ -46,7 +46,7 @@ public abstract class DefinitionParser {
         for (String path : definitionPaths) {
             path = PathUtils.currentPlatPath(path);
             this.definitionPaths.add(path);
-            Set<File> files = PathUtils.listFiles(new File(path), getFileType());
+            Set<File> files = PathUtils.listFiles(new File(path), definitionFileType());
             definitionFiles.addAll(files);
         }
     }
@@ -118,7 +118,7 @@ public abstract class DefinitionParser {
         return new ArrayList<>(validatedErrors);
     }
 
-    protected abstract String getFileType();
+    protected abstract String definitionFileType();
 
     public void parse() throws Exception {
         if (!classes.isEmpty()) {

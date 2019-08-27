@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 public class XmlDefinitionParser extends DefinitionParser {
 
     @Override
-    protected String getFileType() {
+    protected String definitionFileType() {
         return "xml";
     }
 
