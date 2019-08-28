@@ -16,7 +16,7 @@ namespace Test.Message.Role
 		/// <summary>
 		/// 消息ID
 		/// </summary>
-		public const int ID = 544233;
+		public override int Id => 544233;
 
         /// <summary>
 		/// 角色id
@@ -65,10 +65,6 @@ namespace Test.Message.Role
 		/// </summary>
 		private UserInfo UserInfo { get; set; }
 
-
-        public CRoleLogin(): base(ID)
-		{
-		}
 
 		public override MessageBase Create()
 		{

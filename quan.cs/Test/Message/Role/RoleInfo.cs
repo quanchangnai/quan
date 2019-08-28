@@ -55,7 +55,6 @@ namespace Test.Message.Role
 		public Dictionary<int, int> Map { get; } = new Dictionary<int, int>();
 
 
-
 		public override void Encode(Buffer buffer)
 		{
 	    	base.Encode(buffer);

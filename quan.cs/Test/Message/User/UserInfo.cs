@@ -33,7 +33,6 @@ namespace Test.Message.User
 		public int Level { get; set; }
 
 
-
 		public override void Encode(Buffer buffer)
 		{
 	    	base.Encode(buffer);
