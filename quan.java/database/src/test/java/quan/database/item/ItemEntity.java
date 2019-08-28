@@ -21,7 +21,7 @@ public class ItemEntity extends Entity {
     }
 
     public ItemEntity setId(int id) {
-        this.id.setLogValue(id, getRoot());
+        this.id.setLogValue(id, _getRoot());
         return this;
     }
 
@@ -30,13 +30,13 @@ public class ItemEntity extends Entity {
     }
 
     public ItemEntity setName(String name) {
-        this.name.setLogValue(name, getRoot());
+        this.name.setLogValue(name, _getRoot());
         return this;
     }
 
 
     @Override
-    public void setChildrenLogRoot(Data root) {
+    public void _setChildrenLogRoot(Data root) {
     }
 
     @Override

@@ -20,7 +20,7 @@ public abstract class Data<K> extends Entity implements Comparable<Data<K>> {
 
     private static final AtomicLong nextId = new AtomicLong();
 
-    private long _id = nextId.incrementAndGet();
+    private long id = nextId.incrementAndGet();
 
     /**
      * 行级锁，当数据不受缓存管理时使用，受缓存管理时使用锁池
@@ -36,7 +36,7 @@ public abstract class Data<K> extends Entity implements Comparable<Data<K>> {
         }
     }
 
-    final Lock getLock() {
+    final Lock _getLock() {
         return lock;
     }
 
@@ -45,11 +45,11 @@ public abstract class Data<K> extends Entity implements Comparable<Data<K>> {
     }
 
     @Override
-    public final Data<K> getRoot() {
+    public final Data<K> _getRoot() {
         return this;
     }
 
-    public final long getVersion() {
+    public final long _getVersion() {
         return version;
     }
 
@@ -60,7 +60,7 @@ public abstract class Data<K> extends Entity implements Comparable<Data<K>> {
         }
     }
 
-    public final long getTouchTime() {
+    public final long touchTime() {
         return touchTime;
     }
 
@@ -68,17 +68,17 @@ public abstract class Data<K> extends Entity implements Comparable<Data<K>> {
         touchTime = System.currentTimeMillis();
     }
 
-    final boolean isExpired() {
+    final boolean _isExpired() {
         return expired;
     }
 
-    final void setExpired(boolean expired) {
+    final void _setExpired(boolean expired) {
         this.expired = expired;
     }
 
     @Override
     public final int compareTo(Data<K> other) {
-        long compare = this._id - other._id;
+        long compare = this.id - other.id;
         if (compare > 0) {
             return 1;
         } else if (compare == 0) {

@@ -17,14 +17,14 @@ public final class SetField<E> extends Node implements Set<E>, Field<PSet<E>> {
     private PSet<E> data = Empty.set();
 
     public SetField(Data root) {
-        setRoot(root);
+        _setRoot(root);
     }
 
     @Override
-    public void setChildrenLogRoot(Data root) {
+    public void _setChildrenLogRoot(Data root) {
         for (E e : getValue()) {
             if (e instanceof Entity) {
-                ((Entity) e).setLogRoot(root);
+                ((Entity) e)._setLogRoot(root);
             }
         }
     }
@@ -104,7 +104,7 @@ public final class SetField<E> extends Node implements Set<E>, Field<PSet<E>> {
         if (add && log == null) {
             log = new FieldLog<>(this, data);
             transaction.addFieldLog(log);
-            transaction.addVersionLog(getRoot());
+            transaction.addVersionLog(_getRoot());
         }
 
         return log;
@@ -121,7 +121,7 @@ public final class SetField<E> extends Node implements Set<E>, Field<PSet<E>> {
         PSet<E> newData = oldData.plus(e);
 
         if (e instanceof Entity) {
-            ((Entity) e).setLogRoot(getRoot());
+            ((Entity) e)._setLogRoot(_getRoot());
         }
 
         if (oldData != newData) {
@@ -140,7 +140,7 @@ public final class SetField<E> extends Node implements Set<E>, Field<PSet<E>> {
 
         for (E e : oldData) {
             if (e.equals(o) && e instanceof Entity) {
-                ((Entity) e).setLogRoot(null);
+                ((Entity) e)._setLogRoot(null);
             }
         }
 
@@ -169,7 +169,7 @@ public final class SetField<E> extends Node implements Set<E>, Field<PSet<E>> {
 
         for (E e : c) {
             if (e instanceof Entity) {
-                ((Entity) e).setLogRoot(getRoot());
+                ((Entity) e)._setLogRoot(_getRoot());
             }
         }
 
@@ -207,7 +207,7 @@ public final class SetField<E> extends Node implements Set<E>, Field<PSet<E>> {
         if (log.getValue().isEmpty()) {
             return;
         }
-        setChildrenLogRoot(null);
+        _setChildrenLogRoot(null);
         log.setValue(Empty.set());
     }
 

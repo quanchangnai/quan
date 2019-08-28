@@ -28,7 +28,7 @@ class RootLog {
     }
 
     public void commit() {
-        node.setRoot(root);
+        node._setRoot(root);
     }
 
 }

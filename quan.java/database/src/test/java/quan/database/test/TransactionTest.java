@@ -115,7 +115,7 @@ public class TransactionTest {
 //        roleData2.getItems().keySet().remove(itemEntity.getId());
 
         System.err.println("roleData2:" + roleData2.toString());
-        System.err.println("itemEntity.getRoot():" + itemEntity.getRoot());
+        System.err.println("itemEntity.getRoot():" + itemEntity._getRoot());
         return true;
     }
 }

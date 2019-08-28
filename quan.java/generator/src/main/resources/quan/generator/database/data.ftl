@@ -20,10 +20,10 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
     //${field.comment}
     </#if>
     <#if field.type == "set" || field.type == "list">
-    private ${field.classType}<${field.classValueType}> ${field.name} = new ${field.classType}<>(getRoot());
+    private ${field.classType}<${field.classValueType}> ${field.name} = new ${field.classType}<>(_getRoot());
 
     <#elseif field.type == "map">
-    private ${field.classType}<${field.classKeyType}, ${field.classValueType}> ${field.name} = new ${field.classType}<>(getRoot());
+    private ${field.classType}<${field.classKeyType}, ${field.classValueType}> ${field.name} = new ${field.classType}<>(_getRoot());
 
     <#elseif field.type = "string">
     private BaseField<${field.classType}> ${field.name} = new BaseField<>("");
@@ -61,7 +61,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
 
     public ${name}(${keyType} ${keyName}) {
 	    super(_cache);
-        this.${keyName}.setLogValue(${keyName}, getRoot());
+        this.${keyName}.setLogValue(${keyName}, _getRoot());
     }
 
     <#else>
@@ -71,7 +71,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
         
     public ${name}(${keyType} ${keyName}) {
         super(null);
-        this.${keyName}.setLogValue(${keyName}, getRoot());
+        this.${keyName}.setLogValue(${keyName}, _getRoot());
     }
 
     </#if>
@@ -113,7 +113,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
      */
     </#if>
     public ${name} set${field.name?cap_first}(${field.basicType} ${field.name}) {
-        this.${field.name}.setLogValue(${field.name}.getValue(), getRoot());
+        this.${field.name}.setLogValue(${field.name}.getValue(), _getRoot());
 	    return this;
     }
 
@@ -128,7 +128,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
      */
     </#if>
     public ${name} set${field.name?cap_first}(${field.basicType} ${field.name}) {
-        this.${field.name}.setLogValue(${field.name}, getRoot());
+        this.${field.name}.setLogValue(${field.name}, _getRoot());
         return this;
     }
 
@@ -136,17 +136,17 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
 </#list>
 
     @Override
-    public void setChildrenLogRoot(Data root) {
+    public void _setChildrenLogRoot(Data root) {
 <#list fields as field>
     <#if field.collectionType>
-        ${field.name}.setLogRoot(root);
+        ${field.name}._setLogRoot(root);
     <#elseif !field.builtInType && !field.enumType>
         <#if field_index gt 0 && fields[field_index-1].collectionType>
 
         </#if>
         ${field.type} $${field.name} = this.${field.name}.getValue();
         if ($${field.name} != null) {
-            $${field.name}.setLogRoot(root);
+            $${field.name}._setLogRoot(root);
         }
 
     </#if>

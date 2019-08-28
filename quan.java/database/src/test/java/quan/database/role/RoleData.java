@@ -35,26 +35,26 @@ public class RoleData extends Data<Long> {
     //道具
     private EntityField<ItemEntity> item = new EntityField<>();
 
-    private MapField<Integer, ItemEntity> items = new MapField<>(getRoot());
+    private MapField<Integer, ItemEntity> items = new MapField<>(_getRoot());
 
-    private SetField<Boolean> set = new SetField<>(getRoot());
+    private SetField<Boolean> set = new SetField<>(_getRoot());
 
-    private ListField<String> list = new ListField<>(getRoot());
+    private ListField<String> list = new ListField<>(_getRoot());
 
-    private MapField<Integer, Integer> map = new MapField<>(getRoot());
+    private MapField<Integer, Integer> map = new MapField<>(_getRoot());
 
-    private SetField<ItemEntity> set2 = new SetField<>(getRoot());
+    private SetField<ItemEntity> set2 = new SetField<>(_getRoot());
 
-    private ListField<ItemEntity> list2 = new ListField<>(getRoot());
+    private ListField<ItemEntity> list2 = new ListField<>(_getRoot());
 
-    private MapField<Integer, ItemEntity> map2 = new MapField<>(getRoot());
+    private MapField<Integer, ItemEntity> map2 = new MapField<>(_getRoot());
 
 
     private static Cache<Long, RoleData> _cache;
 
     public RoleData(Long id) {
 	    super(_cache);
-        this.id.setLogValue(id, getRoot());
+        this.id.setLogValue(id, _getRoot());
     }
 
     @Override
@@ -74,7 +74,7 @@ public class RoleData extends Data<Long> {
     }
 
     public RoleData setName(String name) {
-        this.name.setLogValue(name, getRoot());
+        this.name.setLogValue(name, _getRoot());
         return this;
     }
 
@@ -89,7 +89,7 @@ public class RoleData extends Data<Long> {
      * 角色类型
      */
     public RoleData setRoleType(RoleType roleType) {
-        this.roleType.setLogValue(roleType.getValue(), getRoot());
+        this.roleType.setLogValue(roleType.getValue(), _getRoot());
 	    return this;
     }
 
@@ -98,7 +98,7 @@ public class RoleData extends Data<Long> {
     }
 
     public RoleData setBo(boolean bo) {
-        this.bo.setLogValue(bo, getRoot());
+        this.bo.setLogValue(bo, _getRoot());
         return this;
     }
 
@@ -107,7 +107,7 @@ public class RoleData extends Data<Long> {
     }
 
     public RoleData setBy(byte by) {
-        this.by.setLogValue(by, getRoot());
+        this.by.setLogValue(by, _getRoot());
         return this;
     }
 
@@ -116,7 +116,7 @@ public class RoleData extends Data<Long> {
     }
 
     public RoleData setS(short s) {
-        this.s.setLogValue(s, getRoot());
+        this.s.setLogValue(s, _getRoot());
         return this;
     }
 
@@ -125,7 +125,7 @@ public class RoleData extends Data<Long> {
     }
 
     public RoleData setI(int i) {
-        this.i.setLogValue(i, getRoot());
+        this.i.setLogValue(i, _getRoot());
         return this;
     }
 
@@ -134,7 +134,7 @@ public class RoleData extends Data<Long> {
     }
 
     public RoleData setF(float f) {
-        this.f.setLogValue(f, getRoot());
+        this.f.setLogValue(f, _getRoot());
         return this;
     }
 
@@ -143,7 +143,7 @@ public class RoleData extends Data<Long> {
     }
 
     public RoleData setD(double d) {
-        this.d.setLogValue(d, getRoot());
+        this.d.setLogValue(d, _getRoot());
         return this;
     }
 
@@ -158,7 +158,7 @@ public class RoleData extends Data<Long> {
      * 道具
      */
     public RoleData setItem(ItemEntity item) {
-        this.item.setLogValue(item, getRoot());
+        this.item.setLogValue(item, _getRoot());
         return this;
     }
 
@@ -192,19 +192,19 @@ public class RoleData extends Data<Long> {
 
 
     @Override
-    public void setChildrenLogRoot(Data root) {
+    public void _setChildrenLogRoot(Data root) {
         ItemEntity $item = this.item.getValue();
         if ($item != null) {
-            $item.setLogRoot(root);
+            $item._setLogRoot(root);
         }
 
-        items.setLogRoot(root);
-        set.setLogRoot(root);
-        list.setLogRoot(root);
-        map.setLogRoot(root);
-        set2.setLogRoot(root);
-        list2.setLogRoot(root);
-        map2.setLogRoot(root);
+        items._setLogRoot(root);
+        set._setLogRoot(root);
+        list._setLogRoot(root);
+        map._setLogRoot(root);
+        set2._setLogRoot(root);
+        list2._setLogRoot(root);
+        map2._setLogRoot(root);
     }
 
     @Override

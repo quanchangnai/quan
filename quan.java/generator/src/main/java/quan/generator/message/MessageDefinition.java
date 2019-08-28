@@ -2,6 +2,9 @@ package quan.generator.message;
 
 import quan.generator.BeanDefinition;
 import quan.generator.DefinitionCategory;
+import quan.generator.FieldDefinition;
+
+import java.util.Arrays;
 
 /**
  * Created by quanchangnai on 2017/7/6.
@@ -15,6 +18,7 @@ public class MessageDefinition extends BeanDefinition {
 
     {
         category = DefinitionCategory.message;
+        reservedFieldNames.addAll(Arrays.asList("id", "seq"));
     }
 
     public MessageDefinition() {

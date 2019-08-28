@@ -2,10 +2,7 @@ package quan.generator;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -33,6 +30,8 @@ public abstract class ClassDefinition extends Definition {
     //字段名:字段定义
     protected Map<String, FieldDefinition> nameFields = new HashMap<>();
 
+    //保留字段名
+    protected Set<String> reservedFieldNames = new HashSet<>();
 
     @Override
     public String getDefinitionTypeName() {
@@ -126,7 +125,7 @@ public abstract class ClassDefinition extends Definition {
         if (StringUtils.isBlank(language)) {
             return;
         }
-        for (String lang : language.trim().split("," ,-1)) {
+        for (String lang : language.trim().split(",", -1)) {
             this.languages.add(lang.trim());
         }
     }
@@ -137,9 +136,9 @@ public abstract class ClassDefinition extends Definition {
 
     public void validate() {
         if (getName() == null) {
-            addValidatedError(getDefinitionTypeName() + "名不能为空" );
+            addValidatedError(getDefinitionTypeName() + "名不能为空");
         } else if (!Pattern.matches(namePattern(), getName())) {
-            addValidatedError(getDefinitionTypeName() + "名[" + getName() + "]格式错误" );
+            addValidatedError(getDefinitionTypeName() + "名[" + getName() + "]格式错误");
         }
 
         if (!languages.isEmpty() && !Language.names().containsAll(languages)) {
@@ -158,19 +157,36 @@ public abstract class ClassDefinition extends Definition {
     }
 
     protected void validateField(FieldDefinition fieldDefinition) {
-        //校验字段名
+        validateFieldNameSelf(fieldDefinition);
+        validateFieldNameDuplicate(fieldDefinition);
+    }
+
+    protected void validateFieldNameSelf(FieldDefinition fieldDefinition) {
         if (fieldDefinition.getName() == null) {
-            addValidatedError(getName4Validate("的" ) + "字段名不能为空" );
+            addValidatedError(getName4Validate("的") + "字段名不能为空");
             return;
         }
+
+        //校验字段名格式
         if (!Pattern.matches(fieldDefinition.namePattern(), fieldDefinition.getName())) {
-            addValidatedError(getName4Validate("的" ) + "字段名[" + fieldDefinition.getName() + "]格式错误" );
+            addValidatedError(getName4Validate("的") + "字段名[" + fieldDefinition.getName() + "]格式错误");
+            return;
+        }
+
+        if (!reservedFieldNames.isEmpty() && reservedFieldNames.contains(fieldDefinition.getName())) {
+            addValidatedError(getName4Validate("的") + "字段名[" + fieldDefinition.getName() + "]不合法，不能使用保留字段名" + reservedFieldNames);
+        }
+    }
+
+    protected void validateFieldNameDuplicate(FieldDefinition fieldDefinition) {
+        if (fieldDefinition.getName() == null) {
+            return;
         }
         if (nameFields.containsKey(fieldDefinition.getName())) {
-            addValidatedError(getName4Validate("的" ) + "字段名[" + fieldDefinition.getName() + "]不能重复" );
-            return;
+            addValidatedError(getName4Validate("的") + "字段名[" + fieldDefinition.getName() + "]不能重复");
+        } else {
+            nameFields.put(fieldDefinition.getName(), fieldDefinition);
         }
-        nameFields.put(fieldDefinition.getName(), fieldDefinition);
     }
 
     protected void addValidatedError(String error) {

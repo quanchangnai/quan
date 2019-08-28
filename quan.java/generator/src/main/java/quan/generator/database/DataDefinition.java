@@ -16,6 +16,7 @@ public class DataDefinition extends BeanDefinition {
 
     {
         category = DefinitionCategory.data;
+        reservedFieldNames.add("key");
     }
 
     public DataDefinition() {

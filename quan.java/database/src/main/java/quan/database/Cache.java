@@ -112,7 +112,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
 
     void setInsert(V data) {
 //        logger.debug("[{}],Cache.setInsert({}),rows:{}", name, data.getKey(), rows);
-        data.setExpired(false);
+        data._setExpired(false);
         Row<V> row = rows.get(data.getKey());
         //row有可能为空(新插入时)
         //可能状态:delete:(被删除过)
@@ -327,7 +327,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
             for (K key : dirty.keySet()) {
                 Row<V> row = rows.get(key);
                 if (row.state == Row.DELETE && row.data != null) {
-                    row.data.setExpired(true);
+                    row.data._setExpired(true);
                 }
             }
 
@@ -347,7 +347,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
             store0();
             for (Row<V> row : rows.values()) {
                 if (row.data != null) {
-                    row.data.setExpired(true);
+                    row.data._setExpired(true);
                 }
             }
             rows.clear();
@@ -389,8 +389,8 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
         Iterator<Row<V>> iterator = rows.values().iterator();
         while (iterator.hasNext()) {
             V data = iterator.next().data;
-            if (currentTime - data.getTouchTime() > cacheExpire * 1000) {
-                data.setExpired(true);
+            if (currentTime - data.touchTime() > cacheExpire * 1000) {
+                data._setExpired(true);
                 iterator.remove();
                 cleans.add(data.getKey());
             }

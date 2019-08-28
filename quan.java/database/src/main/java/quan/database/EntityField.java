@@ -22,7 +22,7 @@ public final class EntityField<V extends Entity> extends BaseField<V> {
 
         V oldValue = getValue();
         if (oldValue != null) {
-            oldValue.setLogRoot(null);
+            oldValue._setLogRoot(null);
         }
 
         FieldLog<V> log = (FieldLog<V>) transaction.getFieldLog(this);
@@ -33,7 +33,7 @@ public final class EntityField<V extends Entity> extends BaseField<V> {
         }
 
         if (value != null) {
-            value.setLogRoot(root);
+            value._setLogRoot(root);
         }
 
     }

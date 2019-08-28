@@ -11,7 +11,7 @@ class VersionLog {
 
     public VersionLog(Data data) {
         this.data = data;
-        this.version = data.getVersion();
+        this.version = data._getVersion();
     }
 
     public long getVersion() {
@@ -27,7 +27,7 @@ class VersionLog {
         if (cache != null) {
             cache.checkWorkable();
         }
-        return version != data.getVersion();
+        return version != data._getVersion();
     }
 
     public void commit() {

@@ -145,7 +145,7 @@ public class Transaction {
         if (data.getCache() != null) {
             data.getCache().checkWorkable();
         }
-        if (data.isExpired()) {
+        if (data._isExpired()) {
             throw new IllegalStateException("数据已过期");
         }
         data.touch();
@@ -400,7 +400,7 @@ public class Transaction {
         }
 
         for (Data data : notCachedRowLocksIndexes) {
-            notCachedRowLocks.add(data.getLock());
+            notCachedRowLocks.add(data._getLock());
         }
 
         //存档时要阻塞

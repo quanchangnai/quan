@@ -259,6 +259,8 @@ public class ConfigDefinition extends BeanDefinition {
 
     @Override
     protected void validateField(FieldDefinition field) {
+        validateFieldNameDuplicate(field);
+
         if (field.getColumn() != null) {
             if (!columnFields.containsKey(field.getColumn())) {
                 columnFields.put(field.getColumn(), field);
@@ -266,22 +268,11 @@ public class ConfigDefinition extends BeanDefinition {
                 addValidatedError(getName4Validate("的") + field.getName4Validate() + "和列[" + field.getColumn() + "]必须一一对应");
             }
         }
-
-        if (field.getName() != null) {
-            if (!nameFields.containsKey(field.getName())) {
-                nameFields.put(field.getName(), field);
-            } else {
-                addValidatedError(getName4Validate("的") + "字段名[" + field.getName() + "]不能重复");
-            }
-        }
     }
 
     protected void validateSelfField(FieldDefinition field) {
         //校验字段名
-        if (field.getName() == null) {
-            addValidatedError(getName4Validate("的") + "字段名不能为空");
-            return;
-        }
+        validateFieldNameSelf(field);
 
         //校验字段类型
         validateFieldType(field);
