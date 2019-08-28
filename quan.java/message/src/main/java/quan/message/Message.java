@@ -9,45 +9,37 @@ import java.io.IOException;
 public abstract class Message extends Bean {
 
     /**
-     * 消息ID
-     */
-    private final int id;
-
-    /**
      * 消息序号
      */
-    private long sn;
+    private long seq;
 
-    protected Message(int id) {
-        this.id = id;
+    /**
+     * 消息ID
+     */
+    public abstract int getId();
+
+    public final long getSeq() {
+        return seq;
     }
 
-    public final int getId() {
-        return id;
-    }
-
-    public final long getSn() {
-        return sn;
-    }
-
-    public final void setSn(long sn) {
-        this.sn = sn;
+    public final void setSeq(long seq) {
+        this.seq = seq;
     }
 
     public abstract Message create();
 
     @Override
     public void encode(Buffer buffer) throws IOException {
-        buffer.writeInt(id);
-        buffer.writeLong(sn);
+        buffer.writeInt(getId());
+        buffer.writeLong(seq);
     }
 
     @Override
     public void decode(Buffer buffer) throws IOException {
         int msgId = buffer.readInt();
-        if (msgId != id) {
-            throw new IOException("消息ID不匹配,目标值：" + id + "，实际值：" + msgId);
+        if (msgId != getId()) {
+            throw new IOException("消息ID不匹配,期望值：" + getId() + "，实际值：" + msgId);
         }
-        sn = buffer.readLong();
+        seq = buffer.readLong();
     }
 }

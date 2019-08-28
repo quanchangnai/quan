@@ -7,23 +7,16 @@ namespace Quan.Message
     /// </summary>
     public abstract class MessageBase : Bean
     {
-        public int Id { get; }
+        public abstract int Id { get; }
 
-        public long Sn { get; set; }
-
-
-        protected MessageBase(int id)
-        {
-            Id = id;
-        }
+        public long Seq { get; set; }
 
         public abstract MessageBase Create();
-
 
         public override void Encode(Buffer buffer)
         {
             buffer.WriteInt(Id);
-            buffer.WriteLong(Sn);
+            buffer.WriteLong(Seq);
         }
 
         public override void Decode(Buffer buffer)
@@ -31,10 +24,10 @@ namespace Quan.Message
             var id = buffer.ReadInt();
             if (id != Id)
             {
-                throw new IOException("消息ID不匹配,目标值：" + Id + "，实际值：" + id);
+                throw new IOException("消息ID不匹配,期望值：" + Id + "，实际值：" + id);
             }
 
-            Sn = buffer.ReadLong();
+            Seq = buffer.ReadLong();
         }
     }
 }

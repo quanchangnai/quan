@@ -21,7 +21,7 @@ namespace ${fullPackageName}
 		/// <summary>
 		/// 消息ID
 		/// </summary>
-		public const int ID = ${id?c};
+		public override int Id => ${id?c};
 
 </#if>
 <#list fields as field>
@@ -103,16 +103,12 @@ namespace ${fullPackageName}
 </#list>
 
 <#if definitionType ==3>
-        public ${name}(): base(ID)
-		{
-		}
-
 		public override MessageBase Create()
 		{
 			return new ${name}();
 		}
-</#if>
 
+</#if>
 		public override void Encode(Buffer buffer)
 		{
 	    	base.Encode(buffer);

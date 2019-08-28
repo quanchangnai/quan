@@ -115,7 +115,7 @@ public class ConfigDefinition extends BeanDefinition {
             if (configDefinition == null) {
                 continue;
             }
-            allTables.addAll(Arrays.asList(configDefinition.table.split(",",-1)));
+            allTables.addAll(Arrays.asList(configDefinition.table.split(",", -1)));
         }
 
         return allTables;
@@ -203,7 +203,7 @@ public class ConfigDefinition extends BeanDefinition {
         }
 
         //支持分表
-        tables.addAll(Arrays.asList(table.split(",",-1)));
+        tables.addAll(Arrays.asList(table.split(",", -1)));
         for (String t : tables) {
             ConfigDefinition other = parser.getTableConfigs().get(t);
             if (other != null && !getName().equals(other.getName())) {
@@ -374,10 +374,6 @@ public class ConfigDefinition extends BeanDefinition {
         }
     }
 
-    protected boolean supportFieldRef() {
-        return true;
-    }
-
     private void validateIndexes() {
         for (FieldDefinition selfField : selfFields) {
             if (selfField.getIndex() == null && !selfField.getName().equals("id")) {
@@ -446,11 +442,25 @@ public class ConfigDefinition extends BeanDefinition {
             return;
         }
 
-        String[] fieldNameArray = fieldNames.split(",",-1);
-        if (fieldNameArray.length > 3) {
+        String[] fieldNameArray = fieldNames.split(",", -1);
+
+        boolean fieldNamePatternError = false;
+        for (String fieldName : fieldNameArray) {
+            if (!fieldNamePatternError) {
+                fieldNamePatternError = StringUtils.isBlank(fieldName);
+            }
+        }
+
+        if (fieldNamePatternError) {
+            addValidatedError(getName4Validate("的") + indexDefinition.getName4Validate() + "字段[" + fieldNames + "]格式错误");
+        } else if (fieldNameArray.length > 3) {
             addValidatedError(getName4Validate("的") + indexDefinition.getName4Validate() + "字段[" + fieldNames + "]不能超过三个");
         }
+
         for (String fieldName : fieldNameArray) {
+            if (StringUtils.isBlank(fieldName)) {
+                continue;
+            }
             FieldDefinition fieldDefinition = nameFields.get(fieldName);
             if (fieldDefinition == null) {
                 addValidatedError(getName4Validate("的") + indexDefinition.getName4Validate() + "字段[" + fieldName + "]不存在");

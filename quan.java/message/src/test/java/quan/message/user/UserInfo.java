@@ -18,8 +18,6 @@ public class UserInfo extends Bean {
     //等级
     private int level;
 
-    public UserInfo() {
-    }
 
     /**
      * ID

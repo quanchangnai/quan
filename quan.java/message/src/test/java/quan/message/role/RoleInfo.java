@@ -36,8 +36,6 @@ public class RoleInfo extends Bean {
 
     private HashMap<Integer, Integer> map = new HashMap<>();
 
-    public RoleInfo() {
-    }
 
     /**
      * 角色id

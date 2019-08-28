@@ -42,12 +42,17 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     </#if>
 
 </#list>
-    public ${name}() {
+
 <#if definitionType ==3>
-        super(ID);
-</#if>
+    /**
+     * 消息ID
+     */
+    @Override
+    public final int getId() {
+        return ID;
     }
 
+</#if>
 <#list fields as field>
     <#if field.comment !="">
     /**

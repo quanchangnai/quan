@@ -22,7 +22,7 @@ public abstract class DefinitionParser {
 
     protected String enumPackagePrefix;
 
-    private List<String> definitionPaths = new ArrayList<>();
+    private LinkedHashSet<String> definitionPaths = new LinkedHashSet<>();
 
     protected LinkedHashSet<File> definitionFiles = new LinkedHashSet<>();
 
@@ -69,7 +69,7 @@ public abstract class DefinitionParser {
         this.enumPackagePrefix = enumPackagePrefix;
     }
 
-    public List<String> getDefinitionPaths() {
+    public LinkedHashSet<String> getDefinitionPaths() {
         return definitionPaths;
     }
 

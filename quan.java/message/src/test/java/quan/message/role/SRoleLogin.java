@@ -37,8 +37,13 @@ public class SRoleLogin extends Message {
     //用户信息
     private UserInfo userInfo;
 
-    public SRoleLogin() {
-        super(ID);
+
+    /**
+     * 消息ID
+     */
+    @Override
+    public final int getId() {
+        return ID;
     }
 
     /**
