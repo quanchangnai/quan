@@ -391,10 +391,11 @@ public class RoleData extends Data<Long> {
     }
 
     public synchronized static void setCache(Cache<Long, RoleData> cache) {
-        cache.checkWorkable();
         if (_cache != null && _cache.isWorkable()) {
             throw new IllegalStateException("数据已设置缓存" );
         }
+        Objects.requireNonNull(cache, "参数[cache]不能为空" );
+        cache.checkWorkable();
         _cache = cache;
     }
 

@@ -328,10 +328,11 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
 
 <#if definitionType ==5 && persistent>
     public synchronized static void setCache(Cache<${keyType}, ${name}> cache) {
-        cache.checkWorkable();
         if (_cache != null && _cache.isWorkable()) {
             throw new IllegalStateException("数据已设置缓存" );
         }
+        Objects.requireNonNull(cache, "参数[cache]不能为空" );
+        cache.checkWorkable();
         _cache = cache;
     }
 
