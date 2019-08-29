@@ -7,7 +7,7 @@ class ListLog<V> extends FieldLog<V> {
 
     private int modCount;
 
-    public ListLog(Field field, V value) {
+    public ListLog(Field<V> field, V value) {
         super(field, value);
     }
 
