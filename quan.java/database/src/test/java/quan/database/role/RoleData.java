@@ -57,6 +57,11 @@ public class RoleData extends Data<Long> {
         this.id.setLogValue(id, _getRoot());
     }
 
+    public RoleData(Cache<Long, RoleData> cache, Long id) {
+        super(cache);
+        this.id.setLogValue(id, _getRoot());
+    }
+
     @Override
     public Long getKey() {
         return getId();

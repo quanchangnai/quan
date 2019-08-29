@@ -64,6 +64,11 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
         this.${keyName}.setLogValue(${keyName}, _getRoot());
     }
 
+    public ${name}(Cache<${keyType}, ${name}> cache, ${keyType} ${keyName}) {
+        super(cache);
+        this.${keyName}.setLogValue(${keyName}, _getRoot());
+    }
+
     <#else>
     public ${name}() {
         super(null);

@@ -19,7 +19,7 @@ public abstract class Database {
      */
     private static Database instance;
 
-    private AtomicInteger nextId = new AtomicInteger();
+    private static AtomicInteger nextId = new AtomicInteger();
 
     /**
      * 数据库实例ID，正常情况下只会有一个数据库实例
@@ -80,7 +80,7 @@ public abstract class Database {
     }
 
     public static void setDefault(Database database) {
-        Database.instance = instance;
+        Database.instance = database;
     }
 
     public Config getConfig() {
@@ -191,7 +191,7 @@ public abstract class Database {
                     }
                     try {
                         Thread.sleep(1000);
-                    } catch (InterruptedException e) {
+                    } catch (InterruptedException ignored) {
                     }
                 }
 

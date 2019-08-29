@@ -37,8 +37,8 @@ public class MySqlDB extends Database {
         basicDataSource.setPoolPreparedStatements(true);
 
         List<String> initSqlList = new ArrayList<>();
-        initSqlList.add(String.format("CREATE DATABASE IF NOT EXISTS `%s` CHARACTER SET 'utf8mb4'", config.database));
-        initSqlList.add(String.format("USE `%s`", config.database));
+        initSqlList.add(String.format("CREATE DATABASE IF NOT EXISTS `%s` CHARACTER SET 'utf8mb4'" , config.database));
+        initSqlList.add(String.format("USE `%s`" , config.database));
         basicDataSource.setConnectionInitSqls(initSqlList);
         basicDataSource.setDefaultAutoCommit(true);
 
@@ -54,7 +54,7 @@ public class MySqlDB extends Database {
     @Override
     protected void registerCache0(Cache cache) {
         try (Connection conn = getConnection(); Statement statement = conn.createStatement()) {
-            String sql = String.format("CREATE TABLE IF NOT EXISTS `%s`( _key VARCHAR(%d) PRIMARY KEY,_data text ) ENGINE = INNODB DEFAULT charset = utf8mb4", cache.getName(), getConfig().tableKeyLength);
+            String sql = String.format("CREATE TABLE IF NOT EXISTS `%s`( _key VARCHAR(%d) PRIMARY KEY,_data text ) ENGINE = INNODB DEFAULT charset = utf8mb4" , cache.getName(), getConfig().tableKeyLength);
             statement.execute(sql);
         } catch (SQLException e) {
             throw new DbException(e);
@@ -79,7 +79,8 @@ public class MySqlDB extends Database {
     @Override
     protected <K, V extends Data<K>> V get(Cache<K, V> cache, K key) {
         checkClosed();
-        try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement("SELECT _data FROM `" + cache.getName() + "` WHERE _key = ?")) {
+        String sql = String.format("SELECT _data FROM `%s` WHERE _key = ?" , cache.getName());
+        try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, key.toString());
             ResultSet resultSet = statement.executeQuery();
             if (!resultSet.next()) {
@@ -98,7 +99,8 @@ public class MySqlDB extends Database {
     @Override
     protected <K, V extends Data<K>> void put(V data) {
         checkClosed();
-        try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement("INSERT INTO `" + data.getCache().getName() + "`(_key, _data) values(?, ?) ON DUPLICATE KEY UPDATE _data = VALUES(_data)")) {
+        String sql = String.format("INSERT INTO `%s`(_key, _data) values(?, ?) ON DUPLICATE KEY UPDATE _data = VALUES(_data)" , data.getCache().getName());
+        try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, data.getKey().toString());
             statement.setString(2, data.encode().toJSONString());
             statement.execute();
@@ -110,7 +112,8 @@ public class MySqlDB extends Database {
     @Override
     protected <K, V extends Data<K>> void delete(Cache<K, V> cache, K key) {
         checkClosed();
-        try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement("DELETE FROM `" + cache.getName() + "` WHERE _key = ?")) {
+        String sql = String.format("DELETE FROM `%s` WHERE _key = ?" , cache.getName());
+        try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, key.toString());
             statement.execute();
         } catch (Exception e) {
@@ -127,7 +130,8 @@ public class MySqlDB extends Database {
             try {
                 //插入或更新
                 if (!puts.isEmpty()) {
-                    try (PreparedStatement statement = connection.prepareStatement("INSERT INTO `" + cache.getName() + "`(_key, _data) values(?, ?) ON DUPLICATE KEY UPDATE _data = values(_data)")) {
+                    String sql = String.format("INSERT INTO `%s`(_key, _data) values(?, ?) ON DUPLICATE KEY UPDATE _data = values(_data)" , cache.getName());
+                    try (PreparedStatement statement = connection.prepareStatement(sql)) {
                         for (V putData : puts) {
                             statement.setString(1, putData.getKey().toString());
                             statement.setString(2, putData.encode().toJSONString());
@@ -139,7 +143,8 @@ public class MySqlDB extends Database {
 
                 //删除
                 if (!deletes.isEmpty()) {
-                    try (PreparedStatement statement = connection.prepareStatement("DELETE FROM `" + cache.getName() + "` WHERE _key = ?")) {
+                    String sql = String.format("DELETE FROM `%s` WHERE _key = ?" , cache.getName());
+                    try (PreparedStatement statement = connection.prepareStatement(sql)) {
                         for (K deleteKey : deletes) {
                             statement.setString(1, deleteKey.toString());
                             statement.addBatch();
@@ -198,9 +203,9 @@ public class MySqlDB extends Database {
         public Config setConnectionString(String connectionString) {
             database = ConnectionUrlParser.parseConnectionString(connectionString).getPath();
             if (database == null) {
-                throw new IllegalArgumentException("必须指定连接数据库");
+                throw new IllegalArgumentException("必须指定连接数据库" );
             }
-            this.connectionString = connectionString.replace("/" + database + "?", "?");
+            this.connectionString = connectionString.replace("/" + database + "?" , "?" );
             return this;
         }
 
