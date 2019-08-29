@@ -13,7 +13,7 @@ public class ItemEntity extends Entity {
 
     private BaseField<Integer> id = new BaseField<>(0);
 
-    private BaseField<String> name = new BaseField<>("");
+    private BaseField<String> name = new BaseField<>("" );
 
 
     public int getId() {
@@ -36,23 +36,23 @@ public class ItemEntity extends Entity {
 
 
     @Override
-    public void _setChildrenLogRoot(Data root) {
+    protected void _setChildrenLogRoot(Data root) {
     }
 
     @Override
     public JSONObject encode() {
         JSONObject json = new JSONObject();
 
-        json.put("id", this.id.getValue());
-        json.put("name", this.name.getValue());
+        json.put("id" , this.id.getValue());
+        json.put("name" , this.name.getValue());
 
         return json;
     }
 
     @Override
     public void decode(JSONObject json) {
-        this.id.setValue(json.getIntValue("id"));
-        this.name.setValue(json.getOrDefault("name","").toString());
+        this.id.setValue(json.getIntValue("id" ));
+        this.name.setValue(json.getOrDefault("name" , "" ).toString());
     }
 
     @Override

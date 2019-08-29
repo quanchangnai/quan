@@ -15,7 +15,7 @@ public class RoleData extends Data<Long> {
     //角色ID
     private BaseField<Long> id = new BaseField<>(0L);
 
-    private BaseField<String> name = new BaseField<>("");
+    private BaseField<String> name = new BaseField<>("" );
 
     //角色类型
     private BaseField<Integer> roleType = new BaseField<>(0);
@@ -192,94 +192,94 @@ public class RoleData extends Data<Long> {
 
 
     @Override
-    public void _setChildrenLogRoot(Data root) {
+    protected void _setChildrenLogRoot(Data root) {
         ItemEntity $item = this.item.getValue();
         if ($item != null) {
-            $item._setLogRoot(root);
+            _setLogRoot($item, root);
         }
 
-        items._setLogRoot(root);
-        set._setLogRoot(root);
-        list._setLogRoot(root);
-        map._setLogRoot(root);
-        set2._setLogRoot(root);
-        list2._setLogRoot(root);
-        map2._setLogRoot(root);
+        _setLogRoot(items, root);
+        _setLogRoot(set, root);
+        _setLogRoot(list, root);
+        _setLogRoot(map, root);
+        _setLogRoot(set2, root);
+        _setLogRoot(list2, root);
+        _setLogRoot(map2, root);
     }
 
     @Override
     public JSONObject encode() {
         JSONObject json = new JSONObject();
 
-        json.put("id", this.id.getValue());
-        json.put("name", this.name.getValue());
-        json.put("roleType", this.roleType.getValue());
-        json.put("bo", this.bo.getValue());
-        json.put("by", this.by.getValue());
-        json.put("s", this.s.getValue());
-        json.put("i", this.i.getValue());
-        json.put("f", this.f.getValue());
-        json.put("d", this.d.getValue());
+        json.put("id" , this.id.getValue());
+        json.put("name" , this.name.getValue());
+        json.put("roleType" , this.roleType.getValue());
+        json.put("bo" , this.bo.getValue());
+        json.put("by" , this.by.getValue());
+        json.put("s" , this.s.getValue());
+        json.put("i" , this.i.getValue());
+        json.put("f" , this.f.getValue());
+        json.put("d" , this.d.getValue());
 
         ItemEntity $item = this.item.getValue();
         if ($item != null) {
-            json.put("item", $item.encode());
+            json.put("item" , $item.encode());
         }
 
         JSONObject $items = new JSONObject();
         for (Integer $items$Key : this.items.keySet()) {
             $items.put(String.valueOf($items$Key), this.items.get($items$Key).encode());
         }
-        json.put("items", $items);
+        json.put("items" , $items);
 
         JSONArray $set = new JSONArray();
         $set.addAll(this.set);
-        json.put("set", $set);
+        json.put("set" , $set);
 
         JSONArray $list = new JSONArray();
         $list.addAll(this.list);
-        json.put("list", $list);
+        json.put("list" , $list);
 
         JSONObject $map = new JSONObject();
         for (Integer $map$Key : this.map.keySet()) {
             $map.put(String.valueOf($map$Key), this.map.get($map$Key));
         }
-        json.put("map", $map);
+        json.put("map" , $map);
 
         JSONArray $set2 = new JSONArray();
         for (ItemEntity $set2$Value : this.set2) {
             $set2.add($set2$Value.encode());
         }
-        json.put("set2", $set2);
+        json.put("set2" , $set2);
 
         JSONArray $list2 = new JSONArray();
         for (ItemEntity $list2$Value : this.list2) {
             $list2.add($list2$Value.encode());
         }
-        json.put("list2", $list2);
+        json.put("list2" , $list2);
 
         JSONObject $map2 = new JSONObject();
         for (Integer $map2$Key : this.map2.keySet()) {
             $map2.put(String.valueOf($map2$Key), this.map2.get($map2$Key).encode());
         }
-        json.put("map2", $map2);
+        json.put("map2" , $map2);
 
         return json;
     }
 
     @Override
     public void decode(JSONObject json) {
-        this.id.setValue(json.getLongValue("id"));
-        this.name.setValue(json.getOrDefault("name","").toString());
-        this.roleType.setValue(json.getIntValue("roleType"));
-        this.bo.setValue(json.getBooleanValue("bo"));
-        this.by.setValue(json.getByteValue("by"));
-        this.s.setValue(json.getShortValue("s"));
-        this.i.setValue(json.getIntValue("i"));
-        this.f.setValue(json.getFloatValue("f"));
-        this.d.setValue(json.getDoubleValue("d"));
+        this.id.setValue(json.getLongValue("id" ));
+        this.name.setValue(json.getOrDefault("name" , "" ).toString());
+        this.roleType.setValue(json.getIntValue("roleType" ));
+        this.bo.setValue(json.getBooleanValue("bo" ));
+        this.by.setValue(json.getByteValue("by" ));
+        this.s.setValue(json.getShortValue("s" ));
+        this.i.setValue(json.getIntValue("i" ));
+        this.f.setValue(json.getFloatValue("f" ));
+        this.d.setValue(json.getDoubleValue("d" ));
 
-        JSONObject $item = json.getJSONObject("item");
+        JSONObject $item = json.getJSONObject("item" );
         if ($item != null) {
             ItemEntity $item$Value = this.item.getValue();
             if ($item$Value == null) {
@@ -289,7 +289,7 @@ public class RoleData extends Data<Long> {
             $item$Value.decode($item);
         }
 
-        JSONObject $items$1 = json.getJSONObject("items");
+        JSONObject $items$1 = json.getJSONObject("items" );
         if ($items$1 != null) {
             PMap<Integer, ItemEntity> $items$2 = Empty.map();
             for (String $items$Key : $items$1.keySet()) {
@@ -300,7 +300,7 @@ public class RoleData extends Data<Long> {
             this.items.setValue($items$2);
         }
 
-        JSONArray $set$1 = json.getJSONArray("set");
+        JSONArray $set$1 = json.getJSONArray("set" );
         if ($set$1 != null) {
             PSet<Boolean> $set$2 = Empty.set();
             for (int i = 0; i < $set$1.size(); i++) {
@@ -309,7 +309,7 @@ public class RoleData extends Data<Long> {
             this.set.setValue($set$2);
         }
 
-        JSONArray $list$1 = json.getJSONArray("list");
+        JSONArray $list$1 = json.getJSONArray("list" );
         if ($list$1 != null) {
             PVector<String> $list$2 = Empty.vector();
             for (int i = 0; i < $list$1.size(); i++) {
@@ -318,7 +318,7 @@ public class RoleData extends Data<Long> {
             this.list.setValue($list$2);
         }
 
-        JSONObject $map$1 = json.getJSONObject("map");
+        JSONObject $map$1 = json.getJSONObject("map" );
         if ($map$1 != null) {
             PMap<Integer, Integer> $map$2 = Empty.map();
             for (String $map$Key : $map$1.keySet()) {
@@ -327,7 +327,7 @@ public class RoleData extends Data<Long> {
             this.map.setValue($map$2);
         }
 
-        JSONArray $set2$1 = json.getJSONArray("set2");
+        JSONArray $set2$1 = json.getJSONArray("set2" );
         if ($set2$1 != null) {
             PSet<ItemEntity> $set2$2 = Empty.set();
             for (int i = 0; i < $set2$1.size(); i++) {
@@ -338,7 +338,7 @@ public class RoleData extends Data<Long> {
             this.set2.setValue($set2$2);
         }
 
-        JSONArray $list2$1 = json.getJSONArray("list2");
+        JSONArray $list2$1 = json.getJSONArray("list2" );
         if ($list2$1 != null) {
             PVector<ItemEntity> $list2$2 = Empty.vector();
             for (int i = 0; i < $list2$1.size(); i++) {
@@ -349,7 +349,7 @@ public class RoleData extends Data<Long> {
             this.list2.setValue($list2$2);
         }
 
-        JSONObject $map2$1 = json.getJSONObject("map2");
+        JSONObject $map2$1 = json.getJSONObject("map2" );
         if ($map2$1 != null) {
             PMap<Integer, ItemEntity> $map2$2 = Empty.map();
             for (String $map2$Key : $map2$1.keySet()) {
@@ -388,7 +388,7 @@ public class RoleData extends Data<Long> {
     public synchronized static void setCache(Cache<Long, RoleData> cache) {
         cache.checkWorkable();
         if (_cache != null && _cache.isWorkable()) {
-            throw new IllegalStateException("数据已设置缓存");
+            throw new IllegalStateException("数据已设置缓存" );
         }
         _cache = cache;
     }
@@ -400,11 +400,11 @@ public class RoleData extends Data<Long> {
 
         Database database = Database.getDefault();
         if (database == null) {
-            throw new IllegalStateException("没有默认数据库");
+            throw new IllegalStateException("没有默认数据库" );
         }
 
         if (_cache == null) {
-            _cache = new Cache<>("RoleData", RoleData::new);
+            _cache = new Cache<>("RoleData" , RoleData::new);
             database.registerCache(_cache);
         } else if (!_cache.isWorkable()) {
             database.registerCache(_cache);

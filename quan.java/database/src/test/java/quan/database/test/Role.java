@@ -74,11 +74,9 @@ public class Role {
 //            Transaction.breakdown();
         }
 
-
         if (roleData.getId() == 1) {
 //            return false;
         }
-
         return true;
     }
 

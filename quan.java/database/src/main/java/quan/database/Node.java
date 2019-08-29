@@ -12,7 +12,7 @@ public abstract class Node {
 
     private Data root;
 
-    public Data _getRoot() {
+    protected Data _getRoot() {
         Transaction transaction = Transaction.get();
         if (transaction != null) {
             RootLog rootLog = transaction.getRootLog(this);
@@ -23,11 +23,11 @@ public abstract class Node {
         return root;
     }
 
-    public void _setRoot(Data root) {
+    protected void _setRoot(Data root) {
         this.root = root;
     }
 
-    public void _setLogRoot(Data root) {
+    protected void _setLogRoot(Data root) {
         Transaction transaction = Transaction.get();
         RootLog rootLog = transaction.getRootLog(this);
         if (rootLog != null) {
@@ -39,7 +39,10 @@ public abstract class Node {
         _setChildrenLogRoot(root);
     }
 
-    public abstract void _setChildrenLogRoot(Data root);
+    protected static void _setLogRoot(Node node, Data root) {
+        node._setLogRoot(root);
+    }
 
+    protected abstract void _setChildrenLogRoot(Data root);
 
 }

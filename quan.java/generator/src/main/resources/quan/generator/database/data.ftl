@@ -26,7 +26,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
     private ${field.classType}<${field.classKeyType}, ${field.classValueType}> ${field.name} = new ${field.classType}<>(_getRoot());
 
     <#elseif field.type = "string">
-    private BaseField<${field.classType}> ${field.name} = new BaseField<>("");
+    private BaseField<${field.classType}> ${field.name} = new BaseField<>("" );
 
     <#elseif field.type = "byte">
     private BaseField<${field.classType}> ${field.name} = new BaseField<>((byte) 0);
@@ -136,17 +136,17 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
 </#list>
 
     @Override
-    public void _setChildrenLogRoot(Data root) {
+    protected void _setChildrenLogRoot(Data root) {
 <#list fields as field>
     <#if field.collectionType>
-        ${field.name}._setLogRoot(root);
+        _setLogRoot(${field.name}, root);
     <#elseif !field.builtInType && !field.enumType>
         <#if field_index gt 0 && fields[field_index-1].collectionType>
 
         </#if>
         ${field.type} $${field.name} = this.${field.name}.getValue();
         if ($${field.name} != null) {
-            $${field.name}._setLogRoot(root);
+            _setLogRoot($${field.name}, root);
         }
 
     </#if>
@@ -170,7 +170,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
         <#else>
         $${field.name}.addAll(this.${field.name});
         </#if>
-        json.put("${field.name}", $${field.name});
+        json.put("${field.name}" , $${field.name});
         <#if field_has_next && (fields[field_index+1].enumType || fields[field_index+1].primitiveType) >
 
         </#if>
@@ -186,19 +186,19 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
             $${field.name}.put(String.valueOf($${field.name}$Key), this.${field.name}.get($${field.name}$Key));
         </#if>
         }
-        json.put("${field.name}", $${field.name});
+        json.put("${field.name}" , $${field.name});
         <#if field_has_next && (fields[field_index+1].enumType || fields[field_index+1].primitiveType) >
 
         </#if>
     <#elseif field.builtInType || field.enumType>
-        json.put("${field.name}", this.${field.name}.getValue());
+        json.put("${field.name}" , this.${field.name}.getValue());
     <#else>
         <#if field_index gt 0 >
 
         </#if>
         ${field.type} $${field.name} = this.${field.name}.getValue();
         if ($${field.name} != null) {
-            json.put("${field.name}", $${field.name}.encode());
+            json.put("${field.name}" , $${field.name}.encode());
         }
         <#if field_has_next && (fields[field_index+1].enumType || fields[field_index+1].primitiveType) >
 
@@ -216,7 +216,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
         <#if field_index gt 0 >
 
         </#if>
-        JSONArray $${field.name}$1 = json.getJSONArray("${field.name}");
+        JSONArray $${field.name}$1 = json.getJSONArray("${field.name}" );
         if ($${field.name}$1 != null) {
             PVector<${field.classValueType}> $${field.name}$2 = Empty.vector();
             for (int i = 0; i < $${field.name}$1.size(); i++) {
@@ -230,14 +230,14 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
             }
             this.${field.name}.setValue($${field.name}$2);
         }
-        <#if field_has_next && (fields[field_index+1].enumType || fields[field_index+1].primitiveType && fields[field_index+1].type!="string")>
+        <#if field_has_next && (fields[field_index+1].enumType || fields[field_index+1].primitiveType && fields[field_index+1].type!="string" )>
 
         </#if>
     <#elseif field.type == "set">
         <#if field_index gt 0 >
 
         </#if>
-        JSONArray $${field.name}$1 = json.getJSONArray("${field.name}");
+        JSONArray $${field.name}$1 = json.getJSONArray("${field.name}" );
         if ($${field.name}$1 != null) {
             PSet<${field.classValueType}> $${field.name}$2 = Empty.set();
             for (int i = 0; i < $${field.name}$1.size(); i++) {
@@ -251,14 +251,14 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
             }
             this.${field.name}.setValue($${field.name}$2);
         }
-        <#if field_has_next && (fields[field_index+1].enumType || fields[field_index+1].primitiveType && fields[field_index+1].type!="string")>
+        <#if field_has_next && (fields[field_index+1].enumType || fields[field_index+1].primitiveType && fields[field_index+1].type!="string" )>
 
         </#if>
     <#elseif field.type == "map">
         <#if field_index gt 0 >
 
         </#if>
-        JSONObject $${field.name}$1 = json.getJSONObject("${field.name}");
+        JSONObject $${field.name}$1 = json.getJSONObject("${field.name}" );
         if ($${field.name}$1 != null) {
             PMap<${field.classKeyType}, ${field.classValueType}> $${field.name}$2 = Empty.map();
             for (String $${field.name}$Key : $${field.name}$1.keySet()) {
@@ -272,20 +272,20 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
             }
             this.${field.name}.setValue($${field.name}$2);
         }
-        <#if field_has_next && (fields[field_index+1].enumType || fields[field_index+1].primitiveType && fields[field_index+1].type!="string")>
+        <#if field_has_next && (fields[field_index+1].enumType || fields[field_index+1].primitiveType && fields[field_index+1].type!="string" )>
 
         </#if>
     <#elseif field.type=="int" || field.enumType>
-        this.${field.name}.setValue(json.getIntValue("${field.name}"));
+        this.${field.name}.setValue(json.getIntValue("${field.name}" ));
     <#elseif field.type=="string">
-        this.${field.name}.setValue(json.getOrDefault("${field.name}","").toString());
+        this.${field.name}.setValue(json.getOrDefault("${field.name}" , "" ).toString());
     <#elseif field.builtInType>
-        this.${field.name}.setValue(json.get${field.classType}Value("${field.name}"));
+        this.${field.name}.setValue(json.get${field.classType}Value("${field.name}" ));
     <#else>
         <#if field_index gt 0 >
 
         </#if>
-        JSONObject $${field.name} = json.getJSONObject("${field.name}");
+        JSONObject $${field.name} = json.getJSONObject("${field.name}" );
         if ($${field.name} != null) {
             ${field.classType} $${field.name}$Value = this.${field.name}.getValue();
             if ($${field.name}$Value == null) {
@@ -294,7 +294,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
             }
             $${field.name}$Value.decode($${field.name});
         }
-        <#if field_has_next && (fields[field_index+1].enumType || fields[field_index+1].primitiveType && fields[field_index+1].type!="string")>
+        <#if field_has_next && (fields[field_index+1].enumType || fields[field_index+1].primitiveType && fields[field_index+1].type!="string" )>
 
         </#if>
     </#if>
@@ -325,7 +325,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
     public synchronized static void setCache(Cache<${keyType}, ${name}> cache) {
         cache.checkWorkable();
         if (_cache != null && _cache.isWorkable()) {
-            throw new IllegalStateException("数据已设置缓存");
+            throw new IllegalStateException("数据已设置缓存" );
         }
         _cache = cache;
     }
@@ -337,11 +337,11 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
 
         Database database = Database.getDefault();
         if (database == null) {
-            throw new IllegalStateException("没有默认数据库");
+            throw new IllegalStateException("没有默认数据库" );
         }
 
         if (_cache == null) {
-            _cache = new Cache<>("${name}", ${name}::new);
+            _cache = new Cache<>("${name}" , ${name}::new);
             database.registerCache(_cache);
         } else if (!_cache.isWorkable()) {
             database.registerCache(_cache);

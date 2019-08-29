@@ -40,31 +40,31 @@ public abstract class Data<K> extends Entity implements Comparable<Data<K>> {
         return lock;
     }
 
-    public final Cache<K, ? extends Data<K>> getCache() {
+    final Cache<K, ? extends Data<K>> getCache() {
         return cache;
     }
 
     @Override
-    public final Data<K> _getRoot() {
+    protected final Data<K> _getRoot() {
         return this;
     }
 
-    public final long _getVersion() {
+    final long _getVersion() {
         return version;
     }
 
-    public final void versionUp() {
+    final void versionUp() {
         version++;
         if (version < 0) {
             version = 1;
         }
     }
 
-    public final long touchTime() {
+    final long touchTime() {
         return touchTime;
     }
 
-    public final void touch() {
+    final void touch() {
         touchTime = System.currentTimeMillis();
     }
 
@@ -89,5 +89,5 @@ public abstract class Data<K> extends Entity implements Comparable<Data<K>> {
     }
 
     public abstract K getKey();
-    
+
 }
