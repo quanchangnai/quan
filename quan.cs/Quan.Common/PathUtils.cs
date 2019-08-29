@@ -10,7 +10,7 @@ namespace Quan.Common
             return path.Replace("/", Path.DirectorySeparatorChar.ToString()).Replace("\\", Path.DirectorySeparatorChar.ToString());
         }
 
-        public static HashSet<FileInfo> ListFiles(DirectoryInfo directory, string extension)
+        public static HashSet<FileInfo> ListFiles(this DirectoryInfo directory, string extension)
         {
             var childrenFiles = new HashSet<FileInfo>();
             if (!directory.Exists)
@@ -18,12 +18,12 @@ namespace Quan.Common
                 return childrenFiles;
             }
 
-            var files = directory.GetFiles("*." + extension);
+            var files = directory.GetFiles(extension == null ? "*" : "*." + extension);
             childrenFiles.UnionWith(files);
 
             foreach (var directoryInfo in directory.GetDirectories())
             {
-                childrenFiles.UnionWith(ListFiles(directoryInfo, extension));
+                childrenFiles.UnionWith(directoryInfo.ListFiles(extension));
             }
 
             return childrenFiles;
