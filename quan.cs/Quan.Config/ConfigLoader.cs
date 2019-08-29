@@ -38,7 +38,7 @@ namespace Quan.Config
 
         private void InitConfigDescendants()
         {
-            var jsonFiles = PathUtils.ListFiles(new DirectoryInfo(_jsonPath), "json");
+            var jsonFiles = new DirectoryInfo(_jsonPath).ListFiles("json");
             var configs = new List<ConfigBase>();
 
             foreach (var jsonFile in jsonFiles)
