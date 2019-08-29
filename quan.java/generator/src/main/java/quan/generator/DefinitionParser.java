@@ -120,7 +120,7 @@ public abstract class DefinitionParser {
 
     protected abstract String definitionFileType();
 
-    public void parse() throws Exception {
+    public void parse() {
         if (!classes.isEmpty()) {
             return;
         }
@@ -154,6 +154,6 @@ public abstract class DefinitionParser {
         }
     }
 
-    protected abstract List<ClassDefinition> parseClasses(File definitionFile) throws Exception;
+    protected abstract List<ClassDefinition> parseClasses(File definitionFile);
 
 }

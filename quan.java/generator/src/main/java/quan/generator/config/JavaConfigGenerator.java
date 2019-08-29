@@ -1,10 +1,12 @@
 package quan.generator.config;
 
+import org.apache.commons.cli.CommandLine;
+import quan.generator.DefinitionParser;
 import quan.generator.Language;
+import quan.generator.util.CommandLineUtils;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,33 +19,33 @@ public class JavaConfigGenerator extends ConfigGenerator {
     public static final Map<String, String> CLASS_TYPES = new HashMap<>();
 
     static {
-        BASIC_TYPES.put("bool", "boolean");
-        BASIC_TYPES.put("short", "short");
-        BASIC_TYPES.put("int", "int");
-        BASIC_TYPES.put("long", "long");
-        BASIC_TYPES.put("float", "float");
-        BASIC_TYPES.put("double", "double");
-        BASIC_TYPES.put("string", "String");
-        BASIC_TYPES.put("set", "Set");
-        BASIC_TYPES.put("list", "List");
-        BASIC_TYPES.put("map", "Map");
-        BASIC_TYPES.put("date", "Date");
-        BASIC_TYPES.put("time", "Date");
-        BASIC_TYPES.put("datetime", "Date");
+        BASIC_TYPES.put("bool" , "boolean" );
+        BASIC_TYPES.put("short" , "short" );
+        BASIC_TYPES.put("int" , "int" );
+        BASIC_TYPES.put("long" , "long" );
+        BASIC_TYPES.put("float" , "float" );
+        BASIC_TYPES.put("double" , "double" );
+        BASIC_TYPES.put("string" , "String" );
+        BASIC_TYPES.put("set" , "Set" );
+        BASIC_TYPES.put("list" , "List" );
+        BASIC_TYPES.put("map" , "Map" );
+        BASIC_TYPES.put("date" , "Date" );
+        BASIC_TYPES.put("time" , "Date" );
+        BASIC_TYPES.put("datetime" , "Date" );
 
-        CLASS_TYPES.put("bool", "Boolean");
-        CLASS_TYPES.put("short", "Short");
-        CLASS_TYPES.put("int", "Integer");
-        CLASS_TYPES.put("long", "Long");
-        CLASS_TYPES.put("float", "Float");
-        CLASS_TYPES.put("double", "Double");
-        CLASS_TYPES.put("string", "String");
-        CLASS_TYPES.put("set", "HashSet");
-        CLASS_TYPES.put("list", "ArrayList");
-        CLASS_TYPES.put("map", "HashMap");
-        CLASS_TYPES.put("date", "Date");
-        CLASS_TYPES.put("time", "Date");
-        CLASS_TYPES.put("datetime", "Date");
+        CLASS_TYPES.put("bool" , "Boolean" );
+        CLASS_TYPES.put("short" , "Short" );
+        CLASS_TYPES.put("int" , "Integer" );
+        CLASS_TYPES.put("long" , "Long" );
+        CLASS_TYPES.put("float" , "Float" );
+        CLASS_TYPES.put("double" , "Double" );
+        CLASS_TYPES.put("string" , "String" );
+        CLASS_TYPES.put("set" , "HashSet" );
+        CLASS_TYPES.put("list" , "ArrayList" );
+        CLASS_TYPES.put("map" , "HashMap" );
+        CLASS_TYPES.put("date" , "Date" );
+        CLASS_TYPES.put("time" , "Date" );
+        CLASS_TYPES.put("datetime" , "Date" );
     }
 
     {
@@ -51,7 +53,7 @@ public class JavaConfigGenerator extends ConfigGenerator {
         classTypes.putAll(CLASS_TYPES);
     }
 
-    public JavaConfigGenerator(String codePath) throws Exception {
+    public JavaConfigGenerator(String codePath) {
         super(codePath);
     }
 
@@ -61,16 +63,15 @@ public class JavaConfigGenerator extends ConfigGenerator {
         return Language.java;
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
+        CommandLine commandLine = CommandLineUtils.parseCommandLine("JavaConfigGenerator" , args);
+        if (commandLine == null) {
+            return;
+        }
 
-        List<String> definitionPaths = new ArrayList<>();
-        definitionPaths.add("generator\\definition\\config");
-        String codePath = "config\\src\\test\\java";
-        String packagePrefix = "quan.config";
-
-        JavaConfigGenerator generator = new JavaConfigGenerator(codePath);
-        generator.useXmlDefinitionParser(definitionPaths, packagePrefix);
-
+        JavaConfigGenerator generator = new JavaConfigGenerator(commandLine.getOptionValue("codePath" ));
+        DefinitionParser definitionParser = generator.useXmlDefinitionParser(Arrays.asList(commandLine.getOptionValues("definitionPath" )), commandLine.getOptionValue("packagePrefix" ));
+        definitionParser.setEnumPackagePrefix(commandLine.getOptionValue("enumPackagePrefix" ));
         generator.generate();
     }
 }

@@ -1,5 +1,6 @@
 package quan.generator;
 
+import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import quan.generator.config.ConfigDefinition;
@@ -23,17 +24,24 @@ public class XmlDefinitionParser extends DefinitionParser {
     }
 
     @Override
-    protected List<ClassDefinition> parseClasses(File definitionFile) throws Exception {
+    protected List<ClassDefinition> parseClasses(File definitionFile) {
         List<ClassDefinition> classDefinitions = new ArrayList<>();
 
-        Element rootElement = new SAXReader().read(definitionFile).getRootElement();
-        if (rootElement == null || !rootElement.getName().equals("package")) {
+        Element rootElement;
+        try {
+            rootElement = new SAXReader().read(definitionFile).getRootElement();
+        } catch (DocumentException e) {
+            addValidatedError(String.format("解析定义文件[%s]出错" , definitionFile));
+            logger.error("" , definitionFile, e);
+            return classDefinitions;
+        }
+        if (rootElement == null || !rootElement.getName().equals("package" )) {
             return classDefinitions;
         }
 
-        String packageName = definitionFile.getName().substring(0, definitionFile.getName().lastIndexOf("."));
+        String packageName = definitionFile.getName().substring(0, definitionFile.getName().lastIndexOf("." ));
         if (!Pattern.matches(Constants.PACKAGE_NAME_PATTERN, packageName)) {
-            addValidatedError("定义文件名[" + packageName + "]格式错误");
+            addValidatedError("定义文件名[" + packageName + "]格式错误" );
             return classDefinitions;
         }
 
@@ -59,14 +67,14 @@ public class XmlDefinitionParser extends DefinitionParser {
             }
             classDefinition.setPackageName(packageName);
 
-            classDefinition.setName(classElement.attributeValue("name"));
-            classDefinition.setLang(classElement.attributeValue("lang"));
+            classDefinition.setName(classElement.attributeValue("name" ));
+            classDefinition.setLang(classElement.attributeValue("lang" ));
 
             String comment = rootElement.node(i - 1).getText();
-            comment = comment.replaceAll("[\r\n]", "").trim();
-            if (comment.equals("")) {
+            comment = comment.replaceAll("[\r\n]" , "" ).trim();
+            if (comment.equals("" )) {
                 comment = classElement.node(0).getText();
-                comment = comment.replaceAll("[\r\n]", "").trim();
+                comment = comment.replaceAll("[\r\n]" , "" ).trim();
             }
             classDefinition.setComment(comment);
 
@@ -90,7 +98,7 @@ public class XmlDefinitionParser extends DefinitionParser {
                 break;
             case "bean":
                 if (category == DefinitionCategory.message || category == DefinitionCategory.config) {//临时
-                    classDefinition = new BeanDefinition(classElement.attributeValue("delimiter")).setCategory(getCategory());
+                    classDefinition = new BeanDefinition(classElement.attributeValue("delimiter" )).setCategory(getCategory());
                 }
                 break;
             case "message":
@@ -100,12 +108,12 @@ public class XmlDefinitionParser extends DefinitionParser {
                 break;
             case "data":
                 if (category == DefinitionCategory.data) {
-                    classDefinition = new DataDefinition(classElement.attributeValue("key"), classElement.attributeValue("persistent"));
+                    classDefinition = new DataDefinition(classElement.attributeValue("key" ), classElement.attributeValue("persistent" ));
                 }
                 break;
             case "config":
                 if (category == DefinitionCategory.config) {
-                    classDefinition = new ConfigDefinition(classElement.attributeValue("table"), classElement.attributeValue("parent"));
+                    classDefinition = new ConfigDefinition(classElement.attributeValue("table" ), classElement.attributeValue("parent" ));
                 }
                 break;
         }
@@ -120,9 +128,9 @@ public class XmlDefinitionParser extends DefinitionParser {
             }
 
             Element fieldElement = (Element) classElement.node(i);
-            if (fieldElement.getName().equals("field")) {
+            if (fieldElement.getName().equals("field" )) {
                 parseField(classDefinition, classElement, fieldElement, i);
-            } else if (fieldElement.getName().equals("index") && classDefinition instanceof ConfigDefinition) {
+            } else if (fieldElement.getName().equals("index" ) && classDefinition instanceof ConfigDefinition) {
                 parseIndex((ConfigDefinition) classDefinition, classElement, fieldElement, i);
             }
 
@@ -135,17 +143,17 @@ public class XmlDefinitionParser extends DefinitionParser {
         fieldDefinition.setParser(classDefinition.parser);
         fieldDefinition.setCategory(getCategory());
 
-        fieldDefinition.setName(fieldElement.attributeValue("name"));
-        fieldDefinition.setTypes(fieldElement.attributeValue("type"));
-        fieldDefinition.setValue(fieldElement.attributeValue("value"));
-        fieldDefinition.setColumn(fieldElement.attributeValue("column"));
-        fieldDefinition.setOptional(fieldElement.attributeValue("optional"));
-        fieldDefinition.setIndex(fieldElement.attributeValue("index"));
-        fieldDefinition.setDelimiter(fieldElement.attributeValue("delimiter"));
-        fieldDefinition.setRef(fieldElement.attributeValue("ref"));
+        fieldDefinition.setName(fieldElement.attributeValue("name" ));
+        fieldDefinition.setTypes(fieldElement.attributeValue("type" ));
+        fieldDefinition.setValue(fieldElement.attributeValue("value" ));
+        fieldDefinition.setColumn(fieldElement.attributeValue("column" ));
+        fieldDefinition.setOptional(fieldElement.attributeValue("optional" ));
+        fieldDefinition.setIndex(fieldElement.attributeValue("index" ));
+        fieldDefinition.setDelimiter(fieldElement.attributeValue("delimiter" ));
+        fieldDefinition.setRef(fieldElement.attributeValue("ref" ));
 
         String comment = classElement.node(i + 1).getText();
-        comment = comment.replaceAll("[\r\n]", "").trim();
+        comment = comment.replaceAll("[\r\n]" , "" ).trim();
         fieldDefinition.setComment(comment);
 
         classDefinition.addField(fieldDefinition);
@@ -156,12 +164,12 @@ public class XmlDefinitionParser extends DefinitionParser {
         indexDefinition.setParser(configDefinition.parser);
         indexDefinition.setCategory(getCategory());
 
-        indexDefinition.setName(indexElement.attributeValue("name"));
-        indexDefinition.setType(indexElement.attributeValue("type"));
-        indexDefinition.setFieldNames(indexElement.attributeValue("fields"));
+        indexDefinition.setName(indexElement.attributeValue("name" ));
+        indexDefinition.setType(indexElement.attributeValue("type" ));
+        indexDefinition.setFieldNames(indexElement.attributeValue("fields" ));
 
         String comment = classElement.node(i + 1).getText();
-        comment = comment.replaceAll("[\r\n]", "").trim();
+        comment = comment.replaceAll("[\r\n]" , "" ).trim();
 
         indexDefinition.setComment(comment);
 

@@ -6,6 +6,7 @@ import quan.generator.ClassDefinition;
 import quan.generator.DefinitionCategory;
 import quan.generator.Generator;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -15,12 +16,18 @@ import java.util.stream.Collectors;
 public abstract class MessageGenerator extends Generator {
 
     //ID冲突时重新计算
-    private boolean recalculateIdOnConflicted = false;
+    private boolean recalcIdOnConflicted = false;
 
-    public MessageGenerator(String codePath) throws Exception {
+    public MessageGenerator(String codePath) {
         super(codePath);
 
-        Template messageTemplate = freemarkerCfg.getTemplate("message." + supportLanguage() + ".ftl");
+        Template messageTemplate;
+        try {
+            messageTemplate = freemarkerCfg.getTemplate("message." + supportLanguage() + ".ftl" );
+        } catch (IOException e) {
+            logger.error("" , e);
+            return;
+        }
 
         templates.put(MessageDefinition.class, messageTemplate);
         templates.put(BeanDefinition.class, messageTemplate);
@@ -41,17 +48,17 @@ public abstract class MessageGenerator extends Generator {
     }
 
     @Override
-    protected void parseDefinition() throws Exception {
+    protected void parseDefinition() {
         super.parseDefinition();
-        calculateMessageId();
+        calcMessageId();
     }
 
-    public MessageGenerator setRecalculateIdOnConflicted(boolean recalculateIdOnConflicted) {
-        this.recalculateIdOnConflicted = recalculateIdOnConflicted;
+    public MessageGenerator setRecalcIdOnConflicted(boolean recalculateIdOnConflicted) {
+        this.recalcIdOnConflicted = recalculateIdOnConflicted;
         return this;
     }
 
-    private void calculateMessageId() {
+    private void calcMessageId() {
         Set<MessageDefinition> messageDefinitions = new HashSet<>();
         for (ClassDefinition classDefinition : definitionParser.getClasses().values()) {
             if (classDefinition instanceof MessageDefinition) {
@@ -59,10 +66,10 @@ public abstract class MessageGenerator extends Generator {
             }
         }
         //0xFFFFF正好占用3个字节,当前设置了[ID冲突时重新计算]时，100000个坑位用于解决冲突，每次用10000个
-        calculateMessageId(messageDefinitions, 1, 0xFFFFF - 100000);
+        calcMessageId(messageDefinitions, 1, 0xFFFFF - 100000);
     }
 
-    private void calculateMessageId(Set<MessageDefinition> messageDefinitions, int begin, int end) {
+    private void calcMessageId(Set<MessageDefinition> messageDefinitions, int begin, int end) {
         Map<Integer, List<MessageDefinition>> conflictedMessagesMap = new HashMap<>();
         for (MessageDefinition messageDefinition : messageDefinitions) {
             int messageId = begin + (messageDefinition.getOriginalName().hashCode() & 0x7FFFFFFF) % (end - begin);
@@ -75,18 +82,18 @@ public abstract class MessageGenerator extends Generator {
             conflictedMessages.sort(Comparator.comparing(MessageDefinition::getOriginalName));
             conflictedMessages.get(0).setId(messageId);
             if (conflictedMessages.size() > 1) {
-                if (recalculateIdOnConflicted) {
+                if (recalcIdOnConflicted) {
                     allConflictedMessages.addAll(conflictedMessages.subList(1, conflictedMessages.size()));
                 } else {
                     List<String> conflictedNames = conflictedMessages.stream().map(MessageDefinition::getName).collect(Collectors.toList());
-                    definitionParser.addValidatedError(String.format("消息%sID有冲突,改名可以解决冲突", conflictedNames));
+                    definitionParser.addValidatedError(String.format("消息%sID有冲突,改名可以解决冲突" , conflictedNames));
                 }
             }
         }
 
         //ID冲突的消息调整区间参数重新计算
         if (!allConflictedMessages.isEmpty()) {
-            calculateMessageId(allConflictedMessages, end, end + 10000);
+            calcMessageId(allConflictedMessages, end, end + 10000);
         }
     }
 }
