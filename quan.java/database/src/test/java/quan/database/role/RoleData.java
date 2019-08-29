@@ -53,7 +53,7 @@ public class RoleData extends Data<Long> {
     private static Cache<Long, RoleData> _cache;
 
     public RoleData(Long id) {
-	    super(_cache);
+        super(_cache);
         this.id.setLogValue(id, _getRoot());
     }
 
@@ -90,7 +90,7 @@ public class RoleData extends Data<Long> {
      */
     public RoleData setRoleType(RoleType roleType) {
         this.roleType.setLogValue(roleType.getValue(), _getRoot());
-	    return this;
+        return this;
     }
 
     public boolean getBo() {

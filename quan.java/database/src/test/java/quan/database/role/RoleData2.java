@@ -156,7 +156,7 @@ public class RoleData2 extends Data<Long> {
 
     public RoleData2 setItemType(ItemType itemType) {
         this.itemType.setLogValue(itemType.getValue(), _getRoot());
-	    return this;
+        return this;
     }
 
     public Map<Integer, ItemEntity> getItems() {

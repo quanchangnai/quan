@@ -60,7 +60,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
     private static Cache<${keyType}, ${name}> _cache;
 
     public ${name}(${keyType} ${keyName}) {
-	    super(_cache);
+        super(_cache);
         this.${keyName}.setLogValue(${keyName}, _getRoot());
     }
 
@@ -114,7 +114,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
     </#if>
     public ${name} set${field.name?cap_first}(${field.basicType} ${field.name}) {
         this.${field.name}.setLogValue(${field.name}.getValue(), _getRoot());
-	    return this;
+        return this;
     }
 
     <#else>
