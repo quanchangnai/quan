@@ -9,7 +9,7 @@ class FieldLog<V> {
 
     private V value;
 
-    public FieldLog(Field field, V value) {
+    public FieldLog(Field<V> field, V value) {
         this.field = field;
         this.value = value;
     }
