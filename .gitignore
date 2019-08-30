@@ -1,14 +1,1 @@
-.idea
-*.iml
-.project
-.classpath
-.setting*
-target/
-classes
 .temp
-bin
-obj
-.vs
-*.DotSettings.user
-/quan.java/config/json
-/quan.cs/packages
