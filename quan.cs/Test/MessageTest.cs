@@ -1,7 +1,9 @@
 using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Threading;
+using Quan.Message;
 using Test.Message.Role;
 using Buffer = Quan.Message.Buffer;
 
@@ -14,6 +16,7 @@ namespace Test
             Test1();
             Test2();
             Test3();
+            Test4();
         }
 
         private static void Test1()
@@ -68,6 +71,14 @@ namespace Test
         private static void Test3()
         {
             Console.WriteLine("Test3====================");
+            var messageFactory = new MessageFactory();
+            messageFactory.Register(Assembly.GetExecutingAssembly().FullName);
+            Console.WriteLine(messageFactory.Create(544233));
+        }
+
+        private static void Test4()
+        {
+            Console.WriteLine("Test4====================");
 
             var sRoleLogin1 = new SRoleLogin {RoleId = 1111, RoleName = "张三1111"};
 

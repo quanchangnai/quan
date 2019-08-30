@@ -38,7 +38,7 @@ public abstract class Message extends Bean {
     public void decode(Buffer buffer) throws IOException {
         int msgId = buffer.readInt();
         if (msgId != getId()) {
-            throw new IOException("消息ID不匹配,期望值：" + getId() + "，实际值：" + msgId);
+            throw new IOException(String.format("消息ID不匹配,期望值[%s],实际值[%s]" , getId(), msgId));
         }
         seq = buffer.readLong();
     }

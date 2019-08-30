@@ -24,7 +24,7 @@ namespace Quan.Message
             var id = buffer.ReadInt();
             if (id != Id)
             {
-                throw new IOException("消息ID不匹配,期望值：" + Id + "，实际值：" + id);
+                throw new IOException($"消息ID不匹配,期望值[{Id}],实际值[{id}]");
             }
 
             Seq = buffer.ReadLong();

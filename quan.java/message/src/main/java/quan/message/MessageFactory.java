@@ -6,6 +6,7 @@ import quan.common.util.ClassUtils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -19,8 +20,9 @@ public class MessageFactory {
     protected Map<Integer, Message> prototypes = new HashMap<>();
 
     public void register(Message message) {
+        Objects.requireNonNull(message, "参数[message]不能为空" );
         if (prototypes.containsKey(message.getId())) {
-            throw new IllegalArgumentException("消息ID重复:" + message.getId());
+            throw new IllegalArgumentException("消息ID[" + message.getId() + "]不能重复" );
         }
         prototypes.put(message.getId(), message);
     }
@@ -32,7 +34,7 @@ public class MessageFactory {
                 Message message = (Message) messageClass.getDeclaredConstructor().newInstance();
                 register(message);
             } catch (Exception e) {
-                logger.error("", e);
+                logger.error("" , e);
             }
         }
     }
