@@ -4,7 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/config/config.iml" filepath="$PROJECT_DIR$/config/config.iml" />
       <module fileurl="file://$PROJECT_DIR$/message/message.iml" filepath="$PROJECT_DIR$/message/message.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/quan.lua.iml" filepath="$PROJECT_DIR$/.idea/quan.lua.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/quan.iml" filepath="$PROJECT_DIR$/.idea/quan.iml" />
     </modules>
   </component>
 </project>
