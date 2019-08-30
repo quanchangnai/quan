@@ -73,7 +73,7 @@ public class CSharpConfigGenerator extends ConfigGenerator {
     }
 
     public static void main(String[] args) {
-        CommandLine commandLine = CommandLineUtils.parseCommandLine("CSharpConfigGenerator" , args);
+        CommandLine commandLine = CommandLineUtils.parseCommandLine(CSharpConfigGenerator.class.getSimpleName() , args);
         if (commandLine == null) {
             return;
         }

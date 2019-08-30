@@ -112,7 +112,7 @@ public class DatabaseGenerator extends Generator {
     }
 
     public static void main(String[] args) {
-        CommandLine commandLine = CommandLineUtils.parseCommandLine("JavaMessageGenerator" , args);
+        CommandLine commandLine = CommandLineUtils.parseCommandLine(DatabaseGenerator.class.getSimpleName(), args);
         if (commandLine == null) {
             return;
         }

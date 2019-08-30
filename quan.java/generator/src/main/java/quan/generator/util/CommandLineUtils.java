@@ -7,6 +7,14 @@ import org.apache.commons.cli.*;
  */
 public class CommandLineUtils {
 
+    private static CommandLineParser commandLineParser = new DefaultParser();
+
+    private static HelpFormatter helpFormatter = new HelpFormatter();
+
+    static {
+        helpFormatter.setOptionComparator(null);
+    }
+
     public static CommandLine parseCommandLine(String generatorName, String[] args, Option... extOptions) {
         Option definitionPathOption = new Option(null, "definitionPath" , true, "定义文件路径,多个路径以空格分隔" );
         definitionPathOption.setRequired(true);
@@ -29,9 +37,9 @@ public class CommandLineUtils {
         }
 
         try {
-            return new DefaultParser().parse(options, args);
+            return commandLineParser.parse(options, args);
         } catch (Exception e) {
-            new HelpFormatter().printHelp(generatorName, options);
+            helpFormatter.printHelp(generatorName, options);
         }
 
         return null;

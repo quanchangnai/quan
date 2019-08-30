@@ -1,7 +1,5 @@
 package quan.generator;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import quan.generator.config.CSharpConfigGenerator;
 import quan.generator.config.JavaConfigGenerator;
 import quan.generator.database.DatabaseGenerator;
@@ -17,9 +15,11 @@ import java.util.List;
 public class GeneratorTest {
 
     public static void main(String[] args) {
+        long start = System.currentTimeMillis();
         generateData();
         generateMessage();
         generateConfig();
+        System.err.println("GeneratorTest耗时(ms):" + (System.currentTimeMillis() - start));
     }
 
     private static void generateData() {

@@ -71,7 +71,7 @@ public class CSharpMessageGenerator extends MessageGenerator {
 
     public static void main(String[] args) {
         Option recalcIdOption = new Option(null, "recalcId" , false, "哈希计算消息ID冲突时是否重新计算(可选)" );
-        CommandLine commandLine = CommandLineUtils.parseCommandLine("CSharpMessageGenerator" , args, recalcIdOption);
+        CommandLine commandLine = CommandLineUtils.parseCommandLine(CSharpMessageGenerator.class.getSimpleName() , args, recalcIdOption);
         if (commandLine == null) {
             return;
         }
