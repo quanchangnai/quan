@@ -274,7 +274,7 @@ namespace ${fullPackageName}
         </#if>
     </#list>
 
-        public static void Index(IList<${name}> configs)
+        public static void Load(IList<${name}> configs)
         {
     <#list indexes as index>
         <#if index.unique && index.fields?size==1>

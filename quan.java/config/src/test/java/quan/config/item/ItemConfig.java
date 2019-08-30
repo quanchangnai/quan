@@ -189,7 +189,7 @@ public class ItemConfig extends Config {
 
 
     @SuppressWarnings({"unchecked"})
-    public static List<String> index(List<ItemConfig> configs) {
+    public static List<String> load(List<ItemConfig> configs) {
         Map<Integer, ItemConfig> idConfigs = new HashMap<>();
 
         List<String> errors = new ArrayList<>();

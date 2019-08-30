@@ -73,14 +73,14 @@ public class CSharpConfigGenerator extends ConfigGenerator {
     }
 
     public static void main(String[] args) {
-        CommandLine commandLine = CommandLineUtils.parseCommandLine(CSharpConfigGenerator.class.getSimpleName() , args);
+        CommandLine commandLine = CommandLineUtils.parseCommandLine(CSharpConfigGenerator.class.getSimpleName(), args);
         if (commandLine == null) {
             return;
         }
 
-        CSharpConfigGenerator generator = new CSharpConfigGenerator(commandLine.getOptionValue("codePath" ));
-        DefinitionParser definitionParser = generator.useXmlDefinitionParser(Arrays.asList(commandLine.getOptionValues("definitionPath" )), commandLine.getOptionValue("packagePrefix" ));
-        definitionParser.setEnumPackagePrefix(commandLine.getOptionValue("enumPackagePrefix" ));
+        CSharpConfigGenerator generator = new CSharpConfigGenerator(commandLine.getOptionValue(CommandLineUtils.codePath));
+        DefinitionParser definitionParser = generator.useXmlDefinitionParser(Arrays.asList(commandLine.getOptionValues(CommandLineUtils.definitionPath)), commandLine.getOptionValue(CommandLineUtils.packagePrefix));
+        definitionParser.setEnumPackagePrefix(commandLine.getOptionValue(CommandLineUtils.enumPackagePrefix));
         generator.generate();
     }
 }

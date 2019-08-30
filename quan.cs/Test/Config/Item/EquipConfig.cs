@@ -89,7 +89,7 @@ namespace Test.Config.Item
         }
 
 
-        public static void Index(IList<EquipConfig> configs)
+        public static void Load(IList<EquipConfig> configs)
         {
             IDictionary<int, EquipConfig> idConfigs = new Dictionary<int, EquipConfig>();
             IDictionary<int, IList<EquipConfig>> positionConfigs = new Dictionary<int, IList<EquipConfig>>();

@@ -117,9 +117,9 @@ public class DatabaseGenerator extends Generator {
             return;
         }
 
-        DatabaseGenerator generator = new DatabaseGenerator(commandLine.getOptionValue("codePath" ));
-        DefinitionParser definitionParser = generator.useXmlDefinitionParser(Arrays.asList(commandLine.getOptionValues("definitionPath" )), commandLine.getOptionValue("packagePrefix" ));
-        definitionParser.setEnumPackagePrefix(commandLine.getOptionValue("enumPackagePrefix" ));
+        DatabaseGenerator generator = new DatabaseGenerator(commandLine.getOptionValue(CommandLineUtils.codePath));
+        DefinitionParser definitionParser = generator.useXmlDefinitionParser(Arrays.asList(commandLine.getOptionValues(CommandLineUtils.definitionPath)), commandLine.getOptionValue(CommandLineUtils.packagePrefix));
+        definitionParser.setEnumPackagePrefix(commandLine.getOptionValue(CommandLineUtils.enumPackagePrefix));
         generator.generate();
     }
 

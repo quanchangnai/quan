@@ -64,14 +64,14 @@ public class JavaConfigGenerator extends ConfigGenerator {
     }
 
     public static void main(String[] args) {
-        CommandLine commandLine = CommandLineUtils.parseCommandLine(JavaConfigGenerator.class.getSimpleName() , args);
+        CommandLine commandLine = CommandLineUtils.parseCommandLine(JavaConfigGenerator.class.getSimpleName(), args);
         if (commandLine == null) {
             return;
         }
 
-        JavaConfigGenerator generator = new JavaConfigGenerator(commandLine.getOptionValue("codePath" ));
-        DefinitionParser definitionParser = generator.useXmlDefinitionParser(Arrays.asList(commandLine.getOptionValues("definitionPath" )), commandLine.getOptionValue("packagePrefix" ));
-        definitionParser.setEnumPackagePrefix(commandLine.getOptionValue("enumPackagePrefix" ));
+        JavaConfigGenerator generator = new JavaConfigGenerator(commandLine.getOptionValue(CommandLineUtils.codePath));
+        DefinitionParser definitionParser = generator.useXmlDefinitionParser(Arrays.asList(commandLine.getOptionValues(CommandLineUtils.definitionPath)), commandLine.getOptionValue(CommandLineUtils.packagePrefix));
+        definitionParser.setEnumPackagePrefix(commandLine.getOptionValue(CommandLineUtils.enumPackagePrefix));
         generator.generate();
     }
 }

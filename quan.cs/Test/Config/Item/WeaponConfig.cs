@@ -197,7 +197,7 @@ namespace Test.Config.Item
         }
 
 
-        public static void Index(IList<WeaponConfig> configs)
+        public static void Load(IList<WeaponConfig> configs)
         {
             IDictionary<int, WeaponConfig> idConfigs = new Dictionary<int, WeaponConfig>();
             IDictionary<int, IList<WeaponConfig>> positionConfigs = new Dictionary<int, IList<WeaponConfig>>();

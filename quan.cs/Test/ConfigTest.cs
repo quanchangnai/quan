@@ -3,6 +3,7 @@ using System.IO;
 using System.Reflection;
 using Quan.Config;
 using Test.Config.Item;
+using Test.Config.Quest;
 
 namespace Test
 {
@@ -22,7 +23,8 @@ namespace Test
                 Console.WriteLine(config);
             }
 
-//            EquipConfig.GetIdConfigs();
+            EquipConfig.GetByPosition(1);
+            QuestConfig.GetById(1);
         }
     }
 }

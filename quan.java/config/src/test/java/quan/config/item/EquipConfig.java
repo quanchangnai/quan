@@ -98,7 +98,7 @@ public class EquipConfig extends ItemConfig {
 
 
         @SuppressWarnings({"unchecked"})
-        public static List<String> index(List<EquipConfig> configs) {
+        public static List<String> load(List<EquipConfig> configs) {
             Map<Integer, EquipConfig> idConfigs = new HashMap<>();
             Map<Integer, List<EquipConfig>> positionConfigs = new HashMap<>();
 

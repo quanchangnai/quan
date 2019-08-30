@@ -107,14 +107,14 @@ namespace Quan.Config
 
             try
             {
-                var indexMethod = configType.GetMethod("Index", new[] {typeof(IList<>).MakeGenericType(configType)});
-                if (indexMethod == null)
+                var loadMethod = configType.GetMethod("Load", new[] {typeof(IList<>).MakeGenericType(configType)});
+                if (loadMethod == null)
                 {
-                    Console.WriteLine("加载配置出错，配置类[{0}]没有索引方法", configType.FullName);
+                    Console.WriteLine("加载配置出错，配置类[{0}]没有加载方法", configType.FullName);
                     return;
                 }
 
-                indexMethod.Invoke(null, new[] {configs});
+                loadMethod.Invoke(null, new[] {configs});
             }
             catch (Exception e)
             {

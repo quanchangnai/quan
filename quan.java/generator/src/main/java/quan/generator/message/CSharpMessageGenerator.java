@@ -1,7 +1,6 @@
 package quan.generator.message;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.Option;
 import quan.generator.*;
 import quan.generator.util.CSharpUtils;
 import quan.generator.util.CommandLineUtils;
@@ -70,16 +69,15 @@ public class CSharpMessageGenerator extends MessageGenerator {
     }
 
     public static void main(String[] args) {
-        Option recalcIdOption = new Option(null, "recalcId" , false, "哈希计算消息ID冲突时是否重新计算(可选)" );
-        CommandLine commandLine = CommandLineUtils.parseCommandLine(CSharpMessageGenerator.class.getSimpleName() , args, recalcIdOption);
+        CommandLine commandLine = CommandLineUtils.parseMessageCommandLine(CSharpMessageGenerator.class.getSimpleName(), args);
         if (commandLine == null) {
             return;
         }
 
-        CSharpMessageGenerator generator = new CSharpMessageGenerator(commandLine.getOptionValue("codePath" ));
-        DefinitionParser definitionParser = generator.useXmlDefinitionParser(Arrays.asList(commandLine.getOptionValues("definitionPath" )), commandLine.getOptionValue("packagePrefix" ));
-        definitionParser.setEnumPackagePrefix(commandLine.getOptionValue("enumPackagePrefix" ));
-        generator.setRecalcIdOnConflicted(commandLine.hasOption("recalcId" ));
+        CSharpMessageGenerator generator = new CSharpMessageGenerator(commandLine.getOptionValue(CommandLineUtils.codePath));
+        DefinitionParser definitionParser = generator.useXmlDefinitionParser(Arrays.asList(commandLine.getOptionValues(CommandLineUtils.definitionPath)), commandLine.getOptionValue(CommandLineUtils.packagePrefix));
+        definitionParser.setEnumPackagePrefix(commandLine.getOptionValue(CommandLineUtils.enumPackagePrefix));
+        generator.setRecalcIdOnConflicted(commandLine.hasOption(CommandLineUtils.recalcId));
         generator.generate();
     }
 }

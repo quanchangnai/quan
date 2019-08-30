@@ -144,7 +144,7 @@ namespace Test.Config.Item
         }
 
 
-        public static void Index(IList<ItemConfig> configs)
+        public static void Load(IList<ItemConfig> configs)
         {
             IDictionary<int, ItemConfig> idConfigs = new Dictionary<int, ItemConfig>();
 

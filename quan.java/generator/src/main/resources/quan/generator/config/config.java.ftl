@@ -294,7 +294,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     </#list>
 
     ${tab}@SuppressWarnings({"unchecked"})
-    ${tab}public static List<String> index(List<${name}> configs) {
+    ${tab}public static List<String> load(List<${name}> configs) {
     <#list indexes as index>
         <#if index.unique && index.fields?size==1>
         ${tab}Map<${index.fields[0].classType}, ${name}> ${index.name}Configs = new HashMap<>();

@@ -376,7 +376,7 @@ public class QuestConfig extends Config {
 
 
     @SuppressWarnings({"unchecked"})
-    public static List<String> index(List<QuestConfig> configs) {
+    public static List<String> load(List<QuestConfig> configs) {
         Map<Integer, Map<Integer, QuestConfig>> composite1Configs = new HashMap<>();
         Map<Integer, Map<Boolean, List<QuestConfig>>> composite2Configs = new HashMap<>();
         Map<String, Map<Integer, Map<Integer, QuestConfig>>> composite3Configs = new HashMap<>();

@@ -67,7 +67,7 @@ namespace Test.Config.Quest
         }
 
 
-        public static void Index(IList<QuestTargetConfig> configs)
+        public static void Load(IList<QuestTargetConfig> configs)
         {
             IDictionary<int, QuestTargetConfig> idConfigs = new Dictionary<int, QuestTargetConfig>();
 

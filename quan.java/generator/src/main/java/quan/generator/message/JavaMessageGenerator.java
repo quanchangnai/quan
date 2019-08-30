@@ -74,16 +74,15 @@ public class JavaMessageGenerator extends MessageGenerator {
     }
 
     public static void main(String[] args) {
-        Option recalcIdOption = new Option(null, "recalcId" , false, "哈希计算消息ID冲突时是否重新计算(可选)" );
-        CommandLine commandLine = CommandLineUtils.parseCommandLine(JavaMessageGenerator.class.getSimpleName(), args, recalcIdOption);
+        CommandLine commandLine = CommandLineUtils.parseMessageCommandLine(JavaMessageGenerator.class.getSimpleName(), args);
         if (commandLine == null) {
             return;
         }
 
-        JavaMessageGenerator generator = new JavaMessageGenerator(commandLine.getOptionValue("codePath" ));
-        DefinitionParser definitionParser = generator.useXmlDefinitionParser(Arrays.asList(commandLine.getOptionValues("definitionPath" )), commandLine.getOptionValue("packagePrefix" ));
-        definitionParser.setEnumPackagePrefix(commandLine.getOptionValue("enumPackagePrefix" ));
-        generator.setRecalcIdOnConflicted(commandLine.hasOption("recalcId" ));
+        JavaMessageGenerator generator = new JavaMessageGenerator(commandLine.getOptionValue(CommandLineUtils.codePath));
+        DefinitionParser definitionParser = generator.useXmlDefinitionParser(Arrays.asList(commandLine.getOptionValues(CommandLineUtils.definitionPath)), commandLine.getOptionValue(CommandLineUtils.packagePrefix));
+        definitionParser.setEnumPackagePrefix(commandLine.getOptionValue(CommandLineUtils.enumPackagePrefix));
+        generator.setRecalcIdOnConflicted(commandLine.hasOption(CommandLineUtils.recalcId));
         generator.generate();
     }
 }

@@ -74,7 +74,7 @@ public class QuestTargetConfig extends Config {
 
 
     @SuppressWarnings({"unchecked"})
-    public static List<String> index(List<QuestTargetConfig> configs) {
+    public static List<String> load(List<QuestTargetConfig> configs) {
         Map<Integer, QuestTargetConfig> idConfigs = new HashMap<>();
 
         List<String> errors = new ArrayList<>();

@@ -312,7 +312,7 @@ namespace Test.Config.Quest
         }
 
 
-        public static void Index(IList<QuestConfig> configs)
+        public static void Load(IList<QuestConfig> configs)
         {
             IDictionary<int, IDictionary<int, QuestConfig>> composite1Configs = new Dictionary<int, IDictionary<int, QuestConfig>>();
             IDictionary<int, IDictionary<bool, IList<QuestConfig>>> composite2Configs = new Dictionary<int, IDictionary<bool, IList<QuestConfig>>>();

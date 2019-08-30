@@ -211,7 +211,7 @@ public class WeaponConfig extends EquipConfig {
 
 
         @SuppressWarnings({"unchecked"})
-        public static List<String> index(List<WeaponConfig> configs) {
+        public static List<String> load(List<WeaponConfig> configs) {
             Map<Integer, WeaponConfig> idConfigs = new HashMap<>();
             Map<Integer, List<WeaponConfig>> positionConfigs = new HashMap<>();
             Map<Integer, Map<Integer, List<WeaponConfig>>> composite1Configs = new HashMap<>();
