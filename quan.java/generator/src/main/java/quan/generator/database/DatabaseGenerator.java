@@ -112,7 +112,7 @@ public class DatabaseGenerator extends Generator {
     }
 
     public static void main(String[] args) {
-        CommandLine commandLine = CommandLineUtils.parseCommandLine(DatabaseGenerator.class.getSimpleName(), args);
+        CommandLine commandLine = CommandLineUtils.parseArgs(DatabaseGenerator.class.getSimpleName(), args);
         if (commandLine == null) {
             return;
         }

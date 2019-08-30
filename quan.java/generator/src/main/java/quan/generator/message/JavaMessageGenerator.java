@@ -1,7 +1,6 @@
 package quan.generator.message;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.Option;
 import quan.generator.BeanDefinition;
 import quan.generator.ClassDefinition;
 import quan.generator.DefinitionParser;
@@ -74,7 +73,7 @@ public class JavaMessageGenerator extends MessageGenerator {
     }
 
     public static void main(String[] args) {
-        CommandLine commandLine = CommandLineUtils.parseMessageCommandLine(JavaMessageGenerator.class.getSimpleName(), args);
+        CommandLine commandLine = CommandLineUtils.parseMessageArgs(JavaMessageGenerator.class.getSimpleName(), args);
         if (commandLine == null) {
             return;
         }

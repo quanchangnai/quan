@@ -69,7 +69,7 @@ public class CSharpMessageGenerator extends MessageGenerator {
     }
 
     public static void main(String[] args) {
-        CommandLine commandLine = CommandLineUtils.parseMessageCommandLine(CSharpMessageGenerator.class.getSimpleName(), args);
+        CommandLine commandLine = CommandLineUtils.parseMessageArgs(CSharpMessageGenerator.class.getSimpleName(), args);
         if (commandLine == null) {
             return;
         }

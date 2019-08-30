@@ -25,7 +25,7 @@ public class CommandLineUtils {
         helpFormatter.setOptionComparator(null);
     }
 
-    public static CommandLine parseCommandLine(String generatorName, String[] args, Option... extOptions) {
+    public static CommandLine parseArgs(String generatorName, String[] args, Option... extOptions) {
         Option definitionPathOption = new Option(null, CommandLineUtils.definitionPath, true, "定义文件路径,多个路径以空格分隔" );
         definitionPathOption.setRequired(true);
         definitionPathOption.setArgs(Option.UNLIMITED_VALUES);
@@ -55,8 +55,8 @@ public class CommandLineUtils {
         return null;
     }
 
-    public static CommandLine parseMessageCommandLine(String generatorName, String[] args) {
+    public static CommandLine parseMessageArgs(String generatorName, String[] args) {
         Option recalcIdOption = new Option(null, CommandLineUtils.recalcId, false, "哈希计算消息ID冲突时是否重新计算(可选)" );
-        return CommandLineUtils.parseCommandLine(generatorName, args, recalcIdOption);
+        return CommandLineUtils.parseArgs(generatorName, args, recalcIdOption);
     }
 }

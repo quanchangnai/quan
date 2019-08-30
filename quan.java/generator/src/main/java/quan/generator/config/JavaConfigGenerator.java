@@ -64,7 +64,7 @@ public class JavaConfigGenerator extends ConfigGenerator {
     }
 
     public static void main(String[] args) {
-        CommandLine commandLine = CommandLineUtils.parseCommandLine(JavaConfigGenerator.class.getSimpleName(), args);
+        CommandLine commandLine = CommandLineUtils.parseArgs(JavaConfigGenerator.class.getSimpleName(), args);
         if (commandLine == null) {
             return;
         }
