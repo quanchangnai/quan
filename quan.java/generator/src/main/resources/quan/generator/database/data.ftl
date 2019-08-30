@@ -348,10 +348,8 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
 
         if (_cache == null) {
             _cache = new Cache<>("${name}" , ${name}::new);
-            database.registerCache(_cache);
-        } else if (!_cache.isWorkable()) {
-            database.registerCache(_cache);
         }
+        database.registerCache(_cache);
     }
 
     public static ${name} get(${keyType} ${keyName}) {

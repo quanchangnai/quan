@@ -411,10 +411,8 @@ public class RoleData extends Data<Long> {
 
         if (_cache == null) {
             _cache = new Cache<>("RoleData" , RoleData::new);
-            database.registerCache(_cache);
-        } else if (!_cache.isWorkable()) {
-            database.registerCache(_cache);
         }
+        database.registerCache(_cache);
     }
 
     public static RoleData get(Long id) {
