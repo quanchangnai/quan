@@ -13,12 +13,12 @@ namespace Quan.Config
         protected internal abstract ConfigBase Create(JObject json);
 
 
-        protected static void Index<TKey, TValue>(IDictionary<TKey, TValue> configs, TValue config, TKey key)
+        protected static void Load<TKey, TValue>(IDictionary<TKey, TValue> configs, TValue config, TKey key)
         {
             configs[key] = config;
         }
 
-        protected static void Index<TKey, TValue>(IDictionary<TKey, IList<TValue>> configs, TValue config, TKey key)
+        protected static void Load<TKey, TValue>(IDictionary<TKey, IList<TValue>> configs, TValue config, TKey key)
         {
             configs.TryGetValue(key, out var list);
             if (list == null)
@@ -30,7 +30,7 @@ namespace Quan.Config
             list.Add(config);
         }
 
-        protected static void Index<TKey1, TKey2, TValue>(IDictionary<TKey1, IDictionary<TKey2, TValue>> configs, TValue config, TKey1 key1, TKey2 key2)
+        protected static void Load<TKey1, TKey2, TValue>(IDictionary<TKey1, IDictionary<TKey2, TValue>> configs, TValue config, TKey1 key1, TKey2 key2)
         {
             configs.TryGetValue(key1, out var dict);
             if (dict == null)
@@ -39,10 +39,10 @@ namespace Quan.Config
                 configs[key1] = dict;
             }
 
-            Index(dict, config, key2);
+            Load(dict, config, key2);
         }
 
-        protected static void Index<TKey1, TKey2, TValue>(IDictionary<TKey1, IDictionary<TKey2, IList<TValue>>> configs, TValue config, TKey1 key1, TKey2 key2)
+        protected static void Load<TKey1, TKey2, TValue>(IDictionary<TKey1, IDictionary<TKey2, IList<TValue>>> configs, TValue config, TKey1 key1, TKey2 key2)
         {
             configs.TryGetValue(key1, out var dict);
             if (dict == null)
@@ -51,10 +51,10 @@ namespace Quan.Config
                 configs[key1] = dict;
             }
 
-            Index(dict, config, key2);
+            Load(dict, config, key2);
         }
 
-        protected static void Index<TKey1, TKey2, TKey3, TValue>(IDictionary<TKey1, IDictionary<TKey2, IDictionary<TKey3, TValue>>> configs, TValue config, TKey1 key1, TKey2 key2, TKey3 key3)
+        protected static void Load<TKey1, TKey2, TKey3, TValue>(IDictionary<TKey1, IDictionary<TKey2, IDictionary<TKey3, TValue>>> configs, TValue config, TKey1 key1, TKey2 key2, TKey3 key3)
         {
             configs.TryGetValue(key1, out var dict);
             if (dict == null)
@@ -63,10 +63,10 @@ namespace Quan.Config
                 configs[key1] = dict;
             }
 
-            Index(dict, config, key2, key3);
+            Load(dict, config, key2, key3);
         }
 
-        protected static void Index<TKey1, TKey2, TKey3, TValue>(IDictionary<TKey1, IDictionary<TKey2, IDictionary<TKey3, IList<TValue>>>> configs, TValue config, TKey1 key1, TKey2 key2, TKey3 key3)
+        protected static void Load<TKey1, TKey2, TKey3, TValue>(IDictionary<TKey1, IDictionary<TKey2, IDictionary<TKey3, IList<TValue>>>> configs, TValue config, TKey1 key1, TKey2 key2, TKey3 key3)
         {
             configs.TryGetValue(key1, out var dict);
             if (dict == null)
@@ -75,7 +75,7 @@ namespace Quan.Config
                 configs[key1] = dict;
             }
 
-            Index(dict, config, key2, key3);
+            Load(dict, config, key2, key3);
         }
 
         protected static IDictionary<TKey, TValue> ToImmutableDictionary<TKey, TValue>(IDictionary<TKey, TValue> dictionary)

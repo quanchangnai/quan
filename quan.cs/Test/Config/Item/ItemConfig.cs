@@ -150,7 +150,7 @@ namespace Test.Config.Item
 
             foreach (var config in configs)
             {
-                Index(idConfigs, config, config.Id);
+                Load(idConfigs, config, config.Id);
             }
 
             configs = configs.ToImmutableList();

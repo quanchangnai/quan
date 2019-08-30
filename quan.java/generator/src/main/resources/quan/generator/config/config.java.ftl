@@ -316,11 +316,11 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         ${tab}for (${name} config : configs) {
     <#list indexes as index>
         <#if index.fields?size==1>
-            ${tab}<#if parent??>Config.</#if>index(${index.name}Configs, errors, config, ${index.unique?c}, Arrays.asList("${index.fields[0].name}"), config.${index.fields[0].name});
+            ${tab}<#if parent??>Config.</#if>load(${index.name}Configs, errors, config, ${index.unique?c}, Arrays.asList("${index.fields[0].name}"), config.${index.fields[0].name});
         <#elseif index.fields?size==2>
-            ${tab}<#if parent??>Config.</#if>index(${index.name}Configs, errors, config, ${index.unique?c}, Arrays.asList("${index.fields[0].name}", "${index.fields[1].name}"), config.${index.fields[0].name}, config.${index.fields[1].name});
+            ${tab}<#if parent??>Config.</#if>load(${index.name}Configs, errors, config, ${index.unique?c}, Arrays.asList("${index.fields[0].name}", "${index.fields[1].name}"), config.${index.fields[0].name}, config.${index.fields[1].name});
         <#elseif index.fields?size==3>
-            ${tab}<#if parent??>Config.</#if>index(${index.name}Configs, errors, config, ${index.unique?c}, Arrays.asList("${index.fields[0].name}", "${index.fields[1].name}", "${index.fields[2].name}"), config.${index.fields[0].name}, config.${index.fields[1].name}, config.${index.fields[2].name});
+            ${tab}<#if parent??>Config.</#if>load(${index.name}Configs, errors, config, ${index.unique?c}, Arrays.asList("${index.fields[0].name}", "${index.fields[1].name}", "${index.fields[2].name}"), config.${index.fields[0].name}, config.${index.fields[1].name}, config.${index.fields[2].name});
         </#if>
     </#list>
         ${tab}}

@@ -96,8 +96,8 @@ namespace Test.Config.Item
 
             foreach (var config in configs)
             {
-                ConfigBase.Index(idConfigs, config, config.Id);
-                ConfigBase.Index(positionConfigs, config, config.Position);
+                ConfigBase.Load(idConfigs, config, config.Id);
+                ConfigBase.Load(positionConfigs, config, config.Position);
             }
 
             configs = configs.ToImmutableList();

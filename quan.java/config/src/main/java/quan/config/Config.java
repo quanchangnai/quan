@@ -16,7 +16,7 @@ public abstract class Config extends Bean {
 
     protected abstract Config create(JSONObject json);
 
-    protected static void index(Map configs, List<String> errors, Object config, boolean unique, List<String> keyNames, Object... keys) {
+    protected static void load(Map configs, List<String> errors, Object config, boolean unique, List<String> keyNames, Object... keys) {
         Map map = configs;
         for (int i = 0; i < keys.length - 1; i++) {
             Object key = keys[i];

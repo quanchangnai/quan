@@ -206,10 +206,10 @@ namespace Test.Config.Item
 
             foreach (var config in configs)
             {
-                ConfigBase.Index(idConfigs, config, config.Id);
-                ConfigBase.Index(positionConfigs, config, config.Position);
-                ConfigBase.Index(composite1Configs, config, config.Color, config.W1);
-                ConfigBase.Index(composite2Configs, config, config.W1, config.W2);
+                ConfigBase.Load(idConfigs, config, config.Id);
+                ConfigBase.Load(positionConfigs, config, config.Position);
+                ConfigBase.Load(composite1Configs, config, config.Color, config.W1);
+                ConfigBase.Load(composite2Configs, config, config.W1, config.W2);
             }
 
             configs = configs.ToImmutableList();

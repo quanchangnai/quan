@@ -73,7 +73,7 @@ namespace Test.Config.Quest
 
             foreach (var config in configs)
             {
-                Index(idConfigs, config, config.Id);
+                Load(idConfigs, config, config.Id);
             }
 
             configs = configs.ToImmutableList();

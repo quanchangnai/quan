@@ -220,10 +220,10 @@ public class WeaponConfig extends EquipConfig {
             List<String> errors = new ArrayList<>();
 
             for (WeaponConfig config : configs) {
-                Config.index(idConfigs, errors, config, true, Arrays.asList("id"), config.id);
-                Config.index(positionConfigs, errors, config, false, Arrays.asList("position"), config.position);
-                Config.index(composite1Configs, errors, config, false, Arrays.asList("color", "w1"), config.color, config.w1);
-                Config.index(composite2Configs, errors, config, true, Arrays.asList("w1", "w2"), config.w1, config.w2);
+                Config.load(idConfigs, errors, config, true, Arrays.asList("id"), config.id);
+                Config.load(positionConfigs, errors, config, false, Arrays.asList("position"), config.position);
+                Config.load(composite1Configs, errors, config, false, Arrays.asList("color", "w1"), config.color, config.w1);
+                Config.load(composite2Configs, errors, config, true, Arrays.asList("w1", "w2"), config.w1, config.w2);
             }
 
             configs = Collections.unmodifiableList(configs);

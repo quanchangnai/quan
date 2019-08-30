@@ -195,7 +195,7 @@ public class ItemConfig extends Config {
         List<String> errors = new ArrayList<>();
 
         for (ItemConfig config : configs) {
-            index(idConfigs, errors, config, true, Arrays.asList("id"), config.id);
+            load(idConfigs, errors, config, true, Arrays.asList("id"), config.id);
         }
 
         configs = Collections.unmodifiableList(configs);

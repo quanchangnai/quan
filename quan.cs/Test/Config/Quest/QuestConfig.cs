@@ -323,12 +323,12 @@ namespace Test.Config.Quest
 
             foreach (var config in configs)
             {
-                Index(composite1Configs, config, config.A1, config.A2);
-                Index(composite2Configs, config, config.B1, config.B2);
-                Index(composite3Configs, config, config.C1, config.C2, config.C3);
-                Index(composite4Configs, config, config.D1, config.D2, config.D3);
-                Index(idConfigs, config, config.Id);
-                Index(typeConfigs, config, config.Type);
+                Load(composite1Configs, config, config.A1, config.A2);
+                Load(composite2Configs, config, config.B1, config.B2);
+                Load(composite3Configs, config, config.C1, config.C2, config.C3);
+                Load(composite4Configs, config, config.D1, config.D2, config.D3);
+                Load(idConfigs, config, config.Id);
+                Load(typeConfigs, config, config.Type);
             }
 
             configs = configs.ToImmutableList();

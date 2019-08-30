@@ -296,11 +296,11 @@ namespace ${fullPackageName}
             {
     <#list indexes as index>
         <#if index.fields?size==1>
-                <#if parent??>ConfigBase.</#if>Index(${index.name}Configs, config, config.${index.fields[0].name?cap_first});
+                <#if parent??>ConfigBase.</#if>Load(${index.name}Configs, config, config.${index.fields[0].name?cap_first});
         <#elseif index.fields?size==2>
-                <#if parent??>ConfigBase.</#if>Index(${index.name}Configs, config, config.${index.fields[0].name?cap_first}, config.${index.fields[1].name?cap_first});
+                <#if parent??>ConfigBase.</#if>Load(${index.name}Configs, config, config.${index.fields[0].name?cap_first}, config.${index.fields[1].name?cap_first});
         <#elseif index.fields?size==3>
-                <#if parent??>ConfigBase.</#if>Index(${index.name}Configs, config, config.${index.fields[0].name?cap_first}, config.${index.fields[1].name?cap_first}, config.${index.fields[2].name?cap_first});
+                <#if parent??>ConfigBase.</#if>Load(${index.name}Configs, config, config.${index.fields[0].name?cap_first}, config.${index.fields[1].name?cap_first}, config.${index.fields[2].name?cap_first});
         </#if>
     </#list>
             }
