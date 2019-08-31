@@ -3,6 +3,7 @@ package quan.database;
 /**
  * Created by quanchangnai on 2019/5/17.
  */
+@SuppressWarnings("unchecked")
 class VersionLog {
 
     private long version;

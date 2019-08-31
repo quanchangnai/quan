@@ -3,6 +3,7 @@ package quan.database;
 /**
  * Created by quanchangnai on 2019/6/22.
  */
+@SuppressWarnings("unchecked")
 public class BaseField<V> implements Field<V> {
 
     private V value;

@@ -29,7 +29,7 @@ public class TransactionInterceptor implements MethodInterceptor {
     }
 
     @Override
-    public Object intercept(Object obj, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
+    public Object intercept(Object obj, Method method, Object[] args, MethodProxy methodProxy) {
         //被代理的方法的返回结果，同步调用一定能正确返回，异步调用结果会丢失
         AtomicReference<Object> result = new AtomicReference<>();
 
@@ -38,7 +38,7 @@ public class TransactionInterceptor implements MethodInterceptor {
                 Object superResult = methodProxy.invokeSuper(obj, args);
                 result.set(superResult);
                 //返回false代表事务执行失败，其他值都表示事务执行成功
-                return superResult instanceof Boolean ? (boolean) superResult : true;
+                return !(superResult instanceof Boolean) || (boolean) superResult;
             } catch (Throwable e) {
                 if (!(e instanceof Transaction.BreakdownException)) {
                     logger.error("", e);

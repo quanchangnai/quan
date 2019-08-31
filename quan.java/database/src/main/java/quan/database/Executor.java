@@ -29,8 +29,6 @@ public class Executor implements ExecutorService {
 
     /**
      * 在事务中执行任务
-     *
-     * @param task
      */
     public final void execute(Task task) {
         Objects.requireNonNull(task);

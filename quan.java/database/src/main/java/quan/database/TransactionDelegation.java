@@ -26,7 +26,7 @@ public class TransactionDelegation {
             try {
                 Object callResult = callable.call();
                 result.set(callable.call());
-                return result.get() instanceof Boolean ? (boolean) callResult : true;
+                return !(result.get() instanceof Boolean) || (boolean) callResult;
             } catch (Exception e) {
                 if (!(e instanceof Transaction.BreakdownException)) {
                     logger.error("", e);

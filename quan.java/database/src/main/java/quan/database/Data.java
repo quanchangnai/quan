@@ -12,7 +12,7 @@ public abstract class Data<K> extends Entity implements Comparable<Data<K>> {
     /**
      * 版本号，用于实现乐观锁
      */
-    private volatile long version;
+    private long version;
 
     private volatile long touchTime = System.currentTimeMillis();
 

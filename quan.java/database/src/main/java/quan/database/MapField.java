@@ -94,7 +94,7 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field<PMap<
         }
 
         if (oldValue instanceof Entity) {
-            ((Entity) value)._setLogRoot(null);
+            ((Entity) oldValue)._setLogRoot(null);
         }
 
         return oldValue;

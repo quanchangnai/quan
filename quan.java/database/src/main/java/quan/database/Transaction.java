@@ -173,7 +173,7 @@ public class Transaction {
         return rootLogs.get(node);
     }
 
-    DataLog getDataLog(Object key) {
+    DataLog getDataLog(DataLog.Key key) {
         return dataLogs.get(key);
     }
 
@@ -183,8 +183,6 @@ public class Transaction {
 
     /**
      * 当前是不是处于事务之中
-     *
-     * @return
      */
     public static boolean isInside() {
         return threadLocal.get() != null;
@@ -194,8 +192,7 @@ public class Transaction {
     /**
      * 获取当前事务
      *
-     * @param check
-     * @return
+     * @param check 检查当前是否处于事务之中
      */
     public static Transaction get(boolean check) {
         Transaction transaction = threadLocal.get();
@@ -207,8 +204,6 @@ public class Transaction {
 
     /**
      * 获取当前事务
-     *
-     * @return
      */
     public static Transaction get() {
         return get(false);
@@ -280,8 +275,8 @@ public class Transaction {
         }
 
         if (slow || conflict) {
-//            logger.debug("事务{}结束,执行成功:{},耗时:{}ms,逻辑冲突次数:{} | 事务执行总次数:{},慢事务次数:{},频繁冲突事务次数:{}",
-//                    current.id, !current.failed, costTime, current.taskConflictCount, totalCount, slowCount, conflictCount);
+            logger.debug("事务{}结束,执行成功:{},耗时:{}ms,逻辑冲突次数:{} | 事务执行总次数:{},慢事务次数:{},频繁冲突事务次数:{}",
+                    current.id, !current.failed, costTime, current.taskConflictCount, totalCount, slowCount, conflictCount);
         }
 
     }
@@ -293,8 +288,6 @@ public class Transaction {
 
     /**
      * 在事务中执行任务，执行线程为调用方法的当前线程
-     *
-     * @param task
      */
     public static void execute(Task task) {
         if (isInside()) {
@@ -306,8 +299,6 @@ public class Transaction {
 
     /**
      * 在事务内部执行
-     *
-     * @param task
      */
     public static void insideExecute(Task task) {
         Transaction transaction = get(true);
@@ -320,7 +311,7 @@ public class Transaction {
     /**
      * 在事务外部执行，需要开启新事务
      *
-     * @param task
+     * @param task 事务逻辑
      */
     public static void outsideExecute(Task task) {
         Transaction transaction = Transaction.get();
@@ -515,11 +506,13 @@ public class Transaction {
     }
 
     /**
-     * @param task
+     * 添加事务执行完成之后需要执行的任务
+     *
+     * @param task      后置任务
      * @param committed true:提交执行,false:滚之后执行
      */
     public static void addAfterTask(Runnable task, boolean committed) {
-        addAfterTasks(Arrays.asList(task), committed);
+        addAfterTasks(Collections.singletonList(task), committed);
     }
 
     public static void addAfterTasks(List<Runnable> tasks, boolean committed) {
