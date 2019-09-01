@@ -4,4 +4,31 @@
 --- DateTime: 2019/8/30 17:36
 ---
 
-print("MessageTest")
+local Buffer = require("./Buffer")
+
+print("MessageTest===========")
+print()
+
+function test1()
+    print("test1===========")
+    local str = ""
+    for i = 1, 3 do
+        str = str .. string.char(i)
+    end
+    print("str=" .. str)
+    print(string.unpack("bbb", str))
+    print(str:byte(1, string.len(str)))
+
+    str = string.pack("bbb", 23, 43, 54)
+    print(string.unpack("bbb", str))
+end
+
+function testBuffer()
+    print("testBuffer===========")
+    local buffer = Buffer.new()
+    print(buffer:capacity())
+end
+
+test1()
+print()
+testBuffer()
