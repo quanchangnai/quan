@@ -1,9 +1,10 @@
 package quan.generator.message;
 
 import freemarker.template.Template;
-import quan.generator.BeanDefinition;
-import quan.generator.ClassDefinition;
-import quan.generator.DefinitionCategory;
+import quan.definition.BeanDefinition;
+import quan.definition.ClassDefinition;
+import quan.definition.DefinitionCategory;
+import quan.definition.MessageDefinition;
 import quan.generator.Generator;
 
 import java.io.IOException;
@@ -23,9 +24,9 @@ public abstract class MessageGenerator extends Generator {
 
         Template messageTemplate;
         try {
-            messageTemplate = freemarkerCfg.getTemplate("message." + supportLanguage() + ".ftl" );
+            messageTemplate = freemarkerCfg.getTemplate("message." + supportLanguage() + ".ftl");
         } catch (IOException e) {
-            logger.error("" , e);
+            logger.error("", e);
             return;
         }
 
@@ -86,7 +87,7 @@ public abstract class MessageGenerator extends Generator {
                     allConflictedMessages.addAll(conflictedMessages.subList(1, conflictedMessages.size()));
                 } else {
                     List<String> conflictedNames = conflictedMessages.stream().map(MessageDefinition::getName).collect(Collectors.toList());
-                    definitionParser.addValidatedError(String.format("消息%sID有冲突,改名可以解决冲突" , conflictedNames));
+                    definitionParser.addValidatedError(String.format("消息%sID有冲突,改名可以解决冲突", conflictedNames));
                 }
             }
         }

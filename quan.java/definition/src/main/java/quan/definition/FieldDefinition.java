@@ -1,10 +1,6 @@
-package quan.generator;
+package quan.definition;
 
 import org.apache.commons.lang3.StringUtils;
-import quan.generator.config.ConfigDefinition;
-import quan.generator.config.JavaConfigGenerator;
-import quan.generator.database.DatabaseGenerator;
-import quan.generator.message.JavaMessageGenerator;
 
 /**
  * Created by quanchangnai on 2017/7/6.
@@ -98,19 +94,19 @@ public class FieldDefinition extends Definition {
 
     }
 
-    public boolean isBuiltInType() {
-        return isBuiltInType(type);
+    public boolean isBuiltinType() {
+        return isBuiltinType(type);
     }
 
-    public boolean isBuiltInType(String type) {
+    public boolean isBuiltinType(String type) {
         if (category == DefinitionCategory.data) {
-            return DatabaseGenerator.BASIC_TYPES.containsKey(type);
+            return Constants.DATA_BUILTIN_TYPES.contains(type);
         }
         if (category == DefinitionCategory.message) {
-            return JavaMessageGenerator.BASIC_TYPES.containsKey(type);
+            return Constants.MESSAGE_BUILTIN_TYPES.contains(type);
         }
         if (category == DefinitionCategory.config) {
-            return JavaConfigGenerator.BASIC_TYPES.containsKey(type);
+            return Constants.CONFIG_BUILTIN_TYPES.contains(type);
         }
 
         return false;
@@ -121,7 +117,11 @@ public class FieldDefinition extends Definition {
     }
 
     public boolean isPrimitiveType() {
-        return Constants.PRIMITIVE_TYPES.contains(type);
+        return isPrimitiveType(type);
+    }
+
+    public boolean isPrimitiveType(String type) {
+        return Constants.PRIMITIVE_TYPES.contains(type) || (category == DefinitionCategory.data && type.equals("byte"));
     }
 
     public boolean isEnumType() {
@@ -156,7 +156,7 @@ public class FieldDefinition extends Definition {
      * 类型是否合法
      */
     public boolean isLegalType() {
-        return isBuiltInType() || isBeanType() || isEnumType() || (category == DefinitionCategory.config && isTimeType());
+        return isBuiltinType() || isBeanType() || isEnumType() || (category == DefinitionCategory.config && isTimeType());
     }
 
 
@@ -193,12 +193,12 @@ public class FieldDefinition extends Definition {
         this.keyType = keyType.trim();
     }
 
-    public boolean isBuiltInKeyType() {
-        return isBuiltInType(keyType);
+    public boolean isBuiltinKeyType() {
+        return isBuiltinType(keyType);
     }
 
     public boolean isPrimitiveKeyType() {
-        return Constants.PRIMITIVE_TYPES.contains(keyType);
+        return isPrimitiveType(keyType);
     }
 
 
@@ -213,12 +213,12 @@ public class FieldDefinition extends Definition {
         this.valueType = valueType.trim();
     }
 
-    public boolean isBuiltInValueType() {
-        return isBuiltInType(valueType);
+    public boolean isBuiltinValueType() {
+        return isBuiltinType(valueType);
     }
 
     public boolean isPrimitiveValueType() {
-        return isBuiltInType(valueType);
+        return isPrimitiveType(valueType);
     }
 
     public boolean isBeanValueType() {
@@ -390,20 +390,20 @@ public class FieldDefinition extends Definition {
         }
 
         if (type.equals("map")) {
-            String[] fieldRefs = ref.split(":",-1);
+            String[] fieldRefs = ref.split(":", -1);
             ConfigDefinition refConfig = null;
 
             if (keyRef && fieldRefs.length >= 1) {
-                refConfig = parser.getConfig(fieldRefs[0].split("\\.",-1)[0]);
+                refConfig = parser.getConfig(fieldRefs[0].split("\\.", -1)[0]);
             }
             if (!keyRef && fieldRefs.length == 2) {
-                refConfig = parser.getConfig(fieldRefs[1].split("\\.",-1)[0]);
+                refConfig = parser.getConfig(fieldRefs[1].split("\\.", -1)[0]);
             }
             return refConfig;
         }
 
         //list set 原生类型
-        String[] fieldRefs = ref.split("\\.",-1);
+        String[] fieldRefs = ref.split("\\.", -1);
         if (fieldRefs.length != 2) {
             return null;
         }
@@ -421,18 +421,18 @@ public class FieldDefinition extends Definition {
             return null;
         }
         if (type.equals("map")) {
-            String[] fieldRefs = ref.split(",",-1);
+            String[] fieldRefs = ref.split(",", -1);
             ConfigDefinition refConfig;
 
             if (keyRef && fieldRefs.length >= 1) {
-                String[] fieldKeyRefs = fieldRefs[0].split("\\.",-1);
+                String[] fieldKeyRefs = fieldRefs[0].split("\\.", -1);
                 refConfig = parser.getConfig(fieldKeyRefs[0]);
                 if (refConfig != null) {
                     return refConfig.getField(fieldKeyRefs[1]);
                 }
             }
             if (!keyRef && fieldRefs.length == 2) {
-                String[] fieldValueRefs = fieldRefs[1].split("\\.",-1);
+                String[] fieldValueRefs = fieldRefs[1].split("\\.", -1);
                 refConfig = parser.getConfig(fieldValueRefs[0]);
                 if (refConfig != null) {
                     return refConfig.getField(fieldValueRefs[1]);
@@ -442,7 +442,7 @@ public class FieldDefinition extends Definition {
         }
 
         //list set 原生类型
-        String[] fieldRefs = ref.split("\\.",-1);
+        String[] fieldRefs = ref.split("\\.", -1);
         if (fieldRefs.length != 2) {
             return null;
         }

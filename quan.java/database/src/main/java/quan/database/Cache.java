@@ -119,10 +119,10 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
         //不可能状态:insert,update,normal,插入时会校验数据是否已存在
         if (row != null) {
             if (row.state == Row.INSERT || row.state == Row.UPDATE || row.state == Row.NORMAL) {
-                throw new IllegalStateException("row(" + data.getKey() + "+不可能出现此状态:" + row.state + "，请检查代码逻辑");
+                throw new IllegalStateException("row[" + data.getKey() + "]不可能出现此状态:" + row.state + "，请检查代码逻辑");
             } else {
                 //之前有可能没有查询直接删除了
-                row.setDataAndState(data, Row.INSERT);
+                row.setDataInsert(data);
             }
 
         } else {
@@ -438,11 +438,11 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
             return state;
         }
 
-        void setDataAndState(V data, int state) {
+        void setDataInsert(V data) {
             lock.writeLock().lock();
             try {
                 this.data = data;
-                this.state = state;
+                this.state = INSERT;
             } finally {
                 lock.writeLock().unlock();
             }

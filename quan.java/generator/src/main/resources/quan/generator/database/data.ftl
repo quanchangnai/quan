@@ -3,6 +3,7 @@ package ${fullPackageName};
 import java.util.*;
 import com.alibaba.fastjson.*;
 import org.pcollections.*;
+import quan.database.*;
 <#list imports as import>
 import ${import};
 </#list>
@@ -145,7 +146,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
 <#list fields as field>
     <#if field.collectionType>
         _setLogRoot(${field.name}, root);
-    <#elseif !field.builtInType && !field.enumType>
+    <#elseif !field.builtinType && !field.enumType>
         <#if field_index gt 0 && fields[field_index-1].collectionType>
 
         </#if>
@@ -168,7 +169,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
 
         </#if>
         JSONArray $${field.name} = new JSONArray();
-        <#if !field.builtInValueType>
+        <#if !field.builtinValueType>
         for (${field.classValueType} $${field.name}$Value : this.${field.name}) {
             $${field.name}.add($${field.name}$Value.encode());
         }
@@ -185,7 +186,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
         </#if>
         JSONObject $${field.name} = new JSONObject();
         for (${field.classKeyType} $${field.name}$Key : this.${field.name}.keySet()) {
-        <#if !field.builtInValueType>
+        <#if !field.builtinValueType>
             $${field.name}.put(String.valueOf($${field.name}$Key), this.${field.name}.get($${field.name}$Key).encode());
         <#else>
             $${field.name}.put(String.valueOf($${field.name}$Key), this.${field.name}.get($${field.name}$Key));
@@ -195,7 +196,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
         <#if field_has_next && (fields[field_index+1].enumType || fields[field_index+1].primitiveType) >
 
         </#if>
-    <#elseif field.builtInType || field.enumType>
+    <#elseif field.builtinType || field.enumType>
         json.put("${field.name}" , this.${field.name}.getValue());
     <#else>
         <#if field_index gt 0 >
@@ -225,7 +226,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
         if ($${field.name}$1 != null) {
             PVector<${field.classValueType}> $${field.name}$2 = Empty.vector();
             for (int i = 0; i < $${field.name}$1.size(); i++) {
-        <#if !field.builtInValueType>
+        <#if !field.builtinValueType>
                 ${field.classValueType} $${field.name}$Value = new ${field.classValueType}();
                 $${field.name}$Value.decode($${field.name}$1.getJSONObject(i));
                 $${field.name}$2 = $${field.name}$2.plus($${field.name}$Value);
@@ -246,7 +247,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
         if ($${field.name}$1 != null) {
             PSet<${field.classValueType}> $${field.name}$2 = Empty.set();
             for (int i = 0; i < $${field.name}$1.size(); i++) {
-        <#if !field.builtInValueType>
+        <#if !field.builtinValueType>
                 ${field.classValueType} $${field.name}$Value = new ${field.classValueType}();
                 $${field.name}$Value.decode($${field.name}$1.getJSONObject(i));
                 $${field.name}$2 = $${field.name}$2.plus($${field.name}$Value);
@@ -267,7 +268,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
         if ($${field.name}$1 != null) {
             PMap<${field.classKeyType}, ${field.classValueType}> $${field.name}$2 = Empty.map();
             for (String $${field.name}$Key : $${field.name}$1.keySet()) {
-        <#if !field.builtInValueType>
+        <#if !field.builtinValueType>
                 ${field.classValueType} $${field.name}$Value = new ${field.classValueType}();
                 $${field.name}$Value.decode($${field.name}$1.getJSONObject($${field.name}$Key));
                 $${field.name}$2 = $${field.name}$2.plus(${field.classKeyType}.valueOf($${field.name}$Key), $${field.name}$Value);
@@ -284,7 +285,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
         this.${field.name}.setValue(json.getIntValue("${field.name}" ));
     <#elseif field.type=="string">
         this.${field.name}.setValue(json.getOrDefault("${field.name}" , "" ).toString());
-    <#elseif field.builtInType>
+    <#elseif field.builtinType>
         this.${field.name}.setValue(json.get${field.classType}Value("${field.name}" ));
     <#else>
         <#if field_index gt 0 >

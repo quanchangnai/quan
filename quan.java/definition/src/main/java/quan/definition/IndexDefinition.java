@@ -1,9 +1,6 @@
-package quan.generator.config;
+package quan.definition;
 
 import org.apache.commons.lang3.StringUtils;
-import quan.generator.Constants;
-import quan.generator.Definition;
-import quan.generator.FieldDefinition;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import quan.generator.config.ConfigDefinition;
+import quan.definition.ConfigDefinition;
 
 import java.io.File;
 import java.io.FileInputStream;

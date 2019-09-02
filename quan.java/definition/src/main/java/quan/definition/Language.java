@@ -1,4 +1,4 @@
-package quan.generator;
+package quan.definition;
 
 import java.util.ArrayList;
 import java.util.Collections;

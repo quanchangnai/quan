@@ -3,8 +3,8 @@ package quan.config;
 import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import quan.generator.FieldDefinition;
-import quan.generator.config.ConfigDefinition;
+import quan.definition.FieldDefinition;
+import quan.definition.ConfigDefinition;
 
 import java.io.File;
 import java.util.*;

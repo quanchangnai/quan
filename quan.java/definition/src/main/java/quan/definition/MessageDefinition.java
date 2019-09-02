@@ -1,8 +1,4 @@
-package quan.generator.message;
-
-import quan.generator.BeanDefinition;
-import quan.generator.DefinitionCategory;
-import quan.generator.FieldDefinition;
+package quan.definition;
 
 import java.util.Arrays;
 

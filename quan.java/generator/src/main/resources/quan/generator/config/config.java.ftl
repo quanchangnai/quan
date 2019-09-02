@@ -89,7 +89,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         <#if field_has_next && (selfFields[field_index+1].primitiveType ||selfFields[field_index+1].timeType) >
 
         </#if>
-    <#elseif field.builtInType>
+    <#elseif field.builtinType>
         this.${field.name} = json.get${field.type?cap_first}Value("${field.name}");
     <#elseif field.enumType>
        <#if field_index gt 0 >

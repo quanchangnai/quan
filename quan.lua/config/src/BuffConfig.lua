@@ -3,7 +3,7 @@
 --- Created by quanchangnai.
 --- DateTime: 2019/8/30 21:31
 ---
-local Config = require("./Config")
+local Config = require("Config")
 
 local BuffConfig = { _name = "BuffConfig" }
 local prototype = {}

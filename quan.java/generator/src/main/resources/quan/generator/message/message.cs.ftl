@@ -69,7 +69,7 @@ namespace ${fullPackageName}
             set => _${field.name} = value ?? throw new NullReferenceException();
 		}
 
-    <#elseif field.builtInType || field.enumType>
+    <#elseif field.builtinType || field.enumType>
         <#if field.comment !="">
         /// <summary>
 		/// ${field.comment}
@@ -120,7 +120,7 @@ namespace ${fullPackageName}
         </#if>
 		    buffer.WriteInt(${field.name?cap_first}.Count);
 		    foreach (var ${field.name}Value in ${field.name?cap_first}) {
-		<#if field.builtInValueType>
+		<#if field.builtinValueType>
 			    buffer.Write${field.valueType?cap_first}(${field.name}Value);
 		<#else>
 				${field.name}Value.Encode(buffer);
@@ -136,7 +136,7 @@ namespace ${fullPackageName}
 		    buffer.WriteInt(${field.name?cap_first}.Count);
 		    foreach (var ${field.name}Key in ${field.name?cap_first}.Keys) {
 		        buffer.Write${field.keyType?cap_first}(${field.name}Key);
-		<#if field.builtInValueType>
+		<#if field.builtinValueType>
 			    buffer.Write${field.valueType?cap_first}(${field.name?cap_first}[${field.name}Key]);
 		<#else>
 			    ${field.name?cap_first}[${field.name}Key].Encode(buffer);
@@ -147,7 +147,7 @@ namespace ${fullPackageName}
         </#if>
 	<#elseif field.type=="float"||field.type=="double">
 			buffer.Write${field.type?cap_first}(${field.name?cap_first}<#if field.scale gt 0>, ${field.scale}</#if>);
-	<#elseif field.builtInType>
+	<#elseif field.builtinType>
 		    buffer.Write${field.type?cap_first}(${field.name?cap_first});
 	<#elseif field.enumType>
 			buffer.WriteInt((int)${field.name?cap_first});
@@ -177,7 +177,7 @@ namespace ${fullPackageName}
         </#if>
 		    var ${field.name}Size = buffer.ReadInt();
 		    for (var i = 0; i < ${field.name}Size; i++) {
-		<#if field.builtInValueType>
+		<#if field.builtinValueType>
 			    ${field.name?cap_first}.Add(buffer.Read${field.valueType?cap_first}());
 		<#else>
 			    var ${field.name}Value = new ${field.valueType}();
@@ -194,7 +194,7 @@ namespace ${fullPackageName}
         </#if>
 		    var ${field.name}Size = buffer.ReadInt();
 		    for (var i = 0; i < ${field.name}Size; i++) {
-		<#if field.builtInValueType>
+		<#if field.builtinValueType>
 			    ${field.name?cap_first}.Add(buffer.Read${field.keyType?cap_first}(), buffer.Read${field.valueType?cap_first}());
 		<#else>
 			    var ${field.name}Key = buffer.Read${field.keyType?cap_first}();
@@ -208,7 +208,7 @@ namespace ${fullPackageName}
         </#if>
 	<#elseif field.type=="float"||field.type=="double">
 			${field.name?cap_first} = buffer.Read${field.type?cap_first}(<#if field.scale gt 0>${field.scale}</#if>);
-	<#elseif field.builtInType>
+	<#elseif field.builtinType>
 		    ${field.name?cap_first} = buffer.Read${field.type?cap_first}();
 	<#elseif field.enumType>
 		    ${field.name?cap_first} = (${field.type})buffer.ReadInt();

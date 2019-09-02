@@ -1,9 +1,9 @@
 package quan.generator.util;
 
-import quan.generator.BeanDefinition;
-import quan.generator.ClassDefinition;
-import quan.generator.DefinitionParser;
-import quan.generator.FieldDefinition;
+import quan.definition.BeanDefinition;
+import quan.definition.ClassDefinition;
+import quan.definition.DefinitionParser;
+import quan.definition.FieldDefinition;
 
 /**
  * C#工具类

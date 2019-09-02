@@ -25,13 +25,13 @@ public class GeneratorTest {
     private static void generateData() {
         System.err.println("DatabaseGenerator.generate()==========================" );
         DatabaseGenerator databaseGenerator = new DatabaseGenerator("database\\src\\test\\java" );
-        databaseGenerator.useXmlDefinitionParser("generator\\definition\\database" , "quan.database" );
+        databaseGenerator.useXmlDefinitionParser("definition\\database" , "quan.database" );
         databaseGenerator.generate();
         System.err.println();
     }
 
     private static void generateMessage() {
-        String definitionPath = "generator\\definition\\message";
+        String definitionPath = "definition\\message";
 
         System.err.println("JavaMessageGenerator.generate()==========================" );
         JavaMessageGenerator javaMessageGenerator = new JavaMessageGenerator("message\\src\\test\\java" );
@@ -48,7 +48,7 @@ public class GeneratorTest {
 
     private static void generateConfig() {
         List<String> definitionPaths = new ArrayList<>();
-        definitionPaths.add("generator\\definition\\config" );
+        definitionPaths.add("definition\\config" );
 
         System.err.println("JavaConfigGenerator.generate()==========================" );
         JavaConfigGenerator javaConfigGenerator = new JavaConfigGenerator("config\\src\\test\\java" );

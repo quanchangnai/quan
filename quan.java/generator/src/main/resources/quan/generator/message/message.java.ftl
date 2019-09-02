@@ -2,6 +2,7 @@ package ${fullPackageName};
 
 import java.util.*;
 import java.io.IOException;
+import quan.message.*;
 <#list imports as import>
 import ${import};
 </#list>
@@ -33,7 +34,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     private ${field.basicType} ${field.name} = "";
     <#elseif field.type == "bytes">
     private ${field.basicType} ${field.name} = new byte[0];
-    <#elseif field.builtInType || field.enumType>
+    <#elseif field.builtinType || field.enumType>
     private ${field.basicType} ${field.name};
     <#elseif !field.optional>
     private ${field.basicType} ${field.name} = new ${field.type}();
@@ -80,7 +81,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
      */
     </#if>
     public ${name} set${field.name?cap_first}(${field.basicType} ${field.name}) {
-        <#if (!field.builtInType && !field.optional && !field.enumType) || field.type == "string" || field.type == "bytes">
+        <#if (!field.builtinType && !field.optional && !field.enumType) || field.type == "string" || field.type == "bytes">
         Objects.requireNonNull(${field.name});
         </#if>
         this.${field.name} = ${field.name};
@@ -107,7 +108,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         </#if>
         buffer.writeInt(this.${field.name}.size());
         for (${field.basicValueType} $${field.name}$Value : this.${field.name}) {
-        <#if field.builtInValueType>
+        <#if field.builtinValueType>
             buffer.write${field.valueType?cap_first}($${field.name}$Value);
         <#else>
             $${field.name}$Value.encode(buffer);
@@ -123,7 +124,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         buffer.writeInt(this.${field.name}.size());
         for (${field.basicKeyType} $${field.name}$Key : this.${field.name}.keySet()) {
             buffer.write${field.keyType?cap_first}($${field.name}$Key);
-        <#if field.builtInValueType>
+        <#if field.builtinValueType>
             buffer.write${field.valueType?cap_first}(this.${field.name}.get($${field.name}$Key));
         <#else>
             this.${field.name}.get($${field.name}$Key).encode(buffer);
@@ -134,7 +135,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         </#if>
     <#elseif field.type=="float"||field.type=="double">
         buffer.write${field.type?cap_first}(this.${field.name}<#if field.scale gt 0>, ${field.scale}</#if>);
-    <#elseif field.builtInType>
+    <#elseif field.builtinType>
         buffer.write${field.type?cap_first}(this.${field.name});
     <#elseif field.enumType>
         buffer.writeInt(this.${field.name} == null ? 0 : this.${field.name}.getValue());
@@ -166,7 +167,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         </#if>
         int $${field.name}$Size = buffer.readInt();
         for (int i = 0; i < $${field.name}$Size; i++) {
-        <#if field.builtInValueType>
+        <#if field.builtinValueType>
             this.${field.name}.add(buffer.read${field.valueType?cap_first}());
         <#else>
             ${field.valueType} $${field.name}$Value = new ${field.valueType}();
@@ -183,7 +184,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         </#if>
         int $${field.name}$Size = buffer.readInt();
         for (int i = 0; i < $${field.name}$Size; i++) {
-        <#if field.builtInValueType>
+        <#if field.builtinValueType>
             this.${field.name}.put(buffer.read${field.keyType?cap_first}(), buffer.read${field.valueType?cap_first}());
         <#else>
             ${field.basicKeyType} $${field.name}$Key = buffer.read${field.keyType?cap_first}();
@@ -197,7 +198,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         </#if>
     <#elseif field.type=="float"||field.type=="double">
         this.${field.name} = buffer.read${field.type?cap_first}(<#if field.scale gt 0>${field.scale}</#if>);
-    <#elseif field.builtInType>
+    <#elseif field.builtinType>
         this.${field.name} = buffer.read${field.type?cap_first}();
     <#elseif field.enumType>
         this.${field.name} = ${field.type}.valueOf(buffer.readInt());

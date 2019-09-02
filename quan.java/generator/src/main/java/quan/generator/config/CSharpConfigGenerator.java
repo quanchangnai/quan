@@ -1,7 +1,7 @@
 package quan.generator.config;
 
 import org.apache.commons.cli.CommandLine;
-import quan.generator.*;
+import quan.definition.*;
 import quan.generator.util.CSharpUtils;
 import quan.generator.util.CommandLineUtils;
 

@@ -6,6 +6,7 @@ import freemarker.template.TemplateExceptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.common.util.PathUtils;
+import quan.definition.*;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -155,20 +156,20 @@ public abstract class Generator {
 
     protected void processBeanField(BeanDefinition beanDefinition, FieldDefinition fieldDefinition) {
         String fieldType = fieldDefinition.getType();
-        if (fieldDefinition.isBuiltInType()) {
+        if (fieldDefinition.isBuiltinType()) {
             fieldDefinition.setBasicType(basicTypes.get(fieldType));
             fieldDefinition.setClassType(classTypes.get(fieldType));
         }
 
         if (fieldDefinition.isCollectionType()) {
-            if (fieldType.equals("map" ) && fieldDefinition.isBuiltInKeyType()) {
+            if (fieldType.equals("map" ) && fieldDefinition.isBuiltinKeyType()) {
                 String fieldKeyType = fieldDefinition.getKeyType();
                 fieldDefinition.setBasicKeyType(basicTypes.get(fieldKeyType));
                 fieldDefinition.setClassKeyType(classTypes.get(fieldKeyType));
             }
 
             String fieldValueType = fieldDefinition.getValueType();
-            if (fieldDefinition.isBuiltInValueType()) {
+            if (fieldDefinition.isBuiltinValueType()) {
                 fieldDefinition.setBasicValueType(basicTypes.get(fieldValueType));
                 fieldDefinition.setClassValueType(classTypes.get(fieldValueType));
             }

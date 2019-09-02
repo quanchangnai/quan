@@ -6,9 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.apache.commons.lang3.tuple.Triple;
 import quan.common.util.PathUtils;
-import quan.generator.*;
-import quan.generator.config.ConfigDefinition;
-import quan.generator.config.IndexDefinition;
+import quan.definition.*;
 
 import java.io.File;
 import java.io.FileOutputStream;

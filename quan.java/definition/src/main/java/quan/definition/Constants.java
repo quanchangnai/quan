@@ -1,13 +1,11 @@
-package quan.generator;
+package quan.definition;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by quanchangnai on 2019/8/3.
  */
+@SuppressWarnings("unchecked")
 public class Constants {
 
     /**
@@ -30,6 +28,14 @@ public class Constants {
         return Collections.unmodifiableSet(new HashSet<>(Arrays.asList(params)));
     }
 
+    private static Set<String> unmodifiableSet(Collection<String>... collections) {
+        Set<String> set = new HashSet<>();
+        for (Collection<String> collection : collections) {
+            set.addAll(collection);
+        }
+        return Collections.unmodifiableSet(set);
+    }
+
     /**
      * 原生类型
      */
@@ -44,6 +50,21 @@ public class Constants {
      * 时间类型
      */
     public static final Set<String> TIME_TYPES = unmodifiableSet("date", "time", "datetime");
+
+    /**
+     * 数据库支持的内建类型
+     */
+    public static final Set<String> DATA_BUILTIN_TYPES = unmodifiableSet(PRIMITIVE_TYPES, COLLECTION_TYPES, Collections.singleton("byte"));
+
+    /**
+     * 消息支持的内建类型
+     */
+    public static final Set<String> MESSAGE_BUILTIN_TYPES = unmodifiableSet(PRIMITIVE_TYPES, COLLECTION_TYPES, Collections.singleton("bytes"));
+
+    /**
+     * 配置支持的内建类型
+     */
+    public static final Set<String> CONFIG_BUILTIN_TYPES = unmodifiableSet(PRIMITIVE_TYPES, COLLECTION_TYPES, TIME_TYPES);
 
     /**
      * 合法的分隔符

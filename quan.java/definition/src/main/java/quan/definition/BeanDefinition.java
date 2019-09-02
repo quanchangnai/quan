@@ -1,10 +1,6 @@
-package quan.generator;
+package quan.definition;
 
 import org.apache.commons.lang3.StringUtils;
-import quan.generator.config.ConfigDefinition;
-import quan.generator.config.IndexDefinition;
-import quan.generator.database.DataDefinition;
-import quan.generator.message.MessageDefinition;
 
 import java.util.HashSet;
 import java.util.Set;

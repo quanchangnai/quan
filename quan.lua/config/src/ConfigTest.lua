@@ -4,9 +4,9 @@
 --- DateTime: 2019/8/30 17:04
 --
 
-local BuffConfigs = require("./BuffConfigs")
-local Config = require("./Config")
-local BuffConfig = require("./BuffConfig")
+local BuffConfigs = require("BuffConfigs")
+local Config = require("Config")
+local BuffConfig = require("BuffConfig")
 
 function testConfig()
     print("testConfig=======================")

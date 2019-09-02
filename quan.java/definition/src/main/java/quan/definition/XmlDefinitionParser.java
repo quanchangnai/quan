@@ -1,12 +1,8 @@
-package quan.generator;
+package quan.definition;
 
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
-import quan.generator.config.ConfigDefinition;
-import quan.generator.config.IndexDefinition;
-import quan.generator.database.DataDefinition;
-import quan.generator.message.MessageDefinition;
 
 import java.io.File;
 import java.util.ArrayList;

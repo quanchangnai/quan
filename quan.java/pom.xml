@@ -10,12 +10,13 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>network</module>
-        <module>generator</module>
-        <module>database</module>
         <module>common</module>
+        <module>network</module>
+        <module>database</module>
         <module>message</module>
         <module>config</module>
+        <module>definition</module>
+        <module>generator</module>
         <module>test</module>
     </modules>
 

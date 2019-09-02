@@ -1,4 +1,4 @@
-package quan.generator;
+package quan.definition;
 
 public enum DefinitionCategory {
     data,

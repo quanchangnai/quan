@@ -1,4 +1,4 @@
-package quan.generator;
+package quan.definition;
 
 import org.apache.commons.lang3.StringUtils;
 

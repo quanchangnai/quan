@@ -1,7 +1,4 @@
-package quan.generator.database;
-
-import quan.generator.BeanDefinition;
-import quan.generator.DefinitionCategory;
+package quan.definition;
 
 /**
  * Created by quanchangnai on 2019/6/22.

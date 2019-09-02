@@ -39,7 +39,7 @@ public class ConfigTest {
 
     private static ConfigLoader withDefinitionConfigLoader() {
         List<String> definitionPaths = new ArrayList<>();
-        definitionPaths.add("generator\\definition\\config");
+        definitionPaths.add("definition\\config");
 
 //        TableType tableType = TableType.csv;
 //        String tablePath = "config\\csv";

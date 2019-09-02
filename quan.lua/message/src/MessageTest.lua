@@ -4,7 +4,7 @@
 --- DateTime: 2019/8/30 17:36
 ---
 
-local Buffer = require("./Buffer")
+local Buffer = require("Buffer")
 
 print("MessageTest===========")
 print()
@@ -15,7 +15,7 @@ function test1()
     for i = 1, 3 do
         str = str .. string.char(i)
     end
-    print("str=" .. str)
+    print("str=" .. string.len(str))
     print(string.unpack("bbb", str))
     print(str:byte(1, string.len(str)))
 

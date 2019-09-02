@@ -1,6 +1,7 @@
 package quan.generator.config;
 
 import freemarker.template.Template;
+import quan.definition.*;
 import quan.generator.*;
 
 import java.io.IOException;

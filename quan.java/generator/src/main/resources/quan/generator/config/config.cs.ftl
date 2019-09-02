@@ -92,7 +92,7 @@ namespace ${fullPackageName}
             ${field.name?cap_first}_Str = json["${field.name}$Str"]?.Value<string>() ?? "";
     <#elseif field.type=="string">
             ${field.name?cap_first} = json["${field.name}"]?.Value<${field.type}>() ?? "";
-    <#elseif field.builtInType>
+    <#elseif field.builtinType>
             ${field.name?cap_first} = json["${field.name}"]?.Value<${field.type}>() ?? default;
     <#elseif field.enumType>
             ${field.name?cap_first} = (${field.type}) (json["${field.name}"]?.Value<int>() ?? default);
