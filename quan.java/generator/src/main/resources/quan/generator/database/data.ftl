@@ -27,10 +27,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
     private ${field.classType}<${field.classKeyType}, ${field.classValueType}> ${field.name} = new ${field.classType}<>(_getRoot());
 
     <#elseif field.type = "string">
-    private BaseField<${field.classType}> ${field.name} = new BaseField<>("" );
-
-    <#elseif field.type = "byte">
-    private BaseField<${field.classType}> ${field.name} = new BaseField<>((byte) 0);
+    private BaseField<${field.classType}> ${field.name} = new BaseField<>("");
 
     <#elseif field.type = "short">
     private BaseField<${field.classType}> ${field.name} = new BaseField<>((short) 0);
@@ -164,6 +161,9 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
         JSONObject json = new JSONObject();
 
 <#list fields as field>
+    <#if field.ignore>
+        <#continue>
+    </#if>
     <#if field.type == "list" || field.type == "set">
         <#if field_index gt 0 >
 
@@ -218,6 +218,9 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
     @Override
     public void decode(JSONObject json) {
 <#list fields as field>
+    <#if field.ignore>
+        <#continue>
+    </#if>
     <#if field.type == "list">
         <#if field_index gt 0 >
 

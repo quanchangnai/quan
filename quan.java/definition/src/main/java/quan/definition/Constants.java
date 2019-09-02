@@ -54,7 +54,7 @@ public class Constants {
     /**
      * 数据库支持的内建类型
      */
-    public static final Set<String> DATA_BUILTIN_TYPES = unmodifiableSet(PRIMITIVE_TYPES, COLLECTION_TYPES, Collections.singleton("byte"));
+    public static final Set<String> DATA_BUILTIN_TYPES = unmodifiableSet(PRIMITIVE_TYPES, COLLECTION_TYPES);
 
     /**
      * 消息支持的内建类型

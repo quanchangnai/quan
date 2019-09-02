@@ -15,14 +15,12 @@ public class RoleData extends Data<Long> {
     //角色ID
     private BaseField<Long> id = new BaseField<>(0L);
 
-    private BaseField<String> name = new BaseField<>("" );
+    private BaseField<String> name = new BaseField<>("");
 
     //角色类型
     private BaseField<Integer> roleType = new BaseField<>(0);
 
-    private BaseField<Boolean> bo = new BaseField<>(false);
-
-    private BaseField<Byte> by = new BaseField<>((byte) 0);
+    private BaseField<Boolean> b = new BaseField<>(false);
 
     private BaseField<Short> s = new BaseField<>((short) 0);
 
@@ -98,21 +96,12 @@ public class RoleData extends Data<Long> {
         return this;
     }
 
-    public boolean getBo() {
-        return bo.getValue();
+    public boolean getB() {
+        return b.getValue();
     }
 
-    public RoleData setBo(boolean bo) {
-        this.bo.setLogValue(bo, _getRoot());
-        return this;
-    }
-
-    public byte getBy() {
-        return by.getValue();
-    }
-
-    public RoleData setBy(byte by) {
-        this.by.setLogValue(by, _getRoot());
+    public RoleData setB(boolean b) {
+        this.b.setLogValue(b, _getRoot());
         return this;
     }
 
@@ -219,8 +208,7 @@ public class RoleData extends Data<Long> {
         json.put("id" , this.id.getValue());
         json.put("name" , this.name.getValue());
         json.put("roleType" , this.roleType.getValue());
-        json.put("bo" , this.bo.getValue());
-        json.put("by" , this.by.getValue());
+        json.put("b" , this.b.getValue());
         json.put("s" , this.s.getValue());
         json.put("i" , this.i.getValue());
         json.put("f" , this.f.getValue());
@@ -263,12 +251,6 @@ public class RoleData extends Data<Long> {
         }
         json.put("list2" , $list2);
 
-        JSONObject $map2 = new JSONObject();
-        for (Integer $map2$Key : this.map2.keySet()) {
-            $map2.put(String.valueOf($map2$Key), this.map2.get($map2$Key).encode());
-        }
-        json.put("map2" , $map2);
-
         return json;
     }
 
@@ -277,8 +259,7 @@ public class RoleData extends Data<Long> {
         this.id.setValue(json.getLongValue("id" ));
         this.name.setValue(json.getOrDefault("name" , "" ).toString());
         this.roleType.setValue(json.getIntValue("roleType" ));
-        this.bo.setValue(json.getBooleanValue("bo" ));
-        this.by.setValue(json.getByteValue("by" ));
+        this.b.setValue(json.getBooleanValue("b" ));
         this.s.setValue(json.getShortValue("s" ));
         this.i.setValue(json.getIntValue("i" ));
         this.f.setValue(json.getFloatValue("f" ));
@@ -353,17 +334,6 @@ public class RoleData extends Data<Long> {
             }
             this.list2.setValue($list2$2);
         }
-
-        JSONObject $map2$1 = json.getJSONObject("map2" );
-        if ($map2$1 != null) {
-            PMap<Integer, ItemEntity> $map2$2 = Empty.map();
-            for (String $map2$Key : $map2$1.keySet()) {
-                ItemEntity $map2$Value = new ItemEntity();
-                $map2$Value.decode($map2$1.getJSONObject($map2$Key));
-                $map2$2 = $map2$2.plus(Integer.valueOf($map2$Key), $map2$Value);
-            }
-            this.map2.setValue($map2$2);
-        }
     }
 
     @Override
@@ -372,8 +342,7 @@ public class RoleData extends Data<Long> {
                 "id=" + id +
                 ",name='" + name + '\'' +
                 ",roleType=" + RoleType.valueOf(roleType.getValue()) +
-                ",bo=" + bo +
-                ",by=" + by +
+                ",b=" + b +
                 ",s=" + s +
                 ",i=" + i +
                 ",f=" + f +

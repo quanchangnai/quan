@@ -13,7 +13,7 @@ public class ItemEntity extends Entity {
 
     private BaseField<Integer> id = new BaseField<>(0);
 
-    private BaseField<String> name = new BaseField<>("" );
+    private BaseField<String> name = new BaseField<>("");
 
 
     public int getId() {

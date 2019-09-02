@@ -32,6 +32,9 @@ public class FieldDefinition extends Definition {
     //消息小数类型精度
     private int scale = -1;
 
+    //数据库字段忽略存储
+    private boolean ignore;
+
     //对应配置表格中的列
     private String column;
 
@@ -117,11 +120,7 @@ public class FieldDefinition extends Definition {
     }
 
     public boolean isPrimitiveType() {
-        return isPrimitiveType(type);
-    }
-
-    public boolean isPrimitiveType(String type) {
-        return Constants.PRIMITIVE_TYPES.contains(type) || (category == DefinitionCategory.data && type.equals("byte"));
+        return Constants.PRIMITIVE_TYPES.contains(type);
     }
 
     public boolean isEnumType() {
@@ -198,7 +197,7 @@ public class FieldDefinition extends Definition {
     }
 
     public boolean isPrimitiveKeyType() {
-        return isPrimitiveType(keyType);
+        return Constants.PRIMITIVE_TYPES.contains(keyType);
     }
 
 
@@ -218,7 +217,7 @@ public class FieldDefinition extends Definition {
     }
 
     public boolean isPrimitiveValueType() {
-        return isPrimitiveType(valueType);
+        return Constants.PRIMITIVE_TYPES.contains(valueType);
     }
 
     public boolean isBeanValueType() {
@@ -315,6 +314,17 @@ public class FieldDefinition extends Definition {
 
     public FieldDefinition setScale(int scale) {
         this.scale = scale;
+        return this;
+    }
+
+    public boolean isIgnore() {
+        return ignore;
+    }
+
+    public FieldDefinition setIgnore(String ignore) {
+        if (!StringUtils.isBlank(ignore) && ignore.trim().equals("true")) {
+            this.ignore = true;
+        }
         return this;
     }
 

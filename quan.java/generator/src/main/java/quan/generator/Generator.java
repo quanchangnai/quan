@@ -36,8 +36,8 @@ public abstract class Generator {
 
     public Generator(String codePath) {
         Configuration freemarkerCfg = new Configuration(Configuration.VERSION_2_3_23);
-        freemarkerCfg.setClassForTemplateLoading(Generator.class, "" );
-        freemarkerCfg.setDefaultEncoding("UTF-8" );
+        freemarkerCfg.setClassForTemplateLoading(Generator.class, "");
+        freemarkerCfg.setDefaultEncoding("UTF-8");
         freemarkerCfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
 
         this.codePath = PathUtils.currentPlatPath(codePath);
@@ -45,14 +45,14 @@ public abstract class Generator {
 
         Template enumTemplate;
         try {
-            enumTemplate = freemarkerCfg.getTemplate("enum." + supportLanguage() + ".ftl" );
+            enumTemplate = freemarkerCfg.getTemplate("enum." + supportLanguage() + ".ftl");
         } catch (IOException e) {
-            logger.error("" , e);
+            logger.error("", e);
             return;
         }
         templates.put(EnumDefinition.class, enumTemplate);
 
-        freemarkerCfg.setClassForTemplateLoading(getClass(), "" );
+        freemarkerCfg.setClassForTemplateLoading(getClass(), "");
     }
 
 
@@ -85,7 +85,7 @@ public abstract class Generator {
     }
 
     protected void parseDefinition() {
-        Objects.requireNonNull(definitionParser, "定义解析器不能为空" );
+        Objects.requireNonNull(definitionParser, "定义解析器不能为空");
         definitionParser.parse();
     }
 
@@ -95,7 +95,7 @@ public abstract class Generator {
         List<String> validatedErrors = definitionParser.getValidatedErrors();
 
         if (!validatedErrors.isEmpty()) {
-            System.err.println(String.format("生成%s代码失败，解析定义文件%s共发现%d条错误。" , supportLanguage(), definitionParser.getDefinitionPaths(), validatedErrors.size()));
+            System.err.println(String.format("生成%s代码失败，解析定义文件%s共发现%d条错误。", supportLanguage(), definitionParser.getDefinitionPaths(), validatedErrors.size()));
             for (int i = 1; i <= validatedErrors.size(); i++) {
                 String validatedError = validatedErrors.get(i - 1);
                 System.err.println(i + ":" + validatedError);
@@ -118,9 +118,9 @@ public abstract class Generator {
                 continue;
             }
             Template template = templates.get(classDefinition.getClass());
-            File destFilePath = new File(codePath + File.separator + classDefinition.getFullPackageName().replace("." , File.separator));
+            File destFilePath = new File(codePath + File.separator + classDefinition.getFullPackageName().replace(".", File.separator));
             if (!destFilePath.exists() && !destFilePath.mkdirs()) {
-                logger.info("创建目录[{}]失败" , destFilePath);
+                logger.info("创建目录[{}]失败", destFilePath);
                 continue;
             }
 
@@ -129,11 +129,11 @@ public abstract class Generator {
                 Writer writer = new FileWriter(new File(destFilePath, fileName));
                 template.process(classDefinition, writer);
             } catch (Exception e) {
-                logger.error("" , e);
+                logger.error("", e);
                 continue;
             }
 
-            logger.info("生成[{}]成功" , destFilePath + File.separator + fileName);
+            logger.info("生成[{}]成功", destFilePath + File.separator + fileName);
         }
 
     }
@@ -162,7 +162,7 @@ public abstract class Generator {
         }
 
         if (fieldDefinition.isCollectionType()) {
-            if (fieldType.equals("map" ) && fieldDefinition.isBuiltinKeyType()) {
+            if (fieldType.equals("map") && fieldDefinition.isBuiltinKeyType()) {
                 String fieldKeyType = fieldDefinition.getKeyType();
                 fieldDefinition.setBasicKeyType(basicTypes.get(fieldKeyType));
                 fieldDefinition.setClassKeyType(classTypes.get(fieldKeyType));

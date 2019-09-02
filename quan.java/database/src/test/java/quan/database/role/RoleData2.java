@@ -16,11 +16,9 @@ public class RoleData2 extends Data<Long> {
     //角色ID
     private BaseField<Long> id = new BaseField<>(0L);
 
-    private BaseField<String> name = new BaseField<>("" );
+    private BaseField<String> name = new BaseField<>("");
 
-    private BaseField<Boolean> bo = new BaseField<>(false);
-
-    private BaseField<Byte> by = new BaseField<>((byte) 0);
+    private BaseField<Boolean> b = new BaseField<>(false);
 
     private BaseField<Short> s = new BaseField<>((short) 0);
 
@@ -87,21 +85,12 @@ public class RoleData2 extends Data<Long> {
         return this;
     }
 
-    public boolean getBo() {
-        return bo.getValue();
+    public boolean getB() {
+        return b.getValue();
     }
 
-    public RoleData2 setBo(boolean bo) {
-        this.bo.setLogValue(bo, _getRoot());
-        return this;
-    }
-
-    public byte getBy() {
-        return by.getValue();
-    }
-
-    public RoleData2 setBy(byte by) {
-        this.by.setLogValue(by, _getRoot());
+    public RoleData2 setB(boolean b) {
+        this.b.setLogValue(b, _getRoot());
         return this;
     }
 
@@ -210,8 +199,7 @@ public class RoleData2 extends Data<Long> {
 
         json.put("id" , this.id.getValue());
         json.put("name" , this.name.getValue());
-        json.put("bo" , this.bo.getValue());
-        json.put("by" , this.by.getValue());
+        json.put("b" , this.b.getValue());
         json.put("s" , this.s.getValue());
         json.put("i" , this.i.getValue());
         json.put("f" , this.f.getValue());
@@ -269,8 +257,7 @@ public class RoleData2 extends Data<Long> {
     public void decode(JSONObject json) {
         this.id.setValue(json.getLongValue("id" ));
         this.name.setValue(json.getOrDefault("name" , "" ).toString());
-        this.bo.setValue(json.getBooleanValue("bo" ));
-        this.by.setValue(json.getByteValue("by" ));
+        this.b.setValue(json.getBooleanValue("b" ));
         this.s.setValue(json.getShortValue("s" ));
         this.i.setValue(json.getIntValue("i" ));
         this.f.setValue(json.getFloatValue("f" ));
@@ -365,8 +352,7 @@ public class RoleData2 extends Data<Long> {
         return "RoleData2{" +
                 "id=" + id +
                 ",name='" + name + '\'' +
-                ",bo=" + bo +
-                ",by=" + by +
+                ",b=" + b +
                 ",s=" + s +
                 ",i=" + i +
                 ",f=" + f +

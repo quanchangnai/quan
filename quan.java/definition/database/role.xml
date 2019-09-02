@@ -10,8 +10,7 @@
         <field name="id" type="long"/>角色ID
         <field name="name" type="string"/>
         <field name="roleType" type="RoleType"/>角色类型
-        <field name="bo" type="bool"/>
-        <field name="by" type="byte"/>
+        <field name="b" type="bool"/>
         <field name="s" type="short"/>
         <field name="i" type="int"/>
         <field name="f" type="float"/>
@@ -23,14 +22,13 @@
         <field name="map" type="map:int:int"/>
         <field name="set2" type="set:ItemEntity"/>
         <field name="list2" type="list:ItemEntity"/>
-        <field name="map2" type="map:int:ItemEntity"/>
+        <field name="map2" type="map:int:ItemEntity" ignore="true"/>
     </data>
 
     <data name="RoleData2" key="id" persistent="false">角色2
         <field name="id" type="long"/>角色ID
         <field name="name" type="string"/>
-        <field name="bo" type="bool"/>
-        <field name="by" type="byte"/>
+        <field name="b" type="bool"/>
         <field name="s" type="short"/>
         <field name="i" type="int"/>
         <field name="f" type="float"/>
