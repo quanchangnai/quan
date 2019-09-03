@@ -63,15 +63,20 @@ function readVarInt(self, bits)
     local temp = 0;
 
     while shift < bits do
+        if position > self.bytes:len() then
+            break
+        end
+
         local b = self.bytes:byte(position)
         position = position + 1
         temp = temp | (b & 0x7F) << shift;
+        shift = shift + 7
+
         if (b & 0x80) == 0 then
             --ZigZag解码
             self.position = position
             return (temp >> 1) ~ -(temp & 1);
         end
-        shift = shift + 7
     end
 
     error("读数据出错")
@@ -93,38 +98,41 @@ function Buffer:readLong()
     return readVarInt(self, 64)
 end
 
-function Buffer:readFloat()
-    local position = self.reading and self.position or 1
-    self.reading = true
-    local n = string.unpack("<f", self.bytes, position)
-    self.position = position + 4
-    return n
-end
-
-function Buffer:readDouble()
-    local position = self.reading and self.position or 1
-    self.reading = true
-    local n = string.unpack("<d", self.bytes, position)
-    self.position = position + 8
-    return n
-end
-
-function Buffer:readFloatByScale(scale)
+function Buffer:readFloat(scale)
+    scale = scale or -1
     assert(math.type(scale) == "integer", "参数[scale]类型错误")
+
     if scale < 0 then
-        return self:readFloat()
-    else
-        return self:readLong() / 10 ^ scale
+        local position = self.reading and self.position or 1
+        if position + 3 > self.bytes:len() then
+            error("读数据出错")
+        end
+        self.reading = true
+        local n = string.unpack("<f", self.bytes, position)
+        self.position = position + 4
+        return n
     end
+
+    return self:readLong() / 10 ^ scale
+
 end
 
-function Buffer:readDoubleByScale(scale)
+function Buffer:readDouble(scale)
+    scale = scale or -1
     assert(math.type(scale) == "integer", "参数[scale]类型错误")
+
     if scale < 0 then
-        return self:readDouble()
-    else
-        return self:readLong() / 10 ^ scale
+        local position = self.reading and self.position or 1
+        if position + 7 > self.bytes:len() then
+            error("读数据出错")
+        end
+        self.reading = true
+        local n = string.unpack("<d", self.bytes, position)
+        self.position = position + 8
+        return n
     end
+
+    return self:readLong() / 10 ^ scale
 end
 
 function Buffer:readString()
@@ -132,7 +140,7 @@ function Buffer:readString()
     local length = self:readInt()
     self.reading = true
 
-    if position + length > self:size() + 1 then
+    if position + length - 1 > self:size() then
         error("读数据出错")
     end
 
@@ -195,37 +203,30 @@ function Buffer:writeLong(n)
     writeVarInt(self, n, 64)
 end
 
-function Buffer:writeFloat(n)
+function Buffer:writeFloat(n, scale)
     assert(math.type(n) == "float", "参数[n]类型错误")
-    checkWrite(self)
-    self.bytes = self.bytes .. string.pack("<f", n)
-    self.position = self.bytes:len() + 1
-end
-
-function Buffer:writeDouble(n)
-    assert(math.type(n) == "float", "参数[n]类型错误")
-    checkWrite(self)
-    self.bytes = self.bytes .. string.pack("<d", n)
-    self.position = self.bytes:len() + 1
-end
-
-function Buffer:writeFloatByScale(n, scale)
-    assert(math.type(n) == "float", "参数[n]类型错误")
+    scale = scale or -1
     assert(math.type(scale) == "integer", "参数[scale]类型错误")
-    assert(n > 0x0.000002P-126 and n < 0x1.fffffeP+127, "参数[n]超出了32位浮点型的数值范围")
+
     if scale < 0 then
-        self:writeFloat(n)
+        checkWrite(self)
+        self.bytes = self.bytes .. string.pack("<f", n)
+        self.position = self.bytes:len() + 1
     else
-        self:writeDoubleByScale(n, scale)
+        assert(n > 0x0.000002P-126 and n < 0x1.fffffeP+127, "参数[n]超出了32位浮点型的数值范围")
+        self:writeDouble(n, scale)
     end
 end
 
-function Buffer:writeDoubleByScale(n, scale)
+function Buffer:writeDouble(n, scale)
     assert(math.type(n) == "float", "参数[n]类型错误")
+    scale = scale or -1
     assert(math.type(scale) == "integer", "参数[scale]类型错误")
 
     if scale < 0 then
-        self:writeDouble(n)
+        checkWrite(self)
+        self.bytes = self.bytes .. string.pack("<d", n)
+        self.position = self.bytes:len() + 1
         return
     end
 
