@@ -13,10 +13,10 @@ namespace Quan.Message
         */
         private byte[] _bytes;
 
-        //当前位置
+        //下一个读或写的位置
         private int _position;
 
-        //当前是在读数据还是在写数据，true：读，false：写
+        //当前是在读数据还是在写数据
         private bool _reading;
 
         //结束位置，后面的是无效数据
@@ -29,14 +29,14 @@ namespace Quan.Message
         public Buffer(int capacity)
         {
             _bytes = new byte[capacity];
-            _end = Capacity() - 1;
+            _end = -1;
         }
 
         public Buffer(byte[] bytes)
         {
             _bytes = bytes;
             _position = bytes.Length - 1;
-            _end = Capacity() - 1;
+            _end = _position;
         }
 
         public int Capacity()
@@ -47,6 +47,10 @@ namespace Quan.Message
         public void Reset()
         {
             _position = 0;
+            if (!_reading)
+            {
+                _end = _position - 1;
+            }
         }
 
         /// <summary>
@@ -58,15 +62,7 @@ namespace Quan.Message
         public byte[] AvailableBytes()
         {
             var availableBytes = new byte[Available()];
-            if (_reading)
-            {
-                Array.Copy(_bytes, _position, availableBytes, 0, availableBytes.Length);
-            }
-            else
-            {
-                Array.Copy(_bytes, 0, availableBytes, 0, availableBytes.Length);
-            }
-
+            Array.Copy(_bytes, _reading ? _position : 0, availableBytes, 0, availableBytes.Length);
             return availableBytes;
         }
 
@@ -120,9 +116,9 @@ namespace Quan.Message
         }
 
         /// <summary>
-        /// 读取VarInt，bits只能是[8,16,32,64]中的一种
+        /// 读取VarInt
         /// </summary>
-        /// <param name="bits"></param>
+        /// <param name="bits">读取的最大比特位,只能是[8,16,32,64]中的一种</param>
         /// <returns></returns>
         /// <exception cref="SystemException"></exception>
         /// <exception cref="IOException"></exception>
@@ -134,34 +130,40 @@ namespace Quan.Message
             }
 
             var position = _reading ? _position : 0;
+            _reading = true;
             var shift = 0;
             long temp = 0;
+
             while (shift < bits)
             {
+                if (position >= _bytes.Length)
+                {
+                    break;
+                }
+
                 var b = _bytes[position++];
                 temp |= (b & 0b1111111L) << shift;
+                shift += 7;
+
                 if ((b & 0b10000000) == 0)
                 {
-                    if (!_reading)
-                    {
-                        _reading = true;
-                        _end = _position - 1;
-                    }
-
                     _position = position;
                     //ZigZag解码
                     return (temp >> 1) ^ -(temp & 1);
                 }
-
-                shift += 7;
             }
 
-            throw new IOException("读取数据异常，编码错误");
+            throw new IOException("读数据出错");
         }
 
         public byte[] ReadBytes()
         {
             var length = ReadInt();
+            if (length > Remaining())
+            {
+                throw new IOException("读数据出错");
+            }
+
             var bytes = new byte[length];
             Array.Copy(_bytes, _position, bytes, 0, length);
             _position += length;
@@ -191,23 +193,23 @@ namespace Quan.Message
         public float ReadFloat()
         {
             var position = _reading ? _position : 0;
+            _reading = true;
             var shift = 0;
             var temp = 0;
+
             while (shift < 32)
             {
+                if (position >= _bytes.Length)
+                {
+                    throw new IOException("读数据出错");
+                }
+
                 var b = _bytes[position++];
                 temp |= (b & 0b11111111) << shift;
                 shift += 8;
             }
 
-            if (!_reading)
-            {
-                _reading = true;
-                _end = _position - 1;
-            }
-
             _position = position;
-
             return BitConverter.ToSingle(BitConverter.GetBytes(temp), 0);
         }
 
@@ -218,30 +220,29 @@ namespace Quan.Message
                 return ReadFloat();
             }
 
-            return (float) ReadDouble(scale);
+            return (float) (ReadLong() / Math.Pow(10, scale));
         }
 
         public double ReadDouble()
         {
             var position = _reading ? _position : 0;
+            _reading = true;
             var shift = 0;
             long temp = 0;
 
             while (shift < 64)
             {
-                byte b = _bytes[position++];
+                if (position >= _bytes.Length)
+                {
+                    throw new IOException("读数据出错");
+                }
+
+                var b = _bytes[position++];
                 temp |= (b & 0b11111111L) << shift;
                 shift += 8;
             }
 
-            if (!_reading)
-            {
-                _reading = true;
-                _end = _position - 1;
-            }
-
             _position = position;
-
             return BitConverter.Int64BitsToDouble(temp);
         }
 
@@ -280,37 +281,31 @@ namespace Quan.Message
             var newBytes = new byte[newCapacity];
             Array.Copy(_bytes, 0, newBytes, 0, capacity);
             _bytes = newBytes;
-
-            if (!_reading)
-            {
-                _end = capacity - 1;
-            }
         }
 
         private void WriteVarInt(long n)
         {
             CheckCapacity(10);
+
+            var position = _reading ? 0 : _position;
+            var end = _end;
+            _reading = false;
             //ZigZag编码
             n = (n << 1) ^ (n >> 63);
 
-            var position = _reading ? 0 : _position;
             while (true)
             {
                 if ((n & ~0b1111111) == 0)
                 {
                     _bytes[position++] = (byte) (n & 0b1111111);
-                    if (_reading)
-                    {
-                        _reading = false;
-                        _end = Capacity() - 1;
-                    }
-
                     _position = position;
+                    _end = ++end;
                     return;
                 }
 
                 _bytes[position++] = (byte) (n & 0b1111111 | 0b10000000);
                 n >>= 7;
+                end++;
             }
         }
 
@@ -320,6 +315,7 @@ namespace Quan.Message
             WriteInt(bytes.Length);
             Array.Copy(bytes, 0, _bytes, _position, bytes.Length);
             _position += bytes.Length;
+            _end += bytes.Length;
         }
 
         public void WriteBool(bool b)
@@ -345,22 +341,23 @@ namespace Quan.Message
         public void WriteFloat(float n)
         {
             CheckCapacity(4);
+
             var position = _reading ? 0 : _position;
+            var end = _end;
+            _reading = false;
+
             var temp = BitConverter.ToInt32(BitConverter.GetBytes(n), 0);
             var shift = 0;
+
             while (shift < 32)
             {
                 _bytes[position++] = (byte) (temp >> shift & 0b11111111);
                 shift += 8;
-            }
-
-            if (_reading)
-            {
-                _reading = false;
-                _end = Capacity() - 1;
+                end++;
             }
 
             _position = position;
+            _end = end;
         }
 
         public void WriteFloat(float n, int scale)
@@ -378,22 +375,23 @@ namespace Quan.Message
         public void WriteDouble(double n)
         {
             CheckCapacity(8);
+
             var position = _reading ? 0 : _position;
+            var end = _end;
+            _reading = false;
+
             var temp = BitConverter.DoubleToInt64Bits(n);
             var shift = 0;
+
             while (shift < 64)
             {
                 _bytes[position++] = (byte) (temp >> shift & 0b11111111);
                 shift += 8;
-            }
-
-            if (_reading)
-            {
-                _reading = false;
-                _end = Capacity() - 1;
+                end++;
             }
 
             _position = position;
+            _end = end;
         }
 
         public void WriteDouble(double n, int scale)
@@ -411,7 +409,7 @@ namespace Quan.Message
                 throw new IOException(string.Format("参数[{0}]超出了限定范围[{1},{2}],无法转换为指定精度[{3}]的定点型数据", n, -threshold, threshold, scale));
             }
 
-            WriteLong((long) Math.Round(n * times));
+            WriteLong((long) Math.Floor(n * times));
         }
 
         public void WriteString(string s)

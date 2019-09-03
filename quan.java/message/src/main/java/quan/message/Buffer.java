@@ -9,18 +9,19 @@ import java.nio.charset.StandardCharsets;
  * Created by quanchangnai on 2018/7/2.
  */
 public class Buffer {
+
     /**
      * 字节缓冲区
      */
     private byte[] bytes;
 
     /**
-     * 当前位置
+     * 下一个读或写的位置
      */
     private int position;
 
     /**
-     * 当前是在读数据还是在写数据，true：读，false：写
+     * 当前是在读数据还是在写数据
      */
     private boolean reading;
 
@@ -35,13 +36,13 @@ public class Buffer {
 
     public Buffer(int capacity) {
         this.bytes = new byte[capacity];
-        this.end = capacity() - 1;
+        this.end = -1;
     }
 
     public Buffer(byte[] bytes) {
         this.bytes = bytes;
         this.position = bytes.length - 1;
-        this.end = capacity() - 1;
+        this.end = position;
     }
 
     public Buffer(ByteBuffer buffer) {
@@ -54,6 +55,20 @@ public class Buffer {
 
     public void reset() {
         position = 0;
+        if (!reading) {
+            end = position - 1;
+        }
+    }
+
+    /**
+     * 当前可用的字节数
+     */
+    public int available() {
+        if (reading) {
+            return end + 1;
+        } else {
+            return position;
+        }
     }
 
     /**
@@ -72,16 +87,15 @@ public class Buffer {
     }
 
     /**
-     * 当前可用的字节数
+     * 当前剩余可用的字节数
      */
-    public int available() {
+    public int remaining() {
         if (reading) {
-            return end + 1;
+            return end - position + 1;
         } else {
             return position;
         }
     }
-
 
     /**
      * 当前剩余可用的字节数组<br/>
@@ -99,46 +113,44 @@ public class Buffer {
     }
 
     /**
-     * 当前剩余可用的字节数
-     */
-    public int remaining() {
-        if (reading) {
-            return end - position + 1;
-        } else {
-            return position;
-        }
-    }
-
-
-    /**
-     * 读取VarInt，bits只能是[8,16,32,64]中的一种
+     * 读取VarInt
+     *
+     * @param bits 读取的最大比特位,只能是[8,16,32,64]中的一种
      */
     protected long readVarInt(int bits) throws IOException {
         if (bits != 16 && bits != 32 && bits != 64) {
-            throw new IllegalArgumentException("参数bits限定取值范围[16,32,64],实际值：" + bits);
+            throw new IllegalArgumentException("参数[bits]限定取值范围[16,32,64],实际值[" + bits + "]");
         }
+
         int position = reading ? this.position : 0;
+        reading = true;
         int shift = 0;
         long temp = 0;
+
         while (shift < bits) {
+            if (position >= bytes.length) {
+                break;
+            }
+
             final byte b = bytes[position++];
             temp |= (b & 0b1111111L) << shift;
+            shift += 7;
+
             if ((b & 0b10000000) == 0) {
-                if (!reading) {
-                    reading = true;
-                    end = this.position - 1;
-                }
                 this.position = position;
                 //ZigZag解码
                 return (temp >>> 1) ^ -(temp & 1);
             }
-            shift += 7;
         }
-        throw new IOException("读取数据异常，编码错误");
+
+        throw new IOException("读数据出错");
     }
 
     public byte[] readBytes() throws IOException {
         int length = readInt();
+        if (length > remaining()) {
+            throw new IOException("读数据出错");
+        }
         byte[] bytes = new byte[length];
         System.arraycopy(this.bytes, position, bytes, 0, length);
         position += length;
@@ -162,22 +174,22 @@ public class Buffer {
         return readVarInt(64);
     }
 
-    public float readFloat() {
+    public float readFloat() throws IOException {
         int position = reading ? this.position : 0;
+        reading = true;
         int shift = 0;
         int temp = 0;
+
         while (shift < 32) {
+            if (position >= bytes.length) {
+                throw new IOException("读数据出错");
+            }
             final byte b = bytes[position++];
             temp |= (b & 0b11111111L) << shift;
             shift += 8;
         }
 
-        if (!reading) {
-            reading = true;
-            end = this.position - 1;
-        }
         this.position = position;
-
         return Float.intBitsToFloat(temp);
     }
 
@@ -185,27 +197,26 @@ public class Buffer {
         if (scale < 0) {
             return readFloat();
         } else {
-            return (float) readDouble(scale);
+            return (float) (readLong() / Math.pow(10, scale));
         }
     }
 
-    public double readDouble() {
+    public double readDouble() throws IOException {
         int position = reading ? this.position : 0;
+        reading = true;
         int shift = 0;
         long temp = 0;
 
         while (shift < 64) {
+            if (position >= bytes.length) {
+                throw new IOException("读数据出错");
+            }
             final byte b = bytes[position++];
             temp |= (b & 0b11111111L) << shift;
             shift += 8;
         }
 
-        if (!reading) {
-            reading = true;
-            end = this.position - 1;
-        }
         this.position = position;
-
         return Double.longBitsToDouble(temp);
     }
 
@@ -229,38 +240,39 @@ public class Buffer {
     protected void checkCapacity(int minAddValue) {
         int capacity = capacity();
         int position = reading ? 0 : this.position;
-        if (position + minAddValue >= capacity) {
-            int newCapacity = capacity;
-            while (minAddValue > 0) {
-                newCapacity += capacity;
-                minAddValue -= capacity;
-            }
-            byte[] newBytes = new byte[newCapacity];
-            System.arraycopy(this.bytes, 0, newBytes, 0, capacity);
-            this.bytes = newBytes;
-            if (!reading) {
-                end = capacity - 1;
-            }
+        if (position + minAddValue < capacity) {
+            return;
         }
+
+        int newCapacity = capacity;
+        while (minAddValue > 0) {
+            newCapacity += capacity;
+            minAddValue -= capacity;
+        }
+        byte[] newBytes = new byte[newCapacity];
+        System.arraycopy(this.bytes, 0, newBytes, 0, capacity);
+        this.bytes = newBytes;
     }
 
     protected void writeVarInt(long n) {
         checkCapacity(10);
+
+        int position = reading ? 0 : this.position;
+        int end = this.end;
+        reading = false;
         //ZigZag编码
         n = (n << 1) ^ (n >> 63);
-        int position = reading ? 0 : this.position;
+
         while (true) {
             if ((n & ~0b1111111) == 0) {
                 bytes[position++] = (byte) (n & 0b1111111);
-                if (reading) {
-                    reading = false;
-                    end = capacity() - 1;
-                }
                 this.position = position;
+                this.end = ++end;
                 return;
             } else {
                 bytes[position++] = (byte) (n & 0b1111111 | 0b10000000);
                 n >>>= 7;
+                end++;
             }
         }
     }
@@ -271,6 +283,7 @@ public class Buffer {
         writeInt(bytes.length);
         System.arraycopy(bytes, 0, this.bytes, position, bytes.length);
         position += bytes.length;
+        end += bytes.length;
     }
 
 
@@ -292,18 +305,22 @@ public class Buffer {
 
     public void writeFloat(float n) {
         checkCapacity(4);
+
         int position = reading ? 0 : this.position;
+        int end = this.end;
+        reading = false;
+
         int temp = Float.floatToIntBits(n);
         int shift = 0;
+
         while (shift < 32) {
             bytes[position++] = (byte) (temp >> shift & 0b11111111);
             shift += 8;
+            end++;
         }
-        if (reading) {
-            reading = false;
-            end = capacity() - 1;
-        }
+
         this.position = position;
+        this.end = end;
     }
 
     public void writeFloat(float n, int scale) throws IOException {
@@ -316,18 +333,22 @@ public class Buffer {
 
     public void writeDouble(double n) {
         checkCapacity(8);
+
         int position = reading ? 0 : this.position;
+        int end = this.end;
+        reading = false;
+
         long temp = Double.doubleToLongBits(n);
         int shift = 0;
+
         while (shift < 64) {
             bytes[position++] = (byte) (temp >>> shift & 0b11111111);
             shift += 8;
+            end++;
         }
-        if (reading) {
-            reading = false;
-            end = capacity() - 1;
-        }
+
         this.position = position;
+        this.end = end;
     }
 
     public void writeDouble(double n, int scale) throws IOException {
@@ -341,7 +362,7 @@ public class Buffer {
             throw new IOException(String.format("参数[%s]超出了限定范围[%s,%s],无法转换为指定精度[%s]的定点型数据", n, -threshold, threshold, scale));
         }
 
-        writeLong(Math.round(n * times));
+        writeLong((long) Math.floor(n * times));
     }
 
 

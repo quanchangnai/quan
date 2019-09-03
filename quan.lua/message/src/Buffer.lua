@@ -5,40 +5,244 @@
 ---
 
 local Buffer = {}
-local prototype = {}
-prototype.__index = prototype
 
 function Buffer.new(bytes)
+    assert(bytes == nil or type(bytes) == "string", "参数[bytes]类型错误")
     local instance = {
+        ---字节缓冲区
         bytes = bytes or "",
+        ---下一个读数据的位置
         position = 0,
-        reading = false,
-        endPos = 0
+        --当前是在读数据还是在写数据
+        reading = false
     }
-    setmetatable(instance, prototype)
+    setmetatable(instance, { __index = Buffer })
     return instance
 end
 
-function prototype:capacity()
-    return string.len(self.bytes)
+function Buffer:size()
+    return self.bytes:len()
 end
 
-function prototype:reset()
-    self.position = 0
+function Buffer:reset()
+    self.position = 1
+    if not self.reading then
+        self.bytes = ""
+    end
 end
 
-function prototype:readVarInt(bits)
-
+function Buffer:remaining()
+    if self.position > 0 then
+        return self:size() - self.position + 1
+    else
+        return self.position + 1
+    end
 end
 
-function prototype:writeVarInt(n)
-    --ZigZag编码
-    n = (n << 1) ^ (n >> 63);
-    local position = 0;
-    if not reading then
-        position = self.position
+function Buffer:remainingBytes()
+    if self.position > 0 then
+        return self.bytes:sub(self.position)
+    else
+        return self.bytes
+    end
+end
+
+function validateBits(bits)
+    assert(math.type(bits) == "integer", "参数[bits]类型错误")
+    if bits ~= 16 and bits ~= 32 and bits ~= 64 then
+        error("参数[bits]限定取值范围[16,32,64],实际值" .. bits .. "]")
+    end
+end
+
+function readVarInt(self, bits)
+    validateBits(bits)
+
+    local position = self.reading and self.position or 1
+    self.reading = true
+    local shift = 0;
+    local temp = 0;
+
+    while shift < bits do
+        local b = self.bytes:byte(position)
+        position = position + 1
+        temp = temp | (b & 0x7F) << shift;
+        if (b & 0x80) == 0 then
+            --ZigZag解码
+            self.position = position
+            return (temp >> 1) ~ -(temp & 1);
+        end
+        shift = shift + 7
     end
 
+    error("读数据出错")
+end
+
+function Buffer:readBool()
+    return self:readInt() ~= 0
+end
+
+function Buffer:readShort()
+    return readVarInt(self, 16)
+end
+
+function Buffer:readInt()
+    return readVarInt(self, 32)
+end
+
+function Buffer:readLong()
+    return readVarInt(self, 64)
+end
+
+function Buffer:readFloat()
+    local position = self.reading and self.position or 1
+    self.reading = true
+    local n = string.unpack("<f", self.bytes, position)
+    self.position = position + 4
+    return n
+end
+
+function Buffer:readDouble()
+    local position = self.reading and self.position or 1
+    self.reading = true
+    local n = string.unpack("<d", self.bytes, position)
+    self.position = position + 8
+    return n
+end
+
+function Buffer:readFloatByScale(scale)
+    assert(math.type(scale) == "integer", "参数[scale]类型错误")
+    if scale < 0 then
+        return self:readFloat()
+    else
+        return self:readLong() / 10 ^ scale
+    end
+end
+
+function Buffer:readDoubleByScale(scale)
+    assert(math.type(scale) == "integer", "参数[scale]类型错误")
+    if scale < 0 then
+        return self:readDouble()
+    else
+        return self:readLong() / 10 ^ scale
+    end
+end
+
+function Buffer:readString()
+    local position = self.reading and self.position or 1
+    local length = self:readInt()
+    self.reading = true
+
+    if position + length > self:size() + 1 then
+        error("读数据出错")
+    end
+
+    local str = self.bytes:sub(position + 1, position + length)
+    self.position = position + length
+    return str
+end
+
+function checkWrite(self)
+    self.reading = false
+    if self.position < self.bytes:len() + 1 then
+        self.bytes = self.bytes:sub(1, self.position - 1)
+    end
+end
+
+function writeVarInt(self, n, bits)
+    assert(math.type(n) == "integer", "参数[n]类型错误")
+
+    validateBits(bits)
+    checkWrite(self)
+
+    --ZigZag编码
+    n = (n << 1) ~ (n >> 63);
+    local shift = 0;
+
+    while shift < bits do
+        if ((n & ~0x7F) == 0) then
+            self.bytes = self.bytes .. string.char(n & 0x7F)
+            self.position = self.bytes:len() + 1
+            return ;
+        else
+            self.bytes = self.bytes .. string.char(n & 0x7F | 0x80)
+            n = n >> 7;
+            shift = shift + 7
+        end
+    end
+
+    error("写数据出错")
+end
+
+function Buffer:writeBool(b)
+    assert(type(b) == "boolean", "参数[b]类型错误")
+
+    if b then
+        self:writeInt(1)
+    else
+        self:writeInt(0)
+    end
+end
+
+function Buffer:writeShort(n)
+    writeVarInt(self, n, 16)
+end
+
+function Buffer:writeInt(n)
+    writeVarInt(self, n, 32)
+end
+
+function Buffer:writeLong(n)
+    writeVarInt(self, n, 64)
+end
+
+function Buffer:writeFloat(n)
+    assert(math.type(n) == "float", "参数[n]类型错误")
+    checkWrite(self)
+    self.bytes = self.bytes .. string.pack("<f", n)
+    self.position = self.bytes:len() + 1
+end
+
+function Buffer:writeDouble(n)
+    assert(math.type(n) == "float", "参数[n]类型错误")
+    checkWrite(self)
+    self.bytes = self.bytes .. string.pack("<d", n)
+    self.position = self.bytes:len() + 1
+end
+
+function Buffer:writeFloatByScale(n, scale)
+    assert(math.type(n) == "float", "参数[n]类型错误")
+    assert(math.type(scale) == "integer", "参数[scale]类型错误")
+    assert(n > 0x0.000002P-126 and n < 0x1.fffffeP+127, "参数[n]超出了32位浮点型的数值范围")
+    if scale < 0 then
+        self:writeFloat(n)
+    else
+        self:writeDoubleByScale(n, scale)
+    end
+end
+
+function Buffer:writeDoubleByScale(n, scale)
+    assert(math.type(n) == "float", "参数[n]类型错误")
+    assert(math.type(scale) == "integer", "参数[scale]类型错误")
+
+    if scale < 0 then
+        self:writeDouble(n)
+        return
+    end
+
+    local times = 10 ^ scale
+    local threshold = 0x7fffffffffffffff / times;
+    if n < -threshold or n > threshold then
+        error(string.format("参数[%s]超出了限定范围[%s,%s],无法转换为指定精度[%s]的定点型数据", n, -threshold, threshold, scale))
+    else
+        self:writeLong(math.floor(n * times))
+    end
+end
+
+function Buffer:writeString(s)
+    assert(type(s) == "string", "参数[s]类型错误")
+    self:writeInt(s:len())
+    self.bytes = self.bytes .. s
+    self.position = self.bytes:len() + 1
 end
 
 return Buffer

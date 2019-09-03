@@ -23,11 +23,13 @@ namespace Test
         {
             Console.WriteLine("Test1====================");
 
-            var buffer = new Buffer(100);
+            var buffer = new Buffer();
             buffer.WriteBool(false);
             buffer.WriteInt(231);
             buffer.WriteFloat(424.4F);
             buffer.WriteDouble(23421.424D);
+            buffer.WriteFloat(32.42423F,2);
+            buffer.WriteDouble(5332.45524D,2);
             buffer.WriteString("张三1111");
 
             Console.WriteLine("buffer.Available:{0}", buffer.Available());
@@ -36,6 +38,8 @@ namespace Test
             Console.WriteLine(buffer.ReadInt());
             Console.WriteLine(buffer.ReadFloat());
             Console.WriteLine(buffer.ReadDouble());
+            Console.WriteLine(buffer.ReadFloat(2));
+            Console.WriteLine(buffer.ReadDouble(2));
             Console.WriteLine(buffer.ReadString());
         }
 

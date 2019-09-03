@@ -15,6 +15,7 @@ function test1()
     for i = 1, 3 do
         str = str .. string.char(i)
     end
+    print(str[2])
     print("str=" .. string.len(str))
     print(string.unpack("bbb", str))
     print(str:byte(1, string.len(str)))
@@ -26,9 +27,39 @@ end
 function testBuffer()
     print("testBuffer===========")
     local buffer = Buffer.new()
-    print(buffer:capacity())
+    buffer:writeInt(70)
+    buffer:writeInt(2423)
+    buffer:writeFloat(13.43)
+    buffer:writeDouble(4242.432)
+    buffer:writeFloatByScale(132.32434, 2)
+    buffer:writeDoubleByScale(342254.653254, 2)
+    buffer:writeString("搭顺风车")
+
+    print("buffer:size()=" .. buffer:size())
+
+    print(buffer:readInt())
+    --buffer = Buffer.new(buffer:remainingBytes())
+    buffer:reset()
+    print(buffer:readInt())
+    print(buffer:readInt())
+    print(buffer:readFloat())
+    print(buffer:readDouble())
+    print(buffer:readFloatByScale(2))
+    print(buffer:readDoubleByScale(2))
+    print(buffer:readString())
+
+    local file = io.open("E:\\buffer", "w")
+    file:write(buffer.bytes)
+    file:flush()
+
+    buffer:reset()
+    buffer:writeInt(45)
+    buffer:writeString("奋斗服务")
+    print(buffer:readInt())
+    print(buffer:readString())
 end
 
-test1()
-print()
+--test1()
+--print()
 testBuffer()
+
