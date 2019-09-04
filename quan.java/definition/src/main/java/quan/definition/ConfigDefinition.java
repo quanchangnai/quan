@@ -186,13 +186,7 @@ public class ConfigDefinition extends BeanDefinition {
 
     @Override
     public void validate() {
-        if (getName() == null) {
-            addValidatedError(getName4Validate() + "的名字不能为空");
-        }
-
-        if (!languages.isEmpty() && !Language.names().containsAll(languages)) {
-            addValidatedError(getName4Validate() + "的语言类型" + languages + "非法,合法语言类型" + Language.names());
-        }
+        validateNameAndLanguage();
 
         if (table == null) {
             table = getName();

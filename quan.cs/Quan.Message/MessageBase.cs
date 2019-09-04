@@ -21,6 +21,11 @@ namespace Quan.Message
 
         public override void Decode(Buffer buffer)
         {
+            if (buffer.Reading)
+            {
+                buffer.Reset();
+            }
+
             var id = buffer.ReadInt();
             if (id != Id)
             {

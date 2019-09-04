@@ -34,8 +34,6 @@ public class NettyMessageCodec extends ByteToMessageCodec<Message> {
 
         Buffer buffer = new Buffer(bytes);
         int msgId = buffer.readInt();
-        buffer.reset();
-
         Message message = messageFactory.create(msgId);
         if (message == null) {
             logger.error("消息{}创建失败", msgId);
@@ -43,7 +41,6 @@ public class NettyMessageCodec extends ByteToMessageCodec<Message> {
         }
 
         message.decode(buffer);
-
         out.add(message);
     }
 }

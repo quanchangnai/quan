@@ -4,6 +4,8 @@ import quan.message.role.RoleInfo;
 import quan.message.role.RoleType;
 import quan.message.role.SRoleLogin;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
@@ -20,24 +22,46 @@ public class MessageTest {
 
     public static void main(String[] args) throws Exception {
 
-//        test1();
-//
+        test1();
         test2();
-
 //        test3();
 
     }
 
     private static void test1() throws Exception {
         System.err.println("test1=============================");
-        Buffer buffer = new Buffer(100);
-        buffer.writeBool(false);
-        buffer.writeInt(231);
-        buffer.writeFloat(424.4F);
-        buffer.writeDouble(23421.424D);
-        buffer.writeString("张三1111");
+        Buffer buffer = new Buffer();
+        buffer.writeBool(true);
+        buffer.writeInt(70);
+        buffer.writeInt(2423);
+        buffer.writeFloat(13.43F);
+        buffer.writeDouble(4242.432);
+        buffer.writeFloat(132.32434F, 2);
+        buffer.writeDouble(342254.653254, 2);
+        buffer.writeString("搭顺风车");
 
-        System.err.println("buffer.available():" + buffer.available());
+        System.err.println("buffer.available()=" + buffer.available());
+
+        FileInputStream fileInputStream = new FileInputStream(new File("E:\\buffer"));
+        byte[] bytes = new byte[fileInputStream.available()];
+        fileInputStream.read(bytes);
+        System.err.println("bytes.length=" + bytes.length);
+        buffer = new Buffer(bytes);
+
+        System.err.println(buffer.readBool());
+        System.err.println(buffer.readInt());
+        System.err.println(buffer.readInt());
+        System.err.println(buffer.readFloat());
+        System.err.println(buffer.readDouble());
+        System.err.println(buffer.readFloat(2));
+        System.err.println(buffer.readDouble(2));
+        System.err.println(buffer.readString());
+
+//        buffer.reset();
+//        buffer.writeInt(45);
+//        buffer.writeString("奋斗服务");
+//        System.err.println(buffer.readInt());
+//        System.err.println(buffer.readString());
     }
 
     private static void test2() throws Exception {

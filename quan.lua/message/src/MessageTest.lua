@@ -5,6 +5,8 @@
 ---
 
 local Buffer = require("Buffer")
+local Message = require("Message")
+local SRoleLogin = require("role.SRoleLogin")
 
 print("MessageTest===========")
 print()
@@ -27,6 +29,7 @@ end
 function testBuffer()
     print("testBuffer===========")
     local buffer = Buffer.new()
+    buffer:writeBool(true)
     buffer:writeInt(70)
     buffer:writeInt(2423)
     buffer:writeFloat(13.43)
@@ -37,10 +40,11 @@ function testBuffer()
 
     print("buffer:size()=" .. buffer:size())
 
-    print(buffer:readInt())
-    buffer = Buffer.new(buffer:remainingBytes())
+    print(buffer:readBool())
     print(buffer:readInt())
     buffer:reset()
+    print(buffer:readBool())
+    print(buffer:readInt())
     print(buffer:readInt())
     print(buffer:readFloat())
     print(buffer:readDouble())
@@ -56,10 +60,25 @@ function testBuffer()
     buffer:writeInt(45)
     buffer:writeString("奋斗服务")
     print(buffer:readInt())
+    buffer = Buffer.new(buffer:remainingBytes())
     print(buffer:readString())
+
+    print(table.unpack({ 12, 45, 33 }))
+end
+
+function testMessage()
+    local sRoleLogin1 = SRoleLogin.new()
+    sRoleLogin1.roleId = 123
+    sRoleLogin1.roleName = "abc"
+    local buffer = sRoleLogin1:encode()
+
+    local sRoleLogin2 = SRoleLogin.new()
+    sRoleLogin2:decode(buffer)
+    print("sRoleLogin2.roleId=" .. sRoleLogin2.roleId .. ",sRoleLogin2.roleName=" .. sRoleLogin2.roleName)
+
 end
 
 --test1()
 --print()
-testBuffer()
-
+--testBuffer()
+testMessage()

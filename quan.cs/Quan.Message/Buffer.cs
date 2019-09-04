@@ -17,7 +17,7 @@ namespace Quan.Message
         private int _position;
 
         //当前是在读数据还是在写数据
-        private bool _reading;
+        public bool Reading { get; private set; }
 
         //结束位置，后面的是无效数据
         private int _end;
@@ -39,19 +39,23 @@ namespace Quan.Message
             _end = _position;
         }
 
-        public int Capacity()
-        {
-            return _bytes.Length;
-        }
+        public int Capacity => _bytes.Length;
 
         public void Reset()
         {
             _position = 0;
-            if (!_reading)
+            if (!Reading)
             {
                 _end = _position - 1;
             }
         }
+
+
+        /// <summary>
+        /// 当前可用的字节数
+        /// </summary>
+        /// <returns></returns>
+        public int Available => Reading ? _end + 1 : _position;
 
         /// <summary>
         /// 当前可用的字节数组<br/>
@@ -61,24 +65,16 @@ namespace Quan.Message
         /// <returns></returns>
         public byte[] AvailableBytes()
         {
-            var availableBytes = new byte[Available()];
-            Array.Copy(_bytes, _reading ? _position : 0, availableBytes, 0, availableBytes.Length);
+            var availableBytes = new byte[Available];
+            Array.Copy(_bytes, Reading ? _position : 0, availableBytes, 0, availableBytes.Length);
             return availableBytes;
         }
 
         /// <summary>
-        /// 当前可用的字节数
+        /// 当前剩余可用的字节数
         /// </summary>
         /// <returns></returns>
-        public int Available()
-        {
-            if (_reading)
-            {
-                return _end + 1;
-            }
-
-            return _position;
-        }
+        public int Remaining => Reading ? _end - _position + 1 : _position;
 
         /// <summary>
         /// 当前剩余可用的字节数组<br/>
@@ -88,31 +84,9 @@ namespace Quan.Message
         /// <returns></returns>
         public byte[] RemainingBytes()
         {
-            var remainingBytes = new byte[Remaining()];
-            if (_reading)
-            {
-                Array.Copy(_bytes, _position, remainingBytes, 0, remainingBytes.Length);
-            }
-            else
-            {
-                Array.Copy(_bytes, 0, remainingBytes, 0, remainingBytes.Length);
-            }
-
+            var remainingBytes = new byte[Remaining];
+            Array.Copy(_bytes, Reading ? _position : 0, remainingBytes, 0, remainingBytes.Length);
             return remainingBytes;
-        }
-
-        /// <summary>
-        /// 当前剩余可用的字节数
-        /// </summary>
-        /// <returns></returns>
-        public int Remaining()
-        {
-            if (_reading)
-            {
-                return _end - _position + 1;
-            }
-
-            return _position;
         }
 
         /// <summary>
@@ -120,17 +94,17 @@ namespace Quan.Message
         /// </summary>
         /// <param name="bits">读取的最大比特位,只能是[8,16,32,64]中的一种</param>
         /// <returns></returns>
-        /// <exception cref="SystemException"></exception>
+        /// <exception cref="ArgumentException"></exception>
         /// <exception cref="IOException"></exception>
         private long ReadVarInt(int bits)
         {
             if (bits != 16 && bits != 32 && bits != 64)
             {
-                throw new SystemException("参数bits限定取值范围[16,32,64],实际值：" + bits);
+                throw new ArgumentException("参数bits限定取值范围[16,32,64],实际值：" + bits);
             }
 
-            var position = _reading ? _position : 0;
-            _reading = true;
+            var position = Reading ? _position : 0;
+            Reading = true;
             var shift = 0;
             long temp = 0;
 
@@ -145,12 +119,14 @@ namespace Quan.Message
                 temp |= (b & 0b1111111L) << shift;
                 shift += 7;
 
-                if ((b & 0b10000000) == 0)
+                if ((b & 0b10000000) != 0)
                 {
-                    _position = position;
-                    //ZigZag解码
-                    return (temp >> 1) ^ -(temp & 1);
+                    continue;
                 }
+
+                _position = position;
+                //ZigZag解码
+                return (temp >> 1) ^ -(temp & 1);
             }
 
             throw new IOException("读数据出错");
@@ -159,7 +135,7 @@ namespace Quan.Message
         public byte[] ReadBytes()
         {
             var length = ReadInt();
-            if (length > Remaining())
+            if (length > Remaining)
             {
                 throw new IOException("读数据出错");
             }
@@ -192,8 +168,8 @@ namespace Quan.Message
 
         public float ReadFloat()
         {
-            var position = _reading ? _position : 0;
-            _reading = true;
+            var position = Reading ? _position : 0;
+            Reading = true;
             var shift = 0;
             var temp = 0;
 
@@ -225,8 +201,8 @@ namespace Quan.Message
 
         public double ReadDouble()
         {
-            var position = _reading ? _position : 0;
-            _reading = true;
+            var position = Reading ? _position : 0;
+            Reading = true;
             var shift = 0;
             long temp = 0;
 
@@ -264,8 +240,8 @@ namespace Quan.Message
 
         private void CheckCapacity(int minAddValue)
         {
-            var capacity = Capacity();
-            var position = _reading ? 0 : _position;
+            var capacity = Capacity;
+            var position = Reading ? 0 : _position;
             if (position + minAddValue < capacity)
             {
                 return;
@@ -287,9 +263,9 @@ namespace Quan.Message
         {
             CheckCapacity(10);
 
-            var position = _reading ? 0 : _position;
+            var position = Reading ? 0 : _position;
             var end = _end;
-            _reading = false;
+            Reading = false;
             //ZigZag编码
             n = (n << 1) ^ (n >> 63);
 
@@ -342,9 +318,9 @@ namespace Quan.Message
         {
             CheckCapacity(4);
 
-            var position = _reading ? 0 : _position;
+            var position = Reading ? 0 : _position;
             var end = _end;
-            _reading = false;
+            Reading = false;
 
             var temp = BitConverter.ToInt32(BitConverter.GetBytes(n), 0);
             var shift = 0;
@@ -376,9 +352,9 @@ namespace Quan.Message
         {
             CheckCapacity(8);
 
-            var position = _reading ? 0 : _position;
+            var position = Reading ? 0 : _position;
             var end = _end;
-            _reading = false;
+            Reading = false;
 
             var temp = BitConverter.DoubleToInt64Bits(n);
             var shift = 0;
@@ -406,7 +382,7 @@ namespace Quan.Message
             var threshold = long.MaxValue / times;
             if (n < -threshold || n > threshold)
             {
-                throw new IOException(string.Format("参数[{0}]超出了限定范围[{1},{2}],无法转换为指定精度[{3}]的定点型数据", n, -threshold, threshold, scale));
+                throw new IOException($"参数[{n}]超出了限定范围[{-threshold},{threshold}],无法转换为指定精度[{scale}]的定点型数据");
             }
 
             WriteLong((long) Math.Floor(n * times));

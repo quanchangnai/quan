@@ -53,6 +53,10 @@ public class Buffer {
         return bytes.length;
     }
 
+    public boolean reading() {
+        return reading;
+    }
+
     public void reset() {
         position = 0;
         if (!reading) {
@@ -78,11 +82,7 @@ public class Buffer {
      */
     public byte[] availableBytes() {
         byte[] availableBytes = new byte[available()];
-        if (reading) {
-            System.arraycopy(this.bytes, position, availableBytes, 0, availableBytes.length);
-        } else {
-            System.arraycopy(this.bytes, 0, availableBytes, 0, availableBytes.length);
-        }
+        System.arraycopy(this.bytes, reading ? position : 0, availableBytes, 0, availableBytes.length);
         return availableBytes;
     }
 
@@ -104,11 +104,7 @@ public class Buffer {
      */
     public byte[] remainingBytes() {
         byte[] remainingBytes = new byte[remaining()];
-        if (reading) {
-            System.arraycopy(this.bytes, position, remainingBytes, 0, remainingBytes.length);
-        } else {
-            System.arraycopy(this.bytes, 0, remainingBytes, 0, remainingBytes.length);
-        }
+        System.arraycopy(this.bytes, reading ? position : 0, remainingBytes, 0, remainingBytes.length);
         return remainingBytes;
     }
 
@@ -136,11 +132,13 @@ public class Buffer {
             temp |= (b & 0b1111111L) << shift;
             shift += 7;
 
-            if ((b & 0b10000000) == 0) {
-                this.position = position;
-                //ZigZag解码
-                return (temp >>> 1) ^ -(temp & 1);
+            if ((b & 0b10000000) != 0) {
+                continue;
             }
+
+            this.position = position;
+            //ZigZag解码
+            return (temp >>> 1) ^ -(temp & 1);
         }
 
         throw new IOException("读数据出错");

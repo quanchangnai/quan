@@ -12,7 +12,7 @@ function Buffer.new(bytes)
         ---字节缓冲区
         bytes = bytes or "",
         ---下一个读数据的位置
-        position = 0,
+        position = 1,
         --当前是在读数据还是在写数据
         reading = false
     }
@@ -47,14 +47,14 @@ function Buffer:remainingBytes()
     end
 end
 
-function validateBits(bits)
+local function validateBits(bits)
     assert(math.type(bits) == "integer", "参数[bits]类型错误")
     if bits ~= 16 and bits ~= 32 and bits ~= 64 then
         error("参数[bits]限定取值范围[16,32,64],实际值" .. bits .. "]")
     end
 end
 
-function readVarInt(self, bits)
+local function readVarInt(self, bits)
     validateBits(bits)
 
     local position = self.reading and self.position or 1
@@ -149,14 +149,14 @@ function Buffer:readString()
     return str
 end
 
-function checkWrite(self)
+local function checkWrite(self)
     self.reading = false
     if self.position < self.bytes:len() + 1 then
         self.bytes = self.bytes:sub(1, self.position - 1)
     end
 end
 
-function writeVarInt(self, n, bits)
+local function writeVarInt(self, n, bits)
     assert(math.type(n) == "integer", "参数[n]类型错误")
 
     validateBits(bits)

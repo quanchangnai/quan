@@ -135,6 +135,14 @@ public abstract class ClassDefinition extends Definition {
     }
 
     public void validate() {
+        validateNameAndLanguage();
+
+        for (FieldDefinition fieldDefinition : getFields()) {
+            validateField(fieldDefinition);
+        }
+    }
+
+    protected void validateNameAndLanguage() {
         if (getName() == null) {
             addValidatedError(getDefinitionTypeName() + "名不能为空");
         } else if (!Pattern.matches(namePattern(), getName())) {
@@ -144,11 +152,8 @@ public abstract class ClassDefinition extends Definition {
         if (!languages.isEmpty() && !Language.names().containsAll(languages)) {
             addValidatedError(getName4Validate() + "的语言类型" + languages + "非法,合法的语言类型" + Language.names());
         }
-
-        for (FieldDefinition fieldDefinition : getFields()) {
-            validateField(fieldDefinition);
-        }
     }
+
 
     /**
      * 依赖validate()的结果，必须等所有类的validate()执行完成后再执行

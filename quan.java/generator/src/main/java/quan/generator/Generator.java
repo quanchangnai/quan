@@ -13,7 +13,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Created by quanchangnai on 2019/6/23.
@@ -103,20 +102,24 @@ public abstract class Generator {
             return;
         }
 
-        List<ClassDefinition> classDefinitions = definitionParser.getClasses().values().stream().filter(this::support).collect(Collectors.toList());
-
-        for (ClassDefinition classDefinition : classDefinitions) {
+        List<ClassDefinition> classDefinitions = new ArrayList<>();
+        for (ClassDefinition classDefinition : definitionParser.getClasses().values()) {
+            if (!support(classDefinition) || !classDefinition.supportLanguage(supportLanguage())) {
+                continue;
+            }
             processClassSelf(classDefinition);
+            classDefinitions.add(classDefinition);
         }
 
         for (ClassDefinition classDefinition : classDefinitions) {
             processClassDependency(classDefinition);
         }
 
+        generate(classDefinitions);
+    }
+
+    protected void generate(List<ClassDefinition> classDefinitions) {
         for (ClassDefinition classDefinition : classDefinitions) {
-            if (!classDefinition.supportLanguage(supportLanguage())) {
-                continue;
-            }
             Template template = templates.get(classDefinition.getClass());
             File destFilePath = new File(codePath + File.separator + classDefinition.getFullPackageName().replace(".", File.separator));
             if (!destFilePath.exists() && !destFilePath.mkdirs()) {
