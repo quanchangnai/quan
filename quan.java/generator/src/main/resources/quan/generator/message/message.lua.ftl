@@ -11,23 +11,15 @@ local ${import[import?last_index_of(".")+1..]} = require("${import}")
 ---自动生成
 ---
 local ${name} = {}
+${name}.__index = ${name}
 
 <#if definitionType ==3>
 ---消息ID
-local id = ${id?c}
+${name}.id = ${id?c}
 ---消息类名
-local class = "${fullName}"
+${name}.class = "${fullName}"
 
 </#if>
-local meta = {
-<#if definitionType ==3>
-    __index = { id = id, class = class },
-</#if>
-    __newindex = function()
-        error("该操作不支持")
-    end
-}
-
 ---
 ---<#if comment !="">${comment}<#else>${name}</#if>.构造
 ---@param args 参数列表可以为空
@@ -61,7 +53,7 @@ function ${name}.new(args)
 </#list>
     }
 
-    return setmetatable(instance, meta)
+    return setmetatable(instance, ${name})
 end
 
 ---
@@ -152,10 +144,10 @@ function ${name}.decode(buffer, msg)
 
         </#if>
     for i = 1, buffer:readInt() do
-      <#if field.builtinValueType>
-        table.insert(msg.${field.name}, buffer:read${field.valueType?cap_first}())
+        <#if field.builtinValueType>
+        msg.${field.name}[i] = buffer:read${field.valueType?cap_first}()
         <#else>
-        table.insert(msg.${field.name}, ${field.valueType}.decode(buffer))
+        msg.${field.name}[i] = ${field.valueType}.decode(buffer)
         </#if>
     end
     <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || fields[field_index+1].enumType || !fields[field_index+1].optional) >
@@ -166,7 +158,7 @@ function ${name}.decode(buffer, msg)
 
         </#if>
     for i = 1, buffer:readInt() do
-      <#if field.builtinValueType>
+        <#if field.builtinValueType>
         msg.${field.name}[buffer:read${field.keyType?cap_first}()] = buffer:read${field.valueType?cap_first}()
         <#else>
         msg.${field.name}[buffer:read${field.keyType?cap_first}()] = ${field.valueType}.decode(buffer)
@@ -199,4 +191,4 @@ function ${name}.decode(buffer, msg)
     return msg
 end
 
-return setmetatable(${name}, meta)
+return ${name}

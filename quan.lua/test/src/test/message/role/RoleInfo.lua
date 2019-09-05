@@ -6,12 +6,7 @@ local Message = require("quan.message.Message")
 ---自动生成
 ---
 local RoleInfo = {}
-
-local meta = {
-    __newindex = function()
-        error("该操作不支持")
-    end
-}
+RoleInfo.__index = RoleInfo
 
 ---
 ---角色信息.构造
@@ -38,7 +33,7 @@ function RoleInfo.new(args)
         map = args.map or {},
     }
 
-    return setmetatable(instance, meta)
+    return setmetatable(instance, RoleInfo)
 end
 
 ---
@@ -100,11 +95,11 @@ function RoleInfo.decode(buffer, msg)
     msg.data = buffer:readBytes()
 
     for i = 1, buffer:readInt() do
-        table.insert(msg.list, buffer:readInt())
+        msg.list[i] = buffer:readInt()
     end
 
     for i = 1, buffer:readInt() do
-        table.insert(msg.set, buffer:readInt())
+        msg.set[i] = buffer:readInt()
     end
 
     for i = 1, buffer:readInt() do
@@ -114,4 +109,4 @@ function RoleInfo.decode(buffer, msg)
     return msg
 end
 
-return setmetatable(RoleInfo, meta)
+return RoleInfo

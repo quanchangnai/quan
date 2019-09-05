@@ -8,18 +8,12 @@ local RoleInfo = require("test.message.role.RoleInfo")
 ---自动生成
 ---
 local CRoleLogin = {}
+CRoleLogin.__index = CRoleLogin
 
 ---消息ID
-local id = 544233
+CRoleLogin.id = 544233
 ---消息类名
-local class = "test.message.role.CRoleLogin"
-
-local meta = {
-    __index = { id = id, class = class },
-    __newindex = function()
-        error("该操作不支持")
-    end
-}
+CRoleLogin.class = "test.message.role.CRoleLogin"
 
 ---
 ---角色登录.构造
@@ -48,7 +42,7 @@ function CRoleLogin.new(args)
         userInfo = args.userInfo,
     }
 
-    return setmetatable(instance, meta)
+    return setmetatable(instance, CRoleLogin)
 end
 
 ---
@@ -105,11 +99,11 @@ function CRoleLogin.decode(buffer, msg)
     msg.roleInfo = RoleInfo.decode(buffer, msg.roleInfo)
 
     for i = 1, buffer:readInt() do
-        table.insert(msg.roleInfoList, RoleInfo.decode(buffer))
+        msg.roleInfoList[i] = RoleInfo.decode(buffer)
     end
 
     for i = 1, buffer:readInt() do
-        table.insert(msg.roleInfoSet, RoleInfo.decode(buffer))
+        msg.roleInfoSet[i] = RoleInfo.decode(buffer)
     end
 
     for i = 1, buffer:readInt() do
@@ -123,4 +117,4 @@ function CRoleLogin.decode(buffer, msg)
     return msg
 end
 
-return setmetatable(CRoleLogin, meta)
+return CRoleLogin

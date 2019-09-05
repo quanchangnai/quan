@@ -10,6 +10,7 @@ local Message = require("quan.message.Message")
 local SRoleLogin = require("test.message.role.SRoleLogin")
 local RoleInfo = require("test.message.role.RoleInfo")
 local RoleType = require("test.message.role.RoleType")
+local UserInfo = require("test.message.user.UserInfo")
 
 print("MessageTest===========")
 print()
@@ -81,11 +82,16 @@ function testMessage()
     sRoleLogin1.roleInfo = roleInfo
 
     local roleInfo2 = RoleInfo.new({ id = 222, name = "bbb", type = RoleType.type2, set = { 2233 } })
+
     sRoleLogin1.roleInfoList[1] = roleInfo2
     sRoleLogin1.roleInfoList[2] = roleInfo2
+
     sRoleLogin1.roleInfoSet[1] = roleInfo2
     sRoleLogin1.roleInfoSet[2] = roleInfo2
+
     sRoleLogin1.roleInfoMap[roleInfo2.id] = roleInfo2
+
+    sRoleLogin1.userInfo = UserInfo.new()
 
     local buffer = SRoleLogin.encode(sRoleLogin1)
     print("buffer:size()=" .. buffer:size())

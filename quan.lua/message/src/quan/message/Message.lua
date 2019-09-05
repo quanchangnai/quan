@@ -34,13 +34,24 @@ function Message.decode(buffer, msg)
     return msg
 end
 
-function table.size(map)
-    assert(type(map) == "table", "参数[map]类型错误")
+function table.size(t)
+    assert(type(t) == "table", "参数[t]类型错误")
     local size = 0
-    for k, v in pairs(map) do
+    for k, v in pairs(t) do
         size = size + 1
     end
     return size
+end
+
+function table.readOnly(t)
+    assert(type(t) == "table", "参数[t]类型错误")
+    local meta = {
+        __index = t,
+        __newindex = function()
+            error("不支持该操作")
+        end
+    }
+    return setmetatable({}, meta)
 end
 
 return Message

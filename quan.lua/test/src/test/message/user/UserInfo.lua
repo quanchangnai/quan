@@ -5,12 +5,7 @@ local Message = require("quan.message.Message")
 ---自动生成
 ---
 local UserInfo = {}
-
-local meta = {
-    __newindex = function()
-        error("该操作不支持")
-    end
-}
+UserInfo.__index = UserInfo
 
 ---
 ---UserInfo.构造
@@ -29,7 +24,7 @@ function UserInfo.new(args)
         level = args.level or 0,
     }
 
-    return setmetatable(instance, meta)
+    return setmetatable(instance, UserInfo)
 end
 
 ---
@@ -65,4 +60,4 @@ function UserInfo.decode(buffer, msg)
     return msg
 end
 
-return setmetatable(UserInfo, meta)
+return UserInfo

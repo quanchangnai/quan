@@ -43,11 +43,11 @@ public class MessageTest {
 
         System.err.println("buffer.available()=" + buffer.available());
 
-        FileInputStream fileInputStream = new FileInputStream(new File("E:\\buffer"));
-        byte[] bytes = new byte[fileInputStream.available()];
-        fileInputStream.read(bytes);
-        System.err.println("bytes.length=" + bytes.length);
-        buffer = new Buffer(bytes);
+//        FileInputStream fileInputStream = new FileInputStream(new File("E:\\buffer"));
+//        byte[] bytes = new byte[fileInputStream.available()];
+//        fileInputStream.read(bytes);
+//        System.err.println("bytes.length=" + bytes.length);
+//        buffer = new Buffer(bytes);
 
         System.err.println(buffer.readBool());
         System.err.println(buffer.readInt());
@@ -96,9 +96,9 @@ public class MessageTest {
 
         byte[] encodedBytes = sRoleLogin1.encode();
 
-//        FileInputStream fileInputStream = new FileInputStream(new File("E:\\SRoleLogin"));
-//        encodedBytes = new byte[fileInputStream.available()];
-//        fileInputStream.read(encodedBytes);
+        FileInputStream fileInputStream = new FileInputStream(new File("E:\\SRoleLogin"));
+        encodedBytes = new byte[fileInputStream.available()];
+        fileInputStream.read(encodedBytes);
 
         System.err.println("encodedBytes.length:" + encodedBytes.length);
 
