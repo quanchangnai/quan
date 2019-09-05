@@ -50,7 +50,7 @@ end
 
 ---
 ---UserInfo.解码
----@param buffer buffer quan.message.Buffer 不能为空
+---@param buffer quan.message.Buffer 不能为空
 ---@param msg test.message.user.UserInfo 可以为空
 ---@return test.message.user.UserInfo
 ---

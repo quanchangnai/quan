@@ -81,7 +81,7 @@ end
 
 ---
 ---角色信息.解码
----@param buffer buffer quan.message.Buffer 不能为空
+---@param buffer quan.message.Buffer 不能为空
 ---@param msg test.message.role.RoleInfo 可以为空
 ---@return test.message.role.RoleInfo
 ---

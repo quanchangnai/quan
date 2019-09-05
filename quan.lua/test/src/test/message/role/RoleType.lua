@@ -1,5 +1,5 @@
 ---
----角色类型<br/>
+---角色类型
 ---自动生成
 ---
 local RoleType = {
@@ -9,4 +9,11 @@ local RoleType = {
     type2 = 2
 }
 
-return RoleType
+local meta = {
+    __index = RoleType,
+    __newindex = function()
+        error("枚举不能修改")
+    end
+}
+
+return setmetatable({}, meta)

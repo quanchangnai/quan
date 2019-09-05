@@ -87,6 +87,8 @@ public class MessageTest {
         roleInfo2.getSet().add(2213);
 
         sRoleLogin1.getRoleInfoList().add(roleInfo2);
+        sRoleLogin1.getRoleInfoList().add(roleInfo2);
+        sRoleLogin1.getRoleInfoSet().add(roleInfo2);
         sRoleLogin1.getRoleInfoSet().add(roleInfo2);
         sRoleLogin1.getRoleInfoMap().put(roleInfo2.getId(), roleInfo2);
 

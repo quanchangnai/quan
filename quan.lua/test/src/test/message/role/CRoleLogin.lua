@@ -7,12 +7,12 @@ local RoleInfo = require("test.message.role.RoleInfo")
 ---角色登录
 ---自动生成
 ---
-local SRoleLogin = {}
+local CRoleLogin = {}
 
 ---消息ID
-local id = 763075
+local id = 544233
 ---消息类名
-local class = "test.message.role.SRoleLogin"
+local class = "test.message.role.CRoleLogin"
 
 local meta = {
     __index = { id = id, class = class },
@@ -25,7 +25,7 @@ local meta = {
 ---角色登录.构造
 ---@param args 参数列表可以为空
 ---
-function SRoleLogin.new(args)
+function CRoleLogin.new(args)
     assert(args == nil or type(args) == "table", "参数错误")
     args = args or {}
 
@@ -53,11 +53,11 @@ end
 
 ---
 ---角色登录.编码
----@param msg test.message.role.SRoleLogin 不能为空
+---@param msg test.message.role.CRoleLogin 不能为空
 ---@param buffer quan.message.Buffer 可以为空
 ---@return quan.message.Buffer
 ---
-function SRoleLogin.encode(msg, buffer)
+function CRoleLogin.encode(msg, buffer)
     assert(msg ~= nil, "参数[msg]不能为空")
     buffer = Message.encode(msg, buffer)
 
@@ -92,12 +92,12 @@ end
 ---
 ---角色登录.解码
 ---@param buffer quan.message.Buffer 不能为空
----@param msg test.message.role.SRoleLogin 可以为空
----@return test.message.role.SRoleLogin
+---@param msg test.message.role.CRoleLogin 可以为空
+---@return test.message.role.CRoleLogin
 ---
-function SRoleLogin.decode(buffer, msg)
+function CRoleLogin.decode(buffer, msg)
     assert(buffer ~= nil, "参数[buffer]不能为空")
-    msg = msg or SRoleLogin.new()
+    msg = msg or CRoleLogin.new()
     Message.decode(buffer, msg)
 
     msg.roleId = buffer:readLong()
@@ -123,4 +123,4 @@ function SRoleLogin.decode(buffer, msg)
     return msg
 end
 
-return setmetatable(SRoleLogin, meta)
+return setmetatable(CRoleLogin, meta)

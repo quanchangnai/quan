@@ -82,7 +82,9 @@ function testMessage()
 
     local roleInfo2 = RoleInfo.new({ id = 222, name = "bbb", type = RoleType.type2, set = { 2233 } })
     sRoleLogin1.roleInfoList[1] = roleInfo2
+    sRoleLogin1.roleInfoList[2] = roleInfo2
     sRoleLogin1.roleInfoSet[1] = roleInfo2
+    sRoleLogin1.roleInfoSet[2] = roleInfo2
     sRoleLogin1.roleInfoMap[roleInfo2.id] = roleInfo2
 
     local buffer = SRoleLogin.encode(sRoleLogin1)
@@ -108,4 +110,3 @@ end
 --print()
 --testBuffer()
 testMessage()
-

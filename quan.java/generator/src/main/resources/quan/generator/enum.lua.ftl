@@ -1,6 +1,6 @@
 ---
 <#if comment !="">
----${comment}<br/>
+---${comment}
 </#if>
 ---自动生成
 ---
@@ -11,4 +11,11 @@ local ${name} = {
 </#list>
 }
 
-return ${name}
+local meta = {
+    __index = ${name},
+    __newindex = function()
+        error("枚举不能修改")
+    end
+}
+
+return setmetatable({}, meta)

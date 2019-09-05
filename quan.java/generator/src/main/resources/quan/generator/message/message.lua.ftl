@@ -135,7 +135,7 @@ end
 
 ---
 ---<#if comment !="">${comment}<#else>${name}</#if>.解码
----@param buffer buffer quan.message.Buffer 不能为空
+---@param buffer quan.message.Buffer 不能为空
 ---@param msg ${fullName} 可以为空
 ---@return ${fullName}
 ---

@@ -68,12 +68,18 @@ namespace Test
             roleInfo2.Set.Add(2213);
 
             sRoleLogin1.RoleInfoList.Add(roleInfo2);
+            sRoleLogin1.RoleInfoList.Add(roleInfo2);
+            sRoleLogin1.RoleInfoSet.Add(roleInfo2);
             sRoleLogin1.RoleInfoSet.Add(roleInfo2);
             sRoleLogin1.RoleInfoMap.Add(roleInfo2.Id, roleInfo2);
 
             Console.WriteLine("sRoleLogin1:" + sRoleLogin1);
 
             var encodedBytes = sRoleLogin1.Encode();
+            
+            var fileStream = File.Open("E:\\SRoleLogin", FileMode.Open);
+            encodedBytes = new byte[fileStream.Length];
+            fileStream.Read(encodedBytes, 0, encodedBytes.Length);
 
             Console.WriteLine("encodedBytes.Length:{0}", encodedBytes.Length);
 
