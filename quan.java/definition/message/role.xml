@@ -8,8 +8,8 @@
 
     <bean name="RoleInfo">角色信息
         <field name="id" type="long"/>角色id
-        <field name="roleName" type="string"/>角色名
-        <field name="roleType" type="RoleType"/>
+        <field name="name" type="string"/>角色名
+        <field name="type" type="RoleType"/>
         <field name="b" type="bool"/>
         <field name="s" type="short"/>
         <field name="i" type="int"/>

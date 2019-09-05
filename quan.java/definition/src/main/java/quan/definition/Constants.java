@@ -24,8 +24,8 @@ public class Constants {
     public static final String FIELD_NAME_PATTERN = "[a-z][a-zA-Z\\d]*";
 
 
-    private static Set<String> unmodifiableSet(String... params) {
-        return Collections.unmodifiableSet(new HashSet<>(Arrays.asList(params)));
+    private static Set<String> unmodifiableSet(String... strings) {
+        return Collections.unmodifiableSet(new HashSet<>(Arrays.asList(strings)));
     }
 
     private static Set<String> unmodifiableSet(Collection<String>... collections) {
@@ -37,9 +37,22 @@ public class Constants {
     }
 
     /**
+     * Java保留字
+     */
+    public static final Set<String> JAVA_RESERVED_WORDS = unmodifiableSet(
+            "abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "volatile",
+            "const", "continue", "default", "do", "double", "else", "enum", "extends", "finally", "transient",
+            "float", "for", "goto", "if", "implements", "import", "instanceof", "int", "interface", "long",
+            "native", "new", "try", "package", "private", "protected", "public", "return", "strictfp", "short",
+            "static", "super", "switch", "synchronized", "throw", "throws", "final", "void", "while", "class"
+    );
+
+
+    public static final Set<String> NUMBER_TYPES = unmodifiableSet("short", "int", "long", "float", "double");
+    /**
      * 原生类型
      */
-    public static final Set<String> PRIMITIVE_TYPES = unmodifiableSet("bool", "short", "int", "long", "float", "double", "string");
+    public static final Set<String> PRIMITIVE_TYPES = unmodifiableSet(NUMBER_TYPES, Arrays.asList("bool", "string"));
 
     /**
      * 集合类型

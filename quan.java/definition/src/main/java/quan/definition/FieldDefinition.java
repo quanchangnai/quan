@@ -115,6 +115,10 @@ public class FieldDefinition extends Definition {
         return false;
     }
 
+    public boolean isNumberType() {
+        return Constants.NUMBER_TYPES.contains(type);
+    }
+
     public boolean isCollectionType() {
         return Constants.COLLECTION_TYPES.contains(type);
     }
@@ -139,6 +143,9 @@ public class FieldDefinition extends Definition {
         return getBean() != null;
     }
 
+    public ClassDefinition getClassDefinition() {
+        return  parser.getClass(getType());
+    }
     public BeanDefinition getBean() {
         ClassDefinition classDefinition = parser.getClass(getType());
         if (BeanDefinition.isBeanDefinition(classDefinition)) {

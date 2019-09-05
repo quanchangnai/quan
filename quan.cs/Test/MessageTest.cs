@@ -33,6 +33,7 @@ namespace Test
             buffer.WriteFloat(132.32434F, 2);
             buffer.WriteDouble(342254.653254, 2);
             buffer.WriteString("搭顺风车");
+            buffer.WriteLong(12324);
 
             Console.WriteLine("buffer.Available:{0}", buffer.Available);
 
@@ -50,6 +51,7 @@ namespace Test
             Console.WriteLine(buffer.ReadFloat(2));
             Console.WriteLine(buffer.ReadDouble(2));
             Console.WriteLine(buffer.ReadString());
+            Console.WriteLine(buffer.ReadLong());
         }
 
         public static void Test2()
@@ -58,11 +60,11 @@ namespace Test
 
             var sRoleLogin1 = new SRoleLogin {RoleId = 1111, RoleName = "张三1111"};
 
-            var roleInfo1 = new RoleInfo {Id = 111, RoleName = "aaa", RoleType = RoleType.Type1};
+            var roleInfo1 = new RoleInfo {Id = 111, Name = "aaa", Type = RoleType.Type1};
 
             sRoleLogin1.RoleInfo = roleInfo1;
 
-            var roleInfo2 = new RoleInfo {Id = 222, RoleName = "bbb", RoleType = RoleType.Type2};
+            var roleInfo2 = new RoleInfo {Id = 222, Name = "bbb", Type = RoleType.Type2};
             roleInfo2.Set.Add(2213);
 
             sRoleLogin1.RoleInfoList.Add(roleInfo2);
@@ -95,7 +97,7 @@ namespace Test
 
             var sRoleLogin1 = new SRoleLogin {RoleId = 1111, RoleName = "张三1111"};
 
-            var roleInfo = new RoleInfo {Id = 1312, RoleName = "李四1123123", F = 343.435F, D = 4242.54453D};
+            var roleInfo = new RoleInfo {Id = 1312, Name = "李四1123123", F = 343.435F, D = 4242.54453D};
 
             sRoleLogin1.RoleInfo = roleInfo;
 

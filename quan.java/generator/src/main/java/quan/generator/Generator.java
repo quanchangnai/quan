@@ -183,7 +183,7 @@ public abstract class Generator {
     }
 
     protected void processBeanFieldImports(BeanDefinition beanDefinition, FieldDefinition fieldDefinition) {
-        ClassDefinition fieldClass = definitionParser.getClass(fieldDefinition.getType());
+        ClassDefinition fieldClass = fieldDefinition.getClassDefinition();
         if (fieldClass != null && !fieldClass.getFullPackageName().equals(beanDefinition.getFullPackageName())) {
             beanDefinition.getImports().add(fieldClass.getFullName());
         }

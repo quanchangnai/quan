@@ -48,33 +48,32 @@ function Buffer:remainingBytes()
 end
 
 local function validateBits(bits)
-    assert(math.type(bits) == "integer", "参数[bits]类型错误")
     if bits ~= 16 and bits ~= 32 and bits ~= 64 then
-        error("参数[bits]限定取值范围[16,32,64],实际值" .. bits .. "]")
+        error("参数[bits]限定取值范围[16,32,64],实际值[" .. bits .. "]")
     end
 end
 
-local function readVarInt(self, bits)
+local function readVarInt(buffer, bits)
     validateBits(bits)
 
-    local position = self.reading and self.position or 1
-    self.reading = true
+    local position = buffer.reading and buffer.position or 1
+    buffer.reading = true
     local shift = 0;
     local temp = 0;
 
     while shift < bits do
-        if position > self.bytes:len() then
+        if position > buffer.bytes:len() then
             break
         end
 
-        local b = self.bytes:byte(position)
+        local b = buffer.bytes:byte(position)
         position = position + 1
         temp = temp | (b & 0x7F) << shift;
         shift = shift + 7
 
         if (b & 0x80) == 0 then
             --ZigZag解码
-            self.position = position
+            buffer.position = position
             return (temp >> 1) ~ -(temp & 1);
         end
     end
@@ -135,7 +134,7 @@ function Buffer:readDouble(scale)
     return self:readLong() / 10 ^ scale
 end
 
-function Buffer:readString()
+function Buffer:readBytes()
     local position = self.reading and self.position or 1
     local length = self:readInt()
     self.reading = true
@@ -145,22 +144,26 @@ function Buffer:readString()
     end
 
     local str = self.bytes:sub(position + 1, position + length)
-    self.position = position + length
+    self.position = position + length + 1
     return str
 end
 
-local function checkWrite(self)
-    self.reading = false
-    if self.position < self.bytes:len() + 1 then
-        self.bytes = self.bytes:sub(1, self.position - 1)
+function Buffer:readString()
+    return self:readBytes()
+end
+
+local function checkWrite(buffer)
+    buffer.reading = false
+    if buffer.position < buffer.bytes:len() + 1 then
+        buffer.bytes = buffer.bytes:sub(1, buffer.position - 1)
     end
 end
 
-local function writeVarInt(self, n, bits)
+local function writeVarInt(buffer, n, bits)
     assert(math.type(n) == "integer", "参数[n]类型错误")
 
     validateBits(bits)
-    checkWrite(self)
+    checkWrite(buffer)
 
     --ZigZag编码
     n = (n << 1) ~ (n >> 63);
@@ -168,11 +171,11 @@ local function writeVarInt(self, n, bits)
 
     while shift < bits do
         if ((n & ~0x7F) == 0) then
-            self.bytes = self.bytes .. string.char(n & 0x7F)
-            self.position = self.bytes:len() + 1
+            buffer.bytes = buffer.bytes .. string.char(n & 0x7F)
+            buffer.position = buffer.bytes:len() + 1
             return ;
         else
-            self.bytes = self.bytes .. string.char(n & 0x7F | 0x80)
+            buffer.bytes = buffer.bytes .. string.char(n & 0x7F | 0x80)
             n = n >> 7;
             shift = shift + 7
         end
@@ -204,8 +207,8 @@ function Buffer:writeLong(n)
 end
 
 function Buffer:writeFloat(n, scale)
-    assert(math.type(n) == "float", "参数[n]类型错误")
     scale = scale or -1
+    assert(type(n) == "number", "参数[n]类型错误")
     assert(math.type(scale) == "integer", "参数[scale]类型错误")
 
     if scale < 0 then
@@ -213,14 +216,13 @@ function Buffer:writeFloat(n, scale)
         self.bytes = self.bytes .. string.pack("<f", n)
         self.position = self.bytes:len() + 1
     else
-        assert(n > 0x0.000002P-126 and n < 0x1.fffffeP+127, "参数[n]超出了32位浮点型的数值范围")
         self:writeDouble(n, scale)
     end
 end
 
 function Buffer:writeDouble(n, scale)
-    assert(math.type(n) == "float", "参数[n]类型错误")
     scale = scale or -1
+    assert(type(n) == "number", "参数[n]类型错误")
     assert(math.type(scale) == "integer", "参数[scale]类型错误")
 
     if scale < 0 then
@@ -239,11 +241,15 @@ function Buffer:writeDouble(n, scale)
     end
 end
 
-function Buffer:writeString(s)
-    assert(type(s) == "string", "参数[s]类型错误")
-    self:writeInt(s:len())
-    self.bytes = self.bytes .. s
+function Buffer:writeBytes(bytes)
+    assert(type(bytes) == "string", "参数[bytes]类型错误")
+    self:writeInt(bytes:len())
+    self.bytes = self.bytes .. bytes
     self.position = self.bytes:len() + 1
+end
+
+function Buffer:writeString(s)
+    self:writeBytes(s)
 end
 
 return Buffer

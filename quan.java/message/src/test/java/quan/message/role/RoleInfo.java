@@ -14,9 +14,9 @@ public class RoleInfo extends Bean {
     private long id;
 
     //角色名
-    private String roleName = "";
+    private String name = "";
 
-    private RoleType roleType;
+    private RoleType type;
 
     private boolean b;
 
@@ -55,25 +55,25 @@ public class RoleInfo extends Bean {
     /**
      * 角色名
      */
-    public String getRoleName() {
-        return roleName;
+    public String getName() {
+        return name;
     }
 
     /**
      * 角色名
      */
-    public RoleInfo setRoleName(String roleName) {
-        Objects.requireNonNull(roleName);
-        this.roleName = roleName;
+    public RoleInfo setName(String name) {
+        Objects.requireNonNull(name);
+        this.name = name;
         return this;
     }
 
-    public RoleType getRoleType() {
-        return roleType;
+    public RoleType getType() {
+        return type;
     }
 
-    public RoleInfo setRoleType(RoleType roleType) {
-        this.roleType = roleType;
+    public RoleInfo setType(RoleType type) {
+        this.type = type;
         return this;
     }
 
@@ -149,8 +149,8 @@ public class RoleInfo extends Bean {
         super.encode(buffer);
 
         buffer.writeLong(this.id);
-        buffer.writeString(this.roleName);
-        buffer.writeInt(this.roleType == null ? 0 : this.roleType.getValue());
+        buffer.writeString(this.name);
+        buffer.writeInt(this.type == null ? 0 : this.type.getValue());
         buffer.writeBool(this.b);
         buffer.writeShort(this.s);
         buffer.writeInt(this.i);
@@ -180,8 +180,8 @@ public class RoleInfo extends Bean {
         super.decode(buffer);
 
         this.id = buffer.readLong();
-        this.roleName = buffer.readString();
-        this.roleType = RoleType.valueOf(buffer.readInt());
+        this.name = buffer.readString();
+        this.type = RoleType.valueOf(buffer.readInt());
         this.b = buffer.readBool();
         this.s = buffer.readShort();
         this.i = buffer.readInt();
@@ -209,8 +209,8 @@ public class RoleInfo extends Bean {
     public String toString() {
         return "RoleInfo{" +
                 "id=" + id +
-                ",roleName='" + roleName + '\'' +
-                ",roleType=" + roleType +
+                ",name='" + name + '\'' +
+                ",type=" + type +
                 ",b=" + b +
                 ",s=" + s +
                 ",i=" + i +

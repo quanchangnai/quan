@@ -148,8 +148,8 @@ public class SRoleLogin extends Message {
         }
 
         buffer.writeInt(this.roleInfoSet.size());
-        for (RoleInfo v : this.roleInfoSet) {
-            v.encode(buffer);
+        for (RoleInfo $roleInfoSet$Value : this.roleInfoSet) {
+            $roleInfoSet$Value.encode(buffer);
         }
 
         buffer.writeInt(this.roleInfoMap.size());

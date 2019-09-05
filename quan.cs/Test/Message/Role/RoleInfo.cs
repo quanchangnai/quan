@@ -17,18 +17,18 @@ namespace Test.Message.Role
 		/// </summary>
 		public long Id { get; set; }
 
-		private string _roleName = "";
+		private string _name = "";
 
         /// <summary>
 		/// 角色名
 		/// </summary>
-		public string RoleName
+		public string Name
 		{
-	    	get => _roleName;
-	    	set => _roleName = value ?? throw new NullReferenceException();
+	    	get => _name;
+	    	set => _name = value ?? throw new NullReferenceException();
 		}
 
-		public RoleType RoleType { get; set; }
+		public RoleType Type { get; set; }
 
 		public bool B { get; set; }
 
@@ -60,8 +60,8 @@ namespace Test.Message.Role
 	    	base.Encode(buffer);
 
 		    buffer.WriteLong(Id);
-		    buffer.WriteString(RoleName);
-			buffer.WriteInt((int)RoleType);
+		    buffer.WriteString(Name);
+			buffer.WriteInt((int)Type);
 		    buffer.WriteBool(B);
 		    buffer.WriteShort(S);
 		    buffer.WriteInt(I);
@@ -91,8 +91,8 @@ namespace Test.Message.Role
 	    	base.Decode(buffer);
 
 		    Id = buffer.ReadLong();
-		    RoleName = buffer.ReadString();
-		    RoleType = (RoleType)buffer.ReadInt();
+		    Name = buffer.ReadString();
+		    Type = (RoleType)buffer.ReadInt();
 		    B = buffer.ReadBool();
 		    S = buffer.ReadShort();
 		    I = buffer.ReadInt();
@@ -120,8 +120,8 @@ namespace Test.Message.Role
 		{
 			return "RoleInfo{" +
 					"id=" + Id.ToString2() +
-					",roleName='" + RoleName + '\'' +
-					",roleType=" + RoleType.ToString2() +
+					",name='" + Name + '\'' +
+					",type=" + Type.ToString2() +
 					",b=" + B.ToString2() +
 					",s=" + S.ToString2() +
 					",i=" + I.ToString2() +

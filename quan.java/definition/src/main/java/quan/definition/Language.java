@@ -9,7 +9,7 @@ import java.util.List;
  */
 public enum Language {
 
-    java, cs;
+    java, cs, lua;
 
     private static List<String> names;
 

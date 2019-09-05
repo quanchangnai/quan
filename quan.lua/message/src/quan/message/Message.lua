@@ -3,19 +3,9 @@
 --- Created by quanchangnai.
 --- DateTime: 2019/9/4 16:14
 ---
-local Buffer = require("Buffer")
+local Buffer = require("quan.message.Buffer")
 
 local Message = {}
-
-function Message.instance(instance, class)
-    local meta = {
-        __index = class,
-        __newindex = function()
-            error("该操作不支持")
-        end
-    }
-    setmetatable(instance, meta)
-end
 
 function Message.encode(msg, buffer)
     if buffer then
@@ -24,24 +14,27 @@ function Message.encode(msg, buffer)
         buffer = Buffer.new()
     end
 
-    buffer:writeInt(msg.getId());
+    buffer:writeInt(msg.id);
     buffer:writeLong(msg.seq);
 
     return buffer
 end
 
-function Message.decode(msg, buffer)
+function Message.decode(buffer, msg)
     if buffer.reading then
         buffer:reset()
     end
+
     local msgId = buffer:readInt();
-    if msgId ~= msg.getId() then
-        error(string.format("消息ID不匹配,期望值[%s],实际值[%s]", msg.getId(), msgId))
+    if msgId ~= msg.id then
+        error(string.format("消息ID不匹配,期望值[%s],实际值[%s]", msg.id, msgId))
     end
     msg.seq = buffer:readLong()
+
+    return msg
 end
 
-function mapSize(map)
+function table.size(map)
     assert(type(map) == "table", "参数[map]类型错误")
     local size = 0
     for k, v in pairs(map) do

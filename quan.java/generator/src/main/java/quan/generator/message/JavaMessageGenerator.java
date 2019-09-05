@@ -1,54 +1,41 @@
 package quan.generator.message;
 
 import org.apache.commons.cli.CommandLine;
-import quan.definition.BeanDefinition;
-import quan.definition.ClassDefinition;
 import quan.definition.DefinitionParser;
 import quan.definition.Language;
 import quan.generator.util.CommandLineUtils;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by quanchangnai on 2017/7/6.
  */
 public class JavaMessageGenerator extends MessageGenerator {
 
-    public static final Map<String, String> BASIC_TYPES = new HashMap<>();
-
-    public static final Map<String, String> CLASS_TYPES = new HashMap<>();
-
-    static {
-        BASIC_TYPES.put("bool", "boolean");
-        BASIC_TYPES.put("short", "short");
-        BASIC_TYPES.put("int", "int");
-        BASIC_TYPES.put("long", "long");
-        BASIC_TYPES.put("float", "float");
-        BASIC_TYPES.put("double", "double");
-        BASIC_TYPES.put("string", "String");
-        BASIC_TYPES.put("set", "Set");
-        BASIC_TYPES.put("list", "List");
-        BASIC_TYPES.put("map", "Map");
-        BASIC_TYPES.put("bytes", "byte[]");
-
-        CLASS_TYPES.put("bool", "Boolean");
-        CLASS_TYPES.put("short", "Short");
-        CLASS_TYPES.put("int", "Integer");
-        CLASS_TYPES.put("long", "Long");
-        CLASS_TYPES.put("float", "Float");
-        CLASS_TYPES.put("double", "Double");
-        CLASS_TYPES.put("string", "String");
-        CLASS_TYPES.put("set", "HashSet");
-        CLASS_TYPES.put("list", "ArrayList");
-        CLASS_TYPES.put("map", "HashMap");
-        CLASS_TYPES.put("bytes", "byte[]");
-    }
-
     {
-        basicTypes.putAll(BASIC_TYPES);
-        classTypes.putAll(CLASS_TYPES);
+        basicTypes.put("bool", "boolean");
+        basicTypes.put("short", "short");
+        basicTypes.put("int", "int");
+        basicTypes.put("long", "long");
+        basicTypes.put("float", "float");
+        basicTypes.put("double", "double");
+        basicTypes.put("string", "String");
+        basicTypes.put("set", "Set");
+        basicTypes.put("list", "List");
+        basicTypes.put("map", "Map");
+        basicTypes.put("bytes", "byte[]");
+
+        classTypes.put("bool", "Boolean");
+        classTypes.put("short", "Short");
+        classTypes.put("int", "Integer");
+        classTypes.put("long", "Long");
+        classTypes.put("float", "Float");
+        classTypes.put("double", "Double");
+        classTypes.put("string", "String");
+        classTypes.put("set", "HashSet");
+        classTypes.put("list", "ArrayList");
+        classTypes.put("map", "HashMap");
+        classTypes.put("bytes", "byte[]");
     }
 
     public JavaMessageGenerator(String codePath) {

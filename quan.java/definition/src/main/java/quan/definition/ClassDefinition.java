@@ -33,6 +33,7 @@ public abstract class ClassDefinition extends Definition {
     //保留字段名
     protected Set<String> reservedFieldNames = new HashSet<>();
 
+
     @Override
     public String getDefinitionTypeName() {
         return "类";
@@ -181,6 +182,11 @@ public abstract class ClassDefinition extends Definition {
         if (!reservedFieldNames.isEmpty() && reservedFieldNames.contains(fieldDefinition.getName())) {
             addValidatedError(getName4Validate("的") + "字段名[" + fieldDefinition.getName() + "]不合法，不能使用保留字段名" + reservedFieldNames);
         }
+
+        if (Constants.JAVA_RESERVED_WORDS.contains(fieldDefinition.getName())) {
+            addValidatedError(getName4Validate("的") + "字段名[" + fieldDefinition.getName() + "]不合法，不能使用Java保留字");
+        }
+
     }
 
     protected void validateFieldNameDuplicate(FieldDefinition fieldDefinition) {

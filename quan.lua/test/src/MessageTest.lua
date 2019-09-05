@@ -3,10 +3,13 @@
 --- Created by quanchangnai.
 --- DateTime: 2019/8/30 17:36
 ---
+package.path = "../../message/src/?.lua;" .. package.path
 
-local Buffer = require("Buffer")
-local Message = require("Message")
-local SRoleLogin = require("role.SRoleLogin")
+local Buffer = require("quan.message.Buffer")
+local Message = require("quan.message.Message")
+local SRoleLogin = require("test.message.role.SRoleLogin")
+local RoleInfo = require("test.message.role.RoleInfo")
+local RoleType = require("test.message.role.RoleType")
 
 print("MessageTest===========")
 print()
@@ -37,6 +40,7 @@ function testBuffer()
     buffer:writeFloat(132.32434, 2)
     buffer:writeDouble(342254.653254, 2)
     buffer:writeString("搭顺风车")
+    buffer:writeLong(12324)
 
     print("buffer:size()=" .. buffer:size())
 
@@ -51,6 +55,7 @@ function testBuffer()
     print(buffer:readFloat(2))
     print(buffer:readDouble(2))
     print(buffer:readString())
+    print(buffer:readLong())
 
     local file = io.open("E:\\buffer", "w")
     file:write(buffer.bytes)
@@ -67,14 +72,35 @@ function testBuffer()
 end
 
 function testMessage()
-    local sRoleLogin1 = SRoleLogin.new()
-    sRoleLogin1.roleId = 123
-    sRoleLogin1.roleName = "abc"
-    local buffer = sRoleLogin1:encode()
+    local sRoleLogin1 = SRoleLogin.new({ roleId = 1111 })
+    sRoleLogin1.roleName = "张三1111"
 
-    local sRoleLogin2 = SRoleLogin.new()
-    sRoleLogin2:decode(buffer)
-    print("sRoleLogin2.roleId=" .. sRoleLogin2.roleId .. ",sRoleLogin2.roleName=" .. sRoleLogin2.roleName)
+    local roleInfo = RoleInfo.new()
+    roleInfo.id = 111
+    roleInfo.type = RoleType.type1
+    sRoleLogin1.roleInfo = roleInfo
+
+    local roleInfo2 = RoleInfo.new({ id = 222, name = "bbb", type = RoleType.type2, set = { 2233 } })
+    sRoleLogin1.roleInfoList[1] = roleInfo2
+    sRoleLogin1.roleInfoSet[1] = roleInfo2
+    sRoleLogin1.roleInfoMap[roleInfo2.id] = roleInfo2
+
+    local buffer = SRoleLogin.encode(sRoleLogin1)
+    print("buffer:size()=" .. buffer:size())
+
+    local sRoleLogin2 = SRoleLogin.decode(buffer)
+
+    local buffer = SRoleLogin.encode(sRoleLogin2)
+    local file = io.open("E:\\SRoleLogin", "w")
+    file:write(buffer.bytes)
+    file:flush()
+
+    print("SRoleLogin.id=" .. SRoleLogin.id)
+    print("SRoleLogin.class=" .. SRoleLogin.class)
+    print("sRoleLogin2.id=" .. sRoleLogin2.id)
+    print("sRoleLogin2.class=" .. sRoleLogin2.class)
+    print("sRoleLogin2.roleId=" .. sRoleLogin2.roleId)
+    print("sRoleLogin2.roleName=" .. sRoleLogin2.roleName)
 
 end
 
@@ -82,3 +108,4 @@ end
 --print()
 --testBuffer()
 testMessage()
+

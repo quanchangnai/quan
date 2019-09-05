@@ -22,7 +22,7 @@ public class MessageTest {
 
     public static void main(String[] args) throws Exception {
 
-        test1();
+//        test1();
         test2();
 //        test3();
 
@@ -39,6 +39,7 @@ public class MessageTest {
         buffer.writeFloat(132.32434F, 2);
         buffer.writeDouble(342254.653254, 2);
         buffer.writeString("搭顺风车");
+        buffer.writeLong(12324);
 
         System.err.println("buffer.available()=" + buffer.available());
 
@@ -56,6 +57,7 @@ public class MessageTest {
         System.err.println(buffer.readFloat(2));
         System.err.println(buffer.readDouble(2));
         System.err.println(buffer.readString());
+        System.err.println(buffer.readLong());
 
 //        buffer.reset();
 //        buffer.writeInt(45);
@@ -73,15 +75,15 @@ public class MessageTest {
 
         RoleInfo roleInfo1 = new RoleInfo();
         roleInfo1.setId(111);
-        roleInfo1.setRoleName("aaa");
-        roleInfo1.setRoleType(RoleType.type1);
+        roleInfo1.setName("aaa");
+        roleInfo1.setType(RoleType.type1);
 
         sRoleLogin1.setRoleInfo(roleInfo1);
 
         RoleInfo roleInfo2 = new RoleInfo();
         roleInfo2.setId(222);
-        roleInfo2.setRoleName("bbb");
-        roleInfo2.setRoleType(RoleType.type2);
+        roleInfo2.setName("bbb");
+        roleInfo2.setType(RoleType.type2);
         roleInfo2.getSet().add(2213);
 
         sRoleLogin1.getRoleInfoList().add(roleInfo2);
@@ -91,6 +93,10 @@ public class MessageTest {
         System.err.println("sRoleLogin1:" + sRoleLogin1);
 
         byte[] encodedBytes = sRoleLogin1.encode();
+
+//        FileInputStream fileInputStream = new FileInputStream(new File("E:\\SRoleLogin"));
+//        encodedBytes = new byte[fileInputStream.available()];
+//        fileInputStream.read(encodedBytes);
 
         System.err.println("encodedBytes.length:" + encodedBytes.length);
 
