@@ -4,8 +4,15 @@ local Message = require("quan.message.Message")
 ---
 ---自动生成
 ---
-local UserInfo = {}
-UserInfo.__index = UserInfo
+local UserInfo = {
+    ---类名
+    class = "test.message.user.UserInfo",
+}
+
+local function onUpdateProp(table, key, value)
+    assert(not UserInfo[key], "不允许修改只读属性:" .. key)
+    rawset(table, key, value)
+end
 
 ---
 ---UserInfo.构造
@@ -24,7 +31,8 @@ function UserInfo.new(args)
         level = args.level or 0,
     }
 
-    return setmetatable(instance, UserInfo)
+    instance = setmetatable(instance, { __index = UserInfo, __newindex = onUpdateProp })
+    return instance
 end
 
 ---
@@ -60,4 +68,5 @@ function UserInfo.decode(buffer, msg)
     return msg
 end
 
+UserInfo = table.readOnly(UserInfo)
 return UserInfo

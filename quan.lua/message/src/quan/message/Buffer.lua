@@ -49,7 +49,7 @@ end
 
 local function validateBits(bits)
     if bits ~= 16 and bits ~= 32 and bits ~= 64 then
-        error("参数[bits]限定取值范围[16,32,64],实际值[" .. bits .. "]")
+        error("参数[bits]限定取值范围[16,32,64],实际值[" .. bits .. "]", 2)
     end
 end
 
@@ -78,7 +78,7 @@ local function readVarInt(buffer, bits)
         end
     end
 
-    error("读数据出错")
+    error("读数据出错", 2)
 end
 
 function Buffer:readBool()
@@ -104,7 +104,7 @@ function Buffer:readFloat(scale)
     if scale < 0 then
         local position = self.reading and self.position or 1
         if position + 3 > self.bytes:len() then
-            error("读数据出错")
+            error("读数据出错", 2)
         end
         self.reading = true
         local n = string.unpack("<f", self.bytes, position)
@@ -123,7 +123,7 @@ function Buffer:readDouble(scale)
     if scale < 0 then
         local position = self.reading and self.position or 1
         if position + 7 > self.bytes:len() then
-            error("读数据出错")
+            error("读数据出错", 2)
         end
         self.reading = true
         local n = string.unpack("<d", self.bytes, position)
@@ -140,7 +140,7 @@ function Buffer:readBytes()
     self.reading = true
 
     if position + length - 1 > self:size() then
-        error("读数据出错")
+        error("读数据出错", 2)
     end
 
     local str = self.bytes:sub(position + 1, position + length)
@@ -181,7 +181,7 @@ local function writeVarInt(buffer, n, bits)
         end
     end
 
-    error("写数据出错")
+    error("写数据出错", 2)
 end
 
 function Buffer:writeBool(b)
@@ -235,7 +235,7 @@ function Buffer:writeDouble(n, scale)
     local times = 10 ^ scale
     local threshold = 0x7fffffffffffffff / times;
     if n < -threshold or n > threshold then
-        error(string.format("参数[%s]超出了限定范围[%s,%s],无法转换为指定精度[%s]的定点型数据", n, -threshold, threshold, scale))
+        error(string.format("参数[%s]超出了限定范围[%s,%s],无法转换为指定精度[%s]的定点型数据", n, -threshold, threshold, scale), 2)
     else
         self:writeLong(math.floor(n * times))
     end

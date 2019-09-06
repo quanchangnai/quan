@@ -144,8 +144,9 @@ public class FieldDefinition extends Definition {
     }
 
     public ClassDefinition getClassDefinition() {
-        return  parser.getClass(getType());
+        return parser.getClass(getType());
     }
+
     public BeanDefinition getBean() {
         ClassDefinition classDefinition = parser.getClass(getType());
         if (BeanDefinition.isBeanDefinition(classDefinition)) {
@@ -287,6 +288,11 @@ public class FieldDefinition extends Definition {
             return getType();
         }
         return classType;
+    }
+
+    public String getClassTypeFullName() {
+        ClassDefinition classDefinition = parser.getClass(getType());
+        return classDefinition == null ? getType() : classDefinition.getFullName();
     }
 
     public void setClassType(String classType) {

@@ -1,3 +1,5 @@
+require("quan.message.Message")
+
 ---
 ---角色类型
 ---自动生成
@@ -9,11 +11,5 @@ local RoleType = {
     type2 = 2
 }
 
-local meta = {
-    __index = RoleType,
-    __newindex = function()
-        error("枚举不能修改")
-    end
-}
-
-return setmetatable({}, meta)
+RoleType = table.readOnly(RoleType)
+return RoleType

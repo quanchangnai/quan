@@ -78,7 +78,7 @@ function testMessage()
 
     local roleInfo = RoleInfo.new()
     roleInfo.id = 111
-    roleInfo.type = RoleType.type1
+    roleInfo.type = RoleType.type2
     sRoleLogin1.roleInfo = roleInfo
 
     local roleInfo2 = RoleInfo.new({ id = 222, name = "bbb", type = RoleType.type2, set = { 2233 } })
@@ -115,4 +115,20 @@ end
 --test1()
 --print()
 --testBuffer()
-testMessage()
+--testMessage()
+
+--SRoleLogin.id=1
+print("SRoleLogin.id=" .. tostring(SRoleLogin.id))
+
+local sRoleLogin1 = SRoleLogin.new({ roleId = 1111 })
+
+--sRoleLogin1.id=1
+print("sRoleLogin1.id=" .. tostring(sRoleLogin1.id))
+
+sRoleLogin1.roleId = "1322"
+print("sRoleLogin1.roleId=" .. tostring(sRoleLogin1.roleId))
+
+sRoleLogin1.userInfo = UserInfo.new()
+print("sRoleLogin1.userInfo=" .. tostring(sRoleLogin1.userInfo))
+
+

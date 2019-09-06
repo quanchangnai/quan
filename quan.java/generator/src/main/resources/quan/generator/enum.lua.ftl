@@ -1,3 +1,5 @@
+require("quan.message.Message")
+
 ---
 <#if comment !="">
 ---${comment}
@@ -11,11 +13,5 @@ local ${name} = {
 </#list>
 }
 
-local meta = {
-    __index = ${name},
-    __newindex = function()
-        error("枚举不能修改")
-    end
-}
-
-return setmetatable({}, meta)
+${name} = table.readOnly(${name})
+return ${name}

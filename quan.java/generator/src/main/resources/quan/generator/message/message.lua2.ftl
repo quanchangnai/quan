@@ -19,11 +19,6 @@ local ${name} = {
 </#if>
 }
 
-local function onUpdateProp(table, key, value)
-    assert(not ${name}[key], "不允许修改只读属性:" .. key)
-    rawset(table, key, value)
-end
-
 ---
 ---<#if comment !="">${comment}<#else>${name}</#if>.构造
 ---@param args 参数列表可以为空
@@ -48,16 +43,71 @@ function ${name}.new(args)
     <#elseif field.type == "string" || field.type == "bytes">
         ${field.name} = args.${field.name} or "",
     <#elseif field.collectionType>
-        ${field.name} = args.${field.name} or {},
+        ${field.name} = {},
     <#elseif !field.optional>
-        ${field.name} = args.${field.name} or ${field.type}.new(),
+        ${field.name} = ${field.type}.new(),
     <#else>
-        ${field.name} = args.${field.name},
+        ${field.name} = nil,
     </#if>
 </#list>
     }
 
-    instance = setmetatable(instance, { __index = ${name}, __newindex = onUpdateProp })
+    local origin = instance
+
+    local function onUpdateProp(table, name, value)
+<#if definitionType ==3>
+        if ${name}[name] then
+            error("不能修改只读属性:" .. name, 2)
+        end
+
+</#if>
+        local valueType = type(value)
+        valueType = valueType ~= "number" and valueType or math.type(value)
+        local typeError = "属性类型错误，期望类型:%s,实际类型:%s"
+
+<#if definitionType ==3>
+        if name == "seq" and math.type(value) ~= "integer" then
+            error(string.format(typeError, "integer", valueType), 2)
+        end
+
+</#if>
+<#list fields as field>
+    <#if field.type=="float"||field.type=="double">
+        if name == "${field.name}" and valueType ~= "float" and valueType ~= "integer" then
+            error(string.format(typeError, "number", type(value)), 2)
+        end
+    <#elseif field.numberType || field.enumType>
+        if name == "${field.name}" and valueType ~= "integer" then
+            error(string.format(typeError, "integer", valueType), 2)
+        end
+    <#elseif field.type=="bool">
+        if name == "${field.name}" and valueType ~= "boolean" then
+            error(string.format(typeError, "boolean", valueType), 2)
+        end
+    <#elseif field.type=="string" || field.type=="bytes">
+        if name == "${field.name}" and valueType ~= "string" then
+            error(string.format(typeError, "string", valueType), 2)
+        end
+    <#elseif field.collectionType>
+        if name == "${field.name}" and valueType ~= "table" then
+            error(string.format(typeError, "${field.type}", valueType), 2)
+        end
+    <#elseif field.optional>
+        if name == "${field.name}" and valueType ~= "nil" and (valueType ~= "table" or value.class ~= "${field.classTypeFullName}") then
+            error(string.format(typeError, "nil|${field.classTypeFullName}", valueType), 2)
+        end
+    <#else>
+        if name == "${field.name}" and (valueType ~= "table" or value.class ~= "${field.classTypeFullName}") then
+            error(string.format(typeError, "${field.classTypeFullName}", valueType), 2)
+        end
+    </#if>
+
+</#list>
+        origin[name] = value
+    end
+
+    instance = setmetatable(instance, { __index = ${name} })
+    instance = setmetatable({}, { __index = instance, __newindex = onUpdateProp })
     return instance
 end
 

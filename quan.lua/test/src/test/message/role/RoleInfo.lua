@@ -5,8 +5,15 @@ local Message = require("quan.message.Message")
 ---角色信息
 ---自动生成
 ---
-local RoleInfo = {}
-RoleInfo.__index = RoleInfo
+local RoleInfo = {
+    ---类名
+    class = "test.message.role.RoleInfo",
+}
+
+local function onUpdateProp(table, key, value)
+    assert(not RoleInfo[key], "不允许修改只读属性:" .. key)
+    rawset(table, key, value)
+end
 
 ---
 ---角色信息.构造
@@ -33,7 +40,8 @@ function RoleInfo.new(args)
         map = args.map or {},
     }
 
-    return setmetatable(instance, RoleInfo)
+    instance = setmetatable(instance, { __index = RoleInfo, __newindex = onUpdateProp })
+    return instance
 end
 
 ---
@@ -109,4 +117,5 @@ function RoleInfo.decode(buffer, msg)
     return msg
 end
 
+RoleInfo = table.readOnly(RoleInfo)
 return RoleInfo

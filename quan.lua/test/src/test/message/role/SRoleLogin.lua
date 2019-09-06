@@ -7,13 +7,17 @@ local RoleInfo = require("test.message.role.RoleInfo")
 ---角色登录
 ---自动生成
 ---
-local SRoleLogin = {}
-SRoleLogin.__index = SRoleLogin
+local SRoleLogin = {
+    ---类名
+    class = "test.message.role.SRoleLogin",
+    ---消息ID
+    id = 763075
+}
 
----消息ID
-SRoleLogin.id = 763075
----消息类名
-SRoleLogin.class = "test.message.role.SRoleLogin"
+local function onUpdateProp(table, key, value)
+    assert(not SRoleLogin[key], "不允许修改只读属性:" .. key)
+    rawset(table, key, value)
+end
 
 ---
 ---角色登录.构造
@@ -42,7 +46,8 @@ function SRoleLogin.new(args)
         userInfo = args.userInfo,
     }
 
-    return setmetatable(instance, SRoleLogin)
+    instance = setmetatable(instance, { __index = SRoleLogin, __newindex = onUpdateProp })
+    return instance
 end
 
 ---
@@ -117,4 +122,5 @@ function SRoleLogin.decode(buffer, msg)
     return msg
 end
 
+SRoleLogin = table.readOnly(SRoleLogin)
 return SRoleLogin

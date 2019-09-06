@@ -27,7 +27,7 @@ function Message.decode(buffer, msg)
 
     local msgId = buffer:readInt();
     if msgId ~= msg.id then
-        error(string.format("消息ID不匹配,期望值[%s],实际值[%s]", msg.id, msgId))
+        error(string.format("消息ID不匹配,期望值[%s],实际值[%s]", msg.id, msgId), 2)
     end
     msg.seq = buffer:readLong()
 
@@ -43,12 +43,17 @@ function table.size(t)
     return size
 end
 
-function table.readOnly(t)
-    assert(type(t) == "table", "参数[t]类型错误")
+---
+---构造只读表
+---@param origin table 原始表
+---@return table 只读表
+-----
+function table.readOnly(origin)
+    assert(type(origin) == "table", "参数[origin]类型错误")
     local meta = {
-        __index = t,
-        __newindex = function()
-            error("不支持该操作")
+        __index = origin,
+        __newindex = function(table, key, value)
+            error("不能修改只读表", 2)
         end
     }
     return setmetatable({}, meta)

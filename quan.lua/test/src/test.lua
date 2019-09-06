@@ -4,19 +4,30 @@
 --- DateTime: 2019/9/4 14:34
 ---
 
-local t1 = { aaa = 1, bbb = 2 }
-local t2 = { ccc = 3, ddd = 4 }
-setmetatable(t1, t2)
+--local t1 = { aaa = 1, bbb = 2 }
+--local t2 = { ccc = 3, ddd = 4 }
+--setmetatable(t1, t2)
+--
+--t1.ccc = 444
+--t1.eee = 555
+--
+--print("t1========")
+--for k, v in pairs(t1) do
+--    print(k .. "=" .. v)
+--end
+--
+--print("t2========")
+--for k, v in pairs(t2) do
+--    print(k .. "=" .. v)
+--end
 
-t1.ccc = 444
-t1.eee = 555
 
-print("t1========")
-for k, v in pairs(t1) do
-    print(k .. "=" .. v)
-end
 
-print("t2========")
-for k, v in pairs(t2) do
-    print(k .. "=" .. v)
-end
+
+local t={aaa=1}
+
+t=setmetatable(t,{__tostring=function ()
+    return "xxxx"
+end})
+
+print(t)
