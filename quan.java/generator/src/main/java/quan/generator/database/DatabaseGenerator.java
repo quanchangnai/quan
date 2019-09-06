@@ -3,6 +3,7 @@ package quan.generator.database;
 import freemarker.template.Template;
 import org.apache.commons.cli.CommandLine;
 import quan.definition.*;
+import quan.definition.data.DataDefinition;
 import quan.generator.Generator;
 import quan.generator.util.CommandLineUtils;
 

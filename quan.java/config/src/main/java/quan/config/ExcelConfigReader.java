@@ -2,7 +2,7 @@ package quan.config;
 
 import com.alibaba.fastjson.JSONObject;
 import org.apache.poi.ss.usermodel.*;
-import quan.definition.ConfigDefinition;
+import quan.definition.config.ConfigDefinition;
 
 import java.io.File;
 import java.io.FileInputStream;

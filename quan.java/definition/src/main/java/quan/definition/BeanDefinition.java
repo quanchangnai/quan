@@ -1,6 +1,10 @@
 package quan.definition;
 
 import org.apache.commons.lang3.StringUtils;
+import quan.definition.config.ConfigDefinition;
+import quan.definition.config.IndexDefinition;
+import quan.definition.data.DataDefinition;
+import quan.definition.message.MessageDefinition;
 
 import java.util.HashSet;
 import java.util.Set;

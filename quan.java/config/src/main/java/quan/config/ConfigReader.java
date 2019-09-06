@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.definition.FieldDefinition;
-import quan.definition.ConfigDefinition;
+import quan.definition.config.ConfigDefinition;
 
 import java.io.File;
 import java.util.*;

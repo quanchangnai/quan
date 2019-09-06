@@ -1,6 +1,10 @@
-package quan.definition;
+package quan.definition.config;
 
 import org.apache.commons.lang3.StringUtils;
+import quan.definition.BeanDefinition;
+import quan.definition.Constants;
+import quan.definition.DefinitionCategory;
+import quan.definition.FieldDefinition;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -32,6 +36,8 @@ public class ConfigDefinition extends BeanDefinition {
     protected List<FieldDefinition> selfFields = new ArrayList<>();
 
     private Map<String, FieldDefinition> columnFields = new HashMap<>();
+
+    private List<ConstantDefinition> constants = new ArrayList<>();
 
     {
         category = DefinitionCategory.config;
@@ -183,6 +189,9 @@ public class ConfigDefinition extends BeanDefinition {
         return selfFields;
     }
 
+    public List<ConstantDefinition> getConstants() {
+        return constants;
+    }
 
     @Override
     public void validate() {

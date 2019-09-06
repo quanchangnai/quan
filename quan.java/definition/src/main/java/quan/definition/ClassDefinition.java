@@ -104,6 +104,8 @@ public abstract class ClassDefinition extends Definition {
         return null;
     }
 
+
+
     public String getDefinitionFile() {
         return definitionFile;
     }

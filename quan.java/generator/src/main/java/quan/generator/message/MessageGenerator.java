@@ -4,7 +4,7 @@ import freemarker.template.Template;
 import quan.definition.BeanDefinition;
 import quan.definition.ClassDefinition;
 import quan.definition.DefinitionCategory;
-import quan.definition.MessageDefinition;
+import quan.definition.message.MessageDefinition;
 import quan.generator.Generator;
 
 import java.io.IOException;

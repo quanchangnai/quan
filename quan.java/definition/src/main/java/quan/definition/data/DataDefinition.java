@@ -1,4 +1,7 @@
-package quan.definition;
+package quan.definition.data;
+
+import quan.definition.BeanDefinition;
+import quan.definition.DefinitionCategory;
 
 /**
  * Created by quanchangnai on 2019/6/22.

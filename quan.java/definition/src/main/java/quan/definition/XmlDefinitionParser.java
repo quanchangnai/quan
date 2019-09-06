@@ -3,6 +3,11 @@ package quan.definition;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import quan.definition.config.ConfigDefinition;
+import quan.definition.config.ConstantDefinition;
+import quan.definition.config.IndexDefinition;
+import quan.definition.data.DataDefinition;
+import quan.definition.message.MessageDefinition;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -77,6 +82,10 @@ public class XmlDefinitionParser extends DefinitionParser {
             classDefinitions.add(classDefinition);
 
             parseFields(classDefinition, classElement);
+
+            if (classDefinition instanceof ConfigDefinition) {
+                classDefinitions.addAll(((ConfigDefinition) classDefinition).getConstants());
+            }
         }
         return classDefinitions;
     }
@@ -124,14 +133,19 @@ public class XmlDefinitionParser extends DefinitionParser {
             }
 
             Element fieldElement = (Element) classElement.node(i);
-            if (fieldElement.getName().equals("field")) {
+            String fieldElementName = fieldElement.getName();
+            if (fieldElementName.equals("field")) {
                 parseField(classDefinition, classElement, fieldElement, i);
-            } else if (fieldElement.getName().equals("index") && classDefinition instanceof ConfigDefinition) {
-                parseIndex((ConfigDefinition) classDefinition, classElement, fieldElement, i);
             }
-
+            if (classDefinition instanceof ConfigDefinition) {
+                if (fieldElementName.equals("index")) {
+                    parseIndex((ConfigDefinition) classDefinition, classElement, fieldElement, i);
+                }
+                if (fieldElementName.equals("constant")) {
+                    parseConstant((ConfigDefinition) classDefinition, classElement, fieldElement, i);
+                }
+            }
         }
-
     }
 
     private void parseField(ClassDefinition classDefinition, Element classElement, Element fieldElement, int i) {
@@ -171,6 +185,22 @@ public class XmlDefinitionParser extends DefinitionParser {
         indexDefinition.setComment(comment);
 
         configDefinition.addIndex(indexDefinition);
+    }
+
+    private void parseConstant(ConfigDefinition configDefinition, Element classElement, Element constantElement, int i) {
+        ConstantDefinition constantDefinition = new ConstantDefinition();
+        constantDefinition.setConfigDefinition(configDefinition);
+        constantDefinition.setDefinitionText(constantElement.asXML());
+
+        constantDefinition.setName(constantElement.attributeValue("name"));
+        constantDefinition.setKeyField(constantElement.attributeValue("key"));
+        constantDefinition.setValueField(constantElement.attributeValue("value"));
+
+        String comment = classElement.node(i + 1).getText();
+        comment = comment.replaceAll("[\r\n]", "").trim();
+
+        constantDefinition.setComment(comment);
+
     }
 
 }

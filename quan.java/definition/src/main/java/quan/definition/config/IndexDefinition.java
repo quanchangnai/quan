@@ -1,6 +1,9 @@
-package quan.definition;
+package quan.definition.config;
 
 import org.apache.commons.lang3.StringUtils;
+import quan.definition.Constants;
+import quan.definition.Definition;
+import quan.definition.FieldDefinition;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package>
+
+    <config name="ErrorCodeConfig" table="错误码">
+        <field name="id" type="int" column="ID"/>
+        <field name="key" type="string" column="Key" index="u"/>
+        <field name="text" type="string" column="文本"/>
+        <constant name="ErrorCode" key="key" value="id"/>
+    </config>
+
+</package>

@@ -1,4 +1,7 @@
-package quan.definition;
+package quan.definition.message;
+
+import quan.definition.BeanDefinition;
+import quan.definition.DefinitionCategory;
 
 import java.util.Arrays;
 

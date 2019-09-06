@@ -7,6 +7,8 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.apache.commons.lang3.tuple.Triple;
 import quan.common.util.PathUtils;
 import quan.definition.*;
+import quan.definition.config.ConfigDefinition;
+import quan.definition.config.IndexDefinition;
 
 import java.io.File;
 import java.io.FileOutputStream;

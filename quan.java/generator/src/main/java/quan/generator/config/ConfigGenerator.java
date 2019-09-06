@@ -2,6 +2,7 @@ package quan.generator.config;
 
 import freemarker.template.Template;
 import quan.definition.*;
+import quan.definition.config.ConfigDefinition;
 import quan.generator.*;
 
 import java.io.IOException;
