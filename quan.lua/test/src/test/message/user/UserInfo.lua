@@ -9,7 +9,7 @@ local UserInfo = {
     class = "test.message.user.UserInfo",
 }
 
-local function onUpdateProp(table, key, value)
+local function onSet(table, key, value)
     assert(not UserInfo[key], "不允许修改只读属性:" .. key)
     rawset(table, key, value)
 end
@@ -31,7 +31,7 @@ function UserInfo.new(args)
         level = args.level or 0,
     }
 
-    instance = setmetatable(instance, { __index = UserInfo, __newindex = onUpdateProp })
+    instance = setmetatable(instance, { __index = UserInfo, __newindex = onSet })
     return instance
 end
 
@@ -42,7 +42,8 @@ end
 ---@return quan.message.Buffer
 ---
 function UserInfo.encode(msg, buffer)
-    assert(msg ~= nil, "参数[msg]不能为空")
+    assert(type(msg) == "table" and msg.class == UserInfo.class, "参数[msg]类型错误")
+    assert(buffer == nil or type(buffer) == "table" and buffer.class == Buffer.class, "参数[buffer]类型错误")
 
     buffer:writeLong(msg.id)
     buffer:writeString(msg.name)
@@ -58,9 +59,10 @@ end
 ---@return test.message.user.UserInfo
 ---
 function UserInfo.decode(buffer, msg)
-    assert(buffer ~= nil, "参数[buffer]不能为空")
-    msg = msg or UserInfo.new()
+    assert(type(buffer) == "table" and buffer.class == Buffer.class, "参数[buffer]类型错误")
+    assert(msg == nil or type(msg) == "table" and msg.class == UserInfo.class, "参数[msg]类型错误")
 
+    msg = msg or UserInfo.new()
     msg.id = buffer:readLong()
     msg.name = buffer:readString()
     msg.level = buffer:readInt()

@@ -24,10 +24,54 @@
 
 
 
-local t={aaa=1}
+--local t={aaa=1}
+--
+--t=setmetatable(t,{__tostring=function ()
+--    return "xxxx"
+--end})
+--
+--print(t)
 
-t=setmetatable(t,{__tostring=function ()
-    return "xxxx"
-end})
 
-print(t)
+local function iter (a, i)
+    i = i + 1
+    local v = a[i]
+    if v then
+        return v
+    end
+end
+
+local function lists (list)
+    local i = 0
+    return function()
+        i = i + 1
+        local v = list[i]
+        if v then
+            return i, v
+        end
+    end
+end
+
+local list = { "a", "b", "c" }
+
+print("lists=======")
+for i, v in lists(list) do
+    print(i, v)
+end
+
+local map = { a = "aaa", b = "bbb", c = "ccc" }
+
+local function maps (map)
+    local k = nil
+    return function()
+        k, v = next(map, k)
+        if v then
+            return k, v
+        end
+    end
+end
+
+print("maps=======")
+for k, v in maps(map) do
+    print(k, v)
+end

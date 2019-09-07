@@ -4,7 +4,7 @@ using System.IO;
 namespace Quan.Message
 {
     /// <summary>
-    /// 基于VarInt和ZigZag编码的缓冲区，字节顺序采用小端模式
+    /// 基于VarInt和ZigZag编码的字节缓冲区，字节顺序采用小端模式
     /// </summary>
     public class Buffer
     {

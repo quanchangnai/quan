@@ -4,7 +4,15 @@
 --- DateTime: 2019/9/1 15:27
 ---
 
-local Buffer = {}
+require("quan.message.table")
+
+---
+---基于VarInt和ZigZag编码的字节缓冲区，字节顺序采用小端模式
+---
+local Buffer = {
+    ---类名
+    class = "quan.message.Buffer"
+}
 
 function Buffer.new(bytes)
     assert(bytes == nil or type(bytes) == "string", "参数[bytes]类型错误")
@@ -186,12 +194,7 @@ end
 
 function Buffer:writeBool(b)
     assert(type(b) == "boolean", "参数[b]类型错误")
-
-    if b then
-        self:writeInt(1)
-    else
-        self:writeInt(0)
-    end
+    self:writeInt(b and 1 or 0)
 end
 
 function Buffer:writeShort(n)
@@ -252,4 +255,5 @@ function Buffer:writeString(s)
     self:writeBytes(s)
 end
 
+Buffer = table.readOnly(Buffer)
 return Buffer

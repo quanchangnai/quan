@@ -14,7 +14,7 @@ local SRoleLogin = {
     id = 763075
 }
 
-local function onUpdateProp(table, key, value)
+local function onSet(table, key, value)
     assert(not SRoleLogin[key], "不允许修改只读属性:" .. key)
     rawset(table, key, value)
 end
@@ -46,7 +46,7 @@ function SRoleLogin.new(args)
         userInfo = args.userInfo,
     }
 
-    instance = setmetatable(instance, { __index = SRoleLogin, __newindex = onUpdateProp })
+    instance = setmetatable(instance, { __index = SRoleLogin, __newindex = onSet })
     return instance
 end
 
@@ -57,7 +57,9 @@ end
 ---@return quan.message.Buffer
 ---
 function SRoleLogin.encode(msg, buffer)
-    assert(msg ~= nil, "参数[msg]不能为空")
+    assert(type(msg) == "table" and msg.class == SRoleLogin.class, "参数[msg]类型错误")
+    assert(buffer == nil or type(buffer) == "table" and buffer.class == Buffer.class, "参数[buffer]类型错误")
+
     buffer = Message.encode(msg, buffer)
 
     buffer:writeLong(msg.roleId)
@@ -95,7 +97,9 @@ end
 ---@return test.message.role.SRoleLogin
 ---
 function SRoleLogin.decode(buffer, msg)
-    assert(buffer ~= nil, "参数[buffer]不能为空")
+    assert(type(buffer) == "table" and buffer.class == Buffer.class, "参数[buffer]类型错误")
+    assert(msg == nil or type(msg) == "table" and msg.class == SRoleLogin.class, "参数[msg]类型错误")
+
     msg = msg or SRoleLogin.new()
     Message.decode(buffer, msg)
 

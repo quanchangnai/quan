@@ -5,7 +5,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
 /**
- * 基于VarInt和ZigZag编码的缓冲区，字节顺序采用小端模式<br/>
+ * 基于VarInt和ZigZag编码的字节缓冲区，字节顺序采用小端模式<br/>
  * Created by quanchangnai on 2018/7/2.
  */
 public class Buffer {

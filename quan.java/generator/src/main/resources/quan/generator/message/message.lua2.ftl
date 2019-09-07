@@ -54,7 +54,7 @@ function ${name}.new(args)
 
     local origin = instance
 
-    local function onUpdateProp(table, name, value)
+    local function onSet(table, name, value)
 <#if definitionType ==3>
         if ${name}[name] then
             error("不能修改只读属性:" .. name, 2)
@@ -107,7 +107,7 @@ function ${name}.new(args)
     end
 
     instance = setmetatable(instance, { __index = ${name} })
-    instance = setmetatable({}, { __index = instance, __newindex = onUpdateProp })
+    instance = setmetatable({}, { __index = instance, __newindex = onSet })
     return instance
 end
 
@@ -118,11 +118,13 @@ end
 ---@return quan.message.Buffer
 ---
 function ${name}.encode(msg, buffer)
-    assert(msg ~= nil, "参数[msg]不能为空")
+    assert(type(msg) == "table" and msg.class == ${name}.class, "参数[msg]类型错误")
+    assert(buffer == nil or type(buffer) == "table" and buffer.class == Buffer.class, "参数[buffer]类型错误")
+
 <#if definitionType ==3>
     buffer = Message.encode(msg, buffer)
-</#if>
 
+</#if>
 <#list fields as field>
     <#if field.type=="set" || field.type=="list">
         <#if field_index gt 0>
@@ -187,12 +189,14 @@ end
 ---@return ${fullName}
 ---
 function ${name}.decode(buffer, msg)
-    assert(buffer ~= nil, "参数[buffer]不能为空")
+    assert(type(buffer) == "table" and buffer.class == Buffer.class, "参数[buffer]类型错误")
+    assert(msg == nil or type(msg) == "table" and msg.class == ${name}.class, "参数[msg]类型错误")
+
     msg = msg or ${name}.new()
 <#if definitionType ==3>
     Message.decode(buffer, msg)
-</#if>
 
+</#if>
 <#list fields as field>
     <#if field.type=="set" || field.type=="list">
         <#if field_index gt 0>

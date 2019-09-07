@@ -34,29 +34,4 @@ function Message.decode(buffer, msg)
     return msg
 end
 
-function table.size(t)
-    assert(type(t) == "table", "参数[t]类型错误")
-    local size = 0
-    for k, v in pairs(t) do
-        size = size + 1
-    end
-    return size
-end
-
----
----构造只读表
----@param origin table 原始表
----@return table 只读表
------
-function table.readOnly(origin)
-    assert(type(origin) == "table", "参数[origin]类型错误")
-    local meta = {
-        __index = origin,
-        __newindex = function(table, key, value)
-            error("不能修改只读表", 2)
-        end
-    }
-    return setmetatable({}, meta)
-end
-
 return Message

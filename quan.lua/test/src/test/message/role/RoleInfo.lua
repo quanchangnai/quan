@@ -10,7 +10,7 @@ local RoleInfo = {
     class = "test.message.role.RoleInfo",
 }
 
-local function onUpdateProp(table, key, value)
+local function onSet(table, key, value)
     assert(not RoleInfo[key], "不允许修改只读属性:" .. key)
     rawset(table, key, value)
 end
@@ -40,7 +40,7 @@ function RoleInfo.new(args)
         map = args.map or {},
     }
 
-    instance = setmetatable(instance, { __index = RoleInfo, __newindex = onUpdateProp })
+    instance = setmetatable(instance, { __index = RoleInfo, __newindex = onSet })
     return instance
 end
 
@@ -51,7 +51,8 @@ end
 ---@return quan.message.Buffer
 ---
 function RoleInfo.encode(msg, buffer)
-    assert(msg ~= nil, "参数[msg]不能为空")
+    assert(type(msg) == "table" and msg.class == RoleInfo.class, "参数[msg]类型错误")
+    assert(buffer == nil or type(buffer) == "table" and buffer.class == Buffer.class, "参数[buffer]类型错误")
 
     buffer:writeLong(msg.id)
     buffer:writeString(msg.name)
@@ -89,9 +90,10 @@ end
 ---@return test.message.role.RoleInfo
 ---
 function RoleInfo.decode(buffer, msg)
-    assert(buffer ~= nil, "参数[buffer]不能为空")
-    msg = msg or RoleInfo.new()
+    assert(type(buffer) == "table" and buffer.class == Buffer.class, "参数[buffer]类型错误")
+    assert(msg == nil or type(msg) == "table" and msg.class == RoleInfo.class, "参数[msg]类型错误")
 
+    msg = msg or RoleInfo.new()
     msg.id = buffer:readLong()
     msg.name = buffer:readString()
     msg.type = buffer:readInt();

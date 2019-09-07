@@ -1,4 +1,4 @@
-require("quan.message.Message")
+require("quan.message.table")
 
 ---
 ---角色类型

@@ -13,9 +13,9 @@ local RoleType = require("test.message.role.RoleType")
 local UserInfo = require("test.message.user.UserInfo")
 
 print("MessageTest===========")
-print()
 
-function test1()
+local function test1()
+    print()
     print("test1===========")
     local str = ""
     for i = 1, 3 do
@@ -30,7 +30,8 @@ function test1()
     print(string.unpack("bbb", str))
 end
 
-function testBuffer()
+local function testBuffer()
+    print()
     print("testBuffer===========")
     local buffer = Buffer.new()
     buffer:writeBool(true)
@@ -72,7 +73,9 @@ function testBuffer()
     print(table.unpack({ 12, 45, 33 }))
 end
 
-function testMessage()
+local function testMessage1()
+    print()
+    print("testMessage1===========")
     local sRoleLogin1 = SRoleLogin.new({ roleId = 1111 })
     sRoleLogin1.roleName = "张三1111"
 
@@ -112,23 +115,30 @@ function testMessage()
 
 end
 
---test1()
---print()
---testBuffer()
---testMessage()
+local function testMessage2()
+    print()
+    print("testMessage2===========")
+    --SRoleLogin.id=1
+    print("SRoleLogin.id=" .. tostring(SRoleLogin.id))
 
---SRoleLogin.id=1
-print("SRoleLogin.id=" .. tostring(SRoleLogin.id))
+    local sRoleLogin1 = SRoleLogin.new({ roleId = 1111 })
 
-local sRoleLogin1 = SRoleLogin.new({ roleId = 1111 })
+    --sRoleLogin1.id=1
+    print("sRoleLogin1.id=" .. tostring(sRoleLogin1.id))
 
---sRoleLogin1.id=1
-print("sRoleLogin1.id=" .. tostring(sRoleLogin1.id))
+    --sRoleLogin1.roleId = "1322"
+    print("sRoleLogin1.roleId=" .. tostring(sRoleLogin1.roleId))
 
-sRoleLogin1.roleId = "1322"
-print("sRoleLogin1.roleId=" .. tostring(sRoleLogin1.roleId))
+    sRoleLogin1.userInfo = UserInfo.new()
+    print("sRoleLogin1.userInfo=" .. tostring(sRoleLogin1.userInfo))
 
-sRoleLogin1.userInfo = UserInfo.new()
-print("sRoleLogin1.userInfo=" .. tostring(sRoleLogin1.userInfo))
+end
+
+test1()
+testBuffer()
+testMessage1()
+testMessage2()
+
+
 
 
