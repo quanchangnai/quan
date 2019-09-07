@@ -26,7 +26,9 @@ public abstract class DefinitionParser {
 
     protected LinkedHashSet<File> definitionFiles = new LinkedHashSet<>();
 
-    private Map<String, ClassDefinition> classes = new HashMap<>();
+    protected List<ClassDefinition> parsedClasses = new ArrayList<>();
+
+    private Map<String, ClassDefinition> validatedClasses = new HashMap<>();
 
     //表名:配置
     private Map<String, ConfigDefinition> tableConfigs = new HashMap<>();
@@ -82,15 +84,15 @@ public abstract class DefinitionParser {
     }
 
     public Map<String, ClassDefinition> getClasses() {
-        return classes;
+        return validatedClasses;
     }
 
     public ClassDefinition getClass(String name) {
-        return classes.get(name);
+        return validatedClasses.get(name);
     }
 
     public ConfigDefinition getConfig(String name) {
-        ClassDefinition classDefinition = classes.get(name);
+        ClassDefinition classDefinition = validatedClasses.get(name);
         if (classDefinition instanceof ConfigDefinition) {
             return (ConfigDefinition) classDefinition;
         }
@@ -102,7 +104,7 @@ public abstract class DefinitionParser {
     }
 
     public BeanDefinition getBean(String name) {
-        ClassDefinition classDefinition = classes.get(name);
+        ClassDefinition classDefinition = validatedClasses.get(name);
         if (classDefinition instanceof BeanDefinition) {
             return (BeanDefinition) classDefinition;
         }
@@ -121,39 +123,36 @@ public abstract class DefinitionParser {
     protected abstract String definitionFileType();
 
     public void parse() {
-        if (!classes.isEmpty()) {
+        if (!validatedClasses.isEmpty()) {
             return;
         }
-        List<ClassDefinition> classDefinitions = new ArrayList<>();
 
-        for (File definitionFile : definitionFiles) {
-            classDefinitions.addAll(parseClasses(definitionFile));
-        }
+        definitionFiles.forEach(this::parseClasses);
 
-        for (ClassDefinition classDefinition : classDefinitions) {
+        for (ClassDefinition classDefinition : parsedClasses) {
             if (classDefinition.getName() == null) {
                 continue;
             }
-            ClassDefinition otherClassDefinition = classes.get(classDefinition.getName());
+            ClassDefinition otherClassDefinition = validatedClasses.get(classDefinition.getName());
             if (otherClassDefinition != null) {
                 String error = "定义文件[" + classDefinition.getDefinitionFile();
                 error += "]和[" + otherClassDefinition.getDefinitionFile();
                 error += "]有同名类[" + classDefinition.getName() + "]";
                 validatedErrors.add(error);
             } else {
-                classes.put(classDefinition.getName(), classDefinition);
+                validatedClasses.put(classDefinition.getName(), classDefinition);
             }
         }
 
-        for (ClassDefinition classDefinition : classDefinitions) {
+        for (ClassDefinition classDefinition : parsedClasses) {
             classDefinition.validate();
         }
 
-        for (ClassDefinition classDefinition : classDefinitions) {
+        for (ClassDefinition classDefinition : parsedClasses) {
             classDefinition.validate2();
         }
     }
 
-    protected abstract List<ClassDefinition> parseClasses(File definitionFile);
+    protected abstract void parseClasses(File definitionFile);
 
 }

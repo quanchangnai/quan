@@ -37,8 +37,6 @@ public class ConfigDefinition extends BeanDefinition {
 
     private Map<String, FieldDefinition> columnFields = new HashMap<>();
 
-    private List<ConstantDefinition> constants = new ArrayList<>();
-
     {
         category = DefinitionCategory.config;
     }
@@ -187,10 +185,6 @@ public class ConfigDefinition extends BeanDefinition {
 
     public List<FieldDefinition> getSelfFields() {
         return selfFields;
-    }
-
-    public List<ConstantDefinition> getConstants() {
-        return constants;
     }
 
     @Override

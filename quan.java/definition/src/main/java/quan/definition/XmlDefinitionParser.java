@@ -10,8 +10,6 @@ import quan.definition.data.DataDefinition;
 import quan.definition.message.MessageDefinition;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -25,25 +23,24 @@ public class XmlDefinitionParser extends DefinitionParser {
     }
 
     @Override
-    protected List<ClassDefinition> parseClasses(File definitionFile) {
-        List<ClassDefinition> classDefinitions = new ArrayList<>();
-
+    protected void parseClasses(File definitionFile) {
         Element rootElement;
         try {
             rootElement = new SAXReader().read(definitionFile).getRootElement();
+            if (rootElement == null || !rootElement.getName().equals("package")) {
+                return;
+            }
         } catch (DocumentException e) {
-            addValidatedError(String.format("解析定义文件[%s]出错", definitionFile));
-            logger.error("", definitionFile, e);
-            return classDefinitions;
-        }
-        if (rootElement == null || !rootElement.getName().equals("package")) {
-            return classDefinitions;
+            String error = String.format("解析定义文件[%s]出错", definitionFile);
+            addValidatedError(error);
+            logger.error(error, e);
+            return;
         }
 
         String packageName = definitionFile.getName().substring(0, definitionFile.getName().lastIndexOf("."));
         if (!Pattern.matches(Constants.PACKAGE_NAME_PATTERN, packageName)) {
             addValidatedError("定义文件名[" + packageName + "]格式错误");
-            return classDefinitions;
+            return;
         }
 
         for (int i = 0; i < rootElement.nodeCount(); i++) {
@@ -56,6 +53,7 @@ public class XmlDefinitionParser extends DefinitionParser {
             if (classDefinition == null) {
                 continue;
             }
+            parsedClasses.add(classDefinition);
 
             classDefinition.setParser(this);
             classDefinition.setDefinitionFile(definitionFile.getName());
@@ -79,15 +77,8 @@ public class XmlDefinitionParser extends DefinitionParser {
             }
             classDefinition.setComment(comment);
 
-            classDefinitions.add(classDefinition);
-
             parseFields(classDefinition, classElement);
-
-            if (classDefinition instanceof ConfigDefinition) {
-                classDefinitions.addAll(((ConfigDefinition) classDefinition).getConstants());
-            }
         }
-        return classDefinitions;
     }
 
     private ClassDefinition createClassDefinition(Element classElement) {
@@ -201,6 +192,7 @@ public class XmlDefinitionParser extends DefinitionParser {
 
         constantDefinition.setComment(comment);
 
+        parsedClasses.add(constantDefinition);
     }
 
 }
