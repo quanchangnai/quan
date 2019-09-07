@@ -3,6 +3,7 @@
 --- Created by quanchangnai.
 --- DateTime: 2019/9/4 16:14
 ---
+
 local Buffer = require("quan.message.Buffer")
 
 local Message = {}

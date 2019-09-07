@@ -3,7 +3,7 @@
 --- Created by quanchangnai.
 --- DateTime: 2019/8/30 17:36
 ---
-package.path = "../../message/src/?.lua;" .. package.path
+package.path = package.path .. ";../../message/src/?.lua"
 
 local Buffer = require("quan.message.Buffer")
 local Message = require("quan.message.Message")
@@ -44,7 +44,7 @@ local function testBuffer()
     buffer:writeString("搭顺风车")
     buffer:writeLong(12324)
 
-    print("buffer:size()=" .. buffer:size())
+    print("buffer:size()", buffer:size())
 
     print(buffer:readBool())
     print(buffer:readInt())
@@ -97,7 +97,7 @@ local function testMessage1()
     sRoleLogin1.userInfo = UserInfo.new()
 
     local buffer = SRoleLogin.encode(sRoleLogin1)
-    print("buffer:size()=" .. buffer:size())
+    print("buffer:size()", buffer:size())
 
     local sRoleLogin2 = SRoleLogin.decode(buffer)
 
@@ -106,12 +106,12 @@ local function testMessage1()
     file:write(buffer.bytes)
     file:flush()
 
-    print("SRoleLogin.id=" .. SRoleLogin.id)
-    print("SRoleLogin.class=" .. SRoleLogin.class)
-    print("sRoleLogin2.id=" .. sRoleLogin2.id)
-    print("sRoleLogin2.class=" .. sRoleLogin2.class)
-    print("sRoleLogin2.roleId=" .. sRoleLogin2.roleId)
-    print("sRoleLogin2.roleName=" .. sRoleLogin2.roleName)
+    print("SRoleLogin.id", SRoleLogin.id)
+    print("SRoleLogin.class", SRoleLogin.class)
+    print("sRoleLogin2.id", sRoleLogin2.id)
+    print("sRoleLogin2.class", sRoleLogin2.class)
+    print("sRoleLogin2.roleId", sRoleLogin2.roleId)
+    print("sRoleLogin2.roleName", sRoleLogin2.roleName)
 
 end
 
@@ -119,18 +119,18 @@ local function testMessage2()
     print()
     print("testMessage2===========")
     --SRoleLogin.id=1
-    print("SRoleLogin.id=" .. tostring(SRoleLogin.id))
+    print("SRoleLogin.id", SRoleLogin.id)
 
     local sRoleLogin1 = SRoleLogin.new({ roleId = 1111 })
 
     --sRoleLogin1.id=1
-    print("sRoleLogin1.id=" .. tostring(sRoleLogin1.id))
+    print("sRoleLogin1.id", sRoleLogin1.id)
 
     --sRoleLogin1.roleId = "1322"
-    print("sRoleLogin1.roleId=" .. tostring(sRoleLogin1.roleId))
+    print("sRoleLogin1.roleId", sRoleLogin1.roleId)
 
     sRoleLogin1.userInfo = UserInfo.new()
-    print("sRoleLogin1.userInfo=" .. tostring(sRoleLogin1.userInfo))
+    print("sRoleLogin1.userInfo", sRoleLogin1.userInfo)
 
 end
 

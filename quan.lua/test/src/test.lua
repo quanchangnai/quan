@@ -4,41 +4,47 @@
 --- DateTime: 2019/9/4 14:34
 ---
 
---local t1 = { aaa = 1, bbb = 2 }
---local t2 = { ccc = 3, ddd = 4 }
---setmetatable(t1, t2)
---
---t1.ccc = 444
---t1.eee = 555
---
---print("t1========")
---for k, v in pairs(t1) do
---    print(k .. "=" .. v)
---end
---
---print("t2========")
---for k, v in pairs(t2) do
---    print(k .. "=" .. v)
---end
+local t1 = { aaa = 1, bbb = 2 }
+local t2 = { ccc = 3, ddd = 4 }
+setmetatable(t2, { __index = t1 })
 
+t1.ccc = 444
+t1.eee = 555
 
+print("t1========")
+for k, v in pairs(t1) do
+    print(k .. "=" .. v)
+end
 
+print("t2.aaa", t2.aaa)
+print("t2========")
+for k, v in pairs(t2) do
+    print(k .. "=" .. v)
+end
 
---local t={aaa=1}
---
---t=setmetatable(t,{__tostring=function ()
---    return "xxxx"
---end})
---
---print(t)
+local t = { aaa = 1 }
 
+t = setmetatable(t, { __tostring = function()
+    return "t.tostring"
+end })
 
-local function iter (a, i)
+local function iter (list, i)
     i = i + 1
-    local v = a[i]
+    local v = list[i]
     if v then
-        return v
+        return i, v
     end
+end
+
+local function iterate (list)
+    return iter, list, 0
+end
+
+local list = { "a", "b", "c" }
+
+print("iterate=======")
+for i, v in iterate(list) do
+    print(i, v)
 end
 
 local function lists (list)
@@ -51,8 +57,6 @@ local function lists (list)
         end
     end
 end
-
-local list = { "a", "b", "c" }
 
 print("lists=======")
 for i, v in lists(list) do
