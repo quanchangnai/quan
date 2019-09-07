@@ -69,6 +69,24 @@ namespace ${fullPackageName}
             set => _${field.name} = value ?? throw new NullReferenceException();
 		}
 
+    <#elseif (field.type=="float"||field.type=="double") && field.scale gt 0>
+        private ${field.basicType} _${field.name};
+
+        <#if field.comment !="">
+        /// <summary>
+		/// ${field.comment}
+		/// </summary>
+        </#if>
+        public ${field.basicType} ${field.name?cap_first}
+        {
+            get => _${field.name};
+            set
+            {
+                Buffer.CheckScale(value, ${field.scale}, false);
+                _${field.name} = value;
+            }
+        }
+
     <#elseif field.builtinType || field.enumType>
         <#if field.comment !="">
         /// <summary>

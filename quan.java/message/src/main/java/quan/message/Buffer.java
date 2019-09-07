@@ -349,18 +349,29 @@ public class Buffer {
         this.end = end;
     }
 
+    public static long checkScale(double n, int scale) {
+        int times = (int) Math.pow(10, scale);
+        long threshold = Long.MAX_VALUE / times;
+        if (n < -threshold || n > threshold) {
+            throw new IllegalArgumentException(String.format("参数[%s]超出了限定范围[%s,%s],无法转换为指定精度[%s]的定点型数据", n, -threshold, threshold, scale));
+        }
+        return (long) Math.floor(n * times);
+    }
+
     public void writeDouble(double n, int scale) throws IOException {
         if (scale < 0) {
             writeDouble(n);
             return;
         }
-        int times = (int) Math.pow(10, scale);
-        long threshold = Long.MAX_VALUE / times;
-        if (n < -threshold || n > threshold) {
-            throw new IOException(String.format("参数[%s]超出了限定范围[%s,%s],无法转换为指定精度[%s]的定点型数据", n, -threshold, threshold, scale));
+
+        long lon;
+        try {
+            lon = checkScale(n, scale);
+        } catch (IllegalArgumentException e) {
+            throw new IOException(e.getMessage());
         }
 
-        writeLong((long) Math.floor(n * times));
+        writeLong(lon);
     }
 
 

@@ -109,6 +109,7 @@ public class RoleInfo extends Bean {
     }
 
     public RoleInfo setF(float f) {
+        Buffer.checkScale(f, 2);
         this.f = f;
         return this;
     }

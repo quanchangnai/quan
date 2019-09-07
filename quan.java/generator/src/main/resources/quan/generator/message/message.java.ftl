@@ -82,7 +82,9 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     </#if>
     public ${name} set${field.name?cap_first}(${field.basicType} ${field.name}) {
         <#if (!field.builtinType && !field.optional && !field.enumType) || field.type == "string" || field.type == "bytes">
-        Objects.requireNonNull(${field.name});
+        Objects.requireNonNull(${field.name});<#if field.scale gt 0>, ${field.scale}</#if>
+        <#elseif (field.type=="float"||field.type=="double") && field.scale gt 0>
+        Buffer.checkScale(${field.name}, ${field.scale});
         </#if>
         this.${field.name} = ${field.name};
         return this;

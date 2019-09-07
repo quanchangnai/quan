@@ -370,22 +370,34 @@ namespace Quan.Message
             _end = end;
         }
 
+        public static long CheckScale(double n, int scale, bool encode)
+        {
+            var times = (int) Math.Pow(10, scale);
+            var threshold = long.MaxValue / times;
+            if (n >= -threshold && n <= threshold)
+            {
+                return (long) Math.Floor(n * times);
+            }
+
+            var error = $"参数[{n}]超出了限定范围[{-threshold},{threshold}],无法转换为指定精度[{scale}]的定点型数据";
+            if (encode)
+            {
+                throw new IOException(error);
+            }
+
+            throw new ArgumentException(error);
+        }
+
         public void WriteDouble(double n, int scale)
         {
             if (scale < 0)
             {
                 WriteDouble(n);
-                return;
             }
-
-            var times = (int) Math.Pow(10, scale);
-            var threshold = long.MaxValue / times;
-            if (n < -threshold || n > threshold)
+            else
             {
-                throw new IOException($"参数[{n}]超出了限定范围[{-threshold},{threshold}],无法转换为指定精度[{scale}]的定点型数据");
+                WriteLong(CheckScale(n, scale, true));
             }
-
-            WriteLong((long) Math.Floor(n * times));
         }
 
         public void WriteString(string s)

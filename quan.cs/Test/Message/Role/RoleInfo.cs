@@ -36,9 +36,19 @@ namespace Test.Message.Role
 
 		public int I { get; set; }
 
-		public float F { get; set; }
+        private float _f;
 
-		public double D { get; set; }
+        public float F
+        {
+	        get => _f;
+	        set
+	        {
+		        Buffer.CheckScale(value, 2, false);
+		        _f = value;
+	        }
+        }
+
+        public double D { get; set; }
 
 		private byte[] _data = new byte[0];
 
