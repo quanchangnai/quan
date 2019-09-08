@@ -9,7 +9,6 @@ import quan.definition.FieldDefinition;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 /**
  * Created by quanchangnai on 2019/9/6.
@@ -83,7 +82,7 @@ public class ConstantDefinition extends ClassDefinition {
     public void setConfigs(List<JSONObject> configs) {
         for (JSONObject config : configs) {
             String key = config.getString(keyField);
-            if (!Pattern.matches(Constants.FIELD_NAME_PATTERN, key)) {
+            if (!Constants.FIELD_NAME_PATTERN.matcher(key).matches()) {
                 continue;
             }
             String comment = commentField == null ? "" : config.getString(commentField);

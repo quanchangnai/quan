@@ -2,6 +2,8 @@ package quan.definition;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.regex.Pattern;
+
 /**
  * Created by quanchangnai on 2017/7/6.
  */
@@ -77,7 +79,7 @@ public abstract class Definition {
 
     public abstract String getDefinitionTypeName();
 
-    protected abstract String namePattern();
+    protected abstract Pattern namePattern();
 
     @Override
     public String toString() {

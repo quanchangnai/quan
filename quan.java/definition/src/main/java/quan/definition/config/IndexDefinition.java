@@ -7,6 +7,7 @@ import quan.definition.FieldDefinition;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Created by quanchangnai on 2019/7/14.
@@ -33,7 +34,7 @@ public class IndexDefinition extends Definition {
     }
 
     @Override
-    protected String namePattern() {
+    protected Pattern namePattern() {
         return Constants.FIELD_NAME_PATTERN;
     }
 

@@ -10,7 +10,6 @@ import quan.definition.data.DataDefinition;
 import quan.definition.message.MessageDefinition;
 
 import java.io.File;
-import java.util.regex.Pattern;
 
 /**
  * Created by quanchangnai on 2017/7/10.
@@ -38,7 +37,7 @@ public class XmlDefinitionParser extends DefinitionParser {
         }
 
         String packageName = definitionFile.getName().substring(0, definitionFile.getName().lastIndexOf("."));
-        if (!Pattern.matches(Constants.PACKAGE_NAME_PATTERN, packageName)) {
+        if (!Constants.PACKAGE_NAME_PATTERN.matcher(packageName).matches()) {
             addValidatedError("定义文件名[" + packageName + "]格式错误");
             return;
         }

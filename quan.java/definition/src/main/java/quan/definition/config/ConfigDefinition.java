@@ -7,7 +7,6 @@ import quan.definition.DefinitionCategory;
 import quan.definition.FieldDefinition;
 
 import java.util.*;
-import java.util.regex.Pattern;
 
 /**
  * Created by quanchangnai on 2019/7/11.
@@ -409,7 +408,7 @@ public class ConfigDefinition extends BeanDefinition {
     private void validateIndex(IndexDefinition indexDefinition) {
         if (indexDefinition.getName() == null) {
             addValidatedError(getName4Validate() + "的索引名不能为空");
-        } else if (!Pattern.matches(indexDefinition.namePattern(), indexDefinition.getName())) {
+        } else if (!indexDefinition.namePattern().matcher(indexDefinition.getName()).matches()) {
             addValidatedError(getName4Validate("的") + "索引名[" + indexDefinition.getName() + "]格式错误,正确格式:" + indexDefinition.namePattern());
         }
 

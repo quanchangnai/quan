@@ -3,7 +3,7 @@ package quan.definition;
 import org.apache.commons.lang3.StringUtils;
 import quan.definition.config.ConfigDefinition;
 
-import java.util.Collections;
+import java.util.regex.Pattern;
 
 /**
  * Created by quanchangnai on 2017/7/6.
@@ -70,7 +70,7 @@ public class FieldDefinition extends Definition {
     }
 
     @Override
-    protected String namePattern() {
+    protected Pattern namePattern() {
         return Constants.FIELD_NAME_PATTERN;
     }
 

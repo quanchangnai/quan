@@ -42,7 +42,7 @@ public abstract class ClassDefinition extends Definition {
     }
 
     @Override
-    protected String namePattern() {
+    protected Pattern namePattern() {
         return Constants.CLASS_NAME_PATTERN;
     }
 
@@ -153,7 +153,7 @@ public abstract class ClassDefinition extends Definition {
     protected void validateNameAndLanguage() {
         if (getName() == null) {
             addValidatedError(getDefinitionTypeName() + "名不能为空");
-        } else if (!Pattern.matches(namePattern(), getName())) {
+        } else if (!namePattern().matcher(getName()).matches()) {
             addValidatedError(getDefinitionTypeName() + "名[" + getName() + "]格式错误,正确格式:" + namePattern());
         }
 
@@ -181,7 +181,7 @@ public abstract class ClassDefinition extends Definition {
         }
 
         //校验字段名格式
-        if (!Pattern.matches(fieldDefinition.namePattern(), fieldDefinition.getName())) {
+        if (!fieldDefinition.namePattern().matcher(fieldDefinition.getName()).matches()) {
             addValidatedError(getName4Validate("的") + "字段名[" + fieldDefinition.getName() + "]格式错误,正确格式:" + fieldDefinition.namePattern());
             return;
         }

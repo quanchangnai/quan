@@ -1,6 +1,7 @@
 package quan.definition;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Created by quanchangnai on 2019/8/3.
@@ -11,17 +12,17 @@ public class Constants {
     /**
      * 包名格式
      */
-    public static final String PACKAGE_NAME_PATTERN = "[a-z][a-z\\d]*(\\.[a-z][a-z\\d]*)*";
+    public static final Pattern PACKAGE_NAME_PATTERN = Pattern.compile("[a-z][a-z\\d]*(\\.[a-z][a-z\\d]*)*");
 
     /**
      * 类名格式
      */
-    public static final String CLASS_NAME_PATTERN = "[A-Z][a-zA-Z\\d]*";
+    public static final Pattern CLASS_NAME_PATTERN = Pattern.compile("[A-Z][a-zA-Z\\d]*");
 
     /**
      * 字段名格式
      */
-    public static final String FIELD_NAME_PATTERN = "[a-z][a-zA-Z\\d]*";
+    public static final Pattern FIELD_NAME_PATTERN = Pattern.compile("[a-z][a-zA-Z\\d]*");
 
 
     private static Set<String> unmodifiableSet(String... strings) {
