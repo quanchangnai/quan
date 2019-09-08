@@ -3,11 +3,13 @@ package quan.definition.config;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import quan.definition.ClassDefinition;
+import quan.definition.Constants;
 import quan.definition.FieldDefinition;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Created by quanchangnai on 2019/9/6.
@@ -81,7 +83,7 @@ public class ConstantDefinition extends ClassDefinition {
     public void setConfigs(List<JSONObject> configs) {
         for (JSONObject config : configs) {
             String key = config.getString(keyField);
-            if (StringUtils.isBlank(key)) {
+            if (!Pattern.matches(Constants.FIELD_NAME_PATTERN, key)) {
                 continue;
             }
             String comment = commentField == null ? "" : config.getString(commentField);
