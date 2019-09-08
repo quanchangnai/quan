@@ -1,7 +1,7 @@
 package quan.generator.config;
 
 import org.apache.commons.cli.CommandLine;
-import quan.definition.DefinitionParser;
+import quan.config.TableType;
 import quan.definition.Language;
 import quan.generator.util.CommandLineUtils;
 
@@ -52,14 +52,19 @@ public class JavaConfigGenerator extends ConfigGenerator {
     }
 
     public static void main(String[] args) {
-        CommandLine commandLine = CommandLineUtils.parseArgs(JavaConfigGenerator.class.getSimpleName(), args);
+        CommandLine commandLine = CommandLineUtils.parseConfigArgs(JavaConfigGenerator.class.getSimpleName(), args);
         if (commandLine == null) {
             return;
         }
 
         JavaConfigGenerator generator = new JavaConfigGenerator(commandLine.getOptionValue(CommandLineUtils.codePath));
-        DefinitionParser definitionParser = generator.useXmlDefinitionParser(Arrays.asList(commandLine.getOptionValues(CommandLineUtils.definitionPath)), commandLine.getOptionValue(CommandLineUtils.packagePrefix));
-        definitionParser.setEnumPackagePrefix(commandLine.getOptionValue(CommandLineUtils.enumPackagePrefix));
+        generator.useXmlDefinitionParser(Arrays.asList(commandLine.getOptionValues(CommandLineUtils.definitionPath)), commandLine.getOptionValue(CommandLineUtils.packagePrefix))
+                .setEnumPackagePrefix(commandLine.getOptionValue(CommandLineUtils.enumPackagePrefix));
+
+        String[] tableTypeAndPath = commandLine.getOptionValues(CommandLineUtils.table);
+        generator.initConfigLoader(TableType.valueOf(tableTypeAndPath[0]), tableTypeAndPath[1]);
+
         generator.generate();
     }
+
 }

@@ -1,7 +1,11 @@
 package quan.generator.config;
 
 import org.apache.commons.cli.CommandLine;
-import quan.definition.*;
+import quan.config.TableType;
+import quan.definition.BeanDefinition;
+import quan.definition.ClassDefinition;
+import quan.definition.FieldDefinition;
+import quan.definition.Language;
 import quan.definition.config.ConstantDefinition;
 import quan.generator.util.CSharpUtils;
 import quan.generator.util.CommandLineUtils;
@@ -75,14 +79,18 @@ public class CSharpConfigGenerator extends ConfigGenerator {
     }
 
     public static void main(String[] args) {
-        CommandLine commandLine = CommandLineUtils.parseArgs(CSharpConfigGenerator.class.getSimpleName(), args);
+        CommandLine commandLine = CommandLineUtils.parseConfigArgs(CSharpConfigGenerator.class.getSimpleName(), args);
         if (commandLine == null) {
             return;
         }
 
         CSharpConfigGenerator generator = new CSharpConfigGenerator(commandLine.getOptionValue(CommandLineUtils.codePath));
-        DefinitionParser definitionParser = generator.useXmlDefinitionParser(Arrays.asList(commandLine.getOptionValues(CommandLineUtils.definitionPath)), commandLine.getOptionValue(CommandLineUtils.packagePrefix));
-        definitionParser.setEnumPackagePrefix(commandLine.getOptionValue(CommandLineUtils.enumPackagePrefix));
+        generator.useXmlDefinitionParser(Arrays.asList(commandLine.getOptionValues(CommandLineUtils.definitionPath)), commandLine.getOptionValue(CommandLineUtils.packagePrefix))
+                .setEnumPackagePrefix(commandLine.getOptionValue(CommandLineUtils.enumPackagePrefix));
+
+        String[] tableTypeAndPath = commandLine.getOptionValues(CommandLineUtils.table);
+        generator.initConfigLoader(TableType.valueOf(tableTypeAndPath[0]), tableTypeAndPath[1]);
+
         generator.generate();
     }
 }

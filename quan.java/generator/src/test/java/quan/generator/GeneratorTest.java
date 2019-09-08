@@ -61,14 +61,14 @@ public class GeneratorTest {
         System.err.println("JavaConfigGenerator.generate()==========================");
         JavaConfigGenerator javaConfigGenerator = new JavaConfigGenerator("config\\src\\test\\java");
         javaConfigGenerator.useXmlDefinitionParser(definitionPaths, "quan.config");
-        javaConfigGenerator.initConfigLoader("config\\excel", TableType.xlsx);
+        javaConfigGenerator.initConfigLoader(TableType.xlsx,"config\\excel");
         javaConfigGenerator.generate();
         System.err.println();
 
         System.err.println("CSharpConfigGenerator.generate()==========================");
         CSharpConfigGenerator cSharpConfigGenerator = new CSharpConfigGenerator("..\\quan.cs");
         cSharpConfigGenerator.useXmlDefinitionParser(definitionPaths, "Test.Config");
-        cSharpConfigGenerator.initConfigLoader("config\\excel", TableType.xlsx);
+        cSharpConfigGenerator.initConfigLoader(TableType.xlsx,"config\\excel");
         cSharpConfigGenerator.generate();
         System.err.println();
     }

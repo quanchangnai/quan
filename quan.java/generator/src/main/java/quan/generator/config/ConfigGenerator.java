@@ -97,11 +97,8 @@ public abstract class ConfigGenerator extends Generator {
 
     /**
      * 初始化配置加载器，读取常量key用于常量类生成
-     *
-     * @param tablePath
-     * @param tableType
      */
-    public void initConfigLoader(String tablePath, TableType tableType) {
+    public void initConfigLoader(TableType tableType, String tablePath) {
         Objects.requireNonNull(definitionParser, "必须先设置定义解析器");
         configLoader = new WithDefinitionConfigLoader(tablePath);
         configLoader.setDefinitionParser(definitionParser);
