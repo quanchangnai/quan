@@ -186,6 +186,7 @@ public class XmlDefinitionParser extends DefinitionParser {
         constantDefinition.setName(constantElement.attributeValue("name"));
         constantDefinition.setKeyField(constantElement.attributeValue("key"));
         constantDefinition.setValueField(constantElement.attributeValue("value"));
+        constantDefinition.setCommentField(constantElement.attributeValue("comment"));
 
         String comment = classElement.node(i + 1).getText();
         comment = comment.replaceAll("[\r\n]", "").trim();

@@ -127,6 +127,15 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
         }
     }
 
+    public List<JSONObject> loadJsons(ConfigDefinition configDefinition) {
+        List<JSONObject> jsons = new ArrayList<>();
+        for (String configTable : getConfigTables(configDefinition)) {
+            ConfigReader configReader = getReader(configTable);
+            jsons.addAll(configReader.readJsons());
+        }
+        return jsons;
+    }
+
     public void writeJson(String path) {
         writeJson(path, true);
     }

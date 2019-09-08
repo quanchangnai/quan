@@ -25,6 +25,8 @@ public abstract class ClassDefinition extends Definition {
 
     protected List<String> languages = new ArrayList<>();
 
+    private Set<String> imports = new HashSet<>();
+
     protected List<FieldDefinition> fields = new ArrayList<>();
 
     //字段名:字段定义
@@ -105,7 +107,6 @@ public abstract class ClassDefinition extends Definition {
     }
 
 
-
     public String getDefinitionFile() {
         return definitionFile;
     }
@@ -133,6 +134,10 @@ public abstract class ClassDefinition extends Definition {
         }
     }
 
+    public Set<String> getImports() {
+        return imports;
+    }
+
     public boolean supportLanguage(Language language) {
         return languages.isEmpty() || languages.contains(language.name());
     }
@@ -149,7 +154,7 @@ public abstract class ClassDefinition extends Definition {
         if (getName() == null) {
             addValidatedError(getDefinitionTypeName() + "名不能为空");
         } else if (!Pattern.matches(namePattern(), getName())) {
-            addValidatedError(getDefinitionTypeName() + "名[" + getName() + "]格式错误");
+            addValidatedError(getDefinitionTypeName() + "名[" + getName() + "]格式错误,正确格式:" + namePattern());
         }
 
         if (!languages.isEmpty() && !Language.names().containsAll(languages)) {
@@ -177,7 +182,7 @@ public abstract class ClassDefinition extends Definition {
 
         //校验字段名格式
         if (!Pattern.matches(fieldDefinition.namePattern(), fieldDefinition.getName())) {
-            addValidatedError(getName4Validate("的") + "字段名[" + fieldDefinition.getName() + "]格式错误");
+            addValidatedError(getName4Validate("的") + "字段名[" + fieldDefinition.getName() + "]格式错误,正确格式:" + fieldDefinition.namePattern());
             return;
         }
 
@@ -221,15 +226,6 @@ public abstract class ClassDefinition extends Definition {
 
         error += position + "。";
         parser.addValidatedError(error);
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getName() + "{" +
-                "name=" + getName() +
-                ",packageName=" + getPackageName() +
-                ",fields=" + getFields() +
-                '}';
     }
 
 }

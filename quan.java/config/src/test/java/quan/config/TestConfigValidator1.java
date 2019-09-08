@@ -1,9 +1,7 @@
 package quan.config;
 
+import quan.config.common.ItemConstant;
 import quan.config.item.ItemConfig;
-
-import java.util.Arrays;
-import java.util.Collections;
 
 /**
  * Created by quanchangnai on 2019/8/2.
@@ -18,6 +16,7 @@ public class TestConfigValidator1 implements ConfigValidator {
             System.err.println("itemConfig.toJson():" + itemConfig.toJson());
             error += ":" + itemConfig.getName();
         }
+        System.err.println("ItemConstant.constant2()=" + ItemConstant.constant2());
         throw new ValidatedException(error);
     }
 

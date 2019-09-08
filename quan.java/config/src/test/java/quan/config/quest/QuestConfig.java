@@ -391,8 +391,8 @@ public class QuestConfig extends Config {
             load(composite2Configs, errors, config, false, Arrays.asList("b1", "b2"), config.b1, config.b2);
             load(composite3Configs, errors, config, true, Arrays.asList("c1", "c2", "c3"), config.c1, config.c2, config.c3);
             load(composite4Configs, errors, config, false, Arrays.asList("d1", "d2", "d3"), config.d1, config.d2, config.d3);
-            load(idConfigs, errors, config, true, Arrays.asList("id"), config.id);
-            load(typeConfigs, errors, config, false, Arrays.asList("type"), config.type);
+            load(idConfigs, errors, config, true, Collections.singletonList("id"), config.id);
+            load(typeConfigs, errors, config, false, Collections.singletonList("type"), config.type);
         }
 
         configs = Collections.unmodifiableList(configs);

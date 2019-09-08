@@ -1,8 +1,13 @@
 package quan.definition.config;
 
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import quan.definition.ClassDefinition;
 import quan.definition.FieldDefinition;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by quanchangnai on 2019/9/6.
@@ -14,6 +19,10 @@ public class ConstantDefinition extends ClassDefinition {
     private String keyField;
 
     private String valueField;
+
+    private String commentField;
+
+    private Map<String, String> rows = new HashMap<>();
 
     @Override
     public int getDefinitionType() {
@@ -42,12 +51,22 @@ public class ConstantDefinition extends ClassDefinition {
         this.configDefinition = configDefinition;
     }
 
-    public void setValueField(String valueField) {
-        this.valueField = valueField;
+    public void setKeyField(String keyField) {
+        if (!StringUtils.isBlank(keyField)) {
+            this.keyField = keyField;
+        }
     }
 
-    public void setKeyField(String keyField) {
-        this.keyField = keyField;
+    public void setValueField(String valueField) {
+        if (!StringUtils.isBlank(valueField)) {
+            this.valueField = valueField;
+        }
+    }
+
+    public void setCommentField(String commentField) {
+        if (!StringUtils.isBlank(commentField)) {
+            this.commentField = commentField;
+        }
     }
 
     public FieldDefinition getKeyField() {
@@ -58,22 +77,45 @@ public class ConstantDefinition extends ClassDefinition {
         return configDefinition.getField(valueField);
     }
 
+
+    public void setConfigs(List<JSONObject> configs) {
+        for (JSONObject config : configs) {
+            String key = config.getString(keyField);
+            if (StringUtils.isBlank(key)) {
+                continue;
+            }
+            String comment = commentField == null ? "" : config.getString(commentField);
+            rows.put(key, comment);
+        }
+        System.err.println();
+    }
+
+    public Map<String, String> getRows() {
+        return rows;
+    }
+
     @Override
     public void validate2() {
         validateKeyField();
         validateValueField();
+
+        if (commentField != null && configDefinition.getField(commentField) == null) {
+            addValidatedError(getName4Validate() + "的注释字段[" + commentField + "]不存在");
+        }
     }
 
     public void validateKeyField() {
-        FieldDefinition keyFieldDefinition = configDefinition.getField(keyField);
         if (StringUtils.isBlank(keyField)) {
             addValidatedError(getName4Validate("的") + "key字段不能为空");
             return;
         }
+
+        FieldDefinition keyFieldDefinition = configDefinition.getField(keyField);
         if (keyFieldDefinition == null) {
             addValidatedError(getName4Validate() + "的key[" + keyField + "]不是" + configDefinition.getName4Validate() + "的字段");
             return;
         }
+
         if (!keyFieldDefinition.getType().equals("string")) {
             addValidatedError(getName4Validate() + "的key字段[" + keyField + "]必须是字符串类型");
         }
@@ -85,14 +127,15 @@ public class ConstantDefinition extends ClassDefinition {
     }
 
     public void validateValueField() {
-        FieldDefinition valueFieldDefinition = configDefinition.getField(valueField);
         if (StringUtils.isBlank(valueField)) {
             addValidatedError(getName4Validate("的") + "value字段不能为空");
             return;
         }
+
+        FieldDefinition valueFieldDefinition = configDefinition.getField(valueField);
         if (valueFieldDefinition == null) {
             addValidatedError(getName4Validate() + "的value[" + valueField + "]不是" + configDefinition.getName4Validate() + "的字段");
-            return;
         }
+
     }
 }

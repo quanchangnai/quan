@@ -3,6 +3,8 @@ package quan.definition;
 import org.apache.commons.lang3.StringUtils;
 import quan.definition.config.ConfigDefinition;
 
+import java.util.Collections;
+
 /**
  * Created by quanchangnai on 2017/7/6.
  */

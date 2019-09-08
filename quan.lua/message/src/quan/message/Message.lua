@@ -16,7 +16,7 @@ function Message.encode(msg, buffer)
     end
 
     buffer:writeInt(msg.id);
-    buffer:writeLong(msg.seq);
+    buffer:writeLong(msg.seq or 0);
 
     return buffer
 end

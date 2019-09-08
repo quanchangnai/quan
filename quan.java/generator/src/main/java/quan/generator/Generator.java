@@ -120,29 +120,32 @@ public abstract class Generator {
 
     protected void generate(List<ClassDefinition> classDefinitions) {
         for (ClassDefinition classDefinition : classDefinitions) {
-            Template template = templates.get(classDefinition.getClass());
-            File destFilePath = new File(codePath + File.separator + classDefinition.getFullPackageName().replace(".", File.separator));
-            if (!destFilePath.exists() && !destFilePath.mkdirs()) {
-                logger.info("创建目录[{}]失败", destFilePath);
-                continue;
-            }
-
-            String fileName = classDefinition.getName() + "." + supportLanguage();
-            try {
-                Writer writer = new FileWriter(new File(destFilePath, fileName));
-                template.process(classDefinition, writer);
-            } catch (Exception e) {
-                logger.error("", e);
-                continue;
-            }
-
-            logger.info("生成[{}]成功", destFilePath + File.separator + fileName);
+            generate(classDefinition);
         }
+    }
+
+    protected void generate(ClassDefinition classDefinition) {
+        Template template = templates.get(classDefinition.getClass());
+        File destFilePath = new File(codePath + File.separator + classDefinition.getFullPackageName().replace(".", File.separator));
+        if (!destFilePath.exists() && !destFilePath.mkdirs()) {
+            logger.info("创建目录[{}]失败", destFilePath);
+            return;
+        }
+
+        String fileName = classDefinition.getName() + "." + supportLanguage();
+        try {
+            Writer writer = new FileWriter(new File(destFilePath, fileName));
+            template.process(classDefinition, writer);
+        } catch (Exception e) {
+            logger.error("", e);
+            return;
+        }
+
+        logger.info("生成[{}]成功", destFilePath + File.separator + fileName);
 
     }
 
     protected void processClassSelf(ClassDefinition classDefinition) {
-
     }
 
     protected void processClassDependency(ClassDefinition classDefinition) {

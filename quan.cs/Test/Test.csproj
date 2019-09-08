@@ -48,6 +48,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConfigTest.cs" />
+    <Compile Include="Config\Common\ConstantConfig.cs" />
+    <Compile Include="Config\Common\ItemConstant.cs" />
+    <Compile Include="Config\Common\RewardConstant.cs" />
     <Compile Include="Config\Item\EquipConfig.cs" />
     <Compile Include="Config\Item\ItemConfig.cs" />
     <Compile Include="Config\Item\ItemType.cs" />

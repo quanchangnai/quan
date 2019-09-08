@@ -1,7 +1,5 @@
-<#if fullPackageName !=".">
 package ${fullPackageName};
 
-</#if>
 /**
 <#if comment !="">
  * ${comment}<br/>

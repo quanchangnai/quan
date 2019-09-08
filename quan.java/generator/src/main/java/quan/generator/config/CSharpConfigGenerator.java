@@ -2,6 +2,7 @@ package quan.generator.config;
 
 import org.apache.commons.cli.CommandLine;
 import quan.definition.*;
+import quan.definition.config.ConstantDefinition;
 import quan.generator.util.CSharpUtils;
 import quan.generator.util.CommandLineUtils;
 
@@ -58,6 +59,19 @@ public class CSharpConfigGenerator extends ConfigGenerator {
     @Override
     protected void processBeanFieldImports(BeanDefinition beanDefinition, FieldDefinition fieldDefinition) {
         CSharpUtils.processBeanFieldImports(beanDefinition, fieldDefinition);
+    }
+
+    @Override
+    protected void processConstantDependency(ConstantDefinition constantDefinition) {
+        FieldDefinition valueField = constantDefinition.getValueField();
+        if (valueField.isCollectionType()) {
+            constantDefinition.getImports().add("System.Collections.Generic");
+            if (!valueField.isBuiltinValueType()) {
+                constantDefinition.getImports().add(valueField.getValueBean().getFullPackageName());
+            }
+        } else if (!valueField.isBuiltinType()) {
+            constantDefinition.getImports().add(valueField.getClassDefinition().getFullPackageName());
+        }
     }
 
     public static void main(String[] args) {

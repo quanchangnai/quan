@@ -105,8 +105,8 @@ public class EquipConfig extends ItemConfig {
             List<String> errors = new ArrayList<>();
 
             for (EquipConfig config : configs) {
-                Config.load(idConfigs, errors, config, true, Arrays.asList("id"), config.id);
-                Config.load(positionConfigs, errors, config, false, Arrays.asList("position"), config.position);
+                Config.load(idConfigs, errors, config, true, Collections.singletonList("id"), config.id);
+                Config.load(positionConfigs, errors, config, false, Collections.singletonList("position"), config.position);
             }
 
             configs = Collections.unmodifiableList(configs);

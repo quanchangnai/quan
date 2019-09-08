@@ -44,16 +44,13 @@ public class DatabaseGenerator extends Generator {
     public DatabaseGenerator(String codePath) {
         super(codePath);
 
-        Template dataTemplate;
         try {
-            dataTemplate = freemarkerCfg.getTemplate("data.ftl");
+            Template dataTemplate = freemarkerCfg.getTemplate("data.ftl");
+            templates.put(DataDefinition.class, dataTemplate);
+            templates.put(BeanDefinition.class, dataTemplate);
         } catch (IOException e) {
             logger.error("", e);
-            return;
         }
-        templates.put(DataDefinition.class, dataTemplate);
-        templates.put(BeanDefinition.class, dataTemplate);
-
     }
 
     @Override

@@ -1,5 +1,6 @@
 package quan.generator;
 
+import quan.config.TableType;
 import quan.generator.config.CSharpConfigGenerator;
 import quan.generator.config.JavaConfigGenerator;
 import quan.generator.database.DatabaseGenerator;
@@ -60,12 +61,14 @@ public class GeneratorTest {
         System.err.println("JavaConfigGenerator.generate()==========================");
         JavaConfigGenerator javaConfigGenerator = new JavaConfigGenerator("config\\src\\test\\java");
         javaConfigGenerator.useXmlDefinitionParser(definitionPaths, "quan.config");
+        javaConfigGenerator.initConfigLoader("config\\excel", TableType.xlsx);
         javaConfigGenerator.generate();
         System.err.println();
 
         System.err.println("CSharpConfigGenerator.generate()==========================");
         CSharpConfigGenerator cSharpConfigGenerator = new CSharpConfigGenerator("..\\quan.cs");
         cSharpConfigGenerator.useXmlDefinitionParser(definitionPaths, "Test.Config");
+        cSharpConfigGenerator.initConfigLoader("config\\excel", TableType.xlsx);
         cSharpConfigGenerator.generate();
         System.err.println();
     }

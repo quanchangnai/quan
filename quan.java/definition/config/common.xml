@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <package>
 
-    <config name="ErrorCodeConfig" table="错误码">
-        <field name="id" type="int" column="ID"/>
-        <field name="key" type="string" column="Key" index="u"/>
-        <field name="text" type="string" column="文本"/>
-        <constant name="ErrorCode" key="key" value="id"/>
+    <config name="ConstantConfig" table="常量">
+        <field name="key" type="string" column="常量Key" index="u"/>
+        <field name="itemId" type="int" column="道具ID"/>
+        <field name="rewardList" type="list:Reward" column="奖励List"/>
+        <field name="comment" type="string" column="备注"/>
+        <constant name="ItemConstant" key="key" value="itemId" comment="comment"/>
+        <constant name="RewardConstant" key="key" value="rewardList"/>
     </config>
 
 </package>

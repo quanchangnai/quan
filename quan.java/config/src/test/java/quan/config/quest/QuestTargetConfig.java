@@ -80,7 +80,7 @@ public class QuestTargetConfig extends Config {
         List<String> errors = new ArrayList<>();
 
         for (QuestTargetConfig config : configs) {
-            load(idConfigs, errors, config, true, Arrays.asList("id"), config.id);
+            load(idConfigs, errors, config, true, Collections.singletonList("id"), config.id);
         }
 
         configs = Collections.unmodifiableList(configs);

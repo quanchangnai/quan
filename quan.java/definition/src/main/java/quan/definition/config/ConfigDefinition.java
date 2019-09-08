@@ -410,7 +410,7 @@ public class ConfigDefinition extends BeanDefinition {
         if (indexDefinition.getName() == null) {
             addValidatedError(getName4Validate() + "的索引名不能为空");
         } else if (!Pattern.matches(indexDefinition.namePattern(), indexDefinition.getName())) {
-            addValidatedError(getName4Validate("的") + "索引名[" + indexDefinition.getName() + "]格式错误");
+            addValidatedError(getName4Validate("的") + "索引名[" + indexDefinition.getName() + "]格式错误,正确格式:" + indexDefinition.namePattern());
         }
 
         String indexType = indexDefinition.getType();

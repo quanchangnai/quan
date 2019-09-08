@@ -14,8 +14,6 @@ import java.util.Set;
  */
 public class BeanDefinition extends ClassDefinition {
 
-    private Set<String> imports = new HashSet<>();
-
     //配置Bean的字段分隔符
     private String delimiter = "_";
 
@@ -37,10 +35,6 @@ public class BeanDefinition extends ClassDefinition {
     public BeanDefinition setCategory(DefinitionCategory category) {
         this.category = category;
         return this;
-    }
-
-    public Set<String> getImports() {
-        return imports;
     }
 
 
@@ -306,13 +300,4 @@ public class BeanDefinition extends ClassDefinition {
         return !(classDefinition instanceof DataDefinition) && !(classDefinition instanceof MessageDefinition) && !(classDefinition instanceof ConfigDefinition);
     }
 
-    @Override
-    public String toString() {
-        return getClass().getName() + "{" +
-                "name=" + getName() +
-                ",imports=" + imports +
-                ",packageName=" + getPackageName() +
-                ",fields=" + getFields() +
-                '}';
-    }
 }

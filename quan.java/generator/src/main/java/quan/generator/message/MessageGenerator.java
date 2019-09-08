@@ -22,16 +22,13 @@ public abstract class MessageGenerator extends Generator {
     public MessageGenerator(String codePath) {
         super(codePath);
 
-        Template messageTemplate;
         try {
-            messageTemplate = freemarkerCfg.getTemplate("message." + supportLanguage() + ".ftl");
+            Template messageTemplate = freemarkerCfg.getTemplate("message." + supportLanguage() + ".ftl");
+            templates.put(MessageDefinition.class, messageTemplate);
+            templates.put(BeanDefinition.class, messageTemplate);
         } catch (IOException e) {
             logger.error("", e);
-            return;
         }
-
-        templates.put(MessageDefinition.class, messageTemplate);
-        templates.put(BeanDefinition.class, messageTemplate);
     }
 
 
