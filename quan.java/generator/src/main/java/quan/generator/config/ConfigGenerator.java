@@ -13,6 +13,7 @@ import quan.definition.config.ConstantDefinition;
 import quan.generator.Generator;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -103,5 +104,16 @@ public abstract class ConfigGenerator extends Generator {
         configLoader = new WithDefinitionConfigLoader(tablePath);
         configLoader.setDefinitionParser(definitionParser);
         configLoader.setTableType(tableType);
+    }
+
+    public void initConfigLoader(String tableType, String tablePath) {
+        TableType tableTypeEnum;
+        try {
+            tableTypeEnum = TableType.valueOf(tableType);
+        } catch (Exception e) {
+            logger.error("表格类型错误，可用枚举值{}", Arrays.toString(TableType.values()));
+            return;
+        }
+        initConfigLoader(tableTypeEnum, tablePath);
     }
 }
