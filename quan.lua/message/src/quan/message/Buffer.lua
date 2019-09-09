@@ -4,7 +4,7 @@
 --- DateTime: 2019/9/1 15:27
 ---
 
-require("quan.message.table")
+require("quan.table")
 
 ---
 ---基于VarInt和ZigZag编码的字节缓冲区，字节顺序采用小端模式

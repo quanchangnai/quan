@@ -1,4 +1,4 @@
-require("quan.message.table")
+require("quan.table")
 
 ---
 <#if comment !="">
