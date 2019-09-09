@@ -16,7 +16,6 @@ public class DataDefinition extends BeanDefinition {
 
     {
         category = DefinitionCategory.data;
-        reservedFieldNames.add("key");
     }
 
     public DataDefinition() {
@@ -86,4 +85,11 @@ public class DataDefinition extends BeanDefinition {
         }
     }
 
+    @Override
+    protected boolean isReservedWord(String fieldName) {
+        if (super.isReservedWord(fieldName)) {
+            return true;
+        }
+        return fieldName.equals("key");
+    }
 }

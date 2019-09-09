@@ -32,9 +32,6 @@ public abstract class ClassDefinition extends Definition {
     //字段名:字段定义
     protected Map<String, FieldDefinition> nameFields = new HashMap<>();
 
-    //保留字段名
-    protected Set<String> reservedFieldNames = new HashSet<>();
-
 
     @Override
     public String getDefinitionTypeName() {
@@ -186,14 +183,25 @@ public abstract class ClassDefinition extends Definition {
             return;
         }
 
-        if (!reservedFieldNames.isEmpty() && reservedFieldNames.contains(fieldDefinition.getName())) {
-            addValidatedError(getName4Validate("的") + "字段名[" + fieldDefinition.getName() + "]不合法，不能使用保留字段名" + reservedFieldNames);
+        if (isReservedWord(fieldDefinition.getName())) {
+            addValidatedError(getName4Validate("的") + "字段名[" + fieldDefinition.getName() + "]不合法，不能使用保留字");
         }
+    }
 
-        if (Constants.JAVA_RESERVED_WORDS.contains(fieldDefinition.getName())) {
-            addValidatedError(getName4Validate("的") + "字段名[" + fieldDefinition.getName() + "]不合法，不能使用Java保留字");
+    protected boolean isReservedWord(String fieldName) {
+        if (category == DefinitionCategory.data) {
+            return Constants.JAVA_RESERVED_WORDS.contains(fieldName);
         }
-
+        if (Constants.JAVA_RESERVED_WORDS.contains(fieldName)) {
+            return true;
+        }
+        if (Constants.CS_RESERVED_WORDS.contains(fieldName)) {
+            return true;
+        }
+        if (Constants.LUA_RESERVED_WORDS.contains(fieldName)) {
+            return true;
+        }
+        return false;
     }
 
     protected void validateFieldNameDuplicate(FieldDefinition fieldDefinition) {

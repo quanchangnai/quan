@@ -3,8 +3,6 @@ package quan.definition.message;
 import quan.definition.BeanDefinition;
 import quan.definition.DefinitionCategory;
 
-import java.util.Arrays;
-
 /**
  * Created by quanchangnai on 2017/7/6.
  */
@@ -17,7 +15,7 @@ public class MessageDefinition extends BeanDefinition {
 
     {
         category = DefinitionCategory.message;
-        reservedFieldNames.addAll(Arrays.asList("id", "seq"));
+
     }
 
     public MessageDefinition() {
@@ -56,4 +54,11 @@ public class MessageDefinition extends BeanDefinition {
         originalName = getPackageName() + "." + getName();
     }
 
+    @Override
+    protected boolean isReservedWord(String fieldName) {
+        if (super.isReservedWord(fieldName)) {
+            return true;
+        }
+        return fieldName.equals("id") || fieldName.equals("seq");
+    }
 }
