@@ -97,7 +97,6 @@ public class FieldDefinition extends Definition {
         } else {
             this.type = null;
         }
-
     }
 
     public boolean isBuiltinType() {

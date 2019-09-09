@@ -76,6 +76,10 @@ public abstract class Generator {
         return this;
     }
 
+    public DefinitionParser getDefinitionParser() {
+        return definitionParser;
+    }
+
     protected abstract Language supportLanguage();
 
 
@@ -107,6 +111,7 @@ public abstract class Generator {
             if (!support(classDefinition) || !classDefinition.supportLanguage(supportLanguage())) {
                 continue;
             }
+            classDefinition.reset();
             processClassSelf(classDefinition);
             classDefinitions.add(classDefinition);
         }

@@ -8,9 +8,6 @@ import quan.definition.DefinitionCategory;
  */
 public class MessageDefinition extends BeanDefinition {
 
-    //保存原始类名，因为C#等其他语言的类型会做转换
-    private String originalName;
-
     private int id;
 
     {
@@ -44,14 +41,9 @@ public class MessageDefinition extends BeanDefinition {
         this.id = id;
     }
 
-    public String getOriginalName() {
-        return originalName;
-    }
-
     @Override
     public void validate() {
         super.validate();
-        originalName = getPackageName() + "." + getName();
     }
 
     @Override

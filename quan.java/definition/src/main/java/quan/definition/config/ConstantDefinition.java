@@ -47,7 +47,6 @@ public class ConstantDefinition extends ClassDefinition {
     public void setConfigDefinition(ConfigDefinition configDefinition) {
         setParser(configDefinition.getParser());
         setPackageName(configDefinition.getPackageName());
-        setPackagePrefix(configDefinition.getPackagePrefix());
         setDefinitionFile(configDefinition.getDefinitionFile());
         this.configDefinition = configDefinition;
     }

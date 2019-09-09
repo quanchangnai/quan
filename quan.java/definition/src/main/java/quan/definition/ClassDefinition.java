@@ -11,11 +11,11 @@ import java.util.regex.Pattern;
  */
 public abstract class ClassDefinition extends Definition {
 
-    //包前缀
-    private String packagePrefix;
-
-    //包名
+    //定义包名，不含前缀
     private String packageName;
+
+    //真实包名，和具体语言相关
+    private String realPackageName;
 
     //定义文件
     private String definitionFile;
@@ -23,8 +23,13 @@ public abstract class ClassDefinition extends Definition {
     //定义文本
     private String definitionText;
 
+    //是支持还是排除语言
+    private boolean excludeLanguage;
+
+    //支持或者排除的语言
     protected List<String> languages = new ArrayList<>();
 
+    //导包，和具体英语相关
     private Set<String> imports = new HashSet<>();
 
     protected List<FieldDefinition> fields = new ArrayList<>();
@@ -43,27 +48,17 @@ public abstract class ClassDefinition extends Definition {
         return Constants.CLASS_NAME_PATTERN;
     }
 
+    public void reset() {
+        realPackageName = packageName;
+        imports.clear();
+    }
+
     public String getPackagePrefix() {
-        return packagePrefix;
-    }
-
-    public String getPackageName() {
-        return packageName;
-    }
-
-    public String getFullPackageName() {
-        if (packagePrefix != null) {
-            return packagePrefix + "." + packageName;
-
+        if (this instanceof EnumDefinition) {
+            return StringUtils.isBlank(parser.getEnumPackagePrefix()) ? parser.getPackagePrefix() : parser.getEnumPackagePrefix();
+        } else {
+            return parser.getPackagePrefix();
         }
-        return packageName;
-    }
-
-    public void setPackagePrefix(String packagePrefix) {
-        if (StringUtils.isBlank(packagePrefix)) {
-            return;
-        }
-        this.packagePrefix = packagePrefix.trim();
     }
 
     public void setPackageName(String packageName) {
@@ -71,6 +66,31 @@ public abstract class ClassDefinition extends Definition {
             return;
         }
         this.packageName = packageName.trim();
+        this.realPackageName = this.packageName;
+    }
+
+    public String getPackageName() {
+        return packageName;
+    }
+
+    public String getNameWithPackage() {
+        return packageName + "." + getName();
+    }
+
+    public void setRealPackageName(String realPackageName) {
+        this.realPackageName = realPackageName;
+    }
+
+    public String getRealPackageName() {
+        return realPackageName;
+    }
+
+    public String getFullPackageName() {
+        String packagePrefix = getPackagePrefix();
+        if (packagePrefix != null) {
+            return packagePrefix + "." + realPackageName;
+        }
+        return realPackageName;
     }
 
     public String getFullName() {
@@ -123,11 +143,18 @@ public abstract class ClassDefinition extends Definition {
     }
 
     public void setLang(String language) {
-        if (StringUtils.isBlank(language)) {
+        if (StringUtils.isBlank(language) || category == DefinitionCategory.data) {
             return;
         }
-        for (String lang : language.trim().split(",", -1)) {
-            this.languages.add(lang.trim());
+        language = language.trim();
+        if (language.startsWith("-")) {
+            excludeLanguage = true;
+            language = language.substring(1);
+        }
+        for (String lang : language.split(",", -1)) {
+            if (!lang.isEmpty()) {
+                this.languages.add(lang.trim());
+            }
         }
     }
 
@@ -136,7 +163,11 @@ public abstract class ClassDefinition extends Definition {
     }
 
     public boolean supportLanguage(Language language) {
-        return languages.isEmpty() || languages.contains(language.name());
+        boolean support = languages.isEmpty() || languages.contains(language.name());
+        if (excludeLanguage) {
+            support = !support;
+        }
+        return support;
     }
 
     public void validate() {
@@ -198,10 +229,7 @@ public abstract class ClassDefinition extends Definition {
         if (Constants.CS_RESERVED_WORDS.contains(fieldName)) {
             return true;
         }
-        if (Constants.LUA_RESERVED_WORDS.contains(fieldName)) {
-            return true;
-        }
-        return false;
+        return Constants.LUA_RESERVED_WORDS.contains(fieldName);
     }
 
     protected void validateFieldNameDuplicate(FieldDefinition fieldDefinition) {

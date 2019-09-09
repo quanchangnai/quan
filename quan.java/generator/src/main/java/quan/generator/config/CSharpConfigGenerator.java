@@ -1,7 +1,6 @@
 package quan.generator.config;
 
 import org.apache.commons.cli.CommandLine;
-import quan.config.TableType;
 import quan.definition.BeanDefinition;
 import quan.definition.ClassDefinition;
 import quan.definition.FieldDefinition;
@@ -57,7 +56,7 @@ public class CSharpConfigGenerator extends ConfigGenerator {
     }
 
     protected void processClassSelf(ClassDefinition classDefinition) {
-        classDefinition.setPackageName(CSharpUtils.toCapitalCamel(classDefinition.getPackageName()));
+        classDefinition.setRealPackageName(CSharpUtils.toCapitalCamel(classDefinition.getPackageName()));
     }
 
     @Override

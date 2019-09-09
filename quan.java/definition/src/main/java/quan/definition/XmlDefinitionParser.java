@@ -58,13 +58,7 @@ public class XmlDefinitionParser extends DefinitionParser {
             classDefinition.setDefinitionFile(definitionFile.getName());
             classDefinition.setDefinitionText(classElement.asXML());
 
-            if (classDefinition instanceof EnumDefinition) {
-                classDefinition.setPackagePrefix(packagePrefix);
-            } else {
-                classDefinition.setPackagePrefix(enumPackagePrefix == null ? packagePrefix : enumPackagePrefix);
-            }
             classDefinition.setPackageName(packageName);
-
             classDefinition.setName(classElement.attributeValue("name"));
             classDefinition.setLang(classElement.attributeValue("lang"));
 

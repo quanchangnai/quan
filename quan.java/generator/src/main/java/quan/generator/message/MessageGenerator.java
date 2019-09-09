@@ -70,14 +70,14 @@ public abstract class MessageGenerator extends Generator {
     private void calcMessageId(Set<MessageDefinition> messageDefinitions, int begin, int end) {
         Map<Integer, List<MessageDefinition>> conflictedMessagesMap = new HashMap<>();
         for (MessageDefinition messageDefinition : messageDefinitions) {
-            int messageId = begin + (messageDefinition.getOriginalName().hashCode() & 0x7FFFFFFF) % (end - begin);
+            int messageId = begin + (messageDefinition.getNameWithPackage().hashCode() & 0x7FFFFFFF) % (end - begin);
             conflictedMessagesMap.computeIfAbsent(messageId, h -> new ArrayList<>()).add(messageDefinition);
         }
 
         Set<MessageDefinition> allConflictedMessages = new HashSet<>();
         for (Integer messageId : conflictedMessagesMap.keySet()) {
             List<MessageDefinition> conflictedMessages = conflictedMessagesMap.get(messageId);
-            conflictedMessages.sort(Comparator.comparing(MessageDefinition::getOriginalName));
+            conflictedMessages.sort(Comparator.comparing(MessageDefinition::getNameWithPackage));
             conflictedMessages.get(0).setId(messageId);
             if (conflictedMessages.size() > 1) {
                 if (recalcIdOnConflicted) {
