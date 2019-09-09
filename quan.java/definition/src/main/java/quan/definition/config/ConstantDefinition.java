@@ -6,9 +6,9 @@ import quan.definition.ClassDefinition;
 import quan.definition.Constants;
 import quan.definition.FieldDefinition;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Created by quanchangnai on 2019/9/6.
@@ -23,7 +23,7 @@ public class ConstantDefinition extends ClassDefinition {
 
     private String commentField;
 
-    private Map<String, String> rows = new HashMap<>();
+    private Map<String, String> rows = new TreeMap<>();
 
     @Override
     public int getDefinitionType() {
@@ -49,6 +49,7 @@ public class ConstantDefinition extends ClassDefinition {
         setPackageName(configDefinition.getPackageName());
         setDefinitionFile(configDefinition.getDefinitionFile());
         this.configDefinition = configDefinition;
+        configDefinition.getConstantDefinitions().add(this);
     }
 
     public void setKeyField(String keyField) {

@@ -48,6 +48,7 @@ public class EquipConfig extends ItemConfig {
     public String toString() {
         return "EquipConfig{" +
                 "id=" + id +
+                ",key='" + key + '\'' +
                 ",name='" + name + '\'' +
                 ",type=" + type +
                 ",reward=" + reward +
@@ -73,6 +74,9 @@ public class EquipConfig extends ItemConfig {
         //ID
         private static volatile Map<Integer, EquipConfig> idConfigs = new HashMap<>();
 
+        //常量Key
+        private static volatile Map<String, EquipConfig> keyConfigs = new HashMap<>();
+
         //部位
         private static volatile Map<Integer, List<EquipConfig>> positionConfigs = new HashMap<>();
 
@@ -88,6 +92,14 @@ public class EquipConfig extends ItemConfig {
             return idConfigs.get(id);
         }
 
+        public static Map<String, EquipConfig> getKeyConfigs() {
+            return keyConfigs;
+        }
+
+        public static EquipConfig getByKey(String key) {
+            return keyConfigs.get(key);
+        }
+
         public static Map<Integer, List<EquipConfig>> getPositionConfigs() {
             return positionConfigs;
         }
@@ -100,21 +112,25 @@ public class EquipConfig extends ItemConfig {
         @SuppressWarnings({"unchecked"})
         public static List<String> load(List<EquipConfig> configs) {
             Map<Integer, EquipConfig> idConfigs = new HashMap<>();
+            Map<String, EquipConfig> keyConfigs = new HashMap<>();
             Map<Integer, List<EquipConfig>> positionConfigs = new HashMap<>();
 
             List<String> errors = new ArrayList<>();
 
             for (EquipConfig config : configs) {
                 Config.load(idConfigs, errors, config, true, Collections.singletonList("id"), config.id);
+                Config.load(keyConfigs, errors, config, true, Collections.singletonList("key"), config.key);
                 Config.load(positionConfigs, errors, config, false, Collections.singletonList("position"), config.position);
             }
 
             configs = Collections.unmodifiableList(configs);
             idConfigs = unmodifiableMap(idConfigs);
+            keyConfigs = unmodifiableMap(keyConfigs);
             positionConfigs = unmodifiableMap(positionConfigs);
 
             EquipConfig.self.configs = configs;
             EquipConfig.self.idConfigs = idConfigs;
+            EquipConfig.self.keyConfigs = keyConfigs;
             EquipConfig.self.positionConfigs = positionConfigs;
 
             return errors;

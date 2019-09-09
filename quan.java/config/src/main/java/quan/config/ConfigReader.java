@@ -187,7 +187,7 @@ public abstract class ConfigReader {
 
         //索引字段不能为空
         if (fieldValue == null) {
-            if (configDefinition.isIndexField(fieldDefinition)) {
+            if (configDefinition.isIndexField(fieldDefinition) && !configDefinition.isConstantKeyField(fieldDefinition)) {
                 validatedErrors.add(String.format("配置[%s]的第%d行第%d列[%s]的索引值不能为空", table, row, column, columnName));
             }
             return;

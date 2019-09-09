@@ -26,14 +26,17 @@ public abstract class DefinitionParser {
 
     protected LinkedHashSet<File> definitionFiles = new LinkedHashSet<>();
 
+    //解析出来的类定义
     protected List<ClassDefinition> parsedClasses = new ArrayList<>();
 
+    //已校验过的类定义，类名:类定义
     private Map<String, ClassDefinition> validatedClasses = new HashMap<>();
+
+    //校验出的错误信息
+    private LinkedHashSet<String> validatedErrors = new LinkedHashSet<>();
 
     //表名:配置
     private Map<String, ConfigDefinition> tableConfigs = new HashMap<>();
-
-    private LinkedHashSet<String> validatedErrors = new LinkedHashSet<>();
 
     public DefinitionParser setCategory(DefinitionCategory category) {
         this.category = category;
@@ -151,6 +154,13 @@ public abstract class DefinitionParser {
         for (ClassDefinition classDefinition : parsedClasses) {
             classDefinition.validate2();
         }
+    }
+
+    public void clear() {
+        parsedClasses.clear();
+        validatedClasses.clear();
+        validatedErrors.clear();
+        tableConfigs.clear();
     }
 
     protected abstract void parseClasses(File definitionFile);

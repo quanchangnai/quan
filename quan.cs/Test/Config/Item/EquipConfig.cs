@@ -39,6 +39,7 @@ namespace Test.Config.Item
         {
             return "EquipConfig{" +
                    "Id=" + Id.ToString2() +
+                   ",Key='" + Key + '\'' +
                    ",Name='" + Name + '\'' +
                    ",Type=" + Type.ToString2() +
                    ",Reward=" + Reward.ToString2() +
@@ -57,6 +58,9 @@ namespace Test.Config.Item
 
         // ID
         private static volatile IDictionary<int, EquipConfig> _idConfigs = new Dictionary<int, EquipConfig>();
+
+        // 常量Key
+        private static volatile IDictionary<string, EquipConfig> _keyConfigs = new Dictionary<string, EquipConfig>();
 
         // 部位
         private static volatile IDictionary<int, IList<EquipConfig>> _positionConfigs = new Dictionary<int, IList<EquipConfig>>();
@@ -77,6 +81,17 @@ namespace Test.Config.Item
             return result;
         }
 
+        public new static IDictionary<string, EquipConfig> GetKeyConfigs()
+        {
+            return _keyConfigs;
+        }
+
+        public new static EquipConfig GetByKey(string key)
+        {
+            _keyConfigs.TryGetValue(key, out var result);
+            return result;
+        }
+
         public static IDictionary<int, IList<EquipConfig>> GetPositionConfigs()
         {
             return _positionConfigs;
@@ -92,20 +107,24 @@ namespace Test.Config.Item
         public static void Load(IList<EquipConfig> configs)
         {
             IDictionary<int, EquipConfig> idConfigs = new Dictionary<int, EquipConfig>();
+            IDictionary<string, EquipConfig> keyConfigs = new Dictionary<string, EquipConfig>();
             IDictionary<int, IList<EquipConfig>> positionConfigs = new Dictionary<int, IList<EquipConfig>>();
 
             foreach (var config in configs)
             {
                 ConfigBase.Load(idConfigs, config, config.Id);
+                ConfigBase.Load(keyConfigs, config, config.Key);
                 ConfigBase.Load(positionConfigs, config, config.Position);
             }
 
             configs = configs.ToImmutableList();
             idConfigs = ToImmutableDictionary(idConfigs);
+            keyConfigs = ToImmutableDictionary(keyConfigs);
             positionConfigs = ToImmutableDictionary(positionConfigs);
 
             _configs = configs;
             _idConfigs = idConfigs;
+            _keyConfigs = keyConfigs;
             _positionConfigs = positionConfigs;
         }
     }

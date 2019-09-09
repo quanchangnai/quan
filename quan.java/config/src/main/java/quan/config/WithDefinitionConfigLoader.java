@@ -103,13 +103,13 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
         parseDefinition();
 
         Set<ConfigDefinition> configDefinitions = new HashSet<>(definitionParser.getTableConfigs().values());
-        //配置对应的已索引JSON数据
-        Map<ConfigDefinition, Map<IndexDefinition, Map>> configIndexedJsonsAll = new HashMap<>();
+        //配置对应的其已索引JSON数据
+        Map<ConfigDefinition, Map<IndexDefinition, Map>> allConfigIndexedJsons = new HashMap<>();
 
         for (ConfigDefinition configDefinition : configDefinitions) {
             //索引校验
             if (needValidate()) {
-                configIndexedJsonsAll.put(configDefinition, validateIndex(configDefinition));
+                allConfigIndexedJsons.put(configDefinition, validateIndex(configDefinition));
             }
             //needLoad():加载配置
             load(configDefinition.getFullName(), getConfigTables(configDefinition), false);
@@ -121,8 +121,8 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
                 validatedErrors.addAll(reader.getValidatedErrors());
             }
             //引用校验，依赖索引结果
-            for (ConfigDefinition configDefinition : configIndexedJsonsAll.keySet()) {
-                validateRef(configDefinition, configIndexedJsonsAll);
+            for (ConfigDefinition configDefinition : allConfigIndexedJsons.keySet()) {
+                validateRef(configDefinition, allConfigIndexedJsons);
             }
         }
     }
@@ -281,7 +281,7 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
         }
     }
 
-    private void validateRef(ConfigDefinition configDefinition, Map<ConfigDefinition, Map<IndexDefinition, Map>> configIndexedJsonsAll) {
+    private void validateRef(ConfigDefinition configDefinition, Map<ConfigDefinition, Map<IndexDefinition, Map>> allConfigIndexedJsons) {
         for (String table : getConfigTables(configDefinition)) {
             List<JSONObject> tableJsons = getReader(table).readJsons();
             for (int i = 0; i < tableJsons.size(); i++) {
@@ -293,28 +293,28 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
                     }
                     Object fieldValue = json.get(fieldName);
                     Triple position = Triple.of(table, String.valueOf(i + 1), field.getColumn());
-                    validateFieldRef(position, configDefinition, field, fieldValue, configIndexedJsonsAll);
+                    validateFieldRef(position, configDefinition, field, fieldValue, allConfigIndexedJsons);
                 }
             }
         }
     }
 
-    private void validateFieldRef(Triple position, BeanDefinition bean, FieldDefinition field, Object value, Map<ConfigDefinition, Map<IndexDefinition, Map>> configIndexedJsonsAll) {
+    private void validateFieldRef(Triple position, BeanDefinition bean, FieldDefinition field, Object value, Map<ConfigDefinition, Map<IndexDefinition, Map>> allConfigIndexedJsons) {
         if (field.isPrimitiveType()) {
-            validatePrimitiveTypeRef(position, bean, field, value, false, configIndexedJsonsAll);
+            validatePrimitiveTypeRef(position, bean, field, value, false, allConfigIndexedJsons);
         } else if (field.isBeanType()) {
-            validateBeanTypeRef(position, field.getBean(), (JSONObject) value, configIndexedJsonsAll);
+            validateBeanTypeRef(position, field.getBean(), (JSONObject) value, allConfigIndexedJsons);
         } else if (field.getType().equals("map")) {
             JSONObject map = (JSONObject) value;
             for (String mapKey : map.keySet()) {
                 //校验map的key引用
-                validatePrimitiveTypeRef(position, bean, field, mapKey, true, configIndexedJsonsAll);
+                validatePrimitiveTypeRef(position, bean, field, mapKey, true, allConfigIndexedJsons);
                 //校验map的value引用
                 Object mapValue = map.get(mapKey);
                 if (field.isPrimitiveValueType()) {
-                    validatePrimitiveTypeRef(position, bean, field, mapValue, false, configIndexedJsonsAll);
+                    validatePrimitiveTypeRef(position, bean, field, mapValue, false, allConfigIndexedJsons);
                 } else {
-                    validateBeanTypeRef(position, field.getValueBean(), (JSONObject) mapValue, configIndexedJsonsAll);
+                    validateBeanTypeRef(position, field.getValueBean(), (JSONObject) mapValue, allConfigIndexedJsons);
                 }
             }
 
@@ -322,15 +322,15 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
             JSONArray array = (JSONArray) value;
             for (Object arrayValue : array) {
                 if (field.isPrimitiveValueType()) {
-                    validatePrimitiveTypeRef(position, bean, field, arrayValue, false, configIndexedJsonsAll);
+                    validatePrimitiveTypeRef(position, bean, field, arrayValue, false, allConfigIndexedJsons);
                 } else {
-                    validateBeanTypeRef(position, field.getValueBean(), (JSONObject) arrayValue, configIndexedJsonsAll);
+                    validateBeanTypeRef(position, field.getValueBean(), (JSONObject) arrayValue, allConfigIndexedJsons);
                 }
             }
         }
     }
 
-    private void validatePrimitiveTypeRef(Triple position, BeanDefinition bean, FieldDefinition field, Object value, boolean mapKey, Map<ConfigDefinition, Map<IndexDefinition, Map>> configIndexedJsonsAll) {
+    private void validatePrimitiveTypeRef(Triple position, BeanDefinition bean, FieldDefinition field, Object value, boolean mapKey, Map<ConfigDefinition, Map<IndexDefinition, Map>> allConfigIndexedJsons) {
         ConfigDefinition fieldRefConfig = field.getRefConfig(mapKey);
         FieldDefinition fieldRefField = field.getRefField(mapKey);
         if (fieldRefConfig == null || fieldRefField == null) {
@@ -344,7 +344,7 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
         String fieldRefs = fieldRefConfig.getName() + "." + fieldRefField.getName();
 
         IndexDefinition fieldRefIndex = fieldRefConfig.getIndexByField1(fieldRefField);
-        Map refIndexedJsons = configIndexedJsonsAll.get(fieldRefConfig).get(fieldRefIndex);
+        Map refIndexedJsons = allConfigIndexedJsons.get(fieldRefConfig).get(fieldRefIndex);
 
         if (refIndexedJsons == null || !refIndexedJsons.containsKey(value)) {
             String error;
@@ -361,13 +361,13 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
         }
     }
 
-    private void validateBeanTypeRef(Triple position, BeanDefinition bean, JSONObject json, Map<ConfigDefinition, Map<IndexDefinition, Map>> configIndexedJsonsAll) {
+    private void validateBeanTypeRef(Triple position, BeanDefinition bean, JSONObject json, Map<ConfigDefinition, Map<IndexDefinition, Map>> allConfigIndexedJsons) {
         if (json == null) {
             return;
         }
         for (FieldDefinition field : bean.getFields()) {
             Object fieldValue = json.get(field.getName());
-            validateFieldRef(position, bean, field, fieldValue, configIndexedJsonsAll);
+            validateFieldRef(position, bean, field, fieldValue, allConfigIndexedJsons);
         }
     }
 

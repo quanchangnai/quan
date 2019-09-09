@@ -13,6 +13,9 @@ public class ItemConfig extends Config {
     //ID
     protected final int id;
 
+    //常量Key
+    protected final String key;
+
     //名字
     protected final String name;
 
@@ -41,6 +44,7 @@ public class ItemConfig extends Config {
         super(json);
 
         this.id = json.getIntValue("id");
+        this.key = json.getOrDefault("key", "").toString();
         this.name = json.getOrDefault("name", "").toString();
 
         int $type = json.getIntValue("type");
@@ -89,6 +93,13 @@ public class ItemConfig extends Config {
      */
     public final int getId() {
         return id;
+    }
+
+    /**
+     * 常量Key
+     */
+    public final String getKey() {
+        return key;
     }
 
     /**
@@ -157,6 +168,7 @@ public class ItemConfig extends Config {
     public String toString() {
         return "ItemConfig{" +
                 "id=" + id +
+                ",key='" + key + '\'' +
                 ",name='" + name + '\'' +
                 ",type=" + type +
                 ",reward=" + reward +
@@ -175,6 +187,9 @@ public class ItemConfig extends Config {
     //ID
     private static volatile Map<Integer, ItemConfig> idConfigs = new HashMap<>();
 
+    //常量Key
+    private static volatile Map<String, ItemConfig> keyConfigs = new HashMap<>();
+
     public static List<ItemConfig> getConfigs() {
         return configs;
     }
@@ -187,22 +202,34 @@ public class ItemConfig extends Config {
         return idConfigs.get(id);
     }
 
+    public static Map<String, ItemConfig> getKeyConfigs() {
+        return keyConfigs;
+    }
+
+    public static ItemConfig getByKey(String key) {
+        return keyConfigs.get(key);
+    }
+
 
     @SuppressWarnings({"unchecked"})
     public static List<String> load(List<ItemConfig> configs) {
         Map<Integer, ItemConfig> idConfigs = new HashMap<>();
+        Map<String, ItemConfig> keyConfigs = new HashMap<>();
 
         List<String> errors = new ArrayList<>();
 
         for (ItemConfig config : configs) {
             load(idConfigs, errors, config, true, Collections.singletonList("id"), config.id);
+            load(keyConfigs, errors, config, true, Collections.singletonList("key"), config.key);
         }
 
         configs = Collections.unmodifiableList(configs);
         idConfigs = unmodifiableMap(idConfigs);
+        keyConfigs = unmodifiableMap(keyConfigs);
 
         ItemConfig.configs = configs;
         ItemConfig.idConfigs = idConfigs;
+        ItemConfig.keyConfigs = keyConfigs;
 
         return errors;
     }

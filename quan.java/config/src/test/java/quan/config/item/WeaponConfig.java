@@ -127,6 +127,7 @@ public class WeaponConfig extends EquipConfig {
     public String toString() {
         return "WeaponConfig{" +
                 "id=" + id +
+                ",key='" + key + '\'' +
                 ",name='" + name + '\'' +
                 ",type=" + type +
                 ",reward=" + reward +
@@ -158,6 +159,9 @@ public class WeaponConfig extends EquipConfig {
         //ID
         private static volatile Map<Integer, WeaponConfig> idConfigs = new HashMap<>();
 
+        //常量Key
+        private static volatile Map<String, WeaponConfig> keyConfigs = new HashMap<>();
+
         //部位
         private static volatile Map<Integer, List<WeaponConfig>> positionConfigs = new HashMap<>();
 
@@ -175,6 +179,14 @@ public class WeaponConfig extends EquipConfig {
 
         public static WeaponConfig getById(int id) {
             return idConfigs.get(id);
+        }
+
+        public static Map<String, WeaponConfig> getKeyConfigs() {
+            return keyConfigs;
+        }
+
+        public static WeaponConfig getByKey(String key) {
+            return keyConfigs.get(key);
         }
 
         public static Map<Integer, List<WeaponConfig>> getPositionConfigs() {
@@ -213,6 +225,7 @@ public class WeaponConfig extends EquipConfig {
         @SuppressWarnings({"unchecked"})
         public static List<String> load(List<WeaponConfig> configs) {
             Map<Integer, WeaponConfig> idConfigs = new HashMap<>();
+            Map<String, WeaponConfig> keyConfigs = new HashMap<>();
             Map<Integer, List<WeaponConfig>> positionConfigs = new HashMap<>();
             Map<Integer, Map<Integer, List<WeaponConfig>>> composite1Configs = new HashMap<>();
             Map<Integer, Map<Integer, WeaponConfig>> composite2Configs = new HashMap<>();
@@ -221,6 +234,7 @@ public class WeaponConfig extends EquipConfig {
 
             for (WeaponConfig config : configs) {
                 Config.load(idConfigs, errors, config, true, Collections.singletonList("id"), config.id);
+                Config.load(keyConfigs, errors, config, true, Collections.singletonList("key"), config.key);
                 Config.load(positionConfigs, errors, config, false, Collections.singletonList("position"), config.position);
                 Config.load(composite1Configs, errors, config, false, Arrays.asList("color", "w1"), config.color, config.w1);
                 Config.load(composite2Configs, errors, config, true, Arrays.asList("w1", "w2"), config.w1, config.w2);
@@ -228,12 +242,14 @@ public class WeaponConfig extends EquipConfig {
 
             configs = Collections.unmodifiableList(configs);
             idConfigs = unmodifiableMap(idConfigs);
+            keyConfigs = unmodifiableMap(keyConfigs);
             positionConfigs = unmodifiableMap(positionConfigs);
             composite1Configs = unmodifiableMap(composite1Configs);
             composite2Configs = unmodifiableMap(composite2Configs);
 
             WeaponConfig.self.configs = configs;
             WeaponConfig.self.idConfigs = idConfigs;
+            WeaponConfig.self.keyConfigs = keyConfigs;
             WeaponConfig.self.positionConfigs = positionConfigs;
             WeaponConfig.self.composite1Configs = composite1Configs;
             WeaponConfig.self.composite2Configs = composite2Configs;

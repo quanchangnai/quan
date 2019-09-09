@@ -13,6 +13,7 @@
 
     <config name="ItemConfig" table="道具">
         <field name="id" type="int" column="ID" index="unique"/>
+        <field name="key" type="string" column="常量Key" index="u"/>
         <field name="name" type="string" column="名字"/>
         <field name="type" type="ItemType" column="类型"/>
         <field name="reward" type="Reward" column="奖励"/>
@@ -20,6 +21,7 @@
         <field name="set" type="set:int" column="Set"/>
         <field name="map" type="map:int:int" column="Map" ref="ItemConfig.id"/>
         <field name="effectiveTime" type="datetime" column="生效时间"/>
+        <constant name="ItemIds" key="key" value="id" comment="name"/>
     </config>
 
     <config name="EquipConfig" parent="ItemConfig" table="装备1,装备2">

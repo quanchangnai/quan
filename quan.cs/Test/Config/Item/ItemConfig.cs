@@ -19,6 +19,11 @@ namespace Test.Config.Item
         public readonly int Id;
 
         /// <summary>
+        /// 常量Key
+        /// </summary>
+        public readonly string Key;
+
+        /// <summary>
         /// 名字
         /// </summary>
         public readonly string Name;
@@ -59,6 +64,7 @@ namespace Test.Config.Item
         public ItemConfig(JObject json) : base(json)
         {
             Id = json["id"]?.Value<int>() ?? default;
+            Key = json["key"]?.Value<string>() ?? "";
             Name = json["name"]?.Value<string>() ?? "";
             Type = (ItemType) (json["type"]?.Value<int>() ?? default);
             Reward = json.ContainsKey("reward") ? new Reward(json["reward"].Value<JObject>()) : null;
@@ -110,6 +116,7 @@ namespace Test.Config.Item
         {
             return "ItemConfig{" +
                    "Id=" + Id.ToString2() +
+                   ",Key='" + Key + '\'' +
                    ",Name='" + Name + '\'' +
                    ",Type=" + Type.ToString2() +
                    ",Reward=" + Reward.ToString2() +
@@ -127,6 +134,9 @@ namespace Test.Config.Item
         // ID
         private static volatile IDictionary<int, ItemConfig> _idConfigs = new Dictionary<int, ItemConfig>();
 
+        // 常量Key
+        private static volatile IDictionary<string, ItemConfig> _keyConfigs = new Dictionary<string, ItemConfig>();
+
         public static IList<ItemConfig> GetConfigs()
         {
             return _configs;
@@ -143,21 +153,36 @@ namespace Test.Config.Item
             return result;
         }
 
+        public static IDictionary<string, ItemConfig> GetKeyConfigs()
+        {
+            return _keyConfigs;
+        }
+
+        public static ItemConfig GetByKey(string key)
+        {
+            _keyConfigs.TryGetValue(key, out var result);
+            return result;
+        }
+
 
         public static void Load(IList<ItemConfig> configs)
         {
             IDictionary<int, ItemConfig> idConfigs = new Dictionary<int, ItemConfig>();
+            IDictionary<string, ItemConfig> keyConfigs = new Dictionary<string, ItemConfig>();
 
             foreach (var config in configs)
             {
                 Load(idConfigs, config, config.Id);
+                Load(keyConfigs, config, config.Key);
             }
 
             configs = configs.ToImmutableList();
             idConfigs = ToImmutableDictionary(idConfigs);
+            keyConfigs = ToImmutableDictionary(keyConfigs);
 
             _configs = configs;
             _idConfigs = idConfigs;
+            _keyConfigs = keyConfigs;
         }
     }
 }

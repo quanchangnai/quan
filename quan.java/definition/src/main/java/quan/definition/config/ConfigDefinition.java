@@ -34,7 +34,10 @@ public class ConfigDefinition extends BeanDefinition {
 
     protected List<FieldDefinition> selfFields = new ArrayList<>();
 
+    //列名:字段
     private Map<String, FieldDefinition> columnFields = new HashMap<>();
+
+    private Set<ConstantDefinition> constantDefinitions = new HashSet<>();
 
     {
         category = DefinitionCategory.config;
@@ -184,6 +187,24 @@ public class ConfigDefinition extends BeanDefinition {
 
     public List<FieldDefinition> getSelfFields() {
         return selfFields;
+    }
+
+
+    public Set<ConstantDefinition> getConstantDefinitions() {
+        return constantDefinitions;
+    }
+
+    public boolean isConstantKeyField(FieldDefinition fieldDefinition) {
+        ConfigDefinition parentConfig = getParentConfig();
+        if (parentConfig != null && parentConfig.isConstantKeyField(fieldDefinition)) {
+            return true;
+        }
+        for (ConstantDefinition constantDefinition : constantDefinitions) {
+            if (constantDefinition.getKeyField() == fieldDefinition) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
