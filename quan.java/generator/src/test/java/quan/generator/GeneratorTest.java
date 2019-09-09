@@ -1,8 +1,8 @@
 package quan.generator;
 
 import quan.config.TableType;
-import quan.definition.DefinitionParser;
-import quan.definition.XmlDefinitionParser;
+import quan.definition.parser.DefinitionParser;
+import quan.definition.parser.XmlDefinitionParser;
 import quan.generator.config.CSharpConfigGenerator;
 import quan.generator.config.JavaConfigGenerator;
 import quan.generator.database.DatabaseGenerator;

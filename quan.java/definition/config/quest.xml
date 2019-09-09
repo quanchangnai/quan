@@ -3,7 +3,7 @@
 
     <config name="QuestConfig" table="任务">
         <field name="id" type="int" column="ID"/>
-        <field name="name" type="string" column="名字"/>
+        <field name="name" type="string" column="名字" lang="-java"/>
         <field name="type" type="QuestType" column="类型" index="normal"/>
         <field name="target" type="int" column="任务目标" ref="QuestTargetConfig.id"/>
         <field name="reward" type="Reward" column="奖励"/>

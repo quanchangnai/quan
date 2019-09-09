@@ -1,8 +1,9 @@
 package quan.definition;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+
+import org.apache.commons.lang3.tuple.Pair;
+
+import java.util.*;
 
 /**
  * Created by quanchangnai on 2019/7/27.
@@ -25,4 +26,22 @@ public enum Language {
         return names;
     }
 
+    public static Pair<Boolean, Set<String>> parse(String language) {
+        language = language.trim();
+        boolean exclude = false;
+        Set<String> languages = new HashSet<>();
+
+        if (language.startsWith("-")) {
+            exclude = true;
+            language = language.substring(1);
+        }
+
+        for (String lang : language.split(",", -1)) {
+            if (!lang.isEmpty()) {
+                languages.add(lang.trim());
+            }
+        }
+
+        return Pair.of(exclude, languages);
+    }
 }

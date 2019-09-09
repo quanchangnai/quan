@@ -1,8 +1,9 @@
-package quan.definition;
+package quan.definition.parser;
 
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import quan.definition.*;
 import quan.definition.config.ConfigDefinition;
 import quan.definition.config.ConstantDefinition;
 import quan.definition.config.IndexDefinition;
@@ -70,7 +71,7 @@ public class XmlDefinitionParser extends DefinitionParser {
             }
             classDefinition.setComment(comment);
 
-            parseFields(classDefinition, classElement);
+            parseClassChildren(classDefinition, classElement);
         }
     }
 
@@ -110,7 +111,7 @@ public class XmlDefinitionParser extends DefinitionParser {
         return classDefinition;
     }
 
-    private void parseFields(ClassDefinition classDefinition, Element classElement) {
+    private void parseClassChildren(ClassDefinition classDefinition, Element classElement) {
         for (int i = 0; i < classElement.nodeCount(); i++) {
             if (!(classElement.node(i) instanceof Element)) {
                 continue;
@@ -134,11 +135,11 @@ public class XmlDefinitionParser extends DefinitionParser {
 
     private void parseField(ClassDefinition classDefinition, Element classElement, Element fieldElement, int i) {
         FieldDefinition fieldDefinition = new FieldDefinition();
-        fieldDefinition.setParser(classDefinition.parser);
+        fieldDefinition.setParser(classDefinition.getParser());
         fieldDefinition.setCategory(getCategory());
 
         fieldDefinition.setName(fieldElement.attributeValue("name"));
-        fieldDefinition.setTypes(fieldElement.attributeValue("type"));
+        fieldDefinition.setOriginalType(fieldElement.attributeValue("type"));
         fieldDefinition.setValue(fieldElement.attributeValue("value"));
         fieldDefinition.setColumn(fieldElement.attributeValue("column"));
         fieldDefinition.setOptional(fieldElement.attributeValue("optional"));
@@ -146,6 +147,7 @@ public class XmlDefinitionParser extends DefinitionParser {
         fieldDefinition.setIndex(fieldElement.attributeValue("index"));
         fieldDefinition.setDelimiter(fieldElement.attributeValue("delimiter"));
         fieldDefinition.setRef(fieldElement.attributeValue("ref"));
+        fieldDefinition.setLanguage(fieldElement.attributeValue("lang"));
 
         String comment = classElement.node(i + 1).getText();
         comment = comment.replaceAll("[\r\n]", "").trim();
@@ -156,7 +158,7 @@ public class XmlDefinitionParser extends DefinitionParser {
 
     private void parseIndex(ConfigDefinition configDefinition, Element classElement, Element indexElement, int i) {
         IndexDefinition indexDefinition = new IndexDefinition();
-        indexDefinition.setParser(configDefinition.parser);
+        indexDefinition.setParser(configDefinition.getParser());
         indexDefinition.setCategory(getCategory());
 
         indexDefinition.setName(indexElement.attributeValue("name"));

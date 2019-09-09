@@ -3,6 +3,7 @@ package quan.config;
 import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import quan.definition.Constants;
 import quan.definition.FieldDefinition;
 import quan.definition.config.ConfigDefinition;
 
@@ -185,12 +186,17 @@ public abstract class ConfigReader {
             return;
         }
 
-        //索引字段不能为空
+        boolean constantKeyField = configDefinition.isConstantKeyField(fieldDefinition);
         if (fieldValue == null) {
-            if (configDefinition.isIndexField(fieldDefinition) && !configDefinition.isConstantKeyField(fieldDefinition)) {
+            //索引字段不能为空，常量key除外
+            if (configDefinition.isIndexField(fieldDefinition) && !constantKeyField) {
                 validatedErrors.add(String.format("配置[%s]的第%d行第%d列[%s]的索引值不能为空", table, row, column, columnName));
             }
             return;
+        }
+
+        if (constantKeyField && !Constants.FIELD_NAME_PATTERN.matcher(fieldValue.toString()).matches()) {
+            validatedErrors.add(String.format("配置[%s]的第%d行第%d列[%s]的常量key[%s]格式错误,正确格式:%s", table, row, column, columnName, fieldValue, Constants.FIELD_NAME_PATTERN));
         }
 
         rowJson.put(fieldName, fieldValue);

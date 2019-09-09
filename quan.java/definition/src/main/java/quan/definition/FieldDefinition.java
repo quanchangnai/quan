@@ -1,8 +1,11 @@
 package quan.definition;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import quan.definition.config.ConfigDefinition;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -10,51 +13,59 @@ import java.util.regex.Pattern;
  */
 public class FieldDefinition extends Definition {
 
-    //字段类型的原始定义,set、list包含值类型，map包含键和值的类型
-    private String types;
+    //字段类型的原始定义,集合类型包含其元素类型
+    private String originalType;
+
+    //拆分后的字段类型
     private String type;
-
-    private boolean optional;
-
     private String keyType;
     private String valueType;
 
-    //内建类型对应的具体语言实现类型
+    //内建类型对应的特定语言基本类型，自定义类型保持不变
     private String basicType;
     private String basicKeyType;
     private String basicValueType;
 
-    //内建类型对应的具体语言Class类型
+    //内建类型对应的特定语言具体类型，自定义类型保持不变
     private String classType;
     private String classKeyType;
     private String classValueType;
 
-    //枚举值
+    //字段类型是否有循环依赖
+    private boolean cycle;
+
+    //枚举字段值
     private String value;
 
-    //消息小数类型精度
+    //消息字段,是否可选
+    private boolean optional;
+
+    //消息字段,小数保留的精度
     private int scale = -1;
 
-    //数据库字段忽略存储
+    //数据库字段,忽略存储
     private boolean ignore;
 
-    //对应配置表格中的列
+    //配置字段,对应表格中的列
     private String column;
 
-    //配置的索引类型
+    //配置字段,索引类型
     private String index;
 
-    //配置集合类型字段的分隔符
+    //配置字段,集合类型字段的分隔符
     private String delimiter;
 
-    //配置引用[配置.字段]
+    //配置字段,引用[配置.字段]
     private String ref;
 
-    //配置Bean或者集合类型字段对应的表格列数，校验表头时设置
-    private int columnNum;
+    //配置字段,是支持还是排除语言
+    private boolean excludeLanguage;
 
-    //字段类型依赖是否有循环
-    private boolean cycle;
+    //配置字段,支持或者排除的语言
+    protected Set<String> languages = new HashSet<>();
+
+    //配置字段,Bean或者集合类型字段对应的表格列数，校验表头时设置
+    private int columnNum;
 
     public FieldDefinition() {
     }
@@ -75,15 +86,15 @@ public class FieldDefinition extends Definition {
     }
 
 
-    public String getTypes() {
-        return types;
+    public String getOriginalType() {
+        return originalType;
     }
 
-    public void setTypes(String types) {
-        if (StringUtils.isBlank(types)) {
+    public void setOriginalType(String originalType) {
+        if (StringUtils.isBlank(originalType)) {
             return;
         }
-        this.types = types;
+        this.originalType = originalType;
     }
 
     public String getType() {
@@ -323,6 +334,15 @@ public class FieldDefinition extends Definition {
         this.classValueType = classValueType;
     }
 
+    public boolean isCycle() {
+        return cycle;
+    }
+
+    public FieldDefinition setCycle(boolean cycle) {
+        this.cycle = cycle;
+        return this;
+    }
+
     public int getScale() {
         return scale;
     }
@@ -479,13 +499,39 @@ public class FieldDefinition extends Definition {
         return null;
     }
 
-    public boolean isCycle() {
-        return cycle;
+    public void setLanguage(String language) {
+        if (StringUtils.isBlank(language) || category != DefinitionCategory.config) {
+            return;
+        }
+        Pair<Boolean, Set<String>> pair = Language.parse(language);
+        excludeLanguage = pair.getLeft();
+        languages = pair.getRight();
     }
 
-    public FieldDefinition setCycle(boolean cycle) {
-        this.cycle = cycle;
-        return this;
+    public boolean isExcludeLanguage() {
+        return excludeLanguage;
+    }
+
+    public Set<String> getLanguages() {
+        return languages;
+    }
+
+    public boolean supportLanguage(String language) {
+        boolean support = languages.isEmpty() || languages.contains(language);
+        if (excludeLanguage) {
+            support = !support;
+        }
+        return support;
+    }
+
+    public Set<String> supportLanguages() {
+        Set<String> languages = new HashSet<>();
+        for (String language : Language.names()) {
+            if (supportLanguage(language)) {
+                languages.add(language);
+            }
+        }
+        return languages;
     }
 
     public int getColumnNum() {

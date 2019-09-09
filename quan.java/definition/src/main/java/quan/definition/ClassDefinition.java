@@ -1,6 +1,7 @@
 package quan.definition;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -24,10 +25,10 @@ public abstract class ClassDefinition extends Definition {
     private String definitionText;
 
     //是支持还是排除语言
-    private boolean excludeLanguage;
+    protected boolean excludeLanguage;
 
     //支持或者排除的语言
-    protected List<String> languages = new ArrayList<>();
+    protected Set<String> languages = new HashSet<>();
 
     //导包，和具体英语相关
     private Set<String> imports = new HashSet<>();
@@ -146,16 +147,9 @@ public abstract class ClassDefinition extends Definition {
         if (StringUtils.isBlank(language) || category == DefinitionCategory.data) {
             return;
         }
-        language = language.trim();
-        if (language.startsWith("-")) {
-            excludeLanguage = true;
-            language = language.substring(1);
-        }
-        for (String lang : language.split(",", -1)) {
-            if (!lang.isEmpty()) {
-                this.languages.add(lang.trim());
-            }
-        }
+        Pair<Boolean, Set<String>> pair = Language.parse(language);
+        excludeLanguage = pair.getLeft();
+        languages = pair.getRight();
     }
 
     public Set<String> getImports() {

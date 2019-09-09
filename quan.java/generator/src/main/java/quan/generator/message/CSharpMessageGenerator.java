@@ -2,6 +2,7 @@ package quan.generator.message;
 
 import org.apache.commons.cli.CommandLine;
 import quan.definition.*;
+import quan.definition.parser.DefinitionParser;
 import quan.generator.util.CSharpUtils;
 import quan.generator.util.CommandLineUtils;
 

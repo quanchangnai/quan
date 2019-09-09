@@ -4,6 +4,7 @@ import freemarker.template.Template;
 import org.apache.commons.cli.CommandLine;
 import quan.definition.*;
 import quan.definition.data.DataDefinition;
+import quan.definition.parser.DefinitionParser;
 import quan.generator.Generator;
 import quan.generator.util.CommandLineUtils;
 

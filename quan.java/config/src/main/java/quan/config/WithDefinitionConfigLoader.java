@@ -9,6 +9,8 @@ import quan.common.util.PathUtils;
 import quan.definition.*;
 import quan.definition.config.ConfigDefinition;
 import quan.definition.config.IndexDefinition;
+import quan.definition.parser.DefinitionParser;
+import quan.definition.parser.XmlDefinitionParser;
 
 import java.io.File;
 import java.io.FileOutputStream;

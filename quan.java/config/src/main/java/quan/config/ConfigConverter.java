@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import quan.definition.BeanDefinition;
-import quan.definition.DefinitionParser;
+import quan.definition.parser.DefinitionParser;
 import quan.definition.EnumDefinition;
 import quan.definition.FieldDefinition;
 

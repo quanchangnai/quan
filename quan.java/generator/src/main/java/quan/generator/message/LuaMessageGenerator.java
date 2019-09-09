@@ -2,7 +2,7 @@ package quan.generator.message;
 
 import org.apache.commons.cli.CommandLine;
 import quan.definition.BeanDefinition;
-import quan.definition.DefinitionParser;
+import quan.definition.parser.DefinitionParser;
 import quan.definition.FieldDefinition;
 import quan.definition.Language;
 import quan.generator.util.CommandLineUtils;

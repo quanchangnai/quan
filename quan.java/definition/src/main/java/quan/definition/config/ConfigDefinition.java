@@ -1,10 +1,7 @@
 package quan.definition.config;
 
 import org.apache.commons.lang3.StringUtils;
-import quan.definition.BeanDefinition;
-import quan.definition.Constants;
-import quan.definition.DefinitionCategory;
-import quan.definition.FieldDefinition;
+import quan.definition.*;
 
 import java.util.*;
 
@@ -296,6 +293,9 @@ public class ConfigDefinition extends BeanDefinition {
         //校验字段循环依赖
         validateFieldBeanCycle(field);
 
+        //校验字段支持的语言
+//        validateFieldLanguage(field);
+
         if (field.getColumn() == null) {
             addValidatedError(getName4Validate("的") + field.getName4Validate() + "对应的列不能为空");
             return;
@@ -307,6 +307,20 @@ public class ConfigDefinition extends BeanDefinition {
 
         //校验字段的分隔符
         validateFieldDelimiter(field);
+    }
+
+    private void validateFieldLanguage(FieldDefinition field) {
+        Set<String> fieldLanguages = field.getLanguages();
+        if (isIndexField(field) && (field.isExcludeLanguage() || !field.getLanguages().isEmpty())) {
+            addValidatedError(getName4Validate("的索引") + field.getName4Validate() + "不支持设置语言类型");
+            return;
+        }
+
+        for (String fieldLanguage : field.supportLanguages()) {
+            if (!supportLanguage(Language.valueOf(fieldLanguage))) {
+                addValidatedError(getName4Validate("的") + field.getName4Validate() + "支持的语言类型[" + fieldLanguage + "]不被" + getName4Validate() + "支持");
+            }
+        }
     }
 
     private void validateFieldDelimiter(FieldDefinition field) {

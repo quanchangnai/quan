@@ -1,9 +1,12 @@
-package quan.definition;
+package quan.definition.parser;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.common.util.PathUtils;
+import quan.definition.BeanDefinition;
+import quan.definition.ClassDefinition;
+import quan.definition.DefinitionCategory;
 import quan.definition.config.ConfigDefinition;
 
 import java.io.File;
