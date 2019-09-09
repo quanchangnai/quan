@@ -3,7 +3,7 @@
 
     <config name="QuestConfig" table="任务">
         <field name="id" type="int" column="ID"/>
-        <field name="name" type="string" column="名字" lang="-java"/>
+        <field name="name" type="string" column="名字"/>
         <field name="type" type="QuestType" column="类型" index="normal"/>
         <field name="target" type="int" column="任务目标" ref="QuestTargetConfig.id"/>
         <field name="reward" type="Reward" column="奖励"/>
@@ -26,9 +26,9 @@
         <index name="composite4" type="n" fields="d1,d2,d3"/>
     </config>
 
-    <config name="QuestTargetConfig">
+    <config name="QuestTargetConfig" lang="-lua">
         <field name="id" type="int" column="ID" index="u"/>
-        <field name="name" type="string" column="名字"/>
+        <field name="name" type="string" column="名字" lang="cs"/>
     </config>
 
     <enum name="QuestType">任务类型

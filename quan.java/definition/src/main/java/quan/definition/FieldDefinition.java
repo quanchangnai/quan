@@ -524,9 +524,9 @@ public class FieldDefinition extends Definition {
         return support;
     }
 
-    public Set<String> supportLanguages() {
+    public Set<String> getSupportLanguages(ConfigDefinition configDefinition) {
         Set<String> languages = new HashSet<>();
-        for (String language : Language.names()) {
+        for (String language : configDefinition.getSupportLanguages()) {
             if (supportLanguage(language)) {
                 languages.add(language);
             }

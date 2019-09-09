@@ -30,6 +30,9 @@ public abstract class ClassDefinition extends Definition {
     //支持或者排除的语言
     protected Set<String> languages = new HashSet<>();
 
+    //支持的语言
+    protected Set<String> supportLanguages;
+
     //导包，和具体英语相关
     private Set<String> imports = new HashSet<>();
 
@@ -162,6 +165,19 @@ public abstract class ClassDefinition extends Definition {
             support = !support;
         }
         return support;
+    }
+
+    public Set<String> getSupportLanguages() {
+        if (supportLanguages != null) {
+            return supportLanguages;
+        }
+        supportLanguages = new HashSet<>();
+        for (Language language : Language.values()) {
+            if (supportLanguage(language)) {
+                supportLanguages.add(language.name());
+            }
+        }
+        return supportLanguages;
     }
 
     public void validate() {

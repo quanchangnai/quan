@@ -3,7 +3,9 @@ package quan.definition;
 
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by quanchangnai on 2019/7/27.
@@ -12,17 +14,17 @@ public enum Language {
 
     java, cs, lua;
 
-    private static List<String> names;
+    private static Set<String> names;
 
     static {
-        names = new ArrayList<>();
+        names = new HashSet<>();
         for (Language language : values()) {
             names.add(language.name());
         }
-        names = Collections.unmodifiableList(names);
+        names = Collections.unmodifiableSet(names);
     }
 
-    public static List<String> names() {
+    public static Set<String> names() {
         return names;
     }
 

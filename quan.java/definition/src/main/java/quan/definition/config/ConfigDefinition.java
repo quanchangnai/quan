@@ -1,7 +1,10 @@
 package quan.definition.config;
 
 import org.apache.commons.lang3.StringUtils;
-import quan.definition.*;
+import quan.definition.BeanDefinition;
+import quan.definition.Constants;
+import quan.definition.DefinitionCategory;
+import quan.definition.FieldDefinition;
 
 import java.util.*;
 
@@ -293,9 +296,6 @@ public class ConfigDefinition extends BeanDefinition {
         //校验字段循环依赖
         validateFieldBeanCycle(field);
 
-        //校验字段支持的语言
-//        validateFieldLanguage(field);
-
         if (field.getColumn() == null) {
             addValidatedError(getName4Validate("的") + field.getName4Validate() + "对应的列不能为空");
             return;
@@ -310,16 +310,21 @@ public class ConfigDefinition extends BeanDefinition {
     }
 
     private void validateFieldLanguage(FieldDefinition field) {
-        Set<String> fieldLanguages = field.getLanguages();
         if (isIndexField(field) && (field.isExcludeLanguage() || !field.getLanguages().isEmpty())) {
-            addValidatedError(getName4Validate("的索引") + field.getName4Validate() + "不支持设置语言类型");
+            addValidatedError(getName4Validate("的索引") + field.getName4Validate() + "不支持设置语言");
             return;
         }
 
-        for (String fieldLanguage : field.supportLanguages()) {
-            if (!supportLanguage(Language.valueOf(fieldLanguage))) {
-                addValidatedError(getName4Validate("的") + field.getName4Validate() + "支持的语言类型[" + fieldLanguage + "]不被" + getName4Validate() + "支持");
+        Set<String> supportLanguages = getSupportLanguages();
+
+        Set<String> fieldIllegalLanguages = new HashSet<>();
+        for (String fieldLanguage : field.getLanguages()) {
+            if (!supportLanguages.contains(fieldLanguage)) {
+                fieldIllegalLanguages.add(fieldLanguage);
             }
+        }
+        if (!fieldIllegalLanguages.isEmpty()) {
+            addValidatedError(getName4Validate("的") + field.getName4Validate() + "支持的语言类型" + fieldIllegalLanguages + "非法,合法语言类型" + supportLanguages);
         }
     }
 
@@ -391,7 +396,10 @@ public class ConfigDefinition extends BeanDefinition {
     @Override
     public void validate2() {
         for (FieldDefinition selfField : selfFields) {
+            //校验字段引用
             validateFieldRef(selfField);
+            //校验字段支持的语言
+            validateFieldLanguage(selfField);
         }
     }
 
