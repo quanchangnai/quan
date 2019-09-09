@@ -16,8 +16,4 @@ public class RewardConstant {
         return ConstantConfig.getByKey("constant2").getRewardList();
     }
 
-    public static List<Reward> constant3() {
-        return ConstantConfig.getByKey("constant3").getRewardList();
-    }
-
 }

@@ -21,8 +21,11 @@ public class CommandLineUtils {
     // 消息ID冲突重新计算
     public static final String recalcId = "recalcId";
 
-    //配置表的类型和路径
-    public static final String table = "table";
+    //配置表类型
+    public static final String tableType = "tableType";
+
+    //配置表路径
+    public static final String tablePath = "tablePath";
 
 
     private static CommandLineParser commandLineParser = new DefaultParser();
@@ -69,9 +72,10 @@ public class CommandLineUtils {
     }
 
     public static CommandLine parseConfigArgs(String generatorName, String[] args) {
-        Option tableOption = new Option(null, CommandLineUtils.table, true, "参数1:配置表类型" + Arrays.toString(TableType.values()) + " 参数2:配置表路径");
-        tableOption.setRequired(true);
-        tableOption.setArgs(2);
-        return CommandLineUtils.parseArgs(generatorName, args, tableOption);
+        Option tableTypeOption = new Option(null, CommandLineUtils.tableType, true, "配置表类型" + Arrays.toString(TableType.values()));
+        tableTypeOption.setRequired(true);
+        Option tablePathOption = new Option(null, CommandLineUtils.tablePath, true, "配置表路径");
+        tablePathOption.setRequired(true);
+        return CommandLineUtils.parseArgs(generatorName, args, tableTypeOption, tablePathOption);
     }
 }

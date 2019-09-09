@@ -61,8 +61,7 @@ public class JavaConfigGenerator extends ConfigGenerator {
         generator.useXmlDefinitionParser(Arrays.asList(commandLine.getOptionValues(CommandLineUtils.definitionPath)), commandLine.getOptionValue(CommandLineUtils.packagePrefix))
                 .setEnumPackagePrefix(commandLine.getOptionValue(CommandLineUtils.enumPackagePrefix));
 
-        String[] tableTypeAndPath = commandLine.getOptionValues(CommandLineUtils.table);
-        generator.initConfigLoader(TableType.valueOf(tableTypeAndPath[0]), tableTypeAndPath[1]);
+        generator.initConfigLoader(commandLine.getOptionValue(CommandLineUtils.tableType), commandLine.getOptionValue(CommandLineUtils.tablePath));
 
         generator.generate();
     }

@@ -82,7 +82,7 @@ public class ConstantDefinition extends ClassDefinition {
     public void setConfigs(List<JSONObject> configs) {
         for (JSONObject config : configs) {
             String key = config.getString(keyField);
-            if (!Constants.FIELD_NAME_PATTERN.matcher(key).matches()) {
+            if (key == null || !Constants.FIELD_NAME_PATTERN.matcher(key).matches()) {
                 continue;
             }
             String comment = commentField == null ? "" : config.getString(commentField);

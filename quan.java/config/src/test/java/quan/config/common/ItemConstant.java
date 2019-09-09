@@ -13,17 +13,10 @@ public class ItemConstant {
     }
 
     /**
-     * 常量2
+     * 常量3
      */
     public static int constant2() {
         return ConstantConfig.getByKey("constant2").getItemId();
-    }
-
-    /**
-     * 常量3
-     */
-    public static int constant3() {
-        return ConstantConfig.getByKey("constant3").getItemId();
     }
 
 }
