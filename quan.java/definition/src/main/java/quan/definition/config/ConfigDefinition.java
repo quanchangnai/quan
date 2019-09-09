@@ -315,14 +315,15 @@ public class ConfigDefinition extends BeanDefinition {
             return;
         }
 
-        Set<String> supportLanguages = getSupportLanguages();
-
+        getSupportLanguages();
         Set<String> fieldIllegalLanguages = new HashSet<>();
+
         for (String fieldLanguage : field.getLanguages()) {
             if (!supportLanguages.contains(fieldLanguage)) {
                 fieldIllegalLanguages.add(fieldLanguage);
             }
         }
+
         if (!fieldIllegalLanguages.isEmpty()) {
             addValidatedError(getName4Validate("的") + field.getName4Validate() + "支持的语言类型" + fieldIllegalLanguages + "非法,合法语言类型" + supportLanguages);
         }
