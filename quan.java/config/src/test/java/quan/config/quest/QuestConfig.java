@@ -10,7 +10,6 @@ import quan.config.item.Reward;
 * 自动生成
 */
 public class QuestConfig extends Config {
-
     //ID
     protected final int id;
 

@@ -10,7 +10,6 @@ import quan.config.item.Reward;
 * 自动生成
 */
 public class ConstantConfig extends Config {
-
     //常量Key
     protected final String key;
 

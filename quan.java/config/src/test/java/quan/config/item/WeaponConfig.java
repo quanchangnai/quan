@@ -9,7 +9,6 @@ import quan.config.*;
 * 自动生成
 */
 public class WeaponConfig extends EquipConfig {
-
     //字段1
     protected final int w1;
 

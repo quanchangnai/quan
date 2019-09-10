@@ -147,7 +147,9 @@ public class XmlDefinitionParser extends DefinitionParser {
         fieldDefinition.setIndex(fieldElement.attributeValue("index"));
         fieldDefinition.setDelimiter(fieldElement.attributeValue("delimiter"));
         fieldDefinition.setRef(fieldElement.attributeValue("ref"));
-        fieldDefinition.setLanguage(fieldElement.attributeValue("lang"));
+        if (classDefinition instanceof ConfigDefinition) {
+            fieldDefinition.setLanguage(fieldElement.attributeValue("lang"));
+        }
 
         String comment = classElement.node(i + 1).getText();
         comment = comment.replaceAll("[\r\n]", "").trim();

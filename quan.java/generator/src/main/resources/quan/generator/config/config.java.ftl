@@ -17,8 +17,11 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 <#if !selfFields??>
     <#assign selfFields = fields>
 </#if>
-
+<#assign supportJava = supportLanguage("java")>
 <#list selfFields as field>
+    <#if !(supportJava &&field.supportLanguage("java"))>
+        <#continue>
+    </#if>
     <#if field.comment !="">
     //${field.comment}
     </#if>
@@ -42,6 +45,9 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         super(json);
 
 <#list selfFields as field>
+    <#if !(supportJava &&field.supportLanguage("java"))>
+        <#continue>
+    </#if>
     <#if field.type=="string">
         this.${field.name} = json.getOrDefault("${field.name}", "").toString();
     <#elseif field.type=="bool">
@@ -118,6 +124,9 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     }
 
 <#list selfFields as field>
+    <#if !(supportJava &&field.supportLanguage("java"))>
+        <#continue>
+    </#if>
     <#if field.comment !="">
     /**
      * ${field.comment}
@@ -163,6 +172,9 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     public String toString() {
         return "${name}{" +
         <#list fields as field>
+            <#if !(supportJava &&field.supportLanguage("java"))>
+                <#continue>
+            </#if>
                 "<#rt>
             <#if field_index gt 0>
                 <#lt>,<#rt>

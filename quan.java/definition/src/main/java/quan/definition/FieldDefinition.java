@@ -516,22 +516,15 @@ public class FieldDefinition extends Definition {
         return languages;
     }
 
+    /**
+     * 字段本身是否支持特定语言，实际使用要先判断字段所在的配置是否支持该语言
+     */
     public boolean supportLanguage(String language) {
         boolean support = languages.isEmpty() || languages.contains(language);
         if (excludeLanguage) {
             support = !support;
         }
         return support;
-    }
-
-    public Set<String> getSupportLanguages(ConfigDefinition configDefinition) {
-        Set<String> languages = new HashSet<>();
-        for (String language : configDefinition.getSupportLanguages()) {
-            if (supportLanguage(language)) {
-                languages.add(language);
-            }
-        }
-        return languages;
     }
 
     public int getColumnNum() {

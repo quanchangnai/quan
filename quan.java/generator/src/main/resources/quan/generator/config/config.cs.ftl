@@ -20,7 +20,11 @@ namespace ${fullPackageName}
 <#if !selfFields??>
     <#assign selfFields = fields>
 </#if>
+<#assign supportCs = supportLanguage("cs")>
 <#list selfFields as field>
+    <#if !(supportCs &&field.supportLanguage("cs"))>
+        <#continue>
+    </#if>
     <#if field.comment !="">
         /// <summary>
         /// ${field.comment}
@@ -45,6 +49,9 @@ namespace ${fullPackageName}
         public ${name}(JObject json) : base(json)
         {
 <#list selfFields as field>
+    <#if !(supportCs &&field.supportLanguage("cs"))>
+        <#continue>
+    </#if>
     <#if field.type=="list" || field.type=="set">
         <#if field_index gt 0 >
 
@@ -114,6 +121,9 @@ namespace ${fullPackageName}
         {
             return "${name}{" +
             <#list fields as field>
+                <#if !(supportCs &&field.supportLanguage("cs"))>
+                    <#continue>
+                </#if>
                    "<#rt>
                 <#if field_index gt 0>
                    <#lt>,<#rt>

@@ -9,7 +9,6 @@ import quan.config.*;
 * 自动生成
 */
 public class EquipConfig extends ItemConfig {
-
     //部位
     protected final int position;
 

@@ -31,7 +31,7 @@ public abstract class ClassDefinition extends Definition {
     protected Set<String> languages = new HashSet<>();
 
     //支持的语言
-    protected Set<String> supportLanguages;
+    protected Set<String> supportedLanguages;
 
     //导包，和具体英语相关
     private Set<String> imports = new HashSet<>();
@@ -167,17 +167,22 @@ public abstract class ClassDefinition extends Definition {
         return support;
     }
 
-    public Set<String> getSupportLanguages() {
-        if (supportLanguages != null) {
-            return supportLanguages;
+
+    public boolean supportLanguage(String language) {
+        return supportLanguage(Language.valueOf(language));
+    }
+
+    public Set<String> getSupportedLanguages() {
+        if (supportedLanguages != null) {
+            return supportedLanguages;
         }
-        supportLanguages = new HashSet<>();
+        supportedLanguages = new HashSet<>();
         for (Language language : Language.values()) {
             if (supportLanguage(language)) {
-                supportLanguages.add(language.name());
+                supportedLanguages.add(language.name());
             }
         }
-        return supportLanguages;
+        return supportedLanguages;
     }
 
     public void validate() {

@@ -54,6 +54,8 @@ public class BeanDefinition extends ClassDefinition {
         //校验字段循环依赖
         validateFieldBeanCycle(field);
 
+        //校验字段依赖语言
+        validateFieldBeanLanguage(field);
     }
 
     protected void validateFieldType(FieldDefinition field) {
@@ -169,6 +171,24 @@ public class BeanDefinition extends ClassDefinition {
         return false;
     }
 
+    protected void validateFieldBeanLanguage(FieldDefinition field) {
+        if (category == DefinitionCategory.data) {
+            return;
+        }
+        BeanDefinition fieldBean = null;
+        if (field.isBeanType()) {
+            fieldBean = field.getBean();
+        } else if (field.isCollectionType()) {
+            fieldBean = field.getValueBean();
+        }
+        if (fieldBean == null) {
+            return;
+        }
+        if (!fieldBean.getSupportedLanguages().containsAll(getSupportedLanguages())) {
+            addValidatedError(getName4Validate() + "支持的语言范围" + supportedLanguages + "必须小于或等于其依赖" + fieldBean.getName4Validate() + "支持的语言范围" + fieldBean.supportedLanguages);
+        }
+    }
+
     public String getDelimiter() {
         return delimiter;
     }
@@ -265,7 +285,6 @@ public class BeanDefinition extends ClassDefinition {
         }
 
         FieldDefinition refField = refConfig.getField(refFiledName);
-
         if (refField == null) {
             addValidatedError(getName4Validate() + field.getName4Validate() + "的引用字段[" + refConfigAndField + "]不存在");
             return;
@@ -275,6 +294,11 @@ public class BeanDefinition extends ClassDefinition {
             addValidatedError(getName4Validate() + field.getName4Validate() + "不能引用自己");
             return;
         }
+
+        if (!refConfig.getSupportedLanguages().containsAll(getSupportedLanguages())) {
+            addValidatedError(getName4Validate() + "支持的语言范围" + supportedLanguages + "必须小于或等于其引用" + refConfig.getName4Validate() + "支持的语言范围" + refConfig.supportedLanguages);
+        }
+
         if (field.isCollectionType()) {
             if (keType && field.isPrimitiveKeyType() && !field.getKeyType().equals(refField.getType())) {
                 addValidatedError(getName4Validate("的") + field.getName4Validate() + "类型[" + field.getType() + "]的键类型[" + field.getKeyType() + "]和引用字段[" + refConfigAndField + "]的类型[" + refField.getType() + "]不一致");

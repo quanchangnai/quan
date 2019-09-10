@@ -9,7 +9,6 @@ import quan.config.*;
 * 自动生成
 */
 public class Reward extends Bean {
-
     protected final int itemId;
 
     protected final int itemNum;

@@ -253,6 +253,10 @@ public class ConfigDefinition extends BeanDefinition {
             return;
         }
 
+        if (!parentConfig.getSupportedLanguages().containsAll(getSupportedLanguages())) {
+            addValidatedError(getName4Validate() + "支持的语言范围" + supportedLanguages + "必须小于或等于其父配置[" + parent + "]所支持的语言范围" + parentConfig.supportedLanguages);
+        }
+
         Set<String> parents = new HashSet<>();
         while (parentConfig != null) {
             if (parents.contains(parentConfig.getName())) {
@@ -296,6 +300,9 @@ public class ConfigDefinition extends BeanDefinition {
         //校验字段循环依赖
         validateFieldBeanCycle(field);
 
+        //校验字段依赖语言
+        validateFieldBeanLanguage(field);
+
         if (field.getColumn() == null) {
             addValidatedError(getName4Validate("的") + field.getName4Validate() + "对应的列不能为空");
             return;
@@ -315,17 +322,17 @@ public class ConfigDefinition extends BeanDefinition {
             return;
         }
 
-        getSupportLanguages();
+        getSupportedLanguages();
         Set<String> fieldIllegalLanguages = new HashSet<>();
 
         for (String fieldLanguage : field.getLanguages()) {
-            if (!supportLanguages.contains(fieldLanguage)) {
+            if (!supportedLanguages.contains(fieldLanguage)) {
                 fieldIllegalLanguages.add(fieldLanguage);
             }
         }
 
         if (!fieldIllegalLanguages.isEmpty()) {
-            addValidatedError(getName4Validate("的") + field.getName4Validate() + "支持的语言类型" + fieldIllegalLanguages + "非法,合法语言类型" + supportLanguages);
+            addValidatedError(getName4Validate("的") + field.getName4Validate() + "支持的语言类型" + fieldIllegalLanguages + "非法,合法语言类型" + supportedLanguages);
         }
     }
 

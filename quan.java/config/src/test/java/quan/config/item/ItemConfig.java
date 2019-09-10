@@ -9,7 +9,6 @@ import quan.config.*;
 * 自动生成
 */
 public class ItemConfig extends Config {
-
     //ID
     protected final int id;
 

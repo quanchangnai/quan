@@ -9,19 +9,14 @@ import quan.config.*;
 * 自动生成
 */
 public class QuestTargetConfig extends Config {
-
     //ID
     protected final int id;
-
-    //名字
-    protected final String name;
 
 
     public QuestTargetConfig(JSONObject json) {
         super(json);
 
         this.id = json.getIntValue("id");
-        this.name = json.getOrDefault("name", "").toString();
     }
 
     /**
@@ -29,13 +24,6 @@ public class QuestTargetConfig extends Config {
      */
     public final int getId() {
         return id;
-    }
-
-    /**
-     * 名字
-     */
-    public final String getName() {
-        return name;
     }
 
 
@@ -48,7 +36,6 @@ public class QuestTargetConfig extends Config {
     public String toString() {
         return "QuestTargetConfig{" +
                 "id=" + id +
-                ",name='" + name + '\'' +
                 '}';
 
     }
