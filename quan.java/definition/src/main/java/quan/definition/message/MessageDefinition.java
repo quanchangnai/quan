@@ -4,6 +4,7 @@ import quan.definition.BeanDefinition;
 import quan.definition.DefinitionCategory;
 
 /**
+ * 消息定义
  * Created by quanchangnai on 2017/7/6.
  */
 public class MessageDefinition extends BeanDefinition {
@@ -52,5 +53,10 @@ public class MessageDefinition extends BeanDefinition {
             return true;
         }
         return fieldName.equals("id") || fieldName.equals("seq");
+    }
+
+    public MessageHeadDefinition getHead() {
+        System.err.println("getHead============");
+        return parser.getMessageHead();
     }
 }

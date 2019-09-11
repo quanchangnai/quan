@@ -13,7 +13,7 @@ import ${import};
 </#if>
  * 自动生成
  */
-public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType ==3>Message</#if> {
+public<#if definitionType ==9> abstract</#if> class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType ==3 && head>HeadedMessage<#else>Message</#if> {
 
 <#if definitionType ==3>
     /**

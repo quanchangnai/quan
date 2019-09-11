@@ -5,11 +5,13 @@ import quan.definition.config.ConfigDefinition;
 import quan.definition.config.IndexDefinition;
 import quan.definition.data.DataDefinition;
 import quan.definition.message.MessageDefinition;
+import quan.definition.message.MessageHeadDefinition;
 
 import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * Bean定义，被数据库、消息和配置共用
  * Created by quanchangnai on 2017/7/6.
  */
 public class BeanDefinition extends ClassDefinition {
@@ -18,12 +20,6 @@ public class BeanDefinition extends ClassDefinition {
     private String delimiter = "_";
 
     public BeanDefinition() {
-    }
-
-    public BeanDefinition(String delimiter) {
-        if (!StringUtils.isBlank(delimiter)) {
-            this.delimiter = delimiter;
-        }
     }
 
     @Override
@@ -321,7 +317,10 @@ public class BeanDefinition extends ClassDefinition {
         if (!(classDefinition instanceof BeanDefinition)) {
             return false;
         }
-        return !(classDefinition instanceof DataDefinition) && !(classDefinition instanceof MessageDefinition) && !(classDefinition instanceof ConfigDefinition);
+        return !(classDefinition instanceof DataDefinition)
+                && !(classDefinition instanceof MessageDefinition)
+                && !(classDefinition instanceof MessageHeadDefinition)
+                && !(classDefinition instanceof ConfigDefinition);
     }
 
 }

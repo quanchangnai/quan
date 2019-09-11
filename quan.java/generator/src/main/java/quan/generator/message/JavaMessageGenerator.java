@@ -1,8 +1,11 @@
 package quan.generator.message;
 
 import org.apache.commons.cli.CommandLine;
-import quan.definition.parser.DefinitionParser;
+import quan.definition.ClassDefinition;
 import quan.definition.Language;
+import quan.definition.message.MessageDefinition;
+import quan.definition.message.MessageHeadDefinition;
+import quan.definition.parser.DefinitionParser;
 import quan.generator.util.CommandLineUtils;
 
 import java.util.Arrays;
@@ -47,6 +50,17 @@ public class JavaMessageGenerator extends MessageGenerator {
         return Language.java;
     }
 
+
+    @Override
+    protected void processClassDependency(ClassDefinition classDefinition) {
+        if (classDefinition instanceof MessageDefinition) {
+            MessageHeadDefinition messageHeadDefinition = ((MessageDefinition) classDefinition).getHead();
+            if (messageHeadDefinition != null && !messageHeadDefinition.getFullPackageName().equals(classDefinition.getFullPackageName())) {
+                classDefinition.getImports().add(messageHeadDefinition.getFullName());
+            }
+        }
+        super.processClassDependency(classDefinition);
+    }
 
     public static void main(String[] args) {
         CommandLine commandLine = CommandLineUtils.parseMessageArgs(JavaMessageGenerator.class.getSimpleName(), args);

@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
+ * 字段定义，被数据库、消息和配置共用
  * Created by quanchangnai on 2017/7/6.
  */
 public class FieldDefinition extends Definition {

@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
+ * 常量定义
  * Created by quanchangnai on 2019/9/6.
  */
 public class ConstantDefinition extends ClassDefinition {

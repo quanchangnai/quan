@@ -9,6 +9,7 @@ import quan.definition.config.ConstantDefinition;
 import quan.definition.config.IndexDefinition;
 import quan.definition.data.DataDefinition;
 import quan.definition.message.MessageDefinition;
+import quan.definition.message.MessageHeadDefinition;
 
 import java.io.File;
 
@@ -39,7 +40,7 @@ public class XmlDefinitionParser extends DefinitionParser {
 
         String packageName = definitionFile.getName().substring(0, definitionFile.getName().lastIndexOf("."));
         if (!Constants.PACKAGE_NAME_PATTERN.matcher(packageName).matches()) {
-            addValidatedError("定义文件名[" + packageName + "]格式错误");
+            addValidatedError("定义文件名[" + packageName + "]格式错误,正确格式:" + Constants.PACKAGE_NAME_PATTERN);
             return;
         }
 
@@ -88,12 +89,22 @@ public class XmlDefinitionParser extends DefinitionParser {
                 break;
             case "bean":
                 if (category == DefinitionCategory.message || category == DefinitionCategory.config) {//临时
-                    classDefinition = new BeanDefinition(classElement.attributeValue("delimiter")).setCategory(getCategory());
+                    classDefinition = new BeanDefinition().setCategory(getCategory()).setDelimiter(classElement.attributeValue("delimiter"));
                 }
                 break;
             case "message":
                 if (category == DefinitionCategory.message) {
                     classDefinition = new MessageDefinition();
+                }
+                break;
+            case "message-head":
+                if (category == DefinitionCategory.message) {
+                    if (messageHeadDefinition == null) {
+                        messageHeadDefinition = new MessageHeadDefinition();
+                        classDefinition = messageHeadDefinition;
+                    } else {
+                        addValidatedError("消息头不能重复定义");
+                    }
                 }
                 break;
             case "data":
@@ -122,6 +133,7 @@ public class XmlDefinitionParser extends DefinitionParser {
             if (fieldElementName.equals("field")) {
                 parseField(classDefinition, classElement, fieldElement, i);
             }
+
             if (classDefinition instanceof ConfigDefinition) {
                 if (fieldElementName.equals("index")) {
                     parseIndex((ConfigDefinition) classDefinition, classElement, fieldElement, i);

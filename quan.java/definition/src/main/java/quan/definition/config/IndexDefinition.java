@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 /**
+ * 索引定义
  * Created by quanchangnai on 2019/7/14.
  */
 public class IndexDefinition extends Definition {
@@ -39,11 +40,11 @@ public class IndexDefinition extends Definition {
     }
 
     public boolean isUnique() {
-        return type.equals("unique" ) || type.equals("u" );
+        return type.equals("unique") || type.equals("u");
     }
 
     public boolean isNormal() {
-        return type.equals("normal" ) || type.equals("n" );
+        return type.equals("normal") || type.equals("n");
     }
 
     public String getType() {

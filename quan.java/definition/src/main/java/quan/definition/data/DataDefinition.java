@@ -4,6 +4,7 @@ import quan.definition.BeanDefinition;
 import quan.definition.DefinitionCategory;
 
 /**
+ * 数据定义
  * Created by quanchangnai on 2019/6/22.
  */
 public class DataDefinition extends BeanDefinition {
