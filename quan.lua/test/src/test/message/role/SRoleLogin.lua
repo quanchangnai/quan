@@ -30,6 +30,8 @@ function SRoleLogin.new(args)
     local instance = {
         ---消息序号
         seq = args.seq or 0,
+        ---错误码
+        error = args.error or 0,
         ---角色id
         roleId = args.roleId or 0,
         ---角色名
@@ -62,6 +64,8 @@ function SRoleLogin.encode(msg, buffer)
 
     buffer = Message.encode(msg, buffer)
 
+    buffer:writeLong(msg.seq)
+    buffer:writeInt(msg.error)
     buffer:writeLong(msg.roleId)
     buffer:writeString(msg.roleName)
     RoleInfo.encode(msg.roleInfo, buffer)
@@ -103,6 +107,8 @@ function SRoleLogin.decode(buffer, msg)
     msg = msg or SRoleLogin.new()
     Message.decode(buffer, msg)
 
+    msg.seq = buffer:readLong()
+    msg.error = buffer:readInt()
     msg.roleId = buffer:readLong()
     msg.roleName = buffer:readString()
     msg.roleInfo = RoleInfo.decode(buffer, msg.roleInfo)

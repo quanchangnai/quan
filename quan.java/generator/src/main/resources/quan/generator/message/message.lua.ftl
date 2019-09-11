@@ -24,6 +24,11 @@ local function onSet(table, key, value)
     rawset(table, key, value)
 end
 
+<#if selfAndHeadFields??>
+    <#assign allFields = selfAndHeadFields>
+<#else>
+    <#assign allFields = fields>
+</#if>
 ---
 ---<#if comment !="">${comment}<#else>${name}</#if>.构造
 ---@param args 参数列表可以为空
@@ -33,11 +38,7 @@ function ${name}.new(args)
     args = args or {}
 
     local instance = {
-<#if definitionType ==3>
-        ---消息序号
-        seq = args.seq or 0,
-</#if>
-<#list fields as field>
+<#list allFields as field>
     <#if field.comment !="">
         ---${field.comment}
     </#if>
@@ -75,7 +76,7 @@ function ${name}.encode(msg, buffer)
     buffer = Message.encode(msg, buffer)
 
 </#if>
-<#list fields as field>
+<#list allFields as field>
     <#if field.type=="set" || field.type=="list">
         <#if field_index gt 0>
 
@@ -88,7 +89,7 @@ function ${name}.encode(msg, buffer)
         ${field.valueType}.encode(value, buffer)
         </#if>
     end
-    <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || fields[field_index+1].enumType || !fields[field_index+1].optional) >
+    <#if field_has_next && !allFields[field_index+1].collectionType && (allFields[field_index+1].primitiveType || allFields[field_index+1].enumType || !allFields[field_index+1].optional) >
 
     </#if>
     <#elseif field.type=="map">
@@ -104,7 +105,7 @@ function ${name}.encode(msg, buffer)
         ${field.valueType}.encode(value, buffer)
         </#if>
     end
-    <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || fields[field_index+1].enumType || !fields[field_index+1].optional) >
+    <#if field_has_next && !allFields[field_index+1].collectionType && (allFields[field_index+1].primitiveType || allFields[field_index+1].enumType || !allFields[field_index+1].optional) >
 
     </#if>
     <#elseif field.type=="float"||field.type=="double">
@@ -121,7 +122,7 @@ function ${name}.encode(msg, buffer)
     if msg.${field.name} ~= nil then
         ${field.type}.encode(msg.${field.name}, buffer)
     end
-    <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || fields[field_index+1].enumType || !fields[field_index+1].optional) >
+    <#if field_has_next && !allFields[field_index+1].collectionType && (allFields[field_index+1].primitiveType || allFields[field_index+1].enumType || !allFields[field_index+1].optional) >
 
     </#if>
     <#else>
@@ -147,7 +148,7 @@ function ${name}.decode(buffer, msg)
     Message.decode(buffer, msg)
 
 </#if>
-<#list fields as field>
+<#list allFields as field>
     <#if field.type=="set" || field.type=="list">
         <#if field_index gt 0>
 
@@ -159,7 +160,7 @@ function ${name}.decode(buffer, msg)
         msg.${field.name}[i] = ${field.valueType}.decode(buffer)
         </#if>
     end
-    <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || fields[field_index+1].enumType || !fields[field_index+1].optional) >
+    <#if field_has_next && !allFields[field_index+1].collectionType && (allFields[field_index+1].primitiveType || allFields[field_index+1].enumType || !allFields[field_index+1].optional) >
 
     </#if>
     <#elseif field.type=="map">
@@ -173,7 +174,7 @@ function ${name}.decode(buffer, msg)
         msg.${field.name}[buffer:read${field.keyType?cap_first}()] = ${field.valueType}.decode(buffer)
         </#if>
     end
-    <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || fields[field_index+1].enumType || !fields[field_index+1].optional) >
+    <#if field_has_next && !allFields[field_index+1].collectionType && (allFields[field_index+1].primitiveType || allFields[field_index+1].enumType || !allFields[field_index+1].optional) >
 
     </#if>
     <#elseif field.type=="float"||field.type=="double">
@@ -189,7 +190,7 @@ function ${name}.decode(buffer, msg)
     if buffer:readBool() then
         msg.${field.name} = ${field.type}.decode(buffer)
     end
-    <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || fields[field_index+1].enumType || !fields[field_index+1].optional) >
+    <#if field_has_next && !allFields[field_index+1].collectionType && (allFields[field_index+1].primitiveType || allFields[field_index+1].enumType || !allFields[field_index+1].optional) >
 
     </#if>
     <#else>

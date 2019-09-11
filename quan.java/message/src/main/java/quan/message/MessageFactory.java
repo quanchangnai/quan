@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.common.util.ClassUtils;
 
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -20,9 +21,9 @@ public class MessageFactory {
     protected Map<Integer, Message> prototypes = new HashMap<>();
 
     public void register(Message message) {
-        Objects.requireNonNull(message, "参数[message]不能为空" );
+        Objects.requireNonNull(message, "参数[message]不能为空");
         if (prototypes.containsKey(message.getId())) {
-            throw new IllegalArgumentException("消息ID[" + message.getId() + "]不能重复" );
+            throw new IllegalArgumentException("消息ID[" + message.getId() + "]不能重复");
         }
         prototypes.put(message.getId(), message);
     }
@@ -31,10 +32,13 @@ public class MessageFactory {
         Set<Class<?>> messageClasses = ClassUtils.loadClasses(packageName, Message.class);
         for (Class<?> messageClass : messageClasses) {
             try {
+                if (Modifier.isAbstract(messageClass.getModifiers())) {
+                    continue;
+                }
                 Message message = (Message) messageClass.getDeclaredConstructor().newInstance();
                 register(message);
             } catch (Exception e) {
-                logger.error("" , e);
+                logger.error("", e);
             }
         }
     }

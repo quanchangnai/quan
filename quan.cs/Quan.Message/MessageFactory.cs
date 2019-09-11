@@ -39,7 +39,7 @@ namespace Quan.Message
 
             foreach (var type in assembly.GetTypes())
             {
-                if (!typeof(MessageBase).IsAssignableFrom(type))
+                if (!typeof(MessageBase).IsAssignableFrom(type) || type.IsAbstract)
                 {
                     continue;
                 }

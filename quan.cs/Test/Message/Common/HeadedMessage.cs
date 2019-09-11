@@ -7,42 +7,43 @@ using Buffer = Quan.Message.Buffer;
 namespace Test.Message.Common
 {
 	/// <summary>
+	/// 消息头<br/>
 	/// 自动生成
 	/// </summary>
-    public class HeadedMessage : 
+    public abstract class HeadedMessage : MessageBase
     {
-		public long H1 { get; set; }
+        /// <summary>
+		/// 消息序号
+		/// </summary>
+		public long Seq { get; set; }
 
-		private string _h2 = "";
-
-		public string H2
-		{
-	    	get => _h2;
-	    	set => _h2 = value ?? throw new NullReferenceException();
-		}
+        /// <summary>
+		/// 错误码
+		/// </summary>
+		public int Error { get; set; }
 
 
 		public override void Encode(Buffer buffer)
 		{
 	    	base.Encode(buffer);
 
-		    buffer.WriteLong(H1);
-		    buffer.WriteString(H2);
+		    buffer.WriteLong(Seq);
+		    buffer.WriteInt(Error);
 		}
 
 		public override void Decode(Buffer buffer)
 		{
 	    	base.Decode(buffer);
 
-		    H1 = buffer.ReadLong();
-		    H2 = buffer.ReadString();
+		    Seq = buffer.ReadLong();
+		    Error = buffer.ReadInt();
 		}
 
 		public override string ToString()
 		{
 			return "HeadedMessage{" +
-					"h1=" + H1.ToString2() +
-					",h2='" + H2 + '\'' +
+					"seq=" + Seq.ToString2() +
+					",error=" + Error.ToString2() +
 					'}';
 		}
     }

@@ -9,14 +9,11 @@ namespace Quan.Message
     {
         public abstract int Id { get; }
 
-        public long Seq { get; set; }
-
         public abstract MessageBase Create();
 
         public override void Encode(Buffer buffer)
         {
             buffer.WriteInt(Id);
-            buffer.WriteLong(Seq);
         }
 
         public override void Decode(Buffer buffer)
@@ -31,8 +28,6 @@ namespace Quan.Message
             {
                 throw new IOException($"消息ID不匹配,期望值[{Id}],实际值[{id}]");
             }
-
-            Seq = buffer.ReadLong();
         }
     }
 }

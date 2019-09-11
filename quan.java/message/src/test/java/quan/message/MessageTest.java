@@ -106,6 +106,7 @@ public class MessageTest {
         sRoleLogin2.decode(encodedBytes);
 
         System.err.println("sRoleLogin2:" + sRoleLogin2);
+//        System.err.println("sRoleLogin2.seq:" + sRoleLogin2.getSeq());
     }
 
     private static void test3() throws Exception {

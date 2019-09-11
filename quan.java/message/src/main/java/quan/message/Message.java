@@ -9,29 +9,15 @@ import java.io.IOException;
 public abstract class Message extends Bean {
 
     /**
-     * 消息序号
-     */
-    private long seq;
-
-    /**
      * 消息ID
      */
     public abstract int getId();
-
-    public final long getSeq() {
-        return seq;
-    }
-
-    public final void setSeq(long seq) {
-        this.seq = seq;
-    }
 
     public abstract Message create();
 
     @Override
     public void encode(Buffer buffer) throws IOException {
         buffer.writeInt(getId());
-        buffer.writeLong(seq);
     }
 
     @Override
@@ -43,6 +29,5 @@ public abstract class Message extends Bean {
         if (msgId != getId()) {
             throw new IOException(String.format("消息ID不匹配,期望值[%s],实际值[%s]", getId(), msgId));
         }
-        seq = buffer.readLong();
     }
 }

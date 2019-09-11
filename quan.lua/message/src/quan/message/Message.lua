@@ -16,7 +16,6 @@ function Message.encode(msg, buffer)
     end
 
     buffer:writeInt(msg.id);
-    buffer:writeLong(msg.seq or 0);
 
     return buffer
 end
@@ -30,7 +29,6 @@ function Message.decode(buffer, msg)
     if msgId ~= msg.id then
         error(string.format("消息ID不匹配,期望值[%s],实际值[%s]", msg.id, msgId), 2)
     end
-    msg.seq = buffer:readLong()
 
     return msg
 end

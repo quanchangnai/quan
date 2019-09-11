@@ -15,7 +15,7 @@ namespace ${fullPackageName}
 </#if>
 	/// 自动生成
 	/// </summary>
-    public class ${name} : <#if definitionType ==2>Bean<#elseif definitionType ==3>MessageBase</#if>
+    public<#if definitionType ==9> abstract</#if> class ${name} : <#if definitionType ==2>Bean<#elseif definitionType ==3 && head??>${head.name}<#else>MessageBase</#if>
     {
 <#if definitionType ==3>
 		/// <summary>

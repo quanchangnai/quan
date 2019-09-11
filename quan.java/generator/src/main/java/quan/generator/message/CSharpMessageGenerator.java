@@ -1,7 +1,12 @@
 package quan.generator.message;
 
 import org.apache.commons.cli.CommandLine;
-import quan.definition.*;
+import quan.definition.BeanDefinition;
+import quan.definition.ClassDefinition;
+import quan.definition.FieldDefinition;
+import quan.definition.Language;
+import quan.definition.message.MessageDefinition;
+import quan.definition.message.MessageHeadDefinition;
 import quan.definition.parser.DefinitionParser;
 import quan.generator.util.CSharpUtils;
 import quan.generator.util.CommandLineUtils;
@@ -50,6 +55,17 @@ public class CSharpMessageGenerator extends MessageGenerator {
 
     protected void processClassSelf(ClassDefinition classDefinition) {
         classDefinition.setRealPackageName(CSharpUtils.toCapitalCamel(classDefinition.getPackageName()));
+    }
+
+    @Override
+    protected void processClassDependency(ClassDefinition classDefinition) {
+        if (classDefinition instanceof MessageDefinition) {
+            MessageHeadDefinition messageHeadDefinition = ((MessageDefinition) classDefinition).getHead();
+            if (messageHeadDefinition != null && !messageHeadDefinition.getFullPackageName().equals(classDefinition.getFullPackageName())) {
+                classDefinition.getImports().add(messageHeadDefinition.getFullPackageName());
+            }
+        }
+        super.processClassDependency(classDefinition);
     }
 
     @Override

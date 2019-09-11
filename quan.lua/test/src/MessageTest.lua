@@ -96,6 +96,7 @@ local function testMessage1()
 
     sRoleLogin1.userInfo = UserInfo.new()
 
+    sRoleLogin1.seq = 1000
     local buffer = SRoleLogin.encode(sRoleLogin1)
     print("buffer:size()", buffer:size())
 

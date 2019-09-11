@@ -2,6 +2,10 @@ package quan.definition.message;
 
 import quan.definition.BeanDefinition;
 import quan.definition.DefinitionCategory;
+import quan.definition.FieldDefinition;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 消息定义
@@ -43,8 +47,15 @@ public class MessageDefinition extends BeanDefinition {
     }
 
     @Override
-    public void validate() {
-        super.validate();
+    protected void validateFieldNameDuplicate(FieldDefinition fieldDefinition) {
+        MessageHeadDefinition headDefinition = parser.getMessageHead();
+        if (fieldDefinition.getName() != null && headDefinition != null) {
+            headDefinition.validate();
+            if (headDefinition.getField(fieldDefinition.getName()) != null) {
+                addValidatedError(getName4Validate("的") + "字段名[" + fieldDefinition.getName() + "]不能和消息头的字段重复");
+            }
+        }
+        super.validateFieldNameDuplicate(fieldDefinition);
     }
 
     @Override
@@ -52,11 +63,19 @@ public class MessageDefinition extends BeanDefinition {
         if (super.isReservedWord(fieldName)) {
             return true;
         }
-        return fieldName.equals("id") || fieldName.equals("seq");
+        return fieldName.equals("id");
     }
 
     public MessageHeadDefinition getHead() {
-        System.err.println("getHead============");
         return parser.getMessageHead();
+    }
+
+    public List<FieldDefinition> getSelfAndHeadFields() {
+        List<FieldDefinition> fields = new ArrayList<>();
+        if (getHead() != null) {
+            fields.addAll(getHead().getFields());
+        }
+        fields.addAll(getFields());
+        return fields;
     }
 }

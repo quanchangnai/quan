@@ -4,6 +4,7 @@ using Quan.Common;
 using Quan.Message;
 using Buffer = Quan.Message.Buffer;
 using Test.Message.User;
+using Test.Message.Common;
 
 namespace Test.Message.Role
 {
@@ -11,7 +12,7 @@ namespace Test.Message.Role
 	/// 角色登录<br/>
 	/// 自动生成
 	/// </summary>
-    public class SRoleLogin : MessageBase
+    public class SRoleLogin : HeadedMessage
     {
 		/// <summary>
 		/// 消息ID

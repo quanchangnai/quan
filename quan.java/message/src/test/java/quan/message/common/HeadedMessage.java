@@ -5,31 +5,45 @@ import java.io.IOException;
 import quan.message.*;
 
 /**
+ * 消息头<br/>
  * 自动生成
  */
 public abstract class HeadedMessage extends Message {
 
-    private long h1;
+    //消息序号
+    private long seq;
 
-    private String h2 = "";
+    //错误码
+    private int error;
 
 
-    public long getH1() {
-        return h1;
+    /**
+     * 消息序号
+     */
+    public long getSeq() {
+        return seq;
     }
 
-    public HeadedMessage setH1(long h1) {
-        this.h1 = h1;
+    /**
+     * 消息序号
+     */
+    public HeadedMessage setSeq(long seq) {
+        this.seq = seq;
         return this;
     }
 
-    public String getH2() {
-        return h2;
+    /**
+     * 错误码
+     */
+    public int getError() {
+        return error;
     }
 
-    public HeadedMessage setH2(String h2) {
-        Objects.requireNonNull(h2);
-        this.h2 = h2;
+    /**
+     * 错误码
+     */
+    public HeadedMessage setError(int error) {
+        this.error = error;
         return this;
     }
 
@@ -37,23 +51,23 @@ public abstract class HeadedMessage extends Message {
     public void encode(Buffer buffer) throws IOException {
         super.encode(buffer);
 
-        buffer.writeLong(this.h1);
-        buffer.writeString(this.h2);
+        buffer.writeLong(this.seq);
+        buffer.writeInt(this.error);
     }
 
     @Override
     public void decode(Buffer buffer) throws IOException {
         super.decode(buffer);
 
-        this.h1 = buffer.readLong();
-        this.h2 = buffer.readString();
+        this.seq = buffer.readLong();
+        this.error = buffer.readInt();
     }
 
     @Override
     public String toString() {
         return "HeadedMessage{" +
-                "h1=" + h1 +
-                ",h2='" + h2 + '\'' +
+                "seq=" + seq +
+                ",error=" + error +
                 '}';
 
     }

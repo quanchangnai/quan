@@ -77,16 +77,18 @@ namespace Test
 
             var encodedBytes = sRoleLogin1.Encode();
             
-//            var fileStream = File.Open("E:\\SRoleLogin", FileMode.Open);
-//            encodedBytes = new byte[fileStream.Length];
-//            fileStream.Read(encodedBytes, 0, encodedBytes.Length);
+            var fileStream = File.Open("E:\\SRoleLogin", FileMode.Open);
+            encodedBytes = new byte[fileStream.Length];
+            fileStream.Read(encodedBytes, 0, encodedBytes.Length);
 
             Console.WriteLine("encodedBytes.Length:{0}", encodedBytes.Length);
 
             var sRoleLogin2 = new SRoleLogin();
             sRoleLogin2.Decode(encodedBytes);
 
-            Console.WriteLine("sRoleLogin2" + sRoleLogin2);
+            Console.WriteLine("sRoleLogin2:" + sRoleLogin2);
+            Console.WriteLine("sRoleLogin2.Seq:" + sRoleLogin2.Seq);
+
         }
 
         public static void Test3()
