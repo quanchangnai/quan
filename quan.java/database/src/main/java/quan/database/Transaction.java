@@ -9,6 +9,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 
 /**
+ * 基于乐观锁的事务
  * Created by quanchangnai on 2019/5/16.
  */
 public class Transaction {
@@ -75,7 +76,7 @@ public class Transaction {
     private long id = nextId.incrementAndGet();
 
     /**
-     * 事务是否失败
+     * 事务是否已失败
      */
     private boolean failed;
 
@@ -85,22 +86,22 @@ public class Transaction {
     private List<ReadWriteLock> tableLocks = new ArrayList<>();
 
     /**
-     * 行级锁，数据受缓存管理时
+     * 持久化数据行级锁
      */
-    private List<Lock> cachedRowLocks = new ArrayList<>();
+    private List<Lock> persistentRowLocks = new ArrayList<>();
 
     /**
-     * 行级锁，数据不受缓存管理时
+     * 纯内纯数据行级锁
      */
-    private List<Lock> notCachedRowLocks = new ArrayList<>();
+    private List<Lock> memoryRowLocks = new ArrayList<>();
 
     /**
-     * 记录Data的版本号
+     * 记录数据的版本号
      */
     private Map<Data, VersionLog> versionLogs = new HashMap<>();
 
     /**
-     * 记录节点(Bean和集合)的根对象
+     * 记录节点的根
      */
     private Map<Node, RootLog> rootLogs = new HashMap<>();
 
@@ -110,7 +111,7 @@ public class Transaction {
     private Map<Field, FieldLog> fieldLogs = new HashMap<>();
 
     /**
-     * 记录Data的缓存和创建删除
+     * 记录数据的创建删除
      */
     private Map<DataLog.Key, DataLog> dataLogs = new HashMap<>();
 
@@ -142,8 +143,8 @@ public class Transaction {
         if (data == null) {
             return;
         }
-        if (data.getCache() != null) {
-            data.getCache().checkWorkable();
+        if (data.getTable() != null) {
+            data.getTable().checkWorkable();
         }
         if (data._isExpired()) {
             throw new IllegalStateException("数据已过期");
@@ -358,40 +359,40 @@ public class Transaction {
      */
     private void lock() {
         tableLocks.clear();
-        cachedRowLocks.clear();
-        notCachedRowLocks.clear();
+        persistentRowLocks.clear();
+        memoryRowLocks.clear();
 
-        TreeSet<Cache> caches = new TreeSet<>();
+        TreeSet<Table> tables = new TreeSet<>();
         for (DataLog dataLog : dataLogs.values()) {
-            Cache cache = dataLog.getCache();
-            cache.checkWorkable();
-            caches.add(cache);
-            cachedRowLocks.add(LockPool.getLock(cache, dataLog.getKey().getK()));
+            Table table = dataLog.getTable();
+            table.checkWorkable();
+            tables.add(table);
+            persistentRowLocks.add(LockPool.getLock(table, dataLog.getKey().getK()));
 
         }
-        for (Cache cache : caches) {
-            tableLocks.add(cache.getLock());
+        for (Table table : tables) {
+            tableLocks.add(table.getLock());
         }
 
         TreeSet<Integer> rowLockIndexes = new TreeSet<>();
-        TreeSet<Data> notCachedRowLocksIndexes = new TreeSet<>();
+        TreeSet<Data> memoryRowLockIndexes = new TreeSet<>();
         for (Data data : versionLogs.keySet()) {
-            Cache cache = data.getCache();
-            if (cache != null) {
-                cache.checkWorkable();
-                rowLockIndexes.add(LockPool.getLockIndex(cache, data.getKey()));
+            Table table = data.getTable();
+            if (table != null) {
+                table.checkWorkable();
+                rowLockIndexes.add(LockPool.getLockIndex(table, data.getKey()));
             } else {
-                //没有注册缓存
-                notCachedRowLocksIndexes.add(data);
+                //纯内存数据
+                memoryRowLockIndexes.add(data);
             }
         }
 
         for (Integer rowLockIndex : rowLockIndexes) {
-            cachedRowLocks.add(LockPool.getLock(rowLockIndex));
+            persistentRowLocks.add(LockPool.getLock(rowLockIndex));
         }
 
-        for (Data data : notCachedRowLocksIndexes) {
-            notCachedRowLocks.add(data._getLock());
+        for (Data data : memoryRowLockIndexes) {
+            memoryRowLocks.add(data._getLock());
         }
 
         //存档时要阻塞
@@ -399,11 +400,11 @@ public class Transaction {
             tableLock.readLock().lock();
         }
 
-        for (Lock rowLock : cachedRowLocks) {
+        for (Lock rowLock : persistentRowLocks) {
             rowLock.lock();
         }
 
-        for (Lock rowLock : notCachedRowLocks) {
+        for (Lock rowLock : memoryRowLocks) {
             rowLock.lock();
         }
     }
@@ -414,15 +415,15 @@ public class Transaction {
         }
         tableLocks.clear();
 
-        for (Lock rowLock : cachedRowLocks) {
+        for (Lock rowLock : persistentRowLocks) {
             rowLock.unlock();
         }
-        cachedRowLocks.clear();
+        persistentRowLocks.clear();
 
-        for (Lock rowLock : notCachedRowLocks) {
+        for (Lock rowLock : memoryRowLocks) {
             rowLock.unlock();
         }
-        notCachedRowLocks.clear();
+        memoryRowLocks.clear();
     }
 
 

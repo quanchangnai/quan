@@ -1,6 +1,7 @@
 package quan.database;
 
 /**
+ * 记录字段值
  * Created by quanchangnai on 2019/5/16.
  */
 class FieldLog<V> {

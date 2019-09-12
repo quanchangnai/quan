@@ -5,6 +5,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
+ * 行数据
  * Created by quanchangnai on 2019/5/16.
  */
 public abstract class Data<K> extends Entity implements Comparable<Data<K>> {
@@ -16,22 +17,22 @@ public abstract class Data<K> extends Entity implements Comparable<Data<K>> {
 
     private volatile long touchTime = System.currentTimeMillis();
 
-    private Cache<K, ? extends Data<K>> cache;
+    private Table<K, ? extends Data<K>> table;
 
     private static final AtomicLong nextId = new AtomicLong();
 
     private long id = nextId.incrementAndGet();
 
     /**
-     * 行级锁，当数据不受缓存管理时使用，受缓存管理时使用锁池
+     * 行级锁，当数据是纯内纯时使用，当数据需要持久化时使用公共锁池中的锁
      */
     private Lock lock;
 
     private volatile boolean expired;
 
-    public Data(Cache<K, ? extends Data<K>> cache) {
-        this.cache = cache;
-        if (cache == null) {
+    public Data(Table<K, ? extends Data<K>> table) {
+        this.table = table;
+        if (table == null) {
             lock = new ReentrantLock();
         }
     }
@@ -40,8 +41,8 @@ public abstract class Data<K> extends Entity implements Comparable<Data<K>> {
         return lock;
     }
 
-    final Cache<K, ? extends Data<K>> getCache() {
-        return cache;
+    final Table<K, ? extends Data<K>> getTable() {
+        return table;
     }
 
     @Override

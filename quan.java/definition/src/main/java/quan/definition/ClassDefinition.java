@@ -270,7 +270,7 @@ public abstract class ClassDefinition extends Definition {
 
         if (other != null) {
             position += "。定义文件[" + other.getDefinitionFile() + "]";
-            if (getName() != null) {
+            if (other.getName() != null) {
                 position += "，类[" + other.getName() + "]";
             }
         }

@@ -55,15 +55,15 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
 <#if definitionType ==5>
 
     <#if persistent>
-    private static Cache<${keyType}, ${name}> _cache;
+    private static Table<${keyType}, ${name}> _table;
 
     public ${name}(${keyType} ${keyName}) {
-        super(_cache);
+        super(_table);
         this.${keyName}.setLogValue(${keyName}, _getRoot());
     }
 
-    public ${name}(Cache<${keyType}, ${name}> cache, ${keyType} ${keyName}) {
-        super(cache);
+    public ${name}(Table<${keyType}, ${name}> table, ${keyType} ${keyName}) {
+        super(table);
         this.${keyName}.setLogValue(${keyName}, _getRoot());
     }
 
@@ -331,17 +331,17 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
     }
 
 <#if definitionType ==5 && persistent>
-    public synchronized static void setCache(Cache<${keyType}, ${name}> cache) {
-        if (_cache != null && _cache.isWorkable()) {
+    public synchronized static void setTable(Table<${keyType}, ${name}> table) {
+        if (_table != null && _table.isWorkable()) {
             throw new IllegalStateException("数据已设置缓存" );
         }
-        Objects.requireNonNull(cache, "参数[cache]不能为空" );
-        cache.checkWorkable();
-        _cache = cache;
+        Objects.requireNonNull(table, "参数[table]不能为空" );
+        table.checkWorkable();
+        _table = table;
     }
 
-    private synchronized static void checkCache() {
-        if (_cache != null && _cache.isWorkable()) {
+    private synchronized static void checkTable() {
+        if (_table != null && _table.isWorkable()) {
             return;
         }
 
@@ -350,30 +350,30 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
             throw new IllegalStateException("没有默认数据库" );
         }
 
-        if (_cache == null) {
-            _cache = new Cache<>("${name}" , ${name}::new);
+        if (_table == null) {
+            _table = new Table<>("${name}" , ${name}::new);
         }
-        database.registerCache(_cache);
+        database.registerTable(_table);
     }
 
     public static ${name} get(${keyType} ${keyName}) {
-        checkCache();
-        return _cache.get(${keyName});
+        checkTable();
+        return _table.get(${keyName});
     }
 
     public static void delete(${keyType} ${keyName}) {
-        checkCache();
-        _cache.delete(${keyName});
+        checkTable();
+        _table.delete(${keyName});
     }
 
     public static void insert(${name} data) {
-        checkCache();
-        _cache.insert(data);
+        checkTable();
+        _table.insert(data);
     }
 
     public static ${name} getOrInsert(${keyType} ${keyName}) {
-        checkCache();
-        return _cache.getOrInsert(${keyName});
+        checkTable();
+        return _table.getOrInsert(${keyName});
     }
 
 </#if>

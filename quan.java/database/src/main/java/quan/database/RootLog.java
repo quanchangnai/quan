@@ -1,6 +1,7 @@
 package quan.database;
 
 /**
+ * 记录节点的根
  * Created by quanchangnai on 2019/5/17.
  */
 class RootLog {

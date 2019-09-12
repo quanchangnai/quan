@@ -1,6 +1,7 @@
 package quan.database;
 
 /**
+ * 记录数据的版本号
  * Created by quanchangnai on 2019/5/17.
  */
 @SuppressWarnings("unchecked")
@@ -15,27 +16,23 @@ class VersionLog {
         this.version = data._getVersion();
     }
 
-    public long getVersion() {
-        return version;
-    }
-
     public Data getData() {
         return data;
     }
 
     public boolean isConflict() {
-        Cache cache = data.getCache();
-        if (cache != null) {
-            cache.checkWorkable();
+        Table table = data.getTable();
+        if (table != null) {
+            table.checkWorkable();
         }
         return version != data._getVersion();
     }
 
     public void commit() {
         data.versionUp();
-        Cache cache = data.getCache();
-        if (cache != null) {
-            cache.setUpdate(data);
+        Table table = data.getTable();
+        if (table != null) {
+            table.setUpdate(data);
         }
     }
 }

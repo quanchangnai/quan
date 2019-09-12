@@ -50,11 +50,11 @@ public class BerkeleyDB extends Database {
     }
 
     @Override
-    protected void registerCache0(Cache cache) {
+    protected void registerTable0(Table table) {
         DatabaseConfig databaseConfig = new DatabaseConfig();
         databaseConfig.setAllowCreate(true);
         databaseConfig.setTransactional(true);
-        com.sleepycat.je.Database db = environment.openDatabase(null, cache.getName(), databaseConfig);
+        com.sleepycat.je.Database db = environment.openDatabase(null, table.getName(), databaseConfig);
         dbs.put(db.getDatabaseName(), db);
 
     }
@@ -70,19 +70,19 @@ public class BerkeleyDB extends Database {
     }
 
     @Override
-    protected <K, V extends Data<K>> V get(Cache<K, V> cache, K key) {
+    protected <K, V extends Data<K>> V get(Table<K, V> table, K key) {
         checkClosed();
 
         DatabaseEntry keyEntry = new DatabaseEntry(key.toString().getBytes());
         DatabaseEntry dataEntry = new DatabaseEntry();
 
-        dbs.get(cache.getName()).get(null, keyEntry, dataEntry, LockMode.DEFAULT);
+        dbs.get(table.getName()).get(null, keyEntry, dataEntry, LockMode.DEFAULT);
 
         if (dataEntry.getData() == null) {
             return null;
         }
 
-        V data = cache.getDataFactory().apply(key);
+        V data = table.getDataFactory().apply(key);
         data.decode(JSON.parseObject(new String(dataEntry.getData())));
 
         return data;
@@ -94,21 +94,21 @@ public class BerkeleyDB extends Database {
 
         DatabaseEntry keyEntry = new DatabaseEntry(data.getKey().toString().getBytes());
         DatabaseEntry dataEntry = new DatabaseEntry(data.encode().toJSONString().getBytes());
-        dbs.get(data.getCache().getName()).put(null, keyEntry, dataEntry);
+        dbs.get(data.getTable().getName()).put(null, keyEntry, dataEntry);
     }
 
 
     @Override
-    protected <K, V extends Data<K>> void delete(Cache<K, V> cache, K key) {
+    protected <K, V extends Data<K>> void delete(Table<K, V> table, K key) {
         checkClosed();
 
         DatabaseEntry keyEntry = new DatabaseEntry(key.toString().getBytes());
-        dbs.get(cache.getName()).delete(null, keyEntry);
+        dbs.get(table.getName()).delete(null, keyEntry);
 
     }
 
     @Override
-    protected <K, V extends Data<K>> void bulkWrite(Cache<K, V> cache, Set<V> puts, Set<K> deletes) {
+    protected <K, V extends Data<K>> void bulkWrite(Table<K, V> table, Set<V> puts, Set<K> deletes) {
         checkClosed();
 
         TransactionConfig transactionConfig = new TransactionConfig();
@@ -118,12 +118,12 @@ public class BerkeleyDB extends Database {
             for (V putData : puts) {
                 DatabaseEntry keyEntry = new DatabaseEntry(putData.getKey().toString().getBytes());
                 DatabaseEntry dataEntry = new DatabaseEntry(putData.encode().toJSONString().getBytes());
-                dbs.get(putData.getCache().getName()).put(transaction, keyEntry, dataEntry);
+                dbs.get(putData.getTable().getName()).put(transaction, keyEntry, dataEntry);
             }
 
             for (K deleteKey : deletes) {
                 DatabaseEntry keyEntry = new DatabaseEntry(deleteKey.toString().getBytes());
-                dbs.get(cache.getName()).delete(transaction, keyEntry);
+                dbs.get(table.getName()).delete(transaction, keyEntry);
             }
 
             transaction.commit();

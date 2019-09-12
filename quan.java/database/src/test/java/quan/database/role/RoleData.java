@@ -48,15 +48,15 @@ public class RoleData extends Data<Long> {
     private MapField<Integer, ItemEntity> map2 = new MapField<>(_getRoot());
 
 
-    private static Cache<Long, RoleData> _cache;
+    private static Table<Long, RoleData> _table;
 
     public RoleData(Long id) {
-        super(_cache);
+        super(_table);
         this.id.setLogValue(id, _getRoot());
     }
 
-    public RoleData(Cache<Long, RoleData> cache, Long id) {
-        super(cache);
+    public RoleData(Table<Long, RoleData> table, Long id) {
+        super(table);
         this.id.setLogValue(id, _getRoot());
     }
 
@@ -359,17 +359,17 @@ public class RoleData extends Data<Long> {
 
     }
 
-    public synchronized static void setCache(Cache<Long, RoleData> cache) {
-        if (_cache != null && _cache.isWorkable()) {
+    public synchronized static void setTable(Table<Long, RoleData> table) {
+        if (_table != null && _table.isWorkable()) {
             throw new IllegalStateException("数据已设置缓存" );
         }
-        Objects.requireNonNull(cache, "参数[cache]不能为空" );
-        cache.checkWorkable();
-        _cache = cache;
+        Objects.requireNonNull(table, "参数[table]不能为空" );
+        table.checkWorkable();
+        _table = table;
     }
 
-    private synchronized static void checkCache() {
-        if (_cache != null && _cache.isWorkable()) {
+    private synchronized static void checkTable() {
+        if (_table != null && _table.isWorkable()) {
             return;
         }
 
@@ -378,30 +378,30 @@ public class RoleData extends Data<Long> {
             throw new IllegalStateException("没有默认数据库" );
         }
 
-        if (_cache == null) {
-            _cache = new Cache<>("RoleData" , RoleData::new);
+        if (_table == null) {
+            _table = new Table<>("RoleData" , RoleData::new);
         }
-        database.registerCache(_cache);
+        database.registerTable(_table);
     }
 
     public static RoleData get(Long id) {
-        checkCache();
-        return _cache.get(id);
+        checkTable();
+        return _table.get(id);
     }
 
     public static void delete(Long id) {
-        checkCache();
-        _cache.delete(id);
+        checkTable();
+        _table.delete(id);
     }
 
     public static void insert(RoleData data) {
-        checkCache();
-        _cache.insert(data);
+        checkTable();
+        _table.insert(data);
     }
 
     public static RoleData getOrInsert(Long id) {
-        checkCache();
-        return _cache.getOrInsert(id);
+        checkTable();
+        return _table.getOrInsert(id);
     }
 
 }

@@ -333,10 +333,10 @@ public class BeanDefinition extends ClassDefinition {
         if (!(classDefinition instanceof BeanDefinition)) {
             return false;
         }
-        return !(classDefinition instanceof DataDefinition)
-                && !(classDefinition instanceof MessageDefinition)
-                && !(classDefinition instanceof MessageHeadDefinition)
-                && !(classDefinition instanceof ConfigDefinition);
+        return !(classDefinition instanceof DataDefinition
+                || classDefinition instanceof MessageDefinition
+                || classDefinition instanceof MessageHeadDefinition
+                || classDefinition instanceof ConfigDefinition);
     }
 
 }

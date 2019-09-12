@@ -119,7 +119,6 @@ public class Buffer {
         }
 
         int position = reading ? this.position : 0;
-        reading = true;
         int shift = 0;
         long temp = 0;
 
@@ -136,6 +135,7 @@ public class Buffer {
                 continue;
             }
 
+            reading = true;
             this.position = position;
             //ZigZag解码
             return (temp >>> 1) ^ -(temp & 1);
@@ -174,7 +174,6 @@ public class Buffer {
 
     public float readFloat() throws IOException {
         int position = reading ? this.position : 0;
-        reading = true;
         int shift = 0;
         int temp = 0;
 
@@ -187,6 +186,7 @@ public class Buffer {
             shift += 8;
         }
 
+        reading = true;
         this.position = position;
         return Float.intBitsToFloat(temp);
     }
@@ -201,7 +201,6 @@ public class Buffer {
 
     public double readDouble() throws IOException {
         int position = reading ? this.position : 0;
-        reading = true;
         int shift = 0;
         long temp = 0;
 
@@ -214,6 +213,7 @@ public class Buffer {
             shift += 8;
         }
 
+        reading = true;
         this.position = position;
         return Double.longBitsToDouble(temp);
     }
@@ -257,13 +257,13 @@ public class Buffer {
 
         int position = reading ? 0 : this.position;
         int end = this.end;
-        reading = false;
         //ZigZag编码
         n = (n << 1) ^ (n >> 63);
 
         while (true) {
             if ((n & ~0b1111111) == 0) {
                 bytes[position++] = (byte) (n & 0b1111111);
+                reading = false;
                 this.position = position;
                 this.end = ++end;
                 return;
@@ -306,7 +306,6 @@ public class Buffer {
 
         int position = reading ? 0 : this.position;
         int end = this.end;
-        reading = false;
 
         int temp = Float.floatToIntBits(n);
         int shift = 0;
@@ -317,6 +316,7 @@ public class Buffer {
             end++;
         }
 
+        reading = false;
         this.position = position;
         this.end = end;
     }
@@ -334,7 +334,6 @@ public class Buffer {
 
         int position = reading ? 0 : this.position;
         int end = this.end;
-        reading = false;
 
         long temp = Double.doubleToLongBits(n);
         int shift = 0;
@@ -345,6 +344,7 @@ public class Buffer {
             end++;
         }
 
+        reading = false;
         this.position = position;
         this.end = end;
     }

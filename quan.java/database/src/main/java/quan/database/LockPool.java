@@ -57,9 +57,9 @@ public class LockPool {
     }
 
 
-    static Lock getLock(Cache cache, Object key) {
+    static Lock getLock(Table table, Object key) {
         used = true;
-        return getLock(getLockIndex(cache, key));
+        return getLock(getLockIndex(table, key));
     }
 
     static Lock getLock(int lockIndex) {
@@ -68,9 +68,9 @@ public class LockPool {
     }
 
 
-    static int getLockIndex(Cache cache, Object key) {
+    static int getLockIndex(Table table, Object key) {
         used = true;
-        int hash = Objects.hash(cache, key);
+        int hash = Objects.hash(table, key);
         return (hash & 0x7FFFFFFF) % locks.size();
     }
 

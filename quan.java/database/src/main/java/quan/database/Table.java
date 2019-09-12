@@ -12,10 +12,11 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
 
 /**
+ * 缓存表
  * Created by quanchangnai on 2019/6/21.
  */
 @SuppressWarnings({"unchecked"})
-public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
+public class Table<K, V extends Data<K>> implements Comparable<Table<K, V>> {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -50,11 +51,11 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
     private Map<K, Row<V>> dirty;
 
     /**
-     * 表级锁，存档时加写锁，其他地方加读锁
+     * 表级锁，存档时加写锁，其他时候加读锁
      */
     private ReadWriteLock lock = new ReentrantReadWriteLock();
 
-    public Cache(String name, Function<K, V> dataFactory) {
+    public Table(String name, Function<K, V> dataFactory) {
         this.name = name;
         this.dataFactory = dataFactory;
     }
@@ -97,7 +98,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
     }
 
     @Override
-    public int compareTo(Cache<K, V> other) {
+    public int compareTo(Table<K, V> other) {
         return this.id - other.id;
     }
 
@@ -111,7 +112,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
     }
 
     void setInsert(V data) {
-//        logger.debug("[{}],Cache.setInsert({}),rows:{}", name, data.getKey(), rows);
+//        logger.debug("[{}],Table.setInsert({}),rows:{}", name, data.getKey(), rows);
         data._setExpired(false);
         Row<V> row = rows.get(data.getKey());
         //row有可能为空(新插入时)
@@ -134,7 +135,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
     }
 
     void setUpdate(V data) {
-//        logger.debug("[{}],Cache.setUpdate({}),rows:{}", name, data.getKey(), rows);
+//        logger.debug("[{}],Table.setUpdate({}),rows:{}", name, data.getKey(), rows);
 
         Row<V> row = rows.get(data.getKey());
         //row:可能为空
@@ -152,7 +153,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
     }
 
     void setDelete(K key) {
-//        logger.debug("[{}],Cache.setDelete({}),rows:{}", name, key, rows);
+//        logger.debug("[{}],Table.setDelete({}),rows:{}", name, key, rows);
 
         Row<V> row = rows.get(key);
         //row有可能为空(没有查询直接执行删除，这个时候还不知道有没有数据可以被删)
@@ -258,7 +259,7 @@ public class Cache<K, V extends Data<K>> implements Comparable<Cache<K, V>> {
     public void insert(V data) {
         Objects.requireNonNull(data, "数据不能为空");
         Objects.requireNonNull(data.getKey(), "主键不能为空");
-        Objects.requireNonNull(data.getCache(), "数据不受缓存管理");
+        Objects.requireNonNull(data.getTable(), "数据不受缓存管理");
 
         if (get(data.getKey()) != null) {
             throw new DbException("数据已存在");

@@ -8,6 +8,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
+ * 数据库
  * Created by quanchangnai on 2019/6/21.
  */
 public abstract class Database {
@@ -32,9 +33,9 @@ public abstract class Database {
     private Config config;
 
     /**
-     * 管理的所有缓存
+     * 管理的所有缓存表
      */
-    private Map<String, Cache> caches = new HashMap<>();
+    private Map<String, Table> tables = new HashMap<>();
 
     /**
      * 存档线程数量
@@ -95,28 +96,28 @@ public abstract class Database {
         return name;
     }
 
-    public synchronized void registerCache(Cache cache) {
-        if (caches.containsKey(cache.getName())) {
-            throw new IllegalStateException("缓存已经被注册了");
+    public synchronized void registerTable(Table table) {
+        if (tables.containsKey(table.getName())) {
+            throw new IllegalStateException("缓存表已经被注册了");
         }
-        if (cache.isWorkable()) {
-            throw new IllegalStateException("缓存已经被注册到其他数据库");
+        if (table.isWorkable()) {
+            throw new IllegalStateException("缓存表已经被注册到其他数据库");
         }
-        cache.init(this);
+        table.init(this);
 
-        caches.put(cache.getName(), cache);
+        tables.put(table.getName(), table);
 
-        storeThreads.get(storeThreadIndex).caches.add(cache);
+        storeThreads.get(storeThreadIndex).tables.add(table);
 
         storeThreadIndex++;
         if (storeThreadIndex == storeThreads.size() - 1) {
             storeThreadIndex = 0;
         }
 
-        registerCache0(cache);
+        registerTable0(table);
     }
 
-    protected abstract void registerCache0(Cache cache);
+    protected abstract void registerTable0(Table table);
 
 
     public boolean isClosed() {
@@ -139,7 +140,7 @@ public abstract class Database {
         }
         closed = true;
 
-        caches.clear();
+        tables.clear();
         for (StoreThread storeThread : storeThreads) {
             storeThread.close();
         }
@@ -151,21 +152,21 @@ public abstract class Database {
 
     protected abstract void close0();
 
-    protected abstract <K, V extends Data<K>> V get(Cache<K, V> cache, K key);
+    protected abstract <K, V extends Data<K>> V get(Table<K, V> table, K key);
 
 
     protected abstract <K, V extends Data<K>> void put(V data);
 
 
-    protected abstract <K, V extends Data<K>> void delete(Cache<K, V> cache, K key);
+    protected abstract <K, V extends Data<K>> void delete(Table<K, V> table, K key);
 
-    protected <K, V extends Data<K>> void bulkWrite(Cache<K, V> cache, Set<V> puts, Set<K> deletes) {
+    protected <K, V extends Data<K>> void bulkWrite(Table<K, V> table, Set<V> puts, Set<K> deletes) {
         checkClosed();
         for (V data : puts) {
             put(data);
         }
         for (K key : deletes) {
-            delete(cache, key);
+            delete(table, key);
         }
     }
 
@@ -175,7 +176,7 @@ public abstract class Database {
 
         private int storePeriod;
 
-        private List<Cache> caches = new CopyOnWriteArrayList<>();
+        private List<Table> tables = new CopyOnWriteArrayList<>();
 
         public StoreThread(int storePeriod) {
             this.storePeriod = storePeriod;
@@ -199,17 +200,17 @@ public abstract class Database {
                     break;
                 }
 
-                for (Cache cache : caches) {
-                    cache.store();
+                for (Table table : tables) {
+                    table.store();
                 }
             }
-            caches.clear();
+            tables.clear();
         }
 
         void close() {
             running = false;
-            for (Cache cache : caches) {
-                cache.finalStore();
+            for (Table table : tables) {
+                table.finalStore();
             }
         }
     }
@@ -222,12 +223,12 @@ public abstract class Database {
         private String name = "";
 
         /**
-         * 缓存大小
+         * 表缓存大小，最大缓存多少行
          */
         private int cacheSize = 2000;
 
         /**
-         * 缓存过期时间(秒)
+         * 表缓存过期时间(秒)
          */
         private int cacheExpire = 600;
 

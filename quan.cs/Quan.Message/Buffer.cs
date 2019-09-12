@@ -104,7 +104,6 @@ namespace Quan.Message
             }
 
             var position = Reading ? _position : 0;
-            Reading = true;
             var shift = 0;
             long temp = 0;
 
@@ -124,6 +123,7 @@ namespace Quan.Message
                     continue;
                 }
 
+                Reading = true;
                 _position = position;
                 //ZigZag解码
                 return (temp >> 1) ^ -(temp & 1);
@@ -169,7 +169,6 @@ namespace Quan.Message
         public float ReadFloat()
         {
             var position = Reading ? _position : 0;
-            Reading = true;
             var shift = 0;
             var temp = 0;
 
@@ -185,6 +184,7 @@ namespace Quan.Message
                 shift += 8;
             }
 
+            Reading = true;
             _position = position;
             return BitConverter.ToSingle(BitConverter.GetBytes(temp), 0);
         }
@@ -202,7 +202,6 @@ namespace Quan.Message
         public double ReadDouble()
         {
             var position = Reading ? _position : 0;
-            Reading = true;
             var shift = 0;
             long temp = 0;
 
@@ -218,6 +217,7 @@ namespace Quan.Message
                 shift += 8;
             }
 
+            Reading = true;
             _position = position;
             return BitConverter.Int64BitsToDouble(temp);
         }
@@ -265,7 +265,6 @@ namespace Quan.Message
 
             var position = Reading ? 0 : _position;
             var end = _end;
-            Reading = false;
             //ZigZag编码
             n = (n << 1) ^ (n >> 63);
 
@@ -274,6 +273,7 @@ namespace Quan.Message
                 if ((n & ~0b1111111) == 0)
                 {
                     _bytes[position++] = (byte) (n & 0b1111111);
+                    Reading = false;
                     _position = position;
                     _end = ++end;
                     return;
@@ -320,7 +320,6 @@ namespace Quan.Message
 
             var position = Reading ? 0 : _position;
             var end = _end;
-            Reading = false;
 
             var temp = BitConverter.ToInt32(BitConverter.GetBytes(n), 0);
             var shift = 0;
@@ -332,6 +331,7 @@ namespace Quan.Message
                 end++;
             }
 
+            Reading = false;
             _position = position;
             _end = end;
         }
@@ -354,7 +354,6 @@ namespace Quan.Message
 
             var position = Reading ? 0 : _position;
             var end = _end;
-            Reading = false;
 
             var temp = BitConverter.DoubleToInt64Bits(n);
             var shift = 0;
@@ -366,6 +365,7 @@ namespace Quan.Message
                 end++;
             }
 
+            Reading = false;
             _position = position;
             _end = end;
         }

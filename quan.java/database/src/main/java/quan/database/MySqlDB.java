@@ -52,9 +52,9 @@ public class MySqlDB extends Database {
     }
 
     @Override
-    protected void registerCache0(Cache cache) {
+    protected void registerTable0(Table table) {
         try (Connection conn = getConnection(); Statement statement = conn.createStatement()) {
-            String sql = String.format("CREATE TABLE IF NOT EXISTS `%s`( _key VARCHAR(%d) PRIMARY KEY,_data text ) ENGINE = INNODB DEFAULT charset = utf8mb4" , cache.getName(), getConfig().tableKeyLength);
+            String sql = String.format("CREATE TABLE IF NOT EXISTS `%s`( _key VARCHAR(%d) PRIMARY KEY,_data text ) ENGINE = INNODB DEFAULT charset = utf8mb4" , table.getName(), getConfig().tableKeyLength);
             statement.execute(sql);
         } catch (SQLException e) {
             throw new DbException(e);
@@ -77,9 +77,9 @@ public class MySqlDB extends Database {
     }
 
     @Override
-    protected <K, V extends Data<K>> V get(Cache<K, V> cache, K key) {
+    protected <K, V extends Data<K>> V get(Table<K, V> table, K key) {
         checkClosed();
-        String sql = String.format("SELECT _data FROM `%s` WHERE _key = ?" , cache.getName());
+        String sql = String.format("SELECT _data FROM `%s` WHERE _key = ?" , table.getName());
         try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, key.toString());
             ResultSet resultSet = statement.executeQuery();
@@ -88,7 +88,7 @@ public class MySqlDB extends Database {
             }
 
             String _data = resultSet.getString(1);
-            V data = cache.getDataFactory().apply(key);
+            V data = table.getDataFactory().apply(key);
             data.decode(new JSONObject(JSON.parseObject(_data)));
             return data;
         } catch (Exception e) {
@@ -99,7 +99,7 @@ public class MySqlDB extends Database {
     @Override
     protected <K, V extends Data<K>> void put(V data) {
         checkClosed();
-        String sql = String.format("INSERT INTO `%s`(_key, _data) values(?, ?) ON DUPLICATE KEY UPDATE _data = VALUES(_data)" , data.getCache().getName());
+        String sql = String.format("INSERT INTO `%s`(_key, _data) values(?, ?) ON DUPLICATE KEY UPDATE _data = VALUES(_data)" , data.getTable().getName());
         try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, data.getKey().toString());
             statement.setString(2, data.encode().toJSONString());
@@ -110,9 +110,9 @@ public class MySqlDB extends Database {
     }
 
     @Override
-    protected <K, V extends Data<K>> void delete(Cache<K, V> cache, K key) {
+    protected <K, V extends Data<K>> void delete(Table<K, V> table, K key) {
         checkClosed();
-        String sql = String.format("DELETE FROM `%s` WHERE _key = ?" , cache.getName());
+        String sql = String.format("DELETE FROM `%s` WHERE _key = ?" , table.getName());
         try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, key.toString());
             statement.execute();
@@ -122,7 +122,7 @@ public class MySqlDB extends Database {
     }
 
     @Override
-    protected <K, V extends Data<K>> void bulkWrite(Cache<K, V> cache, Set<V> puts, Set<K> deletes) {
+    protected <K, V extends Data<K>> void bulkWrite(Table<K, V> table, Set<V> puts, Set<K> deletes) {
         checkClosed();
 
         try (Connection connection = getConnection()) {
@@ -130,7 +130,7 @@ public class MySqlDB extends Database {
             try {
                 //插入或更新
                 if (!puts.isEmpty()) {
-                    String sql = String.format("INSERT INTO `%s`(_key, _data) values(?, ?) ON DUPLICATE KEY UPDATE _data = values(_data)" , cache.getName());
+                    String sql = String.format("INSERT INTO `%s`(_key, _data) values(?, ?) ON DUPLICATE KEY UPDATE _data = values(_data)" , table.getName());
                     try (PreparedStatement statement = connection.prepareStatement(sql)) {
                         for (V putData : puts) {
                             statement.setString(1, putData.getKey().toString());
@@ -143,7 +143,7 @@ public class MySqlDB extends Database {
 
                 //删除
                 if (!deletes.isEmpty()) {
-                    String sql = String.format("DELETE FROM `%s` WHERE _key = ?" , cache.getName());
+                    String sql = String.format("DELETE FROM `%s` WHERE _key = ?" , table.getName());
                     try (PreparedStatement statement = connection.prepareStatement(sql)) {
                         for (K deleteKey : deletes) {
                             statement.setString(1, deleteKey.toString());

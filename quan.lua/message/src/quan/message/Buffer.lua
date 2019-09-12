@@ -65,7 +65,6 @@ local function readVarInt(buffer, bits)
     validateBits(bits)
 
     local position = buffer.reading and buffer.position or 1
-    buffer.reading = true
     local shift = 0;
     local temp = 0;
 
@@ -80,8 +79,9 @@ local function readVarInt(buffer, bits)
         shift = shift + 7
 
         if (b & 0x80) == 0 then
-            --ZigZag解码
+            buffer.reading = true
             buffer.position = position
+            --ZigZag解码
             return (temp >> 1) ~ -(temp & 1);
         end
     end
@@ -114,8 +114,8 @@ function Buffer:readFloat(scale)
         if position + 3 > self.bytes:len() then
             error("读数据出错", 2)
         end
-        self.reading = true
         local n = string.unpack("<f", self.bytes, position)
+        self.reading = true
         self.position = position + 4
         return n
     end
@@ -133,8 +133,8 @@ function Buffer:readDouble(scale)
         if position + 7 > self.bytes:len() then
             error("读数据出错", 2)
         end
-        self.reading = true
         local n = string.unpack("<d", self.bytes, position)
+        self.reading = true
         self.position = position + 8
         return n
     end
@@ -145,15 +145,15 @@ end
 function Buffer:readBytes()
     local position = self.reading and self.position or 1
     local length = self:readInt()
-    self.reading = true
 
     if position + length - 1 > self:size() then
         error("读数据出错", 2)
     end
 
-    local str = self.bytes:sub(position + 1, position + length)
+    local bytes = self.bytes:sub(position + 1, position + length)
+    self.reading = true
     self.position = position + length + 1
-    return str
+    return bytes
 end
 
 function Buffer:readString()
@@ -161,7 +161,6 @@ function Buffer:readString()
 end
 
 local function checkWrite(buffer)
-    buffer.reading = false
     if buffer.position < buffer.bytes:len() + 1 then
         buffer.bytes = buffer.bytes:sub(1, buffer.position - 1)
     end
@@ -180,6 +179,7 @@ local function writeVarInt(buffer, n, bits)
     while shift < bits do
         if ((n & ~0x7F) == 0) then
             buffer.bytes = buffer.bytes .. string.char(n & 0x7F)
+            buffer.reading = false
             buffer.position = buffer.bytes:len() + 1
             return ;
         else
@@ -217,6 +217,7 @@ function Buffer:writeFloat(n, scale)
     if scale < 0 then
         checkWrite(self)
         self.bytes = self.bytes .. string.pack("<f", n)
+        self.reading = false
         self.position = self.bytes:len() + 1
     else
         self:writeDouble(n, scale)
@@ -231,6 +232,7 @@ function Buffer:writeDouble(n, scale)
     if scale < 0 then
         checkWrite(self)
         self.bytes = self.bytes .. string.pack("<d", n)
+        self.reading = false
         self.position = self.bytes:len() + 1
         return
     end

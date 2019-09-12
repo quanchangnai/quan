@@ -60,19 +60,19 @@ public class MongoDB extends Database {
     }
 
     @Override
-    protected void registerCache0(Cache cache) {
-        collections.put(cache.getName(), database.getCollection(cache.getName()));
+    protected void registerTable0(Table table) {
+        collections.put(table.getName(), database.getCollection(table.getName()));
     }
 
     @Override
-    protected <K, V extends Data<K>> V get(Cache<K, V> cache, K key) {
+    protected <K, V extends Data<K>> V get(Table<K, V> table, K key) {
         checkClosed();
         Document filter = new Document(_ID, key);
-        Document document = (Document) collections.get(cache.getName()).find(filter).first();
+        Document document = (Document) collections.get(table.getName()).find(filter).first();
         if (document == null) {
             return null;
         }
-        V data = cache.getDataFactory().apply(key);
+        V data = table.getDataFactory().apply(key);
         data.decode(new JSONObject(document));
         return data;
     }
@@ -83,18 +83,18 @@ public class MongoDB extends Database {
         K key = data.getKey();
         Document filter = new Document(_ID, key);
         Document updates = new Document($SET, data.encode());
-        collections.get(data.getCache().getName()).updateOne(filter, updates, updateOptions);
+        collections.get(data.getTable().getName()).updateOne(filter, updates, updateOptions);
     }
 
     @Override
-    protected <K, V extends Data<K>> void delete(Cache<K, V> cache, K key) {
+    protected <K, V extends Data<K>> void delete(Table<K, V> table, K key) {
         checkClosed();
         Document filter = new Document(_ID, key);
-        collections.get(cache.getName()).deleteOne(filter);
+        collections.get(table.getName()).deleteOne(filter);
     }
 
     @Override
-    protected <K, V extends Data<K>> void bulkWrite(Cache<K, V> cache, Set<V> puts, Set<K> deletes) {
+    protected <K, V extends Data<K>> void bulkWrite(Table<K, V> table, Set<V> puts, Set<K> deletes) {
         checkClosed();
 
         List<WriteModel> writeModels = new ArrayList<>();
@@ -113,7 +113,7 @@ public class MongoDB extends Database {
         }
 
         if (!writeModels.isEmpty()) {
-            collections.get(cache.getName()).bulkWrite(writeModels);
+            collections.get(table.getName()).bulkWrite(writeModels);
         }
     }
 

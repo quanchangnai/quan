@@ -3,6 +3,7 @@ package quan.database;
 import java.util.Objects;
 
 /**
+ * 记录数据的创建删除
  * Created by quanchangnai on 2019/6/24.
  */
 @SuppressWarnings({"unchecked"})
@@ -16,9 +17,9 @@ class DataLog {
     private Data current;
 
     /**
-     * 缓存里的原始数据行
+     * 缓存表里的原始数据行
      */
-    private Cache.Row originRow;
+    private Table.Row originRow;
 
     /**
      * 缓存里的原始数据
@@ -35,8 +36,8 @@ class DataLog {
      */
     private boolean deleted;
 
-    public DataLog(Data current, Cache.Row originRow, Data originData, int originState, Cache cache, Object key) {
-        this.key = new Key(cache, key);
+    public DataLog(Data current, Table.Row originRow, Data originData, int originState, Table table, Object key) {
+        this.key = new Key(table, key);
         this.current = current;
         this.originRow = originRow;
         this.originData = originData;
@@ -69,20 +70,20 @@ class DataLog {
         return this;
     }
 
-    public Cache getCache() {
-        return key.cache;
+    public Table getTable() {
+        return key.table;
     }
 
     public boolean isConflict() {
-        key.cache.checkWorkable();
+        key.table.checkWorkable();
 
         //有可能出现事务执行时间比缓存的过期时间还长的极端情况
         long costTime = System.currentTimeMillis() - Transaction.get(true).getTaskStartTime();
-        if (costTime > getCache().getCacheExpire() * 1000) {
+        if (costTime > getTable().getCacheExpire() * 1000) {
             return true;
         }
 
-        Cache.Row row = key.cache.getRow(key.k);
+        Table.Row row = key.table.getRow(key.k);
         if (originRow != row) {
             return true;
         }
@@ -92,22 +93,22 @@ class DataLog {
     }
 
     public void commit() {
-        if (deleted && originState != Cache.Row.DELETE) {
-            key.cache.setDelete(key.k);
+        if (deleted && originState != Table.Row.DELETE) {
+            key.table.setDelete(key.k);
         }
-        if (current != null && (originRow == null || originState == Cache.Row.DELETE)) {
-            key.cache.setInsert(current);
+        if (current != null && (originRow == null || originState == Table.Row.DELETE)) {
+            key.table.setInsert(current);
         }
     }
 
     public static class Key {
 
-        private Cache cache;
+        private Table table;
 
         private Object k;
 
-        public Key(Cache cache, Object k) {
-            this.cache = cache;
+        public Key(Table table, Object k) {
+            this.table = table;
             this.k = k;
         }
 
@@ -120,13 +121,13 @@ class DataLog {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             Key key1 = (Key) o;
-            return Objects.equals(cache, key1.cache) &&
+            return Objects.equals(table, key1.table) &&
                     Objects.equals(k, key1.k);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(cache, k);
+            return Objects.hash(table, k);
         }
 
     }
