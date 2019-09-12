@@ -37,8 +37,8 @@ public class MySqlDB extends Database {
         basicDataSource.setPoolPreparedStatements(true);
 
         List<String> initSqlList = new ArrayList<>();
-        initSqlList.add(String.format("CREATE DATABASE IF NOT EXISTS `%s` CHARACTER SET 'utf8mb4'" , config.database));
-        initSqlList.add(String.format("USE `%s`" , config.database));
+        initSqlList.add(String.format("CREATE DATABASE IF NOT EXISTS `%s` CHARACTER SET 'utf8mb4'", config.database));
+        initSqlList.add(String.format("USE `%s`", config.database));
         basicDataSource.setConnectionInitSqls(initSqlList);
         basicDataSource.setDefaultAutoCommit(true);
 
@@ -54,7 +54,7 @@ public class MySqlDB extends Database {
     @Override
     protected void registerTable0(Table table) {
         try (Connection conn = getConnection(); Statement statement = conn.createStatement()) {
-            String sql = String.format("CREATE TABLE IF NOT EXISTS `%s`( _key VARCHAR(%d) PRIMARY KEY,_data text ) ENGINE = INNODB DEFAULT charset = utf8mb4" , table.getName(), getConfig().tableKeyLength);
+            String sql = String.format("CREATE TABLE IF NOT EXISTS `%s`( _key VARCHAR(%d) PRIMARY KEY,_data text ) ENGINE = INNODB DEFAULT charset = utf8mb4", table.getName(), getConfig().tableKeyLength);
             statement.execute(sql);
         } catch (SQLException e) {
             throw new DbException(e);
@@ -79,7 +79,7 @@ public class MySqlDB extends Database {
     @Override
     protected <K, V extends Data<K>> V get(Table<K, V> table, K key) {
         checkClosed();
-        String sql = String.format("SELECT _data FROM `%s` WHERE _key = ?" , table.getName());
+        String sql = String.format("SELECT _data FROM `%s` WHERE _key = ?", table.getName());
         try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, key.toString());
             ResultSet resultSet = statement.executeQuery();
@@ -99,7 +99,7 @@ public class MySqlDB extends Database {
     @Override
     protected <K, V extends Data<K>> void put(V data) {
         checkClosed();
-        String sql = String.format("INSERT INTO `%s`(_key, _data) values(?, ?) ON DUPLICATE KEY UPDATE _data = VALUES(_data)" , data.getTable().getName());
+        String sql = String.format("INSERT INTO `%s`(_key, _data) values(?, ?) ON DUPLICATE KEY UPDATE _data = VALUES(_data)", data.getTable().getName());
         try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, data.getKey().toString());
             statement.setString(2, data.encode().toJSONString());
@@ -112,7 +112,7 @@ public class MySqlDB extends Database {
     @Override
     protected <K, V extends Data<K>> void delete(Table<K, V> table, K key) {
         checkClosed();
-        String sql = String.format("DELETE FROM `%s` WHERE _key = ?" , table.getName());
+        String sql = String.format("DELETE FROM `%s` WHERE _key = ?", table.getName());
         try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, key.toString());
             statement.execute();
@@ -203,9 +203,9 @@ public class MySqlDB extends Database {
         public Config setConnectionString(String connectionString) {
             database = ConnectionUrlParser.parseConnectionString(connectionString).getPath();
             if (database == null) {
-                throw new IllegalArgumentException("必须指定连接数据库" );
+                throw new IllegalArgumentException("必须指定连接数据库");
             }
-            this.connectionString = connectionString.replace("/" + database + "?" , "?" );
+            this.connectionString = connectionString.replace("/" + database + "?", "?");
             return this;
         }
 

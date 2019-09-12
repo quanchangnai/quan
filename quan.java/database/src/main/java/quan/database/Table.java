@@ -297,6 +297,23 @@ public class Table<K, V extends Data<K>> implements Comparable<Table<K, V>> {
 
     }
 
+    public void expire(K key) {
+        Row<V> row = dirty.remove(key);
+        if (row == null) {
+            return;
+        }
+        Pair<V, Integer> dataAndState = row.getDataAndState();
+        V data = dataAndState.getLeft();
+        if (dataAndState.getRight() == Row.DELETE) {
+            database.delete(this, key);
+        } else {
+            database.put(data);
+        }
+        if (data != null) {
+            data._setExpired(true);
+        }
+    }
+
     private void store0() {
         long startTime = System.currentTimeMillis();
 
@@ -306,7 +323,7 @@ public class Table<K, V extends Data<K>> implements Comparable<Table<K, V>> {
         Set<K> deletes = new HashSet<>();
 
         for (K key : dirty.keySet()) {
-            Row<V> row = rows.get(key);
+            Row<V> row = dirty.get(key);
             if (row.state == Row.INSERT) {
                 row.state = Row.NORMAL;
                 puts.add(row.data);
@@ -326,7 +343,7 @@ public class Table<K, V extends Data<K>> implements Comparable<Table<K, V>> {
             database.bulkWrite(this, puts, deletes);
 
             for (K key : dirty.keySet()) {
-                Row<V> row = rows.get(key);
+                Row<V> row = dirty.get(key);
                 if (row.state == Row.DELETE && row.data != null) {
                     row.data._setExpired(true);
                 }

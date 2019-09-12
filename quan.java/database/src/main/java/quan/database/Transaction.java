@@ -363,31 +363,32 @@ public class Transaction {
         memoryRowLocks.clear();
 
         TreeSet<Table> tables = new TreeSet<>();
+        TreeSet<Integer> persistentRowLockIndexes = new TreeSet<>();
+        TreeSet<Data> memoryRowLockIndexes = new TreeSet<>();
+
         for (DataLog dataLog : dataLogs.values()) {
             Table table = dataLog.getTable();
             table.checkWorkable();
             tables.add(table);
-            persistentRowLocks.add(LockPool.getLock(table, dataLog.getKey().getK()));
-
-        }
-        for (Table table : tables) {
-            tableLocks.add(table.getLock());
+            persistentRowLockIndexes.add(LockPool.getLockIndex(table, dataLog.getKey().getK()));
         }
 
-        TreeSet<Integer> rowLockIndexes = new TreeSet<>();
-        TreeSet<Data> memoryRowLockIndexes = new TreeSet<>();
         for (Data data : versionLogs.keySet()) {
             Table table = data.getTable();
             if (table != null) {
                 table.checkWorkable();
-                rowLockIndexes.add(LockPool.getLockIndex(table, data.getKey()));
+                persistentRowLockIndexes.add(LockPool.getLockIndex(table, data.getKey()));
             } else {
                 //纯内存数据
                 memoryRowLockIndexes.add(data);
             }
         }
 
-        for (Integer rowLockIndex : rowLockIndexes) {
+        for (Table table : tables) {
+            tableLocks.add(table.getLock());
+        }
+
+        for (Integer rowLockIndex : persistentRowLockIndexes) {
             persistentRowLocks.add(LockPool.getLock(rowLockIndex));
         }
 
@@ -413,16 +414,17 @@ public class Transaction {
         for (ReadWriteLock tableLock : tableLocks) {
             tableLock.readLock().unlock();
         }
-        tableLocks.clear();
 
         for (Lock rowLock : persistentRowLocks) {
             rowLock.unlock();
         }
-        persistentRowLocks.clear();
 
         for (Lock rowLock : memoryRowLocks) {
             rowLock.unlock();
         }
+
+        tableLocks.clear();
+        persistentRowLocks.clear();
         memoryRowLocks.clear();
     }
 
