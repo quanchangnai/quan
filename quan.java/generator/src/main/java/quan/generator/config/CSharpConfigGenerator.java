@@ -56,7 +56,7 @@ public class CSharpConfigGenerator extends ConfigGenerator {
     }
 
     protected void processClassSelf(ClassDefinition classDefinition) {
-        classDefinition.setRealPackageName(CSharpUtils.toCapitalCamel(classDefinition.getPackageName()));
+        classDefinition.setPackageName(CSharpUtils.toCapitalCamel(classDefinition.getOriginalPackageName()));
     }
 
     @Override

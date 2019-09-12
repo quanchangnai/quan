@@ -60,7 +60,7 @@ public class XmlDefinitionParser extends DefinitionParser {
             classDefinition.setDefinitionFile(definitionFile.getName());
             classDefinition.setDefinitionText(classElement.asXML());
 
-            classDefinition.setPackageName(packageName);
+            classDefinition.setOriginalPackageName(packageName);
             classDefinition.setName(classElement.attributeValue("name"));
             classDefinition.setLang(classElement.attributeValue("lang"));
 

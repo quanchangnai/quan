@@ -170,7 +170,7 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
 
             String configName = configDefinition.getName();
             if (useNameWithPackage) {
-                configName = configDefinition.getPackageName() + "." + configDefinition.getName();
+                configName = configDefinition.getOriginalPackageName() + "." + configDefinition.getName();
             }
             try (FileOutputStream fileOutputStream = new FileOutputStream(new File(pathFile, configName + ".json"))) {
                 JSON.writeJSONString(fileOutputStream, rows, SerializerFeature.PrettyFormat);

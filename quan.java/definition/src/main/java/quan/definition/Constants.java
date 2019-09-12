@@ -126,8 +126,8 @@ public class Constants {
     public static final Set<String> LEGAL_DELIMITERS = unmodifiableSet(";", ":", "_", "*", "|", "$", "@", "#", "&", "?");
 
     /**
-     * 需要转义的正则表达式特殊字符
+     * 配置支持的需要转义的分隔符(正则表达式特殊字符)
      */
-    public static final Set<String> NEED_ESCAPE_CHARS = unmodifiableSet("*", "|", "?");
+    public static final Set<String> NEED_ESCAPE_DELIMITERS = unmodifiableSet("*", "|", "?");
 
 }

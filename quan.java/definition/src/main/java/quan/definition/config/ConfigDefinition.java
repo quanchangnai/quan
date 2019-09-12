@@ -530,7 +530,7 @@ public class ConfigDefinition extends BeanDefinition {
             if (i > 0) {
                 escapedDelimiter.append("|");
             }
-            if (Constants.NEED_ESCAPE_CHARS.contains(s)) {
+            if (Constants.NEED_ESCAPE_DELIMITERS.contains(s)) {
                 escapedDelimiter.append("\\");
             }
             escapedDelimiter.append(s);

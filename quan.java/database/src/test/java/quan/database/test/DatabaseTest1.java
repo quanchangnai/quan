@@ -23,9 +23,9 @@ public class DatabaseTest1 {
 
     public static void main(String[] args) throws Exception {
 
-        database = new BerkeleyDB(".temp/bdb");
+//        database = new BerkeleyDB(".temp/bdb");
 //        database = new MongoDB(new MongoDB.Config().setConnectionString("mongodb://127.0.0.1:27017").setDatabase("mdb"));
-//        database = new MySqlDB(new MySqlDB.Config().setConnectionString("jdbc:mysql://localhost:3306/test?user=root&password=123456&useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai"));
+        database = new MySqlDB(new MySqlDB.Config().setConnectionString("jdbc:mysql://localhost:3306/test?user=root&password=123456&useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true"));
 
         Transactions.setConflictThreshold(1);
 

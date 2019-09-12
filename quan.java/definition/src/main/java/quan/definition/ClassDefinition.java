@@ -12,11 +12,11 @@ import java.util.regex.Pattern;
  */
 public abstract class ClassDefinition extends Definition {
 
-    //定义包名，不含前缀
-    private String packageName;
+    //原始包名，不含前缀
+    private String originalPackageName;
 
-    //真实包名，和具体语言相关
-    private String realPackageName;
+    //实际包名，不含前缀，和具体语言相关
+    private String packageName;
 
     //定义文件
     private String definitionFile;
@@ -53,7 +53,7 @@ public abstract class ClassDefinition extends Definition {
     }
 
     public void reset() {
-        realPackageName = packageName;
+        packageName = originalPackageName;
         imports.clear();
     }
 
@@ -65,36 +65,36 @@ public abstract class ClassDefinition extends Definition {
         }
     }
 
-    public void setPackageName(String packageName) {
-        if (StringUtils.isBlank(packageName)) {
+    public void setOriginalPackageName(String originalPackageName) {
+        if (StringUtils.isBlank(originalPackageName)) {
             return;
         }
-        this.packageName = packageName.trim();
-        this.realPackageName = this.packageName;
+        this.originalPackageName = originalPackageName.trim();
+        this.packageName = this.originalPackageName;
+    }
+
+    public String getOriginalPackageName() {
+        return originalPackageName;
+    }
+
+    public String getNameWithPackage() {
+        return originalPackageName + "." + getName();
+    }
+
+    public void setPackageName(String packageName) {
+        this.packageName = packageName;
     }
 
     public String getPackageName() {
         return packageName;
     }
 
-    public String getNameWithPackage() {
-        return packageName + "." + getName();
-    }
-
-    public void setRealPackageName(String realPackageName) {
-        this.realPackageName = realPackageName;
-    }
-
-    public String getRealPackageName() {
-        return realPackageName;
-    }
-
     public String getFullPackageName() {
         String packagePrefix = getPackagePrefix();
         if (packagePrefix != null) {
-            return packagePrefix + "." + realPackageName;
+            return packagePrefix + "." + packageName;
         }
-        return realPackageName;
+        return packageName;
     }
 
     public String getFullName() {
