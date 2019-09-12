@@ -87,7 +87,7 @@ namespace Test
             sRoleLogin2.Decode(encodedBytes);
 
             Console.WriteLine("sRoleLogin2:" + sRoleLogin2);
-            Console.WriteLine("sRoleLogin2.Seq:" + sRoleLogin2.Seq);
+//            Console.WriteLine("sRoleLogin2.Seq:" + sRoleLogin2.Seq);
 
         }
 

@@ -70,12 +70,12 @@ public class MessageDefinition extends BeanDefinition {
         return parser.getMessageHead();
     }
 
-    public List<FieldDefinition> getSelfAndHeadFields() {
-        List<FieldDefinition> fields = new ArrayList<>();
+    public List<FieldDefinition> getHeadedFields() {
+        List<FieldDefinition> headedFields = new ArrayList<>();
         if (getHead() != null) {
-            fields.addAll(getHead().getFields());
+            headedFields.addAll(getHead().getFields());
         }
-        fields.addAll(getFields());
-        return fields;
+        headedFields.addAll(getFields());
+        return headedFields;
     }
 }

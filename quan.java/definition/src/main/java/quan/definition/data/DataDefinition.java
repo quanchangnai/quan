@@ -1,7 +1,10 @@
 package quan.definition.data;
 
 import quan.definition.BeanDefinition;
+import quan.definition.Constants;
 import quan.definition.DefinitionCategory;
+
+import java.util.regex.Pattern;
 
 /**
  * 数据定义
@@ -32,6 +35,11 @@ public class DataDefinition extends BeanDefinition {
     @Override
     public DataDefinition setCategory(DefinitionCategory category) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    protected Pattern namePattern() {
+        return Constants.DATA_NAME_PATTERN;
     }
 
     public String getKeyType() {

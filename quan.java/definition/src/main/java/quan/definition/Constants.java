@@ -20,6 +20,21 @@ public class Constants {
     public static final Pattern CLASS_NAME_PATTERN = Pattern.compile("[A-Z][a-zA-Z\\d]*");
 
     /**
+     * 数据类名格式
+     */
+    public static final Pattern DATA_NAME_PATTERN = Pattern.compile("[A-Z][a-zA-Z\\d]*Data");
+
+    /**
+     * 数据实体类名格式
+     */
+    public static final Pattern ENTITY_NAME_PATTERN = Pattern.compile("[A-Z][a-zA-Z\\d]*Entity");
+
+    /**
+     * 配置类名格式
+     */
+    public static final Pattern CONFIG_NAME_PATTERN = Pattern.compile("[A-Z][a-zA-Z\\d]*Config");
+
+    /**
      * 字段名格式
      */
     public static final Pattern FIELD_NAME_PATTERN = Pattern.compile("[a-z][a-zA-Z\\d]*");

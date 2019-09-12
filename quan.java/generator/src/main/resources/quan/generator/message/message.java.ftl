@@ -22,24 +22,29 @@ public<#if definitionType ==9> abstract</#if> class ${name} extends <#if definit
     public static final int ID = ${id?c};
 
 </#if>
+<#if definitionType ==9>
+    <#assign fieldModifier = "protected">
+<#else>
+    <#assign fieldModifier = "private">
+</#if>
 <#list fields as field>
     <#if field.comment !="">
     //${field.comment}
     </#if>
     <#if field.type == "set" || field.type == "list">
-    private ${field.classType}<${field.classValueType}> ${field.name} = new ${field.classType}<>();
+    ${fieldModifier} ${field.classType}<${field.classValueType}> ${field.name} = new ${field.classType}<>();
     <#elseif field.type == "map">
-    private ${field.classType}<${field.classKeyType}, ${field.classValueType}> ${field.name} = new ${field.classType}<>();
+    ${fieldModifier} ${field.classType}<${field.classKeyType}, ${field.classValueType}> ${field.name} = new ${field.classType}<>();
     <#elseif field.type == "string">
-    private ${field.basicType} ${field.name} = "";
+    ${fieldModifier} ${field.basicType} ${field.name} = "";
     <#elseif field.type == "bytes">
-    private ${field.basicType} ${field.name} = new byte[0];
+    ${fieldModifier} ${field.basicType} ${field.name} = new byte[0];
     <#elseif field.builtinType || field.enumType>
-    private ${field.basicType} ${field.name};
+    ${fieldModifier} ${field.basicType} ${field.name};
     <#elseif !field.optional>
-    private ${field.basicType} ${field.name} = new ${field.type}();
+    ${fieldModifier} ${field.basicType} ${field.name} = new ${field.type}();
     <#else>
-    private ${field.basicType} ${field.name};
+    ${fieldModifier} ${field.basicType} ${field.name};
     </#if>
 
 </#list>
@@ -53,6 +58,21 @@ public<#if definitionType ==9> abstract</#if> class ${name} extends <#if definit
         return ID;
     }
 
+</#if>
+<#if head??>
+    <#list head.fields as field>
+        <#if field.comment !="">
+    /**
+     * ${field.comment}
+     */
+        </#if>
+    @Override
+    public ${name} set${field.name?cap_first}(${field.basicType} ${field.name}) {
+        super.set${field.name?cap_first}(${field.name});
+        return this;
+    }
+
+    </#list>
 </#if>
 <#list fields as field>
     <#if field.comment !="">
@@ -223,10 +243,15 @@ public<#if definitionType ==9> abstract</#if> class ${name} extends <#if definit
 </#list>
     }
 
+<#if headedFields??>
+    <#assign allFields = headedFields>
+<#else>
+    <#assign allFields = fields>
+</#if>
     @Override
     public String toString() {
         return "${name}{" +
-        <#list fields as field>
+        <#list allFields as field>
                 "<#rt>
             <#if field_index gt 0>
                 <#lt>,<#rt>

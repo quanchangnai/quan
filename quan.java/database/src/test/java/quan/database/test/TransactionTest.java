@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import quan.database.Transaction;
 import quan.database.item.ItemEntity;
 import quan.database.role.RoleData;
-import quan.database.role.RoleData2;
+import quan.database.role.Role2Data;
 
 import java.util.*;
 
@@ -66,9 +66,9 @@ public class TransactionTest {
 
 
     private static boolean test2() {
-        RoleData2 roleData2 = new RoleData2(2L);
+        Role2Data role2Data = new Role2Data(2L);
 
-        Map<Integer, Integer> map = roleData2.getMap();
+        Map<Integer, Integer> map = role2Data.getMap();
         for (int i = 0; i < 10; i++) {
             map.put(i, i);
         }
@@ -85,7 +85,7 @@ public class TransactionTest {
             }
         }
 
-        List<String> list = roleData2.getList();
+        List<String> list = role2Data.getList();
         for (int i = 0; i < 10; i++) {
             list.add(String.valueOf(i));
         }
@@ -104,17 +104,17 @@ public class TransactionTest {
 
         System.err.println("list.indexOf:" + list.indexOf("8"));
 
-        Set<Boolean> set = roleData2.getSet();
+        Set<Boolean> set = role2Data.getSet();
         set.add(true);
         set.add(false);
         set.removeAll(Arrays.asList(true));
 
         ItemEntity itemEntity = new ItemEntity().setId(1).setName("111");
-        roleData2.getItems().put(itemEntity.getId(), itemEntity);
-        roleData2.getItems().remove(itemEntity.getId());
+        role2Data.getItems().put(itemEntity.getId(), itemEntity);
+        role2Data.getItems().remove(itemEntity.getId());
 //        roleData2.getItems().keySet().remove(itemEntity.getId());
 
-        System.err.println("roleData2:" + roleData2.toString());
+        System.err.println("roleData2:" + role2Data.toString());
         return true;
     }
 }

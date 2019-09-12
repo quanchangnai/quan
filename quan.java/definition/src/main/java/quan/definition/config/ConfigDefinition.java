@@ -7,6 +7,7 @@ import quan.definition.DefinitionCategory;
 import quan.definition.FieldDefinition;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * 配置定义
@@ -69,6 +70,11 @@ public class ConfigDefinition extends BeanDefinition {
     @Override
     public String getDefinitionTypeName() {
         return "配置";
+    }
+
+    @Override
+    protected Pattern namePattern() {
+        return Constants.CONFIG_NAME_PATTERN;
     }
 
     @Override

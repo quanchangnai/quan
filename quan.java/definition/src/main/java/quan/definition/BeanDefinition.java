@@ -9,6 +9,7 @@ import quan.definition.message.MessageHeadDefinition;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * Bean定义，被数据库、消息和配置共用
@@ -33,6 +34,21 @@ public class BeanDefinition extends ClassDefinition {
         return this;
     }
 
+    @Override
+    public String getDefinitionTypeName() {
+        if (category == DefinitionCategory.data) {
+            return "数据实体";
+        }
+        return super.getDefinitionTypeName();
+    }
+
+    @Override
+    protected Pattern namePattern() {
+        if (category == DefinitionCategory.data) {
+            return Constants.ENTITY_NAME_PATTERN;
+        }
+        return super.namePattern();
+    }
 
     @Override
     public void validate() {

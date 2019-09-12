@@ -11,10 +11,10 @@ import quan.message.*;
 public abstract class HeadedMessage extends Message {
 
     //消息序号
-    private long seq;
+    protected long seq;
 
     //错误码
-    private int error;
+    protected int error;
 
 
     /**

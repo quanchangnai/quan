@@ -25,7 +25,7 @@
         <field name="map2" type="map:int:ItemEntity" ignore="true"/>
     </data>
 
-    <data name="RoleData2" key="id" persistent="false">角色2
+    <data name="Role2Data" key="id" persistent="false">角色2
         <field name="id" type="long"/>角色ID
         <field name="name" type="string"/>
         <field name="b" type="bool"/>

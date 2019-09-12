@@ -249,10 +249,15 @@ namespace ${fullPackageName}
 </#list>
 		}
 
+<#if headedFields??>
+	<#assign allFields = headedFields>
+<#else>
+	<#assign allFields = fields>
+</#if>
 		public override string ToString()
 		{
 			return "${name}{" +
-			<#list fields as field>
+			<#list allFields as field>
 					"<#rt>
 				<#if field_index gt 0>
 					<#lt>,<#rt>

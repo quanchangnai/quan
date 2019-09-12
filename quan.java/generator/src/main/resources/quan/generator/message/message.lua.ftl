@@ -24,8 +24,8 @@ local function onSet(table, key, value)
     rawset(table, key, value)
 end
 
-<#if selfAndHeadFields??>
-    <#assign allFields = selfAndHeadFields>
+<#if headedFields??>
+    <#assign allFields = headedFields>
 <#else>
     <#assign allFields = fields>
 </#if>

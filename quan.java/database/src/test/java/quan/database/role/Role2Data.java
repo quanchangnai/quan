@@ -11,7 +11,7 @@ import quan.database.item.ItemType;
  * 角色2<br/>
  * 自动生成
  */
-public class RoleData2 extends Data<Long> {
+public class Role2Data extends Data<Long> {
 
     //角色ID
     private BaseField<Long> id = new BaseField<>(0L);
@@ -47,11 +47,11 @@ public class RoleData2 extends Data<Long> {
     private MapField<Integer, ItemEntity> map2 = new MapField<>(_getRoot());
 
 
-    public RoleData2() {
+    public Role2Data() {
         super(null);
     }
         
-    public RoleData2(Long id) {
+    public Role2Data(Long id) {
         super(null);
         this.id.setLogValue(id, _getRoot());
     }
@@ -71,7 +71,7 @@ public class RoleData2 extends Data<Long> {
     /**
      * 角色ID
      */
-    public RoleData2 setId(long id) {
+    public Role2Data setId(long id) {
         this.id.setLogValue(id, _getRoot());
         return this;
     }
@@ -80,7 +80,7 @@ public class RoleData2 extends Data<Long> {
         return name.getValue();
     }
 
-    public RoleData2 setName(String name) {
+    public Role2Data setName(String name) {
         this.name.setLogValue(name, _getRoot());
         return this;
     }
@@ -89,7 +89,7 @@ public class RoleData2 extends Data<Long> {
         return b.getValue();
     }
 
-    public RoleData2 setB(boolean b) {
+    public Role2Data setB(boolean b) {
         this.b.setLogValue(b, _getRoot());
         return this;
     }
@@ -98,7 +98,7 @@ public class RoleData2 extends Data<Long> {
         return s.getValue();
     }
 
-    public RoleData2 setS(short s) {
+    public Role2Data setS(short s) {
         this.s.setLogValue(s, _getRoot());
         return this;
     }
@@ -107,7 +107,7 @@ public class RoleData2 extends Data<Long> {
         return i.getValue();
     }
 
-    public RoleData2 setI(int i) {
+    public Role2Data setI(int i) {
         this.i.setLogValue(i, _getRoot());
         return this;
     }
@@ -116,7 +116,7 @@ public class RoleData2 extends Data<Long> {
         return f.getValue();
     }
 
-    public RoleData2 setF(float f) {
+    public Role2Data setF(float f) {
         this.f.setLogValue(f, _getRoot());
         return this;
     }
@@ -125,7 +125,7 @@ public class RoleData2 extends Data<Long> {
         return d.getValue();
     }
 
-    public RoleData2 setD(double d) {
+    public Role2Data setD(double d) {
         this.d.setLogValue(d, _getRoot());
         return this;
     }
@@ -134,7 +134,7 @@ public class RoleData2 extends Data<Long> {
         return item.getValue();
     }
 
-    public RoleData2 setItem(ItemEntity item) {
+    public Role2Data setItem(ItemEntity item) {
         this.item.setLogValue(item, _getRoot());
         return this;
     }
@@ -143,7 +143,7 @@ public class RoleData2 extends Data<Long> {
         return ItemType.valueOf(itemType.getValue());
     }
 
-    public RoleData2 setItemType(ItemType itemType) {
+    public Role2Data setItemType(ItemType itemType) {
         this.itemType.setLogValue(itemType.getValue(), _getRoot());
         return this;
     }
@@ -349,7 +349,7 @@ public class RoleData2 extends Data<Long> {
 
     @Override
     public String toString() {
-        return "RoleData2{" +
+        return "Role2Data{" +
                 "id=" + id +
                 ",name='" + name + '\'' +
                 ",b=" + b +

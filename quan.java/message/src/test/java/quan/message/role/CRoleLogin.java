@@ -48,6 +48,24 @@ public class CRoleLogin extends HeadedMessage {
     }
 
     /**
+     * 消息序号
+     */
+    @Override
+    public CRoleLogin setSeq(long seq) {
+        super.setSeq(seq);
+        return this;
+    }
+
+    /**
+     * 错误码
+     */
+    @Override
+    public CRoleLogin setError(int error) {
+        super.setError(error);
+        return this;
+    }
+
+    /**
      * 角色id
      */
     public long getRoleId() {
@@ -206,7 +224,9 @@ public class CRoleLogin extends HeadedMessage {
     @Override
     public String toString() {
         return "CRoleLogin{" +
-                "roleId=" + roleId +
+                "seq=" + seq +
+                ",error=" + error +
+                ",roleId=" + roleId +
                 ",roleName='" + roleName + '\'' +
                 ",roleInfo=" + roleInfo +
                 ",roleInfoList=" + roleInfoList +
