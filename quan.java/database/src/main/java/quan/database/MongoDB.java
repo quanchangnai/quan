@@ -83,7 +83,7 @@ public class MongoDB extends Database {
         K key = data.getKey();
         Document filter = new Document(_ID, key);
         Document updates = new Document($SET, data.encode());
-        collections.get(data.getTable().getName()).updateOne(filter, updates, updateOptions);
+        collections.get(data._getTable().getName()).updateOne(filter, updates, updateOptions);
     }
 
     @Override

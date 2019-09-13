@@ -94,7 +94,7 @@ public class BerkeleyDB extends Database {
 
         DatabaseEntry keyEntry = new DatabaseEntry(data.getKey().toString().getBytes());
         DatabaseEntry dataEntry = new DatabaseEntry(data.encode().toJSONString().getBytes());
-        dbs.get(data.getTable().getName()).put(null, keyEntry, dataEntry);
+        dbs.get(data._getTable().getName()).put(null, keyEntry, dataEntry);
     }
 
 
@@ -118,7 +118,7 @@ public class BerkeleyDB extends Database {
             for (V putData : puts) {
                 DatabaseEntry keyEntry = new DatabaseEntry(putData.getKey().toString().getBytes());
                 DatabaseEntry dataEntry = new DatabaseEntry(putData.encode().toJSONString().getBytes());
-                dbs.get(putData.getTable().getName()).put(transaction, keyEntry, dataEntry);
+                dbs.get(putData._getTable().getName()).put(transaction, keyEntry, dataEntry);
             }
 
             for (K deleteKey : deletes) {

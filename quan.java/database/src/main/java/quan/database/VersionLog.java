@@ -21,7 +21,7 @@ class VersionLog {
     }
 
     public boolean isConflict() {
-        Table table = data.getTable();
+        Table table = data._getTable();
         if (table != null) {
             table.checkWorkable();
         }
@@ -30,7 +30,7 @@ class VersionLog {
 
     public void commit() {
         data.versionUp();
-        Table table = data.getTable();
+        Table table = data._getTable();
         if (table != null) {
             table.setUpdate(data);
         }

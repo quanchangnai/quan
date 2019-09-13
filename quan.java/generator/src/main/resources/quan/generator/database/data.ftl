@@ -376,5 +376,10 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
         return _table.getOrInsert(${keyName});
     }
 
+    public static void store(${keyType} ${keyName}) {
+        checkTable();
+        _table.store(${keyName});
+    }
+
 </#if>
 }

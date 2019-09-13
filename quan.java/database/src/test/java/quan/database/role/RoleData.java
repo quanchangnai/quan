@@ -404,4 +404,9 @@ public class RoleData extends Data<Long> {
         return _table.getOrInsert(id);
     }
 
+    public static void store(Long id) {
+        checkTable();
+        _table.store(id);
+    }
+
 }

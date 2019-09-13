@@ -99,7 +99,7 @@ public class MySqlDB extends Database {
     @Override
     protected <K, V extends Data<K>> void put(V data) {
         checkClosed();
-        String sql = String.format("INSERT INTO `%s`(_key, _data) values(?, ?) ON DUPLICATE KEY UPDATE _data = VALUES(_data)", data.getTable().getName());
+        String sql = String.format("INSERT INTO `%s`(_key, _data) values(?, ?) ON DUPLICATE KEY UPDATE _data = VALUES(_data)", data._getTable().getName());
         try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, data.getKey().toString());
             statement.setString(2, data.encode().toJSONString());

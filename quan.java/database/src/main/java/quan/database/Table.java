@@ -29,19 +29,19 @@ public class Table<K, V extends Data<K>> implements Comparable<Table<K, V>> {
 
     private String name;
 
-    /**
-     * 缓存大小，缓存的数据行数超过此值时，要把过期的缓存清除
-     */
-    private int cacheSize;
+    private Database database;
+
+    private Function<K, V> dataFactory;
 
     /**
      * 缓存过期时间(秒)
      */
     private int cacheExpire;
 
-    private Database database;
-
-    private Function<K, V> dataFactory;
+    /**
+     * 下次清理缓存的时间
+     */
+    private long nextCleanTime;
 
     /**
      * 缓存的所有数据行
@@ -87,10 +87,9 @@ public class Table<K, V extends Data<K>> implements Comparable<Table<K, V>> {
                 return;
             }
             this.database = database;
-            cacheSize = database.getConfig().getCacheSize();
             cacheExpire = database.getConfig().getCacheExpire();
-
-            rows = new ConcurrentHashMap<>(cacheSize);
+            nextCleanTime = System.currentTimeMillis() + cacheExpire * 1000;
+            rows = new ConcurrentHashMap<>();
             dirty = new ConcurrentHashMap<>();
         } finally {
             lock.writeLock().unlock();
@@ -206,24 +205,24 @@ public class Table<K, V extends Data<K>> implements Comparable<Table<K, V>> {
             lock.readLock().unlock();
         }
 
-        Pair<V, Integer> rowDataAndState = row == null ? null : row.getDataAndState();
+        Pair<V, Integer> dataState = row == null ? null : row.getDataState();
 
+        V current = null;
         V data = null;
-        V rowData = null;
-        int rowState = 0;
+        int state = Row.NORMAL;
 
-        if (rowDataAndState != null) {
-            if (rowDataAndState.getRight() != Row.DELETE) {
-                data = rowDataAndState.getLeft();
+        if (dataState != null) {
+            data = dataState.getLeft();
+            state = dataState.getRight();
+            if (state != Row.DELETE) {
+                current = data;
             }
-            rowData = rowDataAndState.getLeft();
-            rowState = rowDataAndState.getRight();
         }
 
-        log = new DataLog(data, row, rowData, rowState, this, key);
+        log = new DataLog(current, row, data, state, this, key);
         transaction.addDataLog(log);
 
-        return data;
+        return current;
 
     }
 
@@ -239,33 +238,32 @@ public class Table<K, V extends Data<K>> implements Comparable<Table<K, V>> {
         }
 
         Row<V> row = rows.get(key);
-        Pair<V, Integer> rowDataAndState = row == null ? null : row.getDataAndState();
+        Pair<V, Integer> dataState = row == null ? null : row.getDataState();
 
-        V rowData = null;
-        int rowState = 0;
+        V data = null;
+        int state = Row.NORMAL;
 
-        if (rowDataAndState != null) {
-            rowData = rowDataAndState.getLeft();
-            rowState = rowDataAndState.getRight();
+        if (dataState != null) {
+            data = dataState.getLeft();
+            state = dataState.getRight();
         }
 
         //数据不一定存在，增加删除日志，这样如果存在数据就一点会被删掉
-        log = new DataLog(null, row, rowData, rowState, this, key);
+        log = new DataLog(null, row, data, state, this, key);
         log.setDeleted();
         transaction.addDataLog(log);
-
     }
 
     public void insert(V data) {
         Objects.requireNonNull(data, "数据不能为空");
-        Objects.requireNonNull(data.getKey(), "主键不能为空");
-        Objects.requireNonNull(data.getTable(), "数据不受缓存管理");
+        Objects.requireNonNull(data._getTable(), "数据不支持持久化");
+        K key = Objects.requireNonNull(data.getKey(), "数据主键不能为空");
 
-        if (get(data.getKey()) != null) {
+        if (get(key) != null) {
             throw new DbException("数据已存在");
         }
 
-        DataLog log = Transaction.get(true).getDataLog(new DataLog.Key(this, data.getKey()));
+        DataLog log = Transaction.get(true).getDataLog(new DataLog.Key(this, key));
         log.setCurrent(data);
     }
 
@@ -284,7 +282,7 @@ public class Table<K, V extends Data<K>> implements Comparable<Table<K, V>> {
     }
 
     /**
-     * 存档数据，并且当缓存数据数量达到上限时清理过期缓存
+     * 存档数据，并尝试清理过期缓存
      */
     public void store() {
         lock.writeLock().lock();
@@ -294,23 +292,31 @@ public class Table<K, V extends Data<K>> implements Comparable<Table<K, V>> {
         } finally {
             lock.writeLock().unlock();
         }
-
     }
 
-    public void expire(K key) {
-        Row<V> row = dirty.remove(key);
-        if (row == null) {
-            return;
-        }
-        Pair<V, Integer> dataAndState = row.getDataAndState();
-        V data = dataAndState.getLeft();
-        if (dataAndState.getRight() == Row.DELETE) {
-            database.delete(this, key);
-        } else {
-            database.put(data);
-        }
-        if (data != null) {
-            data._setExpired(true);
+    /**
+     * 手动存档数据，如果数据不需要存档直接返回
+     */
+    public void store(K key) {
+        Objects.requireNonNull(key, "主键不能为空");
+        lock.readLock().lock();
+        try {
+            Row<V> row = dirty.remove(key);
+            if (row == null) {
+                return;
+            }
+            Pair<V, Integer> dataState = row.getDataState();
+            V data = dataState.getLeft();
+            if (dataState.getRight() == Row.DELETE) {
+                database.delete(this, key);
+            } else {
+                database.put(data);
+            }
+            if (data != null) {
+                data._setExpired(true);
+            }
+        } finally {
+            lock.readLock().unlock();
         }
     }
 
@@ -387,18 +393,12 @@ public class Table<K, V extends Data<K>> implements Comparable<Table<K, V>> {
         }
     }
 
-    private long nextCleanExpiredTime;
-
     /**
      * 清理过期缓存
      */
     private void cleanExpired() {
-        if (rows.size() < cacheSize) {
-            return;
-        }
-
         long currentTime = System.currentTimeMillis();
-        if (currentTime < nextCleanExpiredTime) {
+        if (currentTime < nextCleanTime) {
             return;
         }
 
@@ -414,9 +414,7 @@ public class Table<K, V extends Data<K>> implements Comparable<Table<K, V>> {
             }
         }
 
-        if (cleans.isEmpty()) {
-            nextCleanExpiredTime = currentTime + cacheExpire * 500;
-        }
+        nextCleanTime = currentTime + cacheExpire * 500;
 
         logger.debug("[{}]清理过期缓存, rows.size:{},cleans.size:{},rows:{},cleans:{}", name, rows.size(), cleans.size(), rows, cleans);
     }
@@ -466,7 +464,7 @@ public class Table<K, V extends Data<K>> implements Comparable<Table<K, V>> {
             }
         }
 
-        public Pair<V, Integer> getDataAndState() {
+        public Pair<V, Integer> getDataState() {
             lock.readLock().lock();
             try {
                 return Pair.of(data, state);

@@ -143,8 +143,8 @@ public class Transaction {
         if (data == null) {
             return;
         }
-        if (data.getTable() != null) {
-            data.getTable().checkWorkable();
+        if (data._getTable() != null) {
+            data._getTable().checkWorkable();
         }
         if (data._isExpired()) {
             throw new IllegalStateException("数据已过期");
@@ -374,7 +374,7 @@ public class Transaction {
         }
 
         for (Data data : versionLogs.keySet()) {
-            Table table = data.getTable();
+            Table table = data._getTable();
             if (table != null) {
                 table.checkWorkable();
                 persistentRowLockIndexes.add(LockPool.getLockIndex(table, data.getKey()));

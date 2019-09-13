@@ -19,7 +19,6 @@ public class DatabaseTest2 {
     public static void main(String[] args) throws Exception {
         BerkeleyDB.Config config = new BerkeleyDB.Config();
         config.setDir(".temp/bdb")
-                .setCacheSize(5)
                 .setCacheExpire(30)
                 .setStorePeriod(5);
         Database database = new BerkeleyDB(config);

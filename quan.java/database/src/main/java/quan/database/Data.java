@@ -41,7 +41,7 @@ public abstract class Data<K> extends Entity implements Comparable<Data<K>> {
         return lock;
     }
 
-    final Table<K, ? extends Data<K>> getTable() {
+    final Table<K, ? extends Data<K>> _getTable() {
         return table;
     }
 

@@ -223,11 +223,6 @@ public abstract class Database {
         private String name = "";
 
         /**
-         * 表缓存大小，最大缓存多少行
-         */
-        private int cacheSize = 2000;
-
-        /**
          * 表缓存过期时间(秒)
          */
         private int cacheExpire = 600;
@@ -247,15 +242,6 @@ public abstract class Database {
 
         public Config setName(String name) {
             this.name = name;
-            return this;
-        }
-
-        public int getCacheSize() {
-            return cacheSize;
-        }
-
-        public Config setCacheSize(int cacheSize) {
-            this.cacheSize = Math.max(100, cacheSize);
             return this;
         }
 
