@@ -295,28 +295,22 @@ public class Table<K, V extends Data<K>> implements Comparable<Table<K, V>> {
     }
 
     /**
-     * 手动存档数据，如果数据不需要存档直接返回
+     * 手动存档数据，如果数据不需要存档则直接返回
      */
     public void store(K key) {
         Objects.requireNonNull(key, "主键不能为空");
-        lock.readLock().lock();
-        try {
-            Row<V> row = dirty.remove(key);
-            if (row == null) {
-                return;
-            }
-            Pair<V, Integer> dataState = row.getDataState();
-            V data = dataState.getLeft();
-            if (dataState.getRight() == Row.DELETE) {
-                database.delete(this, key);
-            } else {
-                database.put(data);
-            }
-            if (data != null) {
-                data._setExpired(true);
-            }
-        } finally {
-            lock.readLock().unlock();
+
+        Row<V> row = dirty.remove(key);
+        if (row == null) {
+            return;
+        }
+
+        Pair<V, Integer> dataState = row.getDataState();
+        V data = dataState.getLeft();
+        if (dataState.getRight() == Row.DELETE) {
+            database.delete(this, key);
+        } else {
+            database.put(data);
         }
     }
 
