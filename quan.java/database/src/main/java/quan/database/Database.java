@@ -45,7 +45,7 @@ public abstract class Database {
     /**
      * 所有的存档线程
      */
-    private List<StoreThread> storeThreads = new ArrayList<>();
+    private List<SaveThread> saveThreads = new ArrayList<>();
 
     private int storeThreadIndex;
 
@@ -65,10 +65,10 @@ public abstract class Database {
 
     private void open() {
         for (int i = 0; i < storeThreadNum; i++) {
-            StoreThread storeThread = new StoreThread(config.storePeriod);
-            storeThread.setName(getName() + "-store-thread-" + (i + 1));
-            storeThreads.add(storeThread);
-            storeThread.start();
+            SaveThread saveThread = new SaveThread(config.savePeriod);
+            saveThread.setName(getName() + "-store-thread-" + (i + 1));
+            saveThreads.add(saveThread);
+            saveThread.start();
         }
 
         open0();
@@ -107,10 +107,10 @@ public abstract class Database {
 
         tables.put(table.getName(), table);
 
-        storeThreads.get(storeThreadIndex).tables.add(table);
+        saveThreads.get(storeThreadIndex).tables.add(table);
 
         storeThreadIndex++;
-        if (storeThreadIndex == storeThreads.size() - 1) {
+        if (storeThreadIndex == saveThreads.size() - 1) {
             storeThreadIndex = 0;
         }
 
@@ -141,10 +141,10 @@ public abstract class Database {
         closed = true;
 
         tables.clear();
-        for (StoreThread storeThread : storeThreads) {
-            storeThread.close();
+        for (SaveThread saveThread : saveThreads) {
+            saveThread.close();
         }
-        storeThreads.clear();
+        saveThreads.clear();
 
         close0();
         logger.debug("数据库[{}]已关闭", getName());
@@ -170,23 +170,23 @@ public abstract class Database {
         }
     }
 
-    private static class StoreThread extends Thread {
+    private static class SaveThread extends Thread {
 
         private volatile boolean running;
 
-        private int storePeriod;
+        private int period;
 
         private List<Table> tables = new CopyOnWriteArrayList<>();
 
-        public StoreThread(int storePeriod) {
-            this.storePeriod = storePeriod;
+        public SaveThread(int period) {
+            this.period = period;
         }
 
         @Override
         public void run() {
             running = true;
             while (running) {
-                for (int i = 0; i < storePeriod; i++) {
+                for (int i = 0; i < period; i++) {
                     if (!running) {
                         break;
                     }
@@ -201,7 +201,7 @@ public abstract class Database {
                 }
 
                 for (Table table : tables) {
-                    table.store();
+                    table.save();
                 }
             }
             tables.clear();
@@ -210,7 +210,7 @@ public abstract class Database {
         void close() {
             running = false;
             for (Table table : tables) {
-                table.finalStore();
+                table.finalSave();
             }
         }
     }
@@ -230,11 +230,11 @@ public abstract class Database {
         /***
          * 存档间隔(秒)
          */
-        private int storePeriod = 10;
+        private int savePeriod = 10;
         /**
          * 存档线程数量
          */
-        private int storeThreadNum = Runtime.getRuntime().availableProcessors();
+        private int saveThreadNum = Runtime.getRuntime().availableProcessors();
 
         public String getName() {
             return name == null ? "" : name.trim();
@@ -254,21 +254,21 @@ public abstract class Database {
             return this;
         }
 
-        public int getStorePeriod() {
-            return storePeriod;
+        public int getSavePeriod() {
+            return savePeriod;
         }
 
-        public Config setStorePeriod(int storePeriod) {
-            this.storePeriod = Math.max(1, storePeriod);
+        public Config setSavePeriod(int savePeriod) {
+            this.savePeriod = Math.max(1, savePeriod);
             return this;
         }
 
-        public int getStoreThreadNum() {
-            return storeThreadNum;
+        public int getSaveThreadNum() {
+            return saveThreadNum;
         }
 
-        public Config setStoreThreadNum(int storeThreadNum) {
-            this.storeThreadNum = Math.max(1, storeThreadNum);
+        public Config setSaveThreadNum(int saveThreadNum) {
+            this.saveThreadNum = Math.max(1, saveThreadNum);
             return this;
         }
     }

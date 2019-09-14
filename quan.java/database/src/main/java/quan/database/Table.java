@@ -284,10 +284,10 @@ public class Table<K, V extends Data<K>> implements Comparable<Table<K, V>> {
     /**
      * 存档数据，并尝试清理过期缓存
      */
-    public void store() {
+    public void save() {
         lock.writeLock().lock();
         try {
-            store0();
+            save0();
             cleanExpired();
         } finally {
             lock.writeLock().unlock();
@@ -297,7 +297,7 @@ public class Table<K, V extends Data<K>> implements Comparable<Table<K, V>> {
     /**
      * 手动存档数据，如果数据不需要存档则直接返回
      */
-    public void store(K key) {
+    public void save(K key) {
         Objects.requireNonNull(key, "主键不能为空");
 
         Row<V> row = dirty.remove(key);
@@ -314,7 +314,7 @@ public class Table<K, V extends Data<K>> implements Comparable<Table<K, V>> {
         }
     }
 
-    private void store0() {
+    private void save0() {
         long startTime = System.currentTimeMillis();
 
         int insertNum = 0;
@@ -359,10 +359,10 @@ public class Table<K, V extends Data<K>> implements Comparable<Table<K, V>> {
         logger.debug("[{}]存档耗时:{}ms,当前缓存数量:{},插入数量:{},更新数量:{},删除数量:{}", name, costTime, rows.size(), insertNum, updateNum, deletes.size());
     }
 
-    void finalStore() {
+    void finalSave() {
         lock.writeLock().lock();
         try {
-            store0();
+            save0();
             for (Row<V> row : rows.values()) {
                 if (row.data != null) {
                     row.data._setExpired(true);

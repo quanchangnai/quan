@@ -361,7 +361,7 @@ public class RoleData extends Data<Long> {
 
     public synchronized static void setTable(Table<Long, RoleData> table) {
         if (_table != null && _table.isWorkable()) {
-            throw new IllegalStateException("数据已设置缓存" );
+            throw new IllegalStateException("数据已设置缓存表" );
         }
         Objects.requireNonNull(table, "参数[table]不能为空" );
         table.checkWorkable();
@@ -404,9 +404,9 @@ public class RoleData extends Data<Long> {
         return _table.getOrInsert(id);
     }
 
-    public static void store(Long id) {
+    public static void save(Long id) {
         checkTable();
-        _table.store(id);
+        _table.save(id);
     }
 
 }

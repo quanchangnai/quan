@@ -333,7 +333,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
 <#if definitionType ==5 && persistent>
     public synchronized static void setTable(Table<${keyType}, ${name}> table) {
         if (_table != null && _table.isWorkable()) {
-            throw new IllegalStateException("数据已设置缓存" );
+            throw new IllegalStateException("数据已设置缓存表" );
         }
         Objects.requireNonNull(table, "参数[table]不能为空" );
         table.checkWorkable();
@@ -376,9 +376,9 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
         return _table.getOrInsert(${keyName});
     }
 
-    public static void store(${keyType} ${keyName}) {
+    public static void save(${keyType} ${keyName}) {
         checkTable();
-        _table.store(${keyName});
+        _table.save(${keyName});
     }
 
 </#if>

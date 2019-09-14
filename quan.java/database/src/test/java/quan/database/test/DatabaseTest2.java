@@ -20,7 +20,7 @@ public class DatabaseTest2 {
         BerkeleyDB.Config config = new BerkeleyDB.Config();
         config.setDir(".temp/bdb")
                 .setCacheExpire(30)
-                .setStorePeriod(5);
+                .setSavePeriod(5);
         Database database = new BerkeleyDB(config);
         while (true) {
             Transaction.execute(DatabaseTest2::test1);
