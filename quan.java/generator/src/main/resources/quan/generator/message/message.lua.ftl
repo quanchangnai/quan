@@ -12,7 +12,7 @@ local ${import[import?last_index_of(".")+1..]} = require("${import}")
 ---
 local ${name} = {
     ---类名
-    class = "${fullName}",
+    class = "${getFullName("lua")}",
 <#if definitionType ==3>
     ---消息ID
     id = ${id?c}
@@ -64,7 +64,7 @@ end
 
 ---
 ---<#if comment !="">${comment}<#else>${name}</#if>.编码
----@param msg ${fullName} 不能为空
+---@param msg ${getFullName("lua")} 不能为空
 ---@param buffer quan.message.Buffer 可以为空
 ---@return quan.message.Buffer
 ---
@@ -136,8 +136,8 @@ end
 ---
 ---<#if comment !="">${comment}<#else>${name}</#if>.解码
 ---@param buffer quan.message.Buffer 不能为空
----@param msg ${fullName} 可以为空
----@return ${fullName}
+---@param msg ${getFullName("lua")} 可以为空
+---@return ${getFullName("lua")}
 ---
 function ${name}.decode(buffer, msg)
     assert(type(buffer) == "table" and buffer.class == Buffer.class, "参数[buffer]类型错误")

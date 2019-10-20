@@ -12,11 +12,11 @@ import java.util.regex.Pattern;
  */
 public abstract class ClassDefinition extends Definition {
 
-    //原始包名，不含前缀
-    private String originalPackageName;
-
-    //实际包名，不含前缀，和具体语言相关
+    //不含前缀的默认包名，
     private String packageName;
+
+    //不同语言对应的不含前缀的包名，为空时使用默认包名
+    private Map<String, String> packageNames = new HashMap<>();
 
     //定义文件
     private String definitionFile;
@@ -53,7 +53,6 @@ public abstract class ClassDefinition extends Definition {
     }
 
     public void reset() {
-        packageName = originalPackageName;
         imports.clear();
     }
 
@@ -65,20 +64,8 @@ public abstract class ClassDefinition extends Definition {
         }
     }
 
-    public void setOriginalPackageName(String originalPackageName) {
-        if (StringUtils.isBlank(originalPackageName)) {
-            return;
-        }
-        this.originalPackageName = originalPackageName.trim();
-        this.packageName = this.originalPackageName;
-    }
-
-    public String getOriginalPackageName() {
-        return originalPackageName;
-    }
-
     public String getNameWithPackage() {
-        return originalPackageName + "." + getName();
+        return packageName + "." + getName();
     }
 
     public void setPackageName(String packageName) {
@@ -89,16 +76,41 @@ public abstract class ClassDefinition extends Definition {
         return packageName;
     }
 
-    public String getFullPackageName() {
-        String packagePrefix = getPackagePrefix();
-        if (packagePrefix != null) {
-            return packagePrefix + "." + packageName;
-        }
-        return packageName;
+    public Map<String, String> getPackageNames() {
+        return packageNames;
     }
 
-    public String getFullName() {
-        return getFullPackageName() + "." + getName();
+    public String getPackageName(String lang) {
+        if (!packageNames.containsKey(lang)) {
+            return packageName;
+        }
+        return packageNames.get(lang);
+    }
+
+    public String getPackageName(Language lang) {
+        return getPackageName(lang.name());
+    }
+
+
+    public String getFullPackageName(String lang) {
+        String packagePrefix = getPackagePrefix();
+        if (packagePrefix != null) {
+            return packagePrefix + "." + getPackageName(lang);
+        }
+        return getPackageName(lang);
+    }
+
+    public String getFullPackageName(Language lang) {
+        return getFullPackageName(lang.name());
+    }
+
+
+    public String getFullName(String lang) {
+        return getFullPackageName(lang) + "." + getName();
+    }
+
+    public String getFullName(Language lang) {
+        return getFullPackageName(lang) + "." + getName();
     }
 
     public List<FieldDefinition> getFields() {

@@ -1,4 +1,4 @@
-package ${fullPackageName};
+package ${getFullPackageName("java")};
 
 <#list imports as import>
 import ${import};

@@ -53,16 +53,12 @@ public class CSharpMessageGenerator extends MessageGenerator {
         return Language.cs;
     }
 
-    protected void processClassSelf(ClassDefinition classDefinition) {
-        classDefinition.setPackageName(CSharpUtils.toCapitalCamel(classDefinition.getOriginalPackageName()));
-    }
-
     @Override
     protected void processClassDependency(ClassDefinition classDefinition) {
         if (classDefinition instanceof MessageDefinition) {
             MessageHeadDefinition messageHeadDefinition = ((MessageDefinition) classDefinition).getHead();
-            if (messageHeadDefinition != null && !messageHeadDefinition.getFullPackageName().equals(classDefinition.getFullPackageName())) {
-                classDefinition.getImports().add(messageHeadDefinition.getFullPackageName());
+            if (messageHeadDefinition != null && !messageHeadDefinition.getFullPackageName(supportLanguage()).equals(classDefinition.getFullPackageName(supportLanguage()))) {
+                classDefinition.getImports().add(messageHeadDefinition.getFullPackageName(supportLanguage()));
             }
         }
         super.processClassDependency(classDefinition);

@@ -3,6 +3,7 @@ package quan.generator.util;
 import quan.definition.BeanDefinition;
 import quan.definition.ClassDefinition;
 import quan.definition.FieldDefinition;
+import quan.definition.Language;
 
 /**
  * C#工具类
@@ -33,12 +34,12 @@ public class CSharpUtils {
             beanDefinition.getImports().add("System");
         }
         ClassDefinition fieldClass = fieldDefinition.getClassDefinition();
-        if (fieldClass != null && !fieldClass.getFullPackageName().equals(beanDefinition.getFullPackageName())) {
-            beanDefinition.getImports().add(fieldClass.getFullPackageName());
+        if (fieldClass != null && !fieldClass.getFullPackageName(Language.cs).equals(beanDefinition.getFullPackageName(Language.cs))) {
+            beanDefinition.getImports().add(fieldClass.getFullPackageName(Language.cs));
         }
         BeanDefinition fieldValueBean = fieldDefinition.getValueBean();
-        if (fieldValueBean != null && !fieldValueBean.getFullPackageName().equals(beanDefinition.getFullPackageName())) {
-            beanDefinition.getImports().add(fieldValueBean.getFullPackageName());
+        if (fieldValueBean != null && !fieldValueBean.getFullPackageName(Language.cs).equals(beanDefinition.getFullPackageName(Language.cs))) {
+            beanDefinition.getImports().add(fieldValueBean.getFullPackageName(Language.cs));
         }
     }
 

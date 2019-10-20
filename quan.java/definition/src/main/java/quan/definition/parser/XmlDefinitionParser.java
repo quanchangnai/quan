@@ -1,5 +1,6 @@
 package quan.definition.parser;
 
+import org.dom4j.Attribute;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
@@ -12,6 +13,8 @@ import quan.definition.message.MessageDefinition;
 import quan.definition.message.MessageHeadDefinition;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by quanchangnai on 2017/7/10.
@@ -38,10 +41,20 @@ public class XmlDefinitionParser extends DefinitionParser {
             return;
         }
 
+        //默认以定义文件名作为包名
         String packageName = definitionFile.getName().substring(0, definitionFile.getName().lastIndexOf("."));
         if (!Constants.PACKAGE_NAME_PATTERN.matcher(packageName).matches()) {
             addValidatedError("定义文件名[" + packageName + "]格式错误,正确格式:" + Constants.PACKAGE_NAME_PATTERN);
             return;
+        }
+
+        //具体语言对应的包名
+        Map<String, String> packageNames = new HashMap<>();
+        for (Object attribute : rootElement.attributes()) {
+            Attribute packageAttr = (Attribute) attribute;
+            if (Language.names().contains(packageAttr.getName())) {
+                packageNames.put(packageAttr.getName(), packageAttr.getValue());
+            }
         }
 
         for (int i = 0; i < rootElement.nodeCount(); i++) {
@@ -60,7 +73,9 @@ public class XmlDefinitionParser extends DefinitionParser {
             classDefinition.setDefinitionFile(definitionFile.getName());
             classDefinition.setDefinitionText(classElement.asXML());
 
-            classDefinition.setOriginalPackageName(packageName);
+            classDefinition.setPackageName(packageName);
+            classDefinition.getPackageNames().putAll(packageNames);
+
             classDefinition.setName(classElement.attributeValue("name"));
             classDefinition.setLang(classElement.attributeValue("lang"));
 

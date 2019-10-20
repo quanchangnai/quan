@@ -133,7 +133,7 @@ public abstract class Generator {
 
     protected void generate(ClassDefinition classDefinition) {
         Template template = templates.get(classDefinition.getClass());
-        File destFilePath = new File(codePath + File.separator + classDefinition.getFullPackageName().replace(".", File.separator));
+        File destFilePath = new File(codePath + File.separator + classDefinition.getFullPackageName(Language.java).replace(".", File.separator));
         if (!destFilePath.exists() && !destFilePath.mkdirs()) {
             logger.info("创建目录[{}]失败", destFilePath);
             return;
@@ -194,13 +194,13 @@ public abstract class Generator {
 
     protected void processBeanFieldImports(BeanDefinition beanDefinition, FieldDefinition fieldDefinition) {
         ClassDefinition fieldClass = fieldDefinition.getClassDefinition();
-        if (fieldClass != null && !fieldClass.getFullPackageName().equals(beanDefinition.getFullPackageName())) {
-            beanDefinition.getImports().add(fieldClass.getFullName());
+        if (fieldClass != null && !fieldClass.getFullPackageName(supportLanguage()).equals(beanDefinition.getFullPackageName(supportLanguage()))) {
+            beanDefinition.getImports().add(fieldClass.getFullName(supportLanguage()));
         }
 
         BeanDefinition fieldValueBean = fieldDefinition.getValueBean();
-        if (fieldValueBean != null && !fieldValueBean.getFullPackageName().equals(beanDefinition.getFullPackageName())) {
-            beanDefinition.getImports().add(fieldValueBean.getFullName());
+        if (fieldValueBean != null && !fieldValueBean.getFullPackageName(supportLanguage()).equals(beanDefinition.getFullPackageName(supportLanguage()))) {
+            beanDefinition.getImports().add(fieldValueBean.getFullName(supportLanguage()));
         }
     }
 

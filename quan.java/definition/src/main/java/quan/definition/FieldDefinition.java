@@ -304,11 +304,6 @@ public class FieldDefinition extends Definition {
         return classType;
     }
 
-    public String getClassTypeFullName() {
-        ClassDefinition classDefinition = parser.getClass(getType());
-        return classDefinition == null ? getType() : classDefinition.getFullName();
-    }
-
     public void setClassType(String classType) {
         this.classType = classType;
     }

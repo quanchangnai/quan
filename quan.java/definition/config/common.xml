@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<package>
+<package cs="Common">
 
     <config name="ConstantConfig" table="常量">
         <field name="key" type="string" column="常量Key" index="u"/>

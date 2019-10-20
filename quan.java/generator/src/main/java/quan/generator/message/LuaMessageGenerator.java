@@ -41,12 +41,12 @@ public class LuaMessageGenerator extends MessageGenerator {
     protected void processBeanFieldImports(BeanDefinition beanDefinition, FieldDefinition fieldDefinition) {
         BeanDefinition fieldBean = fieldDefinition.getBean();
         if (fieldBean != null) {
-            beanDefinition.getImports().add(fieldBean.getFullName());
+            beanDefinition.getImports().add(fieldBean.getFullName(supportLanguage()));
         }
 
         BeanDefinition fieldValueBean = fieldDefinition.getValueBean();
         if (fieldValueBean != null) {
-            beanDefinition.getImports().add(fieldValueBean.getFullName());
+            beanDefinition.getImports().add(fieldValueBean.getFullName(supportLanguage()));
         }
     }
 

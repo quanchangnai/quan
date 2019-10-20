@@ -74,8 +74,8 @@ public abstract class ConfigGenerator extends Generator {
                 processField(classDefinition, fieldDefinition);
             }
             ConfigDefinition parentDefinition = configDefinition.getParentConfig();
-            if (parentDefinition != null && !parentDefinition.getFullPackageName().equals(configDefinition.getFullPackageName())) {
-                configDefinition.getImports().add(parentDefinition.getFullName());
+            if (parentDefinition != null && !parentDefinition.getFullPackageName(supportLanguage()).equals(configDefinition.getFullPackageName(supportLanguage()))) {
+                configDefinition.getImports().add(parentDefinition.getFullName(supportLanguage()));
             }
         } else if (classDefinition instanceof ConstantDefinition) {
             processConstantDependency((ConstantDefinition) classDefinition);
@@ -89,10 +89,10 @@ public abstract class ConfigGenerator extends Generator {
         if (valueField.isCollectionType()) {
             constantDefinition.getImports().add("java.util.*");
             if (!valueField.isBuiltinValueType()) {
-                constantDefinition.getImports().add(valueField.getValueBean().getFullName());
+                constantDefinition.getImports().add(valueField.getValueBean().getFullName(supportLanguage()));
             }
         } else if (!valueField.isBuiltinType()) {
-            constantDefinition.getImports().add(valueField.getClassDefinition().getFullName());
+            constantDefinition.getImports().add(valueField.getClassDefinition().getFullName(supportLanguage()));
         }
     }
 

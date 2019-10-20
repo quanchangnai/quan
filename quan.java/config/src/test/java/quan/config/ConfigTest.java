@@ -4,6 +4,7 @@ import quan.config.item.EquipConfig;
 import quan.config.item.ItemConfig;
 import quan.config.item.WeaponConfig;
 import quan.config.quest.QuestConfig;
+import quan.definition.Language;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -87,7 +88,7 @@ public class ConfigTest {
 
         System.err.println("writeJson()=============");
         long startTime = System.currentTimeMillis();
-        configLoader1.writeJson("config\\json", true);
+        configLoader1.writeJson("config\\json", true, Language.cs);
         System.err.println("writeJson()耗时:" + (System.currentTimeMillis() - startTime));
         System.err.println();
     }

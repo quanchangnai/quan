@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.definition.Constants;
 import quan.definition.FieldDefinition;
+import quan.definition.Language;
 import quan.definition.config.ConfigDefinition;
 
 import java.io.File;
@@ -57,7 +58,7 @@ public abstract class ConfigReader {
 
     protected void initPrototype() {
         try {
-            Class<Config> configClass = (Class<Config>) Class.forName(configDefinition.getFullName());
+            Class<Config> configClass = (Class<Config>) Class.forName(configDefinition.getFullName(Language.java));
             prototype = configClass.getDeclaredConstructor(JSONObject.class).newInstance(new JSONObject());
         } catch (Exception e) {
 //            logger.error("实例化配置类[{}]失败", configDefinition.getFullName(), e);

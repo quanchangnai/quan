@@ -125,20 +125,7 @@ namespace Quan.Config
 
         protected static string GetConfigNameWithPackage(FileInfo jsonFile)
         {
-            var jsonName = jsonFile.Name.Substring(0, jsonFile.Name.LastIndexOf(".", StringComparison.Ordinal));
-            var configNameWithPackage = "";
-            for (var i = 0; i < jsonName.Length; i++)
-            {
-                var c = jsonName[i].ToString();
-                if (i == 0 || jsonName[i - 1] == '.')
-                {
-                    c = c.ToUpper();
-                }
-
-                configNameWithPackage += c;
-            }
-
-            return configNameWithPackage;
+            return jsonFile.Name.Substring(0, jsonFile.Name.LastIndexOf(".", StringComparison.Ordinal));
         }
     }
 }

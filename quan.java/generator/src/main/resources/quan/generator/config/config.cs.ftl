@@ -7,7 +7,7 @@ using Quan.Config;
 using ${import};
 </#list>
 
-namespace ${fullPackageName}
+namespace ${getFullPackageName("cs")}
 {
     /// <summary>
 <#if comment !="">

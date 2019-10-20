@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<package>
+<package cs="Quest">
 
     <config name="QuestConfig" table="任务">
         <field name="id" type="int" column="ID"/>

@@ -2,7 +2,6 @@ package quan.generator.config;
 
 import org.apache.commons.cli.CommandLine;
 import quan.definition.BeanDefinition;
-import quan.definition.ClassDefinition;
 import quan.definition.FieldDefinition;
 import quan.definition.Language;
 import quan.definition.config.ConstantDefinition;
@@ -55,10 +54,6 @@ public class CSharpConfigGenerator extends ConfigGenerator {
         return Language.cs;
     }
 
-    protected void processClassSelf(ClassDefinition classDefinition) {
-        classDefinition.setPackageName(CSharpUtils.toCapitalCamel(classDefinition.getOriginalPackageName()));
-    }
-
     @Override
     protected void processBeanFieldImports(BeanDefinition beanDefinition, FieldDefinition fieldDefinition) {
         CSharpUtils.processBeanFieldImports(beanDefinition, fieldDefinition);
@@ -70,10 +65,10 @@ public class CSharpConfigGenerator extends ConfigGenerator {
         if (valueField.isCollectionType()) {
             constantDefinition.getImports().add("System.Collections.Generic");
             if (!valueField.isBuiltinValueType()) {
-                constantDefinition.getImports().add(valueField.getValueBean().getFullPackageName());
+                constantDefinition.getImports().add(valueField.getValueBean().getFullPackageName(supportLanguage()));
             }
         } else if (!valueField.isBuiltinType()) {
-            constantDefinition.getImports().add(valueField.getClassDefinition().getFullPackageName());
+            constantDefinition.getImports().add(valueField.getClassDefinition().getFullPackageName(supportLanguage()));
         }
     }
 

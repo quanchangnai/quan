@@ -55,8 +55,8 @@ public class JavaMessageGenerator extends MessageGenerator {
     protected void processClassDependency(ClassDefinition classDefinition) {
         if (classDefinition instanceof MessageDefinition) {
             MessageHeadDefinition messageHeadDefinition = ((MessageDefinition) classDefinition).getHead();
-            if (messageHeadDefinition != null && !messageHeadDefinition.getFullPackageName().equals(classDefinition.getFullPackageName())) {
-                classDefinition.getImports().add(messageHeadDefinition.getFullName());
+            if (messageHeadDefinition != null && !messageHeadDefinition.getFullPackageName(supportLanguage()).equals(classDefinition.getFullPackageName(supportLanguage()))) {
+                classDefinition.getImports().add(messageHeadDefinition.getFullName(supportLanguage()));
             }
         }
         super.processClassDependency(classDefinition);

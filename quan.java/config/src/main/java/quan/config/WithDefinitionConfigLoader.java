@@ -6,7 +6,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.apache.commons.lang3.tuple.Triple;
 import quan.common.util.PathUtils;
-import quan.definition.*;
+import quan.definition.BeanDefinition;
+import quan.definition.DefinitionCategory;
+import quan.definition.FieldDefinition;
+import quan.definition.Language;
 import quan.definition.config.ConfigDefinition;
 import quan.definition.config.IndexDefinition;
 import quan.definition.parser.DefinitionParser;
@@ -114,7 +117,7 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
                 allConfigIndexedJsons.put(configDefinition, validateIndex(configDefinition));
             }
             //needLoad():加载配置
-            load(configDefinition.getFullName(), getConfigTables(configDefinition), false);
+            load(configDefinition.getFullName(Language.java), getConfigTables(configDefinition), false);
         }
 
         if (needValidate()) {
@@ -138,11 +141,7 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
         return jsons;
     }
 
-    public void writeJson(String path) {
-        writeJson(path, true);
-    }
-
-    public void writeJson(String path, boolean useNameWithPackage) {
+    public void writeJson(String path, boolean useNameWithPackage, Language language) {
         if (definitionParser == null) {
             return;
         }
@@ -170,7 +169,7 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
 
             String configName = configDefinition.getName();
             if (useNameWithPackage) {
-                configName = configDefinition.getOriginalPackageName() + "." + configDefinition.getName();
+                configName = configDefinition.getPackageName(language) + "." + configDefinition.getName();
             }
             try (FileOutputStream fileOutputStream = new FileOutputStream(new File(pathFile, configName + ".json"))) {
                 JSON.writeJSONString(fileOutputStream, rows, SerializerFeature.PrettyFormat);
@@ -428,7 +427,7 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
         }
 
         for (ConfigDefinition configDefinition : needReloadConfigs) {
-            load(configDefinition.getFullName(), getConfigTables(configDefinition), true);
+            load(configDefinition.getFullName(Language.java), getConfigTables(configDefinition), true);
         }
 
         for (ConfigReader reloadReader : reloadReaders) {
@@ -476,7 +475,7 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
                 configReader = new ExcelConfigReader(tableFile, configDefinition);
                 break;
             case json: {
-                configReader = new JsonConfigReader(tableFile, configDefinition.getFullName());
+                configReader = new JsonConfigReader(tableFile, configDefinition.getFullName(Language.java));
                 break;
             }
         }

@@ -7,7 +7,7 @@ using Buffer = Quan.Message.Buffer;
 using ${import};
 </#list>
 
-namespace ${fullPackageName}
+namespace ${getFullPackageName("cs")}
 {
 	/// <summary>
 <#if comment !="">

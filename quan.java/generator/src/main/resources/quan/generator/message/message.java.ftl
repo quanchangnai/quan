@@ -1,4 +1,4 @@
-package ${fullPackageName};
+package ${getFullPackageName("java")};
 
 import java.util.*;
 import java.io.IOException;

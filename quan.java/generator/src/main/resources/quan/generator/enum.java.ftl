@@ -1,4 +1,4 @@
-package ${fullPackageName};
+package ${getFullPackageName("java")};
 
 /**
 <#if comment !="">
