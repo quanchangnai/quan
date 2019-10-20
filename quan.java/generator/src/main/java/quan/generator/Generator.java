@@ -133,7 +133,7 @@ public abstract class Generator {
 
     protected void generate(ClassDefinition classDefinition) {
         Template template = templates.get(classDefinition.getClass());
-        File destFilePath = new File(codePath + File.separator + classDefinition.getFullPackageName(Language.java).replace(".", File.separator));
+        File destFilePath = new File(codePath + File.separator + classDefinition.getFullPackageName(supportLanguage()).replace(".", File.separator));
         if (!destFilePath.exists() && !destFilePath.mkdirs()) {
             logger.info("创建目录[{}]失败", destFilePath);
             return;
