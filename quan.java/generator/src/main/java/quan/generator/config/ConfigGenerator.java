@@ -67,7 +67,7 @@ public abstract class ConfigGenerator extends Generator {
     }
 
     @Override
-    protected void processClassDependency(ClassDefinition classDefinition) {
+    protected void processClass(ClassDefinition classDefinition) {
         if (classDefinition instanceof ConfigDefinition) {
             ConfigDefinition configDefinition = (ConfigDefinition) classDefinition;
             for (FieldDefinition fieldDefinition : configDefinition.getSelfFields()) {
@@ -80,7 +80,7 @@ public abstract class ConfigGenerator extends Generator {
         } else if (classDefinition instanceof ConstantDefinition) {
             processConstantDependency((ConstantDefinition) classDefinition);
         } else {
-            super.processClassDependency(classDefinition);
+            super.processClass(classDefinition);
         }
     }
 

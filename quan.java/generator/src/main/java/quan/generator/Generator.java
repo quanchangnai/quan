@@ -114,12 +114,8 @@ public abstract class Generator {
                 continue;
             }
             classDefinition.reset();
-            processClassSelf(classDefinition);
+            processClass(classDefinition);
             classDefinitions.add(classDefinition);
-        }
-
-        for (ClassDefinition classDefinition : classDefinitions) {
-            processClassDependency(classDefinition);
         }
 
         generate(classDefinitions);
@@ -152,10 +148,7 @@ public abstract class Generator {
 
     }
 
-    protected void processClassSelf(ClassDefinition classDefinition) {
-    }
-
-    protected void processClassDependency(ClassDefinition classDefinition) {
+    protected void processClass(ClassDefinition classDefinition) {
         for (FieldDefinition fieldDefinition : classDefinition.getFields()) {
             processField(classDefinition, fieldDefinition);
         }
@@ -189,7 +182,6 @@ public abstract class Generator {
         }
 
         processBeanFieldImports(beanDefinition, fieldDefinition);
-
     }
 
     protected void processBeanFieldImports(BeanDefinition beanDefinition, FieldDefinition fieldDefinition) {
