@@ -231,14 +231,18 @@ public class Transaction {
         Transaction current = get(true);
         try {
             current.failed = current.failed || failed;
-            if (current.isFailed()) {
-                current.rollback();
-            } else {
+            if (!current.failed) {
                 current.commit();
             }
+            current.clearLogs();
             count();
         } finally {
             threadLocal.set(null);
+            if (current.failed) {
+                runAfterTasks(current.rollbackAfterTasks);
+            } else {
+                runAfterTasks(current.commitAfterTasks);
+            }
         }
     }
 
@@ -476,17 +480,6 @@ public class Transaction {
             fieldLog.commit();
         }
 
-        clearLogs();
-
-        runAfterTasks(commitAfterTasks);
-    }
-
-    /**
-     * 事务回滚
-     */
-    private void rollback() {
-        clearLogs();
-        runAfterTasks(rollbackAfterTasks);
     }
 
     private static void runAfterTasks(List<Runnable> afterTasks) {
