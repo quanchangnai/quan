@@ -116,14 +116,14 @@ public class Transaction {
     private Map<DataLog.Key, DataLog> dataLogs = new HashMap<>();
 
     /**
-     * 事务提交之后需要执行的任务
+     * 事务执行成功之后需要执行的任务
      */
-    private List<Runnable> commitAfterTasks = new ArrayList<>();
+    private List<Runnable> successTasks = new ArrayList<>();
 
     /**
-     * 事务回滚之后需要执行的任务
+     * 事务执行失败之后需要执行的任务
      */
-    private List<Runnable> rollbackAfterTasks = new ArrayList<>();
+    private List<Runnable> failedTasks = new ArrayList<>();
 
 
     public long getId() {
@@ -239,9 +239,9 @@ public class Transaction {
         } finally {
             threadLocal.set(null);
             if (current.failed) {
-                runAfterTasks(current.rollbackAfterTasks);
+                executeAfterTasks(current.failedTasks);
             } else {
-                runAfterTasks(current.commitAfterTasks);
+                executeAfterTasks(current.successTasks);
             }
         }
     }
@@ -331,8 +331,7 @@ public class Transaction {
             while (true) {
                 transaction.taskStartTime = System.currentTimeMillis();
 
-                boolean result = task.run();
-                if (!result) {
+                if (!task.run()) {
                     failed = true;
                     return;
                 }
@@ -342,6 +341,8 @@ public class Transaction {
                     //有冲突，清空日志，重新执行
                     transaction.taskConflictCount++;
                     transaction.clearLogs();
+                    transaction.successTasks.clear();
+                    transaction.failedTasks.clear();
                 } else {
                     return;
                 }
@@ -482,7 +483,7 @@ public class Transaction {
 
     }
 
-    private static void runAfterTasks(List<Runnable> afterTasks) {
+    private static void executeAfterTasks(List<Runnable> afterTasks) {
         for (Runnable afterTask : afterTasks) {
             try {
                 afterTask.run();
@@ -504,19 +505,15 @@ public class Transaction {
     /**
      * 添加事务执行完成之后需要执行的任务
      *
-     * @param task      后置任务
-     * @param committed true:提交执行,false:滚之后执行
+     * @param task    后置任务
+     * @param success true:事务执行成功之后执行,false:事务执行失败之后执行
      */
-    public static void addAfterTask(Runnable task, boolean committed) {
-        addAfterTasks(Collections.singletonList(task), committed);
-    }
-
-    public static void addAfterTasks(List<Runnable> tasks, boolean committed) {
+    public static void addAfterTask(Runnable task, boolean success) {
         Transaction transaction = Transaction.get(true);
-        if (committed) {
-            transaction.commitAfterTasks.addAll(tasks);
+        if (success) {
+            transaction.successTasks.add(task);
         } else {
-            transaction.rollbackAfterTasks.addAll(tasks);
+            transaction.failedTasks.add(task);
         }
     }
 
