@@ -487,16 +487,8 @@ public class Transaction {
         for (Runnable afterTask : afterTasks) {
             try {
                 afterTask.run();
-            } catch (Exception e1) {
-                if (afterTask instanceof AfterTask) {
-                    try {
-                        ((AfterTask) afterTask).onException(e1);
-                    } catch (Exception e2) {
-                        logger.error("", e2);
-                    }
-                } else {
-                    logger.error("", e1);
-                }
+            } catch (Exception e) {
+                logger.error("", e);
             }
         }
         afterTasks.clear();
@@ -506,7 +498,7 @@ public class Transaction {
      * 添加事务执行完成之后需要执行的任务
      *
      * @param task    后置任务
-     * @param success true:事务执行成功之后执行,false:事务执行失败之后执行
+     * @param success true:成功之后执行,false:失败之后执行
      */
     public static void addAfterTask(Runnable task, boolean success) {
         Transaction transaction = Transaction.get(true);
