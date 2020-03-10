@@ -62,18 +62,25 @@ function ${name}.new(args)
     return instance
 end
 
+<#if definitionType ==3>
 ---
 ---<#if comment !="">${comment}<#else>${name}</#if>.编码
----@param msg ${getFullName("lua")} 不能为空
+---@return quan.message.Buffer
+---
+function ${name}:encode()
+    assert(type(self) == "table" and self.class == ${name}.class, "参数[self]类型错误")
+    local buffer = Message.encode(self)
+
+<#else>
+---
+---<#if comment !="">${comment}<#else>${name}</#if>.编码
 ---@param buffer quan.message.Buffer 可以为空
 ---@return quan.message.Buffer
 ---
-function ${name}.encode(msg, buffer)
-    assert(type(msg) == "table" and msg.class == ${name}.class, "参数[msg]类型错误")
+function ${name}:encode(buffer)
+    assert(type(self) == "table" and self.class == ${name}.class, "参数[self]类型错误")
     assert(buffer == nil or type(buffer) == "table" and buffer.class == Buffer.class, "参数[buffer]类型错误")
-
-<#if definitionType ==3>
-    buffer = Message.encode(msg, buffer)
+    buffer = buffer or Buffer.new()
 
 </#if>
 <#list allFields as field>
@@ -81,8 +88,8 @@ function ${name}.encode(msg, buffer)
         <#if field_index gt 0>
 
         </#if>
-    buffer:writeInt(#msg.${field.name})
-    for i, value in ipairs(msg.${field.name}) do
+    buffer:writeInt(#self.${field.name})
+    for i, value in ipairs(self.${field.name}) do
         <#if field.builtinValueType>
         buffer:write${field.valueType?cap_first}(value);
         <#else>
@@ -96,8 +103,8 @@ function ${name}.encode(msg, buffer)
         <#if field_index gt 0>
 
         </#if>
-    buffer:writeInt(table.size(msg.${field.name}))
-    for key, value in pairs(msg.${field.name}) do
+    buffer:writeInt(table.size(self.${field.name}))
+    for key, value in pairs(self.${field.name}) do
         buffer:write${field.keyType?cap_first}(key)
         <#if field.builtinValueType>
         buffer:write${field.valueType?cap_first}(value)
@@ -109,43 +116,51 @@ function ${name}.encode(msg, buffer)
 
     </#if>
     <#elseif field.type=="float"||field.type=="double">
-    buffer:write${field.type?cap_first}(msg.${field.name}<#if field.scale gt 0>, ${field.scale}</#if>)
+    buffer:write${field.type?cap_first}(self.${field.name}<#if field.scale gt 0>, ${field.scale}</#if>)
     <#elseif field.builtinType>
-    buffer:write${field.type?cap_first}(msg.${field.name})
+    buffer:write${field.type?cap_first}(self.${field.name})
     <#elseif field.enumType>
-    buffer:writeInt(msg.${field.name} or 0);
+    buffer:writeInt(self.${field.name} or 0);
     <#elseif field.optional>
         <#if field_index gt 0>
 
         </#if>
-    buffer:writeBool(msg.${field.name} ~= nil);
-    if msg.${field.name} ~= nil then
-        ${field.type}.encode(msg.${field.name}, buffer)
+    buffer:writeBool(self.${field.name} ~= nil);
+    if self.${field.name} ~= nil then
+        ${field.type}.encode(self.${field.name}, buffer)
     end
     <#if field_has_next && !allFields[field_index+1].collectionType && (allFields[field_index+1].primitiveType || allFields[field_index+1].enumType || !allFields[field_index+1].optional) >
 
     </#if>
     <#else>
-    ${field.type}.encode(msg.${field.name}, buffer)
+    ${field.type}.encode(self.${field.name}, buffer)
     </#if>
 </#list>
 
     return buffer
 end
 
+<#if definitionType ==3>
 ---
 ---<#if comment !="">${comment}<#else>${name}</#if>.解码
 ---@param buffer quan.message.Buffer 不能为空
----@param msg ${getFullName("lua")} 可以为空
 ---@return ${getFullName("lua")}
 ---
-function ${name}.decode(buffer, msg)
+function ${name}.decode(buffer)
     assert(type(buffer) == "table" and buffer.class == Buffer.class, "参数[buffer]类型错误")
-    assert(msg == nil or type(msg) == "table" and msg.class == ${name}.class, "参数[msg]类型错误")
-
-    msg = msg or ${name}.new()
-<#if definitionType ==3>
-    Message.decode(buffer, msg)
+    local self = ${name}.new()
+    Message.decode(buffer, self)
+<#else>
+---
+---<#if comment !="">${comment}<#else>${name}</#if>.解码
+---@param buffer quan.message.Buffer 不能为空
+---@param self ${getFullName("lua")} 可以为空
+---@return ${getFullName("lua")}
+---
+function ${name}.decode(buffer, self)
+    assert(type(buffer) == "table" and buffer.class == Buffer.class, "参数[buffer]类型错误")
+    assert(self == nil or type(self) == "table" and self.class == ${name}.class, "参数[self]类型错误")
+    self = self or ${name}.new()
 
 </#if>
 <#list allFields as field>
@@ -155,9 +170,9 @@ function ${name}.decode(buffer, msg)
         </#if>
     for i = 1, buffer:readInt() do
         <#if field.builtinValueType>
-        msg.${field.name}[i] = buffer:read${field.valueType?cap_first}()
+        self.${field.name}[i] = buffer:read${field.valueType?cap_first}()
         <#else>
-        msg.${field.name}[i] = ${field.valueType}.decode(buffer)
+        self.${field.name}[i] = ${field.valueType}.decode(buffer)
         </#if>
     end
     <#if field_has_next && !allFields[field_index+1].collectionType && (allFields[field_index+1].primitiveType || allFields[field_index+1].enumType || !allFields[field_index+1].optional) >
@@ -169,36 +184,36 @@ function ${name}.decode(buffer, msg)
         </#if>
     for i = 1, buffer:readInt() do
         <#if field.builtinValueType>
-        msg.${field.name}[buffer:read${field.keyType?cap_first}()] = buffer:read${field.valueType?cap_first}()
+        self.${field.name}[buffer:read${field.keyType?cap_first}()] = buffer:read${field.valueType?cap_first}()
         <#else>
-        msg.${field.name}[buffer:read${field.keyType?cap_first}()] = ${field.valueType}.decode(buffer)
+        self.${field.name}[buffer:read${field.keyType?cap_first}()] = ${field.valueType}.decode(buffer)
         </#if>
     end
     <#if field_has_next && !allFields[field_index+1].collectionType && (allFields[field_index+1].primitiveType || allFields[field_index+1].enumType || !allFields[field_index+1].optional) >
 
     </#if>
     <#elseif field.type=="float"||field.type=="double">
-    msg.${field.name} = buffer:read${field.type?cap_first}(<#if field.scale gt 0>${field.scale}</#if>)
+    self.${field.name} = buffer:read${field.type?cap_first}(<#if field.scale gt 0>${field.scale}</#if>)
     <#elseif field.builtinType>
-    msg.${field.name} = buffer:read${field.type?cap_first}()
+    self.${field.name} = buffer:read${field.type?cap_first}()
     <#elseif field.enumType>
-    msg.${field.name} = buffer:readInt();
+    self.${field.name} = buffer:readInt();
     <#elseif field.optional>
         <#if field_index gt 0>
 
         </#if>
     if buffer:readBool() then
-        msg.${field.name} = ${field.type}.decode(buffer)
+        self.${field.name} = ${field.type}.decode(buffer)
     end
     <#if field_has_next && !allFields[field_index+1].collectionType && (allFields[field_index+1].primitiveType || allFields[field_index+1].enumType || !allFields[field_index+1].optional) >
 
     </#if>
     <#else>
-    msg.${field.name} = ${field.type}.decode(buffer, msg.${field.name})
+    self.${field.name} = ${field.type}.decode(buffer, self.${field.name})
     </#if>
 </#list>
 
-    return msg
+    return self
 end
 
 ${name} = table.readOnly(${name})

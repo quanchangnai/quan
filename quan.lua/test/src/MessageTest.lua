@@ -7,6 +7,7 @@ package.path = package.path .. ";../../message/src/?.lua"
 
 local Buffer = require("quan.message.Buffer")
 local Message = require("quan.message.Message")
+local MessageFactory = require("test.message.MessageFactory")
 local SRoleLogin = require("test.message.role.SRoleLogin")
 local RoleInfo = require("test.message.role.RoleInfo")
 local RoleType = require("test.message.role.RoleType")
@@ -21,8 +22,8 @@ local function test1()
     for i = 1, 3 do
         str = str .. string.char(i)
     end
-    print(str[2])
-    print("str=" .. string.len(str))
+    print("str[2]", str[2])
+    print("str", str, "str.len()", string.len(str))
     print(string.unpack("bbb", str))
     print(str:byte(1, string.len(str)))
 
@@ -86,6 +87,10 @@ local function testMessage1()
 
     local roleInfo2 = RoleInfo.new({ id = 222, name = "bbb", type = RoleType.type2, set = { 2233 } })
 
+    local roleInfoBuffer = roleInfo2:encode()
+    local roleInfo3 = RoleInfo.decode(roleInfoBuffer)
+    print("roleInfo3.name", roleInfo3.name)
+
     sRoleLogin1.roleInfoList[1] = roleInfo2
     sRoleLogin1.roleInfoList[2] = roleInfo2
 
@@ -97,10 +102,13 @@ local function testMessage1()
     sRoleLogin1.userInfo = UserInfo.new()
 
     sRoleLogin1.seq = 1000
-    local buffer = SRoleLogin.encode(sRoleLogin1)
+    local buffer = sRoleLogin1:encode()
     print("buffer:size()", buffer:size())
 
-    local sRoleLogin2 = SRoleLogin.decode(buffer)
+    --local sRoleLogin2 = SRoleLogin.decode(buffer)
+
+    local sRoleLogin2 = MessageFactory.create(buffer:readInt())
+    local sRoleLogin2 = sRoleLogin2.decode(buffer)
 
     local buffer = SRoleLogin.encode(sRoleLogin2)
     local file = io.open("E:\\SRoleLogin", "w")

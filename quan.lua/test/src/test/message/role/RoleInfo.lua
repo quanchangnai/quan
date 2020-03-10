@@ -46,36 +46,36 @@ end
 
 ---
 ---角色信息.编码
----@param msg test.message.role.RoleInfo 不能为空
 ---@param buffer quan.message.Buffer 可以为空
 ---@return quan.message.Buffer
 ---
-function RoleInfo.encode(msg, buffer)
-    assert(type(msg) == "table" and msg.class == RoleInfo.class, "参数[msg]类型错误")
+function RoleInfo:encode(buffer)
+    assert(type(self) == "table" and self.class == RoleInfo.class, "参数[self]类型错误")
     assert(buffer == nil or type(buffer) == "table" and buffer.class == Buffer.class, "参数[buffer]类型错误")
+    buffer = buffer or Buffer.new()
 
-    buffer:writeLong(msg.id)
-    buffer:writeString(msg.name)
-    buffer:writeInt(msg.type or 0);
-    buffer:writeBool(msg.b)
-    buffer:writeShort(msg.s)
-    buffer:writeInt(msg.i)
-    buffer:writeFloat(msg.f, 2)
-    buffer:writeDouble(msg.d)
-    buffer:writeBytes(msg.data)
+    buffer:writeLong(self.id)
+    buffer:writeString(self.name)
+    buffer:writeInt(self.type or 0);
+    buffer:writeBool(self.b)
+    buffer:writeShort(self.s)
+    buffer:writeInt(self.i)
+    buffer:writeFloat(self.f, 2)
+    buffer:writeDouble(self.d)
+    buffer:writeBytes(self.data)
 
-    buffer:writeInt(#msg.list)
-    for i, value in ipairs(msg.list) do
+    buffer:writeInt(#self.list)
+    for i, value in ipairs(self.list) do
         buffer:writeInt(value);
     end
 
-    buffer:writeInt(#msg.set)
-    for i, value in ipairs(msg.set) do
+    buffer:writeInt(#self.set)
+    for i, value in ipairs(self.set) do
         buffer:writeInt(value);
     end
 
-    buffer:writeInt(table.size(msg.map))
-    for key, value in pairs(msg.map) do
+    buffer:writeInt(table.size(self.map))
+    for key, value in pairs(self.map) do
         buffer:writeInt(key)
         buffer:writeInt(value)
     end
@@ -86,37 +86,37 @@ end
 ---
 ---角色信息.解码
 ---@param buffer quan.message.Buffer 不能为空
----@param msg test.message.role.RoleInfo 可以为空
+---@param self test.message.role.RoleInfo 可以为空
 ---@return test.message.role.RoleInfo
 ---
-function RoleInfo.decode(buffer, msg)
+function RoleInfo.decode(buffer, self)
     assert(type(buffer) == "table" and buffer.class == Buffer.class, "参数[buffer]类型错误")
-    assert(msg == nil or type(msg) == "table" and msg.class == RoleInfo.class, "参数[msg]类型错误")
+    assert(self == nil or type(self) == "table" and self.class == RoleInfo.class, "参数[self]类型错误")
+    self = self or RoleInfo.new()
 
-    msg = msg or RoleInfo.new()
-    msg.id = buffer:readLong()
-    msg.name = buffer:readString()
-    msg.type = buffer:readInt();
-    msg.b = buffer:readBool()
-    msg.s = buffer:readShort()
-    msg.i = buffer:readInt()
-    msg.f = buffer:readFloat(2)
-    msg.d = buffer:readDouble()
-    msg.data = buffer:readBytes()
+    self.id = buffer:readLong()
+    self.name = buffer:readString()
+    self.type = buffer:readInt();
+    self.b = buffer:readBool()
+    self.s = buffer:readShort()
+    self.i = buffer:readInt()
+    self.f = buffer:readFloat(2)
+    self.d = buffer:readDouble()
+    self.data = buffer:readBytes()
 
     for i = 1, buffer:readInt() do
-        msg.list[i] = buffer:readInt()
+        self.list[i] = buffer:readInt()
     end
 
     for i = 1, buffer:readInt() do
-        msg.set[i] = buffer:readInt()
+        self.set[i] = buffer:readInt()
     end
 
     for i = 1, buffer:readInt() do
-        msg.map[buffer:readInt()] = buffer:readInt()
+        self.map[buffer:readInt()] = buffer:readInt()
     end
 
-    return msg
+    return self
 end
 
 RoleInfo = table.readOnly(RoleInfo)

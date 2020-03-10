@@ -37,17 +37,17 @@ end
 
 ---
 ---UserInfo.编码
----@param msg test.message.user.UserInfo 不能为空
 ---@param buffer quan.message.Buffer 可以为空
 ---@return quan.message.Buffer
 ---
-function UserInfo.encode(msg, buffer)
-    assert(type(msg) == "table" and msg.class == UserInfo.class, "参数[msg]类型错误")
+function UserInfo:encode(buffer)
+    assert(type(self) == "table" and self.class == UserInfo.class, "参数[self]类型错误")
     assert(buffer == nil or type(buffer) == "table" and buffer.class == Buffer.class, "参数[buffer]类型错误")
+    buffer = buffer or Buffer.new()
 
-    buffer:writeLong(msg.id)
-    buffer:writeString(msg.name)
-    buffer:writeInt(msg.level)
+    buffer:writeLong(self.id)
+    buffer:writeString(self.name)
+    buffer:writeInt(self.level)
 
     return buffer
 end
@@ -55,19 +55,19 @@ end
 ---
 ---UserInfo.解码
 ---@param buffer quan.message.Buffer 不能为空
----@param msg test.message.user.UserInfo 可以为空
+---@param self test.message.user.UserInfo 可以为空
 ---@return test.message.user.UserInfo
 ---
-function UserInfo.decode(buffer, msg)
+function UserInfo.decode(buffer, self)
     assert(type(buffer) == "table" and buffer.class == Buffer.class, "参数[buffer]类型错误")
-    assert(msg == nil or type(msg) == "table" and msg.class == UserInfo.class, "参数[msg]类型错误")
+    assert(self == nil or type(self) == "table" and self.class == UserInfo.class, "参数[self]类型错误")
+    self = self or UserInfo.new()
 
-    msg = msg or UserInfo.new()
-    msg.id = buffer:readLong()
-    msg.name = buffer:readString()
-    msg.level = buffer:readInt()
+    self.id = buffer:readLong()
+    self.name = buffer:readString()
+    self.level = buffer:readInt()
 
-    return msg
+    return self
 end
 
 UserInfo = table.readOnly(UserInfo)

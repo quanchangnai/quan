@@ -29,7 +29,7 @@ public abstract class Generator {
 
     protected DefinitionParser definitionParser;
 
-    private String codePath;
+    protected String codePath;
 
     protected Configuration freemarkerCfg;
 

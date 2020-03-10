@@ -54,41 +54,37 @@ end
 
 ---
 ---角色登录.编码
----@param msg test.message.role.SRoleLogin 不能为空
----@param buffer quan.message.Buffer 可以为空
 ---@return quan.message.Buffer
 ---
-function SRoleLogin.encode(msg, buffer)
-    assert(type(msg) == "table" and msg.class == SRoleLogin.class, "参数[msg]类型错误")
-    assert(buffer == nil or type(buffer) == "table" and buffer.class == Buffer.class, "参数[buffer]类型错误")
+function SRoleLogin:encode()
+    assert(type(self) == "table" and self.class == SRoleLogin.class, "参数[self]类型错误")
+    local buffer = Message.encode(self)
 
-    buffer = Message.encode(msg, buffer)
+    buffer:writeLong(self.seq)
+    buffer:writeInt(self.error)
+    buffer:writeLong(self.roleId)
+    buffer:writeString(self.roleName)
+    RoleInfo.encode(self.roleInfo, buffer)
 
-    buffer:writeLong(msg.seq)
-    buffer:writeInt(msg.error)
-    buffer:writeLong(msg.roleId)
-    buffer:writeString(msg.roleName)
-    RoleInfo.encode(msg.roleInfo, buffer)
-
-    buffer:writeInt(#msg.roleInfoList)
-    for i, value in ipairs(msg.roleInfoList) do
+    buffer:writeInt(#self.roleInfoList)
+    for i, value in ipairs(self.roleInfoList) do
         RoleInfo.encode(value, buffer)
     end
 
-    buffer:writeInt(#msg.roleInfoSet)
-    for i, value in ipairs(msg.roleInfoSet) do
+    buffer:writeInt(#self.roleInfoSet)
+    for i, value in ipairs(self.roleInfoSet) do
         RoleInfo.encode(value, buffer)
     end
 
-    buffer:writeInt(table.size(msg.roleInfoMap))
-    for key, value in pairs(msg.roleInfoMap) do
+    buffer:writeInt(table.size(self.roleInfoMap))
+    for key, value in pairs(self.roleInfoMap) do
         buffer:writeLong(key)
         RoleInfo.encode(value, buffer)
     end
 
-    buffer:writeBool(msg.userInfo ~= nil);
-    if msg.userInfo ~= nil then
-        UserInfo.encode(msg.userInfo, buffer)
+    buffer:writeBool(self.userInfo ~= nil);
+    if self.userInfo ~= nil then
+        UserInfo.encode(self.userInfo, buffer)
     end
 
     return buffer
@@ -97,39 +93,35 @@ end
 ---
 ---角色登录.解码
 ---@param buffer quan.message.Buffer 不能为空
----@param msg test.message.role.SRoleLogin 可以为空
 ---@return test.message.role.SRoleLogin
 ---
-function SRoleLogin.decode(buffer, msg)
+function SRoleLogin.decode(buffer)
     assert(type(buffer) == "table" and buffer.class == Buffer.class, "参数[buffer]类型错误")
-    assert(msg == nil or type(msg) == "table" and msg.class == SRoleLogin.class, "参数[msg]类型错误")
-
-    msg = msg or SRoleLogin.new()
-    Message.decode(buffer, msg)
-
-    msg.seq = buffer:readLong()
-    msg.error = buffer:readInt()
-    msg.roleId = buffer:readLong()
-    msg.roleName = buffer:readString()
-    msg.roleInfo = RoleInfo.decode(buffer, msg.roleInfo)
+    local self = SRoleLogin.new()
+    Message.decode(buffer, self)
+    self.seq = buffer:readLong()
+    self.error = buffer:readInt()
+    self.roleId = buffer:readLong()
+    self.roleName = buffer:readString()
+    self.roleInfo = RoleInfo.decode(buffer, self.roleInfo)
 
     for i = 1, buffer:readInt() do
-        msg.roleInfoList[i] = RoleInfo.decode(buffer)
+        self.roleInfoList[i] = RoleInfo.decode(buffer)
     end
 
     for i = 1, buffer:readInt() do
-        msg.roleInfoSet[i] = RoleInfo.decode(buffer)
+        self.roleInfoSet[i] = RoleInfo.decode(buffer)
     end
 
     for i = 1, buffer:readInt() do
-        msg.roleInfoMap[buffer:readLong()] = RoleInfo.decode(buffer)
+        self.roleInfoMap[buffer:readLong()] = RoleInfo.decode(buffer)
     end
 
     if buffer:readBool() then
-        msg.userInfo = UserInfo.decode(buffer)
+        self.userInfo = UserInfo.decode(buffer)
     end
 
-    return msg
+    return self
 end
 
 SRoleLogin = table.readOnly(SRoleLogin)
