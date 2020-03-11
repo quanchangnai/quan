@@ -65,8 +65,7 @@ public class LuaMessageGenerator extends MessageGenerator {
         }
 
         String fileName = "MessageFactory." + supportLanguage();
-        try {
-            Writer writer = new FileWriter(new File(destFilePath, fileName));
+        try (Writer writer = new FileWriter(new File(destFilePath, fileName))) {
             Map<String, List<MessageDefinition>> messages = new HashMap<>();
             messages.put("messages", messageDefinitions);
             messageFactoryTemplate.process(messages, writer);

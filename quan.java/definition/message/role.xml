@@ -21,7 +21,7 @@
         <field name="map" type="map:int:int"/>
     </bean>
 
-    <message name="CRoleLogin" lang="">角色登录
+    <message name="CRoleLogin" lang="cs,java,lua">角色登录
         <field name="roleId" type="long"/>角色id
         <field name="roleName" type="string"/>角色名
         <field name="roleInfo" type="RoleInfo"/>角色信息

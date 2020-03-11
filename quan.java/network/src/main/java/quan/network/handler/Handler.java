@@ -1,7 +1,7 @@
 package quan.network.handler;
 
 /**
- * 处理器
+ * 网络IO处理器
  *
  * @author quanchangnai
  */

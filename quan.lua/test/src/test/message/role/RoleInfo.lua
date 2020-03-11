@@ -10,9 +10,26 @@ local RoleInfo = {
     class = "test.message.role.RoleInfo",
 }
 
-local function onSet(table, key, value)
+local function onSet(self, key, value)
     assert(not RoleInfo[key], "不允许修改只读属性:" .. key)
-    rawset(table, key, value)
+    rawset(self, key, value)
+end
+
+local function toString(self)
+    return "RoleInfo{" ..
+            "id=" .. tostring(self.id) ..
+            ",name='" .. self.name .. '\'' ..
+            ",type=" .. tostring(self.type) ..
+            ",b=" .. tostring(self.b) ..
+            ",s=" .. tostring(self.s) ..
+            ",i=" .. tostring(self.i) ..
+            ",f=" .. tostring(self.f) ..
+            ",d=" .. tostring(self.d) ..
+            ",data=" .. tostring(self.data) ..
+            ",list=" .. Message.listToString(self.list) ..
+            ",set=" .. Message.setToString(self.set) ..
+            ",map=" .. Message.mapToString(self.map) ..
+            '}';
 end
 
 ---
@@ -40,7 +57,7 @@ function RoleInfo.new(args)
         map = args.map or {},
     }
 
-    instance = setmetatable(instance, { __index = RoleInfo, __newindex = onSet })
+    instance = setmetatable(instance, { __index = RoleInfo, __newindex = onSet, __tostring = toString })
     return instance
 end
 

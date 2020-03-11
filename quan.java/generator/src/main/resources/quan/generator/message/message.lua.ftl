@@ -18,17 +18,35 @@ local ${name} = {
     id = ${id?c}
 </#if>
 }
-
-local function onSet(table, key, value)
-    assert(not ${name}[key], "不允许修改只读属性:" .. key)
-    rawset(table, key, value)
-end
-
 <#if headedFields??>
     <#assign allFields = headedFields>
 <#else>
     <#assign allFields = fields>
 </#if>
+
+local function onSet(self, key, value)
+    assert(not ${name}[key], "不允许修改只读属性:" .. key)
+    rawset(self, key, value)
+end
+
+local function toString(self)
+    return "${name}{" ..
+    <#list allFields as field>
+            "<#rt>
+        <#if field_index gt 0>
+             <#lt>,<#rt>
+        </#if>
+        <#if field.type == "string">
+             <#lt>${field.name}='" .. self.${field.name} .. '\'' ..
+        <#elseif field.collectionType>
+             <#lt>${field.name}=" .. Message.${field.type}ToString(self.${field.name}) ..
+        <#else>
+             <#lt>${field.name}=" .. tostring(self.${field.name}) ..
+        </#if>
+    </#list>
+            '}';
+end
+
 ---
 ---<#if comment !="">${comment}<#else>${name}</#if>.构造
 ---@param args 参数列表可以为空
@@ -58,7 +76,7 @@ function ${name}.new(args)
 </#list>
     }
 
-    instance = setmetatable(instance, { __index = ${name}, __newindex = onSet })
+    instance = setmetatable(instance, { __index = ${name}, __newindex = onSet, __tostring = toString })
     return instance
 end
 

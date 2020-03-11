@@ -115,6 +115,7 @@ local function testMessage1()
     file:write(buffer.bytes)
     file:flush()
 
+    print("SRoleLogin", sRoleLogin1)
     print("SRoleLogin.id", SRoleLogin.id)
     print("SRoleLogin.class", SRoleLogin.class)
     print("sRoleLogin2.id", sRoleLogin2.id)

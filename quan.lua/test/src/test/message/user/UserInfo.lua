@@ -9,9 +9,17 @@ local UserInfo = {
     class = "test.message.user.UserInfo",
 }
 
-local function onSet(table, key, value)
+local function onSet(self, key, value)
     assert(not UserInfo[key], "不允许修改只读属性:" .. key)
-    rawset(table, key, value)
+    rawset(self, key, value)
+end
+
+local function toString(self)
+    return "UserInfo{" ..
+            "id=" .. tostring(self.id) ..
+            ",name='" .. self.name .. '\'' ..
+            ",level=" .. tostring(self.level) ..
+            '}';
 end
 
 ---
@@ -31,7 +39,7 @@ function UserInfo.new(args)
         level = args.level or 0,
     }
 
-    instance = setmetatable(instance, { __index = UserInfo, __newindex = onSet })
+    instance = setmetatable(instance, { __index = UserInfo, __newindex = onSet, __tostring = toString })
     return instance
 end
 

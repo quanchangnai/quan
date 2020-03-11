@@ -29,3 +29,4 @@ function table.readOnly(origin)
     }
     return setmetatable({}, meta)
 end
+

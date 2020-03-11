@@ -4,7 +4,7 @@
 ---
 local MessageFactory = {}
 
-local prototypes = {
+local registry = {
     [544233] = "test.message.role.CRoleLogin",
     [763075] = "test.message.role.SRoleLogin",
 }
@@ -15,7 +15,10 @@ local prototypes = {
 ---
 function MessageFactory.create(msgId)
     assert(math.type(msgId) == "integer", "参数[msgId]类型错误")
-    return require(prototypes[msgId]).new()
+    local msgName = registry[msgId]
+    if msgName then
+        return require(msgName).new()
+    end
 end
 
 return MessageFactory

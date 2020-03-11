@@ -275,15 +275,15 @@ public abstract class ClassDefinition extends Definition {
     }
 
     protected void addValidatedError(String error, ClassDefinition other) {
-        String position = "。定义文件[" + getDefinitionFile() + "]";
+        String position = "。定位:" + getDefinitionFile();
         if (getName() != null) {
-            position += "，类[" + getName() + "]";
+            position += "->" + getName();
         }
 
         if (other != null) {
-            position += "。定义文件[" + other.getDefinitionFile() + "]";
-            if (other.getName() != null) {
-                position += "，类[" + other.getName() + "]";
+            position = "，" + other.getDefinitionFile();
+            if (getName() != null) {
+                position += "->" + other.getName();
             }
         }
 

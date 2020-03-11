@@ -14,9 +14,23 @@ local CRoleLogin = {
     id = 544233
 }
 
-local function onSet(table, key, value)
+local function onSet(self, key, value)
     assert(not CRoleLogin[key], "不允许修改只读属性:" .. key)
-    rawset(table, key, value)
+    rawset(self, key, value)
+end
+
+local function toString(self)
+    return "CRoleLogin{" ..
+            "seq=" .. tostring(self.seq) ..
+            ",error=" .. tostring(self.error) ..
+            ",roleId=" .. tostring(self.roleId) ..
+            ",roleName='" .. self.roleName .. '\'' ..
+            ",roleInfo=" .. tostring(self.roleInfo) ..
+            ",roleInfoList=" .. Message.listToString(self.roleInfoList) ..
+            ",roleInfoSet=" .. Message.setToString(self.roleInfoSet) ..
+            ",roleInfoMap=" .. Message.mapToString(self.roleInfoMap) ..
+            ",userInfo=" .. tostring(self.userInfo) ..
+            '}';
 end
 
 ---
@@ -48,7 +62,7 @@ function CRoleLogin.new(args)
         userInfo = args.userInfo,
     }
 
-    instance = setmetatable(instance, { __index = CRoleLogin, __newindex = onSet })
+    instance = setmetatable(instance, { __index = CRoleLogin, __newindex = onSet, __tostring = toString })
     return instance
 end
 

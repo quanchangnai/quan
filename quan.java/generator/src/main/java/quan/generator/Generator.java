@@ -136,8 +136,7 @@ public abstract class Generator {
         }
 
         String fileName = classDefinition.getName() + "." + supportLanguage();
-        try {
-            Writer writer = new FileWriter(new File(destFilePath, fileName));
+        try (Writer writer = new FileWriter(new File(destFilePath, fileName))) {
             template.process(classDefinition, writer);
         } catch (Exception e) {
             logger.error("", e);

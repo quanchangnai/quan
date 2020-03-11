@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import java.util.*;
 
 /**
+ * 配置
  * Created by quanchangnai on 2019/7/11.
  */
 @SuppressWarnings({"unchecked"})
