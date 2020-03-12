@@ -37,7 +37,7 @@ local function toString(self)
              <#lt>,<#rt>
         </#if>
         <#if field.type == "string">
-             <#lt>${field.name}='" .. self.${field.name} .. '\'' ..
+             <#lt>${field.name}='" .. tostring(self.${field.name}) .. '\'' ..
         <#elseif field.collectionType>
              <#lt>${field.name}=" .. Message.${field.type}ToString(self.${field.name}) ..
         <#else>
@@ -46,6 +46,9 @@ local function toString(self)
     </#list>
             '}';
 end
+
+---元表
+local meta = { __index = ${name}, __newindex = onSet, __tostring = toString }
 
 ---
 ---<#if comment !="">${comment}<#else>${name}</#if>.构造
@@ -76,7 +79,7 @@ function ${name}.new(args)
 </#list>
     }
 
-    instance = setmetatable(instance, { __index = ${name}, __newindex = onSet, __tostring = toString })
+    instance = setmetatable(instance, meta)
     return instance
 end
 

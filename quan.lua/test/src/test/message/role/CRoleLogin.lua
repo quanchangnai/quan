@@ -24,7 +24,7 @@ local function toString(self)
             "seq=" .. tostring(self.seq) ..
             ",error=" .. tostring(self.error) ..
             ",roleId=" .. tostring(self.roleId) ..
-            ",roleName='" .. self.roleName .. '\'' ..
+            ",roleName='" .. tostring(self.roleName) .. '\'' ..
             ",roleInfo=" .. tostring(self.roleInfo) ..
             ",roleInfoList=" .. Message.listToString(self.roleInfoList) ..
             ",roleInfoSet=" .. Message.setToString(self.roleInfoSet) ..
@@ -32,6 +32,9 @@ local function toString(self)
             ",userInfo=" .. tostring(self.userInfo) ..
             '}';
 end
+
+---元表
+local meta = { __index = CRoleLogin, __newindex = onSet, __tostring = toString }
 
 ---
 ---角色登录.构造
@@ -62,7 +65,7 @@ function CRoleLogin.new(args)
         userInfo = args.userInfo,
     }
 
-    instance = setmetatable(instance, { __index = CRoleLogin, __newindex = onSet, __tostring = toString })
+    instance = setmetatable(instance, meta)
     return instance
 end
 

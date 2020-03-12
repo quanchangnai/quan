@@ -17,10 +17,13 @@ end
 local function toString(self)
     return "UserInfo{" ..
             "id=" .. tostring(self.id) ..
-            ",name='" .. self.name .. '\'' ..
+            ",name='" .. tostring(self.name) .. '\'' ..
             ",level=" .. tostring(self.level) ..
             '}';
 end
+
+---元表
+local meta = { __index = UserInfo, __newindex = onSet, __tostring = toString }
 
 ---
 ---UserInfo.构造
@@ -39,7 +42,7 @@ function UserInfo.new(args)
         level = args.level or 0,
     }
 
-    instance = setmetatable(instance, { __index = UserInfo, __newindex = onSet, __tostring = toString })
+    instance = setmetatable(instance, meta)
     return instance
 end
 

@@ -18,7 +18,7 @@ end
 local function toString(self)
     return "RoleInfo{" ..
             "id=" .. tostring(self.id) ..
-            ",name='" .. self.name .. '\'' ..
+            ",name='" .. tostring(self.name) .. '\'' ..
             ",type=" .. tostring(self.type) ..
             ",b=" .. tostring(self.b) ..
             ",s=" .. tostring(self.s) ..
@@ -31,6 +31,9 @@ local function toString(self)
             ",map=" .. Message.mapToString(self.map) ..
             '}';
 end
+
+---元表
+local meta = { __index = RoleInfo, __newindex = onSet, __tostring = toString }
 
 ---
 ---角色信息.构造
@@ -57,7 +60,7 @@ function RoleInfo.new(args)
         map = args.map or {},
     }
 
-    instance = setmetatable(instance, { __index = RoleInfo, __newindex = onSet, __tostring = toString })
+    instance = setmetatable(instance, meta)
     return instance
 end
 

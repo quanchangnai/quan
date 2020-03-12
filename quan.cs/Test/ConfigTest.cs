@@ -11,8 +11,8 @@ namespace Test
     {
         public static void Test()
         {
-            var jsonPath = "..\\..\\..\\..\\quan.java\\config\\json";
-            var namespacePrefix = "Test.Config";
+            const string jsonPath = "..\\..\\..\\..\\quan.java\\config\\json";
+            const string namespacePrefix = "Test.Config";
             var assemblyName = Assembly.GetExecutingAssembly().FullName;
 
             var configLoader = new ConfigLoader {JsonPath = jsonPath, NamespacePrefix = namespacePrefix, ConfigAssemblies = {assemblyName}};
