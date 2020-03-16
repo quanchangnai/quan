@@ -71,13 +71,13 @@ public class EquipConfig extends ItemConfig {
         //所有EquipConfig
         private static volatile List<EquipConfig> configs = new ArrayList<>();
 
-        //ID
+        //索引:ID
         private static volatile Map<Integer, EquipConfig> idConfigs = new HashMap<>();
 
-        //常量Key
+        //索引:常量Key
         private static volatile Map<String, EquipConfig> keyConfigs = new HashMap<>();
 
-        //部位
+        //索引:部位
         private static volatile Map<Integer, List<EquipConfig>> positionConfigs = new HashMap<>();
 
         public static List<EquipConfig> getConfigs() {

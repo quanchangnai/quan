@@ -1,3 +1,9 @@
+---
+---ItemConfig
+---道具
+---自动生成
+---
+
 local Config = require("quan.config.Config")
 
 ---所有ItemConfig
@@ -7,10 +13,10 @@ local configs = {
     { id = 2, key = "", name = "道具3", type = 2, reward = { itemId = 2, itemNum = 11 }, list = { 44, 223, 342, 45 }, set = {  }, map = { [43] = 45 }, effectiveTime = "" },
 }
 
----ID
+---索引:ID
 local idConfigs = {}
 
----常量Key
+---索引:常量Key
 local keyConfigs = {}
 
 ---加载配置，建立索引

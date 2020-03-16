@@ -156,13 +156,13 @@ public class WeaponConfig extends EquipConfig {
         //所有WeaponConfig
         private static volatile List<WeaponConfig> configs = new ArrayList<>();
 
-        //ID
+        //索引:ID
         private static volatile Map<Integer, WeaponConfig> idConfigs = new HashMap<>();
 
-        //常量Key
+        //索引:常量Key
         private static volatile Map<String, WeaponConfig> keyConfigs = new HashMap<>();
 
-        //部位
+        //索引:部位
         private static volatile Map<Integer, List<WeaponConfig>> positionConfigs = new HashMap<>();
 
         private static volatile Map<Integer, Map<Integer, List<WeaponConfig>>> composite1Configs = new HashMap<>();

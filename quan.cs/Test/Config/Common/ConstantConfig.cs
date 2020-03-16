@@ -73,7 +73,7 @@ namespace Test.Config.Common
         // 所有ConstantConfig
         private static volatile IList<ConstantConfig> _configs = new List<ConstantConfig>();
 
-        // 常量Key
+        // 索引:常量Key
         private static volatile IDictionary<string, ConstantConfig> _keyConfigs = new Dictionary<string, ConstantConfig>();
 
         public static IList<ConstantConfig> GetConfigs()

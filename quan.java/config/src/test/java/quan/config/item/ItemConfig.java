@@ -185,10 +185,10 @@ public class ItemConfig extends Config {
     //所有ItemConfig
     private static volatile List<ItemConfig> configs = new ArrayList<>();
 
-    //ID
+    //索引:ID
     private static volatile Map<Integer, ItemConfig> idConfigs = new HashMap<>();
 
-    //常量Key
+    //索引:常量Key
     private static volatile Map<String, ItemConfig> keyConfigs = new HashMap<>();
 
     public static List<ItemConfig> getConfigs() {

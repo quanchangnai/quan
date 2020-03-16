@@ -201,7 +201,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
 
     <#list indexes as index>
         <#if index.comment !="">
-    ${tab}//${index.comment}
+    ${tab}//索引:${index.comment}
         </#if>
         <#if index.unique && index.fields?size==1>
     ${tab}private static volatile Map<${index.fields[0].classType}, ${name}> ${index.name}Configs = new HashMap<>();

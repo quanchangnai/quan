@@ -1,3 +1,9 @@
+---
+---WeaponConfig
+---武器
+---自动生成
+---
+
 local Config = require("quan.config.Config")
 
 ---所有WeaponConfig
@@ -7,13 +13,13 @@ local configs = {
     { id = 0, key = "", name = "武器4", type = 1, reward = { itemId = 7, itemNum = 13 }, list = { 44, 44, 0, 342, 45 }, set = {  }, map = { [22] = 32 }, effectiveTime = "", position = 2, color = 4, w1 = 11, w2 = 43, rewardList = { { itemId = 42, itemNum = 25 }, { itemId = 32, itemNum = 54 }, { itemId = 63, itemNum = 56 } }, rewardSet = { { itemId = 23, itemNum = 56 }, { itemId = 23, itemNum = 53 } }, rewardMap = { [3] = { itemId = 23, itemNum = 56 }, [4] = { itemId = 12, itemNum = 22 }, [6] = { itemId = 32, itemNum = 56 } }, list2 = { 2, 324 } },
 }
 
----ID
+---索引:ID
 local idConfigs = {}
 
----常量Key
+---索引:常量Key
 local keyConfigs = {}
 
----部位
+---索引:部位
 local positionConfigs = {}
 
 local composite1Configs = {}

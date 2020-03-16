@@ -47,7 +47,7 @@ namespace Test.Config.Quest
         // 所有QuestTargetConfig
         private static volatile IList<QuestTargetConfig> _configs = new List<QuestTargetConfig>();
 
-        // ID
+        // 索引:ID
         private static volatile IDictionary<int, QuestTargetConfig> _idConfigs = new Dictionary<int, QuestTargetConfig>();
 
         public static IList<QuestTargetConfig> GetConfigs()

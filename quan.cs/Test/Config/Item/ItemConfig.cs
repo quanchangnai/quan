@@ -131,10 +131,10 @@ namespace Test.Config.Item
         // 所有ItemConfig
         private static volatile IList<ItemConfig> _configs = new List<ItemConfig>();
 
-        // ID
+        // 索引:ID
         private static volatile IDictionary<int, ItemConfig> _idConfigs = new Dictionary<int, ItemConfig>();
 
-        // 常量Key
+        // 索引:常量Key
         private static volatile IDictionary<string, ItemConfig> _keyConfigs = new Dictionary<string, ItemConfig>();
 
         public static IList<ItemConfig> GetConfigs()

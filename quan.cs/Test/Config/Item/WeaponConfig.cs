@@ -126,13 +126,13 @@ namespace Test.Config.Item
         // 所有WeaponConfig
         private static volatile IList<WeaponConfig> _configs = new List<WeaponConfig>();
 
-        // ID
+        // 索引:ID
         private static volatile IDictionary<int, WeaponConfig> _idConfigs = new Dictionary<int, WeaponConfig>();
 
-        // 常量Key
+        // 索引:常量Key
         private static volatile IDictionary<string, WeaponConfig> _keyConfigs = new Dictionary<string, WeaponConfig>();
 
-        // 部位
+        // 索引:部位
         private static volatile IDictionary<int, IList<WeaponConfig>> _positionConfigs = new Dictionary<int, IList<WeaponConfig>>();
 
         private static volatile IDictionary<int, IDictionary<int, IList<WeaponConfig>>> _composite1Configs = new Dictionary<int, IDictionary<int, IList<WeaponConfig>>>();

@@ -20,10 +20,10 @@
         <field name="s1" type="set:int" column="S1"/>
         <field name="l1" type="list:int" column="L1"/>
         <field name="m1" type="map:int:int" column="M1"/>
-        <index name="composite1" type="u" fields="a1,a2"/>
-        <index name="composite2" type="normal" fields="b1,b2"/>
-        <index name="composite3" type="unique" fields="c1,c2,c3"/>
-        <index name="composite4" type="n" fields="d1,d2,d3"/>
+        <index name="composite1" type="u" fields="a1,a2"/>两字段唯一索引
+        <index name="composite2" type="normal" fields="b1,b2"/>两字段普通索引
+        <index name="composite3" type="unique" fields="c1,c2,c3"/>三字段唯一索引
+        <index name="composite4" type="n" fields="d1,d2,d3"/>三字段普通索引
     </config>
 
     <config name="QuestTargetConfig">

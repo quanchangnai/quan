@@ -1,3 +1,9 @@
+---
+---QuestTargetConfig
+---QuestTargetConfig
+---自动生成
+---
+
 local Config = require("quan.config.Config")
 
 ---所有QuestTargetConfig
@@ -5,7 +11,7 @@ local configs = {
     { id = 1, name = "任务目标1" },
 }
 
----ID
+---索引:ID
 local idConfigs = {}
 
 ---加载配置，建立索引

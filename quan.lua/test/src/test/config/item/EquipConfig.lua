@@ -1,3 +1,9 @@
+---
+---EquipConfig
+---装备1,装备2
+---自动生成
+---
+
 local Config = require("quan.config.Config")
 
 ---所有EquipConfig
@@ -6,13 +12,13 @@ local configs = {
     { id = 5, key = "", name = "装备2", type = 2, reward = { itemId = 6, itemNum = 11 }, list = { 44, 223, 342, 45 }, set = {  }, map = { [43] = 45 }, effectiveTime = "2019.08.07 12.33.55", position = 3, color = 2 },
 }
 
----ID
+---索引:ID
 local idConfigs = {}
 
----常量Key
+---索引:常量Key
 local keyConfigs = {}
 
----部位
+---索引:部位
 local positionConfigs = {}
 
 ---加载配置，建立索引

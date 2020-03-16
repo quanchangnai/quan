@@ -92,7 +92,7 @@ public class ConstantConfig extends Config {
     //所有ConstantConfig
     private static volatile List<ConstantConfig> configs = new ArrayList<>();
 
-    //常量Key
+    //索引:常量Key
     private static volatile Map<String, ConstantConfig> keyConfigs = new HashMap<>();
 
     public static List<ConstantConfig> getConfigs() {

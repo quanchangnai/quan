@@ -1,3 +1,9 @@
+---
+---QuestConfig
+---任务
+---自动生成
+---
+
 local Config = require("quan.config.Config")
 
 ---所有QuestConfig
@@ -5,18 +11,22 @@ local configs = {
     { id = 1, name = "任务1", type = 1, target = 1, reward = { }, a1 = 1, a2 = 2, b1 = 11, b2 = false, c1 = "111", c2 = 222, c3 = 333, d1 = "1111", d2 = 2222, d3 = 333, s1 = {  }, l1 = {  }, m1 = {  } },
 }
 
+---索引:两字段唯一索引
 local composite1Configs = {}
 
+---索引:两字段普通索引
 local composite2Configs = {}
 
+---索引:三字段唯一索引
 local composite3Configs = {}
 
+---索引:三字段普通索引
 local composite4Configs = {}
 
----ID
+---索引:ID
 local idConfigs = {}
 
----类型
+---索引:类型
 local typeConfigs = {}
 
 ---加载配置，建立索引

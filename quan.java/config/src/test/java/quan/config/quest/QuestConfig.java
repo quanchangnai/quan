@@ -284,18 +284,22 @@ public class QuestConfig extends Config {
     //所有QuestConfig
     private static volatile List<QuestConfig> configs = new ArrayList<>();
 
+    //索引:两字段唯一索引
     private static volatile Map<Integer, Map<Integer, QuestConfig>> composite1Configs = new HashMap<>();
 
+    //索引:两字段普通索引
     private static volatile Map<Integer, Map<Boolean, List<QuestConfig>>> composite2Configs = new HashMap<>();
 
+    //索引:三字段唯一索引
     private static volatile Map<String, Map<Integer, Map<Integer, QuestConfig>>> composite3Configs = new HashMap<>();
 
+    //索引:三字段普通索引
     private static volatile Map<String, Map<Integer, Map<Integer, List<QuestConfig>>>> composite4Configs = new HashMap<>();
 
-    //ID
+    //索引:ID
     private static volatile Map<Integer, QuestConfig> idConfigs = new HashMap<>();
 
-    //类型
+    //索引:类型
     private static volatile Map<QuestType, List<QuestConfig>> typeConfigs = new HashMap<>();
 
     public static List<QuestConfig> getConfigs() {

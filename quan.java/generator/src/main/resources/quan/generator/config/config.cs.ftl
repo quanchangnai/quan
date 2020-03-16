@@ -144,7 +144,7 @@ namespace ${getFullPackageName("cs")}
 
     <#list indexes as index>
         <#if index.comment !="">
-        // ${index.comment}
+        // 索引:${index.comment}
         </#if>
         <#if index.unique && index.fields?size==1>
         private static volatile IDictionary<${index.fields[0].classType}, ${name}> _${index.name}Configs = new Dictionary<${index.fields[0].classType}, ${name}>();

@@ -56,13 +56,13 @@ namespace Test.Config.Item
         // 所有EquipConfig
         private static volatile IList<EquipConfig> _configs = new List<EquipConfig>();
 
-        // ID
+        // 索引:ID
         private static volatile IDictionary<int, EquipConfig> _idConfigs = new Dictionary<int, EquipConfig>();
 
-        // 常量Key
+        // 索引:常量Key
         private static volatile IDictionary<string, EquipConfig> _keyConfigs = new Dictionary<string, EquipConfig>();
 
-        // 部位
+        // 索引:部位
         private static volatile IDictionary<int, IList<EquipConfig>> _positionConfigs = new Dictionary<int, IList<EquipConfig>>();
 
         public new static IList<EquipConfig> GetConfigs()

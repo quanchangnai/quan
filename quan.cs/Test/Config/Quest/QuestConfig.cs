@@ -190,18 +190,22 @@ namespace Test.Config.Quest
         // 所有QuestConfig
         private static volatile IList<QuestConfig> _configs = new List<QuestConfig>();
 
+        // 索引:两字段唯一索引
         private static volatile IDictionary<int, IDictionary<int, QuestConfig>> _composite1Configs = new Dictionary<int, IDictionary<int, QuestConfig>>();
 
+        // 索引:两字段普通索引
         private static volatile IDictionary<int, IDictionary<bool, IList<QuestConfig>>> _composite2Configs = new Dictionary<int, IDictionary<bool, IList<QuestConfig>>>();
 
+        // 索引:三字段唯一索引
         private static volatile IDictionary<string, IDictionary<int, IDictionary<int, QuestConfig>>> _composite3Configs = new Dictionary<string, IDictionary<int, IDictionary<int, QuestConfig>>>();
 
+        // 索引:三字段普通索引
         private static volatile IDictionary<string, IDictionary<int, IDictionary<int, IList<QuestConfig>>>> _composite4Configs = new Dictionary<string, IDictionary<int, IDictionary<int, IList<QuestConfig>>>>();
 
-        // ID
+        // 索引:ID
         private static volatile IDictionary<int, QuestConfig> _idConfigs = new Dictionary<int, QuestConfig>();
 
-        // 类型
+        // 索引:类型
         private static volatile IDictionary<QuestType, IList<QuestConfig>> _typeConfigs = new Dictionary<QuestType, IList<QuestConfig>>();
 
         public static IList<QuestConfig> GetConfigs()

@@ -1,3 +1,11 @@
+---
+---${name}
+<#if comment !="">
+---${comment}
+</#if>
+---自动生成
+---
+
 local Config = require("quan.config.Config")
 
 ---所有${name}
@@ -9,7 +17,7 @@ local configs = {
 
 <#list indexes as index>
     <#if index.comment !="">
----${index.comment}
+---索引:${index.comment}
     </#if>
 local ${index.name}Configs = {}
 

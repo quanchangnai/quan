@@ -1,3 +1,9 @@
+---
+---ConstantConfig
+---常量
+---自动生成
+---
+
 local Config = require("quan.config.Config")
 
 ---所有ConstantConfig
@@ -8,7 +14,7 @@ local configs = {
     { key = "", itemId = 4, rewardList = {  }, comment = "常量4" },
 }
 
----常量Key
+---索引:常量Key
 local keyConfigs = {}
 
 ---加载配置，建立索引

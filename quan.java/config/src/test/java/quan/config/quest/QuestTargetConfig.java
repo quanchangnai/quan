@@ -45,7 +45,7 @@ public class QuestTargetConfig extends Config {
     //所有QuestTargetConfig
     private static volatile List<QuestTargetConfig> configs = new ArrayList<>();
 
-    //ID
+    //索引:ID
     private static volatile Map<Integer, QuestTargetConfig> idConfigs = new HashMap<>();
 
     public static List<QuestTargetConfig> getConfigs() {
