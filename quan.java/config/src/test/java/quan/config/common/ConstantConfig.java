@@ -6,10 +6,11 @@ import quan.config.*;
 import quan.config.item.Reward;
 
 /**
-* 常量<br/>
-* 自动生成
-*/
+ * 常量<br/>
+ * 自动生成
+ */
 public class ConstantConfig extends Config {
+
     //常量Key
     protected final String key;
 
@@ -88,7 +89,7 @@ public class ConstantConfig extends Config {
     }
 
 
-    // 所有ConstantConfig
+    //所有ConstantConfig
     private static volatile List<ConstantConfig> configs = new ArrayList<>();
 
     //常量Key
@@ -107,6 +108,11 @@ public class ConstantConfig extends Config {
     }
 
 
+    /**
+     * 加载配置，建立索引
+     * @param configs 所有配置
+     * @return 错误信息
+     */
     @SuppressWarnings({"unchecked"})
     public static List<String> load(List<ConstantConfig> configs) {
         Map<String, ConstantConfig> keyConfigs = new HashMap<>();

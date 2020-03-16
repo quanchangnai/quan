@@ -30,6 +30,10 @@ public class ConfigDefinition extends BeanDefinition {
     //配置的所有后代类
     private Set<String> descendants = new HashSet<>();
 
+    //配置的所有子类
+    private Set<ConfigDefinition> children = new HashSet<>();
+
+    //所有索引,包含继承下来的索引
     private List<IndexDefinition> indexes = new ArrayList<>();
 
     private List<IndexDefinition> selfIndexes = new ArrayList<>();
@@ -38,6 +42,8 @@ public class ConfigDefinition extends BeanDefinition {
 
     //列名:字段
     private Map<String, FieldDefinition> columnFields = new HashMap<>();
+
+    private List<String> rows = new ArrayList<>();
 
     private Set<ConstantDefinition> constantDefinitions = new HashSet<>();
 
@@ -83,6 +89,26 @@ public class ConfigDefinition extends BeanDefinition {
         if (table == null) {
             table = getName();
         }
+    }
+
+    public ConfigDefinition setParent(String parent) {
+        if (StringUtils.isBlank(parent)) {
+            return this;
+        }
+        this.parent = parent.trim();
+        return this;
+    }
+
+    public String getParent() {
+        return parent;
+    }
+
+    public ConfigDefinition getParentConfig() {
+        return parser.getConfig(getParent());
+    }
+
+    public Set<ConfigDefinition> getChildren() {
+        return children;
     }
 
     public Set<String> getDescendants() {
@@ -131,22 +157,6 @@ public class ConfigDefinition extends BeanDefinition {
         }
 
         return allTables;
-    }
-
-    public ConfigDefinition setParent(String parent) {
-        if (StringUtils.isBlank(parent)) {
-            return this;
-        }
-        this.parent = parent.trim();
-        return this;
-    }
-
-    public String getParent() {
-        return parent;
-    }
-
-    public ConfigDefinition getParentConfig() {
-        return parser.getConfig(getParent());
     }
 
     public List<IndexDefinition> getIndexes() {
@@ -214,6 +224,15 @@ public class ConfigDefinition extends BeanDefinition {
         return false;
     }
 
+    public List<String> getRows() {
+        return rows;
+    }
+
+    public ConfigDefinition setRows(List<String> rows) {
+        this.rows = rows;
+        return this;
+    }
+
     @Override
     public void validate() {
         validateNameAndLanguage();
@@ -253,7 +272,6 @@ public class ConfigDefinition extends BeanDefinition {
             return;
         }
 
-        //支持子表
         ConfigDefinition parentConfig = getParentConfig();
         if (parentConfig == null) {
             addValidatedError(getName4Validate() + "的父配置[" + parent + "]不存在");
@@ -264,24 +282,22 @@ public class ConfigDefinition extends BeanDefinition {
             addValidatedError(getName4Validate() + "支持的语言范围" + supportedLanguages + "必须小于或等于其父配置[" + parent + "]所支持的语言范围" + parentConfig.supportedLanguages);
         }
 
-        Set<String> parents = new HashSet<>();
+        parentConfig.children.add(this);
+
+        Set<String> ancestors = new HashSet<>();
         while (parentConfig != null) {
-            if (parents.contains(parentConfig.getName())) {
-                addValidatedError(getName4Validate() + "和父子关系" + parents + "不能有循环");
+            if (ancestors.contains(parentConfig.getName())) {
+                addValidatedError(getName4Validate() + "和父子关系" + ancestors + "不能有循环");
                 return;
             }
-            parents.add(parentConfig.getName());
-            parentConfig = parentConfig.getParentConfig();
-        }
 
-        parentConfig = getParentConfig();
-        while (parentConfig != null) {
             fields.addAll(0, parentConfig.selfFields);
             indexes.addAll(0, parentConfig.selfIndexes);
             parentConfig.descendants.add(getName());
+            ancestors.add(parentConfig.getName());
+
             parentConfig = parentConfig.getParentConfig();
         }
-
     }
 
     @Override

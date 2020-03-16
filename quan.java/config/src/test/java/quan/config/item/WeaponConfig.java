@@ -5,10 +5,11 @@ import com.alibaba.fastjson.*;
 import quan.config.*;
 
 /**
-* 武器<br/>
-* 自动生成
-*/
+ * 武器<br/>
+ * 自动生成
+ */
 public class WeaponConfig extends EquipConfig {
+
     //字段1
     protected final int w1;
 
@@ -152,7 +153,7 @@ public class WeaponConfig extends EquipConfig {
         private self() {
         }
 
-        // 所有WeaponConfig
+        //所有WeaponConfig
         private static volatile List<WeaponConfig> configs = new ArrayList<>();
 
         //ID
@@ -221,6 +222,11 @@ public class WeaponConfig extends EquipConfig {
         }
 
 
+        /**
+         * 加载配置，建立索引
+         * @param configs 所有配置
+         * @return 错误信息
+         */
         @SuppressWarnings({"unchecked"})
         public static List<String> load(List<WeaponConfig> configs) {
             Map<Integer, WeaponConfig> idConfigs = new HashMap<>();

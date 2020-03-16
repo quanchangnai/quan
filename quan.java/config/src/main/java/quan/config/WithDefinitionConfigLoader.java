@@ -132,12 +132,33 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
         }
     }
 
-    public List<JSONObject> loadJsons(ConfigDefinition configDefinition) {
+    /**
+     * 加载JSON格式配置数据
+     *
+     * @param configDefinition 配置定义
+     * @param self             true:只包含自己的数据，false:包含自己和子孙配置的数据
+     * @return
+     */
+    public List<JSONObject> loadJsons(ConfigDefinition configDefinition, boolean self) {
+        Collection<String> configTables;
+        if (self) {
+            configTables = new HashSet<>();
+            if (tableType == TableType.json) {
+                configTables.add(configDefinition.getName());
+            } else {
+                configTables.addAll(configDefinition.getTables());
+            }
+        } else {
+            configTables = getConfigTables(configDefinition);
+        }
+
         List<JSONObject> jsons = new ArrayList<>();
-        for (String configTable : getConfigTables(configDefinition)) {
+
+        for (String configTable : configTables) {
             ConfigReader configReader = getReader(configTable);
             jsons.addAll(configReader.readJsons());
         }
+
         return jsons;
     }
 

@@ -5,10 +5,11 @@ import com.alibaba.fastjson.*;
 import quan.config.*;
 
 /**
-* 装备1,装备2<br/>
-* 自动生成
-*/
+ * 装备1,装备2<br/>
+ * 自动生成
+ */
 public class EquipConfig extends ItemConfig {
+
     //部位
     protected final int position;
 
@@ -67,7 +68,7 @@ public class EquipConfig extends ItemConfig {
         private self() {
         }
 
-        // 所有EquipConfig
+        //所有EquipConfig
         private static volatile List<EquipConfig> configs = new ArrayList<>();
 
         //ID
@@ -108,6 +109,11 @@ public class EquipConfig extends ItemConfig {
         }
 
 
+        /**
+         * 加载配置，建立索引
+         * @param configs 所有配置
+         * @return 错误信息
+         */
         @SuppressWarnings({"unchecked"})
         public static List<String> load(List<EquipConfig> configs) {
             Map<Integer, EquipConfig> idConfigs = new HashMap<>();

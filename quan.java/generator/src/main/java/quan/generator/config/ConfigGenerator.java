@@ -23,7 +23,7 @@ import java.util.Objects;
 public abstract class ConfigGenerator extends Generator {
 
     //配置加载器用于生成常量
-    private WithDefinitionConfigLoader configLoader;
+    protected WithDefinitionConfigLoader configLoader;
 
     public ConfigGenerator(String codePath) {
         super(codePath);
@@ -60,7 +60,7 @@ public abstract class ConfigGenerator extends Generator {
     protected void generate(ClassDefinition classDefinition) {
         if (configLoader != null && classDefinition instanceof ConstantDefinition) {
             ConstantDefinition constantDefinition = (ConstantDefinition) classDefinition;
-            List<JSONObject> configJsons = configLoader.loadJsons(constantDefinition.getConfigDefinition());
+            List<JSONObject> configJsons = configLoader.loadJsons(constantDefinition.getConfigDefinition(),false);
             constantDefinition.setConfigs(configJsons);
         }
         super.generate(classDefinition);

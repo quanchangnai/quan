@@ -5,10 +5,11 @@ import com.alibaba.fastjson.*;
 import quan.config.*;
 
 /**
-* 奖励<br/>
-* 自动生成
-*/
+ * 奖励<br/>
+ * 自动生成
+ */
 public class Reward extends Bean {
+
     protected final int itemId;
 
     protected final int itemNum;

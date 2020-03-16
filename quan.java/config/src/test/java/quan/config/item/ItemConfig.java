@@ -5,10 +5,11 @@ import com.alibaba.fastjson.*;
 import quan.config.*;
 
 /**
-* 道具<br/>
-* 自动生成
-*/
+ * 道具<br/>
+ * 自动生成
+ */
 public class ItemConfig extends Config {
+
     //ID
     protected final int id;
 
@@ -36,6 +37,7 @@ public class ItemConfig extends Config {
     //生效时间
     protected final Date effectiveTime;
 
+    //生效时间
     protected final String effectiveTime$Str;
 
 
@@ -180,7 +182,7 @@ public class ItemConfig extends Config {
     }
 
 
-    // 所有ItemConfig
+    //所有ItemConfig
     private static volatile List<ItemConfig> configs = new ArrayList<>();
 
     //ID
@@ -210,6 +212,11 @@ public class ItemConfig extends Config {
     }
 
 
+    /**
+     * 加载配置，建立索引
+     * @param configs 所有配置
+     * @return 错误信息
+     */
     @SuppressWarnings({"unchecked"})
     public static List<String> load(List<ItemConfig> configs) {
         Map<Integer, ItemConfig> idConfigs = new HashMap<>();

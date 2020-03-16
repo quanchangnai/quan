@@ -242,6 +242,10 @@ public class FieldDefinition extends Definition {
         return Constants.PRIMITIVE_TYPES.contains(valueType);
     }
 
+    public boolean isNumberValueType() {
+        return Constants.NUMBER_TYPES.contains(valueType);
+    }
+
     public boolean isBeanValueType() {
         return getValueBean() != null;
     }

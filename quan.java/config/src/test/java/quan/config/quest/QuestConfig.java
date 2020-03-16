@@ -6,10 +6,11 @@ import quan.config.*;
 import quan.config.item.Reward;
 
 /**
-* 任务<br/>
-* 自动生成
-*/
+ * 任务<br/>
+ * 自动生成
+ */
 public class QuestConfig extends Config {
+
     //ID
     protected final int id;
 
@@ -280,7 +281,7 @@ public class QuestConfig extends Config {
     }
 
 
-    // 所有QuestConfig
+    //所有QuestConfig
     private static volatile List<QuestConfig> configs = new ArrayList<>();
 
     private static volatile Map<Integer, Map<Integer, QuestConfig>> composite1Configs = new HashMap<>();
@@ -374,6 +375,11 @@ public class QuestConfig extends Config {
     }
 
 
+    /**
+     * 加载配置，建立索引
+     * @param configs 所有配置
+     * @return 错误信息
+     */
     @SuppressWarnings({"unchecked"})
     public static List<String> load(List<QuestConfig> configs) {
         Map<Integer, Map<Integer, QuestConfig>> composite1Configs = new HashMap<>();

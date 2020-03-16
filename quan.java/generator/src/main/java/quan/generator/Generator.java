@@ -131,7 +131,7 @@ public abstract class Generator {
         Template template = templates.get(classDefinition.getClass());
         File destFilePath = new File(codePath + File.separator + classDefinition.getFullPackageName(supportLanguage()).replace(".", File.separator));
         if (!destFilePath.exists() && !destFilePath.mkdirs()) {
-            logger.info("创建目录[{}]失败", destFilePath);
+            logger.error("创建目录[{}]失败", destFilePath);
             return;
         }
 
@@ -139,7 +139,7 @@ public abstract class Generator {
         try (Writer writer = new FileWriter(new File(destFilePath, fileName))) {
             template.process(classDefinition, writer);
         } catch (Exception e) {
-            logger.error("", e);
+            logger.info("生成[{}]失败", destFilePath + File.separator + fileName, e);
             return;
         }
 

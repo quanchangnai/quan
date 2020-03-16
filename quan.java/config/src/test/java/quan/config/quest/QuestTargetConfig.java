@@ -5,10 +5,11 @@ import com.alibaba.fastjson.*;
 import quan.config.*;
 
 /**
-* QuestTargetConfig<br/>
-* 自动生成
-*/
+ * QuestTargetConfig<br/>
+ * 自动生成
+ */
 public class QuestTargetConfig extends Config {
+
     //ID
     protected final int id;
 
@@ -41,7 +42,7 @@ public class QuestTargetConfig extends Config {
     }
 
 
-    // 所有QuestTargetConfig
+    //所有QuestTargetConfig
     private static volatile List<QuestTargetConfig> configs = new ArrayList<>();
 
     //ID
@@ -60,6 +61,11 @@ public class QuestTargetConfig extends Config {
     }
 
 
+    /**
+     * 加载配置，建立索引
+     * @param configs 所有配置
+     * @return 错误信息
+     */
     @SuppressWarnings({"unchecked"})
     public static List<String> load(List<QuestTargetConfig> configs) {
         Map<Integer, QuestTargetConfig> idConfigs = new HashMap<>();

@@ -9,10 +9,10 @@ import ${import};
 
 /**
 <#if comment !="">
-* ${comment}<br/>
+ * ${comment}<br/>
 </#if>
-* 自动生成
-*/
+ * 自动生成
+ */
 public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType ==6 && (!parent?? || parent=="")>Config<#elseif definitionType ==6>${parent}</#if> {
 <#if !selfFields??>
     <#assign selfFields = fields>
@@ -22,6 +22,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     <#if !(supportJava &&field.supportLanguage("java"))>
         <#continue>
     </#if>
+
     <#if field.comment !="">
     //${field.comment}
     </#if>
@@ -34,12 +35,15 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     <#elseif  field.timeType>
     protected final ${field.basicType} ${field.name};
 
+    <#if field.comment !="">
+    //${field.comment}
+    </#if>
     protected final String ${field.name}$Str;
     <#else >
     protected final ${field.basicType} ${field.name};
     </#if>
-
 </#list>
+
 
     public ${name}(JSONObject json) {
         super(json);
@@ -192,7 +196,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
     }
 
 <#macro indexer tab>
-    ${tab}// 所有${name}
+    ${tab}//所有${name}
     ${tab}private static volatile List<${name}> configs = new ArrayList<>();
 
     <#list indexes as index>
@@ -305,6 +309,11 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         </#if>
     </#list>
 
+    ${tab}/**
+     ${tab}* 加载配置，建立索引
+     ${tab}* @param configs 所有配置
+     ${tab}* @return 错误信息
+     ${tab}*/
     ${tab}@SuppressWarnings({"unchecked"})
     ${tab}public static List<String> load(List<${name}> configs) {
     <#list indexes as index>

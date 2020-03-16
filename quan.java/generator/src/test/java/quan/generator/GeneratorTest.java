@@ -4,7 +4,9 @@ import quan.config.TableType;
 import quan.definition.parser.DefinitionParser;
 import quan.definition.parser.XmlDefinitionParser;
 import quan.generator.config.CSharpConfigGenerator;
+import quan.generator.config.ConfigGenerator;
 import quan.generator.config.JavaConfigGenerator;
+import quan.generator.config.LuaConfigGenerator;
 import quan.generator.database.DatabaseGenerator;
 import quan.generator.message.CSharpMessageGenerator;
 import quan.generator.message.JavaMessageGenerator;
@@ -17,8 +19,8 @@ public class GeneratorTest {
 
     public static void main(String[] args) {
         long start = System.currentTimeMillis();
-        generateData();
-        generateMessage();
+//        generateData();
+//        generateMessage();
         generateConfig();
         System.err.println("GeneratorTest耗时(ms):" + (System.currentTimeMillis() - start));
     }
@@ -75,6 +77,14 @@ public class GeneratorTest {
         cSharpConfigGenerator.setDefinitionParser(definitionParser);
         cSharpConfigGenerator.initConfigLoader(TableType.xlsx, "config\\excel");
         cSharpConfigGenerator.generate();
+        System.err.println();
+
+        System.err.println("LuaConfigGenerator.generate()==========================");
+        LuaConfigGenerator luaConfigGenerator = new LuaConfigGenerator("..\\quan.lua\\test\\src");
+        definitionParser.setPackagePrefix("test.config");
+        luaConfigGenerator.setDefinitionParser(definitionParser);
+        luaConfigGenerator.initConfigLoader(TableType.xlsx, "config\\excel");
+        luaConfigGenerator.generate();
         System.err.println();
     }
 }

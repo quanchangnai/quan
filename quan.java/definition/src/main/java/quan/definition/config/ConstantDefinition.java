@@ -90,7 +90,6 @@ public class ConstantDefinition extends ClassDefinition {
             String comment = commentField == null ? "" : config.getString(commentField);
             rows.put(key, comment);
         }
-        System.err.println();
     }
 
     public Map<String, String> getRows() {
