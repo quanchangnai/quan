@@ -2,7 +2,7 @@ local Config = require("quan.config.Config")
 
 ---所有QuestTargetConfig
 local configs = {
-    { id = 1, name = "任务目标1" },    
+    { id = 1, name = "任务目标1" },
 }
 
 ---ID
@@ -26,7 +26,7 @@ local QuestTargetConfig = {}
 function QuestTargetConfig.getConfigs()
     return configs
 end
- 
+
 ---
 ---通过索引[id]获取QuestTargetConfig
 ---@param id int ID

@@ -3,7 +3,7 @@ local Config = require("quan.config.Config")
 ---所有${name}
 local configs = {
 <#list rows as row>
-    ${row},    
+    ${row},
 </#list>
 }
 
@@ -49,7 +49,7 @@ local ${name} = {}
 function ${name}.getConfigs()
     return configs
 end
- 
+
 <#list indexes as index>
    <#if index.unique && index.fields?size==1>
 ---
@@ -87,7 +87,7 @@ function ${name}.getBy${index.name?cap_first}(${index.fields[0].name}, ${index.f
     if (not ${index.fields[1].name}) then
         return map
     end
-    
+
     return map[${index.fields[1].name}]
 end
 

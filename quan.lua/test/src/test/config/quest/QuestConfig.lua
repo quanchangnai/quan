@@ -2,7 +2,7 @@ local Config = require("quan.config.Config")
 
 ---所有QuestConfig
 local configs = {
-    { id = 1, name = "任务1", type = 1, target = 1, reward = { }, a1 = 1, a2 = 2, b1 = 11, b2 = false, c1 = "111", c2 = 222, c3 = 333, d1 = "1111", d2 = 2222, d3 = 333, s1 = {  }, l1 = {  }, m1 = {  } },    
+    { id = 1, name = "任务1", type = 1, target = 1, reward = { }, a1 = 1, a2 = 2, b1 = 11, b2 = false, c1 = "111", c2 = 222, c3 = 333, d1 = "1111", d2 = 2222, d3 = 333, s1 = {  }, l1 = {  }, m1 = {  } },
 }
 
 local composite1Configs = {}
@@ -42,7 +42,7 @@ local QuestConfig = {}
 function QuestConfig.getConfigs()
     return configs
 end
- 
+
 ---
 ---通过索引[composite1]获取QuestConfig
 ---@param a1 int A1
@@ -57,7 +57,7 @@ function QuestConfig.getByComposite1(a1, a2)
     if (not a2) then
         return map
     end
-    
+
     return map[a2]
 end
 
