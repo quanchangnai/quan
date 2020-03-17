@@ -3,6 +3,7 @@ using System.Collections.Immutable;
 using Newtonsoft.Json.Linq;
 using Quan.Common;
 using Quan.Config;
+using System;
 
 namespace Test.Config.Quest
 {
@@ -22,11 +23,20 @@ namespace Test.Config.Quest
         /// </summary>
         public readonly string Name;
 
+        /// <summary>
+        /// 中午
+        /// </summary>
+        public readonly DateTime Noon;
+
+        public readonly string Noon_Str;
+
 
         public QuestTargetConfig(JObject json) : base(json)
         {
             Id = json["id"]?.Value<int>() ?? default;
             Name = json["name"]?.Value<string>() ?? "";
+            Noon = ToDateTime(json["noon"]?.Value<long>() ?? default);
+            Noon_Str = json["noon$Str"]?.Value<string>() ?? "";
         }
 
         protected override ConfigBase Create(JObject json)
@@ -40,6 +50,7 @@ namespace Test.Config.Quest
             return "QuestTargetConfig{" +
                    "Id=" + Id.ToString2() +
                    ",Name='" + Name + '\'' +
+                   ",Noon=" + Noon.ToString2() +
                    '}';
         }
 

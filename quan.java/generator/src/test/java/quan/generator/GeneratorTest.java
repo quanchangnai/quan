@@ -52,7 +52,7 @@ public class GeneratorTest {
         System.err.println();
 
         System.err.println("LuaMessageGenerator.generate()==========================");
-        LuaMessageGenerator luaMessageGenerator = new LuaMessageGenerator("..\\quan.lua\\test\\src");
+        LuaMessageGenerator luaMessageGenerator = new LuaMessageGenerator("..\\quan.lua\\src");
         definitionParser.setPackagePrefix("test.message");
         luaMessageGenerator.setDefinitionParser(definitionParser);
         luaMessageGenerator.generate();
@@ -80,7 +80,7 @@ public class GeneratorTest {
         System.err.println();
 
         System.err.println("LuaConfigGenerator.generate()==========================");
-        LuaConfigGenerator luaConfigGenerator = new LuaConfigGenerator("..\\quan.lua\\test\\src");
+        LuaConfigGenerator luaConfigGenerator = new LuaConfigGenerator("..\\quan.lua\\src");
         definitionParser.setPackagePrefix("test.config");
         luaConfigGenerator.setDefinitionParser(definitionParser);
         luaConfigGenerator.initConfigLoader(TableType.xlsx, "config\\excel");

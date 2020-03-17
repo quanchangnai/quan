@@ -11,6 +11,7 @@ import quan.definition.config.ConfigDefinition;
 import quan.generator.util.CommandLineUtils;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -68,14 +69,16 @@ public class LuaConfigGenerator extends ConfigGenerator {
             }
             start = false;
 
-            builder.append(field.getName());
-            builder.append(" = ");
+            builder.append(field.getName()).append(" = ");
 
             if (field.getType().equals("string")) {
                 builder.append("\"").append(object.getOrDefault(field.getName(), "")).append("\"");
             } else if (field.isNumberType()) {
                 builder.append(object.getOrDefault(field.getName(), "0"));
             } else if (field.isTimeType()) {
+                Date date = object.getDate(field.getName());
+                builder.append(date != null ? date.getTime() / 1000 : 0);
+                builder.append(", ").append(field.getName() + "_Str").append(" = ");
                 builder.append("\"").append(object.getOrDefault(field.getName() + "$Str", "")).append("\"");
             } else if (field.getType().equals("map")) {
                 fillMapLuaString(builder, field, object.getJSONObject(field.getName()));

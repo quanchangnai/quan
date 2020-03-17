@@ -79,3 +79,9 @@ print("maps=======")
 for k, v in maps(map) do
     print(k, v)
 end
+
+print("date time=======")
+local date=os.date("*t",16200)
+for k, v in pairs(date) do
+    print("k:",k,"v:",v)
+end
