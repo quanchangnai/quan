@@ -239,7 +239,9 @@ public class WeaponConfig extends EquipConfig {
 
             for (WeaponConfig config : configs) {
                 Config.load(idConfigs, errors, config, true, Collections.singletonList("id"), config.id);
-                Config.load(keyConfigs, errors, config, true, Collections.singletonList("key"), config.key);
+                if (!config.key.equals("")) {
+                    Config.load(keyConfigs, errors, config, true, Collections.singletonList("key"), config.key);
+                }
                 Config.load(positionConfigs, errors, config, false, Collections.singletonList("position"), config.position);
                 Config.load(composite1Configs, errors, config, false, Arrays.asList("color", "w1"), config.color, config.w1);
                 Config.load(composite2Configs, errors, config, true, Arrays.asList("w1", "w2"), config.w1, config.w2);

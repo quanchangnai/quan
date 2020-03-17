@@ -53,6 +53,7 @@
     <Compile Include="Config\Common\RewardConstant.cs" />
     <Compile Include="Config\Item\EquipConfig.cs" />
     <Compile Include="Config\Item\ItemConfig.cs" />
+    <Compile Include="Config\Item\ItemIds.cs" />
     <Compile Include="Config\Item\ItemType.cs" />
     <Compile Include="Config\Item\Reward.cs" />
     <Compile Include="Config\Item\WeaponConfig.cs" />

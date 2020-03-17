@@ -48,9 +48,9 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
         }
     }
 
-    public void setLoadType(LoadType loadType) {
-        Objects.requireNonNull(loadType, "加载类型不能为空");
-        this.loadType = loadType;
+    public void setLoadType(LoadMode loadMode) {
+        Objects.requireNonNull(loadMode, "加载模式不能为空");
+        this.loadMode = loadMode;
     }
 
     /**
@@ -83,7 +83,7 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
     /**
      * 解析配置定义
      */
-    private void parseDefinition() {
+    private void parseDefinitions() {
         Objects.requireNonNull(definitionParser, "配置定义解析器不能为空");
         if (!definitionParser.getClasses().isEmpty()) {
             return;
@@ -104,8 +104,8 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
         }
     }
 
-    protected void loadAll0() {
-        parseDefinition();
+    protected void doLoadAll() {
+        parseDefinitions();
 
         Set<ConfigDefinition> configDefinitions = new HashSet<>(definitionParser.getTableConfigs().values());
         //配置对应的其已索引JSON数据

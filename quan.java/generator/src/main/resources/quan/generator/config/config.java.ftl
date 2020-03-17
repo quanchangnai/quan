@@ -337,7 +337,13 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         ${tab}for (${name} config : configs) {
     <#list indexes as index>
         <#if index.fields?size==1>
+            <#if isConstantKeyField("${index.fields[0].name}")>
+            ${tab}if (!config.${index.fields[0].name}.equals("")) {
+                ${tab}<#if parent??>Config.</#if>load(${index.name}Configs, errors, config, ${index.unique?c}, Collections.singletonList("${index.fields[0].name}"), config.${index.fields[0].name});
+            ${tab}}
+            <#else>
             ${tab}<#if parent??>Config.</#if>load(${index.name}Configs, errors, config, ${index.unique?c}, Collections.singletonList("${index.fields[0].name}"), config.${index.fields[0].name});
+            </#if>
         <#elseif index.fields?size==2>
             ${tab}<#if parent??>Config.</#if>load(${index.name}Configs, errors, config, ${index.unique?c}, Arrays.asList("${index.fields[0].name}", "${index.fields[1].name}"), config.${index.fields[0].name}, config.${index.fields[1].name});
         <#elseif index.fields?size==3>

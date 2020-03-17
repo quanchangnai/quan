@@ -124,7 +124,9 @@ public class EquipConfig extends ItemConfig {
 
             for (EquipConfig config : configs) {
                 Config.load(idConfigs, errors, config, true, Collections.singletonList("id"), config.id);
-                Config.load(keyConfigs, errors, config, true, Collections.singletonList("key"), config.key);
+                if (!config.key.equals("")) {
+                    Config.load(keyConfigs, errors, config, true, Collections.singletonList("key"), config.key);
+                }
                 Config.load(positionConfigs, errors, config, false, Collections.singletonList("position"), config.position);
             }
 

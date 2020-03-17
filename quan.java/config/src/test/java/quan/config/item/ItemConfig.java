@@ -226,7 +226,9 @@ public class ItemConfig extends Config {
 
         for (ItemConfig config : configs) {
             load(idConfigs, errors, config, true, Collections.singletonList("id"), config.id);
-            load(keyConfigs, errors, config, true, Collections.singletonList("key"), config.key);
+            if (!config.key.equals("")) {
+                load(keyConfigs, errors, config, true, Collections.singletonList("key"), config.key);
+            }
         }
 
         configs = Collections.unmodifiableList(configs);

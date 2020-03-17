@@ -120,7 +120,9 @@ public class ConstantConfig extends Config {
         List<String> errors = new ArrayList<>();
 
         for (ConstantConfig config : configs) {
-            load(keyConfigs, errors, config, true, Collections.singletonList("key"), config.key);
+            if (!config.key.equals("")) {
+                load(keyConfigs, errors, config, true, Collections.singletonList("key"), config.key);
+            }
         }
 
         configs = Collections.unmodifiableList(configs);

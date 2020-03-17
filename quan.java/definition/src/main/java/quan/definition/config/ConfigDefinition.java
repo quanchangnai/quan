@@ -224,6 +224,19 @@ public class ConfigDefinition extends BeanDefinition {
         return false;
     }
 
+    public boolean isConstantKeyField(String fieldName) {
+        ConfigDefinition parentConfig = getParentConfig();
+        if (parentConfig != null && parentConfig.isConstantKeyField(fieldName)) {
+            return true;
+        }
+        for (ConstantDefinition constantDefinition : constantDefinitions) {
+            if (constantDefinition.getKeyField().getName().equals(fieldName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public List<String> getRows() {
         return rows;
     }

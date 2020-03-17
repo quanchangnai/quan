@@ -35,7 +35,7 @@ public class WithoutDefinitionConfigLoader extends ConfigLoader {
      * 没有配置定义直接加载JSON格式配置，JSON文件名必须是配置全类名
      */
     @Override
-    protected void loadAll0() {
+    protected void doLoadAll() {
         if (!needLoad()) {
             throw new IllegalStateException("没有配置定义的JSON格式配置不支持校验");
         }

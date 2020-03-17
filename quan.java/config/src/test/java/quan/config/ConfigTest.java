@@ -18,7 +18,7 @@ public class ConfigTest {
     public static void main(String[] args) throws Exception {
 
         ConfigLoader configLoader;
-        if (true) {
+        if (false) {
             configLoader = withDefinitionConfigLoader();
         } else {
             configLoader = withoutDefinitionConfigLoader();
@@ -28,13 +28,13 @@ public class ConfigTest {
 
         writeJson(configLoader);
 
-        reloadAllConfig(configLoader);
+//        reloadAllConfig(configLoader);
+//
+//        reloadByConfigName(configLoader);
+//
+//        reloadByTableName(configLoader);
 
-        reloadByConfigName(configLoader);
-
-        reloadByTableName(configLoader);
-
-        reloadByOriginalName(configLoader);
+//        reloadByOriginalName(configLoader);
 
     }
 
@@ -88,7 +88,7 @@ public class ConfigTest {
 
         System.err.println("writeJson()=============");
         long startTime = System.currentTimeMillis();
-        configLoader1.writeJson("config\\json", true, Language.cs);
+        configLoader1.writeJson("config\\json", true, Language.java);
         System.err.println("writeJson()耗时:" + (System.currentTimeMillis() - startTime));
         System.err.println();
     }

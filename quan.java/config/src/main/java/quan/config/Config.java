@@ -35,9 +35,9 @@ public abstract class Config extends Bean {
             return;
         }
 
-        String duplicatedConfig = config.getClass().getSimpleName();
+        String configNames = config.getClass().getSimpleName();
         if (old.getClass() != config.getClass()) {
-            duplicatedConfig += "," + old.getClass().getSimpleName();
+            configNames += "," + old.getClass().getSimpleName();
         }
 
         List<String> keysList = new ArrayList<>();
@@ -46,7 +46,7 @@ public abstract class Config extends Bean {
         }
 
         List<Object> params = new ArrayList<>();
-        params.add(duplicatedConfig);
+        params.add(configNames);
         params.add(String.join(",", keyNames));
         params.add(String.join(",", keysList));
 

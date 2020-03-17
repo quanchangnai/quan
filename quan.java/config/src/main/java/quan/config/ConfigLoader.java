@@ -25,7 +25,7 @@ public abstract class ConfigLoader {
     protected TableType tableType;
 
     //加载类型，加载或者校验
-    protected LoadType loadType = LoadType.validateAndLoad;
+    protected LoadMode loadMode = LoadMode.validateAndLoad;
 
     protected final Map<String, ConfigReader> readers = new HashMap<>();
 
@@ -37,16 +37,16 @@ public abstract class ConfigLoader {
     protected boolean loaded;
 
     public ConfigLoader(String tablePath) {
-        Objects.requireNonNull(tablePath, "配置表路径不能为空" );
+        Objects.requireNonNull(tablePath, "配置表路径不能为空");
         this.tablePath = PathUtils.currentPlatPath(tablePath);
     }
 
-    public LoadType getLoadType() {
-        return loadType;
+    public LoadMode getLoadMode() {
+        return loadMode;
     }
 
     public void setTableType(TableType tableType) {
-        Objects.requireNonNull(tableType, "配置表类型不能为空" );
+        Objects.requireNonNull(tableType, "配置表类型不能为空");
         this.tableType = tableType;
     }
 
@@ -55,11 +55,11 @@ public abstract class ConfigLoader {
     }
 
     public boolean needValidate() {
-        return loadType == LoadType.onlyValidate || loadType == LoadType.validateAndLoad;
+        return loadMode == LoadMode.onlyValidate || loadMode == LoadMode.validateAndLoad;
     }
 
     public boolean needLoad() {
-        return loadType == LoadType.onlyLoad || loadType == LoadType.validateAndLoad;
+        return loadMode == LoadMode.onlyLoad || loadMode == LoadMode.validateAndLoad;
     }
 
     /**
@@ -81,7 +81,7 @@ public abstract class ConfigLoader {
                 try {
                     validators.add((ConfigValidator) validatorClass.getConstructor().newInstance());
                 } catch (Exception e) {
-                    logger.error("实例化配置校验器[{}]失败" , validatorClass, e);
+                    logger.error("实例化配置校验器[{}]失败", validatorClass, e);
                 }
             }
         }
@@ -92,12 +92,12 @@ public abstract class ConfigLoader {
      */
     public void loadAll() {
         if (loaded) {
-            throw new IllegalStateException("配置已经加载了，重加载调用reloadXxx方法" );
+            throw new IllegalStateException("配置已经加载了，重加载调用reloadXxx方法");
         }
         loaded = true;
         validatedErrors.clear();
 
-        loadAll0();
+        doLoadAll();
 
         if (needValidate()) {
             for (ConfigValidator validator : validators) {
@@ -106,9 +106,9 @@ public abstract class ConfigLoader {
                 } catch (ValidatedException e) {
                     validatedErrors.addAll(e.getErrors());
                 } catch (Exception e) {
-                    String error = String.format("配置错误:%s" , e.getMessage());
+                    String error = String.format("配置错误:%s", e.getMessage());
                     validatedErrors.add(error);
-                    logger.debug("" , e);
+                    logger.debug("", e);
                 }
             }
         }
@@ -118,7 +118,7 @@ public abstract class ConfigLoader {
         }
     }
 
-    protected abstract void loadAll0();
+    protected abstract void doLoadAll();
 
     /**
      * 加载配置到类索引
@@ -127,7 +127,7 @@ public abstract class ConfigLoader {
         if (!needLoad()) {
             return;
         }
-        String configName = configFullName.substring(configFullName.lastIndexOf("." ) + 1);
+        String configName = configFullName.substring(configFullName.lastIndexOf(".") + 1);
         List<Config> configs = new ArrayList<>();
         for (String table : configTables) {
             ConfigReader configReader = getReader(table);
@@ -136,12 +136,12 @@ public abstract class ConfigLoader {
 
         Method loadMethod;
         try {
-            loadMethod = Class.forName(configFullName + "$self" ).getMethod("load" , List.class);
+            loadMethod = Class.forName(configFullName + "$self").getMethod("load", List.class);
         } catch (Exception e1) {
             try {
-                loadMethod = Class.forName(configFullName).getMethod("load" , List.class);
+                loadMethod = Class.forName(configFullName).getMethod("load", List.class);
             } catch (Exception e2) {
-                logger.error("加载配置[{}]类出错，配置类[{}]不存在或者没有加载方法" , configName, configFullName);
+                logger.error("加载配置[{}]类出错，配置类[{}]不存在或者没有加载方法", configName, configFullName);
                 return;
             }
         }
@@ -152,7 +152,7 @@ public abstract class ConfigLoader {
                 validatedErrors.addAll(indexErrors);
             }
         } catch (Exception e) {
-            logger.error("加载配置[{}]类出错，调用配置类[{}]的索引方法出错" , configName, configFullName, e);
+            logger.error("加载配置[{}]类出错，调用配置类[{}]的索引方法出错", configName, configFullName, e);
         }
     }
 
@@ -171,10 +171,10 @@ public abstract class ConfigLoader {
 
     protected void checkReload() {
         if (!needLoad()) {
-            throw new IllegalStateException("配置加载器仅支持校验，不能重加载" );
+            throw new IllegalStateException("配置加载器仅支持校验，不能重加载");
         }
         if (!loaded) {
-            throw new IllegalStateException("配置没有加载过，不能重加载" );
+            throw new IllegalStateException("配置没有加载过，不能重加载");
         }
     }
 
