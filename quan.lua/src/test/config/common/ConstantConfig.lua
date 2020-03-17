@@ -1,7 +1,7 @@
 ---
----ConstantConfig
 ---常量
----自动生成
+---@module ConstantConfig
+---@author 自动生成
 ---
 
 local Config = require("quan.config.Config")
@@ -39,7 +39,7 @@ end
 ---
 ---通过索引[key]获取ConstantConfig
 ---@param key string 常量Key
----@return map<key string,ConstantConfig> | ConstantConfig
+---  map<key string,ConstantConfig> | ConstantConfig
 function ConstantConfig.getByKey(key)
     if (not key) then
         return keyConfigs

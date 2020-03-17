@@ -2,7 +2,7 @@ local Buffer = require("quan.message.Buffer")
 local Message = require("quan.message.Message")
 
 ---
----自动生成
+---@author 自动生成
 ---
 local UserInfo = {
     ---类名

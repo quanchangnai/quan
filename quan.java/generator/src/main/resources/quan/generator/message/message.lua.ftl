@@ -8,7 +8,7 @@ local ${import[import?last_index_of(".")+1..]} = require("${import}")
 <#if comment !="">
 ---${comment}
 </#if>
----自动生成
+---@author 自动生成
 ---
 local ${name} = {
     ---类名

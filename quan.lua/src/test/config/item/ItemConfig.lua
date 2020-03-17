@@ -1,7 +1,7 @@
 ---
----ItemConfig
 ---道具
----自动生成
+---@module ItemConfig
+---@author 自动生成
 ---
 
 local Config = require("quan.config.Config")
@@ -47,7 +47,7 @@ end
 ---
 ---通过索引[id]获取ItemConfig
 ---@param id int ID
----@return map<id int,ItemConfig> | ItemConfig
+---  map<id int,ItemConfig> | ItemConfig
 function ItemConfig.getById(id)
     if (not id) then
         return idConfigs
@@ -58,7 +58,7 @@ end
 ---
 ---通过索引[key]获取ItemConfig
 ---@param key string 常量Key
----@return map<key string,ItemConfig> | ItemConfig
+---  map<key string,ItemConfig> | ItemConfig
 function ItemConfig.getByKey(key)
     if (not key) then
         return keyConfigs

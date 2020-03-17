@@ -1,7 +1,7 @@
 ---
 ---QuestTargetConfig
----QuestTargetConfig
----自动生成
+---@module QuestTargetConfig
+---@author 自动生成
 ---
 
 local Config = require("quan.config.Config")
@@ -36,7 +36,7 @@ end
 ---
 ---通过索引[id]获取QuestTargetConfig
 ---@param id int ID
----@return map<id int,QuestTargetConfig> | QuestTargetConfig
+---  map<id int,QuestTargetConfig> | QuestTargetConfig
 function QuestTargetConfig.getById(id)
     if (not id) then
         return idConfigs

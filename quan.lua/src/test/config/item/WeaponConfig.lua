@@ -1,7 +1,7 @@
 ---
----WeaponConfig
 ---武器
----自动生成
+---@module WeaponConfig
+---@author 自动生成
 ---
 
 local Config = require("quan.config.Config")
@@ -52,7 +52,7 @@ end
 ---
 ---通过索引[id]获取WeaponConfig
 ---@param id int ID
----@return map<id int,WeaponConfig> | WeaponConfig
+---  map<id int,WeaponConfig> | WeaponConfig
 function WeaponConfig.getById(id)
     if (not id) then
         return idConfigs
@@ -63,7 +63,7 @@ end
 ---
 ---通过索引[key]获取WeaponConfig
 ---@param key string 常量Key
----@return map<key string,WeaponConfig> | WeaponConfig
+---  map<key string,WeaponConfig> | WeaponConfig
 function WeaponConfig.getByKey(key)
     if (not key) then
         return keyConfigs

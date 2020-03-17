@@ -5,22 +5,22 @@ local RoleInfo = require("test.message.role.RoleInfo")
 
 ---
 ---角色登录
----自动生成
+---@author 自动生成
 ---
-local CRoleLogin = {
+local SRoleLogin = {
     ---类名
-    class = "test.message.role.CRoleLogin",
+    class = "test.message.role.SRoleLogin",
     ---消息ID
-    id = 544233
+    id = 763075
 }
 
 local function onSet(self, key, value)
-    assert(not CRoleLogin[key], "不允许修改只读属性:" .. key)
+    assert(not SRoleLogin[key], "不允许修改只读属性:" .. key)
     rawset(self, key, value)
 end
 
 local function toString(self)
-    return "CRoleLogin{" ..
+    return "SRoleLogin{" ..
             "seq=" .. tostring(self.seq) ..
             ",error=" .. tostring(self.error) ..
             ",roleId=" .. tostring(self.roleId) ..
@@ -34,13 +34,13 @@ local function toString(self)
 end
 
 ---元表
-local meta = { __index = CRoleLogin, __newindex = onSet, __tostring = toString }
+local meta = { __index = SRoleLogin, __newindex = onSet, __tostring = toString }
 
 ---
 ---角色登录.构造
 ---@param args 参数列表可以为空
 ---
-function CRoleLogin.new(args)
+function SRoleLogin.new(args)
     assert(args == nil or type(args) == "table", "参数错误")
     args = args or {}
 
@@ -73,8 +73,8 @@ end
 ---角色登录.编码
 ---@return quan.message.Buffer
 ---
-function CRoleLogin:encode()
-    assert(type(self) == "table" and self.class == CRoleLogin.class, "参数[self]类型错误")
+function SRoleLogin:encode()
+    assert(type(self) == "table" and self.class == SRoleLogin.class, "参数[self]类型错误")
     local buffer = Message.encode(self)
 
     buffer:writeLong(self.seq)
@@ -110,11 +110,11 @@ end
 ---
 ---角色登录.解码
 ---@param buffer quan.message.Buffer 不能为空
----@return test.message.role.CRoleLogin
+---@return test.message.role.SRoleLogin
 ---
-function CRoleLogin.decode(buffer)
+function SRoleLogin.decode(buffer)
     assert(type(buffer) == "table" and buffer.class == Buffer.class, "参数[buffer]类型错误")
-    local self = CRoleLogin.new()
+    local self = SRoleLogin.new()
     Message.decode(buffer, self)
     self.seq = buffer:readLong()
     self.error = buffer:readInt()
@@ -141,5 +141,5 @@ function CRoleLogin.decode(buffer)
     return self
 end
 
-CRoleLogin = table.readOnly(CRoleLogin)
-return CRoleLogin
+SRoleLogin = table.readOnly(SRoleLogin)
+return SRoleLogin

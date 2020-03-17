@@ -1,9 +1,9 @@
 ---
----${name}
 <#if comment !="">
 ---${comment}
 </#if>
----自动生成
+---@module ${name}
+---@author 自动生成
 ---
 
 local Config = require("quan.config.Config")
@@ -63,7 +63,7 @@ end
 ---
 ---通过索引[${index.name}]获取${name}
 ---@param ${index.fields[0].name} ${index.fields[0].type} ${index.fields[0].comment}
----@return map<${index.fields[0].name} ${index.fields[0].type},${name}> | ${name}
+---  map<${index.fields[0].name} ${index.fields[0].type},${name}> | ${name}
 function ${name}.getBy${index.name?cap_first}(${index.fields[0].name})
     if (not ${index.fields[0].name}) then
         return ${index.name}Configs

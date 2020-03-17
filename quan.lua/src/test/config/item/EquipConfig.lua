@@ -1,7 +1,7 @@
 ---
----EquipConfig
 ---装备1,装备2
----自动生成
+---@module EquipConfig
+---@author 自动生成
 ---
 
 local Config = require("quan.config.Config")
@@ -50,7 +50,7 @@ end
 ---
 ---通过索引[id]获取EquipConfig
 ---@param id int ID
----@return map<id int,EquipConfig> | EquipConfig
+---  map<id int,EquipConfig> | EquipConfig
 function EquipConfig.getById(id)
     if (not id) then
         return idConfigs
@@ -61,7 +61,7 @@ end
 ---
 ---通过索引[key]获取EquipConfig
 ---@param key string 常量Key
----@return map<key string,EquipConfig> | EquipConfig
+---  map<key string,EquipConfig> | EquipConfig
 function EquipConfig.getByKey(key)
     if (not key) then
         return keyConfigs

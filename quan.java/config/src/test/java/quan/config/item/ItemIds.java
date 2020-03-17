@@ -1,6 +1,7 @@
 package quan.config.item;
 
 /**
+ * 道具ID<br/>
  * 自动生成
  */
 public class ItemIds {

@@ -3,7 +3,7 @@ local Message = require("quan.message.Message")
 
 ---
 ---角色信息
----自动生成
+---@author 自动生成
 ---
 local RoleInfo = {
     ---类名

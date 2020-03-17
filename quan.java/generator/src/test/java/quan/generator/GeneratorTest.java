@@ -19,8 +19,8 @@ public class GeneratorTest {
 
     public static void main(String[] args) {
         long start = System.currentTimeMillis();
-//        generateData();
-//        generateMessage();
+        generateData();
+        generateMessage();
         generateConfig();
         System.err.println("GeneratorTest耗时(ms):" + (System.currentTimeMillis() - start));
     }
