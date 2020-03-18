@@ -110,7 +110,7 @@ public abstract class Generator {
 
         List<ClassDefinition> classDefinitions = new ArrayList<>();
         for (ClassDefinition classDefinition : definitionParser.getClasses().values()) {
-            if (!support(classDefinition) || !classDefinition.supportLanguage(supportLanguage())) {
+            if (!support(classDefinition) || !classDefinition.supportLanguage(this.supportLanguage())) {
                 continue;
             }
             classDefinition.reset();

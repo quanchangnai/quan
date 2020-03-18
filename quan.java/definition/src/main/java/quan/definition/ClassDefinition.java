@@ -33,7 +33,7 @@ public abstract class ClassDefinition extends Definition {
     //支持的语言
     protected Set<String> supportedLanguages;
 
-    //导包，和具体英语相关
+    //导包，和具体语言相关
     private Set<String> imports = new HashSet<>();
 
     protected List<FieldDefinition> fields = new ArrayList<>();
@@ -287,7 +287,7 @@ public abstract class ClassDefinition extends Definition {
             }
         }
 
-        error += position ;
+        error += position;
         parser.addValidatedError(error);
     }
 

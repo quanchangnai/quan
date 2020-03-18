@@ -48,7 +48,7 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
         }
     }
 
-    public void setLoadType(LoadMode loadMode) {
+    public void setLoadMode(LoadMode loadMode) {
         Objects.requireNonNull(loadMode, "加载模式不能为空");
         this.loadMode = loadMode;
     }

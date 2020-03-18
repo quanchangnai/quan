@@ -527,6 +527,10 @@ public class FieldDefinition extends Definition {
         return support;
     }
 
+    public boolean supportLanguage(Language language) {
+        return supportLanguage(language.name());
+    }
+
     public int getColumnNum() {
         return columnNum;
     }

@@ -18,7 +18,7 @@ public class ConfigTest {
     public static void main(String[] args) throws Exception {
 
         ConfigLoader configLoader;
-        if (false) {
+        if (true) {
             configLoader = withDefinitionConfigLoader();
         } else {
             configLoader = withoutDefinitionConfigLoader();

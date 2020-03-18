@@ -24,7 +24,7 @@ public abstract class ConfigLoader {
     //配置表类型
     protected TableType tableType;
 
-    //加载类型，加载或者校验
+    //加载模式，加载或者校验
     protected LoadMode loadMode = LoadMode.validateAndLoad;
 
     protected final Map<String, ConfigReader> readers = new HashMap<>();
