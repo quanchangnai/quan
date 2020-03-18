@@ -208,6 +208,7 @@ public class XmlDefinitionParser extends DefinitionParser {
         constantDefinition.setDefinitionText(constantElement.asXML());
 
         constantDefinition.setName(constantElement.attributeValue("name"));
+        constantDefinition.setUseEnum(constantElement.attributeValue("enum"));
         constantDefinition.setKeyField(constantElement.attributeValue("key"));
         constantDefinition.setValueField(constantElement.attributeValue("value"));
         constantDefinition.setCommentField(constantElement.attributeValue("comment"));

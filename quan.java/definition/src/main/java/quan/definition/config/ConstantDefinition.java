@@ -11,12 +11,15 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * 常量定义
+ * 常量定义，支持动态读取常量值
  * Created by quanchangnai on 2019/9/6.
  */
 public class ConstantDefinition extends ClassDefinition {
 
     private ConfigDefinition configDefinition;
+
+    //是否使用枚举实现，Java支持动态读取枚举值,其他不支持的语言该参数没有意义
+    private boolean useEnum = true;
 
     private String keyField;
 
@@ -52,6 +55,17 @@ public class ConstantDefinition extends ClassDefinition {
         setDefinitionFile(configDefinition.getDefinitionFile());
         this.configDefinition = configDefinition;
         configDefinition.getConstantDefinitions().add(this);
+    }
+
+    public ConstantDefinition setUseEnum(String useEnum) {
+        if (useEnum != null && useEnum.equals("false")) {
+            this.useEnum = false;
+        }
+        return this;
+    }
+
+    public boolean isUseEnum() {
+        return useEnum;
     }
 
     public void setKeyField(String keyField) {

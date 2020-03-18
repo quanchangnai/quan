@@ -4,20 +4,20 @@ package quan.config.item;
  * 道具ID<br/>
  * 自动生成
  */
-public class ItemIds {
+public enum ItemIds {
 
     /**
      * 道具1
      */
-    public static int item1() {
-        return ItemConfig.getByKey("item1").getId();
-    }
+    item1,
 
     /**
      * 道具2
      */
-    public static int item2() {
-        return ItemConfig.getByKey("item2").getId();
+    item2;
+
+    public int getValue() {
+        return ItemConfig.getByKey(name()).getId();
     }
 
 }
