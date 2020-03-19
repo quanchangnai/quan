@@ -31,6 +31,8 @@ public abstract class Generator {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
+    protected Set<String> definitionPaths;
+
     protected String packagePrefix;
 
     protected String enumPackagePrefix;
@@ -45,8 +47,6 @@ public abstract class Generator {
 
     protected boolean ready = true;
 
-    protected boolean printError;
-
     public Generator() {
         initFreemarker();
     }
@@ -57,37 +57,50 @@ public abstract class Generator {
             ready = false;
             return;
         }
+        definitionPaths = new HashSet<>(Arrays.asList(definitionPath.split(",")));
 
         String codePath = properties.getProperty(category() + "." + supportLanguage() + ".codePath");
         if (StringUtils.isBlank(codePath)) {
             ready = false;
             return;
         }
-        setCodePath(codePath);
 
-        List<String> definitionPaths = new ArrayList<>();
-        for (String path : definitionPath.split(",")) {
-            definitionPaths.add(path);
-        }
+        setCodePath(codePath);
 
         packagePrefix = properties.getProperty(category() + "." + supportLanguage() + ".packagePrefix");
         enumPackagePrefix = properties.getProperty(category() + "." + supportLanguage() + ".enumPackagePrefix");
-        this.useXmlDefinitionParser(definitionPaths);
+    }
+
+
+    public void setDefinitionPath(Collection<String> definitionPaths) {
+        this.definitionPaths = new HashSet<>(definitionPaths);
+    }
+
+    public void setDefinitionPath(String definitionPath) {
+        this.definitionPaths = Collections.singleton(definitionPath);
     }
 
     public void setCodePath(String codePath) {
         this.codePath = PathUtils.currentPlatPath(codePath);
     }
 
-    public DefinitionParser useXmlDefinitionParser(List<String> definitionPaths) {
+    public void setPackagePrefix(String packagePrefix) {
+        this.packagePrefix = packagePrefix;
+    }
+
+    public void setEnumPackagePrefix(String enumPackagePrefix) {
+        this.enumPackagePrefix = enumPackagePrefix;
+    }
+
+    public void useXmlDefinitionParser() {
         definitionParser = new XmlDefinitionParser();
         definitionParser.setCategory(category());
         definitionParser.setDefinitionPaths(definitionPaths);
-        return definitionParser;
     }
 
-    public DefinitionParser useXmlDefinitionParser(String definitionPath) {
-        return useXmlDefinitionParser(Collections.singletonList(definitionPath));
+    public void useXmlDefinitionParser(String definitionPath) {
+        setDefinitionPath(definitionPath);
+        useXmlDefinitionParser();
     }
 
     public void setDefinitionParser(DefinitionParser definitionParser) {
@@ -95,6 +108,7 @@ public abstract class Generator {
             return;
         }
         definitionParser.setCategory(category());
+        definitionParser.setDefinitionPaths(definitionPaths);
         this.definitionParser = definitionParser;
     }
 
@@ -137,10 +151,23 @@ public abstract class Generator {
         freemarkerCfg.setClassForTemplateLoading(getClass(), "");
     }
 
-    public void generate() {
+    public boolean tryGenerate(boolean printError) {
         if (!ready) {
-            return;
+            return false;
         }
+        generate(printError);
+        return true;
+    }
+
+    public boolean tryGenerate() {
+        return tryGenerate(true);
+    }
+
+    public void generate() {
+        generate(true);
+    }
+
+    public void generate(boolean printError) {
         //解析定义文件
         parseDefinitions();
 
@@ -246,11 +273,19 @@ public abstract class Generator {
     }
 
     protected void printErrors() {
+        if (definitionParser == null) {
+            return;
+        }
+
         List<String> errors = new ArrayList<>(definitionParser.getValidatedErrors());
+        if (errors.isEmpty()) {
+            return;
+        }
+
         logger.error("生成{}代码失败，解析定义文件{}共发现{}条错误", category(), definitionParser.getDefinitionPaths(), errors.size());
         for (int i = 1; i <= errors.size(); i++) {
             String error = errors.get(i - 1);
-            logger.error("{}:{}", i, error);
+            logger.error("错误{}:{}", i, error);
         }
     }
 
@@ -261,44 +296,47 @@ public abstract class Generator {
         if (args.length > 0) {
             propertiesFile = args[0];
         } else {
-            logger.info("使用默认生成器属性文件[{}]", propertiesFile);
+            logger.info("使用默认位置的生成器属性文件[{}]\n", propertiesFile);
         }
 
         Properties properties = new Properties();
-        try {
-            properties.load(new FileInputStream(propertiesFile));
+        try (FileInputStream inputStream = new FileInputStream(propertiesFile)) {
+            properties.load(inputStream);
         } catch (IOException e) {
             logger.info("加载生成器属性文件[{}]出错", propertiesFile, e);
             return;
         }
 
-        List<Generator> generators = new ArrayList<>();
-        generators.add(new DatabaseGenerator(properties));
+        DatabaseGenerator databaseGenerator = new DatabaseGenerator(properties);
+        databaseGenerator.useXmlDefinitionParser();
+        databaseGenerator.tryGenerate(true);
 
         JavaMessageGenerator javaMessageGenerator = new JavaMessageGenerator(properties);
-        javaMessageGenerator.printError = true;
         CSharpMessageGenerator cSharpMessageGenerator = new CSharpMessageGenerator(properties);
-        cSharpMessageGenerator.setDefinitionParser(javaMessageGenerator.definitionParser);
         LuaMessageGenerator luaMessageGenerator = new LuaMessageGenerator(properties);
-        luaMessageGenerator.setDefinitionParser(javaMessageGenerator.definitionParser);
 
-        generators.add(javaMessageGenerator);
-        generators.add(cSharpMessageGenerator);
-        generators.add(luaMessageGenerator);
+        DefinitionParser messageDefinitionParser = new XmlDefinitionParser();
+        javaMessageGenerator.setDefinitionParser(messageDefinitionParser);
+        cSharpMessageGenerator.setDefinitionParser(messageDefinitionParser);
+        luaMessageGenerator.setDefinitionParser(messageDefinitionParser);
 
+        javaMessageGenerator.tryGenerate(false);
+        cSharpMessageGenerator.tryGenerate(false);
+        luaMessageGenerator.tryGenerate(false);
+        luaMessageGenerator.printErrors();
+
+        DefinitionParser configDefinitionParser = new XmlDefinitionParser();
         JavaConfigGenerator javaConfigGenerator = new JavaConfigGenerator(properties);
-        javaConfigGenerator.printError = true;
         CSharpConfigGenerator cSharpConfigGenerator = new CSharpConfigGenerator(properties);
-        cSharpConfigGenerator.setDefinitionParser(javaConfigGenerator.definitionParser);
         LuaConfigGenerator luaConfigGenerator = new LuaConfigGenerator(properties);
-        luaConfigGenerator.setDefinitionParser(javaConfigGenerator.definitionParser);
 
-        generators.add(javaConfigGenerator);
-        generators.add(cSharpConfigGenerator);
-        generators.add(luaConfigGenerator);
+        javaConfigGenerator.setDefinitionParser(configDefinitionParser);
+        cSharpConfigGenerator.setDefinitionParser(configDefinitionParser);
+        luaConfigGenerator.setDefinitionParser(configDefinitionParser);
 
-        for (Generator generator : generators) {
-            generator.generate();
-        }
+        javaConfigGenerator.tryGenerate(false);
+        cSharpConfigGenerator.tryGenerate(false);
+        luaConfigGenerator.tryGenerate(false);
+        luaConfigGenerator.printErrors();
     }
 }

@@ -22,7 +22,6 @@ public class GeneratorTest {
         generateMessage();
         generateConfig();
 
-
         System.err.println("GeneratorTest耗时(ms):" + (System.currentTimeMillis() - start));
     }
 
@@ -30,8 +29,8 @@ public class GeneratorTest {
         System.err.println("DatabaseGenerator.generate()==========================");
         DatabaseGenerator databaseGenerator = new DatabaseGenerator();
         databaseGenerator.setCodePath("database\\src\\test\\java");
-        databaseGenerator.useXmlDefinitionParser("definition\\database").setPackagePrefix("quan.database");
-
+        databaseGenerator.useXmlDefinitionParser("definition\\database");
+        databaseGenerator.setPackagePrefix("quan.database");
         databaseGenerator.generate();
         System.err.println();
     }
@@ -74,7 +73,8 @@ public class GeneratorTest {
         javaConfigGenerator.setCodePath("config\\src\\test\\java");
         definitionParser.setPackagePrefix("quan.config");
         javaConfigGenerator.setDefinitionParser(definitionParser);
-        javaConfigGenerator.initConfigLoader(TableType.xlsx, "config\\excel");
+        javaConfigGenerator.setTableType(TableType.xlsx);
+        javaConfigGenerator.setTablePath("config\\excel");
         javaConfigGenerator.generate();
         System.err.println();
 
@@ -83,7 +83,8 @@ public class GeneratorTest {
         cSharpConfigGenerator.setCodePath("..\\quan.cs");
         definitionParser.setPackagePrefix("Test.Config");
         cSharpConfigGenerator.setDefinitionParser(definitionParser);
-        cSharpConfigGenerator.initConfigLoader(TableType.xlsx, "config\\excel");
+        cSharpConfigGenerator.setTableType(TableType.xlsx);
+        cSharpConfigGenerator.setTablePath("config\\excel");
         cSharpConfigGenerator.generate();
         System.err.println();
 
@@ -92,8 +93,8 @@ public class GeneratorTest {
         luaConfigGenerator.setCodePath("..\\quan.lua\\src");
         definitionParser.setPackagePrefix("test.config");
         luaConfigGenerator.setDefinitionParser(definitionParser);
-        luaConfigGenerator.initConfigLoader(TableType.xlsx, "config\\excel");
-        luaConfigGenerator.generate();
+        luaConfigGenerator.setTableType(TableType.xlsx);
+        luaConfigGenerator.setTablePath("config\\excel");
         System.err.println();
     }
 }

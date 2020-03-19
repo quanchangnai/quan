@@ -27,7 +27,7 @@ public abstract class ConfigGenerator extends Generator {
     //配置加载器用于生成常量
     protected WithDefinitionConfigLoader configLoader;
 
-    protected String tableType;
+    protected TableType tableType;
 
     protected String tablePath;
 
@@ -39,11 +39,31 @@ public abstract class ConfigGenerator extends Generator {
         if (!ready) {
             return;
         }
-        tableType = properties.getProperty(category() + ".tableType");
+
+        String tableTypeStr = properties.getProperty(category() + ".tableType");
         tablePath = properties.getProperty(category() + ".tablePath");
-        if (StringUtils.isBlank(tableType) || StringUtils.isBlank(tablePath)) {
+        if (StringUtils.isBlank(tableTypeStr) || StringUtils.isBlank(tablePath)) {
             ready = false;
+            return;
         }
+
+        try {
+            tableType = TableType.valueOf(tableTypeStr);
+        } catch (Exception e) {
+            logger.info("配置表格类型错误，可用枚举值{}", Arrays.toString(TableType.values()));
+        }
+    }
+
+    public void setTableType(String tableType) {
+        this.tableType = TableType.valueOf(tableType);
+    }
+
+    public void setTableType(TableType tableType) {
+        this.tableType = tableType;
+    }
+
+    public void setTablePath(String tablePath) {
+        this.tablePath = tablePath;
     }
 
     @Override
@@ -67,12 +87,12 @@ public abstract class ConfigGenerator extends Generator {
     }
 
     @Override
-    public void generate() {
+    public void generate(boolean printError) {
         if (!ready) {
             return;
         }
         initConfigLoader(tableType, tablePath);
-        super.generate();
+        super.generate(printError);
     }
 
     @Override
@@ -129,21 +149,10 @@ public abstract class ConfigGenerator extends Generator {
     /**
      * 初始化配置加载器，读取常量key用于常量类生成
      */
-    public void initConfigLoader(TableType tableType, String tablePath) {
-        Objects.requireNonNull(definitionParser, "必须先设置定义解析器");
+    protected void initConfigLoader(TableType tableType, String tablePath) {
+        Objects.requireNonNull(definitionParser, "定义解析器不能为空");
         configLoader = new WithDefinitionConfigLoader(tablePath);
         configLoader.setDefinitionParser(definitionParser);
         configLoader.setTableType(tableType);
-    }
-
-    public void initConfigLoader(String tableType, String tablePath) {
-        TableType tableTypeEnum;
-        try {
-            tableTypeEnum = TableType.valueOf(tableType);
-        } catch (Exception e) {
-            logger.error("表格类型错误，可用枚举值{}", Arrays.toString(TableType.values()));
-            return;
-        }
-        initConfigLoader(tableTypeEnum, tablePath);
     }
 }

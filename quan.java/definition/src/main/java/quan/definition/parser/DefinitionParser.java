@@ -54,7 +54,10 @@ public abstract class DefinitionParser {
         return category;
     }
 
-    public void setDefinitionPaths(List<String> definitionPaths) {
+    public void setDefinitionPaths(Collection<String> definitionPaths) {
+        if (definitionPaths == null) {
+            return;
+        }
         for (String path : definitionPaths) {
             path = PathUtils.currentPlatPath(path);
             this.definitionPaths.add(path);
