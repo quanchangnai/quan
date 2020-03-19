@@ -1,14 +1,11 @@
 package quan.generator.message;
 
-import org.apache.commons.cli.CommandLine;
 import quan.definition.ClassDefinition;
 import quan.definition.Language;
 import quan.definition.message.MessageDefinition;
 import quan.definition.message.MessageHeadDefinition;
-import quan.definition.parser.DefinitionParser;
-import quan.generator.util.CommandLineUtils;
 
-import java.util.Arrays;
+import java.util.Properties;
 
 /**
  * Created by quanchangnai on 2017/7/6.
@@ -41,15 +38,17 @@ public class JavaMessageGenerator extends MessageGenerator {
         classTypes.put("bytes", "byte[]");
     }
 
-    public JavaMessageGenerator(String codePath) {
-        super(codePath);
+    public JavaMessageGenerator() {
+    }
+
+    public JavaMessageGenerator(Properties properties) {
+        super(properties);
     }
 
     @Override
     protected Language supportLanguage() {
         return Language.java;
     }
-
 
     @Override
     protected void processClass(ClassDefinition classDefinition) {
@@ -62,16 +61,4 @@ public class JavaMessageGenerator extends MessageGenerator {
         super.processClass(classDefinition);
     }
 
-    public static void main(String[] args) {
-        CommandLine commandLine = CommandLineUtils.parseMessageArgs(JavaMessageGenerator.class.getSimpleName(), args);
-        if (commandLine == null) {
-            return;
-        }
-
-        JavaMessageGenerator generator = new JavaMessageGenerator(commandLine.getOptionValue(CommandLineUtils.codePath));
-        DefinitionParser definitionParser = generator.useXmlDefinitionParser(Arrays.asList(commandLine.getOptionValues(CommandLineUtils.definitionPath)), commandLine.getOptionValue(CommandLineUtils.packagePrefix));
-        definitionParser.setEnumPackagePrefix(commandLine.getOptionValue(CommandLineUtils.enumPackagePrefix));
-        generator.setRecalcIdOnConflicted(commandLine.hasOption(CommandLineUtils.recalcId));
-        generator.generate();
-    }
 }

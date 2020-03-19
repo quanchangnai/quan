@@ -1,11 +1,8 @@
 package quan.generator.config;
 
-import org.apache.commons.cli.CommandLine;
-import quan.config.TableType;
 import quan.definition.Language;
-import quan.generator.util.CommandLineUtils;
 
-import java.util.Arrays;
+import java.util.Properties;
 
 /**
  * Created by quanchangnai on 2019/7/11.
@@ -42,28 +39,16 @@ public class JavaConfigGenerator extends ConfigGenerator {
         classTypes.put("datetime", "Date");
     }
 
-    public JavaConfigGenerator(String codePath) {
-        super(codePath);
+    public JavaConfigGenerator() {
+    }
+
+    public JavaConfigGenerator(Properties properties) {
+        super(properties);
     }
 
     @Override
     protected Language supportLanguage() {
         return Language.java;
-    }
-
-    public static void main(String[] args) {
-        CommandLine commandLine = CommandLineUtils.parseConfigArgs(JavaConfigGenerator.class.getSimpleName(), args);
-        if (commandLine == null) {
-            return;
-        }
-
-        JavaConfigGenerator generator = new JavaConfigGenerator(commandLine.getOptionValue(CommandLineUtils.codePath));
-        generator.useXmlDefinitionParser(Arrays.asList(commandLine.getOptionValues(CommandLineUtils.definitionPath)), commandLine.getOptionValue(CommandLineUtils.packagePrefix))
-                .setEnumPackagePrefix(commandLine.getOptionValue(CommandLineUtils.enumPackagePrefix));
-
-        generator.initConfigLoader(commandLine.getOptionValue(CommandLineUtils.tableType), commandLine.getOptionValue(CommandLineUtils.tablePath));
-
-        generator.generate();
     }
 
 }

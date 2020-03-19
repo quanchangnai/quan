@@ -1,15 +1,12 @@
 package quan.generator.message;
 
 import freemarker.template.Template;
-import org.apache.commons.cli.CommandLine;
 import quan.definition.BeanDefinition;
 import quan.definition.ClassDefinition;
 import quan.definition.FieldDefinition;
 import quan.definition.Language;
 import quan.definition.message.MessageDefinition;
 import quan.definition.message.MessageHeadDefinition;
-import quan.definition.parser.DefinitionParser;
-import quan.generator.util.CommandLineUtils;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -24,8 +21,16 @@ public class LuaMessageGenerator extends MessageGenerator {
 
     private Template messageFactoryTemplate;
 
-    public LuaMessageGenerator(String codePath) {
-        super(codePath);
+    public LuaMessageGenerator() {
+    }
+
+    public LuaMessageGenerator(Properties properties) {
+        super(properties);
+    }
+
+    @Override
+    protected void initFreemarker() {
+        super.initFreemarker();
         try {
             messageFactoryTemplate = freemarkerCfg.getTemplate("factory." + supportLanguage() + ".ftl");
         } catch (IOException e) {
@@ -37,7 +42,6 @@ public class LuaMessageGenerator extends MessageGenerator {
     protected Language supportLanguage() {
         return Language.lua;
     }
-
 
     @Override
     protected void generate(List<ClassDefinition> classDefinitions) {
@@ -74,7 +78,7 @@ public class LuaMessageGenerator extends MessageGenerator {
             return;
         }
 
-        logger.info("生成[{}]成功", destFilePath + File.separator + fileName);
+        logger.info("生成MessageFactory[{}]成功", destFilePath + File.separator + fileName);
     }
 
     @Override
@@ -90,16 +94,4 @@ public class LuaMessageGenerator extends MessageGenerator {
         }
     }
 
-    public static void main(String[] args) {
-        CommandLine commandLine = CommandLineUtils.parseMessageArgs(LuaMessageGenerator.class.getSimpleName(), args);
-        if (commandLine == null) {
-            return;
-        }
-
-        LuaMessageGenerator generator = new LuaMessageGenerator(commandLine.getOptionValue(CommandLineUtils.codePath));
-        DefinitionParser definitionParser = generator.useXmlDefinitionParser(Arrays.asList(commandLine.getOptionValues(CommandLineUtils.definitionPath)), commandLine.getOptionValue(CommandLineUtils.packagePrefix));
-        definitionParser.setEnumPackagePrefix(commandLine.getOptionValue(CommandLineUtils.enumPackagePrefix));
-        generator.setRecalcIdOnConflicted(commandLine.hasOption(CommandLineUtils.recalcId));
-        generator.generate();
-    }
 }

@@ -1,15 +1,12 @@
 package quan.generator.database;
 
 import freemarker.template.Template;
-import org.apache.commons.cli.CommandLine;
 import quan.definition.*;
 import quan.definition.data.DataDefinition;
-import quan.definition.parser.DefinitionParser;
 import quan.generator.Generator;
-import quan.generator.util.CommandLineUtils;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.Properties;
 
 /**
  * Created by quanchangnai on 2017/7/6.
@@ -42,9 +39,16 @@ public class DatabaseGenerator extends Generator {
         classTypes.put("map", "MapField");
     }
 
-    public DatabaseGenerator(String codePath) {
-        super(codePath);
+    public DatabaseGenerator() {
+    }
 
+    public DatabaseGenerator(Properties properties) {
+        super(properties);
+    }
+
+    @Override
+    protected void initFreemarker() {
+        super.initFreemarker();
         try {
             Template dataTemplate = freemarkerCfg.getTemplate("data.ftl");
             templates.put(DataDefinition.class, dataTemplate);
@@ -81,18 +85,6 @@ public class DatabaseGenerator extends Generator {
                 dataDefinition.setKeyType(classTypes.get(fieldDefinition.getType()));
             }
         }
-    }
-
-    public static void main(String[] args) {
-        CommandLine commandLine = CommandLineUtils.parseArgs(DatabaseGenerator.class.getSimpleName(), args);
-        if (commandLine == null) {
-            return;
-        }
-
-        DatabaseGenerator generator = new DatabaseGenerator(commandLine.getOptionValue(CommandLineUtils.codePath));
-        DefinitionParser definitionParser = generator.useXmlDefinitionParser(Arrays.asList(commandLine.getOptionValues(CommandLineUtils.definitionPath)), commandLine.getOptionValue(CommandLineUtils.packagePrefix));
-        definitionParser.setEnumPackagePrefix(commandLine.getOptionValue(CommandLineUtils.enumPackagePrefix));
-        generator.generate();
     }
 
 }

@@ -2,17 +2,15 @@ package quan.generator.config;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.commons.cli.CommandLine;
 import quan.definition.BeanDefinition;
 import quan.definition.ClassDefinition;
 import quan.definition.FieldDefinition;
 import quan.definition.Language;
 import quan.definition.config.ConfigDefinition;
-import quan.generator.util.CommandLineUtils;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 /**
@@ -20,8 +18,11 @@ import java.util.stream.Collectors;
  */
 public class LuaConfigGenerator extends ConfigGenerator {
 
-    public LuaConfigGenerator(String codePath) {
-        super(codePath);
+    public LuaConfigGenerator() {
+    }
+
+    public LuaConfigGenerator(Properties properties) {
+        super(properties);
     }
 
     @Override
@@ -155,22 +156,6 @@ public class LuaConfigGenerator extends ConfigGenerator {
         }
 
         builder.append(" }");
-    }
-
-
-    public static void main(String[] args) {
-        CommandLine commandLine = CommandLineUtils.parseConfigArgs(LuaConfigGenerator.class.getSimpleName(), args);
-        if (commandLine == null) {
-            return;
-        }
-
-        LuaConfigGenerator generator = new LuaConfigGenerator(commandLine.getOptionValue(CommandLineUtils.codePath));
-        generator.useXmlDefinitionParser(Arrays.asList(commandLine.getOptionValues(CommandLineUtils.definitionPath)), commandLine.getOptionValue(CommandLineUtils.packagePrefix))
-                .setEnumPackagePrefix(commandLine.getOptionValue(CommandLineUtils.enumPackagePrefix));
-
-        generator.initConfigLoader(commandLine.getOptionValue(CommandLineUtils.tableType), commandLine.getOptionValue(CommandLineUtils.tablePath));
-
-        generator.generate();
     }
 
 }

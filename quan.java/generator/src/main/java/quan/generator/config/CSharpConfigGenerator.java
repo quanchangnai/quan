@@ -1,14 +1,12 @@
 package quan.generator.config;
 
-import org.apache.commons.cli.CommandLine;
 import quan.definition.BeanDefinition;
 import quan.definition.FieldDefinition;
 import quan.definition.Language;
 import quan.definition.config.ConstantDefinition;
 import quan.generator.util.CSharpUtils;
-import quan.generator.util.CommandLineUtils;
 
-import java.util.Arrays;
+import java.util.Properties;
 
 /**
  * Created by quanchangnai on 2019/7/11.
@@ -45,8 +43,12 @@ public class CSharpConfigGenerator extends ConfigGenerator {
         classTypes.put("datetime", "DateTime");
     }
 
-    public CSharpConfigGenerator(String codePath) {
-        super(codePath);
+    public CSharpConfigGenerator() {
+        super();
+    }
+
+    public CSharpConfigGenerator(Properties properties) {
+        super(properties);
     }
 
     @Override
@@ -72,18 +74,4 @@ public class CSharpConfigGenerator extends ConfigGenerator {
         }
     }
 
-    public static void main(String[] args) {
-        CommandLine commandLine = CommandLineUtils.parseConfigArgs(CSharpConfigGenerator.class.getSimpleName(), args);
-        if (commandLine == null) {
-            return;
-        }
-
-        CSharpConfigGenerator generator = new CSharpConfigGenerator(commandLine.getOptionValue(CommandLineUtils.codePath));
-        generator.useXmlDefinitionParser(Arrays.asList(commandLine.getOptionValues(CommandLineUtils.definitionPath)), commandLine.getOptionValue(CommandLineUtils.packagePrefix))
-                .setEnumPackagePrefix(commandLine.getOptionValue(CommandLineUtils.enumPackagePrefix));
-
-        generator.initConfigLoader(commandLine.getOptionValue(CommandLineUtils.tableType), commandLine.getOptionValue(CommandLineUtils.tablePath));
-
-        generator.generate();
-    }
 }

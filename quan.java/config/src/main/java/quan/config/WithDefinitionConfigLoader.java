@@ -96,7 +96,7 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
             return;
         }
 
-        List<String> validatedErrors = definitionParser.getValidatedErrors();
+        LinkedHashSet<String> validatedErrors = definitionParser.getValidatedErrors();
         if (!validatedErrors.isEmpty()) {
             ValidatedException validatedException = new ValidatedException(String.format("解析配置定义文件%s共发现%d条错误。", definitionParser.getDefinitionPaths(), validatedErrors.size()));
             validatedException.addErrors(validatedErrors);

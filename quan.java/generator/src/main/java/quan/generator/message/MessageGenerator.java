@@ -20,9 +20,18 @@ public abstract class MessageGenerator extends Generator {
     //ID冲突时重新计算
     private boolean recalcIdOnConflicted = false;
 
-    public MessageGenerator(String codePath) {
-        super(codePath);
+    public MessageGenerator() {
+    }
 
+    public MessageGenerator(Properties properties) {
+        super(properties);
+        String recalcId = properties.getProperty(category() + ".recalcId");
+        this.setRecalcIdOnConflicted(recalcId != null && recalcId.equals("true"));
+    }
+
+    @Override
+    protected void initFreemarker() {
+        super.initFreemarker();
         try {
             Template messageTemplate = freemarkerCfg.getTemplate("message." + supportLanguage() + ".ftl");
             templates.put(MessageDefinition.class, messageTemplate);
@@ -32,7 +41,6 @@ public abstract class MessageGenerator extends Generator {
             logger.error("", e);
         }
     }
-
 
     @Override
     public final DefinitionCategory category() {
@@ -48,8 +56,8 @@ public abstract class MessageGenerator extends Generator {
     }
 
     @Override
-    protected void parseDefinition() {
-        super.parseDefinition();
+    protected void parseDefinitions() {
+        super.parseDefinitions();
         calcMessageId();
     }
 
@@ -96,4 +104,5 @@ public abstract class MessageGenerator extends Generator {
             calcMessageId(allConflictedMessages, end, end + 10000);
         }
     }
+
 }

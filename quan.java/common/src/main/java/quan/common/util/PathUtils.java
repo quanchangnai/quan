@@ -1,5 +1,7 @@
 package quan.common.util;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
@@ -15,6 +17,9 @@ public class PathUtils {
      * 转换为当前平台路径
      */
     public static String currentPlatPath(String path) {
+        if (StringUtils.isBlank(path)) {
+            return "";
+        }
         return path.replace("/", File.separator).replace("\\", File.separator);
     }
 

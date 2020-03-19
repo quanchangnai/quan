@@ -4,7 +4,6 @@ import quan.config.TableType;
 import quan.definition.parser.DefinitionParser;
 import quan.definition.parser.XmlDefinitionParser;
 import quan.generator.config.CSharpConfigGenerator;
-import quan.generator.config.ConfigGenerator;
 import quan.generator.config.JavaConfigGenerator;
 import quan.generator.config.LuaConfigGenerator;
 import quan.generator.database.DatabaseGenerator;
@@ -17,18 +16,22 @@ import quan.generator.message.LuaMessageGenerator;
  */
 public class GeneratorTest {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         long start = System.currentTimeMillis();
         generateData();
         generateMessage();
         generateConfig();
+
+
         System.err.println("GeneratorTest耗时(ms):" + (System.currentTimeMillis() - start));
     }
 
     private static void generateData() {
         System.err.println("DatabaseGenerator.generate()==========================");
-        DatabaseGenerator databaseGenerator = new DatabaseGenerator("database\\src\\test\\java");
-        databaseGenerator.useXmlDefinitionParser("definition\\database", "quan.database");
+        DatabaseGenerator databaseGenerator = new DatabaseGenerator();
+        databaseGenerator.setCodePath("database\\src\\test\\java");
+        databaseGenerator.useXmlDefinitionParser("definition\\database").setPackagePrefix("quan.database");
+
         databaseGenerator.generate();
         System.err.println();
     }
@@ -38,21 +41,24 @@ public class GeneratorTest {
         definitionParser.setDefinitionPath("definition\\message");
 
         System.err.println("JavaMessageGenerator.generate()==========================");
-        JavaMessageGenerator javaMessageGenerator = new JavaMessageGenerator("message\\src\\test\\java");
+        JavaMessageGenerator javaMessageGenerator = new JavaMessageGenerator();
+        javaMessageGenerator.setCodePath("message\\src\\test\\java");
         definitionParser.setPackagePrefix("quan.message");
         javaMessageGenerator.setDefinitionParser(definitionParser);
         javaMessageGenerator.generate();
         System.err.println();
 
         System.err.println("CSharpMessageGenerator.generate()==========================");
-        CSharpMessageGenerator cSharpMessageGenerator = new CSharpMessageGenerator("..\\quan.cs");
+        CSharpMessageGenerator cSharpMessageGenerator = new CSharpMessageGenerator();
+        cSharpMessageGenerator.setCodePath("..\\quan.cs");
         definitionParser.setPackagePrefix("Test.Message");
         cSharpMessageGenerator.setDefinitionParser(definitionParser);
         cSharpMessageGenerator.generate();
         System.err.println();
 
         System.err.println("LuaMessageGenerator.generate()==========================");
-        LuaMessageGenerator luaMessageGenerator = new LuaMessageGenerator("..\\quan.lua\\src");
+        LuaMessageGenerator luaMessageGenerator = new LuaMessageGenerator();
+        luaMessageGenerator.setCodePath("..\\quan.lua\\src");
         definitionParser.setPackagePrefix("test.message");
         luaMessageGenerator.setDefinitionParser(definitionParser);
         luaMessageGenerator.generate();
@@ -64,7 +70,8 @@ public class GeneratorTest {
         definitionParser.setDefinitionPath("definition\\config");
 
         System.err.println("JavaConfigGenerator.generate()==========================");
-        JavaConfigGenerator javaConfigGenerator = new JavaConfigGenerator("config\\src\\test\\java");
+        JavaConfigGenerator javaConfigGenerator = new JavaConfigGenerator();
+        javaConfigGenerator.setCodePath("config\\src\\test\\java");
         definitionParser.setPackagePrefix("quan.config");
         javaConfigGenerator.setDefinitionParser(definitionParser);
         javaConfigGenerator.initConfigLoader(TableType.xlsx, "config\\excel");
@@ -72,7 +79,8 @@ public class GeneratorTest {
         System.err.println();
 
         System.err.println("CSharpConfigGenerator.generate()==========================");
-        CSharpConfigGenerator cSharpConfigGenerator = new CSharpConfigGenerator("..\\quan.cs");
+        CSharpConfigGenerator cSharpConfigGenerator = new CSharpConfigGenerator();
+        cSharpConfigGenerator.setCodePath("..\\quan.cs");
         definitionParser.setPackagePrefix("Test.Config");
         cSharpConfigGenerator.setDefinitionParser(definitionParser);
         cSharpConfigGenerator.initConfigLoader(TableType.xlsx, "config\\excel");
@@ -80,7 +88,8 @@ public class GeneratorTest {
         System.err.println();
 
         System.err.println("LuaConfigGenerator.generate()==========================");
-        LuaConfigGenerator luaConfigGenerator = new LuaConfigGenerator("..\\quan.lua\\src");
+        LuaConfigGenerator luaConfigGenerator = new LuaConfigGenerator();
+        luaConfigGenerator.setCodePath("..\\quan.lua\\src");
         definitionParser.setPackagePrefix("test.config");
         luaConfigGenerator.setDefinitionParser(definitionParser);
         luaConfigGenerator.initConfigLoader(TableType.xlsx, "config\\excel");

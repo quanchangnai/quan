@@ -130,8 +130,8 @@ public abstract class DefinitionParser {
         validatedErrors.add(error);
     }
 
-    public List<String> getValidatedErrors() {
-        return new ArrayList<>(validatedErrors);
+    public LinkedHashSet<String> getValidatedErrors() {
+        return validatedErrors;
     }
 
     protected abstract String definitionFileType();

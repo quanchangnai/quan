@@ -61,7 +61,7 @@ public abstract class ConfigReader {
             Class<Config> configClass = (Class<Config>) Class.forName(configDefinition.getFullName(Language.java));
             prototype = configClass.getDeclaredConstructor(JSONObject.class).newInstance(new JSONObject());
         } catch (Exception e) {
-//            logger.error("实例化配置类[{}]失败", configDefinition.getFullName(), e);
+//            logger.error("实例化配置类[{}]失败", configDefinition.getFullName(Language.java), e);
         }
     }
 

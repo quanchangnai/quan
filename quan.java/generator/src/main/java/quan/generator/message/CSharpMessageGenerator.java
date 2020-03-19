@@ -1,17 +1,14 @@
 package quan.generator.message;
 
-import org.apache.commons.cli.CommandLine;
 import quan.definition.BeanDefinition;
 import quan.definition.ClassDefinition;
 import quan.definition.FieldDefinition;
 import quan.definition.Language;
 import quan.definition.message.MessageDefinition;
 import quan.definition.message.MessageHeadDefinition;
-import quan.definition.parser.DefinitionParser;
 import quan.generator.util.CSharpUtils;
-import quan.generator.util.CommandLineUtils;
 
-import java.util.Arrays;
+import java.util.Properties;
 
 /**
  * Created by quanchangnai on 2017/7/6.
@@ -44,8 +41,11 @@ public class CSharpMessageGenerator extends MessageGenerator {
         classTypes.put("bytes", "byte[]");
     }
 
-    public CSharpMessageGenerator(String codePath) {
-        super(codePath);
+    public CSharpMessageGenerator() {
+    }
+
+    public CSharpMessageGenerator(Properties properties) {
+        super(properties);
     }
 
     @Override
@@ -69,16 +69,4 @@ public class CSharpMessageGenerator extends MessageGenerator {
         CSharpUtils.processBeanFieldImports(beanDefinition, fieldDefinition);
     }
 
-    public static void main(String[] args) {
-        CommandLine commandLine = CommandLineUtils.parseMessageArgs(CSharpMessageGenerator.class.getSimpleName(), args);
-        if (commandLine == null) {
-            return;
-        }
-
-        CSharpMessageGenerator generator = new CSharpMessageGenerator(commandLine.getOptionValue(CommandLineUtils.codePath));
-        DefinitionParser definitionParser = generator.useXmlDefinitionParser(Arrays.asList(commandLine.getOptionValues(CommandLineUtils.definitionPath)), commandLine.getOptionValue(CommandLineUtils.packagePrefix));
-        definitionParser.setEnumPackagePrefix(commandLine.getOptionValue(CommandLineUtils.enumPackagePrefix));
-        generator.setRecalcIdOnConflicted(commandLine.hasOption(CommandLineUtils.recalcId));
-        generator.generate();
-    }
 }

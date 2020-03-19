@@ -2,6 +2,7 @@ package quan.generator.config;
 
 import com.alibaba.fastjson.JSONObject;
 import freemarker.template.Template;
+import org.apache.commons.lang3.StringUtils;
 import quan.config.TableType;
 import quan.config.WithDefinitionConfigLoader;
 import quan.definition.BeanDefinition;
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Properties;
 
 /**
  * Created by quanchangnai on 2019/7/11.
@@ -25,9 +27,28 @@ public abstract class ConfigGenerator extends Generator {
     //配置加载器用于生成常量
     protected WithDefinitionConfigLoader configLoader;
 
-    public ConfigGenerator(String codePath) {
-        super(codePath);
+    protected String tableType;
 
+    protected String tablePath;
+
+    public ConfigGenerator() {
+    }
+
+    public ConfigGenerator(Properties properties) {
+        super(properties);
+        if (!ready) {
+            return;
+        }
+        tableType = properties.getProperty(category() + ".tableType");
+        tablePath = properties.getProperty(category() + ".tablePath");
+        if (StringUtils.isBlank(tableType) || StringUtils.isBlank(tablePath)) {
+            ready = false;
+        }
+    }
+
+    @Override
+    protected void initFreemarker() {
+        super.initFreemarker();
         try {
             Template configTemplate = freemarkerCfg.getTemplate("config." + supportLanguage() + ".ftl");
             Template constantTemplate = freemarkerCfg.getTemplate("constant." + supportLanguage() + ".ftl");
@@ -46,6 +67,15 @@ public abstract class ConfigGenerator extends Generator {
     }
 
     @Override
+    public void generate() {
+        if (!ready) {
+            return;
+        }
+        initConfigLoader(tableType, tablePath);
+        super.generate();
+    }
+
+    @Override
     protected boolean support(ClassDefinition classDefinition) {
         if (classDefinition instanceof ConfigDefinition) {
             return true;
@@ -60,7 +90,7 @@ public abstract class ConfigGenerator extends Generator {
     protected void generate(ClassDefinition classDefinition) {
         if (configLoader != null && classDefinition instanceof ConstantDefinition) {
             ConstantDefinition constantDefinition = (ConstantDefinition) classDefinition;
-            List<JSONObject> configJsons = configLoader.loadJsons(constantDefinition.getConfigDefinition(),false);
+            List<JSONObject> configJsons = configLoader.loadJsons(constantDefinition.getConfigDefinition(), false);
             constantDefinition.setConfigs(configJsons);
         }
         super.generate(classDefinition);
