@@ -43,16 +43,16 @@ public class ItemEntity extends Entity {
     public JSONObject encode() {
         JSONObject json = new JSONObject();
 
-        json.put("id" , this.id.getValue());
-        json.put("name" , this.name.getValue());
+        json.put("id", this.id.getValue());
+        json.put("name", this.name.getValue());
 
         return json;
     }
 
     @Override
     public void decode(JSONObject json) {
-        this.id.setValue(json.getIntValue("id" ));
-        this.name.setValue(json.getOrDefault("name" , "" ).toString());
+        this.id.setValue(json.getIntValue("id"));
+        this.name.setValue(json.getOrDefault("name", "").toString());
     }
 
     @Override

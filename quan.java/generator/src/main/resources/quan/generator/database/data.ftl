@@ -176,7 +176,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
         <#else>
         $${field.name}.addAll(this.${field.name});
         </#if>
-        json.put("${field.name}" , $${field.name});
+        json.put("${field.name}", $${field.name});
         <#if field_has_next && (fields[field_index+1].enumType || fields[field_index+1].primitiveType) >
 
         </#if>
@@ -192,19 +192,19 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
             $${field.name}.put(String.valueOf($${field.name}$Key), this.${field.name}.get($${field.name}$Key));
         </#if>
         }
-        json.put("${field.name}" , $${field.name});
+        json.put("${field.name}", $${field.name});
         <#if field_has_next && (fields[field_index+1].enumType || fields[field_index+1].primitiveType) >
 
         </#if>
     <#elseif field.builtinType || field.enumType>
-        json.put("${field.name}" , this.${field.name}.getValue());
+        json.put("${field.name}", this.${field.name}.getValue());
     <#else>
         <#if field_index gt 0 >
 
         </#if>
         ${field.type} $${field.name} = this.${field.name}.getValue();
         if ($${field.name} != null) {
-            json.put("${field.name}" , $${field.name}.encode());
+            json.put("${field.name}", $${field.name}.encode());
         }
         <#if field_has_next && (fields[field_index+1].enumType || fields[field_index+1].primitiveType) >
 
@@ -225,7 +225,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
         <#if field_index gt 0 >
 
         </#if>
-        JSONArray $${field.name}$1 = json.getJSONArray("${field.name}" );
+        JSONArray $${field.name}$1 = json.getJSONArray("${field.name}");
         if ($${field.name}$1 != null) {
             PVector<${field.classValueType}> $${field.name}$2 = Empty.vector();
             for (int i = 0; i < $${field.name}$1.size(); i++) {
@@ -246,7 +246,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
         <#if field_index gt 0 >
 
         </#if>
-        JSONArray $${field.name}$1 = json.getJSONArray("${field.name}" );
+        JSONArray $${field.name}$1 = json.getJSONArray("${field.name}");
         if ($${field.name}$1 != null) {
             PSet<${field.classValueType}> $${field.name}$2 = Empty.set();
             for (int i = 0; i < $${field.name}$1.size(); i++) {
@@ -267,7 +267,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
         <#if field_index gt 0 >
 
         </#if>
-        JSONObject $${field.name}$1 = json.getJSONObject("${field.name}" );
+        JSONObject $${field.name}$1 = json.getJSONObject("${field.name}");
         if ($${field.name}$1 != null) {
             PMap<${field.classKeyType}, ${field.classValueType}> $${field.name}$2 = Empty.map();
             for (String $${field.name}$Key : $${field.name}$1.keySet()) {
@@ -285,16 +285,16 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
 
         </#if>
     <#elseif field.type=="int" || field.enumType>
-        this.${field.name}.setValue(json.getIntValue("${field.name}" ));
+        this.${field.name}.setValue(json.getIntValue("${field.name}"));
     <#elseif field.type=="string">
-        this.${field.name}.setValue(json.getOrDefault("${field.name}" , "" ).toString());
+        this.${field.name}.setValue(json.getOrDefault("${field.name}", "").toString());
     <#elseif field.builtinType>
-        this.${field.name}.setValue(json.get${field.classType}Value("${field.name}" ));
+        this.${field.name}.setValue(json.get${field.classType}Value("${field.name}"));
     <#else>
         <#if field_index gt 0 >
 
         </#if>
-        JSONObject $${field.name} = json.getJSONObject("${field.name}" );
+        JSONObject $${field.name} = json.getJSONObject("${field.name}");
         if ($${field.name} != null) {
             ${field.classType} $${field.name}$Value = this.${field.name}.getValue();
             if ($${field.name}$Value == null) {
