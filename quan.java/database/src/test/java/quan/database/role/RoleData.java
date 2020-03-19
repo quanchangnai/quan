@@ -361,9 +361,9 @@ public class RoleData extends Data<Long> {
 
     public synchronized static void setTable(Table<Long, RoleData> table) {
         if (_table != null && _table.isWorkable()) {
-            throw new IllegalStateException("数据已设置缓存表" );
+            throw new IllegalStateException("数据已设置缓存表");
         }
-        Objects.requireNonNull(table, "参数[table]不能为空" );
+        Objects.requireNonNull(table, "参数[table]不能为空");
         table.checkWorkable();
         _table = table;
     }
@@ -375,11 +375,11 @@ public class RoleData extends Data<Long> {
 
         Database database = Database.getDefault();
         if (database == null) {
-            throw new IllegalStateException("没有默认数据库" );
+            throw new IllegalStateException("没有默认数据库");
         }
 
         if (_table == null) {
-            _table = new Table<>("RoleData" , RoleData::new);
+            _table = new Table<>("RoleData", RoleData::new);
         }
         database.registerTable(_table);
     }
