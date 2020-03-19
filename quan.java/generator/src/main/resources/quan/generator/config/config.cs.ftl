@@ -39,7 +39,7 @@ namespace ${getFullPackageName("cs")}
     <#elseif  field.timeType>
         public readonly ${field.basicType} ${field.name?cap_first};
 
-        public readonly string ${field.name?cap_first}_Str;
+        public readonly string ${field.name?cap_first}_;
     <#else >
         public readonly ${field.basicType} ${field.name?cap_first};
     </#if>
@@ -96,7 +96,7 @@ namespace ${getFullPackageName("cs")}
         </#if>
     <#elseif field.timeType>
             ${field.name?cap_first} = ToDateTime(json["${field.name}"]?.Value<long>() ?? default);
-            ${field.name?cap_first}_Str = json["${field.name}$Str"]?.Value<string>() ?? "";
+            ${field.name?cap_first}_ = json["${field.name}_"]?.Value<string>() ?? "";
     <#elseif field.type=="string">
             ${field.name?cap_first} = json["${field.name}"]?.Value<${field.type}>() ?? "";
     <#elseif field.builtinType>
@@ -130,6 +130,8 @@ namespace ${getFullPackageName("cs")}
                 </#if>
                 <#if field.type == "string">
                    <#lt>${field.name?cap_first}='" + ${field.name?cap_first} + '\'' +
+                <#elseif field.timeType>
+                    <#lt>${field.name?cap_first}='" + ${field.name?cap_first}_ + '\'' +
                 <#else>
                    <#lt>${field.name?cap_first}=" + ${field.name?cap_first}.ToString2() +
                 </#if>

@@ -38,7 +38,7 @@ public class ItemConfig extends Config {
     protected final Date effectiveTime;
 
     //生效时间
-    protected final String effectiveTime$Str;
+    protected final String effectiveTime_;
 
 
     public ItemConfig(JSONObject json) {
@@ -86,7 +86,7 @@ public class ItemConfig extends Config {
         this.map = Collections.unmodifiableMap($map$2);
 
         this.effectiveTime = json.getDate("effectiveTime");
-        this.effectiveTime$Str = json.getOrDefault("effectiveTime$Str", "").toString();
+        this.effectiveTime_ = json.getOrDefault("effectiveTime_", "").toString();
     }
 
     /**
@@ -155,8 +155,8 @@ public class ItemConfig extends Config {
     /**
      * 生效时间
      */
-    public final String getEffectiveTime$Str() {
-        return effectiveTime$Str;
+    public final String getEffectiveTime_() {
+        return effectiveTime_;
     }
 
 
@@ -176,7 +176,7 @@ public class ItemConfig extends Config {
                 ",list=" + list +
                 ",set=" + set +
                 ",map=" + map +
-                ",effectiveTime='" + effectiveTime$Str + '\'' +
+                ",effectiveTime='" + effectiveTime_ + '\'' +
                 '}';
 
     }

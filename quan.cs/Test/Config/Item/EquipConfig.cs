@@ -46,7 +46,7 @@ namespace Test.Config.Item
                    ",List=" + List.ToString2() +
                    ",Set=" + Set.ToString2() +
                    ",Map=" + Map.ToString2() +
-                   ",EffectiveTime=" + EffectiveTime.ToString2() +
+                   ",EffectiveTime='" + EffectiveTime_ + '\'' +
                    ",Position=" + Position.ToString2() +
                    ",Color=" + Color.ToString2() +
                    '}';

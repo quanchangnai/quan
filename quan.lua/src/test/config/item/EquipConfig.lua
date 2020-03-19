@@ -8,8 +8,8 @@ local Config = require("quan.config.Config")
 
 ---所有EquipConfig
 local configs = {
-    { id = 3, key = "", name = "装备1", type = 2, reward = { itemId = 2, itemNum = 11 }, list = { 44, 223, 342, 45 }, set = { 22, 23, 456 }, map = { [43] = 45 }, effectiveTime = 1565073325, effectiveTime_Str = "2019.08.06 14.35.25", position = 1, color = 2 },
-    { id = 5, key = "", name = "装备2", type = 2, reward = { itemId = 6, itemNum = 11 }, list = { 44, 223, 342, 45 }, set = {  }, map = { [43] = 45 }, effectiveTime = 1565152435, effectiveTime_Str = "2019.08.07 12.33.55", position = 3, color = 2 },
+    { id = 3, key = "", name = "装备1", type = 2, reward = { itemId = 2, itemNum = 11 }, list = { 44, 223, 342, 45 }, set = { 22, 23, 456 }, map = { [43] = 45 }, effectiveTime = 1565073325000, effectiveTime_ = "2019.08.06 14.35.25", position = 1, color = 2 },
+    { id = 5, key = "", name = "装备2", type = 2, reward = { itemId = 6, itemNum = 11 }, list = { 44, 223, 342, 45 }, set = {  }, map = { [43] = 45 }, effectiveTime = 1565152435000, effectiveTime_ = "2019.08.07 12.33.55", position = 3, color = 2 },
 }
 
 ---索引:ID

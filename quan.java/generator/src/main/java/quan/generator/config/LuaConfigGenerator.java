@@ -80,9 +80,9 @@ public class LuaConfigGenerator extends ConfigGenerator {
                 builder.append(object.getOrDefault(field.getName(), "0"));
             } else if (field.isTimeType()) {
                 Date date = object.getDate(field.getName());
-                builder.append(date != null ? date.getTime() / 1000 : 0);
-                builder.append(", ").append(field.getName() + "_Str").append(" = ");
-                builder.append("\"").append(object.getOrDefault(field.getName() + "$Str", "")).append("\"");
+                builder.append(date != null ? date.getTime() : 0);
+                builder.append(", ").append(field.getName() + "_").append(" = ");
+                builder.append("\"").append(object.getOrDefault(field.getName() + "_", "")).append("\"");
             } else if (field.getType().equals("map")) {
                 mapLuaString(builder, field, object.getJSONObject(field.getName()));
             } else if (field.getType().equals("list") || field.getType().equals("set")) {

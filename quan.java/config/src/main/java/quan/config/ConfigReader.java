@@ -204,7 +204,7 @@ public abstract class ConfigReader {
 
         //时间类型字段字符串格式
         if (fieldDefinition.isTimeType() && fieldValue instanceof Date) {
-            rowJson.put(fieldName + "$Str", converter.convertTimeType(fieldDefinition.getType(), (Date) fieldValue));
+            rowJson.put(fieldName + "_", converter.convertTimeType(fieldDefinition.getType(), (Date) fieldValue));
         }
     }
 

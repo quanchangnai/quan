@@ -17,7 +17,7 @@ public class QuestTargetConfig extends Config {
     protected final Date noon;
 
     //中午
-    protected final String noon$Str;
+    protected final String noon_;
 
 
     public QuestTargetConfig(JSONObject json) {
@@ -25,7 +25,7 @@ public class QuestTargetConfig extends Config {
 
         this.id = json.getIntValue("id");
         this.noon = json.getDate("noon");
-        this.noon$Str = json.getOrDefault("noon$Str", "").toString();
+        this.noon_ = json.getOrDefault("noon_", "").toString();
     }
 
     /**
@@ -45,8 +45,8 @@ public class QuestTargetConfig extends Config {
     /**
      * 中午
      */
-    public final String getNoon$Str() {
-        return noon$Str;
+    public final String getNoon_() {
+        return noon_;
     }
 
 
@@ -59,7 +59,7 @@ public class QuestTargetConfig extends Config {
     public String toString() {
         return "QuestTargetConfig{" +
                 "id=" + id +
-                ",noon='" + noon$Str + '\'' +
+                ",noon='" + noon_ + '\'' +
                 '}';
 
     }

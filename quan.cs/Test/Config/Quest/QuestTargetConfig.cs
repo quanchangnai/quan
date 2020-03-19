@@ -28,7 +28,7 @@ namespace Test.Config.Quest
         /// </summary>
         public readonly DateTime Noon;
 
-        public readonly string Noon_Str;
+        public readonly string Noon_;
 
 
         public QuestTargetConfig(JObject json) : base(json)
@@ -36,7 +36,7 @@ namespace Test.Config.Quest
             Id = json["id"]?.Value<int>() ?? default;
             Name = json["name"]?.Value<string>() ?? "";
             Noon = ToDateTime(json["noon"]?.Value<long>() ?? default);
-            Noon_Str = json["noon$Str"]?.Value<string>() ?? "";
+            Noon_ = json["noon_"]?.Value<string>() ?? "";
         }
 
         protected override ConfigBase Create(JObject json)
@@ -50,7 +50,7 @@ namespace Test.Config.Quest
             return "QuestTargetConfig{" +
                    "Id=" + Id.ToString2() +
                    ",Name='" + Name + '\'' +
-                   ",Noon=" + Noon.ToString2() +
+                   ",Noon='" + Noon_ + '\'' +
                    '}';
         }
 

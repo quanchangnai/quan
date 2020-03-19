@@ -58,7 +58,7 @@ namespace Test.Config.Item
         /// </summary>
         public readonly DateTime EffectiveTime;
 
-        public readonly string EffectiveTime_Str;
+        public readonly string EffectiveTime_;
 
 
         public ItemConfig(JObject json) : base(json)
@@ -103,7 +103,7 @@ namespace Test.Config.Item
             Map = map2;
 
             EffectiveTime = ToDateTime(json["effectiveTime"]?.Value<long>() ?? default);
-            EffectiveTime_Str = json["effectiveTime$Str"]?.Value<string>() ?? "";
+            EffectiveTime_ = json["effectiveTime_"]?.Value<string>() ?? "";
         }
 
         protected override ConfigBase Create(JObject json)
@@ -123,7 +123,7 @@ namespace Test.Config.Item
                    ",List=" + List.ToString2() +
                    ",Set=" + Set.ToString2() +
                    ",Map=" + Map.ToString2() +
-                   ",EffectiveTime=" + EffectiveTime.ToString2() +
+                   ",EffectiveTime='" + EffectiveTime_ + '\'' +
                    '}';
         }
 
