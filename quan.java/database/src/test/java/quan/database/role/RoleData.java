@@ -92,7 +92,7 @@ public class RoleData extends Data<Long> {
      * 角色类型
      */
     public RoleData setRoleType(RoleType roleType) {
-        this.roleType.setLogValue(roleType.getValue(), _getRoot());
+        this.roleType.setLogValue(roleType.value(), _getRoot());
         return this;
     }
 

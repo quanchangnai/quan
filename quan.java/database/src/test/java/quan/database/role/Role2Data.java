@@ -144,7 +144,7 @@ public class Role2Data extends Data<Long> {
     }
 
     public Role2Data setItemType(ItemType itemType) {
-        this.itemType.setLogValue(itemType.getValue(), _getRoot());
+        this.itemType.setLogValue(itemType.value(), _getRoot());
         return this;
     }
 

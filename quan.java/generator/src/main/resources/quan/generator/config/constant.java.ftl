@@ -27,17 +27,17 @@ public enum ${name} {
 </#list>
 <#if valueField.type=="map">
 
-    public ${valueField.basicType}<${valueField.keyType},${valueField.keyType}> getValue() {
+    public ${valueField.basicType}<${valueField.keyType},${valueField.keyType}> value() {
         return ${configDefinition.name}.getBy${keyField.name?cap_first}(name()").get${valueField.name?cap_first}();
     }
     <#elseif valueField.type=="list" || valueField.type=="set">
 
-    public ${valueField.basicType}<${valueField.valueType}> getValue() {
+    public ${valueField.basicType}<${valueField.valueType}> value() {
         return ${configDefinition.name}.getBy${keyField.name?cap_first}(name()).get${valueField.name?cap_first}();
     }
     <#else>
 
-    public ${valueField.basicType} getValue() {
+    public ${valueField.basicType} value() {
         return ${configDefinition.name}.getBy${keyField.name?cap_first}(name()).get${valueField.name?cap_first}();
     }
     </#if>

@@ -151,7 +151,7 @@ public class RoleInfo extends Bean {
 
         buffer.writeLong(this.id);
         buffer.writeString(this.name);
-        buffer.writeInt(this.type == null ? 0 : this.type.getValue());
+        buffer.writeInt(this.type == null ? 0 : this.type.value());
         buffer.writeBool(this.b);
         buffer.writeShort(this.s);
         buffer.writeInt(this.i);

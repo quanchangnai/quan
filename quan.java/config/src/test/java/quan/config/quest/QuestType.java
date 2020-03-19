@@ -23,7 +23,7 @@ public enum QuestType {
         this.value = value;
     }
 
-    public int getValue() {
+    public int value() {
         return value;
     }
 

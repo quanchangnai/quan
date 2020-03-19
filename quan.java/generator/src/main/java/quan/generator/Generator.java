@@ -2,7 +2,6 @@ package quan.generator;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
-import freemarker.template.TemplateExceptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.common.util.PathUtils;
@@ -36,22 +35,19 @@ public abstract class Generator {
     protected Map<Class<? extends ClassDefinition>, Template> templates = new HashMap<>();
 
     public Generator(String codePath) {
-        Configuration freemarkerCfg = new Configuration(Configuration.VERSION_2_3_23);
+        this.codePath = PathUtils.currentPlatPath(codePath);
+
+        freemarkerCfg = new Configuration(Configuration.VERSION_2_3_23);
         freemarkerCfg.setClassForTemplateLoading(Generator.class, "");
         freemarkerCfg.setDefaultEncoding("UTF-8");
-        freemarkerCfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
 
-        this.codePath = PathUtils.currentPlatPath(codePath);
-        this.freemarkerCfg = freemarkerCfg;
-
-        Template enumTemplate;
         try {
-            enumTemplate = freemarkerCfg.getTemplate("enum." + supportLanguage() + ".ftl");
+            Template enumTemplate = freemarkerCfg.getTemplate("enum." + supportLanguage() + ".ftl");
+            templates.put(EnumDefinition.class, enumTemplate);
         } catch (IOException e) {
             logger.error("", e);
             return;
         }
-        templates.put(EnumDefinition.class, enumTemplate);
 
         freemarkerCfg.setClassForTemplateLoading(getClass(), "");
     }

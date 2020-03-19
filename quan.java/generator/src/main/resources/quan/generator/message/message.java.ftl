@@ -160,7 +160,7 @@ public<#if definitionType ==9> abstract</#if> class ${name} extends <#if definit
     <#elseif field.builtinType>
         buffer.write${field.type?cap_first}(this.${field.name});
     <#elseif field.enumType>
-        buffer.writeInt(this.${field.name} == null ? 0 : this.${field.name}.getValue());
+        buffer.writeInt(this.${field.name} == null ? 0 : this.${field.name}.value());
     <#elseif field.optional>
         <#if field_index gt 0>
 

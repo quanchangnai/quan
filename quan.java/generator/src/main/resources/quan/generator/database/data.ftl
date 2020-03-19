@@ -116,7 +116,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
      */
     </#if>
     public ${name} set${field.name?cap_first}(${field.basicType} ${field.name}) {
-        this.${field.name}.setLogValue(${field.name}.getValue(), _getRoot());
+        this.${field.name}.setLogValue(${field.name}.value(), _getRoot());
         return this;
     }
 
