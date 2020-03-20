@@ -55,11 +55,8 @@ public abstract class DefinitionParser {
     }
 
     public void setDefinitionPaths(Collection<String> definitionPaths) {
-        if (definitionPaths == null) {
-            return;
-        }
         for (String path : definitionPaths) {
-            path = PathUtils.currentPlatPath(path);
+            path = PathUtils.toPlatPath(path);
             this.definitionPaths.add(path);
             Set<File> files = PathUtils.listFiles(new File(path), definitionFileType());
             definitionFiles.addAll(files);

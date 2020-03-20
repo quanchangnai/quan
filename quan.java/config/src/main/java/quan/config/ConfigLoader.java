@@ -38,7 +38,7 @@ public abstract class ConfigLoader {
 
     public ConfigLoader(String tablePath) {
         Objects.requireNonNull(tablePath, "配置表路径不能为空");
-        this.tablePath = PathUtils.currentPlatPath(tablePath);
+        this.tablePath = PathUtils.toPlatPath(tablePath);
     }
 
     public LoadMode getLoadMode() {

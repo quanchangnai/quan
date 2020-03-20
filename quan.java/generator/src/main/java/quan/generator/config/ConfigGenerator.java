@@ -88,11 +88,20 @@ public abstract class ConfigGenerator extends Generator {
 
     @Override
     public void generate(boolean printError) {
-        if (!ready) {
-            return;
-        }
+        check();
         initConfigLoader(tableType, tablePath);
         super.generate(printError);
+    }
+
+    @Override
+    protected void check() {
+        super.check();
+        if (tableType == null) {
+            throw new IllegalArgumentException(category() + "表格类型[tableType]不能为空");
+        }
+        if (tablePath == null) {
+            throw new IllegalArgumentException(category() + "表格文件路径[tablePath]不能为空");
+        }
     }
 
     @Override

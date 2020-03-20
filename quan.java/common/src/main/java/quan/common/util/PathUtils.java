@@ -11,12 +11,10 @@ import java.util.Set;
  */
 public class PathUtils {
 
-//    private static final Logger logger = LoggerFactory.getLogger(PathUtils.class);
-
     /**
      * 转换为当前平台路径
      */
-    public static String currentPlatPath(String path) {
+    public static String toPlatPath(String path) {
         if (StringUtils.isBlank(path)) {
             return "";
         }

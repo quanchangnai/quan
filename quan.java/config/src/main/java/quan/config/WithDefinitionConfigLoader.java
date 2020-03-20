@@ -168,7 +168,7 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
         }
 
         Objects.requireNonNull(path, "输出目录不能为空");
-        File pathFile = new File(PathUtils.currentPlatPath(path));
+        File pathFile = new File(PathUtils.toPlatPath(path));
         if (!pathFile.exists() && !pathFile.mkdirs()) {
             logger.error("输出目录[{}]创建失败", path);
             return;

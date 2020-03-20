@@ -31,7 +31,7 @@ public abstract class Generator {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    protected Set<String> definitionPaths;
+    protected Set<String> definitionPaths = new HashSet<>();
 
     protected String packagePrefix;
 
@@ -57,7 +57,7 @@ public abstract class Generator {
             ready = false;
             return;
         }
-        definitionPaths = new HashSet<>(Arrays.asList(definitionPath.split(",")));
+        definitionPaths.addAll(Arrays.asList(definitionPath.split(",")));
 
         String codePath = properties.getProperty(category() + "." + supportLanguage() + ".codePath");
         if (StringUtils.isBlank(codePath)) {
@@ -73,15 +73,17 @@ public abstract class Generator {
 
 
     public void setDefinitionPath(Collection<String> definitionPaths) {
-        this.definitionPaths = new HashSet<>(definitionPaths);
+        this.definitionPaths.clear();
+        this.definitionPaths.addAll(definitionPaths);
     }
 
     public void setDefinitionPath(String definitionPath) {
-        this.definitionPaths = Collections.singleton(definitionPath);
+        this.definitionPaths.clear();
+        this.definitionPaths.add(definitionPath);
     }
 
     public void setCodePath(String codePath) {
-        this.codePath = PathUtils.currentPlatPath(codePath);
+        this.codePath = PathUtils.toPlatPath(codePath);
     }
 
     public void setPackagePrefix(String packagePrefix) {
@@ -108,7 +110,11 @@ public abstract class Generator {
             return;
         }
         definitionParser.setCategory(category());
-        definitionParser.setDefinitionPaths(definitionPaths);
+        if (!definitionParser.getDefinitionPaths().isEmpty() && definitionPaths.isEmpty()) {
+            definitionPaths.addAll(definitionParser.getDefinitionPaths());
+        } else {
+            definitionParser.setDefinitionPaths(definitionPaths);
+        }
         this.definitionParser = definitionParser;
     }
 
@@ -168,6 +174,7 @@ public abstract class Generator {
     }
 
     public void generate(boolean printError) {
+        check();
         //解析定义文件
         parseDefinitions();
 
@@ -196,6 +203,15 @@ public abstract class Generator {
 
         generate(classDefinitions);
         logger.info("生成{}完成\n", category());
+    }
+
+    protected void check() {
+        if (definitionPaths.isEmpty()) {
+            throw new IllegalArgumentException(category() + "定义文件路径[definitionPaths]不能为空");
+        }
+        if (codePath == null) {
+            throw new IllegalArgumentException(category() + "目标代码(" + supportLanguage() + ")文件路径[codePath]不能为空");
+        }
     }
 
     protected void generate(List<ClassDefinition> classDefinitions) {
@@ -323,7 +339,8 @@ public abstract class Generator {
         javaMessageGenerator.tryGenerate(false);
         cSharpMessageGenerator.tryGenerate(false);
         luaMessageGenerator.tryGenerate(false);
-        luaMessageGenerator.printErrors();
+
+        javaMessageGenerator.printErrors();
 
         DefinitionParser configDefinitionParser = new XmlDefinitionParser();
         JavaConfigGenerator javaConfigGenerator = new JavaConfigGenerator(properties);
@@ -337,6 +354,7 @@ public abstract class Generator {
         javaConfigGenerator.tryGenerate(false);
         cSharpConfigGenerator.tryGenerate(false);
         luaConfigGenerator.tryGenerate(false);
-        luaConfigGenerator.printErrors();
+
+        javaConfigGenerator.printErrors();
     }
 }
