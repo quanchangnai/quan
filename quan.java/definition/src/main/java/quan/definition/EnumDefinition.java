@@ -16,7 +16,7 @@ public class EnumDefinition extends ClassDefinition {
     }
 
     @Override
-    public EnumDefinition setCategory(DefinitionCategory category) {
+    public EnumDefinition setCategory(Category category) {
         this.category = category;
         return this;
     }

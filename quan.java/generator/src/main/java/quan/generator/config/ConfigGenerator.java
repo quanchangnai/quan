@@ -7,7 +7,7 @@ import quan.config.TableType;
 import quan.config.WithDefinitionConfigLoader;
 import quan.definition.BeanDefinition;
 import quan.definition.ClassDefinition;
-import quan.definition.DefinitionCategory;
+import quan.definition.Category;
 import quan.definition.FieldDefinition;
 import quan.definition.config.ConfigDefinition;
 import quan.definition.config.ConstantDefinition;
@@ -36,14 +36,13 @@ public abstract class ConfigGenerator extends Generator {
 
     public ConfigGenerator(Properties properties) {
         super(properties);
-        if (!ready) {
+        if (!super.isReady()) {
             return;
         }
 
         String tableTypeStr = properties.getProperty(category() + ".tableType");
         tablePath = properties.getProperty(category() + ".tablePath");
         if (StringUtils.isBlank(tableTypeStr) || StringUtils.isBlank(tablePath)) {
-            ready = false;
             return;
         }
 
@@ -82,8 +81,19 @@ public abstract class ConfigGenerator extends Generator {
     }
 
     @Override
-    public final DefinitionCategory category() {
-        return DefinitionCategory.config;
+    public final Category category() {
+        return Category.config;
+    }
+
+    @Override
+    public boolean isReady() {
+        if (!super.isReady()) {
+            return false;
+        }
+        if (tableType == null || StringUtils.isBlank(tablePath)) {
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -97,10 +107,10 @@ public abstract class ConfigGenerator extends Generator {
     protected void check() {
         super.check();
         if (tableType == null) {
-            throw new IllegalArgumentException(category() + "表格类型[tableType]不能为空");
+            throw new IllegalArgumentException(category().comment() + "的表格类型[tableType]不能为空");
         }
         if (tablePath == null) {
-            throw new IllegalArgumentException(category() + "表格文件路径[tablePath]不能为空");
+            throw new IllegalArgumentException(category().comment() + "的表格文件路径[tablePath]不能为空");
         }
     }
 

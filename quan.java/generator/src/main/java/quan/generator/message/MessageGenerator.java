@@ -3,7 +3,7 @@ package quan.generator.message;
 import freemarker.template.Template;
 import quan.definition.BeanDefinition;
 import quan.definition.ClassDefinition;
-import quan.definition.DefinitionCategory;
+import quan.definition.Category;
 import quan.definition.message.MessageDefinition;
 import quan.definition.message.MessageHeadDefinition;
 import quan.generator.Generator;
@@ -43,8 +43,8 @@ public abstract class MessageGenerator extends Generator {
     }
 
     @Override
-    public final DefinitionCategory category() {
-        return DefinitionCategory.message;
+    public final Category category() {
+        return Category.message;
     }
 
     @Override

@@ -3,7 +3,7 @@ package quan.definition.config;
 import org.apache.commons.lang3.StringUtils;
 import quan.definition.BeanDefinition;
 import quan.definition.Constants;
-import quan.definition.DefinitionCategory;
+import quan.definition.Category;
 import quan.definition.FieldDefinition;
 
 import java.util.*;
@@ -48,7 +48,7 @@ public class ConfigDefinition extends BeanDefinition {
     private Set<ConstantDefinition> constantDefinitions = new HashSet<>();
 
     {
-        category = DefinitionCategory.config;
+        category = Category.config;
     }
 
     public ConfigDefinition() {
@@ -64,7 +64,7 @@ public class ConfigDefinition extends BeanDefinition {
     }
 
     @Override
-    public ConfigDefinition setCategory(DefinitionCategory category) {
+    public ConfigDefinition setCategory(Category category) {
         throw new UnsupportedOperationException();
     }
 

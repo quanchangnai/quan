@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import quan.common.util.PathUtils;
 import quan.definition.BeanDefinition;
 import quan.definition.ClassDefinition;
-import quan.definition.DefinitionCategory;
+import quan.definition.Category;
 import quan.definition.config.ConfigDefinition;
 import quan.definition.message.MessageHeadDefinition;
 
@@ -20,7 +20,7 @@ public abstract class DefinitionParser {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    protected DefinitionCategory category;
+    protected Category category;
 
     protected String packagePrefix;
 
@@ -45,12 +45,12 @@ public abstract class DefinitionParser {
     //表名:配置
     private Map<String, ConfigDefinition> tableConfigs = new HashMap<>();
 
-    public DefinitionParser setCategory(DefinitionCategory category) {
+    public DefinitionParser setCategory(Category category) {
         this.category = category;
         return this;
     }
 
-    public DefinitionCategory getCategory() {
+    public Category getCategory() {
         return category;
     }
 

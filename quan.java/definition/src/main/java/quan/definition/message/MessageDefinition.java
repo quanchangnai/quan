@@ -1,7 +1,7 @@
 package quan.definition.message;
 
 import quan.definition.BeanDefinition;
-import quan.definition.DefinitionCategory;
+import quan.definition.Category;
 import quan.definition.FieldDefinition;
 
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ public class MessageDefinition extends BeanDefinition {
     private int id;
 
     {
-        category = DefinitionCategory.message;
+        category = Category.message;
 
     }
 
@@ -29,7 +29,7 @@ public class MessageDefinition extends BeanDefinition {
     }
 
     @Override
-    public MessageDefinition setCategory(DefinitionCategory category) {
+    public MessageDefinition setCategory(Category category) {
         throw new UnsupportedOperationException();
     }
 

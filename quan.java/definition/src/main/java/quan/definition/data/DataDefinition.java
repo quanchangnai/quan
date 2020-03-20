@@ -2,7 +2,7 @@ package quan.definition.data;
 
 import quan.definition.BeanDefinition;
 import quan.definition.Constants;
-import quan.definition.DefinitionCategory;
+import quan.definition.Category;
 
 import java.util.regex.Pattern;
 
@@ -19,7 +19,7 @@ public class DataDefinition extends BeanDefinition {
     private boolean persistent = true;
 
     {
-        category = DefinitionCategory.data;
+        category = Category.data;
     }
 
     public DataDefinition() {
@@ -33,7 +33,7 @@ public class DataDefinition extends BeanDefinition {
     }
 
     @Override
-    public DataDefinition setCategory(DefinitionCategory category) {
+    public DataDefinition setCategory(Category category) {
         throw new UnsupportedOperationException();
     }
 

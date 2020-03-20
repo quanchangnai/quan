@@ -78,7 +78,7 @@ public class LuaMessageGenerator extends MessageGenerator {
             return;
         }
 
-        logger.info("生成MessageFactory[{}]成功", destFilePath + File.separator + fileName);
+        logger.info("生成消息工厂[{}]完成", destFilePath + File.separator + fileName);
     }
 
     @Override
@@ -93,5 +93,4 @@ public class LuaMessageGenerator extends MessageGenerator {
             beanDefinition.getImports().add(fieldValueBean.getFullName(supportLanguage()));
         }
     }
-
 }

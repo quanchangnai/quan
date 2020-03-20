@@ -98,22 +98,22 @@ public class XmlDefinitionParser extends DefinitionParser {
                 classDefinition = new EnumDefinition().setCategory(getCategory());
                 break;
             case "entity":
-                if (category == DefinitionCategory.data) {
+                if (category == Category.data) {
                     classDefinition = new BeanDefinition().setCategory(getCategory());
                 }
                 break;
             case "bean":
-                if (category == DefinitionCategory.message || category == DefinitionCategory.config) {//临时
+                if (category == Category.message || category == Category.config) {//临时
                     classDefinition = new BeanDefinition().setCategory(getCategory()).setDelimiter(classElement.attributeValue("delimiter"));
                 }
                 break;
             case "message":
-                if (category == DefinitionCategory.message) {
+                if (category == Category.message) {
                     classDefinition = new MessageDefinition();
                 }
                 break;
             case "message-head":
-                if (category == DefinitionCategory.message) {
+                if (category == Category.message) {
                     if (messageHeadDefinition == null) {
                         messageHeadDefinition = new MessageHeadDefinition();
                         classDefinition = messageHeadDefinition;
@@ -123,12 +123,12 @@ public class XmlDefinitionParser extends DefinitionParser {
                 }
                 break;
             case "data":
-                if (category == DefinitionCategory.data) {
+                if (category == Category.data) {
                     classDefinition = new DataDefinition(classElement.attributeValue("key"), classElement.attributeValue("persistent"));
                 }
                 break;
             case "config":
-                if (category == DefinitionCategory.config) {
+                if (category == Category.config) {
                     classDefinition = new ConfigDefinition(classElement.attributeValue("table"), classElement.attributeValue("parent"));
                 }
                 break;

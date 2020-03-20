@@ -29,22 +29,22 @@ public class BeanDefinition extends ClassDefinition {
     }
 
     @Override
-    public BeanDefinition setCategory(DefinitionCategory category) {
+    public BeanDefinition setCategory(Category category) {
         this.category = category;
         return this;
     }
 
     @Override
     public String getDefinitionTypeName() {
-        if (category == DefinitionCategory.data) {
+        if (category == Category.data) {
             return "数据实体";
         }
-        return super.getDefinitionTypeName();
+        return "";
     }
 
     @Override
     protected Pattern namePattern() {
-        if (category == DefinitionCategory.data) {
+        if (category == Category.data) {
             return Constants.ENTITY_NAME_PATTERN;
         }
         return super.namePattern();
@@ -91,7 +91,7 @@ public class BeanDefinition extends ClassDefinition {
             return;
         }
 
-        if (fieldTypes.length != 1 && !field.isCollectionType() && !(field.category == DefinitionCategory.message && (fieldType.equals("float") || fieldType.equals("double")))) {
+        if (fieldTypes.length != 1 && !field.isCollectionType() && !(field.category == Category.message && (fieldType.equals("float") || fieldType.equals("double")))) {
             addValidatedError(getName4Validate("的") + field.getName4Validate() + "类型[" + field.getOriginalType() + "]格式错误");
             return;
         }
@@ -122,7 +122,7 @@ public class BeanDefinition extends ClassDefinition {
             }
         }
 
-        if (field.category == DefinitionCategory.message && (fieldType.equals("float") || fieldType.equals("double"))) {
+        if (field.category == Category.message && (fieldType.equals("float") || fieldType.equals("double"))) {
             boolean patternError = fieldTypes.length != 1 && fieldTypes.length != 2;
             if (fieldTypes.length == 2) {
                 int scale = -1;
@@ -184,7 +184,7 @@ public class BeanDefinition extends ClassDefinition {
     }
 
     protected void validateFieldBeanLanguage(FieldDefinition field) {
-        if (category == DefinitionCategory.data) {
+        if (category == Category.data) {
             return;
         }
         BeanDefinition fieldBean = null;
@@ -218,7 +218,7 @@ public class BeanDefinition extends ClassDefinition {
     }
 
     private void validateDelimiter() {
-        if (category != DefinitionCategory.config || getClass() != BeanDefinition.class) {
+        if (category != Category.config || getClass() != BeanDefinition.class) {
             return;
         }
         if (delimiter.length() != 1) {
@@ -244,7 +244,7 @@ public class BeanDefinition extends ClassDefinition {
     }
 
     protected void validateFieldRef(FieldDefinition field) {
-        if (field.getType() == null || getCategory() != DefinitionCategory.config || field.getRef() == null) {
+        if (field.getType() == null || getCategory() != Category.config || field.getRef() == null) {
             return;
         }
 

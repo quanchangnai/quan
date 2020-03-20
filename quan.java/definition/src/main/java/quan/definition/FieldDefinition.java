@@ -116,13 +116,13 @@ public class FieldDefinition extends Definition {
     }
 
     public boolean isBuiltinType(String type) {
-        if (category == DefinitionCategory.data) {
+        if (category == Category.data) {
             return Constants.DATA_BUILTIN_TYPES.contains(type);
         }
-        if (category == DefinitionCategory.message) {
+        if (category == Category.message) {
             return Constants.MESSAGE_BUILTIN_TYPES.contains(type);
         }
-        if (category == DefinitionCategory.config) {
+        if (category == Category.config) {
             return Constants.CONFIG_BUILTIN_TYPES.contains(type);
         }
 
@@ -177,7 +177,7 @@ public class FieldDefinition extends Definition {
      * 类型是否合法
      */
     public boolean isLegalType() {
-        return isBuiltinType() || isBeanType() || isEnumType() || (category == DefinitionCategory.config && isTimeType());
+        return isBuiltinType() || isBeanType() || isEnumType() || (category == Category.config && isTimeType());
     }
 
 
@@ -500,7 +500,7 @@ public class FieldDefinition extends Definition {
     }
 
     public void setLanguage(String language) {
-        if (StringUtils.isBlank(language) || category != DefinitionCategory.config) {
+        if (StringUtils.isBlank(language) || category != Category.config) {
             return;
         }
         Pair<Boolean, Set<String>> pair = Language.parse(language);

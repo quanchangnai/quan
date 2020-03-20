@@ -159,7 +159,7 @@ public abstract class ClassDefinition extends Definition {
     }
 
     public void setLang(String language) {
-        if (StringUtils.isBlank(language) || category == DefinitionCategory.data) {
+        if (StringUtils.isBlank(language) || category == Category.data) {
             return;
         }
         Pair<Boolean, Set<String>> pair = Language.parse(language);
@@ -247,7 +247,7 @@ public abstract class ClassDefinition extends Definition {
     }
 
     protected boolean isReservedWord(String fieldName) {
-        if (category == DefinitionCategory.data) {
+        if (category == Category.data) {
             return Constants.JAVA_RESERVED_WORDS.contains(fieldName);
         }
         if (Constants.JAVA_RESERVED_WORDS.contains(fieldName)) {
@@ -276,15 +276,8 @@ public abstract class ClassDefinition extends Definition {
 
     protected void addValidatedError(String error, ClassDefinition other) {
         String position = ",定位:" + getDefinitionFile();
-        if (getName() != null) {
-            position += "->" + getName();
-        }
-
         if (other != null) {
             position = "," + other.getDefinitionFile();
-            if (getName() != null) {
-                position += "->" + other.getName();
-            }
         }
 
         error += position;

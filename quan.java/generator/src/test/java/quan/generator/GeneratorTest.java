@@ -95,6 +95,7 @@ public class GeneratorTest {
         luaConfigGenerator.setDefinitionParser(definitionParser);
         luaConfigGenerator.setTableType(TableType.xlsx);
         luaConfigGenerator.setTablePath("config\\excel");
+        luaConfigGenerator.generate();
         System.err.println();
     }
 }

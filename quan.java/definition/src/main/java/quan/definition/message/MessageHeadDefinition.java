@@ -1,7 +1,7 @@
 package quan.definition.message;
 
 import quan.definition.BeanDefinition;
-import quan.definition.DefinitionCategory;
+import quan.definition.Category;
 import quan.definition.FieldDefinition;
 
 /**
@@ -13,7 +13,7 @@ public class MessageHeadDefinition extends BeanDefinition {
     private boolean validated;
 
     {
-        category = DefinitionCategory.message;
+        category = Category.message;
         setName("HeadedMessage");
     }
 
@@ -28,7 +28,7 @@ public class MessageHeadDefinition extends BeanDefinition {
     }
 
     @Override
-    public MessageHeadDefinition setCategory(DefinitionCategory category) {
+    public MessageHeadDefinition setCategory(Category category) {
         throw new UnsupportedOperationException();
     }
 

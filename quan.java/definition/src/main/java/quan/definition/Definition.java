@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
  */
 public abstract class Definition {
 
-    protected DefinitionCategory category;
+    protected Category category;
 
     private String name;
 
@@ -21,11 +21,11 @@ public abstract class Definition {
     public Definition() {
     }
 
-    public DefinitionCategory getCategory() {
+    public Category getCategory() {
         return category;
     }
 
-    public Definition setCategory(DefinitionCategory category) {
+    public Definition setCategory(Category category) {
         this.category = category;
         return this;
     }

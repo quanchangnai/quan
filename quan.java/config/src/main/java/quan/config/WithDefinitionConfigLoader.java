@@ -7,7 +7,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.apache.commons.lang3.tuple.Triple;
 import quan.common.util.PathUtils;
 import quan.definition.BeanDefinition;
-import quan.definition.DefinitionCategory;
+import quan.definition.Category;
 import quan.definition.FieldDefinition;
 import quan.definition.Language;
 import quan.definition.config.ConfigDefinition;
@@ -58,7 +58,7 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
      */
     public DefinitionParser useXmlDefinition(List<String> definitionPaths, String packagePrefix) {
         definitionParser = new XmlDefinitionParser();
-        definitionParser.setCategory(DefinitionCategory.config);
+        definitionParser.setCategory(Category.config);
         definitionParser.setDefinitionPaths(definitionPaths);
         definitionParser.setPackagePrefix(packagePrefix);
         return definitionParser;
@@ -76,7 +76,7 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
      */
     public void setDefinitionParser(DefinitionParser definitionParser) {
         Objects.requireNonNull(definitionParser, "配置解析器不能为空");
-        definitionParser.setCategory(DefinitionCategory.config);
+        definitionParser.setCategory(Category.config);
         this.definitionParser = definitionParser;
     }
 
