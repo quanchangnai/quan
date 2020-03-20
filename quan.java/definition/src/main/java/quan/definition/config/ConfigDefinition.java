@@ -1,11 +1,13 @@
 package quan.definition.config;
 
 import org.apache.commons.lang3.StringUtils;
+import quan.common.util.PathUtils;
 import quan.definition.BeanDefinition;
-import quan.definition.Constants;
 import quan.definition.Category;
+import quan.definition.Constants;
 import quan.definition.FieldDefinition;
 
+import java.io.File;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -19,10 +21,10 @@ public class ConfigDefinition extends BeanDefinition {
     private String table;
 
     //配置对应的表，包含分表
-    private List<String> tables = new ArrayList<>();
+    private TreeSet<String> tables = new TreeSet<>();
 
     //配置对应的表，包含分表和子表
-    private List<String> allTables = new ArrayList<>();
+    private TreeSet<String> allTables = new TreeSet<>();
 
     //配置的父类
     private String parent;
@@ -115,8 +117,8 @@ public class ConfigDefinition extends BeanDefinition {
         return descendants;
     }
 
-    public Set<String> getDescendantsAndMe() {
-        Set<String> descendantsAndMe = new HashSet<>(descendants);
+    public TreeSet<String> getDescendantsAndMe() {
+        TreeSet<String> descendantsAndMe = new TreeSet<>(descendants);
         descendantsAndMe.add(getName());
         return descendantsAndMe;
     }
@@ -133,14 +135,14 @@ public class ConfigDefinition extends BeanDefinition {
         return table;
     }
 
-    public List<String> getTables() {
+    public TreeSet<String> getTables() {
         return tables;
     }
 
     /**
      * 自身和子类的所有表
      */
-    public List<String> getAllTables() {
+    public TreeSet<String> getAllTables() {
         if (!allTables.isEmpty()) {
             return allTables;
         }
@@ -253,9 +255,6 @@ public class ConfigDefinition extends BeanDefinition {
         if (table == null) {
             table = getName();
         }
-        if (StringUtils.isBlank(getComment())) {
-            setComment(table);
-        }
 
         //支持分表
         tables.addAll(Arrays.asList(table.split(",", -1)));
@@ -265,6 +264,25 @@ public class ConfigDefinition extends BeanDefinition {
                 addValidatedError(getName4Validate() + other.getName4Validate() + "和表格[" + t + "]不能多对一", other);
             }
             parser.getTableConfigs().put(t, this);
+        }
+
+        if (StringUtils.isBlank(getComment())) {
+            StringBuilder comment = new StringBuilder();
+            boolean start = true;
+            for (String t1 : tables) {
+                if (!start) {
+                    comment.append(",");
+                }
+                start = false;
+                String t2 = PathUtils.toPlatPath(t1);
+                int lastSepIndex = t2.lastIndexOf(File.separator);
+                if (lastSepIndex >= 0) {
+                    comment.append(t2.substring(lastSepIndex + 1));
+                } else {
+                    comment.append(t2);
+                }
+            }
+            setComment(comment.toString());
         }
 
         validateParent();

@@ -140,16 +140,15 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
      * @return
      */
     public List<JSONObject> loadJsons(ConfigDefinition configDefinition, boolean self) {
-        Collection<String> configTables;
+        TreeSet<String> configTables = new TreeSet<>();
         if (self) {
-            configTables = new HashSet<>();
             if (tableType == TableType.json) {
                 configTables.add(configDefinition.getName());
             } else {
                 configTables.addAll(configDefinition.getTables());
             }
         } else {
-            configTables = getConfigTables(configDefinition);
+            configTables.addAll(getConfigTables(configDefinition));
         }
 
         List<JSONObject> jsons = new ArrayList<>();
