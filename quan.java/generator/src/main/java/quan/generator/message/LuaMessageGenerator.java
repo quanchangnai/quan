@@ -8,10 +8,7 @@ import quan.definition.Language;
 import quan.definition.message.MessageDefinition;
 import quan.definition.message.MessageHeadDefinition;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -62,14 +59,14 @@ public class LuaMessageGenerator extends MessageGenerator {
     }
 
     protected void generateFactory(List<MessageDefinition> messageDefinitions) {
-        File destFilePath = new File(codePath + File.separator + getDefinitionParser().getPackagePrefix().replace(".", File.separator));
-        if (!destFilePath.exists() && !destFilePath.mkdirs()) {
-            logger.info("创建目录[{}]失败", destFilePath);
+        File filePath = new File(codePath + File.separator + getDefinitionParser().getPackagePrefix().replace(".", File.separator));
+        if (!filePath.exists() && !filePath.mkdirs()) {
+            logger.info("创建目录[{}]失败", filePath);
             return;
         }
 
         String fileName = "MessageFactory." + supportLanguage();
-        try (Writer writer = new FileWriter(new File(destFilePath, fileName))) {
+        try (Writer writer = new OutputStreamWriter(new FileOutputStream(new File(filePath, fileName)), "UTF-8")) {
             Map<String, List<MessageDefinition>> messages = new HashMap<>();
             messages.put("messages", messageDefinitions);
             messageFactoryTemplate.process(messages, writer);
@@ -78,7 +75,7 @@ public class LuaMessageGenerator extends MessageGenerator {
             return;
         }
 
-        logger.info("生成消息工厂[{}]完成", destFilePath + File.separator + fileName);
+        logger.info("生成消息工厂[{}]完成", filePath + File.separator + fileName);
     }
 
     @Override

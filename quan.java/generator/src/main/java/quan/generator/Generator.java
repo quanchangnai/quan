@@ -231,7 +231,7 @@ public abstract class Generator {
             return;
         }
 
-        try (Writer writer = new FileWriter(new File(filePath, fileName))) {
+        try (Writer writer = new OutputStreamWriter(new FileOutputStream(new File(filePath, fileName)), "UTF-8")) {
             template.process(classDefinition, writer);
         } catch (Exception e) {
             logger.info("生成{}[{}]失败", category().comment(), filePath + File.separator + fileName, e);
