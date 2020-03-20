@@ -14,17 +14,17 @@ import ${import};
  */
 <#if useEnum>
 public enum ${name} {
-<#list rows?keys as key>
+    <#list rows?keys as key>
 
-    <#if rows[key] !="">
+    <#if rows[key].right !="">
     /**
-     * ${rows[key]}
+     * ${rows[key].right}
      */
     </#if>
     ${key}<#if key?has_next>,<#else>;</#if>
-<#else>
+    <#else>
     ;
-</#list>
+    </#list>
 <#if valueField.type=="map">
 
     public ${valueField.basicType}<${valueField.keyType},${valueField.keyType}> value() {
@@ -43,11 +43,11 @@ public enum ${name} {
     </#if>
 <#else>
 public class ${name} {
-<#list rows?keys as key>
+    <#list rows?keys as key>
 
-    <#if rows[key] !="">
+    <#if rows[key].right !="">
     /**
-     * ${rows[key]}
+     * ${rows[key].right}
      */
     </#if>
     <#if valueField.type=="map">
@@ -63,7 +63,7 @@ public class ${name} {
         return ${configDefinition.name}.getBy${keyField.name?cap_first}("${key}").get${valueField.name?cap_first}();
     }
     </#if>
-</#list>
+    </#list>
 </#if>
 
 }

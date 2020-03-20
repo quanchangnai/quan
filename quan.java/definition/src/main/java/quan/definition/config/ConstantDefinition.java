@@ -2,6 +2,7 @@ package quan.definition.config;
 
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import quan.definition.ClassDefinition;
 import quan.definition.Constants;
 import quan.definition.FieldDefinition;
@@ -18,7 +19,7 @@ public class ConstantDefinition extends ClassDefinition {
 
     private ConfigDefinition configDefinition;
 
-    //是否使用枚举实现，Java支持动态读取枚举值,其他不支持的语言该参数没有意义
+    //是否使用枚举实现，Java支持动态读取枚举值,C#支持整数枚举，其他不支持的语言该参数没有意义
     private boolean useEnum = true;
 
     private String keyField;
@@ -27,7 +28,7 @@ public class ConstantDefinition extends ClassDefinition {
 
     private String commentField;
 
-    private Map<String, String> rows = new TreeMap<>();
+    private Map<String, Pair<String, String>> rows = new TreeMap<>();
 
     @Override
     public int getDefinitionType() {
@@ -101,12 +102,13 @@ public class ConstantDefinition extends ClassDefinition {
             if (key == null || !Constants.FIELD_NAME_PATTERN.matcher(key).matches()) {
                 continue;
             }
+            String value = config.getString(valueField);
             String comment = commentField == null ? "" : config.getString(commentField);
-            rows.put(key, comment);
+            rows.put(key, Pair.of(value, comment));
         }
     }
 
-    public Map<String, String> getRows() {
+    public Map<String, Pair<String, String>> getRows() {
         return rows;
     }
 

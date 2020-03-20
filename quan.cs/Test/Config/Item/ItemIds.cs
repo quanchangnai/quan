@@ -4,16 +4,16 @@ namespace Test.Config.Item
     /// 道具ID<br/>
     /// 自动生成
     /// </summary>
-    public class ItemIds 
+    public enum ItemIds
     {
         /// <summary>
         /// 道具1
         /// </summary>
-        public static int Item1 => ItemConfig.GetByKey("item1").Id;
+        Item1 = 1,
 
         /// <summary>
         /// 道具2
         /// </summary>
-        public static int Item2 => ItemConfig.GetByKey("item2").Id;
-    }
+        Item2 = 2
+     }
 }

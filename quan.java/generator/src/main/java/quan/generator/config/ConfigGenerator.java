@@ -98,14 +98,14 @@ public abstract class ConfigGenerator extends Generator {
 
     @Override
     public void generate(boolean printError) {
-        check();
+        checkProps();
         initConfigLoader(tableType, tablePath);
         super.generate(printError);
     }
 
     @Override
-    protected void check() {
-        super.check();
+    protected void checkProps() {
+        super.checkProps();
         if (tableType == null) {
             throw new IllegalArgumentException(category().comment() + "的表格类型[tableType]不能为空");
         }

@@ -9,8 +9,8 @@ local ${name} = {}
 
 <#list rows?keys as key>
 ---
-    <#if rows[key] !="">
----${rows[key]}
+    <#if rows[key].right !="">
+---${rows[key].right}
     </#if>
     <#if valueField.type=="map">
 ---@return ${valueField.basicType}<${valueField.keyType},${valueField.keyType}>

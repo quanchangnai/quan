@@ -21,6 +21,7 @@ import java.io.*;
 import java.util.*;
 
 /**
+ * 代码生成器
  * Created by quanchangnai on 2019/6/23.
  */
 public abstract class Generator {
@@ -131,7 +132,6 @@ public abstract class Generator {
     }
 
     protected void parseDefinitions() {
-        Objects.requireNonNull(definitionParser, "定义解析器不能为空");
         definitionParser.setPackagePrefix(packagePrefix);
         definitionParser.setEnumPackagePrefix(enumPackagePrefix);
         definitionParser.parse();
@@ -170,8 +170,7 @@ public abstract class Generator {
     }
 
     public void generate(boolean printError) {
-        check();
-        //解析定义文件
+        checkProps();
         parseDefinitions();
 
         if (!definitionParser.getValidatedErrors().isEmpty()) {
@@ -201,9 +200,15 @@ public abstract class Generator {
         logger.info("生成{}{}全部完成\n", supportLanguage(), category().comment());
     }
 
-    protected void check() {
+    /**
+     * 检查生成器必须要设置的属性
+     */
+    protected void checkProps() {
         if (definitionPaths.isEmpty()) {
             throw new IllegalArgumentException(category().comment() + "的定义文件路径[definitionPaths]不能为空");
+        }
+        if (definitionParser == null) {
+            throw new IllegalArgumentException(category().comment() + "的定义解析器[definitionParser]不能为空");
         }
         if (codePath == null) {
             throw new IllegalArgumentException(category().comment() + "的目标代码[" + supportLanguage() + "]文件路径[codePath]不能为空");
