@@ -29,7 +29,7 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
     protected DefinitionParser definitionParser;
 
     //表格正文起始行号
-    private int bodyRowNum;
+    private int tableBodyStartRow;
 
     {
         tableType = TableType.csv;
@@ -42,9 +42,9 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
     /**
      * 设置表格正文起始行号，默认是第3行,第1行固定是表头，中间是注释等，行号从1开始
      */
-    public void setBodyRowNum(int bodyRowNum) {
-        if (bodyRowNum > 1 && this.bodyRowNum == 0) {
-            this.bodyRowNum = bodyRowNum;
+    public void setTableBodyStartRow(int tableBodyStartRow) {
+        if (tableBodyStartRow > 1 && this.tableBodyStartRow == 0) {
+            this.tableBodyStartRow = tableBodyStartRow;
         }
     }
 
@@ -500,7 +500,7 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
             }
         }
 
-        configReader.setBodyRowNum(bodyRowNum);
+        configReader.setTableBodyStartRow(tableBodyStartRow);
 
         return configReader;
     }

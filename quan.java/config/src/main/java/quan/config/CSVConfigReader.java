@@ -45,11 +45,11 @@ public class CSVConfigReader extends ConfigReader {
         validateColumnNames(columnNames);
 
         //第[bodyRowNum]行起是正文
-        if (records.size() < bodyRowNum) {
+        if (records.size() < tableBodyStartRow) {
             return;
         }
 
-        for (int i = bodyRowNum; i <= records.size(); i++) {
+        for (int i = tableBodyStartRow; i <= records.size(); i++) {
             CSVRecord record = records.get(i - 1);
             JSONObject rowJson = new JSONObject(true);
             for (int j = 1; j <= columnNames.size(); j++) {

@@ -42,11 +42,11 @@ public class ExcelConfigReader extends ConfigReader {
             validateColumnNames(columnNames);
 
             //第[bodyRowNum]行起是正文
-            if (rowNum < bodyRowNum) {
+            if (rowNum < tableBodyStartRow) {
                 return;
             }
 
-            for (int i = bodyRowNum; i <= rowNum; i++) {
+            for (int i = tableBodyStartRow; i <= rowNum; i++) {
                 Row row = sheet.getRow(i - 1);
                 JSONObject rowJson = new JSONObject(true);
                 for (int j = 1; j <= columnNames.size(); j++) {

@@ -17,8 +17,8 @@ import java.util.stream.Collectors;
  */
 public abstract class MessageGenerator extends Generator {
 
-    //ID冲突时重新计算
-    private boolean recalcIdOnConflicted = false;
+    //ID冲突时重新哈希计算
+    private boolean rehashId;
 
     public MessageGenerator() {
     }
@@ -34,8 +34,8 @@ public abstract class MessageGenerator extends Generator {
             return;
         }
 
-        String recalcId = properties.getProperty(category() + ".recalcId");
-        this.setRecalcIdOnConflicted(recalcId != null && recalcId.equals("true"));
+        String rehashId = properties.getProperty(category() + ".rehashId");
+        this.setRehashId(rehashId != null && rehashId.equals("true"));
     }
 
     @Override
@@ -67,26 +67,27 @@ public abstract class MessageGenerator extends Generator {
     @Override
     protected void parseDefinitions() {
         super.parseDefinitions();
-        calcMessageId();
+        hashId();
     }
 
-    public MessageGenerator setRecalcIdOnConflicted(boolean recalculateIdOnConflicted) {
-        this.recalcIdOnConflicted = recalculateIdOnConflicted;
+    public MessageGenerator setRehashId(boolean rehashId) {
+        this.rehashId = rehashId;
         return this;
     }
 
-    private void calcMessageId() {
+    //使用类名哈希计算消息ID
+    private void hashId() {
         Set<MessageDefinition> messageDefinitions = new HashSet<>();
         for (ClassDefinition classDefinition : definitionParser.getClasses().values()) {
             if (classDefinition instanceof MessageDefinition) {
                 messageDefinitions.add((MessageDefinition) classDefinition);
             }
         }
-        //0xFFFFF正好占用3个字节,当设置了[ID冲突时重新计算]时，100000个坑位用于解决冲突，每次用10000个
-        calcMessageId(messageDefinitions, 1, 0xFFFFF - 100000);
+        //0xFFFFF正好占用3个字节,当设置了[ID冲突时重新哈希计算]时，100000个坑位用于解决冲突，每次用10000个
+        hashId(messageDefinitions, 1, 0xFFFFF - 100000);
     }
 
-    private void calcMessageId(Set<MessageDefinition> messageDefinitions, int begin, int end) {
+    private void hashId(Set<MessageDefinition> messageDefinitions, int begin, int end) {
         Map<Integer, List<MessageDefinition>> conflictedMessagesMap = new HashMap<>();
         for (MessageDefinition messageDefinition : messageDefinitions) {
             int messageId = begin + (messageDefinition.getNameWithPackage().hashCode() & 0x7FFFFFFF) % (end - begin);
@@ -99,7 +100,7 @@ public abstract class MessageGenerator extends Generator {
             conflictedMessages.sort(Comparator.comparing(MessageDefinition::getNameWithPackage));
             conflictedMessages.get(0).setId(messageId);
             if (conflictedMessages.size() > 1) {
-                if (recalcIdOnConflicted) {
+                if (rehashId) {
                     allConflictedMessages.addAll(conflictedMessages.subList(1, conflictedMessages.size()));
                 } else {
                     List<String> conflictedNames = conflictedMessages.stream().map(MessageDefinition::getName).collect(Collectors.toList());
@@ -110,8 +111,7 @@ public abstract class MessageGenerator extends Generator {
 
         //ID冲突的消息调整区间参数重新计算
         if (!allConflictedMessages.isEmpty()) {
-            calcMessageId(allConflictedMessages, end, end + 10000);
+            hashId(allConflictedMessages, end, end + 10000);
         }
     }
-
 }

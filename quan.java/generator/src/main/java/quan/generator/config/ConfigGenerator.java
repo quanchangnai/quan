@@ -31,6 +31,8 @@ public abstract class ConfigGenerator extends Generator {
 
     protected String tablePath;
 
+    protected String tableBodyStartRow;
+
     public ConfigGenerator() {
     }
 
@@ -64,6 +66,7 @@ public abstract class ConfigGenerator extends Generator {
 
         tableType = properties.getProperty(category() + ".tableType");
         tablePath = properties.getProperty(category() + ".tablePath");
+        tableBodyStartRow = properties.getProperty(category() + ".tableBodyStartRow");
 
         ConfigConverter.setDateTimePattern(properties.getProperty(category() + ".dateTimePattern"));
         ConfigConverter.setDatePattern(properties.getProperty(category() + ".datePattern"));
@@ -84,6 +87,16 @@ public abstract class ConfigGenerator extends Generator {
         }
         if (StringUtils.isBlank(tablePath)) {
             throw new IllegalArgumentException(category().comment() + "的表格文件路径[tablePath]不能为空");
+        }
+
+        if (!StringUtils.isBlank(tableBodyStartRow)) {
+            try {
+                if (Integer.parseInt(tableBodyStartRow) < 2) {
+                    throw new Exception();
+                }
+            } catch (Exception e) {
+                throw new IllegalArgumentException(category().comment() + "的表格正文开始行号[tableBodyStartRow]不合法，合法值为空值或者大于1的整数");
+            }
         }
     }
 
@@ -116,18 +129,23 @@ public abstract class ConfigGenerator extends Generator {
     /**
      * 初始化配置加载器，读取常量key用于常量类生成
      */
-    protected void initConfigLoader(TableType tableType, String tablePath) {
+    protected void initConfigLoader(TableType tableType, String tablePath, int tableBodyStartRow) {
         if (definitionParser == null) {
             throw new IllegalArgumentException(category().comment() + "的定义解析器[definitionParser]不能为空");
         }
         configLoader = new WithDefinitionConfigLoader(tablePath);
         configLoader.setDefinitionParser(definitionParser);
         configLoader.setTableType(tableType);
+        configLoader.setTableBodyStartRow(tableBodyStartRow);
     }
 
     @Override
     public void generate(boolean printError) {
-        initConfigLoader(TableType.valueOf(tableType), tablePath);
+        int tableBodyStartRow = 0;
+        if (!StringUtils.isBlank(this.tableBodyStartRow)) {
+            tableBodyStartRow = Integer.parseInt(this.tableBodyStartRow);
+        }
+        initConfigLoader(TableType.valueOf(tableType), tablePath, tableBodyStartRow);
         super.generate(printError);
     }
 

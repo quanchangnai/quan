@@ -28,7 +28,7 @@ public abstract class ConfigReader {
     protected ConfigConverter converter;
 
     //表格正文起始行号，默认是第3行,第1行固定是表头，中间是注释等，行号从1开始
-    protected int bodyRowNum = 3;
+    protected int tableBodyStartRow = 3;
 
     protected Config prototype;
 
@@ -69,9 +69,9 @@ public abstract class ConfigReader {
         return prototype;
     }
 
-    public ConfigReader setBodyRowNum(int bodyRowNum) {
-        if (bodyRowNum > 1) {
-            this.bodyRowNum = bodyRowNum;
+    public ConfigReader setTableBodyStartRow(int tableBodyStartRow) {
+        if (tableBodyStartRow > 1) {
+            this.tableBodyStartRow = tableBodyStartRow;
         }
         return this;
     }
