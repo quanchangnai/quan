@@ -49,44 +49,14 @@ public abstract class Generator {
     protected Map<Class<? extends ClassDefinition>, Template> templates = new HashMap<>();
 
     public Generator() {
-        initFreemarker();
     }
 
     public Generator(Properties properties) {
-        if (initProps(properties)) {
+        initProps(properties);
+        if (enable) {
             checkProps();
         }
     }
-
-    protected boolean initProps(Properties properties) {
-        String enable = properties.getProperty(category() + ".enable");
-        if (enable == null || !enable.equals("true")) {
-            this.enable = false;
-            return false;
-        }
-
-        enable = properties.getProperty(category() + "." + supportLanguage() + ".enable");
-        if (enable == null || !enable.equals("true")) {
-            this.enable = false;
-            return false;
-        }
-
-        String definitionPath = properties.getProperty(category() + ".definitionPath");
-        if (!StringUtils.isBlank(definitionPath)) {
-            definitionPaths.addAll(Arrays.asList(definitionPath.split(",")));
-        }
-
-        String codePath = properties.getProperty(category() + "." + supportLanguage() + ".codePath");
-        if (!StringUtils.isBlank(codePath)) {
-            setCodePath(codePath);
-        }
-
-        packagePrefix = properties.getProperty(category() + "." + supportLanguage() + ".packagePrefix");
-        enumPackagePrefix = properties.getProperty(category() + "." + supportLanguage() + ".enumPackagePrefix");
-
-        return true;
-    }
-
 
     public void setDefinitionPath(Collection<String> definitionPaths) {
         this.definitionPaths.clear();
@@ -146,13 +116,42 @@ public abstract class Generator {
         return classDefinition instanceof BeanDefinition || classDefinition instanceof EnumDefinition;
     }
 
-    protected void parseDefinitions() {
-        if (definitionParser == null) {
-            throw new IllegalArgumentException(category().comment() + "的定义解析器[definitionParser]不能为空");
+    protected void initProps(Properties properties) {
+        String enable = properties.getProperty(category() + ".enable");
+        if (enable == null || !enable.equals("true")) {
+            this.enable = false;
         }
-        definitionParser.setPackagePrefix(packagePrefix);
-        definitionParser.setEnumPackagePrefix(enumPackagePrefix);
-        definitionParser.parse();
+
+        enable = properties.getProperty(category() + "." + supportLanguage() + ".enable");
+        if (enable == null || !enable.equals("true")) {
+            this.enable = false;
+        }
+
+        String definitionPath = properties.getProperty(category() + ".definitionPath");
+        if (!StringUtils.isBlank(definitionPath)) {
+            definitionPaths.addAll(Arrays.asList(definitionPath.split(",")));
+        }
+
+        String codePath = properties.getProperty(category() + "." + supportLanguage() + ".codePath");
+        if (!StringUtils.isBlank(codePath)) {
+            setCodePath(codePath);
+        }
+
+        packagePrefix = properties.getProperty(category() + "." + supportLanguage() + ".packagePrefix");
+        enumPackagePrefix = properties.getProperty(category() + "." + supportLanguage() + ".enumPackagePrefix");
+    }
+
+
+    /**
+     * 检查生成器必须要设置的属性
+     */
+    protected void checkProps() {
+        if (definitionPaths.isEmpty()) {
+            throw new IllegalArgumentException(category().comment() + "的定义文件路径[definitionPaths]不能为空");
+        }
+        if (codePath == null) {
+            throw new IllegalArgumentException(category().comment() + "的目标代码[" + supportLanguage() + "]文件路径[codePath]不能为空");
+        }
     }
 
     protected void initFreemarker() {
@@ -169,6 +168,15 @@ public abstract class Generator {
         }
 
         freemarkerCfg.setClassForTemplateLoading(getClass(), "");
+    }
+
+    protected void parseDefinitions() {
+        if (definitionParser == null) {
+            throw new IllegalArgumentException(category().comment() + "的定义解析器[definitionParser]不能为空");
+        }
+        definitionParser.setPackagePrefix(packagePrefix);
+        definitionParser.setEnumPackagePrefix(enumPackagePrefix);
+        definitionParser.parse();
     }
 
     public boolean tryGenerate(boolean printError) {
@@ -216,18 +224,6 @@ public abstract class Generator {
 
         generate(classDefinitions);
         logger.info("生成{}{}全部完成\n", supportLanguage(), category().comment());
-    }
-
-    /**
-     * 检查生成器必须要设置的属性
-     */
-    protected void checkProps() {
-        if (definitionPaths.isEmpty()) {
-            throw new IllegalArgumentException(category().comment() + "的定义文件路径[definitionPaths]不能为空");
-        }
-        if (codePath == null) {
-            throw new IllegalArgumentException(category().comment() + "的目标代码[" + supportLanguage() + "]文件路径[codePath]不能为空");
-        }
     }
 
     protected void generate(List<ClassDefinition> classDefinitions) {

@@ -26,6 +26,11 @@ public class LuaMessageGenerator extends MessageGenerator {
     }
 
     @Override
+    protected Language supportLanguage() {
+        return Language.lua;
+    }
+
+    @Override
     protected void initFreemarker() {
         super.initFreemarker();
         try {
@@ -33,11 +38,6 @@ public class LuaMessageGenerator extends MessageGenerator {
         } catch (IOException e) {
             logger.error("", e);
         }
-    }
-
-    @Override
-    protected Language supportLanguage() {
-        return Language.lua;
     }
 
     @Override

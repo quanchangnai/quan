@@ -28,15 +28,14 @@ public abstract class MessageGenerator extends Generator {
     }
 
     @Override
-    protected boolean initProps(Properties properties) {
-        if (!super.initProps(properties)) {
-            return false;
+    protected void initProps(Properties properties) {
+        super.initProps(properties);
+        if (!enable) {
+            return;
         }
 
         String recalcId = properties.getProperty(category() + ".recalcId");
         this.setRecalcIdOnConflicted(recalcId != null && recalcId.equals("true"));
-
-        return true;
     }
 
     @Override

@@ -27,7 +27,7 @@ public abstract class ConfigGenerator extends Generator {
     //配置加载器用于生成常量
     protected WithDefinitionConfigLoader configLoader;
 
-    protected TableType tableType;
+    protected String tableType;
 
     protected String tablePath;
 
@@ -38,40 +38,64 @@ public abstract class ConfigGenerator extends Generator {
         super(properties);
     }
 
+    public void setTableType(String tableType) {
+        this.tableType = tableType;
+    }
+
+    public void setTableType(TableType tableType) {
+        this.tableType = tableType.name();
+    }
+
+    public void setTablePath(String tablePath) {
+        this.tablePath = tablePath;
+    }
+
     @Override
-    protected boolean initProps(Properties properties) {
-        if (!super.initProps(properties)) {
-            return false;
+    public final Category category() {
+        return Category.config;
+    }
+
+    @Override
+    protected void initProps(Properties properties) {
+        super.initProps(properties);
+        if (!enable) {
+            return;
         }
 
-        String tableType_ = properties.getProperty(category() + ".tableType");
+        tableType = properties.getProperty(category() + ".tableType");
         tablePath = properties.getProperty(category() + ".tablePath");
-
-        if (!StringUtils.isBlank(tableType_)) {
-            try {
-                tableType = TableType.valueOf(tableType_);
-            } catch (Exception e) {
-                logger.info("配置表格类型错误，可用枚举值{}", Arrays.toString(TableType.values()));
-            }
-        }
 
         ConfigConverter.setDateTimePattern(properties.getProperty(category() + ".dateTimePattern"));
         ConfigConverter.setDatePattern(properties.getProperty(category() + ".datePattern"));
         ConfigConverter.setTimePattern(properties.getProperty(category() + ".timePattern"));
 
-        return true;
     }
 
-    public void setTableType(String tableType) {
-        this.tableType = TableType.valueOf(tableType);
+    @Override
+    protected void checkProps() {
+        super.checkProps();
+        if (tableType == null) {
+            throw new IllegalArgumentException(category().comment() + "的表格类型[tableType]不能为空");
+        }
+        try {
+            TableType.valueOf(tableType);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(category().comment() + "的表格类型[tableType]不合法,当前值:" + tableType + ",合法值:" + Arrays.toString(TableType.values()));
+        }
+        if (StringUtils.isBlank(tablePath)) {
+            throw new IllegalArgumentException(category().comment() + "的表格文件路径[tablePath]不能为空");
+        }
     }
 
-    public void setTableType(TableType tableType) {
-        this.tableType = tableType;
-    }
-
-    public void setTablePath(String tablePath) {
-        this.tablePath = tablePath;
+    @Override
+    protected boolean support(ClassDefinition classDefinition) {
+        if (classDefinition instanceof ConfigDefinition) {
+            return true;
+        }
+        if (classDefinition instanceof ConstantDefinition) {
+            return true;
+        }
+        return super.support(classDefinition);
     }
 
     @Override
@@ -89,37 +113,22 @@ public abstract class ConfigGenerator extends Generator {
         }
     }
 
-    @Override
-    public final Category category() {
-        return Category.config;
+    /**
+     * 初始化配置加载器，读取常量key用于常量类生成
+     */
+    protected void initConfigLoader(TableType tableType, String tablePath) {
+        if (definitionParser == null) {
+            throw new IllegalArgumentException(category().comment() + "的定义解析器[definitionParser]不能为空");
+        }
+        configLoader = new WithDefinitionConfigLoader(tablePath);
+        configLoader.setDefinitionParser(definitionParser);
+        configLoader.setTableType(tableType);
     }
 
     @Override
     public void generate(boolean printError) {
-        initConfigLoader(tableType, tablePath);
+        initConfigLoader(TableType.valueOf(tableType), tablePath);
         super.generate(printError);
-    }
-
-    @Override
-    protected void checkProps() {
-        super.checkProps();
-        if (tableType == null) {
-            throw new IllegalArgumentException(category().comment() + "的表格类型[tableType]不能为空");
-        }
-        if (tablePath == null) {
-            throw new IllegalArgumentException(category().comment() + "的表格文件路径[tablePath]不能为空");
-        }
-    }
-
-    @Override
-    protected boolean support(ClassDefinition classDefinition) {
-        if (classDefinition instanceof ConfigDefinition) {
-            return true;
-        }
-        if (classDefinition instanceof ConstantDefinition) {
-            return true;
-        }
-        return super.support(classDefinition);
     }
 
     @Override
@@ -160,17 +169,5 @@ public abstract class ConfigGenerator extends Generator {
         } else if (!valueField.isBuiltinType()) {
             constantDefinition.getImports().add(valueField.getClassDefinition().getFullName(supportLanguage()));
         }
-    }
-
-    /**
-     * 初始化配置加载器，读取常量key用于常量类生成
-     */
-    protected void initConfigLoader(TableType tableType, String tablePath) {
-        if (definitionParser == null) {
-            throw new IllegalArgumentException(category().comment() + "的定义解析器[definitionParser]不能为空");
-        }
-        configLoader = new WithDefinitionConfigLoader(tablePath);
-        configLoader.setDefinitionParser(definitionParser);
-        configLoader.setTableType(tableType);
     }
 }

@@ -47,18 +47,6 @@ public class DatabaseGenerator extends Generator {
     }
 
     @Override
-    protected void initFreemarker() {
-        super.initFreemarker();
-        try {
-            Template dataTemplate = freemarkerCfg.getTemplate("data.ftl");
-            templates.put(DataDefinition.class, dataTemplate);
-            templates.put(BeanDefinition.class, dataTemplate);
-        } catch (IOException e) {
-            logger.error("", e);
-        }
-    }
-
-    @Override
     public final Category category() {
         return Category.data;
     }
@@ -74,6 +62,18 @@ public class DatabaseGenerator extends Generator {
             return true;
         }
         return super.support(classDefinition);
+    }
+
+    @Override
+    protected void initFreemarker() {
+        super.initFreemarker();
+        try {
+            Template dataTemplate = freemarkerCfg.getTemplate("data.ftl");
+            templates.put(DataDefinition.class, dataTemplate);
+            templates.put(BeanDefinition.class, dataTemplate);
+        } catch (IOException e) {
+            logger.error("", e);
+        }
     }
 
     @Override
