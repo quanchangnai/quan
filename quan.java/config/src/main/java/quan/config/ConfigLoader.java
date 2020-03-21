@@ -3,8 +3,8 @@ package quan.config;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import quan.common.util.ClassUtils;
-import quan.common.util.PathUtils;
+import quan.common.ClassUtils;
+import quan.common.PathUtils;
 
 import java.lang.reflect.Method;
 import java.util.*;

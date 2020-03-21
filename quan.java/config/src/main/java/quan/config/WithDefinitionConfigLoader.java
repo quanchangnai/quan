@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.apache.commons.lang3.tuple.Triple;
-import quan.common.util.PathUtils;
+import quan.common.PathUtils;
 import quan.definition.BeanDefinition;
 import quan.definition.Category;
 import quan.definition.FieldDefinition;

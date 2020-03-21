@@ -2,8 +2,8 @@ package quan.generator.message;
 
 import freemarker.template.Template;
 import quan.definition.BeanDefinition;
-import quan.definition.ClassDefinition;
 import quan.definition.Category;
+import quan.definition.ClassDefinition;
 import quan.definition.message.MessageDefinition;
 import quan.definition.message.MessageHeadDefinition;
 import quan.generator.Generator;
@@ -25,8 +25,18 @@ public abstract class MessageGenerator extends Generator {
 
     public MessageGenerator(Properties properties) {
         super(properties);
+    }
+
+    @Override
+    protected boolean initProps(Properties properties) {
+        if (!super.initProps(properties)) {
+            return false;
+        }
+
         String recalcId = properties.getProperty(category() + ".recalcId");
         this.setRecalcIdOnConflicted(recalcId != null && recalcId.equals("true"));
+
+        return true;
     }
 
     @Override

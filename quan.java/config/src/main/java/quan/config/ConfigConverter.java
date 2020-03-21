@@ -4,9 +4,9 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import quan.definition.BeanDefinition;
-import quan.definition.parser.DefinitionParser;
 import quan.definition.EnumDefinition;
 import quan.definition.FieldDefinition;
+import quan.definition.parser.DefinitionParser;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -29,6 +29,9 @@ public class ConfigConverter {
     private DefinitionParser definitionParser;
 
     public static void setDateTimePattern(String pattern) {
+        if (StringUtils.isBlank(pattern)) {
+            return;
+        }
         dateTimeFormat = new SimpleDateFormat(pattern);
     }
 
@@ -37,6 +40,9 @@ public class ConfigConverter {
     }
 
     public static void setDatePattern(String pattern) {
+        if (StringUtils.isBlank(pattern)) {
+            return;
+        }
         dateFormat = new SimpleDateFormat(pattern);
     }
 
@@ -45,6 +51,9 @@ public class ConfigConverter {
     }
 
     public static void setTimePattern(String pattern) {
+        if (StringUtils.isBlank(pattern)) {
+            return;
+        }
         timeFormat = new SimpleDateFormat(pattern);
     }
 
@@ -79,7 +88,7 @@ public class ConfigConverter {
     public Object convertColumnBean(FieldDefinition fieldDefinition, JSONObject object, String columnValue) {
         BeanDefinition beanDefinition = fieldDefinition.getBean();
 
-        //Bean类型字段对应1列
+        //Bean类型字段对应一列
         if (fieldDefinition.getColumnNum() == 1) {
             return convertBean(beanDefinition, columnValue);
         }

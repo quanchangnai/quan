@@ -3,11 +3,12 @@ package quan.generator.config;
 import com.alibaba.fastjson.JSONObject;
 import freemarker.template.Template;
 import org.apache.commons.lang3.StringUtils;
+import quan.config.ConfigConverter;
 import quan.config.TableType;
 import quan.config.WithDefinitionConfigLoader;
 import quan.definition.BeanDefinition;
-import quan.definition.ClassDefinition;
 import quan.definition.Category;
+import quan.definition.ClassDefinition;
 import quan.definition.FieldDefinition;
 import quan.definition.config.ConfigDefinition;
 import quan.definition.config.ConstantDefinition;
@@ -16,7 +17,6 @@ import quan.generator.Generator;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.Properties;
 
 /**
@@ -36,21 +36,30 @@ public abstract class ConfigGenerator extends Generator {
 
     public ConfigGenerator(Properties properties) {
         super(properties);
-        if (!super.isReady()) {
-            return;
+    }
+
+    @Override
+    protected boolean initProps(Properties properties) {
+        if (!super.initProps(properties)) {
+            return false;
         }
 
-        String tableTypeStr = properties.getProperty(category() + ".tableType");
+        String tableType_ = properties.getProperty(category() + ".tableType");
         tablePath = properties.getProperty(category() + ".tablePath");
-        if (StringUtils.isBlank(tableTypeStr) || StringUtils.isBlank(tablePath)) {
-            return;
+
+        if (!StringUtils.isBlank(tableType_)) {
+            try {
+                tableType = TableType.valueOf(tableType_);
+            } catch (Exception e) {
+                logger.info("配置表格类型错误，可用枚举值{}", Arrays.toString(TableType.values()));
+            }
         }
 
-        try {
-            tableType = TableType.valueOf(tableTypeStr);
-        } catch (Exception e) {
-            logger.info("配置表格类型错误，可用枚举值{}", Arrays.toString(TableType.values()));
-        }
+        ConfigConverter.setDateTimePattern(properties.getProperty(category() + ".dateTimePattern"));
+        ConfigConverter.setDatePattern(properties.getProperty(category() + ".datePattern"));
+        ConfigConverter.setTimePattern(properties.getProperty(category() + ".timePattern"));
+
+        return true;
     }
 
     public void setTableType(String tableType) {
@@ -86,19 +95,7 @@ public abstract class ConfigGenerator extends Generator {
     }
 
     @Override
-    public boolean isReady() {
-        if (!super.isReady()) {
-            return false;
-        }
-        if (tableType == null || StringUtils.isBlank(tablePath)) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
     public void generate(boolean printError) {
-        checkProps();
         initConfigLoader(tableType, tablePath);
         super.generate(printError);
     }
@@ -169,7 +166,9 @@ public abstract class ConfigGenerator extends Generator {
      * 初始化配置加载器，读取常量key用于常量类生成
      */
     protected void initConfigLoader(TableType tableType, String tablePath) {
-        Objects.requireNonNull(definitionParser, "定义解析器不能为空");
+        if (definitionParser == null) {
+            throw new IllegalArgumentException(category().comment() + "的定义解析器[definitionParser]不能为空");
+        }
         configLoader = new WithDefinitionConfigLoader(tablePath);
         configLoader.setDefinitionParser(definitionParser);
         configLoader.setTableType(tableType);

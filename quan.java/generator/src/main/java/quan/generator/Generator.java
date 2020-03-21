@@ -5,7 +5,7 @@ import freemarker.template.Template;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import quan.common.util.PathUtils;
+import quan.common.PathUtils;
 import quan.definition.*;
 import quan.definition.parser.DefinitionParser;
 import quan.definition.parser.XmlDefinitionParser;
@@ -32,6 +32,8 @@ public abstract class Generator {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
+    protected boolean enable = true;
+
     protected Set<String> definitionPaths = new HashSet<>();
 
     protected String packagePrefix;
@@ -51,21 +53,38 @@ public abstract class Generator {
     }
 
     public Generator(Properties properties) {
-        String definitionPath = properties.getProperty(category() + ".definitionPath");
-        if (StringUtils.isBlank(definitionPath)) {
-            return;
+        if (initProps(properties)) {
+            checkProps();
         }
-        definitionPaths.addAll(Arrays.asList(definitionPath.split(",")));
+    }
+
+    protected boolean initProps(Properties properties) {
+        String enable = properties.getProperty(category() + ".enable");
+        if (enable == null || !enable.equals("true")) {
+            this.enable = false;
+            return false;
+        }
+
+        enable = properties.getProperty(category() + "." + supportLanguage() + ".enable");
+        if (enable == null || !enable.equals("true")) {
+            this.enable = false;
+            return false;
+        }
+
+        String definitionPath = properties.getProperty(category() + ".definitionPath");
+        if (!StringUtils.isBlank(definitionPath)) {
+            definitionPaths.addAll(Arrays.asList(definitionPath.split(",")));
+        }
 
         String codePath = properties.getProperty(category() + "." + supportLanguage() + ".codePath");
-        if (StringUtils.isBlank(codePath)) {
-            return;
+        if (!StringUtils.isBlank(codePath)) {
+            setCodePath(codePath);
         }
-
-        setCodePath(codePath);
 
         packagePrefix = properties.getProperty(category() + "." + supportLanguage() + ".packagePrefix");
         enumPackagePrefix = properties.getProperty(category() + "." + supportLanguage() + ".enumPackagePrefix");
+
+        return true;
     }
 
 
@@ -119,10 +138,6 @@ public abstract class Generator {
         return definitionParser;
     }
 
-    public boolean isReady() {
-        return !definitionPaths.isEmpty() && !StringUtils.isEmpty(codePath);
-    }
-
     public abstract Category category();
 
     protected abstract Language supportLanguage();
@@ -132,6 +147,9 @@ public abstract class Generator {
     }
 
     protected void parseDefinitions() {
+        if (definitionParser == null) {
+            throw new IllegalArgumentException(category().comment() + "的定义解析器[definitionParser]不能为空");
+        }
         definitionParser.setPackagePrefix(packagePrefix);
         definitionParser.setEnumPackagePrefix(enumPackagePrefix);
         definitionParser.parse();
@@ -154,7 +172,7 @@ public abstract class Generator {
     }
 
     public boolean tryGenerate(boolean printError) {
-        if (!isReady()) {
+        if (!enable) {
             return false;
         }
         generate(printError);
@@ -206,9 +224,6 @@ public abstract class Generator {
     protected void checkProps() {
         if (definitionPaths.isEmpty()) {
             throw new IllegalArgumentException(category().comment() + "的定义文件路径[definitionPaths]不能为空");
-        }
-        if (definitionParser == null) {
-            throw new IllegalArgumentException(category().comment() + "的定义解析器[definitionParser]不能为空");
         }
         if (codePath == null) {
             throw new IllegalArgumentException(category().comment() + "的目标代码[" + supportLanguage() + "]文件路径[codePath]不能为空");
@@ -327,7 +342,6 @@ public abstract class Generator {
 
         DatabaseGenerator databaseGenerator = new DatabaseGenerator(properties);
         databaseGenerator.useXmlDefinitionParser();
-        databaseGenerator.tryGenerate(true);
 
         JavaMessageGenerator javaMessageGenerator = new JavaMessageGenerator(properties);
         CSharpMessageGenerator cSharpMessageGenerator = new CSharpMessageGenerator(properties);
@@ -338,12 +352,6 @@ public abstract class Generator {
         cSharpMessageGenerator.setDefinitionParser(messageDefinitionParser);
         luaMessageGenerator.setDefinitionParser(messageDefinitionParser);
 
-        javaMessageGenerator.tryGenerate(false);
-        cSharpMessageGenerator.tryGenerate(false);
-        luaMessageGenerator.tryGenerate(false);
-
-        javaMessageGenerator.printErrors();
-
         DefinitionParser configDefinitionParser = new XmlDefinitionParser();
         JavaConfigGenerator javaConfigGenerator = new JavaConfigGenerator(properties);
         CSharpConfigGenerator cSharpConfigGenerator = new CSharpConfigGenerator(properties);
@@ -353,10 +361,16 @@ public abstract class Generator {
         cSharpConfigGenerator.setDefinitionParser(configDefinitionParser);
         luaConfigGenerator.setDefinitionParser(configDefinitionParser);
 
+        databaseGenerator.tryGenerate(true);
+
+        javaMessageGenerator.tryGenerate(false);
+        cSharpMessageGenerator.tryGenerate(false);
+        luaMessageGenerator.tryGenerate(false);
+        javaMessageGenerator.printErrors();
+
         javaConfigGenerator.tryGenerate(false);
         cSharpConfigGenerator.tryGenerate(false);
         luaConfigGenerator.tryGenerate(false);
-
         javaConfigGenerator.printErrors();
     }
 }

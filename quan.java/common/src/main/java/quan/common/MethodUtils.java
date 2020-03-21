@@ -1,4 +1,4 @@
-package quan.common.util;
+package quan.common;
 
 import java.util.Arrays;
 import java.util.Collection;

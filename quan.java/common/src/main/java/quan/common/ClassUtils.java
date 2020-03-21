@@ -1,4 +1,4 @@
-package quan.common.util;
+package quan.common;
 
 import net.bytebuddy.agent.ByteBuddyAgent;
 import net.bytebuddy.agent.builder.AgentBuilder;

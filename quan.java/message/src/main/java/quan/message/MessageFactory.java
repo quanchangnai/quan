@@ -2,7 +2,7 @@ package quan.message;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import quan.common.util.ClassUtils;
+import quan.common.ClassUtils;
 
 import java.lang.reflect.Modifier;
 import java.util.HashMap;

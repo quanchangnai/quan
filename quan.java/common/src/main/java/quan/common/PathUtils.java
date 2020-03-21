@@ -1,4 +1,4 @@
-package quan.common.util;
+package quan.common;
 
 import org.apache.commons.lang3.StringUtils;
 
