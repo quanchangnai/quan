@@ -4,6 +4,10 @@
 --- DateTime: 2019/9/4 14:34
 ---
 
+package.path = package.path .. ";../../../src/?.lua"
+
+require("quan.table")
+
 local t1 = { aaa = 1, bbb = 2 }
 local t2 = { ccc = 3, ddd = 4 }
 setmetatable(t2, { __index = t1 })
@@ -81,7 +85,31 @@ for k, v in maps(map) do
 end
 
 print("date time=======")
-local date=os.date("*t",16200)
+local date = os.date("*t", 16200)
 for k, v in pairs(date) do
-    print("k:",k,"v:",v)
+    print("k:", k, "v:", v)
 end
+
+print("=========0", os.date())
+
+local n = 100000000
+local c = 0
+local empty1
+local empty2
+
+
+print("=========1", os.time())
+
+for i = 1, n do
+    empty1 = {}
+    c=c+1
+end
+
+print("=========2", os.time())
+c=0
+for i = 1, n do
+    empty2 = table.empty()
+    c=c+1
+end
+
+print("=========3", os.time())

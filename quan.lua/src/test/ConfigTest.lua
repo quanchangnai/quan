@@ -4,7 +4,6 @@
 --- DateTime: 2019/8/30 17:04
 --
 
-package.path = package.path .. ";../?.lua"
 package.path = package.path .. ";../../../src/?.lua"
 
 local Config = require("quan.config.Config")

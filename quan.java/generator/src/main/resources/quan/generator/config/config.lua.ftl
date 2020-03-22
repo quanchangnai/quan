@@ -77,7 +77,7 @@ end
 ---@param ${index.fields[0].name} ${index.fields[0].type} ${index.fields[0].comment}
 ---@return map<${index.fields[0].name} ${index.fields[0].type},list<${name}>> | list<${name}>
 function ${name}.getBy${index.name?cap_first}(${index.fields[0].name})
-    return ${index.name}Configs[${index.fields[0].name}] or {}
+    return ${index.name}Configs[${index.fields[0].name}] or table.empty()
 end
 
    <#elseif index.unique && index.fields?size==2>
@@ -91,7 +91,7 @@ function ${name}.getBy${index.name?cap_first}(${index.fields[0].name}, ${index.f
         return ${index.name}Configs
     end
 
-    local map = ${index.name}Configs[${index.fields[0].name}] or {}
+    local map = ${index.name}Configs[${index.fields[0].name}] or table.empty()
     if (not ${index.fields[1].name}) then
         return map
     end
@@ -110,7 +110,7 @@ function ${name}.getBy${index.name?cap_first}(${index.fields[0].name}, ${index.f
         return ${index.name}Configs
     end
 
-    local map = ${index.name}Configs[${index.fields[0].name}] or {}
+    local map = ${index.name}Configs[${index.fields[0].name}] or table.empty()
     if (not ${index.fields[1].name}) then
         return map
     end
@@ -129,12 +129,12 @@ function ${name}.getBy${index.name?cap_first}(${index.fields[0].name}, ${index.f
         return ${index.name}Configs
     end
 
-    local map1 = ${index.name}Configs[${index.fields[0].name}] or {}
+    local map1 = ${index.name}Configs[${index.fields[0].name}] or table.empty()
     if (not ${index.fields[1].name}) then
         return map1
     end
 
-    local map2 = map1[${index.fields[1].name}] or {}
+    local map2 = map1[${index.fields[1].name}] or table.empty()
     if (not ${index.fields[2].name}) then
         return map2
     end
@@ -154,12 +154,12 @@ function ${name}.getBy${index.name?cap_first}(${index.fields[0].name}, ${index.f
         return ${index.name}Configs
     end
 
-    local map1 = ${index.name}Configs[${index.fields[0].name}] or {}
+    local map1 = ${index.name}Configs[${index.fields[0].name}] or table.empty()
     if (not ${index.fields[1].name}) then
         return map1
     end
 
-    local map2 = map1[${index.fields[1].name}] or {}
+    local map2 = map1[${index.fields[1].name}] or table.empty()
     if (not ${index.fields[2].name}) then
         return map2
     end

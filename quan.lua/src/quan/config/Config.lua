@@ -4,6 +4,8 @@
 --- DateTime: 2019/8/30 21:04
 ---
 
+require("quan.table")
+
 local Config = {}
 
 function Config.load(configs, config, unique, keyNames, keys)

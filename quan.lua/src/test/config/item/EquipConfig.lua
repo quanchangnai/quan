@@ -74,7 +74,7 @@ end
 ---@param position int 部位
 ---@return map<position int,list<EquipConfig>> | list<EquipConfig>
 function EquipConfig.getByPosition(position)
-    return positionConfigs[position] or {}
+    return positionConfigs[position] or table.empty()
 end
 
 return EquipConfig

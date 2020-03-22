@@ -30,3 +30,7 @@ function table.readOnly(origin)
     return setmetatable({}, meta)
 end
 
+local empty = table.readOnly({})
+function table.empty()
+    return empty
+end

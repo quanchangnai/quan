@@ -63,7 +63,7 @@ function QuestConfig.getByComposite1(a1, a2)
         return composite1Configs
     end
 
-    local map = composite1Configs[a1] or {}
+    local map = composite1Configs[a1] or table.empty()
     if (not a2) then
         return map
     end
@@ -81,7 +81,7 @@ function QuestConfig.getByComposite2(b1, b2)
         return composite2Configs
     end
 
-    local map = composite2Configs[b1] or {}
+    local map = composite2Configs[b1] or table.empty()
     if (not b2) then
         return map
     end
@@ -99,12 +99,12 @@ function QuestConfig.getByComposite3(c1, c2, c3)
         return composite3Configs
     end
 
-    local map1 = composite3Configs[c1] or {}
+    local map1 = composite3Configs[c1] or table.empty()
     if (not c2) then
         return map1
     end
 
-    local map2 = map1[c2] or {}
+    local map2 = map1[c2] or table.empty()
     if (not c3) then
         return map2
     end
@@ -123,12 +123,12 @@ function QuestConfig.getByComposite4(d1, d2, d3)
         return composite4Configs
     end
 
-    local map1 = composite4Configs[d1] or {}
+    local map1 = composite4Configs[d1] or table.empty()
     if (not d2) then
         return map1
     end
 
-    local map2 = map1[d2] or {}
+    local map2 = map1[d2] or table.empty()
     if (not d3) then
         return map2
     end
@@ -152,7 +152,7 @@ end
 ---@param type QuestType 类型
 ---@return map<type QuestType,list<QuestConfig>> | list<QuestConfig>
 function QuestConfig.getByType(type)
-    return typeConfigs[type] or {}
+    return typeConfigs[type] or table.empty()
 end
 
 return QuestConfig

@@ -76,7 +76,7 @@ end
 ---@param position int 部位
 ---@return map<position int,list<WeaponConfig>> | list<WeaponConfig>
 function WeaponConfig.getByPosition(position)
-    return positionConfigs[position] or {}
+    return positionConfigs[position] or table.empty()
 end
 
 ---
@@ -89,7 +89,7 @@ function WeaponConfig.getByComposite1(color, w1)
         return composite1Configs
     end
 
-    local map = composite1Configs[color] or {}
+    local map = composite1Configs[color] or table.empty()
     if (not w1) then
         return map
     end
@@ -106,7 +106,7 @@ function WeaponConfig.getByComposite2(w1, w2)
         return composite2Configs
     end
 
-    local map = composite2Configs[w1] or {}
+    local map = composite2Configs[w1] or table.empty()
     if (not w2) then
         return map
     end

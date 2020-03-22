@@ -3,7 +3,6 @@
 --- Created by quanchangnai.
 --- DateTime: 2019/8/30 17:36
 ---
-package.path = package.path .. ";../?.lua"
 package.path = package.path .. ";../../../src/?.lua"
 
 local Buffer = require("quan.message.Buffer")
