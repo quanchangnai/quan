@@ -6,7 +6,6 @@ import quan.definition.FieldDefinition;
 import quan.definition.Language;
 import quan.definition.message.MessageDefinition;
 import quan.definition.message.MessageHeadDefinition;
-import quan.generator.util.CSharpUtils;
 
 import java.util.Properties;
 
@@ -63,10 +62,11 @@ public class CSharpMessageGenerator extends MessageGenerator {
         }
         super.processClass(classDefinition);
     }
-
     @Override
     protected void processBeanFieldImports(BeanDefinition beanDefinition, FieldDefinition fieldDefinition) {
-        CSharpUtils.processBeanFieldImports(beanDefinition, fieldDefinition);
+        super.processBeanFieldImports(beanDefinition, fieldDefinition);
+        if (fieldDefinition.isTimeType()) {
+            beanDefinition.getImports().add("System");
+        }
     }
-
 }

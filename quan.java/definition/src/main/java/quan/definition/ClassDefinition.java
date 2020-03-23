@@ -113,6 +113,13 @@ public abstract class ClassDefinition extends Definition {
         return getFullPackageName(lang) + "." + getName();
     }
 
+    public String getImportedByOther(Language language) {
+        if (language == Language.cs) {
+            return getFullPackageName(language);
+        }
+        return getFullName(language);
+    }
+
     public List<FieldDefinition> getFields() {
         return fields;
     }

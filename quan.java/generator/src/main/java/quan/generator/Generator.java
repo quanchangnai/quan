@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.common.PathUtils;
 import quan.definition.*;
+import quan.definition.config.ConfigDefinition;
 import quan.definition.parser.DefinitionParser;
 import quan.definition.parser.XmlDefinitionParser;
 import quan.generator.config.CSharpConfigGenerator;
@@ -254,8 +255,26 @@ public abstract class Generator {
     }
 
     protected void processClass(ClassDefinition classDefinition) {
-        for (FieldDefinition fieldDefinition : classDefinition.getFields()) {
-            processField(classDefinition, fieldDefinition);
+        if (classDefinition instanceof BeanDefinition) {
+            BeanDefinition beanDefinition = (BeanDefinition) classDefinition;
+            for (FieldDefinition fieldDefinition : beanDefinition.getSelfFields()) {
+                processField(classDefinition, fieldDefinition);
+            }
+
+            Set<BeanDefinition> dependentBeans = new HashSet<>(beanDefinition.getChildren());
+            if (beanDefinition.getParent() != null && !(beanDefinition instanceof ConfigDefinition)) {
+                dependentBeans.add(beanDefinition.getParent());
+            }
+
+            for (BeanDefinition dependentBean : dependentBeans) {
+                if (!dependentBean.getFullPackageName(supportLanguage()).equals(classDefinition.getFullPackageName(supportLanguage()))) {
+                    beanDefinition.getImports().add(dependentBean.getImportedByOther(supportLanguage()));
+                }
+            }
+        } else {
+            for (FieldDefinition fieldDefinition : classDefinition.getFields()) {
+                processField(classDefinition, fieldDefinition);
+            }
         }
     }
 
@@ -292,12 +311,12 @@ public abstract class Generator {
     protected void processBeanFieldImports(BeanDefinition beanDefinition, FieldDefinition fieldDefinition) {
         ClassDefinition fieldClass = fieldDefinition.getClassDefinition();
         if (fieldClass != null && !fieldClass.getFullPackageName(supportLanguage()).equals(beanDefinition.getFullPackageName(supportLanguage()))) {
-            beanDefinition.getImports().add(fieldClass.getFullName(supportLanguage()));
+            beanDefinition.getImports().add(fieldClass.getImportedByOther(supportLanguage()));
         }
 
         BeanDefinition fieldValueBean = fieldDefinition.getValueBean();
         if (fieldValueBean != null && !fieldValueBean.getFullPackageName(supportLanguage()).equals(beanDefinition.getFullPackageName(supportLanguage()))) {
-            beanDefinition.getImports().add(fieldValueBean.getFullName(supportLanguage()));
+            beanDefinition.getImports().add(fieldValueBean.getImportedByOther(supportLanguage()));
         }
     }
 

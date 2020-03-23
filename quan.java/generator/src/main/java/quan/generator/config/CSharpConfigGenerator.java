@@ -4,7 +4,6 @@ import quan.definition.BeanDefinition;
 import quan.definition.FieldDefinition;
 import quan.definition.Language;
 import quan.definition.config.ConstantDefinition;
-import quan.generator.util.CSharpUtils;
 
 import java.util.Properties;
 
@@ -58,7 +57,10 @@ public class CSharpConfigGenerator extends ConfigGenerator {
 
     @Override
     protected void processBeanFieldImports(BeanDefinition beanDefinition, FieldDefinition fieldDefinition) {
-        CSharpUtils.processBeanFieldImports(beanDefinition, fieldDefinition);
+        super.processBeanFieldImports(beanDefinition, fieldDefinition);
+        if (fieldDefinition.isTimeType()) {
+            beanDefinition.getImports().add("System");
+        }
     }
 
     @Override

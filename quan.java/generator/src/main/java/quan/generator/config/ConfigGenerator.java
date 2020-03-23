@@ -161,16 +161,7 @@ public abstract class ConfigGenerator extends Generator {
 
     @Override
     protected void processClass(ClassDefinition classDefinition) {
-        if (classDefinition instanceof ConfigDefinition) {
-            ConfigDefinition configDefinition = (ConfigDefinition) classDefinition;
-            for (FieldDefinition fieldDefinition : configDefinition.getSelfFields()) {
-                processField(classDefinition, fieldDefinition);
-            }
-            ConfigDefinition parentDefinition = configDefinition.getParent();
-            if (parentDefinition != null && !parentDefinition.getFullPackageName(supportLanguage()).equals(configDefinition.getFullPackageName(supportLanguage()))) {
-                configDefinition.getImports().add(parentDefinition.getFullName(supportLanguage()));
-            }
-        } else if (classDefinition instanceof ConstantDefinition) {
+        if (classDefinition instanceof ConstantDefinition) {
             processConstantDependency((ConstantDefinition) classDefinition);
         } else {
             super.processClass(classDefinition);
