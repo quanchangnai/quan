@@ -2,6 +2,7 @@ package quan.generator.config;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.lang3.StringUtils;
 import quan.definition.BeanDefinition;
 import quan.definition.ClassDefinition;
 import quan.definition.FieldDefinition;
@@ -57,14 +58,22 @@ public class LuaConfigGenerator extends ConfigGenerator {
 
     private void beanLuaString(StringBuilder builder, BeanDefinition beanDefinition, JSONObject object) {
         if (object == null) {
-            builder.append("{ }");
+            builder.append("nil");
             return;
         }
 
         builder.append("{ ");
         boolean start = true;
 
-        for (FieldDefinition field : beanDefinition.getFields()) {
+        BeanDefinition actualBeanDefinition = beanDefinition;
+        String clazz = object.getString("class");
+        if (!StringUtils.isEmpty(clazz)) {
+            actualBeanDefinition = definitionParser.getBean(clazz);
+            builder.append("class = ").append("\"").append(clazz).append("\", ");
+        }
+
+
+        for (FieldDefinition field : actualBeanDefinition.getFields()) {
             if (!field.supportLanguage(this.supportLanguage())) {
                 continue;
             }

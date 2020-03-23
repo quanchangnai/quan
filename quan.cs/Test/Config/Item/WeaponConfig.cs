@@ -54,7 +54,7 @@ namespace Test.Config.Item
             {
                 foreach (var rewardListValue in rewardList1)
                 {
-                    rewardList2 =rewardList2.Add(new Reward(rewardListValue.Value<JObject>()));
+                    rewardList2 =rewardList2.Add(Reward.Create(rewardListValue.Value<JObject>()));
                 }
             }
             RewardList = rewardList2;
@@ -65,7 +65,7 @@ namespace Test.Config.Item
             {
                 foreach (var rewardSetValue in rewardSet1)
                 {
-                    rewardSet2 =rewardSet2.Add(new Reward(rewardSetValue.Value<JObject>()));
+                    rewardSet2 =rewardSet2.Add(Reward.Create(rewardSetValue.Value<JObject>()));
                 }
             }
             RewardSet = rewardSet2;
@@ -76,7 +76,7 @@ namespace Test.Config.Item
             {
                 foreach (var rewardMapKeyValue in rewardMap1)
                 {
-                    rewardMap2 = rewardMap2.Add(int.Parse(rewardMapKeyValue.Key), new Reward(rewardMapKeyValue.Value.Value<JObject>()));
+                    rewardMap2 = rewardMap2.Add(int.Parse(rewardMapKeyValue.Key), Reward.Create(rewardMapKeyValue.Value.Value<JObject>()));
                 }
             }
             RewardMap = rewardMap2;
@@ -98,7 +98,6 @@ namespace Test.Config.Item
             return new WeaponConfig(json);
         }
 
-
         public override string ToString()
         {
             return "WeaponConfig{" +
@@ -106,6 +105,7 @@ namespace Test.Config.Item
                    ",Key='" + Key + '\'' +
                    ",Name='" + Name + '\'' +
                    ",Type=" + Type.ToString2() +
+                   ",UseEffect=" + UseEffect.ToString2() +
                    ",Reward=" + Reward.ToString2() +
                    ",List=" + List.ToString2() +
                    ",Set=" + Set.ToString2() +
@@ -121,7 +121,6 @@ namespace Test.Config.Item
                    ",List2=" + List2.ToString2() +
                    '}';
         }
-
 
         // 所有WeaponConfig
         private static volatile IList<WeaponConfig> _configs = new List<WeaponConfig>();

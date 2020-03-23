@@ -166,7 +166,7 @@ public abstract class ConfigGenerator extends Generator {
             for (FieldDefinition fieldDefinition : configDefinition.getSelfFields()) {
                 processField(classDefinition, fieldDefinition);
             }
-            ConfigDefinition parentDefinition = configDefinition.getParentConfig();
+            ConfigDefinition parentDefinition = configDefinition.getParent();
             if (parentDefinition != null && !parentDefinition.getFullPackageName(supportLanguage()).equals(configDefinition.getFullPackageName(supportLanguage()))) {
                 configDefinition.getImports().add(parentDefinition.getFullName(supportLanguage()));
             }

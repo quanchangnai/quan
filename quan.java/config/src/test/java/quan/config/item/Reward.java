@@ -31,6 +31,9 @@ public class Reward extends Bean {
     }
 
 
+    public static Reward create(JSONObject json) {
+        return new Reward(json);
+    }
 
     @Override
     public String toString() {

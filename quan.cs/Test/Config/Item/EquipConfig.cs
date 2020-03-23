@@ -34,7 +34,6 @@ namespace Test.Config.Item
             return new EquipConfig(json);
         }
 
-
         public override string ToString()
         {
             return "EquipConfig{" +
@@ -42,6 +41,7 @@ namespace Test.Config.Item
                    ",Key='" + Key + '\'' +
                    ",Name='" + Name + '\'' +
                    ",Type=" + Type.ToString2() +
+                   ",UseEffect=" + UseEffect.ToString2() +
                    ",Reward=" + Reward.ToString2() +
                    ",List=" + List.ToString2() +
                    ",Set=" + Set.ToString2() +
@@ -51,7 +51,6 @@ namespace Test.Config.Item
                    ",Color=" + Color.ToString2() +
                    '}';
         }
-
 
         // 所有EquipConfig
         private static volatile IList<EquipConfig> _configs = new List<EquipConfig>();

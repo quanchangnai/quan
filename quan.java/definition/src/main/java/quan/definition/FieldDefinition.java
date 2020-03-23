@@ -56,6 +56,9 @@ public class FieldDefinition extends Definition {
     //配置字段,集合类型字段的分隔符
     private String delimiter;
 
+    private String escapedDelimiter;
+
+
     //配置字段,引用[配置.字段]
     private String ref;
 
@@ -401,7 +404,10 @@ public class FieldDefinition extends Definition {
     }
 
     public String getEscapedDelimiter() {
-        return ConfigDefinition.escapeDelimiter(getDelimiter());
+        if (StringUtils.isEmpty(escapedDelimiter)) {
+            escapedDelimiter = ConfigDefinition.escapeDelimiter(getDelimiter());
+        }
+        return escapedDelimiter;
     }
 
     public FieldDefinition setDelimiter(String delimiter) {
@@ -541,11 +547,18 @@ public class FieldDefinition extends Definition {
     }
 
     public boolean isLegalColumnNum() {
+        if (columnNum == 1) {
+            return true;
+        }
         BeanDefinition beanDefinition = getBean();
         if (beanDefinition != null) {
-            return columnNum == 1 || columnNum == beanDefinition.getFields().size();
+            if (beanDefinition.hasChild()) {
+                return columnNum == beanDefinition.getDescendantMaxFieldCount() + 1;
+            } else {
+                return columnNum == beanDefinition.getFields().size();
+            }
         } else if (type.equals("map")) {
-            return columnNum == 1 || columnNum > 0 && columnNum % 2 == 0;
+            return columnNum > 0 && columnNum % 2 == 0;
         }
         return true;
     }

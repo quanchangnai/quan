@@ -12,11 +12,21 @@
         <field name="type2" value="2"/>道具类型2
     </enum>
 
+    <bean name="UseEffect" delimiter="_">使用效果
+        <field name="aaa" type="int"/>
+    </bean>
+
+    <bean name="UseEffect2" parent="UseEffect">使用效果2
+        <field name="bbb" type="int"/>
+    </bean>
+
+
     <config name="ItemConfig" table="道具/道具">
         <field name="id" type="int" column="ID" index="unique"/>
         <field name="key" type="string" column="常量Key" index="u"/>
         <field name="name" type="string" column="名字"/>
         <field name="type" type="ItemType" column="类型"/>
+        <field name="useEffect" type="UseEffect" column="使用效果"/>
         <field name="reward" type="Reward" column="奖励"/>
         <field name="list" type="list:int" column="List" ref="ItemConfig.id"/>
         <field name="set" type="set:int" column="Set"/>

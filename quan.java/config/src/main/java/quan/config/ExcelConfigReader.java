@@ -41,7 +41,7 @@ public class ExcelConfigReader extends ConfigReader {
             }
             validateColumnNames(columnNames);
 
-            //第[bodyRowNum]行起是正文
+            //第[tableBodyStartRow]行起是正文
             if (rowNum < tableBodyStartRow) {
                 return;
             }

@@ -39,7 +39,7 @@ public class WeaponConfig extends EquipConfig {
         List<Reward> $rewardList$2 = new ArrayList<>();
         if ($rewardList$1 != null) {
             for (int i = 0; i < $rewardList$1.size(); i++) {
-                Reward $rewardList$Value = new Reward($rewardList$1.getJSONObject(i));
+                Reward $rewardList$Value = Reward.create($rewardList$1.getJSONObject(i));
                 $rewardList$2.add($rewardList$Value);
             }
         }
@@ -49,7 +49,7 @@ public class WeaponConfig extends EquipConfig {
         Set<Reward> $rewardSet$2 = new HashSet<>();
         if ($rewardSet$1 != null) {
             for (int i = 0; i < $rewardSet$1.size(); i++) {
-                Reward $rewardSet$Value = new Reward($rewardSet$1.getJSONObject(i));
+                Reward $rewardSet$Value = Reward.create($rewardSet$1.getJSONObject(i));
                 $rewardSet$2.add($rewardSet$Value);
             }
         }
@@ -59,7 +59,7 @@ public class WeaponConfig extends EquipConfig {
         Map<Integer, Reward> $rewardMap$2 = new HashMap<>();
         if ($rewardMap$1 != null) {
             for (String $rewardMap$Key : $rewardMap$1.keySet()) {
-                Reward $rewardMap$Value = new Reward($rewardMap$1.getJSONObject($rewardMap$Key));
+                Reward $rewardMap$Value = Reward.create($rewardMap$1.getJSONObject($rewardMap$Key));
                 $rewardMap$2.put(Integer.valueOf($rewardMap$Key), $rewardMap$Value);
             }
         }
@@ -130,6 +130,7 @@ public class WeaponConfig extends EquipConfig {
                 ",key='" + key + '\'' +
                 ",name='" + name + '\'' +
                 ",type=" + type +
+                ",useEffect=" + useEffect +
                 ",reward=" + reward +
                 ",list=" + list +
                 ",set=" + set +

@@ -45,7 +45,7 @@ namespace Test.Config.Common
             {
                 foreach (var rewardListValue in rewardList1)
                 {
-                    rewardList2 =rewardList2.Add(new Reward(rewardListValue.Value<JObject>()));
+                    rewardList2 =rewardList2.Add(Reward.Create(rewardListValue.Value<JObject>()));
                 }
             }
             RewardList = rewardList2;
@@ -58,7 +58,6 @@ namespace Test.Config.Common
             return new ConstantConfig(json);
         }
 
-
         public override string ToString()
         {
             return "ConstantConfig{" +
@@ -68,7 +67,6 @@ namespace Test.Config.Common
                    ",Comment='" + Comment + '\'' +
                    '}';
         }
-
 
         // 所有ConstantConfig
         private static volatile IList<ConstantConfig> _configs = new List<ConstantConfig>();

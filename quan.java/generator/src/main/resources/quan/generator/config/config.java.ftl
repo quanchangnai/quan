@@ -13,7 +13,7 @@ import ${import};
 </#if>
  * 自动生成
  */
-public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType ==6 && (!parent?? || parent=="")>Config<#elseif definitionType ==6>${parent}</#if> {
+public class ${name} extends <#if parentName?? && parentName!="">${parentName}<#elseif definitionType ==2>Bean<#else>Config</#if> {
 <#if !selfFields??>
     <#assign selfFields = fields>
 </#if>
@@ -68,7 +68,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         if ($${field.name}$1 != null) {
             for (int i = 0; i < $${field.name}$1.size(); i++) {
                 <#if field.beanValueType>
-                ${field.classValueType} $${field.name}$Value = new ${field.classValueType}($${field.name}$1.getJSONObject(i));
+                ${field.classValueType} $${field.name}$Value = ${field.classValueType}.create($${field.name}$1.getJSONObject(i));
                 $${field.name}$2.add($${field.name}$Value);
                 <#else>
                 $${field.name}$2.add($${field.name}$1.get${field.classValueType}(i));
@@ -88,7 +88,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         if ($${field.name}$1 != null) {
             for (String $${field.name}$Key : $${field.name}$1.keySet()) {
                 <#if field.beanValueType>
-                ${field.classValueType} $${field.name}$Value = new ${field.classValueType}($${field.name}$1.getJSONObject($${field.name}$Key));
+                ${field.classValueType} $${field.name}$Value = ${field.classValueType}.create($${field.name}$1.getJSONObject($${field.name}$Key));
                 $${field.name}$2.put(${field.classKeyType}.valueOf($${field.name}$Key), $${field.name}$Value);
                 <#else>
                 $${field.name}$2.put(${field.classKeyType}.valueOf($${field.name}$Key), $${field.name}$1.get${field.classValueType}($${field.name}$Key));
@@ -116,7 +116,7 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
         </#if>
         JSONObject $${field.name} = json.getJSONObject("${field.name}");
         if ($${field.name} != null) {
-            this.${field.name} = new ${field.type}($reward);
+            this.${field.name} = ${field.type}.create($${field.name});
         } else {
             this.${field.name} = null;
         }
@@ -168,6 +168,21 @@ public class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType
  <#if definitionType ==6>
     @Override
     protected ${name} create(JSONObject json) {
+        return new ${name}(json);
+    }
+<#else>
+    public static ${name} create(JSONObject json) {
+        <#if (children?size>0)>
+        String clazz = json.getString("class");
+        if (clazz != null) {
+            switch (clazz) {
+            <#list children as child>
+                case "${child.name}":
+                    return new ${child.name}(json);
+            </#list> 
+            }
+        }  
+        </#if>
         return new ${name}(json);
     }
 </#if>

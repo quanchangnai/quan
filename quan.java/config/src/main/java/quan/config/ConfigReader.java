@@ -3,6 +3,7 @@ package quan.config;
 import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import quan.definition.BeanDefinition;
 import quan.definition.Constants;
 import quan.definition.FieldDefinition;
 import quan.definition.Language;
@@ -141,9 +142,10 @@ public abstract class ConfigReader {
         }
 
         for (FieldDefinition fieldDefinition : mapAndBeanFieldColumnNums.keySet()) {
+            BeanDefinition fieldBean = fieldDefinition.getBean();
             Integer columnNum = mapAndBeanFieldColumnNums.get(fieldDefinition);
-            if (columnNum != 1 && fieldDefinition.isBeanType() && columnNum != fieldDefinition.getBean().getFields().size()) {
-                validatedErrors.add(String.format("配置[%s]的字段类型[%s]要么对应列数非法，要么单独对应1列，要么按字段拆开对应%s列", table, fieldDefinition.getType(), fieldDefinition.getBean().getFields().size()));
+            if (columnNum != 1 && fieldBean != null && (!fieldBean.hasChild() && columnNum != fieldBean.getFields().size() || fieldBean.hasChild() && columnNum != fieldBean.getDescendantMaxFieldCount() + 1)) {
+                validatedErrors.add(String.format("配置[%s]的字段类型[%s]要么对应列数非法，要么单独对应1列，要么按字段拆开对应%s列", table, fieldDefinition.getType(), fieldBean.getFields().size()));
                 fieldDefinition.setColumnNum(0);
             } else if (columnNum != 1 && columnNum % 2 != 0 && fieldDefinition.getType().equals("map")) {
                 validatedErrors.add(String.format("配置[%s]的字段类型[%s]要么对应列数非法，要么单独对应1列，要么按键值对拆开对应偶数列", table, fieldDefinition.getType()));

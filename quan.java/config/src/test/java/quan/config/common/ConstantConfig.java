@@ -34,7 +34,7 @@ public class ConstantConfig extends Config {
         List<Reward> $rewardList$2 = new ArrayList<>();
         if ($rewardList$1 != null) {
             for (int i = 0; i < $rewardList$1.size(); i++) {
-                Reward $rewardList$Value = new Reward($rewardList$1.getJSONObject(i));
+                Reward $rewardList$Value = Reward.create($rewardList$1.getJSONObject(i));
                 $rewardList$2.add($rewardList$Value);
             }
         }

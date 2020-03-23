@@ -51,6 +51,7 @@ public class EquipConfig extends ItemConfig {
                 ",key='" + key + '\'' +
                 ",name='" + name + '\'' +
                 ",type=" + type +
+                ",useEffect=" + useEffect +
                 ",reward=" + reward +
                 ",list=" + list +
                 ",set=" + set +

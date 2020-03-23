@@ -110,7 +110,7 @@ namespace Test.Config.Quest
             Name = json["name"]?.Value<string>() ?? "";
             Type = (QuestType) (json["type"]?.Value<int>() ?? default);
             Target = json["target"]?.Value<int>() ?? default;
-            Reward = json.ContainsKey("reward") ? new Reward(json["reward"].Value<JObject>()) : null;
+            Reward = json.ContainsKey("reward") ? Reward.Create(json["reward"].Value<JObject>()) : null;
             A1 = json["a1"]?.Value<int>() ?? default;
             A2 = json["a2"]?.Value<int>() ?? default;
             B1 = json["b1"]?.Value<int>() ?? default;
@@ -161,7 +161,6 @@ namespace Test.Config.Quest
             return new QuestConfig(json);
         }
 
-
         public override string ToString()
         {
             return "QuestConfig{" +
@@ -185,7 +184,6 @@ namespace Test.Config.Quest
                    ",M1=" + M1.ToString2() +
                    '}';
         }
-
 
         // 所有QuestConfig
         private static volatile IList<QuestConfig> _configs = new List<QuestConfig>();

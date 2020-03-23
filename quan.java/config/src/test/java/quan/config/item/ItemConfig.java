@@ -22,6 +22,9 @@ public class ItemConfig extends Config {
     //类型
     protected final ItemType type;
 
+    //使用效果
+    protected final UseEffect useEffect;
+
     //奖励
     protected final Reward reward;
 
@@ -51,9 +54,16 @@ public class ItemConfig extends Config {
         int $type = json.getIntValue("type");
         this.type = $type > 0 ? ItemType.valueOf($type) : null;
 
+        JSONObject $useEffect = json.getJSONObject("useEffect");
+        if ($useEffect != null) {
+            this.useEffect = UseEffect.create($useEffect);
+        } else {
+            this.useEffect = null;
+        }
+
         JSONObject $reward = json.getJSONObject("reward");
         if ($reward != null) {
-            this.reward = new Reward($reward);
+            this.reward = Reward.create($reward);
         } else {
             this.reward = null;
         }
@@ -118,6 +128,13 @@ public class ItemConfig extends Config {
     }
 
     /**
+     * 使用效果
+     */
+    public final UseEffect getUseEffect() {
+        return useEffect;
+    }
+
+    /**
      * 奖励
      */
     public final Reward getReward() {
@@ -172,6 +189,7 @@ public class ItemConfig extends Config {
                 ",key='" + key + '\'' +
                 ",name='" + name + '\'' +
                 ",type=" + type +
+                ",useEffect=" + useEffect +
                 ",reward=" + reward +
                 ",list=" + list +
                 ",set=" + set +

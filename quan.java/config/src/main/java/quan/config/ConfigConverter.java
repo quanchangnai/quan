@@ -94,11 +94,25 @@ public class ConfigConverter {
         }
 
         //Bean类型字段对应多列
+
+        BeanDefinition actualBeanDefinition = beanDefinition;
         if (object == null) {
-            object = new JSONObject();
+            if (beanDefinition.hasChild()) {
+                if (!StringUtils.isEmpty(columnValue)) {
+                    object = new JSONObject();
+                    object.put("class", columnValue);
+                }
+                return object;
+            } else {
+                object = new JSONObject();
+            }
         }
 
-        for (FieldDefinition beanField : beanDefinition.getFields()) {
+        if (beanDefinition.hasChild()) {
+            actualBeanDefinition = definitionParser.getBean(object.getString("class"));
+        }
+
+        for (FieldDefinition beanField : actualBeanDefinition.getFields()) {
             if (!object.containsKey(beanField.getName())) {
                 object.put(beanField.getName(), convert(beanField, columnValue));
                 break;
@@ -383,11 +397,29 @@ public class ConfigConverter {
         if (StringUtils.isBlank(value)) {
             return null;
         }
-        JSONObject object = new JSONObject();
+
         String[] values = value.split(beanDefinition.getEscapedDelimiter(), -1);
-        for (int i = 0; i < beanDefinition.getFields().size(); i++) {
-            FieldDefinition fieldDefinition = beanDefinition.getFields().get(i);
-            Object v = convert(fieldDefinition, values[i]);
+
+        JSONObject object = new JSONObject();
+
+        BeanDefinition actualBeanDefinition = beanDefinition;
+
+        //有子类，按具体类型转换
+        if (beanDefinition.hasChild()) {
+            object.put("class", values[0]);
+            actualBeanDefinition = definitionParser.getBean(values[0]);
+            if (actualBeanDefinition == null) {
+                throw new ConvertException(ConvertException.ErrorType.common);
+            }
+        }
+
+        for (int i = 0; i < actualBeanDefinition.getFields().size(); i++) {
+            int valueIndex = i;
+            if (beanDefinition.hasChild()) {
+                valueIndex++;
+            }
+            FieldDefinition fieldDefinition = actualBeanDefinition.getFields().get(i);
+            Object v = convert(fieldDefinition, values[valueIndex]);
             object.put(fieldDefinition.getName(), v);
         }
 

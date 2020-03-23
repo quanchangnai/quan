@@ -15,7 +15,7 @@ namespace ${getFullPackageName("cs")}
 </#if>
 	/// 自动生成
 	/// </summary>
-    public class ${name} : <#if definitionType ==2>Bean<#elseif definitionType ==6 && (!parent?? || parent=="")>ConfigBase<#elseif definitionType ==6>${parent}</#if>
+    public class ${name} : <#if parentName?? && parentName!="">${parentName}<#elseif definitionType ==2>Bean<#else>ConfigBase</#if>
     {
 <#if !selfFields??>
     <#assign selfFields = fields>
@@ -63,7 +63,7 @@ namespace ${getFullPackageName("cs")}
                 foreach (var ${field.name}Value in ${field.name}1)
                 {
                 <#if field.beanValueType>
-                    ${field.name}2 =${field.name}2.Add(new ${field.classValueType}(${field.name}Value.Value<JObject>()));
+                    ${field.name}2 =${field.name}2.Add(${field.classValueType}.Create(${field.name}Value.Value<JObject>()));
                 <#else>
                     ${field.name}2 =${field.name}2.Add(${field.name}Value.Value<${field.valueType}>());
                 </#if>
@@ -84,7 +84,7 @@ namespace ${getFullPackageName("cs")}
                 foreach (var ${field.name}KeyValue in ${field.name}1)
                 {
                 <#if field.beanValueType>
-                    ${field.name}2 = ${field.name}2.Add(${field.classKeyType}.Parse(${field.name}KeyValue.Key), new ${field.classValueType}(${field.name}KeyValue.Value.Value<JObject>()));
+                    ${field.name}2 = ${field.name}2.Add(${field.classKeyType}.Parse(${field.name}KeyValue.Key), ${field.classValueType}.Create(${field.name}KeyValue.Value.Value<JObject>()));
                 <#else>
                     ${field.name}2 = ${field.name}2.Add(${field.classKeyType}.Parse(${field.name}KeyValue.Key), ${field.name}KeyValue.Value.Value<${field.classValueType}>());
                 </#if>
@@ -104,7 +104,7 @@ namespace ${getFullPackageName("cs")}
     <#elseif field.enumType>
             ${field.name?cap_first} = (${field.type}) (json["${field.name}"]?.Value<int>() ?? default);
     <#else>
-            ${field.name?cap_first} = json.ContainsKey("${field.name}") ? new ${field.type}(json["${field.name}"].Value<JObject>()) : null;
+            ${field.name?cap_first} = json.ContainsKey("${field.name}") ? ${field.type}.Create(json["${field.name}"].Value<JObject>()) : null;
     </#if>
 </#list>
         }
@@ -114,8 +114,23 @@ namespace ${getFullPackageName("cs")}
         {
             return new ${name}(json);
         }
+<#else>
+        public<#if parentName?? && parentName!=""> new</#if> static ${name} Create(JObject json) 
+        {
+            <#if (children?size>0)>
+            var clazz = json["class"].Value<string>();
+            if (clazz != null) {
+                switch (clazz) {
+                <#list children as child>
+                    case "${child.name}":
+                        return ${child.name}.Create(json);
+                </#list> 
+                }
+            }  
+            </#if>
+            return new ${name}(json);
+        }
 </#if>
-
 
         public override string ToString()
         {
@@ -138,9 +153,8 @@ namespace ${getFullPackageName("cs")}
             </#list>
                    '}';
         }
-
-
 <#if definitionType ==6>
+
         // 所有${name}
         private static volatile IList<${name}> _configs = new List<${name}>();
 
@@ -168,7 +182,7 @@ namespace ${getFullPackageName("cs")}
 
         </#if>
     </#list>
-        public <#if parent??>new </#if>static IList<${name}> GetConfigs()
+        public <#if parentName??>new </#if>static IList<${name}> GetConfigs()
         {
             return _configs;
         }
@@ -308,11 +322,11 @@ namespace ${getFullPackageName("cs")}
             {
     <#list indexes as index>
         <#if index.fields?size==1>
-                <#if parent??>ConfigBase.</#if>Load(${index.name}Configs, config, config.${index.fields[0].name?cap_first});
+                <#if parentName??>ConfigBase.</#if>Load(${index.name}Configs, config, config.${index.fields[0].name?cap_first});
         <#elseif index.fields?size==2>
-                <#if parent??>ConfigBase.</#if>Load(${index.name}Configs, config, config.${index.fields[0].name?cap_first}, config.${index.fields[1].name?cap_first});
+                <#if parentName??>ConfigBase.</#if>Load(${index.name}Configs, config, config.${index.fields[0].name?cap_first}, config.${index.fields[1].name?cap_first});
         <#elseif index.fields?size==3>
-                <#if parent??>ConfigBase.</#if>Load(${index.name}Configs, config, config.${index.fields[0].name?cap_first}, config.${index.fields[1].name?cap_first}, config.${index.fields[2].name?cap_first});
+                <#if parentName??>ConfigBase.</#if>Load(${index.name}Configs, config, config.${index.fields[0].name?cap_first}, config.${index.fields[1].name?cap_first}, config.${index.fields[2].name?cap_first});
         </#if>
     </#list>
             }

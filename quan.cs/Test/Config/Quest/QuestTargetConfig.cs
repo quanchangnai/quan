@@ -44,7 +44,6 @@ namespace Test.Config.Quest
             return new QuestTargetConfig(json);
         }
 
-
         public override string ToString()
         {
             return "QuestTargetConfig{" +
@@ -53,7 +52,6 @@ namespace Test.Config.Quest
                    ",Noon='" + Noon_ + '\'' +
                    '}';
         }
-
 
         // 所有QuestTargetConfig
         private static volatile IList<QuestTargetConfig> _configs = new List<QuestTargetConfig>();

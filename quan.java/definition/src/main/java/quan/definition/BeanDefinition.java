@@ -7,8 +7,7 @@ import quan.definition.data.DataDefinition;
 import quan.definition.message.MessageDefinition;
 import quan.definition.message.MessageHeadDefinition;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -17,10 +16,34 @@ import java.util.regex.Pattern;
  */
 public class BeanDefinition extends ClassDefinition {
 
+    //配置的父类
+    protected String parentName;
+
+    //配置的所有后代类
+    protected Set<String> descendants = new HashSet<>();
+
+    //配置的所有子类
+    protected Set<BeanDefinition> children = new HashSet<>();
+
+    protected int descendantMaxFieldCount;
+
+    protected List<FieldDefinition> selfFields = new ArrayList<>();
+
     //配置Bean的字段分隔符
     private String delimiter = "_";
 
+    private String escapedDelimiter;
+
     public BeanDefinition() {
+    }
+
+    public BeanDefinition(String parent, String delimiter) {
+        if (!StringUtils.isEmpty(parent)) {
+            this.parentName = parent;
+        }
+        if (!StringUtils.isEmpty(delimiter)) {
+            this.delimiter = delimiter;
+        }
     }
 
     @Override
@@ -50,10 +73,98 @@ public class BeanDefinition extends ClassDefinition {
         return super.namePattern();
     }
 
+    public List<FieldDefinition> getSelfFields() {
+        return selfFields;
+    }
+
+    @Override
+    public void addField(FieldDefinition fieldDefinition) {
+        super.addField(fieldDefinition);
+        selfFields.add(fieldDefinition);
+    }
+
+    public BeanDefinition setParentName(String parentName) {
+        if (StringUtils.isBlank(parentName)) {
+            return this;
+        }
+        this.parentName = parentName.trim();
+        return this;
+    }
+
+    public String getParentName() {
+        return parentName;
+    }
+
+    public BeanDefinition getParent() {
+        return parser.getBean(getParentName());
+    }
+
+    public Set<BeanDefinition> getChildren() {
+        return children;
+    }
+
+    public boolean hasChild() {
+        return !children.isEmpty();
+    }
+
+    public Set<String> getDescendants() {
+        return descendants;
+    }
+
+    public TreeSet<String> getDescendantsAndMe() {
+        TreeSet<String> descendantsAndMe = new TreeSet<>(descendants);
+        descendantsAndMe.add(getName());
+        return descendantsAndMe;
+    }
+
+    public int getDescendantMaxFieldCount() {
+        if (descendantMaxFieldCount == 0) {
+            return fields.size();
+        }
+        return descendantMaxFieldCount;
+    }
+
     @Override
     public void validate() {
         super.validate();
         validateDelimiter();
+        validateParent();
+    }
+
+    protected void validateParent() {
+        if (getParentName() == null) {
+            return;
+        }
+
+        BeanDefinition parent = getParent();
+        if (parent == null) {
+            addValidatedError(getName4Validate() + "的父类[" + parentName + "]不存在");
+            return;
+        }
+
+        parent.children.add(this);
+
+        Set<String> ancestors = new HashSet<>();
+        while (parent != null) {
+            if (ancestors.contains(parent.getName())) {
+                addValidatedError(getName4Validate() + "和父子关系" + ancestors + "不能有循环");
+                return;
+            }
+            ancestors.add(parent.getName());
+
+            fields.addAll(0, parent.selfFields);
+            parent.descendants.add(getName());
+
+            parent = parent.getParent();
+        }
+
+        parent = getParent();
+        while (parent != null) {
+            if (fields.size() > parent.descendantMaxFieldCount) {
+                parent.descendantMaxFieldCount = fields.size();
+            }
+            parent = parent.getParent();
+        }
     }
 
     @Override
@@ -214,13 +325,23 @@ public class BeanDefinition extends ClassDefinition {
     }
 
     public String getEscapedDelimiter() {
-        return ConfigDefinition.escapeDelimiter(getDelimiter());
+        if (StringUtils.isEmpty(escapedDelimiter)) {
+            String delimiter_ = this.delimiter;
+            BeanDefinition parentBean = getParent();
+            while (parentBean != null) {
+                delimiter_ = parentBean.delimiter;
+                parentBean = parentBean.getParent();
+            }
+            escapedDelimiter = ConfigDefinition.escapeDelimiter(delimiter_);
+        }
+        return escapedDelimiter;
     }
 
     private void validateDelimiter() {
         if (category != Category.config || getClass() != BeanDefinition.class) {
             return;
         }
+
         if (delimiter.length() != 1) {
             addValidatedError(getName4Validate() + "的分隔符[" + delimiter + "]长度必须1个字符");
         }

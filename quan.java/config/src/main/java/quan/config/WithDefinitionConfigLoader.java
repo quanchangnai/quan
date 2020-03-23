@@ -442,7 +442,7 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
             ConfigDefinition configDefinition = getConfigByTable(table);
             while (configDefinition != null) {
                 needReloadConfigs.add(configDefinition);
-                configDefinition = configDefinition.getParentConfig();
+                configDefinition = configDefinition.getParent();
             }
         }
 

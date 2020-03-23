@@ -34,6 +34,11 @@ namespace Test.Config.Item
         public readonly ItemType Type;
 
         /// <summary>
+        /// 使用效果
+        /// </summary>
+        public readonly UseEffect UseEffect;
+
+        /// <summary>
         /// 奖励
         /// </summary>
         public readonly Reward Reward;
@@ -67,7 +72,8 @@ namespace Test.Config.Item
             Key = json["key"]?.Value<string>() ?? "";
             Name = json["name"]?.Value<string>() ?? "";
             Type = (ItemType) (json["type"]?.Value<int>() ?? default);
-            Reward = json.ContainsKey("reward") ? new Reward(json["reward"].Value<JObject>()) : null;
+            UseEffect = json.ContainsKey("useEffect") ? UseEffect.Create(json["useEffect"].Value<JObject>()) : null;
+            Reward = json.ContainsKey("reward") ? Reward.Create(json["reward"].Value<JObject>()) : null;
 
             var list1 = json["list"]?.Value<JArray>();
             var list2 = ImmutableList<int>.Empty;
@@ -111,7 +117,6 @@ namespace Test.Config.Item
             return new ItemConfig(json);
         }
 
-
         public override string ToString()
         {
             return "ItemConfig{" +
@@ -119,6 +124,7 @@ namespace Test.Config.Item
                    ",Key='" + Key + '\'' +
                    ",Name='" + Name + '\'' +
                    ",Type=" + Type.ToString2() +
+                   ",UseEffect=" + UseEffect.ToString2() +
                    ",Reward=" + Reward.ToString2() +
                    ",List=" + List.ToString2() +
                    ",Set=" + Set.ToString2() +
@@ -126,7 +132,6 @@ namespace Test.Config.Item
                    ",EffectiveTime='" + EffectiveTime_ + '\'' +
                    '}';
         }
-
 
         // 所有ItemConfig
         private static volatile IList<ItemConfig> _configs = new List<ItemConfig>();

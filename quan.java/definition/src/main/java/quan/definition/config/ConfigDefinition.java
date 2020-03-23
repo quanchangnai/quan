@@ -2,10 +2,7 @@ package quan.definition.config;
 
 import org.apache.commons.lang3.StringUtils;
 import quan.common.PathUtils;
-import quan.definition.BeanDefinition;
-import quan.definition.Category;
-import quan.definition.Constants;
-import quan.definition.FieldDefinition;
+import quan.definition.*;
 
 import java.io.File;
 import java.util.*;
@@ -26,21 +23,10 @@ public class ConfigDefinition extends BeanDefinition {
     //配置对应的表，包含分表和子表
     private TreeSet<String> allTables = new TreeSet<>();
 
-    //配置的父类
-    private String parent;
-
-    //配置的所有后代类
-    private Set<String> descendants = new HashSet<>();
-
-    //配置的所有子类
-    private Set<ConfigDefinition> children = new HashSet<>();
-
     //所有索引,包含继承下来的索引
     private List<IndexDefinition> indexes = new ArrayList<>();
 
     private List<IndexDefinition> selfIndexes = new ArrayList<>();
-
-    protected List<FieldDefinition> selfFields = new ArrayList<>();
 
     //列名:字段
     private Map<String, FieldDefinition> columnFields = new HashMap<>();
@@ -61,7 +47,7 @@ public class ConfigDefinition extends BeanDefinition {
             this.table = table;
         }
         if (!StringUtils.isBlank(parent)) {
-            this.parent = parent;
+            this.parentName = parent;
         }
     }
 
@@ -93,34 +79,9 @@ public class ConfigDefinition extends BeanDefinition {
         }
     }
 
-    public ConfigDefinition setParent(String parent) {
-        if (StringUtils.isBlank(parent)) {
-            return this;
-        }
-        this.parent = parent.trim();
-        return this;
-    }
-
-    public String getParent() {
-        return parent;
-    }
-
-    public ConfigDefinition getParentConfig() {
-        return parser.getConfig(getParent());
-    }
-
-    public Set<ConfigDefinition> getChildren() {
-        return children;
-    }
-
-    public Set<String> getDescendants() {
-        return descendants;
-    }
-
-    public TreeSet<String> getDescendantsAndMe() {
-        TreeSet<String> descendantsAndMe = new TreeSet<>(descendants);
-        descendantsAndMe.add(getName());
-        return descendantsAndMe;
+    @Override
+    public ConfigDefinition getParent() {
+        return parser.getConfig(getParentName());
     }
 
     public ConfigDefinition setTable(String table) {
@@ -138,6 +99,7 @@ public class ConfigDefinition extends BeanDefinition {
     public TreeSet<String> getTables() {
         return tables;
     }
+
 
     /**
      * 自身和子类的所有表
@@ -196,26 +158,13 @@ public class ConfigDefinition extends BeanDefinition {
         return columnFields;
     }
 
-
-    @Override
-    public void addField(FieldDefinition fieldDefinition) {
-        super.addField(fieldDefinition);
-        selfFields.add(fieldDefinition);
-    }
-
-
-    public List<FieldDefinition> getSelfFields() {
-        return selfFields;
-    }
-
-
     public Set<ConstantDefinition> getConstantDefinitions() {
         return constantDefinitions;
     }
 
     public boolean isConstantKeyField(FieldDefinition fieldDefinition) {
-        ConfigDefinition parentConfig = getParentConfig();
-        if (parentConfig != null && parentConfig.isConstantKeyField(fieldDefinition)) {
+        ConfigDefinition parent = getParent();
+        if (parent != null && parent.isConstantKeyField(fieldDefinition)) {
             return true;
         }
         for (ConstantDefinition constantDefinition : constantDefinitions) {
@@ -227,7 +176,7 @@ public class ConfigDefinition extends BeanDefinition {
     }
 
     public boolean isConstantKeyField(String fieldName) {
-        ConfigDefinition parentConfig = getParentConfig();
+        ConfigDefinition parentConfig = getParent();
         if (parentConfig != null && parentConfig.isConstantKeyField(fieldName)) {
             return true;
         }
@@ -298,36 +247,44 @@ public class ConfigDefinition extends BeanDefinition {
         validateIndexes();
     }
 
-    private void validateParent() {
-        if (getParent() == null) {
+    @Override
+    protected void validateParent() {
+        if (StringUtils.isEmpty(parentName)) {
             return;
         }
 
-        ConfigDefinition parentConfig = getParentConfig();
-        if (parentConfig == null) {
-            addValidatedError(getName4Validate() + "的父配置[" + parent + "]不存在");
+        ClassDefinition parentClass = parser.getClass(parentName);
+        if (parentClass == null) {
+            addValidatedError(getName4Validate() + "的父配置[" + parentName + "]不存在");
             return;
         }
 
-        if (!parentConfig.getSupportedLanguages().containsAll(getSupportedLanguages())) {
-            addValidatedError(getName4Validate() + "支持的语言范围" + supportedLanguages + "必须小于或等于其父配置[" + parent + "]所支持的语言范围" + parentConfig.supportedLanguages);
+        if (!(parentClass instanceof ConfigDefinition)) {
+            addValidatedError(getName4Validate() + "的父类[" + parentName + "]只能是配置");
+            return;
         }
 
-        parentConfig.children.add(this);
+        ConfigDefinition parent = getParent();
+
+        if (!parent.getSupportedLanguages().containsAll(getSupportedLanguages())) {
+            addValidatedError(getName4Validate() + "支持的语言范围" + supportedLanguages + "必须小于或等于其父配置[" + parentName + "]所支持的语言范围" + parent.supportedLanguages);
+        }
+
+        parent.children.add(this);
 
         Set<String> ancestors = new HashSet<>();
-        while (parentConfig != null) {
-            if (ancestors.contains(parentConfig.getName())) {
+        while (parent != null) {
+            if (ancestors.contains(parent.getName())) {
                 addValidatedError(getName4Validate() + "和父子关系" + ancestors + "不能有循环");
                 return;
             }
+            ancestors.add(parent.getName());
 
-            fields.addAll(0, parentConfig.selfFields);
-            indexes.addAll(0, parentConfig.selfIndexes);
-            parentConfig.descendants.add(getName());
-            ancestors.add(parentConfig.getName());
+            fields.addAll(0, parent.selfFields);
+            indexes.addAll(0, parent.selfIndexes);
+            parent.descendants.add(getName());
 
-            parentConfig = parentConfig.getParentConfig();
+            parent = parent.getParent();
         }
     }
 

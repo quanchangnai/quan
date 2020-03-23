@@ -42,6 +42,7 @@ public class ConvertException extends RuntimeException {
     }
 
     public enum ErrorType {
+        common,
         enumValue,
         enumName,
         setDuplicateValue,

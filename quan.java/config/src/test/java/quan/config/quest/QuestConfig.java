@@ -79,7 +79,7 @@ public class QuestConfig extends Config {
 
         JSONObject $reward = json.getJSONObject("reward");
         if ($reward != null) {
-            this.reward = new Reward($reward);
+            this.reward = Reward.create($reward);
         } else {
             this.reward = null;
         }

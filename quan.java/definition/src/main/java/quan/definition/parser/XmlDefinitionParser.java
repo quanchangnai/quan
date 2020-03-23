@@ -99,12 +99,13 @@ public class XmlDefinitionParser extends DefinitionParser {
                 break;
             case "entity":
                 if (category == Category.data) {
-                    classDefinition = new BeanDefinition().setCategory(getCategory());
+                    classDefinition = new BeanDefinition(classElement.attributeValue("parent"), classElement.attributeValue("delimiter")).setCategory(getCategory());
                 }
                 break;
             case "bean":
-                if (category == Category.message || category == Category.config) {//临时
-                    classDefinition = new BeanDefinition().setCategory(getCategory()).setDelimiter(classElement.attributeValue("delimiter"));
+                //TODO 待优化
+                if (category == Category.message || category == Category.config) {
+                    classDefinition = new BeanDefinition(classElement.attributeValue("parent"), classElement.attributeValue("delimiter")).setCategory(getCategory());
                 }
                 break;
             case "message":

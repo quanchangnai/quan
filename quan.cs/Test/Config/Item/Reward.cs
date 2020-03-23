@@ -23,7 +23,10 @@ namespace Test.Config.Item
             ItemNum = json["itemNum"]?.Value<int>() ?? default;
         }
 
-
+        public static Reward Create(JObject json) 
+        {
+            return new Reward(json);
+        }
 
         public override string ToString()
         {
@@ -32,7 +35,5 @@ namespace Test.Config.Item
                    ",ItemNum=" + ItemNum.ToString2() +
                    '}';
         }
-
-
     }
 }
