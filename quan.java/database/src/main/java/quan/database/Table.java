@@ -48,7 +48,7 @@ public class Table<K, V extends Data<K>> implements Comparable<Table<K, V>> {
      */
     private Map<K, Row<V>> rows;
 
-    private Map<K, Row<V>> dirty;
+    private Map<K, Row<V>> dirties;
 
     /**
      * 表级锁，存档时加写锁，其他时候加读锁
@@ -90,7 +90,7 @@ public class Table<K, V extends Data<K>> implements Comparable<Table<K, V>> {
             cacheExpire = database.getConfig().getCacheExpire();
             nextCleanTime = System.currentTimeMillis() + cacheExpire * 1000;
             rows = new ConcurrentHashMap<>();
-            dirty = new ConcurrentHashMap<>();
+            dirties = new ConcurrentHashMap<>();
         } finally {
             lock.writeLock().unlock();
         }
@@ -129,7 +129,7 @@ public class Table<K, V extends Data<K>> implements Comparable<Table<K, V>> {
             //新插入
             row = new Row<>(data, Row.INSERT);
             rows.put(data.getKey(), row);
-            dirty.put(data.getKey(), row);
+            dirties.put(data.getKey(), row);
         }
     }
 
@@ -147,7 +147,7 @@ public class Table<K, V extends Data<K>> implements Comparable<Table<K, V>> {
         //可能状态:insert,update,normal,delete(当前事务中被删除)
         if (row.state == Row.NORMAL) {
             row.state = Row.UPDATE;
-            dirty.put(data.getKey(), row);
+            dirties.put(data.getKey(), row);
         }
     }
 
@@ -161,16 +161,16 @@ public class Table<K, V extends Data<K>> implements Comparable<Table<K, V>> {
             if (row.state == Row.INSERT) {
                 //新插入的数据清除插入记录
                 rows.remove(key);
-                dirty.remove(key);
+                dirties.remove(key);
             } else {
                 row.state = Row.DELETE;
-                dirty.put(key, row);
+                dirties.put(key, row);
             }
         } else {
             //设置删除记录即可
             row = new Row<>(null, Row.DELETE);
             rows.put(key, row);
-            dirty.put(key, row);
+            dirties.put(key, row);
         }
     }
 
@@ -300,7 +300,7 @@ public class Table<K, V extends Data<K>> implements Comparable<Table<K, V>> {
     public void save(K key) {
         Objects.requireNonNull(key, "主键不能为空");
 
-        Row<V> row = dirty.remove(key);
+        Row<V> row = dirties.remove(key);
         if (row == null) {
             return;
         }
@@ -322,8 +322,8 @@ public class Table<K, V extends Data<K>> implements Comparable<Table<K, V>> {
         Set<V> puts = new HashSet<>();
         Set<K> deletes = new HashSet<>();
 
-        for (K key : dirty.keySet()) {
-            Row<V> row = dirty.get(key);
+        for (K key : dirties.keySet()) {
+            Row<V> row = dirties.get(key);
             if (row.state == Row.INSERT) {
                 row.state = Row.NORMAL;
                 puts.add(row.data);
@@ -342,14 +342,14 @@ public class Table<K, V extends Data<K>> implements Comparable<Table<K, V>> {
         try {
             database.bulkWrite(this, puts, deletes);
 
-            for (K key : dirty.keySet()) {
-                Row<V> row = dirty.get(key);
+            for (K key : dirties.keySet()) {
+                Row<V> row = dirties.get(key);
                 if (row.state == Row.DELETE && row.data != null) {
                     row.data._setExpired(true);
                 }
             }
 
-            dirty.clear();
+            dirties.clear();
         } catch (Exception e) {
             logger.error("存档出错", e);
         }
