@@ -7,12 +7,17 @@ import java.util.regex.Pattern;
  * Created by quanchangnai on 2019/8/3.
  */
 @SuppressWarnings("unchecked")
-public class Constants {
+public final class Constants {
 
     /**
-     * 包名格式
+     * 首字母小写包名格式
      */
-    public static final Pattern PACKAGE_NAME_PATTERN = Pattern.compile("[a-z][a-z\\d]*(\\.[a-z][a-z\\d]*)*");
+    public static final Pattern LOWER_PACKAGE_NAME_PATTERN = Pattern.compile("[a-z][a-z\\d]*(\\.[a-z][a-z\\d]*)*");
+
+    /**
+     * 首字母大写包名格式
+     */
+    public static final Pattern UPPER_PACKAGE_NAME_PATTERN = Pattern.compile("[A-Z][a-z\\d]*(\\.[A-Z][a-z\\d]*)*");
 
     /**
      * 类名格式
@@ -106,7 +111,7 @@ public class Constants {
     public static final Set<String> TIME_TYPES = unmodifiableSet("date", "time", "datetime");
 
     /**
-     * 数据库支持的内建类型
+     * 数据支持的内建类型
      */
     public static final Set<String> DATA_BUILTIN_TYPES = unmodifiableSet(PRIMITIVE_TYPES, COLLECTION_TYPES);
 

@@ -260,7 +260,7 @@ public class ConfigDefinition extends BeanDefinition {
         }
 
         if (!(parentClass instanceof ConfigDefinition)) {
-            addValidatedError(getName4Validate() + "的父类[" + parentName + "]只能是配置");
+            addValidatedError(getName4Validate() + "的父类[" + parentName + "]只能是配置类");
             return;
         }
 

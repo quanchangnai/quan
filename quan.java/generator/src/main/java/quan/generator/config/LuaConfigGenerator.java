@@ -62,17 +62,24 @@ public class LuaConfigGenerator extends ConfigGenerator {
             return;
         }
 
-        builder.append("{ ");
-        boolean start = true;
-
         BeanDefinition actualBeanDefinition = beanDefinition;
         String clazz = object.getString("class");
         if (!StringUtils.isEmpty(clazz)) {
             actualBeanDefinition = definitionParser.getBean(clazz);
+        }
+
+        if (actualBeanDefinition == null) {
+            builder.append("nil");
+            return;
+        }
+
+        builder.append("{ ");
+
+        if (!StringUtils.isEmpty(clazz)) {
             builder.append("class = ").append("\"").append(clazz).append("\", ");
         }
 
-
+        boolean start = true;
         for (FieldDefinition field : actualBeanDefinition.getFields()) {
             if (!field.supportLanguage(this.supportLanguage())) {
                 continue;
@@ -166,5 +173,4 @@ public class LuaConfigGenerator extends ConfigGenerator {
 
         builder.append(" }");
     }
-
 }

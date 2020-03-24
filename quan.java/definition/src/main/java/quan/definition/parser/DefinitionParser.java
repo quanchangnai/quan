@@ -5,8 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.common.PathUtils;
 import quan.definition.BeanDefinition;
-import quan.definition.ClassDefinition;
 import quan.definition.Category;
+import quan.definition.ClassDefinition;
 import quan.definition.config.ConfigDefinition;
 import quan.definition.message.MessageHeadDefinition;
 
@@ -143,18 +143,34 @@ public abstract class DefinitionParser {
 
         definitionFiles.forEach(this::parseClasses);
 
+        Map<String, ClassDefinition> dissimilarClasses = new HashMap<>();
+
         for (ClassDefinition classDefinition : parsedClasses) {
             if (classDefinition.getName() == null) {
                 continue;
             }
-            ClassDefinition otherClassDefinition = validatedClasses.get(classDefinition.getName());
-            if (otherClassDefinition != null) {
-                String error = "定义文件[" + classDefinition.getDefinitionFile();
-                error += "]和[" + otherClassDefinition.getDefinitionFile();
-                error += "]有同名类[" + classDefinition.getName() + "]";
+            ClassDefinition existingClassDefinition = validatedClasses.get(classDefinition.getName());
+            if (existingClassDefinition != null) {
+                String error = "定义文件[" + classDefinition.getDefinitionFile() + "]";
+                if (!classDefinition.getDefinitionFile().equals(existingClassDefinition.getDefinitionFile())) {
+                    error += "和[" + existingClassDefinition.getDefinitionFile() + "]";
+                }
+                error += "有同名类[" + classDefinition.getName() + "]";
                 validatedErrors.add(error);
             } else {
                 validatedClasses.put(classDefinition.getName(), classDefinition);
+            }
+
+            ClassDefinition similarClassDefinition = dissimilarClasses.get(classDefinition.getName().toLowerCase());
+            if (similarClassDefinition != null && !similarClassDefinition.getName().equals(classDefinition.getName())) {
+                String error = "定义文件[" + classDefinition.getDefinitionFile() + "]的类[" + similarClassDefinition.getName() + "]和";
+                if (!classDefinition.getDefinitionFile().equals(similarClassDefinition.getDefinitionFile())) {
+                    error += "[" + similarClassDefinition.getDefinitionFile() + "]的";
+                }
+                error += "类[" + classDefinition.getName() + "]名字相似";
+                validatedErrors.add(error);
+            } else {
+                dissimilarClasses.put(classDefinition.getName().toLowerCase(), classDefinition);
             }
         }
 

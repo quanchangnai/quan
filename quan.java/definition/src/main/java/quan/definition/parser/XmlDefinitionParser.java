@@ -43,17 +43,22 @@ public class XmlDefinitionParser extends DefinitionParser {
 
         //默认以定义文件名作为包名
         String packageName = definitionFile.getName().substring(0, definitionFile.getName().lastIndexOf("."));
-        if (!Constants.PACKAGE_NAME_PATTERN.matcher(packageName).matches()) {
-            addValidatedError("定义文件名[" + packageName + "]格式错误,正确格式:" + Constants.PACKAGE_NAME_PATTERN);
-            return;
+        if (!Constants.LOWER_PACKAGE_NAME_PATTERN.matcher(packageName).matches()) {
+            addValidatedError("定义文件名[" + packageName + "]格式错误,正确格式:" + Constants.LOWER_PACKAGE_NAME_PATTERN);
         }
 
         //具体语言对应的包名
         Map<String, String> packageNames = new HashMap<>();
         for (Object attribute : rootElement.attributes()) {
             Attribute packageAttr = (Attribute) attribute;
-            if (Language.names().contains(packageAttr.getName())) {
-                packageNames.put(packageAttr.getName(), packageAttr.getValue());
+            String lang = packageAttr.getName();
+            if (Language.names().contains(lang)) {
+                String packageName1 = packageAttr.getValue();
+                if (!Constants.LOWER_PACKAGE_NAME_PATTERN.matcher(packageName1).matches() && !Constants.UPPER_PACKAGE_NAME_PATTERN.matcher(packageName1).matches()) {
+                    addValidatedError("定义文件[" + definitionFile + "]自定义语言[" + lang + "]包名[" + packageName1 + "]格式错误,正确格式:" + Constants.LOWER_PACKAGE_NAME_PATTERN + " 或 " + Constants.UPPER_PACKAGE_NAME_PATTERN);
+                    continue;
+                }
+                packageNames.put(lang, packageName1);
             }
         }
 

@@ -330,7 +330,7 @@ public abstract class Generator {
             return;
         }
 
-        logger.error("生成{}代码失败，解析定义文件{}共发现{}条错误", category().comment(), definitionParser.getDefinitionPaths(), errors.size());
+        logger.error("生成{}代码失败，解析目录{}下的定义文件共发现{}条错误", category().comment(), definitionParser.getDefinitionPaths(), errors.size());
         for (int i = 1; i <= errors.size(); i++) {
             String error = errors.get(i - 1);
             logger.error("错误{}:{}", i, error);

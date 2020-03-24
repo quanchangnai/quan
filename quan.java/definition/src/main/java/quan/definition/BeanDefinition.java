@@ -141,6 +141,9 @@ public class BeanDefinition extends ClassDefinition {
             addValidatedError(getName4Validate() + "的父类[" + parentName + "]不存在");
             return;
         }
+        if (parent.getClass() != BeanDefinition.class) {
+            addValidatedError(getName4Validate() + "的父类[" + parentName + "]类型不合法");
+        }
 
         parent.children.add(this);
 
