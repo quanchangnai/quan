@@ -146,12 +146,12 @@ public abstract class ConfigReader {
             Integer columnNum = mapAndBeanFieldColumnNums.get(fieldDefinition);
             if (columnNum != 1 && fieldBean != null && (!fieldBean.hasChild() && columnNum != fieldBean.getFields().size() || fieldBean.hasChild() && columnNum != fieldBean.getDescendantMaxFieldCount() + 1)) {
                 validatedErrors.add(String.format("配置[%s]的字段类型[%s]要么对应列数非法，要么单独对应1列，要么按字段拆开对应%s列", table, fieldDefinition.getType(), fieldBean.getFields().size()));
-                fieldDefinition.setColumnNum(0);
+                fieldDefinition.setColumnCount(0);
             } else if (columnNum != 1 && columnNum % 2 != 0 && fieldDefinition.getType().equals("map")) {
                 validatedErrors.add(String.format("配置[%s]的字段类型[%s]要么对应列数非法，要么单独对应1列，要么按键值对拆开对应偶数列", table, fieldDefinition.getType()));
-                fieldDefinition.setColumnNum(0);
+                fieldDefinition.setColumnCount(0);
             } else {
-                fieldDefinition.setColumnNum(columnNum);
+                fieldDefinition.setColumnCount(columnNum);
             }
         }
 
@@ -165,7 +165,7 @@ public abstract class ConfigReader {
         if (fieldDefinition == null) {
             return;
         }
-        if (!fieldDefinition.isLegalColumnNum()) {
+        if (!fieldDefinition.isLegalColumnCount()) {
             //Bean或者map类型字段对应的列数不合法
             return;
         }

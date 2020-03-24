@@ -268,7 +268,7 @@ public abstract class Generator {
 
             for (BeanDefinition dependentBean : dependentBeans) {
                 if (!dependentBean.getFullPackageName(supportLanguage()).equals(classDefinition.getFullPackageName(supportLanguage()))) {
-                    beanDefinition.getImports().add(dependentBean.getImportedByOther(supportLanguage()));
+                    beanDefinition.getImports().add(dependentBean.getUserImport(supportLanguage()));
                 }
             }
         } else {
@@ -311,12 +311,12 @@ public abstract class Generator {
     protected void processBeanFieldImports(BeanDefinition beanDefinition, FieldDefinition fieldDefinition) {
         ClassDefinition fieldClass = fieldDefinition.getClassDefinition();
         if (fieldClass != null && !fieldClass.getFullPackageName(supportLanguage()).equals(beanDefinition.getFullPackageName(supportLanguage()))) {
-            beanDefinition.getImports().add(fieldClass.getImportedByOther(supportLanguage()));
+            beanDefinition.getImports().add(fieldClass.getUserImport(supportLanguage()));
         }
 
         BeanDefinition fieldValueBean = fieldDefinition.getValueBean();
         if (fieldValueBean != null && !fieldValueBean.getFullPackageName(supportLanguage()).equals(beanDefinition.getFullPackageName(supportLanguage()))) {
-            beanDefinition.getImports().add(fieldValueBean.getImportedByOther(supportLanguage()));
+            beanDefinition.getImports().add(fieldValueBean.getUserImport(supportLanguage()));
         }
     }
 

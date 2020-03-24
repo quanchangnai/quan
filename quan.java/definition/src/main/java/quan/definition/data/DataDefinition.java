@@ -86,11 +86,11 @@ public class DataDefinition extends BeanDefinition {
     public void validate() {
         super.validate();
         if (getKeyName() == null) {
-            addValidatedError(getName4Validate() + "的主键不能为空");
+            addValidatedError(getValidatedName() + "的主键不能为空");
             return;
         }
         if (getFields().stream().noneMatch(t -> t.getName().equals(getKeyName()))) {
-            addValidatedError(getName4Validate() + "的主键[" + getKeyName() + "]不存在");
+            addValidatedError(getValidatedName() + "的主键[" + getKeyName() + "]不存在");
         }
     }
 

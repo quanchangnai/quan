@@ -172,7 +172,7 @@ public class XmlDefinitionParser extends DefinitionParser {
         fieldDefinition.setCategory(getCategory());
 
         fieldDefinition.setName(fieldElement.attributeValue("name"));
-        fieldDefinition.setOriginalType(fieldElement.attributeValue("type"));
+        fieldDefinition.setOriginType(fieldElement.attributeValue("type"));
         fieldDefinition.setValue(fieldElement.attributeValue("value"));
         fieldDefinition.setColumn(fieldElement.attributeValue("column"));
         fieldDefinition.setOptional(fieldElement.attributeValue("optional"));

@@ -19,7 +19,7 @@ public class ConstantDefinition extends ClassDefinition {
 
     private ConfigDefinition configDefinition;
 
-    //是否使用枚举实现，Java支持动态读取枚举值,C#支持整数枚举，其他不支持的语言该参数没有意义
+    //是否使用枚举实现，Java支持动态读取枚举值，C#支持整数枚举，其他不支持的语言该参数没有意义
     private boolean useEnum = true;
 
     private String keyField;
@@ -33,11 +33,6 @@ public class ConstantDefinition extends ClassDefinition {
     @Override
     public int getDefinitionType() {
         return 8;
-    }
-
-    @Override
-    public String getName4Validate() {
-        return super.getName4Validate();
     }
 
     @Override
@@ -118,41 +113,41 @@ public class ConstantDefinition extends ClassDefinition {
         validateValueField();
 
         if (commentField != null && configDefinition.getField(commentField) == null) {
-            addValidatedError(getName4Validate() + "的注释字段[" + commentField + "]不存在");
+            addValidatedError(getValidatedName() + "的注释字段[" + commentField + "]不存在");
         }
     }
 
     public void validateKeyField() {
         if (StringUtils.isBlank(keyField)) {
-            addValidatedError(getName4Validate("的") + "key字段不能为空");
+            addValidatedError(getValidatedName("的") + "key字段不能为空");
             return;
         }
 
         FieldDefinition keyFieldDefinition = configDefinition.getField(keyField);
         if (keyFieldDefinition == null) {
-            addValidatedError(getName4Validate() + "的key[" + keyField + "]不是" + configDefinition.getName4Validate() + "的字段");
+            addValidatedError(getValidatedName() + "的key[" + keyField + "]不是" + configDefinition.getValidatedName() + "的字段");
             return;
         }
 
         if (!keyFieldDefinition.getType().equals("string")) {
-            addValidatedError(getName4Validate() + "的key字段[" + keyField + "]必须是字符串类型");
+            addValidatedError(getValidatedName() + "的key字段[" + keyField + "]必须是字符串类型");
         }
 
         IndexDefinition keyFieldIndex = configDefinition.getIndexByField1(keyFieldDefinition);
         if (keyFieldIndex == null || !keyFieldIndex.isUnique() || keyFieldIndex.getFields().size() > 1) {
-            addValidatedError(getName4Validate() + "的key字段[" + keyField + "]必须是单字段唯一索引");
+            addValidatedError(getValidatedName() + "的key字段[" + keyField + "]必须是单字段唯一索引");
         }
     }
 
     public void validateValueField() {
         if (StringUtils.isBlank(valueField)) {
-            addValidatedError(getName4Validate("的") + "value字段不能为空");
+            addValidatedError(getValidatedName("的") + "value字段不能为空");
             return;
         }
 
         FieldDefinition valueFieldDefinition = configDefinition.getField(valueField);
         if (valueFieldDefinition == null) {
-            addValidatedError(getName4Validate() + "的value[" + valueField + "]不是" + configDefinition.getName4Validate() + "的字段");
+            addValidatedError(getValidatedName() + "的value[" + valueField + "]不是" + configDefinition.getValidatedName() + "的字段");
         }
 
     }

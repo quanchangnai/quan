@@ -89,7 +89,7 @@ public class ConfigConverter {
         BeanDefinition beanDefinition = fieldDefinition.getBean();
 
         //Bean类型字段对应一列
-        if (fieldDefinition.getColumnNum() == 1) {
+        if (fieldDefinition.getColumnCount() == 1) {
             return convertBean(beanDefinition, columnValue);
         }
 
@@ -267,7 +267,7 @@ public class ConfigConverter {
 
         //set
         JSONArray setArray = convertSet(fieldDefinition, value);
-        if (fieldDefinition.getColumnNum() == 1) {
+        if (fieldDefinition.getColumnCount() == 1) {
             array.addAll(setArray);
             return array;
         }
@@ -292,7 +292,7 @@ public class ConfigConverter {
 
     public JSONObject convertColumnMap(FieldDefinition fieldDefinition, JSONObject rowJson, String value) {
         //map类型字段对应1列
-        if (fieldDefinition.getColumnNum() == 1) {
+        if (fieldDefinition.getColumnCount() == 1) {
             return convertMap(fieldDefinition, value);
         }
 

@@ -32,9 +32,9 @@ public class EnumDefinition extends ClassDefinition {
         }
 
         if (enumValue <= 0) {
-            addValidatedError(getName4Validate() + "的值[" + fieldDefinition.getValue() + "]必须为正整数");
+            addValidatedError(getValidatedName() + "的值[" + fieldDefinition.getValue() + "]必须为正整数");
         } else if (valuesFields.containsKey(enumValue)) {
-            addValidatedError(getName4Validate() + "的值[" + fieldDefinition.getValue() + "]不能重复");
+            addValidatedError(getValidatedName() + "的值[" + fieldDefinition.getValue() + "]不能重复");
         } else {
             valuesFields.put(enumValue, fieldDefinition);
         }

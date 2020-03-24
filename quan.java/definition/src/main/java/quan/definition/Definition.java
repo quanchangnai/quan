@@ -42,19 +42,19 @@ public abstract class Definition {
         return name;
     }
 
-    public String getName4Validate() {
-        return getName4Validate("");
+    public String getValidatedName() {
+        return getValidatedName("");
     }
 
-    public String getName4Validate(String append) {
+    public String getValidatedName(String append) {
         String definitionTypeName = getDefinitionTypeName();
-        String name4Validate;
+        String validatedName;
         if (name != null) {
-            name4Validate = definitionTypeName + "[" + name + "]" + append;
+            validatedName = definitionTypeName + "[" + name + "]" + append;
         } else {
-            name4Validate = definitionTypeName + append;
+            validatedName = definitionTypeName + append;
         }
-        return name4Validate;
+        return validatedName;
     }
 
 

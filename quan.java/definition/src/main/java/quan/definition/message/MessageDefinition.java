@@ -52,7 +52,7 @@ public class MessageDefinition extends BeanDefinition {
         if (fieldDefinition.getName() != null && headDefinition != null) {
             headDefinition.validate();
             if (headDefinition.getField(fieldDefinition.getName()) != null) {
-                addValidatedError(getName4Validate("的") + "字段名[" + fieldDefinition.getName() + "]不能和消息头的字段重复");
+                addValidatedError(getValidatedName("的") + "字段名[" + fieldDefinition.getName() + "]不能和消息头的字段重复");
             }
         }
         super.validateFieldNameDuplicate(fieldDefinition);

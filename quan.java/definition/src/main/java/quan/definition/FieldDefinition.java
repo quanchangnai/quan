@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 public class FieldDefinition extends Definition {
 
     //字段类型的原始定义,集合类型包含其元素类型
-    private String originalType;
+    private String originType;
 
     //拆分后的字段类型
     private String type;
@@ -56,20 +56,20 @@ public class FieldDefinition extends Definition {
     //配置字段,集合类型字段的分隔符
     private String delimiter;
 
+    //配置字段,转义后的集合类型字段的分隔符
     private String escapedDelimiter;
-
 
     //配置字段,引用[配置.字段]
     private String ref;
 
-    //配置字段,是支持还是排除语言
+    //配置字段,是支持还是排除设置的语言
     private boolean excludeLanguage;
 
     //配置字段,支持或者排除的语言
     protected Set<String> languages = new HashSet<>();
 
-    //配置字段,Bean或者集合类型字段对应的表格列数，校验表头时设置
-    private int columnNum;
+    //配置字段,对象或者集合类型字段对应的表格列数，校验表头时设置
+    private int columnCount;
 
     public FieldDefinition() {
     }
@@ -90,15 +90,15 @@ public class FieldDefinition extends Definition {
     }
 
 
-    public String getOriginalType() {
-        return originalType;
+    public String getOriginType() {
+        return originType;
     }
 
-    public void setOriginalType(String originalType) {
-        if (StringUtils.isBlank(originalType)) {
+    public void setOriginType(String originType) {
+        if (StringUtils.isBlank(originType)) {
             return;
         }
-        this.originalType = originalType;
+        this.originType = originType;
     }
 
     public String getType() {
@@ -537,28 +537,28 @@ public class FieldDefinition extends Definition {
         return supportLanguage(language.name());
     }
 
-    public int getColumnNum() {
-        return columnNum;
+    public int getColumnCount() {
+        return columnCount;
     }
 
-    public FieldDefinition setColumnNum(int columnNum) {
-        this.columnNum = columnNum;
+    public FieldDefinition setColumnCount(int columnCount) {
+        this.columnCount = columnCount;
         return this;
     }
 
-    public boolean isLegalColumnNum() {
-        if (columnNum == 1) {
+    public boolean isLegalColumnCount() {
+        if (columnCount == 1) {
             return true;
         }
         BeanDefinition beanDefinition = getBean();
         if (beanDefinition != null) {
             if (beanDefinition.hasChild()) {
-                return columnNum == beanDefinition.getDescendantMaxFieldCount() + 1;
+                return columnCount == beanDefinition.getDescendantMaxFieldCount() + 1;
             } else {
-                return columnNum == beanDefinition.getFields().size();
+                return columnCount == beanDefinition.getFields().size();
             }
         } else if (type.equals("map")) {
-            return columnNum > 0 && columnNum % 2 == 0;
+            return columnCount > 0 && columnCount % 2 == 0;
         }
         return true;
     }
