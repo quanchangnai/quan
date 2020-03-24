@@ -1,6 +1,5 @@
 package quan.config.item;
 
-import java.util.*;
 import com.alibaba.fastjson.*;
 import quan.config.*;
 
@@ -25,14 +24,13 @@ public class UseEffect extends Bean {
 
 
     public static UseEffect create(JSONObject json) {
-        String clazz = json.getString("class");
-        if (clazz != null) {
-            switch (clazz) {
-                case "UseEffect2":
-                    return new UseEffect2(json);
-            }
-        }  
-        return new UseEffect(json);
+        String clazz = json.getOrDefault("class", "").toString();
+        switch (clazz) {
+            case "UseEffect2":
+                return UseEffect2.create(json);
+            default:
+                return new UseEffect(json);
+        }
     }
 
     @Override
@@ -42,6 +40,5 @@ public class UseEffect extends Bean {
                 '}';
 
     }
-
 
 }

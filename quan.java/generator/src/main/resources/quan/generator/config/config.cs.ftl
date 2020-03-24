@@ -1,8 +1,12 @@
+<#if definitionType == 6>
 using System.Collections.Generic;
 using System.Collections.Immutable;
+</#if>
 using Newtonsoft.Json.Linq;
 using Quan.Common;
+<#if !(parentName??) || definitionType == 6>
 using Quan.Config;
+</#if>
 <#list imports as import>
 using ${import};
 </#list>
@@ -15,7 +19,7 @@ namespace ${getFullPackageName("cs")}
 </#if>
 	/// 自动生成
 	/// </summary>
-    public class ${name} : <#if parentName?? && parentName!="">${parentName}<#elseif definitionType ==2>Bean<#else>ConfigBase</#if>
+    public class ${name} : <#if parentName??>${parentName}<#elseif definitionType ==2>Bean<#else>ConfigBase</#if>
     {
 <#if !selfFields??>
     <#assign selfFields = fields>
@@ -115,20 +119,22 @@ namespace ${getFullPackageName("cs")}
             return new ${name}(json);
         }
 <#else>
-        public<#if parentName?? && parentName!=""> new</#if> static ${name} Create(JObject json) 
+        public<#if parentName?? && parentName!=""> new</#if> static ${name} Create(JObject json)
         {
             <#if (children?size>0)>
-            var clazz = json["class"].Value<string>();
-            if (clazz != null) {
-                switch (clazz) {
+            var clazz = json["class"].Value<string>() ?? "";
+            switch (clazz) 
+            {
                 <#list children as child>
-                    case "${child.name}":
-                        return ${child.name}.Create(json);
+                case "${child.name}":
+                    return ${child.name}.Create(json);
+                default:
+                    return new ${name}(json);
                 </#list> 
-                }
-            }  
-            </#if>
+            }
+            <#else>
             return new ${name}(json);
+            </#if>
         }
 </#if>
 

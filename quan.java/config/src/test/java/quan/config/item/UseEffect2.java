@@ -1,8 +1,6 @@
 package quan.config.item;
 
-import java.util.*;
 import com.alibaba.fastjson.*;
-import quan.config.*;
 
 /**
  * 使用效果2<br/>
@@ -36,6 +34,5 @@ public class UseEffect2 extends UseEffect {
                 '}';
 
     }
-
 
 }

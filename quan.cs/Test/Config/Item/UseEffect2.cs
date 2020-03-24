@@ -1,8 +1,5 @@
-using System.Collections.Generic;
-using System.Collections.Immutable;
 using Newtonsoft.Json.Linq;
 using Quan.Common;
-using Quan.Config;
 
 namespace Test.Config.Item
 {
@@ -20,7 +17,7 @@ namespace Test.Config.Item
             Bbb = json["bbb"]?.Value<int>() ?? default;
         }
 
-        public new static UseEffect2 Create(JObject json) 
+        public new static UseEffect2 Create(JObject json)
         {
             return new UseEffect2(json);
         }

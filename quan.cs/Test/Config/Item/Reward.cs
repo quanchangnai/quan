@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Collections.Immutable;
 using Newtonsoft.Json.Linq;
 using Quan.Common;
 using Quan.Config;
@@ -23,7 +21,7 @@ namespace Test.Config.Item
             ItemNum = json["itemNum"]?.Value<int>() ?? default;
         }
 
-        public static Reward Create(JObject json) 
+        public static Reward Create(JObject json)
         {
             return new Reward(json);
         }

@@ -1,6 +1,5 @@
 package quan.config.item;
 
-import java.util.*;
 import com.alibaba.fastjson.*;
 import quan.config.*;
 
@@ -43,6 +42,5 @@ public class Reward extends Bean {
                 '}';
 
     }
-
 
 }

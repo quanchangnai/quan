@@ -1,8 +1,12 @@
 package ${getFullPackageName("java")};
 
+<#if definitionType == 6>
 import java.util.*;
+</#if>
 import com.alibaba.fastjson.*;
+<#if !(parentName??) || definitionType == 6>
 import quan.config.*;
+</#if>
 <#list imports as import>
 import ${import};
 </#list>
@@ -13,7 +17,7 @@ import ${import};
 </#if>
  * 自动生成
  */
-public class ${name} extends <#if parentName?? && parentName!="">${parentName}<#elseif definitionType ==2>Bean<#else>Config</#if> {
+public class ${name} extends <#if parentName??>${parentName}<#elseif definitionType ==2>Bean<#else>Config</#if> {
 <#if !selfFields??>
     <#assign selfFields = fields>
 </#if>
@@ -173,17 +177,18 @@ public class ${name} extends <#if parentName?? && parentName!="">${parentName}<#
 <#else>
     public static ${name} create(JSONObject json) {
         <#if (children?size>0)>
-        String clazz = json.getString("class");
-        if (clazz != null) {
-            switch (clazz) {
+        String clazz = json.getOrDefault("class", "").toString();
+        switch (clazz) {
             <#list children as child>
-                case "${child.name}":
-                    return new ${child.name}(json);
+            case "${child.name}":
+                return ${child.name}.create(json);
+            default:
+                return new UseEffect(json);
             </#list> 
-            }
-        }  
-        </#if>
+        }
+        <#else>
         return new ${name}(json);
+        </#if>
     }
 </#if>
 
@@ -209,7 +214,6 @@ public class ${name} extends <#if parentName?? && parentName!="">${parentName}<#
                 '}';
 
     }
-
 <#macro indexer tab>
     ${tab}//所有${name}
     ${tab}private static volatile List<${name}> configs = new ArrayList<>();
@@ -382,6 +386,7 @@ public class ${name} extends <#if parentName?? && parentName!="">${parentName}<#
     </#macro>
 
  <#if definitionType ==6>
+
     <#if parent??>
     public static class self {
 

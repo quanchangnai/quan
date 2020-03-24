@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Collections.Immutable;
 using Newtonsoft.Json.Linq;
 using Quan.Common;
 using Quan.Config;
@@ -20,16 +18,16 @@ namespace Test.Config.Item
             Aaa = json["aaa"]?.Value<int>() ?? default;
         }
 
-        public static UseEffect Create(JObject json) 
+        public static UseEffect Create(JObject json)
         {
-            var clazz = json["class"].Value<string>();
-            if (clazz != null) {
-                switch (clazz) {
-                    case "UseEffect2":
-                        return UseEffect2.Create(json);
-                }
-            }  
-            return new UseEffect(json);
+            var clazz = json["class"].Value<string>() ?? "";
+            switch (clazz) 
+            {
+                case "UseEffect2":
+                    return UseEffect2.Create(json);
+                default:
+                    return new UseEffect(json);
+            }
         }
 
         public override string ToString()
