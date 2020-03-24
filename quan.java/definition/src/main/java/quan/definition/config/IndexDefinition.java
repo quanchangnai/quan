@@ -40,11 +40,19 @@ public class IndexDefinition extends Definition {
     }
 
     public boolean isUnique() {
-        return type.equals("unique") || type.equals("u");
+        return isUnique(type);
+    }
+
+    public static boolean isUnique(String index) {
+        return !StringUtils.isBlank(index) && (index.trim().equals("unique") || index.trim().equals("u"));
     }
 
     public boolean isNormal() {
-        return type.equals("normal") || type.equals("n");
+        return isNormal(type);
+    }
+
+    public static boolean isNormal(String index) {
+        return !StringUtils.isBlank(index) && (index.trim().equals("normal") || index.trim().equals("n"));
     }
 
     public String getType() {
@@ -52,10 +60,9 @@ public class IndexDefinition extends Definition {
     }
 
     public IndexDefinition setType(String type) {
-        if (StringUtils.isBlank(type)) {
-            return this;
+        if (isNormal(type) || isUnique(type)) {
+            this.type = type.trim();
         }
-        this.type = type.trim();
         return this;
     }
 

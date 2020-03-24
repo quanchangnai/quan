@@ -3,6 +3,7 @@ package quan.definition;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import quan.definition.config.ConfigDefinition;
+import quan.definition.config.IndexDefinition;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -384,10 +385,9 @@ public class FieldDefinition extends Definition {
     }
 
     public FieldDefinition setIndex(String index) {
-        if (StringUtils.isBlank(index)) {
-            return this;
+        if (IndexDefinition.isUnique(index) || IndexDefinition.isNormal(index) || index != null && index.trim().equals("-")) {
+            this.index = index.trim();
         }
-        this.index = index.trim();
         return this;
     }
 

@@ -427,26 +427,34 @@ public class ConfigDefinition extends BeanDefinition {
             if (selfField.getIndex() == null && !selfField.getName().equals("id")) {
                 continue;
             }
+            if (selfField.getIndex() != null && selfField.getIndex().equals("-")) {
+                continue;
+            }
+
             if (!selfField.isPrimitiveType() && !selfField.isEnumType()) {
                 addValidatedError(getValidatedName("的") + selfField.getValidatedName() + "类型[" + selfField.getType() + "]不支持索引，允许的类型为" + Constants.PRIMITIVE_TYPES + "或枚举");
                 continue;
             }
+
             IndexDefinition indexDefinition = new IndexDefinition();
             indexDefinition.setParser(parser);
             indexDefinition.setCategory(category);
 
             indexDefinition.setName(selfField.getName());
             indexDefinition.setFieldNames(selfField.getName());
-            if (selfField.getName().equals("id")) {
+
+            if (selfField.getName().equals("id") && (selfField.getIndex() == null || IndexDefinition.isUnique(selfField.getIndex()))) {
                 indexDefinition.setType("unique");
             } else {
                 indexDefinition.setType(selfField.getIndex());
             }
+
             if (selfField.getComment() == null) {
                 indexDefinition.setComment(selfField.getColumn());
             } else {
                 indexDefinition.setComment(selfField.getComment());
             }
+
             addIndex(indexDefinition);
         }
 
