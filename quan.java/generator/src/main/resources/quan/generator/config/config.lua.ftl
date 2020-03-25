@@ -62,8 +62,9 @@ end
    <#if index.unique && index.fields?size==1>
 ---
 ---通过索引[${index.name}]获取${name}
+---@overload fun():map<${index.fields[0].name}:${index.fields[0].type},${name}>
 ---@param ${index.fields[0].name} ${index.fields[0].type} ${index.fields[0].comment}
----  map<${index.fields[0].name} ${index.fields[0].type},${name}> | ${name}
+---@return ${name}
 function ${name}.getBy${index.name?cap_first}(${index.fields[0].name})
     if (not ${index.fields[0].name}) then
         return ${index.name}Configs
@@ -74,8 +75,9 @@ end
    <#elseif index.normal && index.fields?size==1>
 ---
 ---通过索引[${index.name}]获取${name}
+---@overload fun():map<${index.fields[0].name}:${index.fields[0].type},list<${name}>> 
 ---@param ${index.fields[0].name} ${index.fields[0].type} ${index.fields[0].comment}
----@return map<${index.fields[0].name} ${index.fields[0].type},list<${name}>> | list<${name}>
+---@return list<${name}>
 function ${name}.getBy${index.name?cap_first}(${index.fields[0].name})
     return ${index.name}Configs[${index.fields[0].name}] or table.empty()
 end
@@ -83,9 +85,11 @@ end
    <#elseif index.unique && index.fields?size==2>
 ---
 ---通过索引[${index.name}]获取${name}
+---@overload fun():map<${index.fields[0].name}:${index.fields[0].type},map<${index.fields[1].name}:${index.fields[1].type},${name}>>
+---@overload fun(${index.fields[0].name}:${index.fields[0].type}):map<${index.fields[1].name}:${index.fields[1].type},${name}>
 ---@param ${index.fields[0].name} ${index.fields[0].type} ${index.fields[0].comment}
 ---@param ${index.fields[1].name} ${index.fields[1].type} ${index.fields[1].comment}
----@return map<${index.fields[0].name} ${index.fields[0].type},map<${index.fields[1].name} ${index.fields[1].type},${name}>> | map<${index.fields[1].name} ${index.fields[1].type},${name}> | ${name}
+---@return ${name}
 function ${name}.getBy${index.name?cap_first}(${index.fields[0].name}, ${index.fields[1].name})
     if (not ${index.fields[0].name}) then
         return ${index.name}Configs
@@ -102,9 +106,11 @@ end
    <#elseif index.normal && index.fields?size==2>
 ---
 ---通过索引[${index.name}]获取${name}
+---@overload fun():map<${index.fields[0].name}:${index.fields[0].type},map<${index.fields[1].name}:${index.fields[1].type},list<${name}>>>
+---@overload fun(${index.fields[0].name}:${index.fields[0].type}):map<${index.fields[1].name}:${index.fields[1].type},list<${name}>>
 ---@param ${index.fields[0].name} ${index.fields[0].type} ${index.fields[0].comment}
 ---@param ${index.fields[1].name} ${index.fields[1].type} ${index.fields[1].comment}
----@return map<${index.fields[0].name} ${index.fields[0].type},map<${index.fields[1].name} ${index.fields[1].type},list<${name}>>> | map<${index.fields[1].name} ${index.fields[1].type},list<${name}>> | list<${name}>
+---@return list<${name}>
 function ${name}.getBy${index.name?cap_first}(${index.fields[0].name}, ${index.fields[1].name})
     if (not ${index.fields[0].name}) then
         return ${index.name}Configs
@@ -120,10 +126,13 @@ end
    <#elseif index.unique && index.fields?size==3>
 ---
 ---通过索引[${index.name}]获取${name}
+---@overload fun():map<${index.fields[0].name}:${index.fields[0].type},map<${index.fields[1].name}:${index.fields[1].type},map<${index.fields[2].name}:${index.fields[2].type},${name}>>>
+---@overload fun(${index.fields[0].name}:${index.fields[0].type}):map<${index.fields[1].name}:${index.fields[1].type},map<${index.fields[2].name}:${index.fields[2].type},${name}>>
+---@overload fun(${index.fields[0].name}:${index.fields[0].type}, ${index.fields[1].name}:${index.fields[1].type}):map<${index.fields[2].name}:${index.fields[2].type},${name}>
 ---@param ${index.fields[0].name} ${index.fields[0].type} ${index.fields[0].comment}
 ---@param ${index.fields[1].name} ${index.fields[1].type} ${index.fields[1].comment}
 ---@param ${index.fields[2].name} ${index.fields[2].type} ${index.fields[2].comment}
----@return  map<${index.fields[0].name} ${index.fields[0].type},map<${index.fields[1].name} ${index.fields[1].type},map<${index.fields[2].name} ${index.fields[2].type},${name}>>> | map<${index.fields[1].name} ${index.fields[1].type},map<${index.fields[2].name} ${index.fields[2].type},${name}>> | map<${index.fields[2].name} ${index.fields[2].type},${name}> | ${name}
+---@return ${name}
 function ${name}.getBy${index.name?cap_first}(${index.fields[0].name}, ${index.fields[1].name}, ${index.fields[2].name})
     if (not ${index.fields[0].name}) then
         return ${index.name}Configs
@@ -145,10 +154,13 @@ end
    <#elseif index.normal && index.fields?size==3>
 ---
 ---通过索引[${index.name}]获取${name}
+---@overload fun():map<${index.fields[0].name}:${index.fields[0].type},map<${index.fields[1].name}:${index.fields[1].type},map<${index.fields[2].name}:${index.fields[2].type},list<${name}>>>>
+---@overload fun(${index.fields[0].name}:${index.fields[0].type}):map<${index.fields[1].name}:${index.fields[1].type},map<${index.fields[2].name}:${index.fields[2].type},list<${name}>>>
+---@overload fun(${index.fields[1].name}:${index.fields[1].type}, ${index.fields[1].name}:${index.fields[1].type}):map<${index.fields[2].name}:${index.fields[2].type},list<${name}>>
 ---@param ${index.fields[0].name} ${index.fields[0].type} ${index.fields[0].comment}
 ---@param ${index.fields[1].name} ${index.fields[1].type} ${index.fields[1].comment}
 ---@param ${index.fields[2].name} ${index.fields[2].type} ${index.fields[2].comment}
----@return map<${index.fields[0].name} ${index.fields[0].type},map<${index.fields[1].name} ${index.fields[1].type},map<${index.fields[2].name} ${index.fields[2].type},list<${name}>>>> | map<${index.fields[1].name} ${index.fields[1].type},map<${index.fields[2].name} ${index.fields[2].type},list<${name}>>> | map<${index.fields[2].name} ${index.fields[2].type},list<${name}>> | list<${name}>
+---@return list<${name}>
 function ${name}.getBy${index.name?cap_first}(${index.fields[0].name}, ${index.fields[1].name}, ${index.fields[2].name})
     if (not ${index.fields[0].name}) then
         return ${index.name}Configs

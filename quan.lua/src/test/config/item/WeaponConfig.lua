@@ -51,8 +51,9 @@ end
 
 ---
 ---通过索引[id]获取WeaponConfig
+---@overload fun():map<id:int,WeaponConfig>
 ---@param id int ID
----  map<id int,WeaponConfig> | WeaponConfig
+---@return WeaponConfig
 function WeaponConfig.getById(id)
     if (not id) then
         return idConfigs
@@ -62,8 +63,9 @@ end
 
 ---
 ---通过索引[key]获取WeaponConfig
+---@overload fun():map<key:string,WeaponConfig>
 ---@param key string 常量Key
----  map<key string,WeaponConfig> | WeaponConfig
+---@return WeaponConfig
 function WeaponConfig.getByKey(key)
     if (not key) then
         return keyConfigs
@@ -73,17 +75,20 @@ end
 
 ---
 ---通过索引[position]获取WeaponConfig
+---@overload fun():map<position:int,list<WeaponConfig>> 
 ---@param position int 部位
----@return map<position int,list<WeaponConfig>> | list<WeaponConfig>
+---@return list<WeaponConfig>
 function WeaponConfig.getByPosition(position)
     return positionConfigs[position] or table.empty()
 end
 
 ---
 ---通过索引[composite1]获取WeaponConfig
+---@overload fun():map<color:int,map<w1:int,list<WeaponConfig>>>
+---@overload fun(color:int):map<w1:int,list<WeaponConfig>>
 ---@param color int 颜色
 ---@param w1 int 字段1
----@return map<color int,map<w1 int,list<WeaponConfig>>> | map<w1 int,list<WeaponConfig>> | list<WeaponConfig>
+---@return list<WeaponConfig>
 function WeaponConfig.getByComposite1(color, w1)
     if (not color) then
         return composite1Configs
@@ -98,9 +103,11 @@ end
 
 ---
 ---通过索引[composite2]获取WeaponConfig
+---@overload fun():map<w1:int,map<w2:int,WeaponConfig>>
+---@overload fun(w1:int):map<w2:int,WeaponConfig>
 ---@param w1 int 字段1
 ---@param w2 int 字段2
----@return map<w1 int,map<w2 int,WeaponConfig>> | map<w2 int,WeaponConfig> | WeaponConfig
+---@return WeaponConfig
 function WeaponConfig.getByComposite2(w1, w2)
     if (not w1) then
         return composite2Configs

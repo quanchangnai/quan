@@ -46,8 +46,9 @@ end
 
 ---
 ---通过索引[id]获取ItemConfig
+---@overload fun():map<id:int,ItemConfig>
 ---@param id int ID
----  map<id int,ItemConfig> | ItemConfig
+---@return ItemConfig
 function ItemConfig.getById(id)
     if (not id) then
         return idConfigs
@@ -57,8 +58,9 @@ end
 
 ---
 ---通过索引[key]获取ItemConfig
+---@overload fun():map<key:string,ItemConfig>
 ---@param key string 常量Key
----  map<key string,ItemConfig> | ItemConfig
+---@return ItemConfig
 function ItemConfig.getByKey(key)
     if (not key) then
         return keyConfigs

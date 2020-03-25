@@ -49,8 +49,9 @@ end
 
 ---
 ---通过索引[id]获取EquipConfig
+---@overload fun():map<id:int,EquipConfig>
 ---@param id int ID
----  map<id int,EquipConfig> | EquipConfig
+---@return EquipConfig
 function EquipConfig.getById(id)
     if (not id) then
         return idConfigs
@@ -60,8 +61,9 @@ end
 
 ---
 ---通过索引[key]获取EquipConfig
+---@overload fun():map<key:string,EquipConfig>
 ---@param key string 常量Key
----  map<key string,EquipConfig> | EquipConfig
+---@return EquipConfig
 function EquipConfig.getByKey(key)
     if (not key) then
         return keyConfigs
@@ -71,8 +73,9 @@ end
 
 ---
 ---通过索引[position]获取EquipConfig
+---@overload fun():map<position:int,list<EquipConfig>> 
 ---@param position int 部位
----@return map<position int,list<EquipConfig>> | list<EquipConfig>
+---@return list<EquipConfig>
 function EquipConfig.getByPosition(position)
     return positionConfigs[position] or table.empty()
 end

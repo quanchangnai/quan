@@ -38,8 +38,9 @@ end
 
 ---
 ---通过索引[key]获取ConstantConfig
+---@overload fun():map<key:string,ConstantConfig>
 ---@param key string 常量Key
----  map<key string,ConstantConfig> | ConstantConfig
+---@return ConstantConfig
 function ConstantConfig.getByKey(key)
     if (not key) then
         return keyConfigs

@@ -35,8 +35,9 @@ end
 
 ---
 ---通过索引[id]获取QuestTargetConfig
+---@overload fun():map<id:int,QuestTargetConfig>
 ---@param id int ID
----  map<id int,QuestTargetConfig> | QuestTargetConfig
+---@return QuestTargetConfig
 function QuestTargetConfig.getById(id)
     if (not id) then
         return idConfigs

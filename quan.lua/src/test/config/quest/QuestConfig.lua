@@ -55,9 +55,11 @@ end
 
 ---
 ---通过索引[composite1]获取QuestConfig
+---@overload fun():map<a1:int,map<a2:int,QuestConfig>>
+---@overload fun(a1:int):map<a2:int,QuestConfig>
 ---@param a1 int A1
 ---@param a2 int A2
----@return map<a1 int,map<a2 int,QuestConfig>> | map<a2 int,QuestConfig> | QuestConfig
+---@return QuestConfig
 function QuestConfig.getByComposite1(a1, a2)
     if (not a1) then
         return composite1Configs
@@ -73,9 +75,11 @@ end
 
 ---
 ---通过索引[composite2]获取QuestConfig
+---@overload fun():map<b1:int,map<b2:bool,list<QuestConfig>>>
+---@overload fun(b1:int):map<b2:bool,list<QuestConfig>>
 ---@param b1 int B1
 ---@param b2 bool B2
----@return map<b1 int,map<b2 bool,list<QuestConfig>>> | map<b2 bool,list<QuestConfig>> | list<QuestConfig>
+---@return list<QuestConfig>
 function QuestConfig.getByComposite2(b1, b2)
     if (not b1) then
         return composite2Configs
@@ -90,10 +94,13 @@ end
 
 ---
 ---通过索引[composite3]获取QuestConfig
+---@overload fun():map<c1:string,map<c2:int,map<c3:int,QuestConfig>>>
+---@overload fun(c1:string):map<c2:int,map<c3:int,QuestConfig>>
+---@overload fun(c1:string, c2:int):map<c3:int,QuestConfig>
 ---@param c1 string C1
 ---@param c2 int C2
 ---@param c3 int C3
----@return  map<c1 string,map<c2 int,map<c3 int,QuestConfig>>> | map<c2 int,map<c3 int,QuestConfig>> | map<c3 int,QuestConfig> | QuestConfig
+---@return QuestConfig
 function QuestConfig.getByComposite3(c1, c2, c3)
     if (not c1) then
         return composite3Configs
@@ -114,10 +121,13 @@ end
 
 ---
 ---通过索引[composite4]获取QuestConfig
+---@overload fun():map<d1:string,map<d2:int,map<d3:int,list<QuestConfig>>>>
+---@overload fun(d1:string):map<d2:int,map<d3:int,list<QuestConfig>>>
+---@overload fun(d2:int, d2:int):map<d3:int,list<QuestConfig>>
 ---@param d1 string D1
 ---@param d2 int D2
 ---@param d3 int D3
----@return map<d1 string,map<d2 int,map<d3 int,list<QuestConfig>>>> | map<d2 int,map<d3 int,list<QuestConfig>>> | map<d3 int,list<QuestConfig>> | list<QuestConfig>
+---@return list<QuestConfig>
 function QuestConfig.getByComposite4(d1, d2, d3)
     if (not d1) then
         return composite4Configs
@@ -138,8 +148,9 @@ end
 
 ---
 ---通过索引[id]获取QuestConfig
+---@overload fun():map<id:int,QuestConfig>
 ---@param id int ID
----  map<id int,QuestConfig> | QuestConfig
+---@return QuestConfig
 function QuestConfig.getById(id)
     if (not id) then
         return idConfigs
@@ -149,8 +160,9 @@ end
 
 ---
 ---通过索引[type]获取QuestConfig
+---@overload fun():map<type:QuestType,list<QuestConfig>> 
 ---@param type QuestType 类型
----@return map<type QuestType,list<QuestConfig>> | list<QuestConfig>
+---@return list<QuestConfig>
 function QuestConfig.getByType(type)
     return typeConfigs[type] or table.empty()
 end
