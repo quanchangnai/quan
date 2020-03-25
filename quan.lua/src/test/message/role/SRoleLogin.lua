@@ -9,7 +9,7 @@ local RoleInfo = require("test.message.role.RoleInfo")
 ---
 local SRoleLogin = {
     ---类名
-    class = "test.message.role.SRoleLogin",
+    class = "SRoleLogin",
     ---消息ID
     id = 763075
 }

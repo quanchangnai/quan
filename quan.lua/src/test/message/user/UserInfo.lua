@@ -6,7 +6,7 @@ local Message = require("quan.message.Message")
 ---
 local UserInfo = {
     ---类名
-    class = "test.message.user.UserInfo",
+    class = "UserInfo",
 }
 
 local function onSet(self, key, value)

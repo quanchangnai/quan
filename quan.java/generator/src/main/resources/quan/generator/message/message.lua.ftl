@@ -12,7 +12,7 @@ local ${import[import?last_index_of(".")+1..]} = require("${import}")
 ---
 local ${name} = {
     ---类名
-    class = "${getFullName("lua")}",
+    class = "${name}",
 <#if definitionType ==3>
     ---消息ID
     id = ${id?c}
