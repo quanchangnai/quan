@@ -5,7 +5,9 @@ import org.apache.commons.lang3.tuple.Pair;
 import quan.definition.config.ConfigDefinition;
 import quan.definition.config.IndexDefinition;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -69,8 +71,8 @@ public class FieldDefinition extends Definition {
     //配置字段,支持或者排除的语言
     protected Set<String> languages = new HashSet<>();
 
-    //配置字段,对象或者集合类型字段对应的表格列数，校验表头时设置
-    private int columnCount;
+    //配置字段,字段对应的表格列号,对象或者集合类型可能会对应多列，校验表头时设置
+    private List<Integer> columnNums = new ArrayList<>();
 
     public FieldDefinition() {
     }
@@ -537,28 +539,23 @@ public class FieldDefinition extends Definition {
         return supportLanguage(language.name());
     }
 
-    public int getColumnCount() {
-        return columnCount;
-    }
-
-    public FieldDefinition setColumnCount(int columnCount) {
-        this.columnCount = columnCount;
-        return this;
+    public List<Integer> getColumnNums() {
+        return columnNums;
     }
 
     public boolean isLegalColumnCount() {
-        if (columnCount == 1) {
+        if (columnNums.size() == 1) {
             return true;
         }
         BeanDefinition beanDefinition = getBean();
         if (beanDefinition != null) {
             if (beanDefinition.hasChild()) {
-                return columnCount == beanDefinition.getDescendantMaxFieldCount() + 1;
+                return columnNums.size() == beanDefinition.getDescendantMaxFieldCount() + 1;
             } else {
-                return columnCount == beanDefinition.getFields().size();
+                return columnNums.size() == beanDefinition.getFields().size();
             }
         } else if (type.equals("map")) {
-            return columnCount > 0 && columnCount % 2 == 0;
+            return columnNums.size() > 0 && columnNums.size() % 2 == 0;
         }
         return true;
     }

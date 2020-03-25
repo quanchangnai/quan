@@ -25,8 +25,11 @@ namespace Test.Config.Item
             {
                 case "UseEffect2":
                     return UseEffect2.Create(json);
-                default:
+                case "":
+                case "UseEffect":
                     return new UseEffect(json);
+                default:
+                    return null;   
             }
         }
 

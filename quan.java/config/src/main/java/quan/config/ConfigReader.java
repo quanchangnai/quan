@@ -116,47 +116,39 @@ public abstract class ConfigReader {
     }
 
     protected void validateColumnNames(List<String> columns) {
-        Set<FieldDefinition> fields = new HashSet<>(configDefinition.getFields());
-        Set<String> validatedColumns = new HashSet<>();
-        Map<FieldDefinition, Integer> mapAndBeanFieldColumnNums = new HashMap<>();
+        configDefinition.getFields().forEach(f -> f.getColumnNums().clear());
 
-        for (String columnName : columns) {
+        Set<FieldDefinition> lackFields = new HashSet<>(configDefinition.getFields());
+        Set<String> validatedColumns = new HashSet<>();
+
+        for (int i = 0; i < columns.size(); i++) {
+            String columnName = columns.get(i);
             FieldDefinition fieldDefinition = configDefinition.getColumnFields().get(columnName);
             if (fieldDefinition == null) {
                 continue;
             }
-            fields.remove(fieldDefinition);
-
-            String fieldType = fieldDefinition.getType();
+            lackFields.remove(fieldDefinition);
 
             if (validatedColumns.contains(columnName) && !fieldDefinition.isCollectionType() && !fieldDefinition.isBeanType()) {
-                validatedErrors.add(String.format("配置[%s]的字段类型[%s]不支持对应多列[%s]", table, fieldType, columnName));
+                validatedErrors.add(String.format("配置[%s]的字段类型[%s]不支持对应多列[%s]", table, fieldDefinition.getType(), columnName));
             }
 
             validatedColumns.add(columnName);
-
-            if (fieldDefinition.isCollectionType() || fieldDefinition.isBeanType()) {
-                Integer columnNums = mapAndBeanFieldColumnNums.getOrDefault(fieldDefinition, 0);
-                mapAndBeanFieldColumnNums.put(fieldDefinition, columnNums + 1);
-            }
+            fieldDefinition.getColumnNums().add(i + 1);
         }
 
-        for (FieldDefinition fieldDefinition : mapAndBeanFieldColumnNums.keySet()) {
+        for (FieldDefinition fieldDefinition : configDefinition.getFields()) {
             BeanDefinition fieldBean = fieldDefinition.getBean();
-            Integer columnNum = mapAndBeanFieldColumnNums.get(fieldDefinition);
-            if (columnNum != 1 && fieldBean != null && (!fieldBean.hasChild() && columnNum != fieldBean.getFields().size() || fieldBean.hasChild() && columnNum != fieldBean.getDescendantMaxFieldCount() + 1)) {
-                validatedErrors.add(String.format("配置[%s]的字段类型[%s]要么对应列数非法，要么单独对应1列，要么按字段拆开对应%s列", table, fieldDefinition.getType(), fieldBean.getFields().size()));
-                fieldDefinition.setColumnCount(0);
-            } else if (columnNum != 1 && columnNum % 2 != 0 && fieldDefinition.getType().equals("map")) {
-                validatedErrors.add(String.format("配置[%s]的字段类型[%s]要么对应列数非法，要么单独对应1列，要么按键值对拆开对应偶数列", table, fieldDefinition.getType()));
-                fieldDefinition.setColumnCount(0);
-            } else {
-                fieldDefinition.setColumnCount(columnNum);
+            if (!fieldDefinition.isLegalColumnCount() && fieldBean != null) {
+                validatedErrors.add(String.format("配置[%s]的字段类型[%s]对应列数非法，要么单独对应1列，要么按字段拆开对应%s列", table, fieldDefinition.getType(), fieldBean.getFields().size()));
+            }
+            if (!fieldDefinition.isLegalColumnCount() && fieldDefinition.getType().equals("map")) {
+                validatedErrors.add(String.format("配置[%s]的字段类型[%s]对应列数非法，要么单独对应1列，要么按键值对拆开对应偶数列", table, fieldDefinition.getType()));
             }
         }
 
-        for (FieldDefinition field : fields) {
-            validatedErrors.add(String.format("配置[%s]缺少字段[%s]对应的列[%s]", table, field.getName(), field.getColumn()));
+        for (FieldDefinition fieldDefinition : lackFields) {
+            validatedErrors.add(String.format("配置[%s]缺少字段[%s]对应的列[%s]", table, fieldDefinition.getName(), fieldDefinition.getColumn()));
         }
     }
 
@@ -176,7 +168,7 @@ public abstract class ConfigReader {
 
         try {
             if (fieldDefinition.isBeanType()) {
-                fieldValue = converter.convertColumnBean(fieldDefinition, rowJson.getJSONObject(fieldDefinition.getName()), columnValue);
+                fieldValue = converter.convertColumnBean(fieldDefinition, rowJson.getJSONObject(fieldDefinition.getName()), columnValue, column);
             } else if (fieldDefinition.getType().equals("map")) {
                 fieldValue = converter.convertColumnMap(fieldDefinition, rowJson, columnValue);
             } else if (fieldType.equals("list") || fieldType.equals("set")) {
@@ -195,6 +187,10 @@ public abstract class ConfigReader {
             if (configDefinition.isIndexField(fieldDefinition) && !constantKeyField) {
                 validatedErrors.add(String.format("配置[%s]的第%d行第%d列[%s]的索引值不能为空", table, row, column, columnName));
             }
+            //必填字段校验
+            if (!fieldDefinition.isOptional() && fieldDefinition.isBeanType() && fieldDefinition.getColumnNums().size() == 1) {
+                validatedErrors.add(String.format("配置[%s]的第%d行第%d列[%s]不能为空", table, row, column, columnName));
+            }
             return;
         }
 
@@ -212,7 +208,7 @@ public abstract class ConfigReader {
 
     protected void handleConvertException(Exception e, String columnName, String columnValue, int row, int column) {
         String commonError = String.format("配置[%s]的第%d行第%d列[%s]数据[%s]错误", table, row, column, columnName, columnValue);
-        if (columnValue.length() > 20) {
+        if (columnValue.isEmpty() || columnValue.length() > 20) {
             commonError = String.format("配置[%s]的第%d行第%d列[%s]数据错误", table, row, column, columnName);
         }
         if (!(e instanceof ConvertException)) {
@@ -239,6 +235,12 @@ public abstract class ConfigReader {
                 break;
             case mapDuplicateKey:
                 validatedErrors.add(String.format(commonError + ",map不能有重复键[%s]", e1.getParam(0)));
+                break;
+            case beanClassEmpty:
+                validatedErrors.add(String.format(commonError + ",[%s]是必填字段", e1.getParam(0)));
+                break;
+            case beanClassError:
+                validatedErrors.add(String.format(commonError + ",[%s]不是字段[%s]的合法类型", e1.getParam(0), e1.getParam(1)));
                 break;
             default:
                 validatedErrors.add(commonError);

@@ -182,9 +182,12 @@ public class ${name} extends <#if parentName??>${parentName}<#elseif definitionT
             <#list children as child>
             case "${child.name}":
                 return ${child.name}.create(json);
-            default:
-                return new UseEffect(json);
             </#list> 
+            case "":
+            case "${name}":
+                return new ${name}(json);
+            default:
+                return null;
         }
         <#else>
         return new ${name}(json);

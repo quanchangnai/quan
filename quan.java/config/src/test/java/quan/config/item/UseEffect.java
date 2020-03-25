@@ -28,8 +28,11 @@ public class UseEffect extends Bean {
         switch (clazz) {
             case "UseEffect2":
                 return UseEffect2.create(json);
-            default:
+            case "":
+            case "UseEffect":
                 return new UseEffect(json);
+            default:
+                return null;
         }
     }
 

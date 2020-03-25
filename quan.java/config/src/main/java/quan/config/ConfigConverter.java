@@ -85,31 +85,43 @@ public class ConfigConverter {
         return value;
     }
 
-    public Object convertColumnBean(FieldDefinition fieldDefinition, JSONObject object, String columnValue) {
+    public Object convertColumnBean(FieldDefinition fieldDefinition, JSONObject object, String columnValue, int columnNum) {
         BeanDefinition beanDefinition = fieldDefinition.getBean();
 
-        //Bean类型字段对应一列
-        if (fieldDefinition.getColumnCount() == 1) {
+        //字段对应一列
+        if (fieldDefinition.getColumnNums().size() == 1) {
             return convertBean(beanDefinition, columnValue);
         }
 
-        //Bean类型字段对应多列
-
-        BeanDefinition actualBeanDefinition = beanDefinition;
-        if (object == null) {
+        //字段对应多列
+        if (columnNum == fieldDefinition.getColumnNums().get(0)) {
+            object = new JSONObject();
             if (beanDefinition.hasChild()) {
-                if (!StringUtils.isEmpty(columnValue)) {
-                    object = new JSONObject();
+                //第1列是类名
+                if (StringUtils.isEmpty(columnValue)) {
+                    if (!fieldDefinition.isOptional()) {
+                        throw new ConvertException(ConvertException.ErrorType.beanClassEmpty, fieldDefinition.getName());
+                    }
+                } else if (parser.getBean(columnValue) == null || !beanDefinition.getDescendantsAndMe().contains(columnValue)) {
+                    throw new ConvertException(ConvertException.ErrorType.beanClassError, columnValue, fieldDefinition.getName());
+                } else {
                     object.put("class", columnValue);
                 }
                 return object;
-            } else {
-                object = new JSONObject();
             }
         }
 
+        if (object == null) {
+            return null;
+        }
+
+        BeanDefinition actualBeanDefinition = beanDefinition;
         if (beanDefinition.hasChild()) {
             actualBeanDefinition = parser.getBean(object.getString("class"));
+        }
+
+        if (actualBeanDefinition == null) {
+            return object;
         }
 
         for (FieldDefinition beanField : actualBeanDefinition.getFields()) {
@@ -267,7 +279,7 @@ public class ConfigConverter {
 
         //set
         JSONArray setArray = convertSet(fieldDefinition, value);
-        if (fieldDefinition.getColumnCount() == 1) {
+        if (fieldDefinition.getColumnNums().size() == 1) {
             array.addAll(setArray);
             return array;
         }
@@ -292,7 +304,7 @@ public class ConfigConverter {
 
     public JSONObject convertColumnMap(FieldDefinition fieldDefinition, JSONObject rowJson, String value) {
         //map类型字段对应1列
-        if (fieldDefinition.getColumnCount() == 1) {
+        if (fieldDefinition.getColumnNums().size() == 1) {
             return convertMap(fieldDefinition, value);
         }
 

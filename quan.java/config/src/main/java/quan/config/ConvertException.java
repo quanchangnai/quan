@@ -49,6 +49,8 @@ public class ConvertException extends RuntimeException {
         mapInvalidKey,
         mapInvalidValue,
         mapDuplicateKey,
+        beanClassEmpty,
+        beanClassError,
     }
 
 }
