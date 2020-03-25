@@ -95,19 +95,17 @@ public class ConfigConverter {
 
         //字段对应多列
         if (columnNum == fieldDefinition.getColumnNums().get(0)) {
-            object = new JSONObject();
             if (beanDefinition.hasChild()) {
                 //第1列是类名
-                if (StringUtils.isEmpty(columnValue)) {
-                    if (!fieldDefinition.isOptional()) {
-                        throw new ConvertException(ConvertException.ErrorType.beanClassEmpty, fieldDefinition.getName());
-                    }
-                } else if (parser.getBean(columnValue) == null || !beanDefinition.getDescendantsAndMe().contains(columnValue)) {
-                    throw new ConvertException(ConvertException.ErrorType.beanClassError, columnValue, fieldDefinition.getName());
-                } else {
+                if (beanDefinition.getDescendantsAndMe().contains(columnValue)) {
+                    object = new JSONObject();
                     object.put("class", columnValue);
+                } else if (!StringUtils.isBlank(columnValue)) {
+                    throw new ConvertException(ConvertException.ErrorType.beanClassError, columnValue, beanDefinition.getName());
                 }
                 return object;
+            } else {
+                object = new JSONObject();
             }
         }
 
@@ -126,7 +124,10 @@ public class ConfigConverter {
 
         for (FieldDefinition beanField : actualBeanDefinition.getFields()) {
             if (!object.containsKey(beanField.getName())) {
-                object.put(beanField.getName(), convert(beanField, columnValue));
+                Object convertedColumnValue = convert(beanField, columnValue);
+                if (convertedColumnValue != null) {
+                    object.put(beanField.getName(), convertedColumnValue);
+                }
                 break;
             }
         }
@@ -405,6 +406,7 @@ public class ConfigConverter {
         return object;
     }
 
+
     private JSONObject convertBean(BeanDefinition beanDefinition, String value) {
         if (StringUtils.isBlank(value)) {
             return null;
@@ -418,11 +420,12 @@ public class ConfigConverter {
 
         //有子类，按具体类型转换
         if (beanDefinition.hasChild()) {
-            object.put("class", values[0]);
-            actualBeanDefinition = parser.getBean(values[0]);
-            if (actualBeanDefinition == null) {
-                throw new ConvertException(ConvertException.ErrorType.common);
+            String actualBean = values[0];
+            if (!beanDefinition.getDescendantsAndMe().contains(actualBean)) {
+                throw new ConvertException(ConvertException.ErrorType.beanClassError, actualBean, beanDefinition.getName());
             }
+            object.put("class", actualBean);
+            actualBeanDefinition = parser.getBean(actualBean);
         }
 
         for (int i = 0; i < actualBeanDefinition.getFields().size(); i++) {

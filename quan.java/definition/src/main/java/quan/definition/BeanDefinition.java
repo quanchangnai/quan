@@ -22,6 +22,8 @@ public class BeanDefinition extends ClassDefinition {
     //配置的所有后代类
     protected Set<String> descendants = new HashSet<>();
 
+    private TreeSet<String> descendantsAndMe = new TreeSet<>();
+
     //配置的所有子类
     protected Set<BeanDefinition> children = new HashSet<>();
 
@@ -112,8 +114,10 @@ public class BeanDefinition extends ClassDefinition {
     }
 
     public TreeSet<String> getDescendantsAndMe() {
-        TreeSet<String> descendantsAndMe = new TreeSet<>(descendants);
-        descendantsAndMe.add(getName());
+        if (descendantsAndMe.isEmpty()) {
+            descendantsAndMe.addAll(descendants);
+            descendantsAndMe.add(getName());
+        }
         return descendantsAndMe;
     }
 

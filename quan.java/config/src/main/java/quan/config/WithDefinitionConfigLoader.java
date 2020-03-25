@@ -500,6 +500,7 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
             }
         }
 
+        configReader.setTable(table);
         configReader.setTableBodyStartRow(tableBodyStartRow);
 
         return configReader;

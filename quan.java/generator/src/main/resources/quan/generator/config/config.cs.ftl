@@ -129,7 +129,6 @@ namespace ${getFullPackageName("cs")}
                 case "${child.name}":
                     return ${child.name}.Create(json);
                 </#list> 
-                case "":
                 case "${name}":
                     return new ${name}(json);
                 default:

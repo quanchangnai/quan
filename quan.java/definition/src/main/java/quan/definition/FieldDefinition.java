@@ -543,6 +543,10 @@ public class FieldDefinition extends Definition {
         return columnNums;
     }
 
+    public Integer getLastColumnNum() {
+        return columnNums.get(columnNums.size() - 1);
+    }
+
     public boolean isLegalColumnCount() {
         if (columnNums.size() == 1) {
             return true;

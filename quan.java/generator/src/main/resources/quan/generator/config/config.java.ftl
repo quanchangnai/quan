@@ -182,8 +182,7 @@ public class ${name} extends <#if parentName??>${parentName}<#elseif definitionT
             <#list children as child>
             case "${child.name}":
                 return ${child.name}.create(json);
-            </#list> 
-            case "":
+            </#list>
             case "${name}":
                 return new ${name}(json);
             default:

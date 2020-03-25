@@ -35,7 +35,6 @@ public class ConvertException extends RuntimeException {
         return params.get(i);
     }
 
-
     @Override
     public String getMessage() {
         return "配置转换错误类型:" + errorType.name();
@@ -49,8 +48,6 @@ public class ConvertException extends RuntimeException {
         mapInvalidKey,
         mapInvalidValue,
         mapDuplicateKey,
-        beanClassEmpty,
-        beanClassError,
+        beanClassError
     }
-
 }
