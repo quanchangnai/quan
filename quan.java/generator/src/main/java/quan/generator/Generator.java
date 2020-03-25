@@ -41,9 +41,9 @@ public abstract class Generator {
 
     protected String enumPackagePrefix;
 
-    protected DefinitionParser definitionParser;
-
     protected String codePath;
+
+    protected DefinitionParser parser;
 
     protected Configuration freemarkerCfg;
 
@@ -81,32 +81,32 @@ public abstract class Generator {
         this.enumPackagePrefix = enumPackagePrefix;
     }
 
-    public void useXmlDefinitionParser() {
-        definitionParser = new XmlDefinitionParser();
-        definitionParser.setCategory(category());
-        definitionParser.setDefinitionPaths(definitionPaths);
+    public void useXmlParser() {
+        parser = new XmlDefinitionParser();
+        parser.setCategory(category());
+        parser.setDefinitionPaths(definitionPaths);
     }
 
-    public void useXmlDefinitionParser(String definitionPath) {
+    public void useXmlParser(String definitionPath) {
         setDefinitionPath(definitionPath);
-        useXmlDefinitionParser();
+        useXmlParser();
     }
 
-    public void setDefinitionParser(DefinitionParser definitionParser) {
-        if (definitionParser == null) {
+    public void setParser(DefinitionParser parser) {
+        if (parser == null) {
             return;
         }
-        definitionParser.setCategory(category());
-        if (!definitionParser.getDefinitionPaths().isEmpty() && definitionPaths.isEmpty()) {
-            definitionPaths.addAll(definitionParser.getDefinitionPaths());
+        parser.setCategory(category());
+        if (!parser.getDefinitionPaths().isEmpty() && definitionPaths.isEmpty()) {
+            definitionPaths.addAll(parser.getDefinitionPaths());
         } else {
-            definitionParser.setDefinitionPaths(definitionPaths);
+            parser.setDefinitionPaths(definitionPaths);
         }
-        this.definitionParser = definitionParser;
+        this.parser = parser;
     }
 
-    public DefinitionParser getDefinitionParser() {
-        return definitionParser;
+    public DefinitionParser getParser() {
+        return parser;
     }
 
     public abstract Category category();
@@ -172,12 +172,12 @@ public abstract class Generator {
     }
 
     protected void parseDefinitions() {
-        if (definitionParser == null) {
+        if (parser == null) {
             throw new IllegalArgumentException(category().comment() + "的定义解析器[definitionParser]不能为空");
         }
-        definitionParser.setPackagePrefix(packagePrefix);
-        definitionParser.setEnumPackagePrefix(enumPackagePrefix);
-        definitionParser.parse();
+        parser.setPackagePrefix(packagePrefix);
+        parser.setEnumPackagePrefix(enumPackagePrefix);
+        parser.parse();
     }
 
     public boolean tryGenerate(boolean printError) {
@@ -200,21 +200,21 @@ public abstract class Generator {
         checkProps();
         parseDefinitions();
 
-        if (!definitionParser.getValidatedErrors().isEmpty()) {
+        if (!parser.getValidatedErrors().isEmpty()) {
             if (printError) {
                 printErrors();
             }
             return;
         }
 
-        if (definitionParser.getClasses().isEmpty()) {
+        if (parser.getClasses().isEmpty()) {
             return;
         }
 
         initFreemarker();
 
         List<ClassDefinition> classDefinitions = new ArrayList<>();
-        for (ClassDefinition classDefinition : definitionParser.getClasses().values()) {
+        for (ClassDefinition classDefinition : parser.getClasses().values()) {
             if (!support(classDefinition) || !classDefinition.supportLanguage(this.supportLanguage())) {
                 continue;
             }
@@ -321,16 +321,16 @@ public abstract class Generator {
     }
 
     protected void printErrors() {
-        if (definitionParser == null) {
+        if (parser == null) {
             return;
         }
 
-        List<String> errors = new ArrayList<>(definitionParser.getValidatedErrors());
+        List<String> errors = new ArrayList<>(parser.getValidatedErrors());
         if (errors.isEmpty()) {
             return;
         }
 
-        logger.error("生成{}代码失败，解析目录{}下的定义文件共发现{}条错误", category().comment(), definitionParser.getDefinitionPaths(), errors.size());
+        logger.error("生成{}代码失败，解析目录{}下的定义文件共发现{}条错误", category().comment(), parser.getDefinitionPaths(), errors.size());
         for (int i = 1; i <= errors.size(); i++) {
             String error = errors.get(i - 1);
             logger.error("错误{}:{}", i, error);
@@ -356,25 +356,25 @@ public abstract class Generator {
         }
 
         DatabaseGenerator databaseGenerator = new DatabaseGenerator(properties);
-        databaseGenerator.useXmlDefinitionParser();
+        databaseGenerator.useXmlParser();
 
         JavaMessageGenerator javaMessageGenerator = new JavaMessageGenerator(properties);
         CSharpMessageGenerator cSharpMessageGenerator = new CSharpMessageGenerator(properties);
         LuaMessageGenerator luaMessageGenerator = new LuaMessageGenerator(properties);
 
-        DefinitionParser messageDefinitionParser = new XmlDefinitionParser();
-        javaMessageGenerator.setDefinitionParser(messageDefinitionParser);
-        cSharpMessageGenerator.setDefinitionParser(messageDefinitionParser);
-        luaMessageGenerator.setDefinitionParser(messageDefinitionParser);
+        DefinitionParser messageParser = new XmlDefinitionParser();
+        javaMessageGenerator.setParser(messageParser);
+        cSharpMessageGenerator.setParser(messageParser);
+        luaMessageGenerator.setParser(messageParser);
 
-        DefinitionParser configDefinitionParser = new XmlDefinitionParser();
+        DefinitionParser configParser = new XmlDefinitionParser();
         JavaConfigGenerator javaConfigGenerator = new JavaConfigGenerator(properties);
         CSharpConfigGenerator cSharpConfigGenerator = new CSharpConfigGenerator(properties);
         LuaConfigGenerator luaConfigGenerator = new LuaConfigGenerator(properties);
 
-        javaConfigGenerator.setDefinitionParser(configDefinitionParser);
-        cSharpConfigGenerator.setDefinitionParser(configDefinitionParser);
-        luaConfigGenerator.setDefinitionParser(configDefinitionParser);
+        javaConfigGenerator.setParser(configParser);
+        cSharpConfigGenerator.setParser(configParser);
+        luaConfigGenerator.setParser(configParser);
 
         databaseGenerator.tryGenerate(true);
 

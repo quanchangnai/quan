@@ -65,7 +65,7 @@ public class LuaConfigGenerator extends ConfigGenerator {
         BeanDefinition actualBeanDefinition = beanDefinition;
         String clazz = object.getString("class");
         if (!StringUtils.isEmpty(clazz)) {
-            actualBeanDefinition = definitionParser.getBean(clazz);
+            actualBeanDefinition = parser.getBean(clazz);
         }
 
         if (actualBeanDefinition == null) {

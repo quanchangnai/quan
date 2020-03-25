@@ -26,7 +26,7 @@ public class ConfigConverter {
 
     private static SimpleDateFormat timeFormat = new SimpleDateFormat("HH.mm.ss");
 
-    private DefinitionParser definitionParser;
+    private DefinitionParser parser;
 
     public static void setDateTimePattern(String pattern) {
         if (StringUtils.isBlank(pattern)) {
@@ -61,8 +61,8 @@ public class ConfigConverter {
         return timeFormat.toPattern();
     }
 
-    public ConfigConverter(DefinitionParser definitionParser) {
-        this.definitionParser = definitionParser;
+    public ConfigConverter(DefinitionParser parser) {
+        this.parser = parser;
     }
 
     public Object convert(FieldDefinition fieldDefinition, String value) {
@@ -109,7 +109,7 @@ public class ConfigConverter {
         }
 
         if (beanDefinition.hasChild()) {
-            actualBeanDefinition = definitionParser.getBean(object.getString("class"));
+            actualBeanDefinition = parser.getBean(object.getString("class"));
         }
 
         for (FieldDefinition beanField : actualBeanDefinition.getFields()) {
@@ -244,7 +244,7 @@ public class ConfigConverter {
             if (fieldDefinition.isPrimitiveValueType()) {
                 o = convertPrimitiveType(fieldDefinition.getValueType(), v);
             } else {
-                o = convertBean(definitionParser.getBean(fieldDefinition.getValueType()), v);
+                o = convertBean(parser.getBean(fieldDefinition.getValueType()), v);
             }
             if (o != null) {
                 array.add(o);
@@ -337,7 +337,7 @@ public class ConfigConverter {
                 if (fieldDefinition.isPrimitiveValueType()) {
                     objectValue = convertPrimitiveType(fieldDefinition.getValueType(), value);
                 } else {
-                    objectValue = convertBean(definitionParser.getBean(fieldDefinition.getValueType()), value);
+                    objectValue = convertBean(parser.getBean(fieldDefinition.getValueType()), value);
                 }
             } catch (Exception ignored) {
             }
@@ -379,7 +379,7 @@ public class ConfigConverter {
                 if (fieldDefinition.isPrimitiveValueType()) {
                     v = convertPrimitiveType(fieldDefinition.getValueType(), values[i + 1]);
                 } else {
-                    v = convertBean(definitionParser.getBean(fieldDefinition.getValueType()), values[i + 1]);
+                    v = convertBean(parser.getBean(fieldDefinition.getValueType()), values[i + 1]);
                 }
             } catch (Exception ignored) {
             }
@@ -407,7 +407,7 @@ public class ConfigConverter {
         //有子类，按具体类型转换
         if (beanDefinition.hasChild()) {
             object.put("class", values[0]);
-            actualBeanDefinition = definitionParser.getBean(values[0]);
+            actualBeanDefinition = parser.getBean(values[0]);
             if (actualBeanDefinition == null) {
                 throw new ConvertException(ConvertException.ErrorType.common);
             }

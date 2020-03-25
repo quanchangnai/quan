@@ -59,7 +59,7 @@ public class LuaMessageGenerator extends MessageGenerator {
     }
 
     protected void generateFactory(List<MessageDefinition> messageDefinitions) {
-        File filePath = new File(codePath + File.separator + getDefinitionParser().getPackagePrefix().replace(".", File.separator));
+        File filePath = new File(codePath + File.separator + getParser().getPackagePrefix().replace(".", File.separator));
         if (!filePath.exists() && !filePath.mkdirs()) {
             logger.info("创建目录[{}]失败", filePath);
             return;

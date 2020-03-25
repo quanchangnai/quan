@@ -132,6 +132,11 @@ public class BeanDefinition extends ClassDefinition {
     }
 
     protected void validateParent() {
+        //目前只有配置支持
+        if (category != Category.config) {
+            return;
+        }
+
         if (getParentName() == null) {
             return;
         }

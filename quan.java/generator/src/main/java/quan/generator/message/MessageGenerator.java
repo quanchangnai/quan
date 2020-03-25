@@ -78,7 +78,7 @@ public abstract class MessageGenerator extends Generator {
     //使用类名哈希计算消息ID
     private void hashId() {
         Set<MessageDefinition> messageDefinitions = new HashSet<>();
-        for (ClassDefinition classDefinition : definitionParser.getClasses().values()) {
+        for (ClassDefinition classDefinition : parser.getClasses().values()) {
             if (classDefinition instanceof MessageDefinition) {
                 messageDefinitions.add((MessageDefinition) classDefinition);
             }
@@ -104,7 +104,7 @@ public abstract class MessageGenerator extends Generator {
                     allConflictedMessages.addAll(conflictedMessages.subList(1, conflictedMessages.size()));
                 } else {
                     List<String> conflictedNames = conflictedMessages.stream().map(MessageDefinition::getName).collect(Collectors.toList());
-                    definitionParser.addValidatedError(String.format("消息%sID有冲突,改名可以解决冲突", conflictedNames));
+                    parser.addValidatedError(String.format("消息%sID有冲突,改名可以解决冲突", conflictedNames));
                 }
             }
         }

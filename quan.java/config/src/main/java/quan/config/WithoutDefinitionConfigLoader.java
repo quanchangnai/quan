@@ -8,15 +8,15 @@ import java.util.*;
 
 /**
  * 没有配置定义时加载配置<br/>
- * 配置文件名必须是[不含前缀的配置包名.类名.xxx]，目前仅支持JSON格式
+ * 配置文件名必须是[不含前缀的配置包名.类名.格式]，目前仅支持JSON格式
  * Created by quanchangnai on 2019/8/23.
  */
 public class WithoutDefinitionConfigLoader extends ConfigLoader {
 
-    //包名前缀，在不使用配置定义加载JSON格式配置时需要
+    //包名前缀，在没有配置定义加载时需要
     private String packagePrefix = "";
 
-    //配置全类名:所有子孙配置[命名空间.类名]，包含自己
+    //配置全类名:所有子孙配置[包名.类名]，包含自己
     private final Map<String, Set<String>> configDescendants = new HashMap<>();
 
     {
@@ -31,26 +31,20 @@ public class WithoutDefinitionConfigLoader extends ConfigLoader {
         this.packagePrefix = packagePrefix;
     }
 
-    /**
-     * 没有配置定义直接加载JSON格式配置，JSON文件名必须是配置全类名
-     */
+    @Override
+    public void setTableType(TableType tableType) {
+    }
+
     @Override
     protected void doLoadAll() {
-        if (!needLoad()) {
-            throw new IllegalStateException("没有配置定义的JSON格式配置不支持校验");
-        }
-
         initConfigDescendants();
-
         for (String configFullName : configDescendants.keySet()) {
             load(configFullName, configDescendants.get(configFullName), true);
         }
 
-        if (needValidate()) {
-            //格式错误
-            for (ConfigReader reader : readers.values()) {
-                validatedErrors.addAll(reader.getValidatedErrors());
-            }
+        //格式错误
+        for (ConfigReader reader : readers.values()) {
+            validatedErrors.addAll(reader.getValidatedErrors());
         }
     }
 

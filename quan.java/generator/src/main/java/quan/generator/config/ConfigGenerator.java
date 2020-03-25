@@ -130,11 +130,11 @@ public abstract class ConfigGenerator extends Generator {
      * 初始化配置加载器，读取常量key用于常量类生成
      */
     protected void initConfigLoader(TableType tableType, String tablePath, int tableBodyStartRow) {
-        if (definitionParser == null) {
+        if (parser == null) {
             throw new IllegalArgumentException(category().comment() + "的定义解析器[definitionParser]不能为空");
         }
         configLoader = new WithDefinitionConfigLoader(tablePath);
-        configLoader.setDefinitionParser(definitionParser);
+        configLoader.setParser(parser);
         configLoader.setTableType(tableType);
         configLoader.setTableBodyStartRow(tableBodyStartRow);
     }

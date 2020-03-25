@@ -26,7 +26,7 @@ import java.util.*;
 @SuppressWarnings({"unchecked"})
 public class WithDefinitionConfigLoader extends ConfigLoader {
 
-    protected DefinitionParser definitionParser;
+    protected DefinitionParser parser;
 
     //表格正文起始行号
     private int tableBodyStartRow;
@@ -57,11 +57,11 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
      * 使用XML配置解析器
      */
     public DefinitionParser useXmlDefinition(List<String> definitionPaths, String packagePrefix) {
-        definitionParser = new XmlDefinitionParser();
-        definitionParser.setCategory(Category.config);
-        definitionParser.setDefinitionPaths(definitionPaths);
-        definitionParser.setPackagePrefix(packagePrefix);
-        return definitionParser;
+        parser = new XmlDefinitionParser();
+        parser.setCategory(Category.config);
+        parser.setDefinitionPaths(definitionPaths);
+        parser.setPackagePrefix(packagePrefix);
+        return parser;
     }
 
     /**
@@ -74,31 +74,31 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
     /**
      * 设置配置解析器
      */
-    public void setDefinitionParser(DefinitionParser definitionParser) {
-        Objects.requireNonNull(definitionParser, "配置解析器不能为空");
-        definitionParser.setCategory(Category.config);
-        this.definitionParser = definitionParser;
+    public void setParser(DefinitionParser parser) {
+        Objects.requireNonNull(parser, "配置解析器不能为空");
+        parser.setCategory(Category.config);
+        this.parser = parser;
     }
 
     /**
      * 解析配置定义
      */
     private void parseDefinitions() {
-        Objects.requireNonNull(definitionParser, "配置定义解析器不能为空");
-        if (!definitionParser.getClasses().isEmpty()) {
+        Objects.requireNonNull(parser, "配置定义解析器不能为空");
+        if (!parser.getClasses().isEmpty()) {
             return;
         }
 
         try {
-            definitionParser.parse();
+            parser.parse();
         } catch (Exception e) {
-            logger.error("解析配置定义文件[{}]出错", definitionParser.getDefinitionPaths(), e);
+            logger.error("解析配置定义文件[{}]出错", parser.getDefinitionPaths(), e);
             return;
         }
 
-        LinkedHashSet<String> validatedErrors = definitionParser.getValidatedErrors();
+        LinkedHashSet<String> validatedErrors = parser.getValidatedErrors();
         if (!validatedErrors.isEmpty()) {
-            ValidatedException validatedException = new ValidatedException(String.format("解析配置定义文件%s共发现%d条错误。", definitionParser.getDefinitionPaths(), validatedErrors.size()));
+            ValidatedException validatedException = new ValidatedException(String.format("解析配置定义文件%s共发现%d条错误。", parser.getDefinitionPaths(), validatedErrors.size()));
             validatedException.addErrors(validatedErrors);
             throw validatedException;
         }
@@ -107,7 +107,7 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
     protected void doLoadAll() {
         parseDefinitions();
 
-        Set<ConfigDefinition> configDefinitions = new HashSet<>(definitionParser.getTableConfigs().values());
+        Set<ConfigDefinition> configDefinitions = new HashSet<>(parser.getTableConfigs().values());
         //配置对应的其已索引JSON数据
         Map<ConfigDefinition, Map<IndexDefinition, Map>> allConfigIndexedJsons = new HashMap<>();
 
@@ -162,7 +162,7 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
     }
 
     public void writeJson(String path, boolean useNameWithPackage, Language language) {
-        if (definitionParser == null) {
+        if (parser == null) {
             return;
         }
 
@@ -173,7 +173,7 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
             return;
         }
 
-        Set<ConfigDefinition> configDefinitions = new HashSet<>(definitionParser.getTableConfigs().values());
+        Set<ConfigDefinition> configDefinitions = new HashSet<>(parser.getTableConfigs().values());
 
         for (ConfigDefinition configDefinition : configDefinitions) {
             JSONArray rows = new JSONArray();
@@ -206,9 +206,9 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
      */
     private ConfigDefinition getConfigByTable(String table) {
         if (tableType == TableType.json) {
-            return definitionParser.getConfig(table);
+            return parser.getConfig(table);
         } else {
-            return definitionParser.getTableConfigs().get(table);
+            return parser.getTableConfigs().get(table);
         }
     }
 
@@ -395,7 +395,7 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
     @Override
     protected void checkReload() {
         super.checkReload();
-        Objects.requireNonNull(definitionParser, "配置定义解析器不能为空");
+        Objects.requireNonNull(parser, "配置定义解析器不能为空");
     }
 
     /**
@@ -410,7 +410,7 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
 
         Set<String> tableNames = new LinkedHashSet<>();
         for (String configName : configNames) {
-            ConfigDefinition configDefinition = definitionParser.getConfig(configName);
+            ConfigDefinition configDefinition = parser.getConfig(configName);
             if (configDefinition == null) {
                 logger.error("重加载[{}]失败，不存在该配置", configName);
                 continue;
@@ -470,7 +470,7 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
 
         List<String> configNames = new ArrayList<>();
         for (String originalName : originalNames) {
-            ConfigDefinition configDefinition = definitionParser.getTableConfigs().get(originalName);
+            ConfigDefinition configDefinition = parser.getTableConfigs().get(originalName);
             if (configDefinition == null) {
                 logger.error("重加载[{}]失败，不存在该配置定义", originalName);
                 continue;
