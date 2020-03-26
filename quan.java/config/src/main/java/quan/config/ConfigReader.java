@@ -194,11 +194,11 @@ public abstract class ConfigReader {
         if (fieldValue == null) {
             //索引字段不能为空，常量key除外
             if (configDefinition.isIndexField(fieldDefinition) && !constantKeyField) {
-                validatedErrors.add(String.format("配置[%s]的第%d行第%s列[%s]的索引值不能为空", table, row, columnStr, columnName));
+                validatedErrors.add(String.format("配置[%s]的第[%d]行第[%s]列[%s]的索引值不能为空", table, row, columnStr, columnName));
             }
             //必填字段校验
             if (!fieldDefinition.isOptional() && fieldDefinition.isBeanType() && fieldDefinition.getColumnNums().size() == 1) {
-                validatedErrors.add(String.format("配置[%s]的第%d行第%s列[%s]不能为空", table, row, columnStr, columnName));
+                validatedErrors.add(String.format("配置[%s]的第[%d]行第[%s]列[%s]不能为空", table, row, columnStr, columnName));
             }
             return;
         } else {
@@ -206,15 +206,21 @@ public abstract class ConfigReader {
             if (fieldDefinition.isBeanType() && column == fieldDefinition.getLastColumnNum() && ((JSONObject) fieldValue).isEmpty()) {
                 rowJson.remove(fieldName);
                 if (!fieldDefinition.isOptional()) {
-                    String firstColumnStr = columnStr(fieldDefinition.getColumnNums().get(0));
-                    validatedErrors.add(String.format("配置[%s]的第%d行第%s-%s列[%s]不能为空", table, row, firstColumnStr, columnStr, columnName));
+                    StringBuilder columnsStr = new StringBuilder();
+                    for (Integer columnNum : fieldDefinition.getColumnNums()) {
+                        if (columnNum != fieldDefinition.getColumnNums().get(0)) {
+                            columnsStr.append(",");
+                        }
+                        columnsStr.append(columnStr(columnNum));
+                    }
+                    validatedErrors.add(String.format("配置[%s]的第[%d]行第[%s]列[%s]不能为空", table, row, columnsStr.toString(), columnName));
                 }
                 return;
             }
         }
 
         if (constantKeyField && !Constants.FIELD_NAME_PATTERN.matcher(fieldValue.toString()).matches()) {
-            validatedErrors.add(String.format("配置[%s]的第%d行第%s列[%s]的常量key[%s]格式错误,正确格式:%s", table, row, column, columnName, fieldValue, Constants.FIELD_NAME_PATTERN));
+            validatedErrors.add(String.format("配置[%s]的第[%d]行第[%s]列[%s]的常量key[%s]格式错误,正确格式:%s", table, row, column, columnName, fieldValue, Constants.FIELD_NAME_PATTERN));
         }
 
         rowJson.put(fieldName, fieldValue);
@@ -225,18 +231,27 @@ public abstract class ConfigReader {
         }
     }
 
-    private String columnStr(int column) {
-        String columnStr = column + "";
-        if (column <= 26) {
-            columnStr += "(" + (char) ('A' + column - 1) + ")";
+    private static String columnStr(int c) {
+        if (c < 1) {
+            throw new IllegalArgumentException("参数[c]必须大于0");
         }
-        return columnStr;
+
+        StringBuilder s = new StringBuilder();
+        int a = c, b;
+
+        do {
+            b = (a - 1) % 26 + 1;
+            a = (a - 1) / 26;
+            s = s.append((char) ('A' + b - 1));
+        } while (a > 0);
+
+        return c + "(" + s.reverse().toString() + ")";
     }
 
     protected void handleConvertException(Exception e, String columnName, String columnValue, int row, String columnStr) {
-        String commonError = String.format("配置[%s]的第%s行第%s列[%s]数据[%s]错误", table, row, columnStr, columnName, columnValue);
+        String commonError = String.format("配置[%s]的第[%s]行第[%s]列[%s]数据[%s]错误", table, row, columnStr, columnName, columnValue);
         if (columnValue.isEmpty() || columnValue.length() > 20) {
-            commonError = String.format("配置[%s]的第%d行第%s列[%s]数据错误", table, row, columnStr, columnName);
+            commonError = String.format("配置[%s]的第[%d]行第[%s]列[%s]数据错误", table, row, columnStr, columnName);
         }
         if (!(e instanceof ConvertException)) {
             validatedErrors.add(commonError);
@@ -245,6 +260,9 @@ public abstract class ConfigReader {
 
         ConvertException e1 = (ConvertException) e;
         switch (e1.getErrorType()) {
+            case typeError:
+                validatedErrors.add(String.format(commonError + ",[%s]不匹配期望类型[%s]", e1.getParam(0), e1.getParam(1)));
+                break;
             case enumName:
                 validatedErrors.add(String.format(commonError + ",枚举名[%s]不合法", e1.getParam(0)));
                 break;
@@ -262,9 +280,6 @@ public abstract class ConfigReader {
                 break;
             case mapDuplicateKey:
                 validatedErrors.add(String.format(commonError + ",map不能有重复键[%s]", e1.getParam(0)));
-                break;
-            case beanClassError:
-                validatedErrors.add(String.format(commonError + ",[%s]不匹配期望类型[%s]", e1.getParam(0), e1.getParam(1)));
                 break;
             default:
                 validatedErrors.add(commonError);

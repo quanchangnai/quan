@@ -279,7 +279,7 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
                 if (!jsonTables.get(oldJson).equals(table)) {
                     repeatedTables += "," + jsonTables.get(oldJson);
                 }
-                validatedErrors.add(String.format("配置[%s]有重复数据[%s,%s = %s,%s]", repeatedTables, field1.getColumn(), field2.getColumn(), json.get(field1.getName()), json.get(field2.getName())));
+                validatedErrors.add(String.format("配置[%s]有重复数据[(%s,%s) = (%s,%s)]", repeatedTables, field1.getColumn(), field2.getColumn(), json.get(field1.getName()), json.get(field2.getName())));
             }
         }
 
@@ -297,7 +297,7 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
                 if (!jsonTables.get(oldJson).equals(table)) {
                     repeatedTables += "," + jsonTables.get(oldJson);
                 }
-                validatedErrors.add(String.format("配置[%s]有重复数据[%s,%s,%s = %s,%s,%s]", repeatedTables, field1.getColumn(), field2.getColumn(), field3.getColumn(), json.get(field1.getName()), json.get(field2.getName()), json.get(field3.getName())));
+                validatedErrors.add(String.format("配置[%s]有重复数据[(%s,%s,%s) = (%s,%s,%s)]", repeatedTables, field1.getColumn(), field2.getColumn(), field3.getColumn(), json.get(field1.getName()), json.get(field2.getName()), json.get(field3.getName())));
             }
         }
     }
@@ -369,14 +369,14 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
 
         if (refIndexedJsons == null || !refIndexedJsons.containsKey(value)) {
             String error;
-            String keyOrValue = "值";
-            if (field.isCollectionType() && mapKey) {
-                keyOrValue = "键";
+            String keyOrValue = "";
+            if (field.isCollectionType()) {
+                keyOrValue = mapKey ? "键" : "值";
             }
             if (bean instanceof ConfigDefinition) {
                 error = String.format("配置[%s]的第%s行[%s]的%s引用[%s]数据[%s]不存在", position.getLeft(), position.getMiddle(), position.getRight(), keyOrValue, fieldRefs, value);
             } else {
-                error = String.format("配置[%s]第%s行[%s]的对象[%s]字段[%s]的%s引用[%s]数据[%s]不存在", position.getLeft(), position.getMiddle(), position.getRight(), bean.getName(), field.getName(), keyOrValue, fieldRefs, value);
+                error = String.format("配置[%s]第%s行[%s]的对象[%s]字段[%s]%s引用[%s]数据[%s]不存在", position.getLeft(), position.getMiddle(), position.getRight(), bean.getName(), field.getName(), keyOrValue, fieldRefs, value);
             }
             validatedErrors.add(error);
         }

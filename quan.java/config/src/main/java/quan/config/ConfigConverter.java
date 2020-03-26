@@ -101,7 +101,7 @@ public class ConfigConverter {
                     object = new JSONObject();
                     object.put("class", columnValue);
                 } else if (!StringUtils.isBlank(columnValue)) {
-                    throw new ConvertException(ConvertException.ErrorType.beanClassError, columnValue, beanDefinition.getName());
+                    throw new ConvertException(ConvertException.ErrorType.typeError, columnValue, beanDefinition.getName());
                 }
                 return object;
             } else {
@@ -168,21 +168,25 @@ public class ConfigConverter {
         if (StringUtils.isBlank(value)) {
             return null;
         }
-        switch (type) {
-            case "bool":
-                return Boolean.parseBoolean(value.toLowerCase());
-            case "short":
-                return Short.parseShort(value);
-            case "int":
-                return Integer.parseInt(value);
-            case "long":
-                return Long.parseLong(value);
-            case "float":
-                return Float.parseFloat(value);
-            case "double":
-                return Double.parseDouble(value);
-            default:
-                return value;
+        try {
+            switch (type) {
+                case "bool":
+                    return Boolean.parseBoolean(value.toLowerCase());
+                case "short":
+                    return Short.parseShort(value);
+                case "int":
+                    return Integer.parseInt(value);
+                case "long":
+                    return Long.parseLong(value);
+                case "float":
+                    return Float.parseFloat(value);
+                case "double":
+                    return Double.parseDouble(value);
+                default:
+                    return value;
+            }
+        } catch (Exception e) {
+            throw new ConvertException(ConvertException.ErrorType.typeError, e, value, type);
         }
     }
 
@@ -201,7 +205,7 @@ public class ConfigConverter {
             //纯时间
             return timeFormat.parse(value);
         } catch (ParseException e) {
-            throw new RuntimeException(e);
+            throw new ConvertException(ConvertException.ErrorType.common, e);
         }
     }
 
@@ -422,7 +426,7 @@ public class ConfigConverter {
         if (beanDefinition.hasChild()) {
             String actualBean = values[0];
             if (!beanDefinition.getDescendantsAndMe().contains(actualBean)) {
-                throw new ConvertException(ConvertException.ErrorType.beanClassError, actualBean, beanDefinition.getName());
+                throw new ConvertException(ConvertException.ErrorType.typeError, actualBean, beanDefinition.getName());
             }
             object.put("class", actualBean);
             actualBeanDefinition = parser.getBean(actualBean);

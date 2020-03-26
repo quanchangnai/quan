@@ -18,6 +18,13 @@ public class ConvertException extends RuntimeException {
         this.params.addAll(Arrays.asList(params));
     }
 
+    public ConvertException(ErrorType errorType, Throwable cause, String... params) {
+        super(cause);
+        this.errorType = errorType;
+        this.params.addAll(Arrays.asList(params));
+    }
+
+
     public ConvertException(ErrorType errorType, List<String> params) {
         this.errorType = errorType;
         this.params.addAll(params);
@@ -42,12 +49,12 @@ public class ConvertException extends RuntimeException {
 
     public enum ErrorType {
         common,
+        typeError,
         enumValue,
         enumName,
         setDuplicateValue,
         mapInvalidKey,
         mapInvalidValue,
         mapDuplicateKey,
-        beanClassError
     }
 }
