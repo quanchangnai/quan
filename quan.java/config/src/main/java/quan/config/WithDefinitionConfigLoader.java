@@ -137,7 +137,7 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
      *
      * @param configDefinition 配置定义
      * @param self             true:只包含自己的数据，false:包含自己和子孙配置的数据
-     * @return
+     * @return SON格式配置数据
      */
     public List<JSONObject> loadJsons(ConfigDefinition configDefinition, boolean self) {
         TreeSet<String> configTables = new TreeSet<>();

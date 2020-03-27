@@ -207,7 +207,7 @@ public abstract class ConfigReader {
                 rowJson.remove(fieldName);
                 if (!fieldDefinition.isOptional()) {
                     StringBuilder columnsStr = new StringBuilder();
-                    for (Integer columnNum : fieldDefinition.getColumnNums()) {
+                    for (int columnNum : fieldDefinition.getColumnNums()) {
                         if (columnNum != fieldDefinition.getColumnNums().get(0)) {
                             columnsStr.append(",");
                         }
@@ -242,7 +242,7 @@ public abstract class ConfigReader {
         do {
             b = (a - 1) % 26 + 1;
             a = (a - 1) / 26;
-            s = s.append((char) ('A' + b - 1));
+            s.append((char) ('A' + b - 1));
         } while (a > 0);
 
         return c + "(" + s.reverse().toString() + ")";

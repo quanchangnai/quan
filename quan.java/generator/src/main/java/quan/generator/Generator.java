@@ -19,6 +19,7 @@ import quan.generator.message.JavaMessageGenerator;
 import quan.generator.message.LuaMessageGenerator;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -243,7 +244,7 @@ public abstract class Generator {
             return;
         }
 
-        try (Writer writer = new OutputStreamWriter(new FileOutputStream(new File(filePath, fileName)), "UTF-8")) {
+        try (Writer writer = new OutputStreamWriter(new FileOutputStream(new File(filePath, fileName)), StandardCharsets.UTF_8)) {
             template.process(classDefinition, writer);
         } catch (Exception e) {
             logger.info("生成{}[{}]失败", category().comment(), filePath + File.separator + fileName, e);

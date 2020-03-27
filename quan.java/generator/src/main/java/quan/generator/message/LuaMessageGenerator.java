@@ -9,6 +9,7 @@ import quan.definition.message.MessageDefinition;
 import quan.definition.message.MessageHeadDefinition;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -66,7 +67,7 @@ public class LuaMessageGenerator extends MessageGenerator {
         }
 
         String fileName = "MessageFactory." + supportLanguage();
-        try (Writer writer = new OutputStreamWriter(new FileOutputStream(new File(filePath, fileName)), "UTF-8")) {
+        try (Writer writer = new OutputStreamWriter(new FileOutputStream(new File(filePath, fileName)), StandardCharsets.UTF_8)) {
             Map<String, List<MessageDefinition>> messages = new HashMap<>();
             messages.put("messages", messageDefinitions);
             messageFactoryTemplate.process(messages, writer);

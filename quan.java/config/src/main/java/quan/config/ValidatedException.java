@@ -1,5 +1,6 @@
 package quan.config;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 
@@ -14,8 +15,8 @@ public class ValidatedException extends RuntimeException {
     public ValidatedException() {
     }
 
-    public ValidatedException(String error) {
-        errors.add(error);
+    public ValidatedException(String... error) {
+        this.errors.addAll(Arrays.asList(error));
     }
 
     public ValidatedException(Collection<String> errors) {
@@ -26,8 +27,8 @@ public class ValidatedException extends RuntimeException {
         return errors;
     }
 
-    public ValidatedException addError(String error) {
-        errors.add(error);
+    public ValidatedException addError(String... error) {
+        this.errors.addAll(Arrays.asList(error));
         return this;
     }
 
