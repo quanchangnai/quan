@@ -24,10 +24,10 @@ public class NetworkMessageCodec implements Handler<Object> {
     @Override
     public void onReceived(HandlerContext handlerContext, Object msg) throws Exception {
         if (msg instanceof ByteBuffer) {
-            Buffer buffer = new Buffer((ByteBuffer) msg);
+            Buffer buffer = new BytesBuffer((ByteBuffer) msg);
             decode(handlerContext, buffer);
         } else if (msg instanceof byte[]) {
-            Buffer buffer = new Buffer((byte[]) msg);
+            Buffer buffer = new BytesBuffer((byte[]) msg);
             decode(handlerContext, buffer);
         } else {
             handlerContext.triggerReceived(msg);

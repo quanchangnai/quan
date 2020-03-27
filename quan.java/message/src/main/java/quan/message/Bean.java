@@ -8,7 +8,7 @@ import java.io.IOException;
 public abstract class Bean {
 
     public final byte[] encode() throws IOException {
-        Buffer buffer = new Buffer();
+        Buffer buffer = new BytesBuffer();
         encode(buffer);
         return buffer.availableBytes();
     }
@@ -17,7 +17,7 @@ public abstract class Bean {
     }
 
     public final void decode(byte[] bytes) throws IOException {
-        Buffer buffer = new Buffer(bytes);
+        Buffer buffer = new BytesBuffer(bytes);
         decode(buffer);
     }
 

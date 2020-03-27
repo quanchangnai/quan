@@ -32,7 +32,7 @@ public class NettyMessageCodec extends ByteToMessageCodec<Message> {
         byte[] bytes = new byte[byteBuf.readableBytes()];
         byteBuf.readBytes(bytes);
 
-        Buffer buffer = new Buffer(bytes);
+        Buffer buffer = new BytesBuffer(bytes);
         int msgId = buffer.readInt();
         Message message = messageFactory.create(msgId);
         if (message == null) {

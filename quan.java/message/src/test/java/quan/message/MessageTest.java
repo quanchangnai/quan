@@ -22,15 +22,15 @@ public class MessageTest {
 
     public static void main(String[] args) throws Exception {
 
-//        test1();
+        test1();
         test2();
-//        test3();
+        test3();
 
     }
 
     private static void test1() throws Exception {
         System.err.println("test1=============================");
-        Buffer buffer = new Buffer();
+        Buffer buffer = new BytesBuffer();
         buffer.writeBool(true);
         buffer.writeInt(70);
         buffer.writeInt(2423);
