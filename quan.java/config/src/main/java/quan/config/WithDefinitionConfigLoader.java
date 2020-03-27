@@ -235,7 +235,7 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
             List<JSONObject> tableJsons = configReader.readJsons();
 
             for (JSONObject json : tableJsons) {
-                jsonTables.put(json, table);
+                jsonTables.put(json, table + "." + tableType);
                 //校验索引
                 for (IndexDefinition indexDefinition : configDefinition.getIndexes()) {
                     Map indexedJsons = configIndexedJsons.computeIfAbsent(indexDefinition, k -> new HashMap());
@@ -313,7 +313,7 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
                         continue;
                     }
                     Object fieldValue = json.get(fieldName);
-                    Triple position = Triple.of(table, String.valueOf(i + 1), field.getColumn());
+                    Triple position = Triple.of(table + "." + tableType, String.valueOf(i + 1), field.getColumn());
                     validateFieldRef(position, configDefinition, field, fieldValue, allConfigIndexedJsons);
                 }
             }
@@ -500,7 +500,7 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
             }
         }
 
-        configReader.setTable(table);
+        configReader.setTable(table + "." + tableType);
         configReader.setTableBodyStartRow(tableBodyStartRow);
 
         return configReader;

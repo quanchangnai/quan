@@ -49,7 +49,7 @@ public abstract class ConfigReader {
 
     protected void init(File tableFile, ConfigDefinition configDefinition) {
         this.tableFile = tableFile;
-        this.table = tableFile.getName().substring(0, tableFile.getName().lastIndexOf("."));
+        this.table = tableFile.getName();
         this.configDefinition = configDefinition;
         if (configDefinition != null) {
             converter = new ConfigConverter(configDefinition.getParser());
@@ -173,7 +173,7 @@ public abstract class ConfigReader {
         String fieldType = fieldDefinition.getType();
         Object fieldValue;
 
-        String columnStr = columnStr(column);
+        String columnStr = buildColumnStr(column);
 
         try {
             if (fieldDefinition.isBeanType()) {
@@ -211,7 +211,7 @@ public abstract class ConfigReader {
                         if (columnNum != fieldDefinition.getColumnNums().get(0)) {
                             columnsStr.append(",");
                         }
-                        columnsStr.append(columnStr(columnNum));
+                        columnsStr.append(buildColumnStr(columnNum));
                     }
                     validatedErrors.add(String.format("配置[%s]的第[%d]行第[%s]列[%s]不能为空", table, row, columnsStr.toString(), columnName));
                 }
@@ -231,7 +231,7 @@ public abstract class ConfigReader {
         }
     }
 
-    private static String columnStr(int c) {
+    private static String buildColumnStr(int c) {
         if (c < 1) {
             throw new IllegalArgumentException("参数[c]必须大于0");
         }
