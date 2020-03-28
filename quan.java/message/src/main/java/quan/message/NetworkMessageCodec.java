@@ -36,6 +36,7 @@ public class NetworkMessageCodec implements Handler<Object> {
 
     private void decode(HandlerContext handlerContext, Buffer buffer) throws IOException {
         int msgId = buffer.readInt();
+        buffer.reset();
         Message message = messageFactory.create(msgId);
         if (message == null) {
             logger.error("消息{}创建失败", msgId);

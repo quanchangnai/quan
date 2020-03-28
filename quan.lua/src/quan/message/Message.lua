@@ -21,10 +21,6 @@ function Message.encode(msg, buffer)
 end
 
 function Message.decode(buffer, msg)
-    if buffer.reading then
-        buffer:reset()
-    end
-
     local msgId = buffer:readInt();
     if msgId ~= msg.id then
         error(string.format("消息ID不匹配,期望值[%s],实际值[%s]", msg.id, msgId), 2)

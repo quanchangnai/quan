@@ -8,36 +8,74 @@ import java.nio.charset.StandardCharsets;
  */
 public abstract class Buffer {
 
-    public abstract boolean reading();
+    /**
+     * 容量
+     */
+    public abstract int capacity();
 
+    /**
+     * 重置读位置到0
+     */
     public abstract void reset();
 
     /**
-     * 当前可用的字节数
+     * 清除数据，读写位置都置为0
      */
-    public abstract int available();
+    public abstract void clear();
 
     /**
-     * 当前可用的字节数组
+     * 当前剩余可读的字节数
      */
-    public abstract byte[] availableBytes();
+    public abstract int readableCount();
 
     /**
-     * 当前剩余可用的字节数
-     */
-    public abstract int remaining();
-
-    /**
-     * 当前剩余可用的字节数组
+     * 读取当前剩余的字节数组
      */
     public abstract byte[] remainingBytes();
 
     /**
+     * 丢弃已经读过的数据
+     */
+    public abstract void discardReadBytes();
+
+    /**
      * 读取VarInt
      *
-     * @param bits 读取的最大比特位,只能是[8,16,32,64]中的一种
+     * @param readCount 最大读取字节数,合法值:2,4,8
      */
-    protected abstract long readVarInt(int bits) throws IOException;
+    protected long readVarInt(int readCount) throws IOException {
+        onRead();
+
+        int shift = 0;
+        long temp = 0;
+        int bits = readCount * 8;
+
+        while (shift < bits) {
+            final byte b = readByte();
+            temp |= (b & 0b1111111L) << shift;
+            shift += 7;
+
+            if ((b & 0b10000000) != 0) {
+                continue;
+            }
+
+            //ZigZag解码
+            return (temp >>> 1) ^ -(temp & 1);
+        }
+
+        throw new IOException("读数据出错");
+    }
+
+    /**
+     * 读数据之前的回调
+     */
+    protected void onRead() throws IOException {
+    }
+
+    /**
+     * 实际读一个字节
+     */
+    protected abstract byte readByte();
 
     public abstract byte[] readBytes() throws IOException;
 
@@ -45,20 +83,32 @@ public abstract class Buffer {
         return readInt() != 0;
     }
 
-
     public short readShort() throws IOException {
-        return (short) readVarInt(16);
+        return (short) readVarInt(2);
     }
 
     public int readInt() throws IOException {
-        return (int) readVarInt(32);
+        return (int) readVarInt(4);
     }
 
     public long readLong() throws IOException {
-        return readVarInt(64);
+        return readVarInt(8);
     }
 
-    public abstract float readFloat() throws IOException;
+    public float readFloat() throws IOException {
+        onRead();
+
+        int shift = 0;
+        int temp = 0;
+
+        while (shift < 32) {
+            final byte b = readByte();
+            temp |= (b & 0b11111111L) << shift;
+            shift += 8;
+        }
+
+        return Float.intBitsToFloat(temp);
+    }
 
     public float readFloat(int scale) throws IOException {
         if (scale < 0) {
@@ -68,7 +118,20 @@ public abstract class Buffer {
         }
     }
 
-    public abstract double readDouble() throws IOException;
+    public double readDouble() throws IOException {
+        onRead();
+
+        int shift = 0;
+        long temp = 0;
+
+        while (shift < 64) {
+            final byte b = readByte();
+            temp |= (b & 0b11111111L) << shift;
+            shift += 8;
+        }
+
+        return Double.longBitsToDouble(temp);
+    }
 
     public double readDouble(int scale) throws IOException {
         if (scale < 0) {
@@ -83,7 +146,35 @@ public abstract class Buffer {
     }
 
 
-    protected abstract void writeVarInt(long n);
+    protected void writeVarInt(long n) {
+        onWrite(10);
+
+        //ZigZag编码
+        n = (n << 1) ^ (n >> 63);
+
+        while (true) {
+            if ((n & ~0b1111111) == 0) {
+                writeByte((byte) (n & 0b1111111));
+                return;
+            } else {
+                writeByte((byte) (n & 0b1111111 | 0b10000000));
+                n >>>= 7;
+            }
+        }
+    }
+
+    /**
+     * 写数据之前的回调
+     *
+     * @param writeCount 未压缩之前要写入的字节数量
+     */
+    protected void onWrite(int writeCount) {
+    }
+
+    /**
+     * 实际写一个字节
+     */
+    protected abstract void writeByte(byte b);
 
 
     public abstract void writeBytes(byte[] bytes);
@@ -105,7 +196,17 @@ public abstract class Buffer {
         writeVarInt(n);
     }
 
-    public abstract void writeFloat(float n);
+    public void writeFloat(float n) {
+        onWrite(4);
+
+        int temp = Float.floatToIntBits(n);
+        int shift = 0;
+
+        while (shift < 32) {
+            writeByte((byte) (temp >> shift & 0b11111111));
+            shift += 8;
+        }
+    }
 
     public void writeFloat(float n, int scale) throws IOException {
         if (scale < 0) {
@@ -115,7 +216,17 @@ public abstract class Buffer {
         }
     }
 
-    public abstract void writeDouble(double n);
+    public void writeDouble(double n) {
+        onWrite(8);
+
+        long temp = Double.doubleToLongBits(n);
+        int shift = 0;
+
+        while (shift < 64) {
+            writeByte((byte) (temp >>> shift & 0b11111111));
+            shift += 8;
+        }
+    }
 
     public static long checkScale(double n, int scale) {
         int times = (int) Math.pow(10, scale);

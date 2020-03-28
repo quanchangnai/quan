@@ -47,6 +47,8 @@ local function testBuffer()
 
     print("buffer:size()", buffer:size())
 
+    buffer=Buffer.new(buffer.bytes)
+
     print(buffer:readBool())
     print(buffer:readInt())
     buffer:reset()
@@ -60,11 +62,15 @@ local function testBuffer()
     print(buffer:readString())
     print(buffer:readLong())
 
+    print("=================")
+
     local file = io.open("E:\\buffer", "w")
     file:write(buffer.bytes)
     file:flush()
 
     buffer:reset()
+    print(buffer:readBool())
+    buffer:clear()
     buffer:writeInt(45)
     buffer:writeString("奋斗服务")
     print(buffer:readInt())
@@ -108,6 +114,7 @@ local function testMessage1()
     --local sRoleLogin2 = SRoleLogin.decode(buffer)
 
     local sRoleLogin2 = MessageFactory.create(buffer:readInt())
+    buffer:reset()
     local sRoleLogin2 = sRoleLogin2.decode(buffer)
 
     local buffer = SRoleLogin.encode(sRoleLogin2)

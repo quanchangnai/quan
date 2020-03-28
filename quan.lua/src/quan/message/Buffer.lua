@@ -19,10 +19,8 @@ function Buffer.new(bytes)
     local instance = {
         ---字节缓冲区
         bytes = bytes or "",
-        ---下一个读数据的位置
-        position = 1,
-        --当前是在读数据还是在写数据
-        reading = false
+        ---下一个读的位置,该位置的数据还未读
+        readPos = 1,
     }
     setmetatable(instance, { __index = Buffer })
     return instance
@@ -33,54 +31,46 @@ function Buffer:size()
 end
 
 function Buffer:reset()
-    self.position = 1
-    if not self.reading then
-        self.bytes = ""
-    end
+    self.readPos = 1
 end
 
-function Buffer:remaining()
-    if self.position > 0 then
-        return self:size() - self.position + 1
-    else
-        return self.position + 1
-    end
+function Buffer:clear()
+    self.readPos = 1
+    self.bytes = ""
+end
+
+function Buffer:readableCount()
+    return self:size() - self.readPos + 1;
 end
 
 function Buffer:remainingBytes()
-    if self.position > 0 then
-        return self.bytes:sub(self.position)
-    else
-        return self.bytes
-    end
+    return self.bytes:sub(self.readPos)
 end
 
-local function validateBits(bits)
-    if bits ~= 16 and bits ~= 32 and bits ~= 64 then
-        error("参数[bits]限定取值范围[16,32,64],实际值[" .. bits .. "]", 2)
-    end
+function Buffer:discardReadBytes()
+    self.bytes = self.bytes:sub(self.readPos)
+    self.readPos = 1;
 end
 
+---从buff重读取变长整数
+---@param buffer
+---@param bits 最多读几个bit位，合法值:16,32,64
 local function readVarInt(buffer, bits)
-    validateBits(bits)
-
-    local position = buffer.reading and buffer.position or 1
     local shift = 0;
     local temp = 0;
 
     while shift < bits do
-        if position > buffer.bytes:len() then
-            break
+        if buffer.readPos > buffer:size() then
+            error("读数据出错", 2)
         end
 
-        local b = buffer.bytes:byte(position)
-        position = position + 1
+        local b = buffer.bytes:byte(buffer.readPos)
+        buffer.readPos = buffer.readPos + 1
+
         temp = temp | (b & 0x7F) << shift;
         shift = shift + 7
 
         if (b & 0x80) == 0 then
-            buffer.reading = true
-            buffer.position = position
             --ZigZag解码
             return (temp >> 1) ~ -(temp & 1);
         end
@@ -110,13 +100,11 @@ function Buffer:readFloat(scale)
     assert(math.type(scale) == "integer", "参数[scale]类型错误")
 
     if scale < 0 then
-        local position = self.reading and self.position or 1
-        if position + 3 > self.bytes:len() then
+        if self.readPos + 3 > self:size() then
             error("读数据出错", 2)
         end
-        local n = string.unpack("<f", self.bytes, position)
-        self.reading = true
-        self.position = position + 4
+        local n = string.unpack("<f", self.bytes, self.readPos)
+        self.readPos = self.readPos + 4
         return n
     end
 
@@ -129,13 +117,11 @@ function Buffer:readDouble(scale)
     assert(math.type(scale) == "integer", "参数[scale]类型错误")
 
     if scale < 0 then
-        local position = self.reading and self.position or 1
-        if position + 7 > self.bytes:len() then
+        if self.readPos + 7 > self:size() then
             error("读数据出错", 2)
         end
-        local n = string.unpack("<d", self.bytes, position)
-        self.reading = true
-        self.position = position + 8
+        local n = string.unpack("<d", self.bytes, self.readPos)
+        self.readPos = self.readPos + 8
         return n
     end
 
@@ -143,16 +129,14 @@ function Buffer:readDouble(scale)
 end
 
 function Buffer:readBytes()
-    local position = self.reading and self.position or 1
     local length = self:readInt()
 
-    if position + length - 1 > self:size() then
+    if self.readPos + length - 1 > self:size() then
         error("读数据出错", 2)
     end
 
-    local bytes = self.bytes:sub(position + 1, position + length)
-    self.reading = true
-    self.position = position + length + 1
+    local bytes = self.bytes:sub(self.readPos, self.readPos + length - 1)
+    self.readPos = self.readPos + length
     return bytes
 end
 
@@ -160,17 +144,8 @@ function Buffer:readString()
     return self:readBytes()
 end
 
-local function checkWrite(buffer)
-    if buffer.position < buffer.bytes:len() + 1 then
-        buffer.bytes = buffer.bytes:sub(1, buffer.position - 1)
-    end
-end
-
 local function writeVarInt(buffer, n, bits)
     assert(math.type(n) == "integer", "参数[n]类型错误")
-
-    validateBits(bits)
-    checkWrite(buffer)
 
     --ZigZag编码
     n = (n << 1) ~ (n >> 63);
@@ -179,12 +154,10 @@ local function writeVarInt(buffer, n, bits)
     while shift < bits do
         if ((n & ~0x7F) == 0) then
             buffer.bytes = buffer.bytes .. string.char(n & 0x7F)
-            buffer.reading = false
-            buffer.position = buffer.bytes:len() + 1
-            return ;
+            return
         else
             buffer.bytes = buffer.bytes .. string.char(n & 0x7F | 0x80)
-            n = n >> 7;
+            n = n >> 7
             shift = shift + 7
         end
     end
@@ -215,10 +188,7 @@ function Buffer:writeFloat(n, scale)
     assert(math.type(scale) == "integer", "参数[scale]类型错误")
 
     if scale < 0 then
-        checkWrite(self)
         self.bytes = self.bytes .. string.pack("<f", n)
-        self.reading = false
-        self.position = self.bytes:len() + 1
     else
         self:writeDouble(n, scale)
     end
@@ -230,10 +200,7 @@ function Buffer:writeDouble(n, scale)
     assert(math.type(scale) == "integer", "参数[scale]类型错误")
 
     if scale < 0 then
-        checkWrite(self)
         self.bytes = self.bytes .. string.pack("<d", n)
-        self.reading = false
-        self.position = self.bytes:len() + 1
         return
     end
 
@@ -250,7 +217,6 @@ function Buffer:writeBytes(bytes)
     assert(type(bytes) == "string", "参数[bytes]类型错误")
     self:writeInt(bytes:len())
     self.bytes = self.bytes .. bytes
-    self.position = self.bytes:len() + 1
 end
 
 function Buffer:writeString(s)

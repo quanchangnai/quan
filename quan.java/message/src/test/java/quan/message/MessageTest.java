@@ -1,11 +1,11 @@
 package quan.message;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import quan.message.role.RoleInfo;
 import quan.message.role.RoleType;
 import quan.message.role.SRoleLogin;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
@@ -31,6 +31,7 @@ public class MessageTest {
     private static void test1() throws Exception {
         System.err.println("test1=============================");
         Buffer buffer = new BytesBuffer();
+        buffer = new NettyBuffer(Unpooled.buffer());
         buffer.writeBool(true);
         buffer.writeInt(70);
         buffer.writeInt(2423);
@@ -41,7 +42,7 @@ public class MessageTest {
         buffer.writeString("搭顺风车");
         buffer.writeLong(12324);
 
-        System.err.println("buffer.available()=" + buffer.available());
+        System.err.println("buffer.readableCount()=" + buffer.readableCount());
 
 //        FileInputStream fileInputStream = new FileInputStream(new File("E:\\buffer"));
 //        byte[] bytes = new byte[fileInputStream.available()];
@@ -96,9 +97,9 @@ public class MessageTest {
 
         byte[] encodedBytes = sRoleLogin1.encode();
 
-        FileInputStream fileInputStream = new FileInputStream(new File("E:\\SRoleLogin"));
-        encodedBytes = new byte[fileInputStream.available()];
-        fileInputStream.read(encodedBytes);
+//        FileInputStream fileInputStream = new FileInputStream(new File("E:\\SRoleLogin"));
+//        encodedBytes = new byte[fileInputStream.available()];
+//        fileInputStream.read(encodedBytes);
 
         System.err.println("encodedBytes.length:" + encodedBytes.length);
 
@@ -107,9 +108,16 @@ public class MessageTest {
 
         System.err.println("sRoleLogin2:" + sRoleLogin2);
 //        System.err.println("sRoleLogin2.seq:" + sRoleLogin2.getSeq());
+
+        ByteBuf byteBuf = Unpooled.buffer();
+        sRoleLogin1.encode(byteBuf);
+        SRoleLogin sRoleLogin3 = new SRoleLogin();
+        sRoleLogin3.decode(byteBuf);
+        System.err.println("sRoleLogin3:" + sRoleLogin3);
     }
 
     private static void test3() throws Exception {
+        System.err.println("test3=============================");
         ByteBuffer buffer = ByteBuffer.allocate(4);
         buffer.putInt(42);
         buffer.flip();

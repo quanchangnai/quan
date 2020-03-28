@@ -22,9 +22,6 @@ public abstract class Message extends Bean {
 
     @Override
     public void decode(Buffer buffer) throws IOException {
-        if (buffer.reading()) {
-            buffer.reset();
-        }
         int msgId = buffer.readInt();
         if (msgId != getId()) {
             throw new IOException(String.format("消息ID不匹配,期望值[%s],实际值[%s]", getId(), msgId));

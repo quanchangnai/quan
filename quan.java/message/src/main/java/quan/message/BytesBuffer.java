@@ -2,10 +2,9 @@ package quan.message;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 
 /**
- * 基于VarInt和ZigZag编码的字节缓冲区，字节顺序采用小端模式<br/>
+ * 直接使用字节数组实现的字节缓冲区，编码采用VarInt和ZigZag算法，字节顺序采用小端模式<br/>
  * Created by quanchangnai on 2018/7/2.
  */
 public class BytesBuffer extends Buffer {
@@ -16,381 +15,132 @@ public class BytesBuffer extends Buffer {
     private byte[] bytes;
 
     /**
-     * 下一个读或写的位置
+     * 下一个读的位置,该位置的数据还未读
      */
-    private int position;
+    private int readPos;
 
     /**
-     * 当前是在读数据还是在写数据
+     * 下一个写的位置,该位置还未写数据
      */
-    private boolean reading;
-
-    /**
-     * 结束位置，后面的是无效数据
-     */
-    private int end;
+    private int writePos;
 
     public BytesBuffer() {
-        this(64);
+        this(128);
     }
 
     public BytesBuffer(int capacity) {
         this.bytes = new byte[capacity];
-        this.end = -1;
     }
 
     public BytesBuffer(byte[] bytes) {
         this.bytes = bytes;
-        this.position = bytes.length - 1;
-        this.end = position;
+        this.writePos = bytes.length;
     }
 
     public BytesBuffer(ByteBuffer buffer) {
         this(buffer.array());
     }
 
+    @Override
     public int capacity() {
         return bytes.length;
     }
 
-    public boolean reading() {
-        return reading;
-    }
-
+    @Override
     public void reset() {
-        position = 0;
-        if (!reading) {
-            end = position - 1;
-        }
+        readPos = 0;
+    }
+
+    @Override
+    public void clear() {
+        readPos = 0;
+        writePos = 0;
     }
 
     /**
-     * 当前可用的字节数
+     * 当前剩余可读的字节数
      */
-    public int available() {
-        if (reading) {
-            return end + 1;
-        } else {
-            return position;
-        }
+    @Override
+    public int readableCount() {
+        return writePos - readPos;
     }
 
-    /**
-     * 当前可用的字节数组<br/>
-     * 当前正在读数据时：[0,end]<br/>
-     * 当前正在写数据时：[0,position)<br/>
-     */
-    public byte[] availableBytes() {
-        byte[] availableBytes = new byte[available()];
-        System.arraycopy(this.bytes, reading ? position : 0, availableBytes, 0, availableBytes.length);
-        return availableBytes;
-    }
-
-    /**
-     * 当前剩余可用的字节数
-     */
-    public int remaining() {
-        if (reading) {
-            return end - position + 1;
-        } else {
-            return position;
-        }
-    }
-
-    /**
-     * 当前剩余可用的字节数组<br/>
-     * 当前正在读数据时：[position,end]<br/>
-     * 当前正在写数据时：[0,position)<br/>
-     */
+    @Override
     public byte[] remainingBytes() {
-        byte[] remainingBytes = new byte[remaining()];
-        System.arraycopy(this.bytes, reading ? position : 0, remainingBytes, 0, remainingBytes.length);
+        byte[] remainingBytes = new byte[readableCount()];
+        System.arraycopy(this.bytes, readPos, remainingBytes, 0, remainingBytes.length);
+        readPos += remainingBytes.length;
         return remainingBytes;
     }
 
-    /**
-     * 读取VarInt
-     *
-     * @param bits 读取的最大比特位,只能是[8,16,32,64]中的一种
-     */
-    protected long readVarInt(int bits) throws IOException {
-        if (bits != 16 && bits != 32 && bits != 64) {
-            throw new IllegalArgumentException("参数[bits]限定取值范围[16,32,64],实际值[" + bits + "]");
-        }
-
-        int position = reading ? this.position : 0;
-        int shift = 0;
-        long temp = 0;
-
-        while (shift < bits) {
-            if (position >= bytes.length) {
-                break;
-            }
-
-            final byte b = bytes[position++];
-            temp |= (b & 0b1111111L) << shift;
-            shift += 7;
-
-            if ((b & 0b10000000) != 0) {
-                continue;
-            }
-
-            reading = true;
-            this.position = position;
-            //ZigZag解码
-            return (temp >>> 1) ^ -(temp & 1);
-        }
-
-        throw new IOException("读数据出错");
+    @Override
+    public void discardReadBytes() {
+        byte[] newBytes = new byte[capacity() - readPos];
+        System.arraycopy(bytes, readPos, newBytes, 0, newBytes.length);
+        bytes = newBytes;
+        writePos -= readPos;
+        readPos = 0;
     }
 
-    protected byte readByte() throws IOException {
-        position = reading ? position : 0;
-        reading = true;
-
-        if (remaining() < 1) {
-            throw new IOException("读数据出错");
+    @Override
+    protected void onRead() throws IOException {
+        if (readableCount() < 1) {
+            throw new IOException("读数据出错，剩余字节数不够");
         }
-
-        return bytes[position++];
     }
 
+    @Override
+    protected byte readByte() {
+        return bytes[readPos++];
+    }
+
+    @Override
     public byte[] readBytes() throws IOException {
         int length = readInt();
-        if (length > remaining()) {
-            throw new IOException("读数据出错");
+        int readable = readableCount();
+        if (length > readableCount()) {
+            throw new IOException(String.format("读数据出错，希望读%d字节,实际剩余%d字节", length, readable));
         }
+
         byte[] bytes = new byte[length];
-        System.arraycopy(this.bytes, position, bytes, 0, length);
-        position += length;
+
+        System.arraycopy(this.bytes, readPos, bytes, 0, length);
+        readPos += length;
+
         return bytes;
     }
 
-    public boolean readBool() throws IOException {
-        return readInt() != 0;
-    }
-
-
-    public short readShort() throws IOException {
-        return (short) readVarInt(16);
-    }
-
-    public int readInt() throws IOException {
-        return (int) readVarInt(32);
-    }
-
-    public long readLong() throws IOException {
-        return readVarInt(64);
-    }
-
-    public float readFloat() throws IOException {
-        int position = reading ? this.position : 0;
-        int shift = 0;
-        int temp = 0;
-
-        while (shift < 32) {
-            if (position >= bytes.length) {
-                throw new IOException("读数据出错");
-            }
-            final byte b = bytes[position++];
-            temp |= (b & 0b11111111L) << shift;
-            shift += 8;
-        }
-
-        reading = true;
-        this.position = position;
-        return Float.intBitsToFloat(temp);
-    }
-
-    public float readFloat(int scale) throws IOException {
-        if (scale < 0) {
-            return readFloat();
-        } else {
-            return (float) (readLong() / Math.pow(10, scale));
-        }
-    }
-
-    public double readDouble() throws IOException {
-        int position = reading ? this.position : 0;
-        int shift = 0;
-        long temp = 0;
-
-        while (shift < 64) {
-            if (position >= bytes.length) {
-                throw new IOException("读数据出错");
-            }
-            final byte b = bytes[position++];
-            temp |= (b & 0b11111111L) << shift;
-            shift += 8;
-        }
-
-        reading = true;
-        this.position = position;
-        return Double.longBitsToDouble(temp);
-    }
-
-    public double readDouble(int scale) throws IOException {
-        if (scale < 0) {
-            return readDouble();
-        } else {
-            return readLong() / Math.pow(10, scale);
-        }
-    }
-
-    public String readString() throws IOException {
-        return new String(readBytes(), StandardCharsets.UTF_8);
-    }
-
-    /**
-     * 检测并增加缓冲区容量
-     *
-     * @param minAddValue 最少增加的容量
-     */
-    protected void checkCapacity(int minAddValue) {
-        int capacity = capacity();
-        int position = reading ? 0 : this.position;
-        if (position + minAddValue < capacity) {
+    @Override
+    protected void onWrite(int writeCount) {
+        if (writePos + writeCount < capacity()) {
             return;
         }
 
+        //当缓冲区容量不够时进行扩容
+        int capacity = capacity();
         int newCapacity = capacity;
-        while (minAddValue > 0) {
+
+        while (writeCount > 0) {
             newCapacity += capacity;
-            minAddValue -= capacity;
+            writeCount -= capacity;
         }
+
         byte[] newBytes = new byte[newCapacity];
         System.arraycopy(this.bytes, 0, newBytes, 0, capacity);
         this.bytes = newBytes;
     }
 
-    protected void writeVarInt(long n) {
-        checkCapacity(10);
-
-        int position = reading ? 0 : this.position;
-        int end = this.end;
-        //ZigZag编码
-        n = (n << 1) ^ (n >> 63);
-
-        while (true) {
-            if ((n & ~0b1111111) == 0) {
-                bytes[position++] = (byte) (n & 0b1111111);
-                reading = false;
-                this.position = position;
-                this.end = ++end;
-                return;
-            } else {
-                bytes[position++] = (byte) (n & 0b1111111 | 0b10000000);
-                n >>>= 7;
-                end++;
-            }
-        }
+    @Override
+    protected void writeByte(byte b) {
+        bytes[writePos++] = b;
     }
 
-    protected void writeByte(byte b) throws IOException {
-        position = reading ? 0 : this.position;
-        reading = false;
-
-        if (remaining() < 1) {
-            throw new IOException("写数据出错");
-        }
-
-        bytes[position++] = b;
-        end++;
-    }
-
-
+    @Override
     public void writeBytes(byte[] bytes) {
-        checkCapacity(10 + bytes.length);
+        onWrite(10 + bytes.length);
+
         writeInt(bytes.length);
-        System.arraycopy(bytes, 0, this.bytes, position, bytes.length);
-        position += bytes.length;
-        end += bytes.length;
+        System.arraycopy(bytes, 0, this.bytes, writePos, bytes.length);
+        writePos += bytes.length;
     }
-
-
-    public void writeBool(boolean b) {
-        writeInt(b ? 1 : 0);
-    }
-
-    public void writeShort(short n) {
-        writeVarInt(n);
-    }
-
-    public void writeInt(int n) {
-        writeVarInt(n);
-    }
-
-    public void writeLong(long n) {
-        writeVarInt(n);
-    }
-
-    public void writeFloat(float n) {
-        checkCapacity(4);
-
-        int position = reading ? 0 : this.position;
-        int end = this.end;
-
-        int temp = Float.floatToIntBits(n);
-        int shift = 0;
-
-        while (shift < 32) {
-            bytes[position++] = (byte) (temp >> shift & 0b11111111);
-            shift += 8;
-            end++;
-        }
-
-        reading = false;
-        this.position = position;
-        this.end = end;
-    }
-
-    public void writeFloat(float n, int scale) throws IOException {
-        if (scale < 0) {
-            writeFloat(n);
-        } else {
-            writeDouble(n, scale);
-        }
-    }
-
-    public void writeDouble(double n) {
-        checkCapacity(8);
-
-        int position = reading ? 0 : this.position;
-        int end = this.end;
-
-        long temp = Double.doubleToLongBits(n);
-        int shift = 0;
-
-        while (shift < 64) {
-            bytes[position++] = (byte) (temp >>> shift & 0b11111111);
-            shift += 8;
-            end++;
-        }
-
-        reading = false;
-        this.position = position;
-        this.end = end;
-    }
-
-    public void writeDouble(double n, int scale) throws IOException {
-        if (scale < 0) {
-            writeDouble(n);
-            return;
-        }
-
-        long lon;
-        try {
-            lon = checkScale(n, scale);
-        } catch (IllegalArgumentException e) {
-            throw new IOException(e.getMessage());
-        }
-
-        writeLong(lon);
-    }
-
-
-    public void writeString(String s) {
-        writeBytes(s.getBytes(StandardCharsets.UTF_8));
-    }
-
 }

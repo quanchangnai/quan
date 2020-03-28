@@ -24,16 +24,14 @@ public class NettyMessageCodec extends ByteToMessageCodec<Message> {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, Message msg, ByteBuf byteBuf) throws Exception {
-        byteBuf.writeBytes(msg.encode());
+        msg.encode(byteBuf);
     }
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) throws Exception {
-        byte[] bytes = new byte[byteBuf.readableBytes()];
-        byteBuf.readBytes(bytes);
-
-        Buffer buffer = new BytesBuffer(bytes);
+        Buffer buffer = new NettyBuffer(byteBuf);
         int msgId = buffer.readInt();
+        buffer.reset();
         Message message = messageFactory.create(msgId);
         if (message == null) {
             logger.error("消息{}创建失败", msgId);

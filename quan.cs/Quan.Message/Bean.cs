@@ -6,7 +6,7 @@ namespace Quan.Message
         {
             var buffer = new Buffer();
             Encode(buffer);
-            return buffer.AvailableBytes();
+            return buffer.RemainingBytes();
         }
 
         public virtual void Encode(Buffer buffer)

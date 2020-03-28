@@ -5,6 +5,7 @@ import io.netty.buffer.ByteBuf;
 import java.io.IOException;
 
 /**
+ * 使用Netty的ByteBuf实现的字节缓冲区，编码采用VarInt和ZigZag算法，字节顺序采用小端模式<br/>
  * Created by quanchangnai on 2020/3/27.
  */
 public class NettyBuffer extends Buffer {
@@ -15,9 +16,13 @@ public class NettyBuffer extends Buffer {
         this.byteBuf = byteBuf;
     }
 
+    public ByteBuf getByteBuf() {
+        return byteBuf;
+    }
+
     @Override
-    public boolean reading() {
-        return false;
+    public int capacity() {
+        return byteBuf.capacity();
     }
 
     @Override
@@ -26,55 +31,50 @@ public class NettyBuffer extends Buffer {
     }
 
     @Override
-    public int available() {
-        return 0;
+    public void clear() {
+        byteBuf.clear();
     }
 
     @Override
-    public byte[] availableBytes() {
-        return new byte[0];
-    }
-
-    @Override
-    public int remaining() {
+    public int readableCount() {
         return byteBuf.readableBytes();
     }
 
     @Override
     public byte[] remainingBytes() {
-        return new byte[0];
+        byte[] remainingBytes = new byte[readableCount()];
+        byteBuf.readBytes(remainingBytes);
+        return remainingBytes;
     }
 
     @Override
-    protected long readVarInt(int bits) throws IOException {
-        return 0;
+    public void discardReadBytes() {
+        byteBuf.discardReadBytes();
+    }
+
+    @Override
+    protected byte readByte() {
+        return byteBuf.readByte();
     }
 
     @Override
     public byte[] readBytes() throws IOException {
         int length = readInt();
-        if (length > remaining()) {
+        if (length > readableCount()) {
             throw new IOException("读数据出错");
         }
+
         byte[] bytes = new byte[length];
         byteBuf.readBytes(bytes);
         return bytes;
     }
 
-    @Override
-    public float readFloat() throws IOException {
-        return 0;
-    }
 
     @Override
-    public double readDouble() throws IOException {
-        return 0;
+    protected void writeByte(byte b) {
+        byteBuf.writeByte(b);
     }
 
-    @Override
-    protected void writeVarInt(long n) {
-
-    }
 
     @Override
     public void writeBytes(byte[] bytes) {
@@ -82,13 +82,4 @@ public class NettyBuffer extends Buffer {
         byteBuf.writeBytes(bytes);
     }
 
-    @Override
-    public void writeFloat(float n) {
-
-    }
-
-    @Override
-    public void writeDouble(double n) {
-
-    }
 }

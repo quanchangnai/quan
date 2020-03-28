@@ -35,7 +35,7 @@ namespace Test
             buffer.WriteString("搭顺风车");
             buffer.WriteLong(12324);
 
-            Console.WriteLine("buffer.Available:{0}", buffer.Available);
+            Console.WriteLine("buffer.ReadableCount:{0}", buffer.ReadableCount);
 
             var fileStream = File.Open("E:\\buffer", FileMode.Open);
             var bytes = new byte[fileStream.Length];
@@ -76,10 +76,11 @@ namespace Test
             Console.WriteLine("sRoleLogin1:" + sRoleLogin1);
 
             var encodedBytes = sRoleLogin1.Encode();
-            
+
             var fileStream = File.Open("E:\\SRoleLogin", FileMode.Open);
-            encodedBytes = new byte[fileStream.Length];
-            fileStream.Read(encodedBytes, 0, encodedBytes.Length);
+//            encodedBytes = new byte[fileStream.Length];
+//            fileStream.Read(encodedBytes, 0, encodedBytes.Length);
+//            fileStream.Write(encodedBytes, 0, encodedBytes.Length);
 
             Console.WriteLine("encodedBytes.Length:{0}", encodedBytes.Length);
 
@@ -88,7 +89,6 @@ namespace Test
 
             Console.WriteLine("sRoleLogin2:" + sRoleLogin2);
 //            Console.WriteLine("sRoleLogin2.Seq:" + sRoleLogin2.Seq);
-
         }
 
         public static void Test3()
@@ -119,7 +119,7 @@ namespace Test
             Array.Copy(encodedBytes, 0, sendBytes, lengthBytes.Length, encodedBytes.Length);
 
             var ip = IPAddress.Parse("127.0.0.1");
-            var port = 9898;
+            const int port = 9898;
 
             var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
