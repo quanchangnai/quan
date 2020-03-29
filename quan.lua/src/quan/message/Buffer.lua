@@ -60,12 +60,12 @@ end
 
 ---从buff重读取变长整数
 ---@param buffer
----@param bits 最多读几个bit位，合法值:16,32,64
-local function readVarInt(buffer, bits)
+---@param readBits 最多读几个bit位，合法值:16,32,64
+local function readVarInt(buffer, readBits)
     local shift = 0;
     local temp = 0;
 
-    while shift < bits do
+    while shift < readBits do
         if buffer.readIndex > buffer:size() then
             error("读数据出错", 2)
         end

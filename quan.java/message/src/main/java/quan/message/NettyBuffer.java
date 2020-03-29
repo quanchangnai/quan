@@ -2,8 +2,6 @@ package quan.message;
 
 import io.netty.buffer.ByteBuf;
 
-import java.io.IOException;
-
 /**
  * 使用Netty的ByteBuf实现的字节缓冲区
  * Created by quanchangnai on 2020/3/27.
@@ -47,7 +45,7 @@ public class NettyBuffer extends Buffer {
 
     @Override
     public byte[] remainingBytes() {
-        byte[] remainingBytes = new byte[readableCount()];
+        byte[] remainingBytes = new byte[buf.readableBytes()];
         buf.readBytes(remainingBytes);
         return remainingBytes;
     }
@@ -63,17 +61,11 @@ public class NettyBuffer extends Buffer {
     }
 
     @Override
-    public byte[] readBytes() throws IOException {
-        int length = readInt();
-        if (length > readableCount()) {
-            throw new IOException("读数据出错");
-        }
-
+    protected byte[] readBytes(int length) {
         byte[] bytes = new byte[length];
         buf.readBytes(bytes);
         return bytes;
     }
-
 
     @Override
     protected void writeByte(byte b) {

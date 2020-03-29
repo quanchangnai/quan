@@ -105,18 +105,10 @@ public class SimpleBuffer extends Buffer {
     }
 
     @Override
-    public byte[] readBytes() throws IOException {
-        int length = readInt();
-        int readable = readableCount();
-        if (length > readableCount()) {
-            throw new IOException(String.format("读数据出错，希望读%d字节,实际剩余%d字节", length, readable));
-        }
-
+    protected byte[] readBytes(int length) {
         byte[] bytes = new byte[length];
-
         System.arraycopy(this.bytes, readIndex, bytes, 0, length);
         readIndex += length;
-
         return bytes;
     }
 

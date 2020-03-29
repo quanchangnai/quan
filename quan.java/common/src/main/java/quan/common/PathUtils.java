@@ -12,7 +12,10 @@ import java.util.Set;
 public class PathUtils {
 
     /**
-     * 转换为当前平台路径
+     * 把指定路径转换为当前平台路径
+     *
+     * @param path 路径风格符不明确的路径
+     * @return 转换后的路径
      */
     public static String toPlatPath(String path) {
         if (StringUtils.isBlank(path)) {

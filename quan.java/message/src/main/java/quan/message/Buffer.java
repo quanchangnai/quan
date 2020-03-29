@@ -47,16 +47,15 @@ public abstract class Buffer {
     /**
      * 读取VarInt
      *
-     * @param readCount 最大读取字节数,合法值:2,4,8
+     * @param readBits 最多读几个bit位，合法值:16,32,64
      */
-    protected long readVarInt(int readCount) throws IOException {
+    protected long readVarInt(int readBits) throws IOException {
         onRead();
 
         int shift = 0;
         long temp = 0;
-        int bits = readCount * 8;
 
-        while (shift < bits) {
+        while (shift < readBits) {
             final byte b = readByte();
             temp |= (b & 0b1111111L) << shift;
             shift += 7;
@@ -83,22 +82,32 @@ public abstract class Buffer {
      */
     protected abstract byte readByte();
 
-    public abstract byte[] readBytes() throws IOException;
+    public byte[] readBytes() throws IOException {
+        int length = readInt();
+        int readable = readableCount();
+        if (length > readableCount()) {
+            throw new IOException(String.format("读数据出错，希望读%d字节,实际剩余%d字节", length, readable));
+        }
+
+        return readBytes(length);
+    }
+
+    protected abstract byte[] readBytes(int length);
 
     public boolean readBool() throws IOException {
         return readInt() != 0;
     }
 
     public short readShort() throws IOException {
-        return (short) readVarInt(2);
+        return (short) readVarInt(16);
     }
 
     public int readInt() throws IOException {
-        return (int) readVarInt(4);
+        return (int) readVarInt(32);
     }
 
     public long readLong() throws IOException {
-        return readVarInt(8);
+        return readVarInt(64);
     }
 
     public float readFloat() throws IOException {

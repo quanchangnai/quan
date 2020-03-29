@@ -99,16 +99,16 @@ namespace Quan.Message
         /// <summary>
         /// 读取VarInt
         /// </summary>
-        /// <param name="bits">读取的最大比特位,只能是[8,16,32,64]中的一种</param>
+        /// <param name="readBits">最多读几个bit位，合法值:16,32,64</param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="IOException"></exception>
-        private long ReadVarInt(int bits)
+        private long ReadVarInt(int readBits)
         {
             var shift = 0;
             long temp = 0;
 
-            while (shift < bits)
+            while (shift < readBits)
             {
                 if (ReadableCount < 1)
                 {
