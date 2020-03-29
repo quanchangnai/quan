@@ -431,7 +431,7 @@ public class ConfigDefinition extends BeanDefinition {
                 continue;
             }
 
-            if (!selfField.isPrimitiveType() && !selfField.isEnumType()) {
+            if (!selfField.isPrimitiveType() && !selfField.isEnumType() && selfField.getType() != null) {
                 addValidatedError(getValidatedName("的") + selfField.getValidatedName() + "类型[" + selfField.getType() + "]不支持索引，允许的类型为" + Constants.PRIMITIVE_TYPES + "或枚举");
                 continue;
             }
@@ -522,7 +522,7 @@ public class ConfigDefinition extends BeanDefinition {
                 addValidatedError(getValidatedName("的") + indexDefinition.getValidatedName() + "字段[" + fieldName + "]不存在");
                 continue;
             }
-            if (!fieldDefinition.isPrimitiveType() && !fieldDefinition.isEnumType()) {
+            if (!fieldDefinition.isPrimitiveType() && !fieldDefinition.isEnumType() && fieldDefinition.getType() != null) {
                 addValidatedError(getValidatedName("的") + indexDefinition.getValidatedName() + "字段[" + fieldName + "]类型[" + fieldDefinition.getType() + "]非法，允许的类型为" + Constants.PRIMITIVE_TYPES + "或枚举");
             }
             if (!indexDefinition.addField(fieldDefinition)) {

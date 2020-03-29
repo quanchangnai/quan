@@ -28,11 +28,11 @@ import java.util.*;
  */
 public abstract class Generator {
 
+    protected static final Logger logger = LoggerFactory.getLogger(Generator.class);
+
     protected Map<String, String> basicTypes = new HashMap<>();
 
     protected Map<String, String> classTypes = new HashMap<>();
-
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     protected boolean enable = true;
 
@@ -225,7 +225,7 @@ public abstract class Generator {
         }
 
         generate(classDefinitions);
-        logger.info("生成{}{}全部完成\n", supportLanguage(), category().comment());
+        logger.info("生成{}{}完成\n", supportLanguage(), category().comment());
     }
 
     protected void generate(List<ClassDefinition> classDefinitions) {
@@ -334,12 +334,12 @@ public abstract class Generator {
         logger.error("生成{}代码失败，解析目录{}下的定义文件共发现{}条错误", category().comment(), parser.getDefinitionPaths(), errors.size());
         for (int i = 1; i <= errors.size(); i++) {
             String error = errors.get(i - 1);
-            logger.error("错误{}:{}", i, error);
+            logger.error(error);
         }
     }
 
     public static void main(String[] args) {
-        Logger logger = LoggerFactory.getLogger(Generator.class);
+        long startTime = System.currentTimeMillis();
 
         String propertiesFile = "generator.properties";
         if (args.length > 0) {
@@ -388,5 +388,7 @@ public abstract class Generator {
         cSharpConfigGenerator.tryGenerate(false);
         luaConfigGenerator.tryGenerate(false);
         javaConfigGenerator.printErrors();
+
+        logger.info("生成完成，耗时{}s", (System.currentTimeMillis() - startTime) / 1000D);
     }
 }

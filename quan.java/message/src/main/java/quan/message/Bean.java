@@ -19,11 +19,11 @@ public abstract class Bean {
         decode(new SimpleBuffer(bytes));
     }
 
-    public void encode(ByteBuf byteBuf) throws IOException {
+    public final void encode(ByteBuf byteBuf) throws IOException {
         encode(new NettyBuffer(byteBuf));
     }
 
-    public void decode(ByteBuf byteBuf) throws IOException {
+    public final void decode(ByteBuf byteBuf) throws IOException {
         decode(new NettyBuffer(byteBuf));
     }
 

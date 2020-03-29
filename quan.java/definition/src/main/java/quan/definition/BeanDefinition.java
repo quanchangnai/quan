@@ -445,13 +445,13 @@ public class BeanDefinition extends ClassDefinition {
         }
 
         if (field.isCollectionType()) {
-            if (keType && field.isPrimitiveKeyType() && !field.getKeyType().equals(refField.getType())) {
+            if (keType && field.isPrimitiveKeyType() && !field.getKeyType().equals(refField.getType()) && refField.getType() != null) {
                 addValidatedError(getValidatedName("的") + field.getValidatedName() + "类型[" + field.getType() + "]的键类型[" + field.getKeyType() + "]和引用字段[" + refConfigAndField + "]的类型[" + refField.getType() + "]不一致");
             }
-            if (!keType && field.isLegalValueType() && !field.getValueType().equals(refField.getType())) {
+            if (!keType && field.isLegalValueType() && !field.getValueType().equals(refField.getType()) && refField.getType() != null) {
                 addValidatedError(getValidatedName("的") + field.getValidatedName() + "类型[" + field.getType() + "]的值类型[" + field.getValueType() + "]和引用字段[" + refConfigAndField + "]的类型[" + refField.getType() + "]不一致");
             }
-        } else if (!field.getType().equals(refField.getType())) {
+        } else if (!field.getType().equals(refField.getType()) && refField.getType() != null) {
             addValidatedError(getValidatedName("的") + field.getValidatedName() + "的类型[" + field.getType() + "]和引用字段[" + refConfigAndField + "]的类型[" + refField.getType() + "]不一致");
         }
 

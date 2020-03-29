@@ -64,7 +64,7 @@ public class CSharpConfigGenerator extends ConfigGenerator {
     }
 
     @Override
-    protected void processConstantDependency(ConstantDefinition constantDefinition) {
+    protected void processConstant(ConstantDefinition constantDefinition) {
         FieldDefinition valueField = constantDefinition.getValueField();
         if (valueField.isCollectionType()) {
             constantDefinition.getImports().add("System.Collections.Generic");
