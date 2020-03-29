@@ -17,12 +17,17 @@ public class BytesBuffer extends Buffer {
     /**
      * 下一个读的位置,该位置的数据还未读
      */
-    private int readPos;
+    private int readIndex;
 
     /**
      * 下一个写的位置,该位置还未写数据
      */
-    private int writePos;
+    private int writeIndex;
+
+    /**
+     * 标记的读位置
+     */
+    private int markedIndex;
 
     public BytesBuffer() {
         this(128);
@@ -34,7 +39,7 @@ public class BytesBuffer extends Buffer {
 
     public BytesBuffer(byte[] bytes) {
         this.bytes = bytes;
-        this.writePos = bytes.length;
+        this.writeIndex = bytes.length;
     }
 
     public BytesBuffer(ByteBuffer buffer) {
@@ -48,13 +53,18 @@ public class BytesBuffer extends Buffer {
 
     @Override
     public void reset() {
-        readPos = 0;
+        readIndex = markedIndex;
     }
 
     @Override
     public void clear() {
-        readPos = 0;
-        writePos = 0;
+        readIndex = 0;
+        writeIndex = 0;
+    }
+
+    @Override
+    public void mark() {
+        markedIndex = readIndex;
     }
 
     /**
@@ -62,24 +72,24 @@ public class BytesBuffer extends Buffer {
      */
     @Override
     public int readableCount() {
-        return writePos - readPos;
+        return writeIndex - readIndex;
     }
 
     @Override
     public byte[] remainingBytes() {
         byte[] remainingBytes = new byte[readableCount()];
-        System.arraycopy(this.bytes, readPos, remainingBytes, 0, remainingBytes.length);
-        readPos += remainingBytes.length;
+        System.arraycopy(this.bytes, readIndex, remainingBytes, 0, remainingBytes.length);
+        readIndex += remainingBytes.length;
         return remainingBytes;
     }
 
     @Override
     public void discardReadBytes() {
-        byte[] newBytes = new byte[capacity() - readPos];
-        System.arraycopy(bytes, readPos, newBytes, 0, newBytes.length);
+        byte[] newBytes = new byte[capacity() - readIndex];
+        System.arraycopy(bytes, readIndex, newBytes, 0, newBytes.length);
         bytes = newBytes;
-        writePos -= readPos;
-        readPos = 0;
+        writeIndex -= readIndex;
+        readIndex = 0;
     }
 
     @Override
@@ -91,7 +101,7 @@ public class BytesBuffer extends Buffer {
 
     @Override
     protected byte readByte() {
-        return bytes[readPos++];
+        return bytes[readIndex++];
     }
 
     @Override
@@ -104,15 +114,15 @@ public class BytesBuffer extends Buffer {
 
         byte[] bytes = new byte[length];
 
-        System.arraycopy(this.bytes, readPos, bytes, 0, length);
-        readPos += length;
+        System.arraycopy(this.bytes, readIndex, bytes, 0, length);
+        readIndex += length;
 
         return bytes;
     }
 
     @Override
     protected void onWrite(int writeCount) {
-        if (writePos + writeCount < capacity()) {
+        if (writeIndex + writeCount < capacity()) {
             return;
         }
 
@@ -132,7 +142,7 @@ public class BytesBuffer extends Buffer {
 
     @Override
     protected void writeByte(byte b) {
-        bytes[writePos++] = b;
+        bytes[writeIndex++] = b;
     }
 
     @Override
@@ -140,7 +150,7 @@ public class BytesBuffer extends Buffer {
         onWrite(10 + bytes.length);
 
         writeInt(bytes.length);
-        System.arraycopy(bytes, 0, this.bytes, writePos, bytes.length);
-        writePos += bytes.length;
+        System.arraycopy(bytes, 0, this.bytes, writeIndex, bytes.length);
+        writeIndex += bytes.length;
     }
 }

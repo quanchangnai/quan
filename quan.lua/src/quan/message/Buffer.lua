@@ -20,7 +20,9 @@ function Buffer.new(bytes)
         ---字节缓冲区
         bytes = bytes or "",
         ---下一个读的位置,该位置的数据还未读
-        readPos = 1,
+        readIndex = 1,
+        ---标记的读位置
+        markedIndex = 1
     }
     setmetatable(instance, { __index = Buffer })
     return instance
@@ -30,26 +32,30 @@ function Buffer:size()
     return self.bytes:len()
 end
 
+function Buffer:mark()
+    self.markedIndex = self.readIndex
+end
+
 function Buffer:reset()
-    self.readPos = 1
+    self.readIndex = self.markedIndex
 end
 
 function Buffer:clear()
-    self.readPos = 1
+    self.readIndex = 1
     self.bytes = ""
 end
 
 function Buffer:readableCount()
-    return self:size() - self.readPos + 1;
+    return self:size() - self.readIndex + 1;
 end
 
 function Buffer:remainingBytes()
-    return self.bytes:sub(self.readPos)
+    return self.bytes:sub(self.readIndex)
 end
 
 function Buffer:discardReadBytes()
-    self.bytes = self.bytes:sub(self.readPos)
-    self.readPos = 1;
+    self.bytes = self.bytes:sub(self.readIndex)
+    self.readIndex = 1;
 end
 
 ---从buff重读取变长整数
@@ -60,12 +66,12 @@ local function readVarInt(buffer, bits)
     local temp = 0;
 
     while shift < bits do
-        if buffer.readPos > buffer:size() then
+        if buffer.readIndex > buffer:size() then
             error("读数据出错", 2)
         end
 
-        local b = buffer.bytes:byte(buffer.readPos)
-        buffer.readPos = buffer.readPos + 1
+        local b = buffer.bytes:byte(buffer.readIndex)
+        buffer.readIndex = buffer.readIndex + 1
 
         temp = temp | (b & 0x7F) << shift;
         shift = shift + 7
@@ -100,11 +106,11 @@ function Buffer:readFloat(scale)
     assert(math.type(scale) == "integer", "参数[scale]类型错误")
 
     if scale < 0 then
-        if self.readPos + 3 > self:size() then
+        if self.readIndex + 3 > self:size() then
             error("读数据出错", 2)
         end
-        local n = string.unpack("<f", self.bytes, self.readPos)
-        self.readPos = self.readPos + 4
+        local n = string.unpack("<f", self.bytes, self.readIndex)
+        self.readIndex = self.readIndex + 4
         return n
     end
 
@@ -117,11 +123,11 @@ function Buffer:readDouble(scale)
     assert(math.type(scale) == "integer", "参数[scale]类型错误")
 
     if scale < 0 then
-        if self.readPos + 7 > self:size() then
+        if self.readIndex + 7 > self:size() then
             error("读数据出错", 2)
         end
-        local n = string.unpack("<d", self.bytes, self.readPos)
-        self.readPos = self.readPos + 8
+        local n = string.unpack("<d", self.bytes, self.readIndex)
+        self.readIndex = self.readIndex + 8
         return n
     end
 
@@ -131,12 +137,12 @@ end
 function Buffer:readBytes()
     local length = self:readInt()
 
-    if self.readPos + length - 1 > self:size() then
+    if self.readIndex + length - 1 > self:size() then
         error("读数据出错", 2)
     end
 
-    local bytes = self.bytes:sub(self.readPos, self.readPos + length - 1)
-    self.readPos = self.readPos + length
+    local bytes = self.bytes:sub(self.readIndex, self.readIndex + length - 1)
+    self.readIndex = self.readIndex + length
     return bytes
 end
 

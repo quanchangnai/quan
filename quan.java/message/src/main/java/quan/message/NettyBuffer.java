@@ -26,8 +26,13 @@ public class NettyBuffer extends Buffer {
     }
 
     @Override
+    public void mark() {
+        byteBuf.markReaderIndex();
+    }
+
+    @Override
     public void reset() {
-        byteBuf.readerIndex(0);
+        byteBuf.resetReaderIndex();
     }
 
     @Override

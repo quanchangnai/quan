@@ -9,15 +9,15 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 /**
- * 消息编解码器
+ * 简单的消息编解码器
  */
-public class NetworkMessageCodec implements Handler<Object> {
+public class SimpleMessageCodec implements Handler<Object> {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     private MessageFactory messageFactory;
 
-    public NetworkMessageCodec(MessageFactory messageFactory) {
+    public SimpleMessageCodec(MessageFactory messageFactory) {
         this.messageFactory = messageFactory;
     }
 

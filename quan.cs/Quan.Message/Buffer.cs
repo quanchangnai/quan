@@ -14,10 +14,13 @@ namespace Quan.Message
         private byte[] _bytes;
 
         //下一个读的位置
-        private int _readPos;
+        private int _readIndex;
 
         //下一个写的位置
-        private int _writePos;
+        private int _writeIndex;
+
+        //标记的读位置
+        private int _markedIndex;
 
         public Buffer() : this(128)
         {
@@ -31,17 +34,26 @@ namespace Quan.Message
         public Buffer(byte[] bytes)
         {
             _bytes = bytes;
-            _writePos = bytes.Length;
+            _writeIndex = bytes.Length;
         }
 
         public int Capacity => _bytes.Length;
 
         /// <summary>
-        ///重置读位置到0
+        /// 标记当前读位置
+        /// </summary>
+        public void Mark()
+        {
+            _markedIndex = _readIndex;
+        }
+
+
+        /// <summary>
+        ///重置读位置到[标记的位置]
         /// </summary>
         public void Reset()
         {
-            _readPos = 0;
+            _readIndex = _markedIndex;
         }
 
         /// <summary>
@@ -49,8 +61,8 @@ namespace Quan.Message
         /// </summary>
         public void Clear()
         {
-            _readPos = 0;
-            _writePos = 0;
+            _readIndex = 0;
+            _writeIndex = 0;
         }
 
 
@@ -58,7 +70,7 @@ namespace Quan.Message
         /// 当前剩余可读的字节数
         /// </summary>
         /// <returns></returns>
-        public int ReadableCount => _writePos - _readPos;
+        public int ReadableCount => _writeIndex - _readIndex;
 
         /// <summary>
         /// 读取当前剩余的字节数组<br/>
@@ -67,8 +79,8 @@ namespace Quan.Message
         public byte[] RemainingBytes()
         {
             var remainingBytes = new byte[ReadableCount];
-            Array.Copy(_bytes, _readPos, remainingBytes, 0, remainingBytes.Length);
-            _readPos += remainingBytes.Length;
+            Array.Copy(_bytes, _readIndex, remainingBytes, 0, remainingBytes.Length);
+            _readIndex += remainingBytes.Length;
             return remainingBytes;
         }
 
@@ -77,11 +89,11 @@ namespace Quan.Message
         /// </summary>
         public void DiscardReadBytes()
         {
-            var newBytes = new byte[Capacity - _readPos];
-            Array.Copy(_bytes, _readPos, newBytes, 0, newBytes.Length);
+            var newBytes = new byte[Capacity - _readIndex];
+            Array.Copy(_bytes, _readIndex, newBytes, 0, newBytes.Length);
             _bytes = newBytes;
-            _writePos -= _readPos;
-            _readPos = 0;
+            _writeIndex -= _readIndex;
+            _readIndex = 0;
         }
 
         /// <summary>
@@ -103,7 +115,7 @@ namespace Quan.Message
                     break;
                 }
 
-                var b = _bytes[_readPos++];
+                var b = _bytes[_readIndex++];
                 temp |= (b & 0b1111111L) << shift;
                 shift += 7;
 
@@ -128,8 +140,8 @@ namespace Quan.Message
             }
 
             var bytes = new byte[length];
-            Array.Copy(_bytes, _readPos, bytes, 0, length);
-            _readPos += length;
+            Array.Copy(_bytes, _readIndex, bytes, 0, length);
+            _readIndex += length;
             return bytes;
         }
 
@@ -165,7 +177,7 @@ namespace Quan.Message
                     throw new IOException("读数据出错");
                 }
 
-                var b = _bytes[_readPos++];
+                var b = _bytes[_readIndex++];
                 temp |= (b & 0b11111111) << shift;
                 shift += 8;
             }
@@ -195,7 +207,7 @@ namespace Quan.Message
                     throw new IOException("读数据出错");
                 }
 
-                var b = _bytes[_readPos++];
+                var b = _bytes[_readIndex++];
                 temp |= (b & 0b11111111L) << shift;
                 shift += 8;
             }
@@ -222,7 +234,7 @@ namespace Quan.Message
         private void OnWrite(int writeCount)
         {
             var capacity = Capacity;
-            if (_writePos + writeCount < capacity)
+            if (_writeIndex + writeCount < capacity)
             {
                 return;
             }
@@ -250,11 +262,11 @@ namespace Quan.Message
             {
                 if ((n & ~0b1111111) == 0)
                 {
-                    _bytes[_writePos++] = (byte) (n & 0b1111111);
+                    _bytes[_writeIndex++] = (byte) (n & 0b1111111);
                     return;
                 }
 
-                _bytes[_writePos++] = (byte) (n & 0b1111111 | 0b10000000);
+                _bytes[_writeIndex++] = (byte) (n & 0b1111111 | 0b10000000);
                 n >>= 7;
             }
         }
@@ -263,8 +275,8 @@ namespace Quan.Message
         {
             OnWrite(10 + bytes.Length);
             WriteInt(bytes.Length);
-            Array.Copy(bytes, 0, _bytes, _writePos, bytes.Length);
-            _writePos += bytes.Length;
+            Array.Copy(bytes, 0, _bytes, _writeIndex, bytes.Length);
+            _writeIndex += bytes.Length;
         }
 
         public void WriteBool(bool b)
@@ -296,7 +308,7 @@ namespace Quan.Message
 
             while (shift < 32)
             {
-                _bytes[_writePos++] = (byte) (temp >> shift & 0b11111111);
+                _bytes[_writeIndex++] = (byte) (temp >> shift & 0b11111111);
                 shift += 8;
             }
         }
@@ -322,7 +334,7 @@ namespace Quan.Message
 
             while (shift < 64)
             {
-                _bytes[_writePos++] = (byte) (temp >> shift & 0b11111111);
+                _bytes[_writeIndex++] = (byte) (temp >> shift & 0b11111111);
                 shift += 8;
             }
         }

@@ -14,7 +14,12 @@ public abstract class Buffer {
     public abstract int capacity();
 
     /**
-     * 重置读位置到0
+     * 标记当前读位置
+     */
+    public abstract void mark();
+
+    /**
+     * 重置读位置到[标记的位置]
      */
     public abstract void reset();
 

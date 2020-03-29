@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 /**
+ * 集成Netty的消息编解码器
  * Created by quanchangnai on 2019/7/11.
  */
 public class NettyMessageCodec extends ByteToMessageCodec<Message> {
