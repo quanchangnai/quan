@@ -30,7 +30,7 @@ public class MessageTest {
 
     private static void test1() throws Exception {
         System.err.println("test1=============================");
-        Buffer buffer = new BytesBuffer();
+        Buffer buffer = new SimpleBuffer();
         buffer = new NettyBuffer(Unpooled.buffer());
         buffer.writeBool(true);
         buffer.writeInt(70);

@@ -10,13 +10,13 @@ import java.io.IOException;
 public abstract class Bean {
 
     public final byte[] encode() throws IOException {
-        Buffer buffer = new BytesBuffer();
+        Buffer buffer = new SimpleBuffer();
         encode(buffer);
         return buffer.remainingBytes();
     }
 
     public final void decode(byte[] bytes) throws IOException {
-        decode(new BytesBuffer(bytes));
+        decode(new SimpleBuffer(bytes));
     }
 
     public void encode(ByteBuf byteBuf) throws IOException {

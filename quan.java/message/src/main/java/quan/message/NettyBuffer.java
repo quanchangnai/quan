@@ -5,61 +5,61 @@ import io.netty.buffer.ByteBuf;
 import java.io.IOException;
 
 /**
- * 使用Netty的ByteBuf实现的字节缓冲区，编码采用VarInt和ZigZag算法，字节顺序采用小端模式<br/>
+ * 使用Netty的ByteBuf实现的字节缓冲区
  * Created by quanchangnai on 2020/3/27.
  */
 public class NettyBuffer extends Buffer {
 
-    private ByteBuf byteBuf;
+    private ByteBuf buf;
 
-    public NettyBuffer(ByteBuf byteBuf) {
-        this.byteBuf = byteBuf;
+    public NettyBuffer(ByteBuf buf) {
+        this.buf = buf;
     }
 
-    public ByteBuf getByteBuf() {
-        return byteBuf;
+    public ByteBuf getBuf() {
+        return buf;
     }
 
     @Override
     public int capacity() {
-        return byteBuf.capacity();
+        return buf.capacity();
     }
 
     @Override
     public void mark() {
-        byteBuf.markReaderIndex();
+        buf.markReaderIndex();
     }
 
     @Override
     public void reset() {
-        byteBuf.resetReaderIndex();
+        buf.resetReaderIndex();
     }
 
     @Override
     public void clear() {
-        byteBuf.clear();
+        buf.clear();
     }
 
     @Override
     public int readableCount() {
-        return byteBuf.readableBytes();
+        return buf.readableBytes();
     }
 
     @Override
     public byte[] remainingBytes() {
         byte[] remainingBytes = new byte[readableCount()];
-        byteBuf.readBytes(remainingBytes);
+        buf.readBytes(remainingBytes);
         return remainingBytes;
     }
 
     @Override
     public void discardReadBytes() {
-        byteBuf.discardReadBytes();
+        buf.discardReadBytes();
     }
 
     @Override
     protected byte readByte() {
-        return byteBuf.readByte();
+        return buf.readByte();
     }
 
     @Override
@@ -70,21 +70,21 @@ public class NettyBuffer extends Buffer {
         }
 
         byte[] bytes = new byte[length];
-        byteBuf.readBytes(bytes);
+        buf.readBytes(bytes);
         return bytes;
     }
 
 
     @Override
     protected void writeByte(byte b) {
-        byteBuf.writeByte(b);
+        buf.writeByte(b);
     }
 
 
     @Override
     public void writeBytes(byte[] bytes) {
         writeInt(bytes.length);
-        byteBuf.writeBytes(bytes);
+        buf.writeBytes(bytes);
     }
 
 }

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 /**
+ * 采用VarInt和ZigZag编码的字节缓冲区，字节顺序采用小端模式
  * Created by quanchangnai on 2020/3/27.
  */
 public abstract class Buffer {

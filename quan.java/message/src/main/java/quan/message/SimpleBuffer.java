@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 /**
- * 直接使用字节数组实现的字节缓冲区，编码采用VarInt和ZigZag算法，字节顺序采用小端模式<br/>
+ * 直接使用字节数组实现的字节缓冲区
  * Created by quanchangnai on 2018/7/2.
  */
-public class BytesBuffer extends Buffer {
+public class SimpleBuffer extends Buffer {
 
     /**
      * 字节缓冲区
@@ -29,20 +29,20 @@ public class BytesBuffer extends Buffer {
      */
     private int markedIndex;
 
-    public BytesBuffer() {
+    public SimpleBuffer() {
         this(128);
     }
 
-    public BytesBuffer(int capacity) {
+    public SimpleBuffer(int capacity) {
         this.bytes = new byte[capacity];
     }
 
-    public BytesBuffer(byte[] bytes) {
+    public SimpleBuffer(byte[] bytes) {
         this.bytes = bytes;
         this.writeIndex = bytes.length;
     }
 
-    public BytesBuffer(ByteBuffer buffer) {
+    public SimpleBuffer(ByteBuffer buffer) {
         this(buffer.array());
     }
 

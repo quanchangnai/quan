@@ -24,10 +24,10 @@ public class SimpleMessageCodec implements Handler<Object> {
     @Override
     public void onReceived(HandlerContext handlerContext, Object msg) throws Exception {
         if (msg instanceof ByteBuffer) {
-            Buffer buffer = new BytesBuffer((ByteBuffer) msg);
+            Buffer buffer = new SimpleBuffer((ByteBuffer) msg);
             decode(handlerContext, buffer);
         } else if (msg instanceof byte[]) {
-            Buffer buffer = new BytesBuffer((byte[]) msg);
+            Buffer buffer = new SimpleBuffer((byte[]) msg);
             decode(handlerContext, buffer);
         } else {
             handlerContext.triggerReceived(msg);
