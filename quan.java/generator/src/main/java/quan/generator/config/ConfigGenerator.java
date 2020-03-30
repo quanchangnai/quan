@@ -91,7 +91,7 @@ public abstract class ConfigGenerator extends Generator {
 
         if (!StringUtils.isBlank(tableBodyStartRow)) {
             try {
-                if (Integer.parseInt(tableBodyStartRow) < 2) {
+                if (Integer.parseInt(tableBodyStartRow) <= 1) {
                     throw new Exception();
                 }
             } catch (Exception e) {

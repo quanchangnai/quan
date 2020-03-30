@@ -50,7 +50,9 @@ function Buffer:readableCount()
 end
 
 function Buffer:remainingBytes()
-    return self.bytes:sub(self.readIndex)
+    local remainingBytes = self.bytes:sub(self.readIndex)
+    self.readIndex = self.readIndex + remainingBytes:len()
+    return remainingBytes
 end
 
 function Buffer:discardReadBytes()

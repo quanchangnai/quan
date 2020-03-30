@@ -64,10 +64,6 @@ public abstract class ClassDefinition extends Definition {
         }
     }
 
-    public String getNameWithPackage() {
-        return packageName + "." + getName();
-    }
-
     public void setPackageName(String packageName) {
         this.packageName = packageName;
     }
@@ -91,6 +87,14 @@ public abstract class ClassDefinition extends Definition {
         return getPackageName(lang.name());
     }
 
+    /**
+     * 和具体语言无关的简单类名[不含前缀的包名.类名]
+     *
+     * @return
+     */
+    public String getSimpleName() {
+        return packageName + "." + getName();
+    }
 
     public String getFullPackageName(String lang) {
         String packagePrefix = getPackagePrefix();
@@ -113,7 +117,8 @@ public abstract class ClassDefinition extends Definition {
         return getFullPackageName(lang) + "." + getName();
     }
 
-    public String getUserImport(Language language) {
+    //其他类使用本类时的导入包
+    public String getOtherImport(Language language) {
         if (language == Language.cs) {
             return getFullPackageName(language);
         }
