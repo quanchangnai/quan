@@ -5,7 +5,12 @@ namespace Quan.Common
 {
     public static class PathUtils
     {
-        public static string CurrentPlatPath(string path)
+        /// <summary>
+        /// 把指定路径转换为当前平台路径
+        /// </summary>
+        /// <param name="path">路径分隔符不明确的路径</param>
+        /// <returns></returns>
+        public static string ToPlatPath(string path)
         {
             return path.Replace("/", Path.DirectorySeparatorChar.ToString()).Replace("\\", Path.DirectorySeparatorChar.ToString());
         }
