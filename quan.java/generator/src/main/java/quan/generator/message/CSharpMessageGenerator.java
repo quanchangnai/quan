@@ -53,18 +53,18 @@ public class CSharpMessageGenerator extends MessageGenerator {
     }
 
     @Override
-    protected void processClass(ClassDefinition classDefinition) {
+    protected void prepareClass(ClassDefinition classDefinition) {
         if (classDefinition instanceof MessageDefinition) {
             MessageHeadDefinition messageHeadDefinition = ((MessageDefinition) classDefinition).getHead();
             if (messageHeadDefinition != null && !messageHeadDefinition.getFullPackageName(supportLanguage()).equals(classDefinition.getFullPackageName(supportLanguage()))) {
                 classDefinition.getImports().add(messageHeadDefinition.getFullPackageName(supportLanguage()));
             }
         }
-        super.processClass(classDefinition);
+        super.prepareClass(classDefinition);
     }
     @Override
-    protected void processBeanFieldImports(BeanDefinition beanDefinition, FieldDefinition fieldDefinition) {
-        super.processBeanFieldImports(beanDefinition, fieldDefinition);
+    protected void prepareBeanFieldImports(BeanDefinition beanDefinition, FieldDefinition fieldDefinition) {
+        super.prepareBeanFieldImports(beanDefinition, fieldDefinition);
         if (fieldDefinition.isTimeType()) {
             beanDefinition.getImports().add("System");
         }

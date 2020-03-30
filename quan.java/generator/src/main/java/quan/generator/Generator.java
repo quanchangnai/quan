@@ -220,7 +220,7 @@ public abstract class Generator {
                 continue;
             }
             classDefinition.reset();
-            processClass(classDefinition);
+            prepareClass(classDefinition);
             classDefinitions.add(classDefinition);
         }
 
@@ -255,11 +255,11 @@ public abstract class Generator {
 
     }
 
-    protected void processClass(ClassDefinition classDefinition) {
+    protected void prepareClass(ClassDefinition classDefinition) {
         if (classDefinition instanceof BeanDefinition) {
             BeanDefinition beanDefinition = (BeanDefinition) classDefinition;
             for (FieldDefinition fieldDefinition : beanDefinition.getSelfFields()) {
-                processField(classDefinition, fieldDefinition);
+                prepareField(classDefinition, fieldDefinition);
             }
 
             Set<BeanDefinition> dependentBeans = new HashSet<>(beanDefinition.getChildren());
@@ -274,18 +274,18 @@ public abstract class Generator {
             }
         } else {
             for (FieldDefinition fieldDefinition : classDefinition.getFields()) {
-                processField(classDefinition, fieldDefinition);
+                prepareField(classDefinition, fieldDefinition);
             }
         }
     }
 
-    protected void processField(ClassDefinition classDefinition, FieldDefinition fieldDefinition) {
+    protected void prepareField(ClassDefinition classDefinition, FieldDefinition fieldDefinition) {
         if (classDefinition instanceof BeanDefinition) {
-            processBeanField((BeanDefinition) classDefinition, fieldDefinition);
+            prepareBeanField((BeanDefinition) classDefinition, fieldDefinition);
         }
     }
 
-    protected void processBeanField(BeanDefinition beanDefinition, FieldDefinition fieldDefinition) {
+    protected void prepareBeanField(BeanDefinition beanDefinition, FieldDefinition fieldDefinition) {
         String fieldType = fieldDefinition.getType();
         if (fieldDefinition.isBuiltinType()) {
             fieldDefinition.setBasicType(basicTypes.get(fieldType));
@@ -306,10 +306,10 @@ public abstract class Generator {
             }
         }
 
-        processBeanFieldImports(beanDefinition, fieldDefinition);
+        prepareBeanFieldImports(beanDefinition, fieldDefinition);
     }
 
-    protected void processBeanFieldImports(BeanDefinition beanDefinition, FieldDefinition fieldDefinition) {
+    protected void prepareBeanFieldImports(BeanDefinition beanDefinition, FieldDefinition fieldDefinition) {
         ClassDefinition fieldClass = fieldDefinition.getClassDefinition();
         if (fieldClass != null && !fieldClass.getFullPackageName(supportLanguage()).equals(beanDefinition.getFullPackageName(supportLanguage()))) {
             beanDefinition.getImports().add(fieldClass.getUserImport(supportLanguage()));

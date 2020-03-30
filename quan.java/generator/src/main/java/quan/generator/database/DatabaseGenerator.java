@@ -77,8 +77,8 @@ public class DatabaseGenerator extends Generator {
     }
 
     @Override
-    protected void processBeanField(BeanDefinition beanDefinition, FieldDefinition fieldDefinition) {
-        super.processBeanField(beanDefinition, fieldDefinition);
+    protected void prepareBeanField(BeanDefinition beanDefinition, FieldDefinition fieldDefinition) {
+        super.prepareBeanField(beanDefinition, fieldDefinition);
         if (beanDefinition instanceof DataDefinition) {
             DataDefinition dataDefinition = (DataDefinition) beanDefinition;
             if (fieldDefinition.getName().equals(dataDefinition.getKeyName())) {

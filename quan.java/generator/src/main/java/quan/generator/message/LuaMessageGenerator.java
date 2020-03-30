@@ -80,7 +80,7 @@ public class LuaMessageGenerator extends MessageGenerator {
     }
 
     @Override
-    protected void processBeanFieldImports(BeanDefinition beanDefinition, FieldDefinition fieldDefinition) {
+    protected void prepareBeanFieldImports(BeanDefinition beanDefinition, FieldDefinition fieldDefinition) {
         BeanDefinition fieldBean = fieldDefinition.getBean();
         if (fieldBean != null) {
             beanDefinition.getImports().add(fieldBean.getFullName(supportLanguage()));

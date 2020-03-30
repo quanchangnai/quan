@@ -51,14 +51,14 @@ public class JavaMessageGenerator extends MessageGenerator {
     }
 
     @Override
-    protected void processClass(ClassDefinition classDefinition) {
+    protected void prepareClass(ClassDefinition classDefinition) {
         if (classDefinition instanceof MessageDefinition) {
             MessageHeadDefinition messageHeadDefinition = ((MessageDefinition) classDefinition).getHead();
             if (messageHeadDefinition != null && !messageHeadDefinition.getFullPackageName(supportLanguage()).equals(classDefinition.getFullPackageName(supportLanguage()))) {
                 classDefinition.getImports().add(messageHeadDefinition.getFullName(supportLanguage()));
             }
         }
-        super.processClass(classDefinition);
+        super.prepareClass(classDefinition);
     }
 
 }

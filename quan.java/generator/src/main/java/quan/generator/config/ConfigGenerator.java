@@ -150,7 +150,7 @@ public abstract class ConfigGenerator extends Generator {
     }
 
     @Override
-    protected void processClass(ClassDefinition classDefinition) {
+    protected void prepareClass(ClassDefinition classDefinition) {
         if (configLoader != null && classDefinition instanceof ConstantDefinition) {
             ConstantDefinition constantDefinition = (ConstantDefinition) classDefinition;
             List<JSONObject> configJsons = configLoader.loadJsons(constantDefinition.getConfigDefinition(), false);
@@ -158,13 +158,13 @@ public abstract class ConfigGenerator extends Generator {
         }
 
         if (classDefinition instanceof ConstantDefinition) {
-            processConstant((ConstantDefinition) classDefinition);
+            prepareConstant((ConstantDefinition) classDefinition);
         } else {
-            super.processClass(classDefinition);
+            super.prepareClass(classDefinition);
         }
     }
 
-    protected void processConstant(ConstantDefinition constantDefinition) {
+    protected void prepareConstant(ConstantDefinition constantDefinition) {
         FieldDefinition valueField = constantDefinition.getValueField();
         if (valueField.isCollectionType()) {
             constantDefinition.getImports().add("java.util.*");

@@ -56,15 +56,15 @@ public class CSharpConfigGenerator extends ConfigGenerator {
     }
 
     @Override
-    protected void processBeanFieldImports(BeanDefinition beanDefinition, FieldDefinition fieldDefinition) {
-        super.processBeanFieldImports(beanDefinition, fieldDefinition);
+    protected void prepareBeanFieldImports(BeanDefinition beanDefinition, FieldDefinition fieldDefinition) {
+        super.prepareBeanFieldImports(beanDefinition, fieldDefinition);
         if (fieldDefinition.isTimeType()) {
             beanDefinition.getImports().add("System");
         }
     }
 
     @Override
-    protected void processConstant(ConstantDefinition constantDefinition) {
+    protected void prepareConstant(ConstantDefinition constantDefinition) {
         FieldDefinition valueField = constantDefinition.getValueField();
         if (valueField.isCollectionType()) {
             constantDefinition.getImports().add("System.Collections.Generic");
