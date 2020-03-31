@@ -58,25 +58,25 @@ public abstract class ConfigGenerator extends Generator {
     }
 
     @Override
-    protected void initProps(Properties properties) {
-        super.initProps(properties);
+    protected void initOptions(Properties options) {
+        super.initOptions(options);
         if (!enable) {
             return;
         }
 
-        tableType = properties.getProperty(category() + ".tableType");
-        tablePath = properties.getProperty(category() + ".tablePath");
-        tableBodyStartRow = properties.getProperty(category() + ".tableBodyStartRow");
+        tableType = options.getProperty(category() + ".tableType");
+        tablePath = options.getProperty(category() + ".tablePath");
+        tableBodyStartRow = options.getProperty(category() + ".tableBodyStartRow");
 
-        ConfigConverter.setDateTimePattern(properties.getProperty(category() + ".dateTimePattern"));
-        ConfigConverter.setDatePattern(properties.getProperty(category() + ".datePattern"));
-        ConfigConverter.setTimePattern(properties.getProperty(category() + ".timePattern"));
+        ConfigConverter.setDateTimePattern(options.getProperty(category() + ".dateTimePattern"));
+        ConfigConverter.setDatePattern(options.getProperty(category() + ".datePattern"));
+        ConfigConverter.setTimePattern(options.getProperty(category() + ".timePattern"));
 
     }
 
     @Override
-    protected void checkProps() {
-        super.checkProps();
+    protected void checkOptions() {
+        super.checkOptions();
         if (tableType == null) {
             throw new IllegalArgumentException(category().comment() + "的表格类型[tableType]不能为空");
         }

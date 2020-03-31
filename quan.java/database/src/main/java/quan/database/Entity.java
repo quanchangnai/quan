@@ -8,8 +8,5 @@ import com.alibaba.fastjson.JSONObject;
  */
 public abstract class Entity extends Node {
 
-    public abstract JSONObject encode();
-
-    public abstract void decode(JSONObject json);
 
 }

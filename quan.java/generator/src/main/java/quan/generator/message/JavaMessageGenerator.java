@@ -41,8 +41,8 @@ public class JavaMessageGenerator extends MessageGenerator {
     public JavaMessageGenerator() {
     }
 
-    public JavaMessageGenerator(Properties properties) {
-        super(properties);
+    public JavaMessageGenerator(Properties options) {
+        super(options);
     }
 
     @Override

@@ -1,8 +1,6 @@
 package quan.database.item;
 
 import java.util.*;
-import com.alibaba.fastjson.*;
-import org.pcollections.*;
 import quan.database.*;
 
 /**
@@ -37,22 +35,6 @@ public class ItemEntity extends Entity {
 
     @Override
     protected void _setChildrenLogRoot(Data root) {
-    }
-
-    @Override
-    public JSONObject encode() {
-        JSONObject json = new JSONObject();
-
-        json.put("id", this.id.getValue());
-        json.put("name", this.name.getValue());
-
-        return json;
-    }
-
-    @Override
-    public void decode(JSONObject json) {
-        this.id.setValue(json.getIntValue("id"));
-        this.name.setValue(json.getOrDefault("name", "").toString());
     }
 
     @Override

@@ -46,8 +46,8 @@ public class CSharpConfigGenerator extends ConfigGenerator {
         super();
     }
 
-    public CSharpConfigGenerator(Properties properties) {
-        super(properties);
+    public CSharpConfigGenerator(Properties options) {
+        super(options);
     }
 
     @Override

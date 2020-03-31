@@ -22,8 +22,8 @@ public class LuaMessageGenerator extends MessageGenerator {
     public LuaMessageGenerator() {
     }
 
-    public LuaMessageGenerator(Properties properties) {
-        super(properties);
+    public LuaMessageGenerator(Properties options) {
+        super(options);
     }
 
     @Override

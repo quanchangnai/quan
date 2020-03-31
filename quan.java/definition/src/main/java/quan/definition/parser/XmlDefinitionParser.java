@@ -130,7 +130,7 @@ public class XmlDefinitionParser extends DefinitionParser {
                 break;
             case "data":
                 if (category == Category.data) {
-                    classDefinition = new DataDefinition(classElement.attributeValue("key"), classElement.attributeValue("persistent"));
+                    classDefinition = new DataDefinition(classElement.attributeValue("id"));
                 }
                 break;
             case "config":

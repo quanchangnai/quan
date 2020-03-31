@@ -42,8 +42,8 @@ public class JavaConfigGenerator extends ConfigGenerator {
     public JavaConfigGenerator() {
     }
 
-    public JavaConfigGenerator(Properties properties) {
-        super(properties);
+    public JavaConfigGenerator(Properties options) {
+        super(options);
     }
 
     @Override

@@ -1,8 +1,9 @@
 package quan.definition.data;
 
+import org.apache.commons.lang3.StringUtils;
 import quan.definition.BeanDefinition;
-import quan.definition.Constants;
 import quan.definition.Category;
+import quan.definition.Constants;
 
 import java.util.regex.Pattern;
 
@@ -12,11 +13,11 @@ import java.util.regex.Pattern;
  */
 public class DataDefinition extends BeanDefinition {
 
-    private String keyType;
+    //ID字段的类型
+    private String idType;
 
-    private String keyName;
-
-    private boolean persistent = true;
+    //ID字段的名字
+    private String idName = "id";
 
     {
         category = Category.data;
@@ -25,10 +26,9 @@ public class DataDefinition extends BeanDefinition {
     public DataDefinition() {
     }
 
-    public DataDefinition(String keyName, String persistent) {
-        this.keyName = keyName;
-        if (persistent != null && persistent.equals("false")) {
-            this.persistent = false;
+    public DataDefinition(String idName) {
+        if (!StringUtils.isBlank(idName)) {
+            this.idName = idName;
         }
     }
 
@@ -42,25 +42,17 @@ public class DataDefinition extends BeanDefinition {
         return Constants.DATA_NAME_PATTERN;
     }
 
-    public String getKeyType() {
-        return keyType;
+    public String getIdType() {
+        return idType;
     }
 
-    public DataDefinition setKeyType(String keyType) {
-        this.keyType = keyType;
+    public DataDefinition setIdType(String idType) {
+        this.idType = idType;
         return this;
     }
 
-    public String getKeyName() {
-        return keyName;
-    }
-
-    public DataDefinition setKeyName(String keyName) {
-        if (keyName == null || keyName.trim().equals("")) {
-            return this;
-        }
-        this.keyName = keyName;
-        return this;
+    public String getIdName() {
+        return idName;
     }
 
     @Override
@@ -73,32 +65,16 @@ public class DataDefinition extends BeanDefinition {
         return "数据";
     }
 
-    public boolean isPersistent() {
-        return persistent;
-    }
-
-    public DataDefinition setPersistent(boolean persistent) {
-        this.persistent = persistent;
-        return this;
-    }
-
     @Override
     public void validate() {
         super.validate();
-        if (getKeyName() == null) {
+        if (getIdName() == null) {
             addValidatedError(getValidatedName() + "的主键不能为空");
             return;
         }
-        if (getFields().stream().noneMatch(t -> t.getName().equals(getKeyName()))) {
-            addValidatedError(getValidatedName() + "的主键[" + getKeyName() + "]不存在");
+        if (getFields().stream().noneMatch(t -> t.getName().equals(getIdName()))) {
+            addValidatedError(getValidatedName() + "的主键[" + getIdName() + "]不存在");
         }
     }
 
-    @Override
-    protected boolean isReservedWord(String fieldName) {
-        if (super.isReservedWord(fieldName)) {
-            return true;
-        }
-        return fieldName.equals("key");
-    }
 }

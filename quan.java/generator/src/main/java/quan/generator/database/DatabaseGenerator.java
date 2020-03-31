@@ -42,8 +42,8 @@ public class DatabaseGenerator extends Generator {
     public DatabaseGenerator() {
     }
 
-    public DatabaseGenerator(Properties properties) {
-        super(properties);
+    public DatabaseGenerator(Properties options) {
+        super(options);
     }
 
     @Override
@@ -81,8 +81,8 @@ public class DatabaseGenerator extends Generator {
         super.prepareBeanField(beanDefinition, fieldDefinition);
         if (beanDefinition instanceof DataDefinition) {
             DataDefinition dataDefinition = (DataDefinition) beanDefinition;
-            if (fieldDefinition.getName().equals(dataDefinition.getKeyName())) {
-                dataDefinition.setKeyType(classTypes.get(fieldDefinition.getType()));
+            if (fieldDefinition.getName().equals(dataDefinition.getIdName())) {
+                dataDefinition.setIdType(classTypes.get(fieldDefinition.getType()));
             }
         }
     }

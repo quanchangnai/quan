@@ -43,8 +43,8 @@ public class CSharpMessageGenerator extends MessageGenerator {
     public CSharpMessageGenerator() {
     }
 
-    public CSharpMessageGenerator(Properties properties) {
-        super(properties);
+    public CSharpMessageGenerator(Properties options) {
+        super(options);
     }
 
     @Override

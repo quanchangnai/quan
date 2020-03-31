@@ -53,10 +53,10 @@ public abstract class Generator {
     public Generator() {
     }
 
-    public Generator(Properties properties) {
-        initProps(properties);
+    public Generator(Properties options) {
+        initOptions(options);
         if (enable) {
-            checkProps();
+            checkOptions();
         }
     }
 
@@ -118,36 +118,36 @@ public abstract class Generator {
         return classDefinition instanceof BeanDefinition || classDefinition instanceof EnumDefinition;
     }
 
-    protected void initProps(Properties properties) {
-        String enable = properties.getProperty(category() + ".enable");
+    protected void initOptions(Properties options) {
+        String enable = options.getProperty(category() + ".enable");
         if (enable == null || !enable.equals("true")) {
             this.enable = false;
         }
 
-        enable = properties.getProperty(category() + "." + supportLanguage() + ".enable");
+        enable = options.getProperty(category() + "." + supportLanguage() + ".enable");
         if (enable == null || !enable.equals("true")) {
             this.enable = false;
         }
 
-        String definitionPath = properties.getProperty(category() + ".definitionPath");
+        String definitionPath = options.getProperty(category() + ".definitionPath");
         if (!StringUtils.isBlank(definitionPath)) {
             definitionPaths.addAll(Arrays.asList(definitionPath.split(",")));
         }
 
-        String codePath = properties.getProperty(category() + "." + supportLanguage() + ".codePath");
+        String codePath = options.getProperty(category() + "." + supportLanguage() + ".codePath");
         if (!StringUtils.isBlank(codePath)) {
             setCodePath(codePath);
         }
 
-        packagePrefix = properties.getProperty(category() + "." + supportLanguage() + ".packagePrefix");
-        enumPackagePrefix = properties.getProperty(category() + "." + supportLanguage() + ".enumPackagePrefix");
+        packagePrefix = options.getProperty(category() + "." + supportLanguage() + ".packagePrefix");
+        enumPackagePrefix = options.getProperty(category() + "." + supportLanguage() + ".enumPackagePrefix");
     }
 
 
     /**
-     * 检查生成器必须要设置的属性
+     * 检查生成器必须要设置的选项
      */
-    protected void checkProps() {
+    protected void checkOptions() {
         if (definitionPaths.isEmpty()) {
             throw new IllegalArgumentException(category().comment() + "的定义文件路径[definitionPaths]不能为空");
         }
@@ -198,7 +198,7 @@ public abstract class Generator {
     }
 
     public void generate(boolean printError) {
-        checkProps();
+        checkOptions();
         parseDefinitions();
 
         if (!parser.getValidatedErrors().isEmpty()) {
@@ -341,27 +341,27 @@ public abstract class Generator {
     public static void main(String[] args) {
         long startTime = System.currentTimeMillis();
 
-        String propertiesFile = "generator.properties";
+        String optionsFileName = "generator.properties";
         if (args.length > 0) {
-            propertiesFile = args[0];
+            optionsFileName = args[0];
         } else {
-            logger.info("使用默认位置的生成器属性文件[{}]\n", propertiesFile);
+            logger.info("使用默认位置的生成器选项配置文件[{}]\n", optionsFileName);
         }
 
-        Properties properties = new Properties();
-        try (FileInputStream inputStream = new FileInputStream(propertiesFile)) {
-            properties.load(inputStream);
+        Properties options = new Properties();
+        try (FileInputStream inputStream = new FileInputStream(optionsFileName)) {
+            options.load(inputStream);
         } catch (IOException e) {
-            logger.info("加载生成器属性文件[{}]出错", propertiesFile, e);
+            logger.info("加载生成器选项配置文件[{}]出错", optionsFileName, e);
             return;
         }
 
-        DatabaseGenerator databaseGenerator = new DatabaseGenerator(properties);
+        DatabaseGenerator databaseGenerator = new DatabaseGenerator(options);
         databaseGenerator.useXmlParser();
 
-        JavaMessageGenerator javaMessageGenerator = new JavaMessageGenerator(properties);
-        CSharpMessageGenerator cSharpMessageGenerator = new CSharpMessageGenerator(properties);
-        LuaMessageGenerator luaMessageGenerator = new LuaMessageGenerator(properties);
+        JavaMessageGenerator javaMessageGenerator = new JavaMessageGenerator(options);
+        CSharpMessageGenerator cSharpMessageGenerator = new CSharpMessageGenerator(options);
+        LuaMessageGenerator luaMessageGenerator = new LuaMessageGenerator(options);
 
         DefinitionParser messageParser = new XmlDefinitionParser();
         javaMessageGenerator.setParser(messageParser);
@@ -369,9 +369,9 @@ public abstract class Generator {
         luaMessageGenerator.setParser(messageParser);
 
         DefinitionParser configParser = new XmlDefinitionParser();
-        JavaConfigGenerator javaConfigGenerator = new JavaConfigGenerator(properties);
-        CSharpConfigGenerator cSharpConfigGenerator = new CSharpConfigGenerator(properties);
-        LuaConfigGenerator luaConfigGenerator = new LuaConfigGenerator(properties);
+        JavaConfigGenerator javaConfigGenerator = new JavaConfigGenerator(options);
+        CSharpConfigGenerator cSharpConfigGenerator = new CSharpConfigGenerator(options);
+        LuaConfigGenerator luaConfigGenerator = new LuaConfigGenerator(options);
 
         javaConfigGenerator.setParser(configParser);
         cSharpConfigGenerator.setParser(configParser);

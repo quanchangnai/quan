@@ -28,13 +28,13 @@ public abstract class MessageGenerator extends Generator {
     }
 
     @Override
-    protected void initProps(Properties properties) {
-        super.initProps(properties);
+    protected void initOptions(Properties options) {
+        super.initOptions(options);
         if (!enable) {
             return;
         }
 
-        String rehashId = properties.getProperty(category() + ".rehashId");
+        String rehashId = options.getProperty(category() + ".rehashId");
         this.setRehashId(rehashId != null && rehashId.equals("true"));
     }
 
@@ -83,7 +83,7 @@ public abstract class MessageGenerator extends Generator {
                 messageDefinitions.add((MessageDefinition) classDefinition);
             }
         }
-        //0xFFFFF正好占用3个字节,当设置了[ID冲突时重新哈希计算]时，100000个坑位用于解决冲突，每次用10000个
+        //0xFFFFF正好占用3个字节,当设置了[rehashId]时，100000个坑位用于解决冲突，每次用10000个
         hashId(messageDefinitions, 1, 0xFFFFF - 100000);
     }
 

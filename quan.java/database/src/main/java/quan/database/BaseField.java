@@ -1,5 +1,7 @@
 package quan.database;
 
+import com.sleepycat.je.Transaction;
+
 /**
  * Created by quanchangnai on 2019/6/22.
  */
@@ -16,13 +18,6 @@ public class BaseField<V> implements Field<V> {
     }
 
     public V getValue() {
-        Transaction transaction = Transaction.get();
-        if (transaction != null) {
-            FieldLog<V> log = (FieldLog<V>) transaction.getFieldLog(this);
-            if (log != null) {
-                return log.getValue();
-            }
-        }
         return value;
     }
 
@@ -32,18 +27,6 @@ public class BaseField<V> implements Field<V> {
 
     public void setLogValue(V value, Data root) {
         Validations.validateFieldValue(value);
-
-        Transaction transaction = Transaction.get(true);
-        if (root != null) {
-            transaction.addVersionLog(root);
-        }
-
-        FieldLog<V> log = (FieldLog<V>) transaction.getFieldLog(this);
-        if (log != null) {
-            log.setValue(value);
-        } else {
-            transaction.addFieldLog(new FieldLog<>(this, value));
-        }
 
     }
 

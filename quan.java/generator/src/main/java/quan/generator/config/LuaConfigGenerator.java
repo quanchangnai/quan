@@ -22,8 +22,8 @@ public class LuaConfigGenerator extends ConfigGenerator {
     public LuaConfigGenerator() {
     }
 
-    public LuaConfigGenerator(Properties properties) {
-        super(properties);
+    public LuaConfigGenerator(Properties options) {
+        super(options);
     }
 
     @Override
