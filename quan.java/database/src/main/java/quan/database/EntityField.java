@@ -13,8 +13,4 @@ public final class EntityField<V extends Entity> extends BaseField<V> {
         super(value);
     }
 
-    public void setLogValue(V value, Data root) {
-
-    }
-
 }

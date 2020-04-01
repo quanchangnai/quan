@@ -1,6 +1,5 @@
 package quan.database;
 
-import com.sleepycat.je.Transaction;
 import org.pcollections.Empty;
 import org.pcollections.PVector;
 
@@ -127,7 +126,6 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
     public <T> T[] toArray(T[] a) {
         return getValue().toArray(a);
     }
-
 
 
     @Override

@@ -1,7 +1,5 @@
 package quan.database;
 
-import com.sleepycat.je.Transaction;
-
 /**
  * Created by quanchangnai on 2019/6/22.
  */
@@ -27,7 +25,7 @@ public class BaseField<V> implements Field<V> {
 
     public void setLogValue(V value, Data root) {
         Validations.validateFieldValue(value);
-
+        this.value = value;
     }
 
     @Override
