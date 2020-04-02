@@ -82,7 +82,7 @@ public class ItemEntity extends Entity {
             writer.writeStartDocument();
 
             writer.writeInt32("id", value.id.getValue());
-            writer.writeString("name", value.name.getValue());   
+            writer.writeString("name", value.name.getValue());
 
             writer.writeEndDocument();
         }
@@ -91,6 +91,7 @@ public class ItemEntity extends Entity {
         public Class<ItemEntity> getEncoderClass() {
             return ItemEntity.class;
         }
+
     }
 
 }
