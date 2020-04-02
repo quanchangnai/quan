@@ -20,6 +20,13 @@ public class MessageFactory {
 
     protected Map<Integer, Message> registry = new HashMap<>();
 
+    public MessageFactory() {
+    }
+
+    public MessageFactory(String packageName) {
+        register(packageName);
+    }
+
     public void register(Message message) {
         Objects.requireNonNull(message, "参数[message]不能为空");
         if (registry.containsKey(message.getId())) {

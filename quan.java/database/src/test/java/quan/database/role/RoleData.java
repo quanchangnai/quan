@@ -1,8 +1,17 @@
 package quan.database.role;
 
-import java.util.*;
+import org.bson.BsonReader;
+import org.bson.BsonType;
+import org.bson.BsonWriter;
+import org.bson.codecs.DecoderContext;
+import org.bson.codecs.EncoderContext;
+import org.bson.codecs.configuration.CodecRegistry;
 import quan.database.*;
 import quan.database.item.ItemEntity;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 角色<br/>
@@ -49,7 +58,7 @@ public class RoleData extends Data<Long> {
     public RoleData(Long id) {
         this.id.setLogValue(id, _getRoot());
     }
-  
+
     /**
      * 主键
      */
@@ -215,6 +224,143 @@ public class RoleData extends Data<Long> {
                 ",map2=" + map2 +
                 '}';
 
+    }
+
+    public static class Codec extends EntityCodec<RoleData> {
+
+        public Codec(CodecRegistry registry) {
+            super(registry);
+        }
+
+        @Override
+        public RoleData decode(BsonReader reader, DecoderContext decoderContext) {
+            reader.readStartDocument();
+            RoleData value = new RoleData(reader.readInt64("_id"));
+
+            while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
+                switch (reader.readName()) {
+                    case "id":
+                        value.id.setValue(reader.readInt64());
+                        break;
+                    case "name":
+                        value.name.setValue(reader.readString());
+                        break;
+                    case "roleType":
+                        value.roleType.setValue(reader.readInt32());
+                        break;
+                    case "b":
+                        value.b.setValue(reader.readBoolean());
+                        break;
+                    case "s":
+                        value.s.setValue((short) reader.readInt32());
+                        break;
+                    case "i":
+                        value.i.setValue(reader.readInt32());
+                        break;
+                    case "f":
+                        value.f.setValue((float) reader.readDouble());
+                        break;
+                    case "d":
+                        value.d.setValue(reader.readDouble());
+                        break;
+                    case "item":
+                        value.item.setValue(decoderContext.decodeWithChildContext(registry.get(ItemEntity.class), reader));
+                        break;
+                    case "items":
+                        reader.skipValue();
+                        break;
+                    case "set":
+                        reader.readStartArray();
+                        while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
+                            value.set.add(reader.readBoolean());
+                        }
+                        reader.readEndArray();
+                        break;
+                    case "list":
+                        reader.readStartArray();
+                        while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
+                            value.list.add(reader.readString());
+                        }
+                        reader.readEndArray();
+                        break;
+                    case "map":
+                        reader.skipValue();
+                        break;
+                    case "set2":
+                        reader.readStartArray();
+                        while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
+                            value.set2.add(decoderContext.decodeWithChildContext(registry.get(ItemEntity.class), reader));
+                        }
+                        reader.readEndArray();
+                        break;
+                    case "list2":
+                        reader.readStartArray();
+                        while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
+                            value.list2.add(decoderContext.decodeWithChildContext(registry.get(ItemEntity.class), reader));
+                        }
+                        reader.readEndArray();
+                        break;
+                    case "map2":
+                        reader.readStartDocument();
+                        while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
+
+                        }
+                        reader.readEndDocument();
+                        break;
+                    default:
+                        reader.skipValue();
+                }
+            }
+
+            reader.readEndDocument();
+            return value;
+        }
+
+        @Override
+        public void encode(BsonWriter writer, RoleData value, EncoderContext encoderContext) {
+            writer.writeStartDocument();
+            writer.writeInt64("_id", value._getId());
+
+            writer.writeInt64("id", value.id.getValue());
+            writer.writeString("name", value.name.getValue());
+            writer.writeInt32("roleType", value.roleType.getValue());
+            writer.writeBoolean("b", value.b.getValue());
+            writer.writeInt32("s", value.s.getValue());
+            writer.writeInt32("i", value.i.getValue());
+            writer.writeDouble("f", value.f.getValue());
+            writer.writeDouble("d", value.d.getValue());
+            if (value.item.getValue() != null) {
+                writer.writeName("item");
+                encoderContext.encodeWithChildContext(registry.get(ItemEntity.class), writer, value.item.getValue());
+            }
+            writer.writeStartArray("set");
+            for (Boolean setValue : value.set.getValue()) {
+                writer.writeBoolean(setValue);
+            }
+            writer.writeEndArray();
+            writer.writeStartArray("list");
+            for (String listValue : value.list.getValue()) {
+                writer.writeString(listValue);
+            }
+            writer.writeEndArray();
+            writer.writeStartArray("set2");
+            for (ItemEntity set2Value : value.set2.getValue()) {
+                encoderContext.encodeWithChildContext(registry.get(ItemEntity.class), writer, set2Value);
+            }
+            writer.writeEndArray();
+            writer.writeStartArray("list2");
+            for (ItemEntity list2Value : value.list2.getValue()) {
+                encoderContext.encodeWithChildContext(registry.get(ItemEntity.class), writer, list2Value);
+            }
+            writer.writeEndArray();
+
+            writer.writeEndDocument();
+        }
+
+        @Override
+        public Class<RoleData> getEncoderClass() {
+            return RoleData.class;
+        }
     }
 
 }

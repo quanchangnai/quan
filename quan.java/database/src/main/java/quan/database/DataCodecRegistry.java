@@ -20,7 +20,7 @@ public class DataCodecRegistry implements CodecRegistry {
 
     protected final static Logger logger = LoggerFactory.getLogger(DataCodecRegistry.class);
 
-    private Map<Class<?>, EntityCodec<?>> codecs = new HashMap<>();
+    private Map<Class<?>, Codec<?>> codecs = new HashMap<>();
 
     private CodecRegistry registry = CodecRegistries.fromRegistries(new CodecRegistry() {
         @Override
@@ -32,6 +32,15 @@ public class DataCodecRegistry implements CodecRegistry {
     public DataCodecRegistry() {
     }
 
+    public DataCodecRegistry(String packageName) {
+        register(packageName);
+    }
+
+    /**
+     * 注册指定包名下面所有的编解码器
+     *
+     * @param packageName 编解码器所在的包
+     */
     public void register(String packageName) {
         Set<Class<?>> codecClasses = ClassUtils.loadClasses(packageName, EntityCodec.class);
         for (Class<?> codecClass : codecClasses) {
@@ -39,7 +48,7 @@ public class DataCodecRegistry implements CodecRegistry {
                 continue;
             }
             try {
-                EntityCodec codec = (EntityCodec) codecClass.getDeclaredConstructor(CodecRegistry.class).newInstance(this);
+                Codec codec = (Codec) codecClass.getDeclaredConstructor(CodecRegistry.class).newInstance(this);
                 codecs.put(codec.getEncoderClass(), codec);
             } catch (Exception e) {
                 logger.error("", e);
@@ -50,5 +59,9 @@ public class DataCodecRegistry implements CodecRegistry {
     @Override
     public <T> Codec<T> get(Class<T> clazz) {
         return registry.get(clazz);
+    }
+
+    public void test() {
+        System.err.println(codecs);
     }
 }

@@ -1,6 +1,9 @@
 package ${getFullPackageName("java")};
 
 import java.util.*;
+import org.bson.*;
+import org.bson.codecs.*;
+import org.bson.codecs.configuration.CodecRegistry;
 import quan.database.*;
 <#list imports as import>
 import ${import};
@@ -155,6 +158,143 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
         </#list>
                 '}';
 
+    }
+
+    public static class Codec extends EntityCodec<${name}> {
+
+        public Codec(CodecRegistry registry) {
+            super(registry);
+        }
+
+        @Override
+        public ${name} decode(BsonReader reader, DecoderContext decoderContext) {
+            reader.readStartDocument();
+            <#if definitionType ==5>
+                <#if idType == "Integer">
+            ${name} value = new ${name}(reader.readInt32("_id")); 
+                <#elseif idType == "Long">
+            ${name} value = new ${name}(reader.readInt64("_id"));    
+                <#else>
+            ${name} value = new ${name}(reader.read${idType}("_id"));
+                </#if>
+            <#else> 
+            ${name} value = new ${name}(); 
+            </#if>
+
+            while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
+                switch (reader.readName()) {
+                    <#list fields as field>
+                    case "${field.name}":
+                        <#if field.type == "int" || field.enumType>
+                        value.${field.name}.setValue(reader.readInt32());
+                        <#elseif field.type == "long">
+                        value.${field.name}.setValue(reader.readInt64());
+                        <#elseif field.type == "bool">
+                        value.${field.name}.setValue(reader.readBoolean());
+                        <#elseif field.type == "short">
+                        value.${field.name}.setValue((short) reader.readInt32());
+                        <#elseif field.type == "float">
+                        value.${field.name}.setValue((float) reader.readDouble());
+                        <#elseif field.beanType>
+                        value.${field.name}.setValue(decoderContext.decodeWithChildContext(registry.get(${field.type}.class), reader));
+                        <#elseif field.type == "list" || field.type == "set">
+                        reader.readStartArray();
+                        while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
+                            <#if field.valueType == "short">
+                            value.${field.name}.add(reader.readInt32());
+                            <#elseif field.valueType == "int">
+                            value.${field.name}.add((short) reader.readInt32());
+                            <#elseif field.valueType == "long">
+                            value.${field.name}.add(reader.readInt64());
+                            <#elseif field.valueType == "bool">
+                            value.${field.name}.add(reader.readBoolean());
+                            <#elseif field.valueType == "float">
+                            value.${field.name}.add((float) reader.readDouble());
+                            <#elseif field.beanValueType>
+                            value.${field.name}.add(decoderContext.decodeWithChildContext(registry.get(${field.valueType}.class), reader));
+                            <#else>
+                            value.${field.name}.add(reader.read${field.valueType?cap_first}());
+                            </#if>
+                        }
+                        reader.readEndArray();
+                        <#elseif field.type == "map">
+                        reader.readStartDocument();
+                        
+                        reader.readEndDocument(
+                        <#else>
+                        value.${field.name}.setValue(reader.read${field.type?cap_first}());
+                        </#if>
+                        break;
+                    </#list>
+                    default:
+                        reader.skipValue();
+                }
+            }
+
+            reader.readEndDocument();
+            return value;
+        }
+
+        @Override
+        public void encode(BsonWriter writer, ${name} value, EncoderContext encoderContext) {
+            writer.writeStartDocument();
+            <#if definitionType ==5>
+                <#if idType == "Integer">
+            writer.writeInt32("_id", value._getId());
+                <#elseif idType == "Long">
+            writer.writeInt64("_id", value._getId());
+                <#else>
+            writer.write${idType}("_id", value._getId());
+                </#if>
+            </#if>
+
+            <#list fields as field>
+                <#if field.type == "int" || field.enumType || field.type == "short">
+            writer.writeInt32("${field.name}", value.${field.name}.getValue());
+                <#elseif field.type == "long">
+            writer.writeInt64("${field.name}", value.${field.name}.getValue());
+                <#elseif field.type == "bool">
+            writer.writeBoolean("${field.name}", value.${field.name}.getValue());      
+                <#elseif field.type == "float">
+            writer.writeDouble("${field.name}", value.${field.name}.getValue());     
+                <#elseif field.beanType>
+            if (value.${field.name}.getValue() != null) {
+                writer.writeName("${field.name}");
+                encoderContext.encodeWithChildContext(registry.get(${field.type}.class), writer, value.${field.name}.getValue());
+            }
+                <#elseif field.type == "map">
+                <#elseif field.type == "list" || field.type == "set">
+            writer.writeStartArray("${field.name}");
+            for (${field.classValueType} ${field.name}Value : value.${field.name}.getValue()) {
+                    <#if field.valueType == "int" || field.valueType == "short">
+                writer.writeInt32(${field.name}Value);
+                    <#elseif field.valueType == "long">
+                writer.writeInt64(${field.name}Value);
+                    <#elseif field.valueType == "bool">
+                writer.writeBoolean(${field.name}Value);
+                    <#elseif field.valueType == "float">
+                writer.writeDouble(${field.name}Value);
+                    <#elseif field.beanValueType>
+                encoderContext.encodeWithChildContext(registry.get(${field.classValueType}.class), writer, ${field.name}Value);
+                    <#else>
+                writer.write${field.valueType?cap_first}(${field.name}Value);
+                    </#if>
+            }
+            writer.writeEndArray();
+                <#elseif field.type == "map">
+                
+                <#else>
+            writer.write${field.type?cap_first}("${field.name}", value.${field.name}.getValue());   
+                </#if>
+            </#list>
+
+            writer.writeEndDocument();
+        }
+
+        @Override
+        public Class<${name}> getEncoderClass() {
+            return ${name}.class;
+        }
     }
 
 }
