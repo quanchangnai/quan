@@ -11,9 +11,9 @@
         <field name="name" type="string"/>
         <field name="roleType" type="RoleType"/>角色类型
         <field name="b" type="bool"/>
-        <field name="s" type="short"/>
-        <field name="i" type="int"/>
-        <field name="f" type="float"/>
+        <field name="s" type="short"/>sssss
+        <field name="i" type="int"/>iiii
+        <field name="f" type="float"/>ffff
         <field name="d" type="double"/>
         <field name="item" type="ItemEntity"/>道具
         <field name="items" type="map:int:ItemEntity"/>

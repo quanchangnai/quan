@@ -1,5 +1,6 @@
 package quan.definition;
 
+import com.google.common.base.CaseFormat;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import quan.definition.config.ConfigDefinition;
@@ -88,9 +89,16 @@ public class FieldDefinition extends Definition {
     }
 
     @Override
+    public void setName(String name) {
+        super.setName(name);
+        underscoreName = CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, getName());
+    }
+
+    @Override
     protected Pattern namePattern() {
         return Constants.FIELD_NAME_PATTERN;
     }
+
 
 
     public String getOriginType() {

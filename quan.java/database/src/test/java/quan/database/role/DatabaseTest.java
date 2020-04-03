@@ -1,8 +1,9 @@
 package quan.database.role;
 
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientOptions;
-import com.mongodb.MongoClientURI;
+import com.mongodb.ConnectionString;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
@@ -12,7 +13,7 @@ import org.bson.BsonReader;
 import org.bson.BsonWriter;
 import org.bson.json.JsonReader;
 import org.bson.json.JsonWriter;
-import quan.database.DataCodecRegistry;
+import quan.database.SimpleCodecRegistry;
 import quan.database.item.ItemEntity;
 
 import java.io.FileReader;
@@ -35,47 +36,67 @@ public class DatabaseTest {
     }
 
     private static void testMongoClient() throws Exception {
-        DataCodecRegistry dataCodecRegistry = new DataCodecRegistry("quan");
-        MongoClientOptions.Builder optionsBuilder = new MongoClientOptions.Builder().codecRegistry(dataCodecRegistry);
-        MongoClientURI mongoClientURI = new MongoClientURI("mongodb://127.0.0.1:27017", optionsBuilder);
-        MongoClient mongoClient = new MongoClient(mongoClientURI);
+        MongoClientSettings.Builder builder = MongoClientSettings.builder();
+        builder.applyConnectionString(new ConnectionString("mongodb://127.0.0.1:27017"));
+        builder.codecRegistry(new SimpleCodecRegistry("quan"));
+        MongoClient mongoClient = MongoClients.create(builder.build());
         MongoDatabase testDatabase = mongoClient.getDatabase("test");
-        MongoCollection<RoleData> roleDataCollection = testDatabase.getCollection(RoleData.class.getSimpleName(), RoleData.class);
+        MongoCollection<RoleData> roleDataCollection = testDatabase.getCollection(RoleData._NAME, RoleData.class);
 
+        long startTime, endTime;
+
+        startTime = System.currentTimeMillis();
         RoleData roleDataMax = roleDataCollection.find().sort(Sorts.descending("_id")).first();
         System.err.println("roleDataMax:" + roleDataMax);
         if (roleDataMax == null) {
             roleDataMax = new RoleData(1L);
             roleDataMax.setName("aaa");
         }
+        endTime = System.currentTimeMillis();
+        System.err.println("find costTime:" + (endTime - startTime));
 
         RoleData roleData1 = new RoleData(111L);
+        for (int i = 0; i < 20; i++) {
+            roleData1.getList().add("aaaaa" + i);
+            roleData1.getSet().add(true);
+        }
+        startTime = System.currentTimeMillis();
         UpdateResult updateResult = roleDataCollection.replaceOne(Filters.eq(111L), roleData1);
-        System.err.println("updateResult:" + updateResult);
+        endTime = System.currentTimeMillis();
+        System.err.println("replaceOne costTime:" + (endTime - startTime) + ",updateResult:" + updateResult);
 
         roleDataCollection.insertOne(new RoleData(roleDataMax.getId() + 1));
         roleDataCollection.insertOne(new RoleData(roleDataMax.getId() + 2));
         roleDataCollection.insertOne(new RoleData(roleDataMax.getId() + 3));
 
+        startTime = System.currentTimeMillis();
         List<RoleData> roleDataList = new ArrayList<>();
-        for (long i = roleDataMax.getId() + 10; i < roleDataMax.getId() + 100; i++) {
+        for (long i = roleDataMax.getId() + 5; i < roleDataMax.getId() + 20; i++) {
             RoleData roleData = new RoleData(i);
             roleData.setName("aaa" + i);
             roleData.setItem(new ItemEntity().setId((int) i).setName("item" + i));
-            for (long j = i; j < i + 10; j++) {
+            for (long j = i; j < i + 200; j++) {
                 roleData.getList().add("s" + j);
+                roleData.getList2().add(new ItemEntity().setId((int) i).setName("item2-" + i));
             }
             roleDataList.add(roleData);
         }
 
-        long startTime = System.currentTimeMillis();
+        endTime = System.currentTimeMillis();
+        System.err.println("roleDataList costTime:" + (endTime - startTime));
+
+        startTime = System.currentTimeMillis();
 
         roleDataCollection.insertMany(roleDataList);
 
-        long endTime = System.currentTimeMillis();
+        endTime = System.currentTimeMillis();
         System.err.println("insertMany costTime:" + (endTime - startTime));
 
         mongoClient.close();
+
+//        while (true) {
+//            Thread.sleep(10000);
+//        }
     }
 
     private static void testWrite() throws Exception {

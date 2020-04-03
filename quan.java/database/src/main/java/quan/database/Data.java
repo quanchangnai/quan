@@ -6,6 +6,8 @@ package quan.database;
  */
 public abstract class Data<I> extends Entity {
 
+    public static final String _ID = "_id";
+
     @Override
     protected final Data<I> _getRoot() {
         return this;

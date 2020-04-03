@@ -12,6 +12,10 @@ import quan.database.*;
  */
 public class ItemEntity extends Entity {
 
+    public static final String ID = "id";
+
+    public static final String NAME = "name";
+
     private BaseField<Integer> id = new BaseField<>(0);
 
     private BaseField<String> name = new BaseField<>("");
@@ -26,6 +30,11 @@ public class ItemEntity extends Entity {
         return this;
     }
 
+    public ItemEntity addId(int id) {
+        setId(getId() + id);
+        return this;
+    }
+
     public String getName() {
         return name.getValue();
     }
@@ -34,7 +43,6 @@ public class ItemEntity extends Entity {
         this.name.setLogValue(name, _getRoot());
         return this;
     }
-
 
     @Override
     protected void _setChildrenLogRoot(Data root) {
@@ -49,10 +57,16 @@ public class ItemEntity extends Entity {
 
     }
 
-    public static class Codec extends EntityCodec<ItemEntity> {
+    public static class Codec implements org.bson.codecs.Codec<ItemEntity> {
+
+        private CodecRegistry registry;
 
         public Codec(CodecRegistry registry) {
-            super(registry);
+            this.registry = registry;
+        }
+
+        public CodecRegistry getRegistry() {
+            return registry;
         }
 
         @Override
@@ -62,10 +76,10 @@ public class ItemEntity extends Entity {
 
             while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
                 switch (reader.readName()) {
-                    case "id":
+                    case ItemEntity.ID:
                         value.id.setValue(reader.readInt32());
                         break;
-                    case "name":
+                    case ItemEntity.NAME:
                         value.name.setValue(reader.readString());
                         break;
                     default:
@@ -81,8 +95,8 @@ public class ItemEntity extends Entity {
         public void encode(BsonWriter writer, ItemEntity value, EncoderContext encoderContext) {
             writer.writeStartDocument();
 
-            writer.writeInt32("id", value.id.getValue());
-            writer.writeString("name", value.name.getValue());
+            writer.writeInt32(ItemEntity.ID, value.id.getValue());
+            writer.writeString(ItemEntity.NAME, value.name.getValue());
 
             writer.writeEndDocument();
         }

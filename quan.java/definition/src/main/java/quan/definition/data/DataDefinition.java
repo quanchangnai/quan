@@ -1,5 +1,6 @@
 package quan.definition.data;
 
+import com.google.common.base.CaseFormat;
 import org.apache.commons.lang3.StringUtils;
 import quan.definition.BeanDefinition;
 import quan.definition.Category;
@@ -35,6 +36,12 @@ public class DataDefinition extends BeanDefinition {
     @Override
     public DataDefinition setCategory(Category category) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setName(String name) {
+        super.setName(name);
+        underscoreName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, getName());
     }
 
     @Override

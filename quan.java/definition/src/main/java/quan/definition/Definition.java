@@ -1,5 +1,6 @@
 package quan.definition;
 
+import com.google.common.base.CaseFormat;
 import org.apache.commons.lang3.StringUtils;
 import quan.definition.parser.DefinitionParser;
 
@@ -13,6 +14,8 @@ public abstract class Definition {
     protected Category category;
 
     private String name;
+
+    protected String underscoreName;
 
     private String comment = "";
 
@@ -63,6 +66,10 @@ public abstract class Definition {
             return;
         }
         this.name = name.trim();
+    }
+
+    public String getUnderscoreName() {
+        return underscoreName;
     }
 
     public String getComment() {

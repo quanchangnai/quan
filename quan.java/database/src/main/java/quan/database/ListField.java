@@ -1,17 +1,14 @@
 package quan.database;
 
-import org.pcollections.Empty;
-import org.pcollections.PVector;
-
 import java.util.*;
 
 /**
  * Created by quanchangnai on 2019/5/21.
  */
 @SuppressWarnings({"unchecked"})
-public final class ListField<E> extends Node implements List<E>, Field<PVector<E>> {
+public final class ListField<E> extends Node implements List<E>, Field<ArrayList<E>> {
 
-    private PVector<E> data = Empty.vector();
+    private ArrayList<E> _list = new ArrayList<>();
 
     public ListField(Data root) {
         _setRoot(root);
@@ -27,18 +24,16 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
     }
 
     @Override
-    public void setValue(PVector<E> data) {
-        this.data = data;
+    public void setValue(ArrayList<E> value) {
+        this._list = value;
     }
 
     @Override
-    public PVector<E> getValue() {
-
-        return data;
+    public ArrayList<E> getValue() {
+        return _list;
     }
 
     private int getModCount() {
-
         return 0;
     }
 
@@ -131,8 +126,7 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
     @Override
     public boolean add(E e) {
         Validations.validateCollectionValue(e);
-
-        return false;
+        return getValue().add(e);
     }
 
     @Override
@@ -151,8 +145,7 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
             Validations.validateCollectionValue(e);
         }
 
-
-        return false;
+        return getValue().addAll(c);
     }
 
     @Override
@@ -162,8 +155,7 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
             Validations.validateCollectionValue(e);
         }
 
-
-        return false;
+        return getValue().addAll(index, c);
     }
 
     @Override
@@ -180,7 +172,7 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
 
     @Override
     public void clear() {
-
+        getValue().clear();
     }
 
     @Override
@@ -204,18 +196,18 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
     @Override
     public E set(int index, E e) {
         Validations.validateCollectionValue(e);
-        return null;
+        return getValue().set(index, e);
     }
 
     @Override
     public void add(int index, E e) {
         Validations.validateCollectionValue(e);
+        getValue().add(index, e);
     }
 
     @Override
     public E remove(int index) {
-
-        return null;
+        return getValue().remove(index);
     }
 
     @Override

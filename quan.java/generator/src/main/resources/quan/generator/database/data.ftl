@@ -16,42 +16,43 @@ import ${import};
  * 自动生成
  */
 public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionType ==5>Data<${idType}></#if> {
+<#if definitionType ==5>
+
+     public static final String _NAME = "${underscoreName}";
+</#if>
+<#list fields as field>
+
+    <#if field.comment !="">
+    /**
+     * ${field.comment}
+     */
+    </#if>
+    public static final String ${field.underscoreName} = "${field.name}";
+</#list>
 
 <#list fields as field>
-    <#if field.comment !="">
-    //${field.comment}
-    </#if>
     <#if field.type == "set" || field.type == "list">
     private ${field.classType}<${field.classValueType}> ${field.name} = new ${field.classType}<>(_getRoot());
-
     <#elseif field.type == "map">
     private ${field.classType}<${field.classKeyType}, ${field.classValueType}> ${field.name} = new ${field.classType}<>(_getRoot());
-
     <#elseif field.type = "string">
     private BaseField<${field.classType}> ${field.name} = new BaseField<>("");
-
     <#elseif field.type = "short">
     private BaseField<${field.classType}> ${field.name} = new BaseField<>((short) 0);
-
     <#elseif field.type = "int" || field.enumType>
     private BaseField<Integer> ${field.name} = new BaseField<>(0);
-
     <#elseif field.type = "long">
     private BaseField<${field.classType}> ${field.name} = new BaseField<>(0L);
-
     <#elseif field.type = "float">
     private BaseField<${field.classType}> ${field.name} = new BaseField<>(0F);
-
     <#elseif field.type = "double">
     private BaseField<${field.classType}> ${field.name} = new BaseField<>(0D);
-
     <#elseif field.type = "bool">
     private BaseField<${field.classType}> ${field.name} = new BaseField<>(false);
-
     <#else>
     private EntityField<${field.classType}> ${field.name} = new EntityField<>();
-
     </#if>
+
 </#list>
 <#if definitionType ==5>
 
@@ -118,10 +119,21 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
         this.${field.name}.setLogValue(${field.name}, _getRoot());
         return this;
     }
+        <#if field.numberType>
+
+        <#if field.comment !="">
+    /**
+     * ${field.comment}
+     */
+        </#if>
+    public ${name} add${field.name?cap_first}(${field.basicType} ${field.name}) {
+        set${field.name?cap_first}(<#if field.type=="short">(short) (</#if>get${field.name?cap_first}() + ${field.name}<#if field.type=="short">)</#if>);
+        return this;
+    }
+        </#if>
 
     </#if>
 </#list>
-
     @Override
     protected void _setChildrenLogRoot(Data root) {
 <#list fields as field>
@@ -163,17 +175,23 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
     <#assign classTypes={"Byte":"Int32","Boolean":"Boolean","Short":"Int32","Integer":"Int32","Long":"Int64","Float":"Double","Double":"Double","String":"String"}/>
     <#assign convertTypes={"byte":"byte","short":"short","float":"float"}/>
 
-    public static class Codec extends EntityCodec<${name}> {
+    public static class Codec implements org.bson.codecs.Codec<${name}> {
+
+        private CodecRegistry registry;
 
         public Codec(CodecRegistry registry) {
-            super(registry);
+            this.registry = registry;
+        }
+
+        public CodecRegistry getRegistry() {
+            return registry;
         }
 
         @Override
         public ${name} decode(BsonReader reader, DecoderContext decoderContext) {
             reader.readStartDocument();
             <#if definitionType ==5>
-            ${name} value = new ${name}(reader.read${classTypes[idType]}("_id"));
+            ${name} value = new ${name}(reader.read${classTypes[idType]}(${name}._ID));
             <#else>
             ${name} value = new ${name}(); 
             </#if>
@@ -181,7 +199,8 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
             while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
                 switch (reader.readName()) {
                     <#list fields as field>
-                    case "${field.name}":
+                        <#if field.ignore || definitionType == 5 && field.name == idName ><#continue/></#if>
+                    case ${name}.${field.underscoreName}:
                         <#if field.enumType>
                         value.${field.name}.setValue(reader.readInt32());
                         <#elseif field.primitiveType>
@@ -228,26 +247,21 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
         public void encode(BsonWriter writer, ${name} value, EncoderContext encoderContext) {
             writer.writeStartDocument();
             <#if definitionType ==5>
-                <#if idType == "Integer">
-            writer.writeInt32("_id", value._getId());
-                <#elseif idType == "Long">
-            writer.writeInt64("_id", value._getId());
-                <#else>
-            writer.write${idType}("_id", value._getId());
-                </#if>
+            writer.write${classTypes[idType]}(${name}._ID, value._getId());
             </#if>
 
             <#list fields as field>
+                <#if field.ignore || definitionType == 5 && field.name == idName ><#continue/></#if>
                 <#if field.enumType>
-            writer.writeInt32("${field.name}", value.${field.name}.getValue());
+            writer.writeInt32(${name}.${field.underscoreName}, value.${field.name}.getValue());
                 <#elseif field.primitiveType>
-            writer.write${basicTypes[field.type]}("${field.name}", value.${field.name}.getValue());
+            writer.write${basicTypes[field.type]}(${name}.${field.underscoreName}, value.${field.name}.getValue());
                 <#elseif field.beanType>
                     <#if field_index gt 0 >
 
                     </#if>
             if (value.${field.name}.getValue() != null) {
-                writer.writeName("${field.name}");
+                writer.writeName(${name}.${field.underscoreName});
                 encoderContext.encodeWithChildContext(registry.get(${field.type}.class), writer, value.${field.name}.getValue());
             }
                     <#if field_has_next && fields[field_index+1].primitiveType >
@@ -257,17 +271,19 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
                     <#if field_index gt 0 >
 
                     </#if>
-            writer.writeStartArray("${field.name}");
-            for (${field.classValueType} ${field.name}Value : value.${field.name}.getValue()) {
+            if (!value.${field.name}.getValue().isEmpty()) {
+                writer.writeStartArray(${name}.${field.underscoreName});
+                for (${field.classValueType} ${field.name}Value : value.${field.name}.getValue()) {
                     <#if field.primitiveValueType>
-                writer.write${basicTypes[field.valueType]}(${field.name}Value);
+                    writer.write${basicTypes[field.valueType]}(${field.name}Value);
                     <#elseif field.beanValueType>
-                encoderContext.encodeWithChildContext(registry.get(${field.classValueType}.class), writer, ${field.name}Value);
+                    encoderContext.encodeWithChildContext(registry.get(${field.classValueType}.class), writer, ${field.name}Value);
                     <#else>
-                writer.write${field.valueType?cap_first}(${field.name}Value);
+                    writer.write${field.valueType?cap_first}(${field.name}Value);
                     </#if>
+                }
+                writer.writeEndArray();
             }
-            writer.writeEndArray();
                     <#if field_has_next && fields[field_index+1].primitiveType >
 
                     </#if>
@@ -275,18 +291,20 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
                     <#if field_index gt 0 >
 
                     </#if>
-            writer.writeStartDocument("${field.name}");
-            for (${field.classKeyType} ${field.name}Key : value.${field.name}.getValue().keySet()) {
-                writer.write${basicTypes[field.keyType]}(${field.name}Key);
+            if (!value.${field.name}.getValue().isEmpty()) {
+                writer.writeStartDocument(${name}.${field.underscoreName});
+                for (${field.classKeyType} ${field.name}Key : value.${field.name}.getValue().keySet()) {
+                    writer.write${basicTypes[field.keyType]}(${field.name}Key);
                     <#if field.primitiveValueType>
-                writer.write${basicTypes[field.valueType]}(value.${field.name}.getValue().get(${field.name}Key));
+                    writer.write${basicTypes[field.valueType]}(value.${field.name}.getValue().get(${field.name}Key));
                     <#elseif field.beanValueType>
-                encoderContext.encodeWithChildContext(registry.get(${field.classValueType}.class), writer, value.${field.name}.getValue().get(${field.name}Key));
+                    encoderContext.encodeWithChildContext(registry.get(${field.classValueType}.class), writer, value.${field.name}.getValue().get(${field.name}Key));
                     <#else>
-                writer.write${field.valueType?cap_first}(${field.name}Value);
+                    writer.write${field.valueType?cap_first}(${field.name}Value);
                     </#if>
+                }
+                writer.writeEndDocument();
             }
-            writer.writeEndDocument();
                     <#if field_has_next && fields[field_index+1].primitiveType >
 
                     </#if>
