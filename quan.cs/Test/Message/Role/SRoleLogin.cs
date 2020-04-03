@@ -9,7 +9,7 @@ using Test.Message.Common;
 namespace Test.Message.Role
 {
 	/// <summary>
-	/// 角色登录<br/>
+	/// 角色登录，哈希生成ID<br/>
 	/// 自动生成
 	/// </summary>
     public class SRoleLogin : HeadedMessage

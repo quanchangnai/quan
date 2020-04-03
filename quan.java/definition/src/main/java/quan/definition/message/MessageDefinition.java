@@ -1,5 +1,6 @@
 package quan.definition.message;
 
+import org.apache.commons.lang3.StringUtils;
 import quan.definition.BeanDefinition;
 import quan.definition.Category;
 import quan.definition.FieldDefinition;
@@ -13,6 +14,9 @@ import java.util.List;
  */
 public class MessageDefinition extends BeanDefinition {
 
+    //支持定义消息ID，一般情况下由哈希生成
+    private String strId;
+
     private int id;
 
     {
@@ -20,7 +24,10 @@ public class MessageDefinition extends BeanDefinition {
 
     }
 
-    public MessageDefinition() {
+    public MessageDefinition(String strId) {
+        if (!StringUtils.isBlank(strId)) {
+            this.strId = strId.trim();
+        }
     }
 
     @Override
@@ -44,6 +51,23 @@ public class MessageDefinition extends BeanDefinition {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+
+    public boolean isDefinedId() {
+        return !StringUtils.isBlank(strId);
+    }
+
+    @Override
+    public void validate() {
+        if (strId != null) {
+            try {
+                id = Integer.parseInt(strId);
+            } catch (NumberFormatException e) {
+                addValidatedError(getValidatedName("的") + "ID[" + strId + "]不合法");
+            }
+        }
+        super.validate();
     }
 
     @Override

@@ -5,7 +5,7 @@
 local MessageFactory = {}
 
 local registry = {
-    [544233] = "test.message.role.CRoleLogin",
+    [1] = "test.message.role.CRoleLogin",
     [763075] = "test.message.role.SRoleLogin",
 }
 

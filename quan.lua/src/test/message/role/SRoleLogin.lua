@@ -4,7 +4,7 @@ local UserInfo = require("test.message.user.UserInfo")
 local RoleInfo = require("test.message.role.RoleInfo")
 
 ---
----角色登录
+---角色登录，哈希生成ID
 ---@author 自动生成
 ---
 local SRoleLogin = {
@@ -37,7 +37,7 @@ end
 local meta = { __index = SRoleLogin, __newindex = onSet, __tostring = toString }
 
 ---
----角色登录.构造
+---角色登录，哈希生成ID.构造
 ---@param args 参数列表可以为空
 ---
 function SRoleLogin.new(args)
@@ -70,7 +70,7 @@ function SRoleLogin.new(args)
 end
 
 ---
----角色登录.编码
+---角色登录，哈希生成ID.编码
 ---@return quan.message.Buffer
 ---
 function SRoleLogin:encode()
@@ -108,7 +108,7 @@ function SRoleLogin:encode()
 end
 
 ---
----角色登录.解码
+---角色登录，哈希生成ID.解码
 ---@param buffer quan.message.Buffer 不能为空
 ---@return test.message.role.SRoleLogin
 ---

@@ -9,7 +9,7 @@ using Test.Message.Common;
 namespace Test.Message.Role
 {
 	/// <summary>
-	/// 角色登录<br/>
+	/// 角色登录，自定义ID<br/>
 	/// 自动生成
 	/// </summary>
     public class CRoleLogin : HeadedMessage
@@ -17,7 +17,7 @@ namespace Test.Message.Role
 		/// <summary>
 		/// 消息ID
 		/// </summary>
-		public override int Id => 544233;
+		public override int Id => 1;
 
         /// <summary>
 		/// 角色id

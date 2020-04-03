@@ -76,21 +76,35 @@ public abstract class MessageGenerator extends Generator {
     }
 
     //使用类名哈希计算消息ID
-    private void hashId() {
-        Set<MessageDefinition> messageDefinitions = new HashSet<>();
+    protected void hashId() {
+        Map<Integer, MessageDefinition> definedIdMessageDefinitions = new HashMap<>();
+        Set<MessageDefinition> hashIdMessageDefinitions = new HashSet<>();
+
         for (ClassDefinition classDefinition : parser.getClasses().values()) {
-            if (classDefinition instanceof MessageDefinition) {
-                messageDefinitions.add((MessageDefinition) classDefinition);
+            if (!(classDefinition instanceof MessageDefinition)) {
+                continue;
+            }
+            MessageDefinition messageDefinition = (MessageDefinition) classDefinition;
+            if (messageDefinition.isDefinedId()) {
+                MessageDefinition oldMessageDefinition = definedIdMessageDefinitions.put(messageDefinition.getId(), messageDefinition);
+                if (oldMessageDefinition != null) {
+                    parser.addValidatedError(String.format(messageDefinition.getValidatedName("和") + oldMessageDefinition.getValidatedName() + "的ID[%d]冲突", messageDefinition.getId()));
+                }
+            } else {
+                hashIdMessageDefinitions.add(messageDefinition);
             }
         }
         //0xFFFFF正好占用3个字节,当设置了[rehashId]时，100000个坑位用于解决冲突，每次用10000个
-        hashId(messageDefinitions, 1, 0xFFFFF - 100000);
+        hashId(definedIdMessageDefinitions, hashIdMessageDefinitions, 1, 0xFFFFF - 100000);
     }
 
-    private void hashId(Set<MessageDefinition> messageDefinitions, int begin, int end) {
+    protected void hashId(Map<Integer, MessageDefinition> definedIdMessageDefinitions, Set<MessageDefinition> hashIdMessageDefinitions, int begin, int end) {
         Map<Integer, List<MessageDefinition>> conflictedMessagesMap = new HashMap<>();
-        for (MessageDefinition messageDefinition : messageDefinitions) {
+        for (MessageDefinition messageDefinition : hashIdMessageDefinitions) {
             int messageId = begin + (messageDefinition.getSimpleName().hashCode() & 0x7FFFFFFF) % (end - begin);
+            if (definedIdMessageDefinitions.containsKey(messageId)) {
+                parser.addValidatedError(String.format(messageDefinition.getValidatedName("和自定义ID的") + definedIdMessageDefinitions.get(messageId).getValidatedName() + "的ID[%d]冲突", messageId));
+            }
             conflictedMessagesMap.computeIfAbsent(messageId, h -> new ArrayList<>()).add(messageDefinition);
         }
 
@@ -111,7 +125,7 @@ public abstract class MessageGenerator extends Generator {
 
         //ID冲突的消息调整区间参数重新计算
         if (!allConflictedMessages.isEmpty()) {
-            hashId(allConflictedMessages, end, end + 10000);
+            hashId(definedIdMessageDefinitions, allConflictedMessages, end, end + 10000);
         }
     }
 }

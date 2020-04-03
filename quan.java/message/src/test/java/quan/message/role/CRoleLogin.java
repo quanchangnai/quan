@@ -7,7 +7,7 @@ import quan.message.common.HeadedMessage;
 import quan.message.user.UserInfo;
 
 /**
- * 角色登录<br/>
+ * 角色登录，自定义ID<br/>
  * 自动生成
  */
 public class CRoleLogin extends HeadedMessage {
@@ -15,7 +15,7 @@ public class CRoleLogin extends HeadedMessage {
     /**
      * 消息ID
      */
-    public static final int ID = 544233;
+    public static final int ID = 1;
 
     //角色id
     private long roleId;

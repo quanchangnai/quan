@@ -7,7 +7,7 @@ import quan.message.common.HeadedMessage;
 import quan.message.user.UserInfo;
 
 /**
- * 角色登录<br/>
+ * 角色登录，哈希生成ID<br/>
  * 自动生成
  */
 public class SRoleLogin extends HeadedMessage {
