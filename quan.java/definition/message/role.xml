@@ -21,7 +21,7 @@
         <field name="map" type="map:int:int"/>
     </bean>
 
-    <message name="CRoleLogin" lang="cs,java,lua">角色登录
+    <message name="CRoleLogin" id="1" lang="cs,java,lua">角色登录，自定义ID
         <field name="roleId" type="long"/>角色id
         <field name="roleName" type="string"/>角色名
         <field name="roleInfo" type="RoleInfo"/>角色信息
@@ -31,7 +31,7 @@
         <field name="userInfo" type="UserInfo" optional="true"/>用户信息
     </message>
 
-    <message name="SRoleLogin">角色登录
+    <message name="SRoleLogin">角色登录，哈希生成ID
         <field name="roleId" type="long"/>角色id
         <field name="roleName" type="string"/>角色名
         <field name="roleInfo" type="RoleInfo"/>角色信息
