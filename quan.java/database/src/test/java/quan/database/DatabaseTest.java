@@ -1,4 +1,4 @@
-package quan.database.role;
+package quan.database;
 
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
@@ -13,8 +13,8 @@ import org.bson.BsonReader;
 import org.bson.BsonWriter;
 import org.bson.json.JsonReader;
 import org.bson.json.JsonWriter;
-import quan.database.SimpleCodecRegistry;
 import quan.database.item.ItemEntity;
+import quan.database.role.RoleData;
 
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -36,10 +36,11 @@ public class DatabaseTest {
     }
 
     private static void testMongoClient() throws Exception {
-        MongoClientSettings.Builder builder = MongoClientSettings.builder();
-        builder.applyConnectionString(new ConnectionString("mongodb://127.0.0.1:27017"));
-        builder.codecRegistry(new SimpleCodecRegistry("quan"));
-        MongoClient mongoClient = MongoClients.create(builder.build());
+        MongoClientSettings.Builder mongoClientSettings = MongoClientSettings.builder();
+        mongoClientSettings.applyConnectionString(new ConnectionString("mongodb://127.0.0.1:27017"));
+        mongoClientSettings.codecRegistry(new PackageCodecRegistry("quan"));
+        MongoClient mongoClient = MongoClients.create(mongoClientSettings.build());
+
         MongoDatabase testDatabase = mongoClient.getDatabase("test");
         MongoCollection<RoleData> roleDataCollection = testDatabase.getCollection(RoleData._NAME, RoleData.class);
 

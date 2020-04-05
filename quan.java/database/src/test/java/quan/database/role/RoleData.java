@@ -13,7 +13,7 @@ import quan.database.item.ItemEntity;
  */
 public class RoleData extends Data<Long> {
 
-     public static final String _NAME = "role_data";
+    public static final String _NAME = "role_data";
 
     /**
      * 角色ID

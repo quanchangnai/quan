@@ -15,11 +15,12 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
+ * 注册指定包名下面所有的编解码器
  * Created by quanchangnai on 2020/4/1.
  */
-public class SimpleCodecRegistry implements CodecRegistry {
+public class PackageCodecRegistry implements CodecRegistry {
 
-    protected final static Logger logger = LoggerFactory.getLogger(SimpleCodecRegistry.class);
+    protected final static Logger logger = LoggerFactory.getLogger(PackageCodecRegistry.class);
 
     private Map<Class<?>, Codec<?>> codecs = new HashMap<>();
 
@@ -30,11 +31,11 @@ public class SimpleCodecRegistry implements CodecRegistry {
         }
     }, MongoClientSettings.getDefaultCodecRegistry());
 
-    public SimpleCodecRegistry() {
+    public PackageCodecRegistry() {
     }
 
-    public SimpleCodecRegistry(String packageName) {
-        register(packageName);
+    public PackageCodecRegistry(String codecPackage) {
+        register(codecPackage);
     }
 
     /**
@@ -43,7 +44,7 @@ public class SimpleCodecRegistry implements CodecRegistry {
      * @param codecPackage 编解码器所在的包
      */
     public void register(String codecPackage) {
-        Objects.requireNonNull(codecPackage, "参数编解码器所在包[codecPackage]不能为空");
+        Objects.requireNonNull(codecPackage, "编解码器所在包[codecPackage]不能为空");
         Set<Class<?>> codecClasses = ClassUtils.loadClasses(codecPackage, Codec.class);
         for (Class<?> codecClass : codecClasses) {
             if (Modifier.isAbstract(codecClass.getModifiers())) {

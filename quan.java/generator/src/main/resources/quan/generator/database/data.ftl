@@ -18,7 +18,7 @@ import ${import};
 public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionType ==5>Data<${idType}></#if> {
 <#if definitionType ==5>
 
-     public static final String _NAME = "${underscoreName}";
+    public static final String _NAME = "${underscoreName}";
 </#if>
 <#list fields as field>
 
