@@ -16,11 +16,11 @@ public class NettyMessageCodec extends ByteToMessageCodec<Message> {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private MessageFactory messageFactory;
+    private MessageRegistry messageRegistry;
 
-    public NettyMessageCodec(MessageFactory messageFactory) {
+    public NettyMessageCodec(MessageRegistry messageRegistry) {
         super(Message.class);
-        this.messageFactory = messageFactory;
+        this.messageRegistry = messageRegistry;
     }
 
     @Override
@@ -33,7 +33,7 @@ public class NettyMessageCodec extends ByteToMessageCodec<Message> {
         Buffer buffer = new NettyBuffer(byteBuf);
         int msgId = buffer.readInt();
         buffer.reset();
-        Message message = messageFactory.create(msgId);
+        Message message = messageRegistry.create(msgId);
         if (message == null) {
             logger.error("消息{}创建失败", msgId);
             return;

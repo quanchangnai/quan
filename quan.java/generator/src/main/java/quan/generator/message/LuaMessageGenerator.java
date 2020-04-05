@@ -17,7 +17,7 @@ import java.util.*;
  */
 public class LuaMessageGenerator extends MessageGenerator {
 
-    private Template messageFactoryTemplate;
+    private Template registryTemplate;
 
     public LuaMessageGenerator() {
     }
@@ -35,7 +35,7 @@ public class LuaMessageGenerator extends MessageGenerator {
     protected void initFreemarker() {
         super.initFreemarker();
         try {
-            messageFactoryTemplate = freemarkerCfg.getTemplate("factory." + supportLanguage() + ".ftl");
+            registryTemplate = freemarkerCfg.getTemplate("registry." + supportLanguage() + ".ftl");
         } catch (IOException e) {
             logger.error("", e);
         }
@@ -66,17 +66,17 @@ public class LuaMessageGenerator extends MessageGenerator {
             return;
         }
 
-        String fileName = "MessageFactory." + supportLanguage();
+        String fileName = "MessageRegistry." + supportLanguage();
         try (Writer writer = new OutputStreamWriter(new FileOutputStream(new File(filePath, fileName)), StandardCharsets.UTF_8)) {
             Map<String, List<MessageDefinition>> messages = new HashMap<>();
             messages.put("messages", messageDefinitions);
-            messageFactoryTemplate.process(messages, writer);
+            registryTemplate.process(messages, writer);
         } catch (Exception e) {
             logger.error("", e);
             return;
         }
 
-        logger.info("生成消息工厂[{}]完成", filePath + File.separator + fileName);
+        logger.info("生成消息注册表[{}]完成", filePath + File.separator + fileName);
     }
 
     @Override

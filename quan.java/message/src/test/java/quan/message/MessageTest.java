@@ -14,10 +14,10 @@ import java.util.Arrays;
  */
 public class MessageTest {
 
-    public static MessageFactory messageFactory = new MessageFactory();
+    public static MessageRegistry messageRegistry = new MessageRegistry();
 
     static {
-        messageFactory.register("quan");
+        messageRegistry.register("quan");
     }
 
     public static void main(String[] args) throws Exception {

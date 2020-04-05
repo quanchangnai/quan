@@ -7,7 +7,7 @@ package.path = package.path .. ";../../../src/?.lua"
 
 local Buffer = require("quan.message.Buffer")
 local Message = require("quan.message.Message")
-local MessageFactory = require("test.message.MessageFactory")
+local MessageRegistry = require("test.message.MessageRegistry")
 local SRoleLogin = require("test.message.role.SRoleLogin")
 local RoleInfo = require("test.message.role.RoleInfo")
 local RoleType = require("test.message.role.RoleType")
@@ -113,7 +113,7 @@ local function testMessage1()
 
     --local sRoleLogin2 = SRoleLogin.decode(buffer)
 
-    local sRoleLogin2 = MessageFactory.create(buffer:readInt())
+    local sRoleLogin2 = MessageRegistry.create(buffer:readInt())
     buffer:reset()
     local sRoleLogin2 = sRoleLogin2.decode(buffer)
 

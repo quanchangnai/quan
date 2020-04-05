@@ -42,7 +42,7 @@
     <Compile Include="Bean.cs" />
     <Compile Include="Buffer.cs" />
     <Compile Include="MessageBase.cs" />
-    <Compile Include="MessageFactory.cs" />
+    <Compile Include="MessageRegistry.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

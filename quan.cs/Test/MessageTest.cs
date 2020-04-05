@@ -94,7 +94,7 @@ namespace Test
         public static void Test3()
         {
             Console.WriteLine("Test3====================");
-            var messageFactory = new MessageFactory();
+            var messageFactory = new MessageRegistry();
             messageFactory.Register(Assembly.GetExecutingAssembly().FullName);
             Console.WriteLine(messageFactory.Create(544233));
         }

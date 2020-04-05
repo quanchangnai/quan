@@ -32,7 +32,7 @@ public class NettyClientTest {
                 protected void initChannel(NioSocketChannel ch) throws Exception {
                     ch.pipeline().addLast(new LengthFieldPrepender(4));
                     ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(100000, 0, 4,0,4));
-                    ch.pipeline().addLast(new NettyMessageCodec(MessageTest.messageFactory));
+                    ch.pipeline().addLast(new NettyMessageCodec(MessageTest.messageRegistry));
                     ch.pipeline().addLast(new NettyClientHandler());
                 }
             });

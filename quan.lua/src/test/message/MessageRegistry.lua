@@ -1,24 +1,24 @@
 ---
----消息工厂
+---消息注册表
 ---自动生成
 ---
-local MessageFactory = {}
+local MessageRegistry = {}
 
-local registry = {
+local messages = {
     [1] = "test.message.role.CRoleLogin",
     [763075] = "test.message.role.SRoleLogin",
 }
 
 ---
----消息工厂.创建消息
+---消息注册表.创建消息
 ---@param msgId 消息ID
 ---
-function MessageFactory.create(msgId)
+function MessageRegistry.create(msgId)
     assert(math.type(msgId) == "integer", "参数[msgId]类型错误")
-    local msgName = registry[msgId]
+    local msgName = messages[msgId]
     if msgName then
         return require(msgName).new()
     end
 end
 
-return MessageFactory
+return MessageRegistry
