@@ -14,7 +14,13 @@ public abstract class Node {
     private Data root;
 
     protected Data _getRoot() {
-
+        Transaction transaction = Transaction.get();
+        if (transaction != null) {
+            RootLog rootLog = transaction.getRootLog(this);
+            if (rootLog != null) {
+                return rootLog.getRoot();
+            }
+        }
         return root;
     }
 
@@ -23,6 +29,14 @@ public abstract class Node {
     }
 
     protected void _setLogRoot(Data root) {
+        Transaction transaction = Transaction.get();
+        RootLog rootLog = transaction.getRootLog(this);
+        if (rootLog != null) {
+            rootLog.setRoot(root);
+        } else {
+            transaction.addRootLog(new RootLog(this, root));
+        }
+
         _setChildrenLogRoot(root);
     }
 

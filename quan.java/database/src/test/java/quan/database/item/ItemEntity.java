@@ -16,9 +16,9 @@ public class ItemEntity extends Entity {
 
     public static final String NAME = "name";
 
-    private BaseField<Integer> id = new BaseField<>(0);
+    private SimpleField<Integer> id = new SimpleField<>(0);
 
-    private BaseField<String> name = new BaseField<>("");
+    private SimpleField<String> name = new SimpleField<>("");
 
 
     public int getId() {

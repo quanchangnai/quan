@@ -6,7 +6,7 @@ import java.util.Objects;
  * 校验工具类
  * Created by quanchangnai on 2019/6/22.
  */
-class Validations {
+public class Validations {
 
     public static void validateMapKey(Object key) {
         Objects.requireNonNull(key);
@@ -15,11 +15,11 @@ class Validations {
     public static void validateCollectionValue(Object value) {
         Objects.requireNonNull(value);
         if (value instanceof Entity) {
-            validateBeanRoot((Entity) value);
+            validateEntityRoot((Entity) value);
         }
     }
 
-    public static void validateBeanRoot(Entity entity) {
+    public static void validateEntityRoot(Entity entity) {
         if (entity == null) {
             return;
         }

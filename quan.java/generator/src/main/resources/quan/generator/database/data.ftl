@@ -36,19 +36,19 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
     <#elseif field.type == "map">
     private ${field.classType}<${field.classKeyType}, ${field.classValueType}> ${field.name} = new ${field.classType}<>(_getRoot());
     <#elseif field.type = "string">
-    private BaseField<${field.classType}> ${field.name} = new BaseField<>("");
+    private SimpleField<${field.classType}> ${field.name} = new SimpleField<>("");
     <#elseif field.type = "short">
-    private BaseField<${field.classType}> ${field.name} = new BaseField<>((short) 0);
+    private SimpleField<${field.classType}> ${field.name} = new SimpleField<>((short) 0);
     <#elseif field.type = "int" || field.enumType>
-    private BaseField<Integer> ${field.name} = new BaseField<>(0);
+    private SimpleField<Integer> ${field.name} = new SimpleField<>(0);
     <#elseif field.type = "long">
-    private BaseField<${field.classType}> ${field.name} = new BaseField<>(0L);
+    private SimpleField<${field.classType}> ${field.name} = new SimpleField<>(0L);
     <#elseif field.type = "float">
-    private BaseField<${field.classType}> ${field.name} = new BaseField<>(0F);
+    private SimpleField<${field.classType}> ${field.name} = new SimpleField<>(0F);
     <#elseif field.type = "double">
-    private BaseField<${field.classType}> ${field.name} = new BaseField<>(0D);
+    private SimpleField<${field.classType}> ${field.name} = new SimpleField<>(0D);
     <#elseif field.type = "bool">
-    private BaseField<${field.classType}> ${field.name} = new BaseField<>(false);
+    private SimpleField<${field.classType}> ${field.name} = new SimpleField<>(false);
     <#else>
     private EntityField<${field.classType}> ${field.name} = new EntityField<>();
     </#if>

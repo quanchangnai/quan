@@ -1,6 +1,5 @@
 package quan.database;
 
-import com.sleepycat.je.Transaction;
 import org.pcollections.Empty;
 import org.pcollections.PMap;
 
@@ -12,7 +11,7 @@ import java.util.*;
 @SuppressWarnings({"unchecked"})
 public final class MapField<K, V> extends Node implements Map<K, V>, Field<PMap<K, V>> {
 
-    private PMap<K, V> data = Empty.map();
+    private PMap<K, V> map = Empty.map();
 
     public MapField(Data root) {
         _setRoot(root);
@@ -26,13 +25,17 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field<PMap<
         }
     }
 
-    public void setValue(PMap<K, V> data) {
-        this.data = data;
+    public void setValue(PMap<K, V> map) {
+        this.map = map;
     }
 
     @Override
     public PMap<K, V> getValue() {
-        return data;
+        FieldLog<PMap<K, V>> log = getLog(false);
+        if (log != null) {
+            return log.getValue();
+        }
+        return map;
     }
 
     @Override
@@ -60,18 +63,54 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field<PMap<
         return getValue().get(key);
     }
 
+    private FieldLog<PMap<K, V>> getLog(boolean add) {
+        Transaction transaction = Transaction.get(add);
+        if (transaction == null) {
+            return null;
+        }
+
+        FieldLog<PMap<K, V>> log = (FieldLog<PMap<K, V>>) transaction.getFieldLog(this);
+        if (add && log == null) {
+            log = new FieldLog<>(this, map);
+            transaction.addFieldLog(log);
+            transaction.addDataLog(_getRoot());
+        }
+
+        return log;
+    }
+
     @Override
     public V put(K key, V value) {
         Validations.validateMapKey(key);
         Validations.validateCollectionValue(value);
 
-        return null;
+        FieldLog<PMap<K, V>> log = getLog(true);
+
+        V oldValue = log.getValue().get(key);
+        log.setValue(log.getValue().plus(key, value));
+
+        if (value instanceof Entity) {
+            ((Entity) value)._setLogRoot(_getRoot());
+        }
+
+        if (oldValue instanceof Entity) {
+            ((Entity) oldValue)._setLogRoot(null);
+        }
+
+        return oldValue;
     }
 
     @Override
     public V remove(Object key) {
+        FieldLog<PMap<K, V>> log = getLog(true);
 
-        return null;
+        V value = log.getValue().get(key);
+        log.setValue(log.getValue().minus(key));
+
+        if (value instanceof Entity) {
+            ((Entity) value)._setLogRoot(null);
+        }
+        return value;
     }
 
     @Override
@@ -84,11 +123,30 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field<PMap<
             Validations.validateCollectionValue(value);
         }
 
+        FieldLog<PMap<K, V>> log = getLog(true);
+        PMap<K, V> oldMap = log.getValue();
+        log.setValue(oldMap.plusAll(m));
+
+        for (K key : m.keySet()) {
+            V newValue = m.get(key);
+            if (newValue instanceof Entity) {
+                ((Entity) newValue)._setLogRoot(_getRoot());
+            }
+            V oldValue = oldMap.get(key);
+            if (oldValue != newValue && oldValue instanceof Entity) {
+                ((Entity) oldValue)._setLogRoot(null);
+            }
+        }
     }
 
     @Override
     public void clear() {
-
+        FieldLog<PMap<K, V>> log = getLog(true);
+        if (log.getValue().isEmpty()) {
+            return;
+        }
+        _setChildrenLogRoot(null);
+        log.setValue(Empty.map());
     }
 
     private Set<K> keySet;
