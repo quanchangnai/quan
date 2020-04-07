@@ -6,5 +6,4 @@ package quan.database;
  */
 public abstract class Entity extends Node {
 
-
 }

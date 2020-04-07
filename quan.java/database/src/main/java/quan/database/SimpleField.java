@@ -15,7 +15,12 @@ public class SimpleField<V> implements Field<V> {
         this.value = value;
     }
 
+    @Override
     public V getValue() {
+        return value;
+    }
+
+    public V getLogValue() {
         Transaction transaction = Transaction.get();
         if (transaction != null) {
             FieldLog<V> log = (FieldLog<V>) transaction.getFieldLog(this);
@@ -49,7 +54,7 @@ public class SimpleField<V> implements Field<V> {
 
     @Override
     public String toString() {
-        return String.valueOf(getValue());
+        return String.valueOf(getLogValue());
     }
 
 }

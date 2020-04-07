@@ -9,11 +9,11 @@ import java.util.Objects;
 public class Validations {
 
     public static void validateMapKey(Object key) {
-        Objects.requireNonNull(key);
+        Objects.requireNonNull(key, "map的key不能为null");
     }
 
     public static void validateCollectionValue(Object value) {
-        Objects.requireNonNull(value);
+        Objects.requireNonNull(value, "list或者set的元素不能为null");
         if (value instanceof Entity) {
             validateEntityRoot((Entity) value);
         }
@@ -30,7 +30,7 @@ public class Validations {
     }
 
     public static void validateFieldValue(Object value) {
-        Objects.requireNonNull(value);
+        Objects.requireNonNull(value, "字段值不能为null");
     }
 
 }

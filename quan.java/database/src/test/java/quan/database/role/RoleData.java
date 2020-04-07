@@ -99,7 +99,12 @@ public class RoleData extends Data<Long> {
 
 
     public RoleData(Long id) {
-        this.id.setLogValue(id, _getRoot());
+        this.id.setValue(id);
+    }
+
+    @Override
+    public String _getName() {
+        return _NAME;
     }
 
     /**
@@ -361,42 +366,42 @@ public class RoleData extends Data<Long> {
                     case RoleData.ITEMS:
                         reader.readStartDocument();
                         while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
-                            value.items.put(reader.readInt32(), decoderContext.decodeWithChildContext(registry.get(ItemEntity.class), reader));
+                            value.items._put(reader.readInt32(), decoderContext.decodeWithChildContext(registry.get(ItemEntity.class), reader));
                         }
                         reader.readEndDocument();
                         break;
                     case RoleData.SET:
                         reader.readStartArray();
                         while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
-                            value.set.add(reader.readBoolean());
+                            value.set._add(reader.readBoolean());
                         }
                         reader.readEndArray();
                         break;
                     case RoleData.LIST:
                         reader.readStartArray();
                         while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
-                            value.list.add(reader.readString());
+                            value.list._add(reader.readString());
                         }
                         reader.readEndArray();
                         break;
                     case RoleData.MAP:
                         reader.readStartDocument();
                         while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
-                            value.map.put(reader.readInt32(), reader.readInt32());
+                            value.map._put(reader.readInt32(), reader.readInt32());
                         }
                         reader.readEndDocument();
                         break;
                     case RoleData.SET2:
                         reader.readStartArray();
                         while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
-                            value.set2.add(decoderContext.decodeWithChildContext(registry.get(ItemEntity.class), reader));
+                            value.set2._add(decoderContext.decodeWithChildContext(registry.get(ItemEntity.class), reader));
                         }
                         reader.readEndArray();
                         break;
                     case RoleData.LIST2:
                         reader.readStartArray();
                         while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
-                            value.list2.add(decoderContext.decodeWithChildContext(registry.get(ItemEntity.class), reader));
+                            value.list2._add(decoderContext.decodeWithChildContext(registry.get(ItemEntity.class), reader));
                         }
                         reader.readEndArray();
                         break;

@@ -7,19 +7,26 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.Sorts;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.BsonReader;
 import org.bson.BsonWriter;
 import org.bson.json.JsonReader;
 import org.bson.json.JsonWriter;
+import org.pcollections.Empty;
+import org.pcollections.PMap;
 import quan.database.item.ItemEntity;
+import quan.database.item.ItemEntity2;
 import quan.database.role.RoleData;
+import quan.database.role.RoleData2;
 
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by quanchangnai on 2020/4/1.
@@ -28,12 +35,14 @@ public class DatabaseTest {
 
     public static void main(String[] args) throws Exception {
 
+        testMongoClient();
+
 //        testWrite();
 //        testRead();
 
-        testMongoClient();
-
+//        testMap();
     }
+
 
     private static void testMongoClient() throws Exception {
         MongoClientSettings.Builder mongoClientSettings = MongoClientSettings.builder();
@@ -42,27 +51,60 @@ public class DatabaseTest {
         MongoClient mongoClient = MongoClients.create(mongoClientSettings.build());
 
         MongoDatabase testDatabase = mongoClient.getDatabase("test");
+
+//        Transaction.listenCommit(changes -> System.err.println("changes:" + changes));
+
+        for (int i = 0; i < 10; i++) {
+            System.err.println("=============" + i);
+            testMongoCollection1(testDatabase);
+            System.err.println();
+            testMongoCollection2(testDatabase);
+            System.err.println();
+        }
+
+
+        mongoClient.close();
+
+//        while (true) {
+//            Thread.sleep(10000);
+//        }
+    }
+
+    private static void testMongoCollection1(MongoDatabase testDatabase) {
+        long startTime = System.currentTimeMillis();
+        Transaction.execute(() -> {
+            doTestMongoCollection1(testDatabase);
+            return true;
+        });
+        System.err.println("testMongoCollection1 costTime:" + (System.currentTimeMillis() - startTime));
+    }
+
+    private static void doTestMongoCollection1(MongoDatabase testDatabase) {
+
+        System.err.println("testMongoCollection1 start===========");
         MongoCollection<RoleData> roleDataCollection = testDatabase.getCollection(RoleData._NAME, RoleData.class);
 
         long startTime, endTime;
 
         startTime = System.currentTimeMillis();
         RoleData roleDataMax = roleDataCollection.find().sort(Sorts.descending("_id")).first();
+        endTime = System.currentTimeMillis();
+        System.err.println("find costTime:" + (endTime - startTime));
+
         System.err.println("roleDataMax:" + roleDataMax);
+
         if (roleDataMax == null) {
             roleDataMax = new RoleData(1L);
             roleDataMax.setName("aaa");
         }
-        endTime = System.currentTimeMillis();
-        System.err.println("find costTime:" + (endTime - startTime));
 
-        RoleData roleData1 = new RoleData(111L);
         for (int i = 0; i < 20; i++) {
-            roleData1.getList().add("aaaaa" + i);
-            roleData1.getSet().add(true);
+            roleDataMax.getList().add("aaaaa" + i);
+            roleDataMax.getSet().add(i % 2 == 1);
         }
+
         startTime = System.currentTimeMillis();
-        UpdateResult updateResult = roleDataCollection.replaceOne(Filters.eq(111L), roleData1);
+        UpdateResult updateResult = roleDataCollection.replaceOne(Filters.eq(roleDataMax._getId()), roleDataMax, new ReplaceOptions().upsert(true));
         endTime = System.currentTimeMillis();
         System.err.println("replaceOne costTime:" + (endTime - startTime) + ",updateResult:" + updateResult);
 
@@ -92,12 +134,117 @@ public class DatabaseTest {
 
         endTime = System.currentTimeMillis();
         System.err.println("insertMany costTime:" + (endTime - startTime));
+    }
 
-        mongoClient.close();
+    private static void testMongoCollection2(MongoDatabase testDatabase) {
 
-//        while (true) {
-//            Thread.sleep(10000);
-//        }
+        long testMongoCollection2StartTime = System.currentTimeMillis();
+
+        System.err.println("testMongoCollection2 start===========");
+
+        MongoCollection<RoleData2> roleDataCollection2 = testDatabase.getCollection(RoleData2._NAME, RoleData2.class);
+
+        long startTime, endTime;
+
+        startTime = System.currentTimeMillis();
+        RoleData2 roleDataMax = roleDataCollection2.find().sort(Sorts.descending("_id")).first();
+        endTime = System.currentTimeMillis();
+        System.err.println("find costTime:" + (endTime - startTime));
+
+        System.err.println("roleDataMax:" + roleDataMax);
+
+        if (roleDataMax == null) {
+            roleDataMax = new RoleData2(1L);
+            roleDataMax.setName("aaa");
+        }
+
+        for (int i = 0; i < 20; i++) {
+            roleDataMax.getList().add("aaaaa" + i);
+            roleDataMax.getSet().add(i % 2 == 1);
+        }
+
+        startTime = System.currentTimeMillis();
+        UpdateResult updateResult = roleDataCollection2.replaceOne(Filters.eq(roleDataMax._getId()), roleDataMax, new ReplaceOptions().upsert(true));
+        endTime = System.currentTimeMillis();
+        System.err.println("replaceOne costTime:" + (endTime - startTime) + ",updateResult:" + updateResult);
+
+        roleDataCollection2.insertOne(new RoleData2(roleDataMax.getId() + 1));
+        roleDataCollection2.insertOne(new RoleData2(roleDataMax.getId() + 2));
+        roleDataCollection2.insertOne(new RoleData2(roleDataMax.getId() + 3));
+
+        startTime = System.currentTimeMillis();
+        List<RoleData2> roleDataList = new ArrayList<>();
+        for (long i = roleDataMax.getId() + 5; i < roleDataMax.getId() + 20; i++) {
+            RoleData2 roleData = new RoleData2(i);
+            roleData.setName("aaa" + i);
+            roleData.setItem(new ItemEntity2().setId((int) i).setName("item" + i));
+            for (long j = i; j < i + 200; j++) {
+                roleData.getList().add("s" + j);
+                roleData.getList2().add(new ItemEntity2().setId((int) i).setName("item2-" + i));
+            }
+            roleDataList.add(roleData);
+        }
+
+        endTime = System.currentTimeMillis();
+        System.err.println("roleDataList costTime:" + (endTime - startTime));
+
+        startTime = System.currentTimeMillis();
+
+        roleDataCollection2.insertMany(roleDataList);
+
+        endTime = System.currentTimeMillis();
+        System.err.println("insertMany costTime:" + (endTime - startTime));
+
+        System.err.println("testMongoCollection2 costTime:" + (System.currentTimeMillis() - testMongoCollection2StartTime));
+    }
+
+    private static void testMap() {
+        System.err.println("testMap()=================");
+        long startTime, endTime;
+
+        startTime = System.nanoTime();
+        Map<Integer, String> map1 = new HashMap<>();
+        for (int i = 0; i < 100; i++) {
+            map1.put(i, "map1_" + i);
+        }
+        endTime = System.nanoTime();
+        System.err.println("map1.put costTime:" + (endTime - startTime));
+
+        startTime = System.nanoTime();
+        PMap<Integer, String> map2 = Empty.map();
+        for (int i = 0; i < 90; i++) {
+            map2 = map2.plus(i, "map2_" + i);
+        }
+        endTime = System.nanoTime();
+        System.err.println("map2.plus1 costTime:" + (endTime - startTime));
+
+        startTime = System.nanoTime();
+        for (int i = 90; i < 100; i++) {
+            map2 = map2.plus(i, "map2_" + i);
+        }
+        endTime = System.nanoTime();
+        System.err.println("map2.plus2 costTime:" + (endTime - startTime));
+
+        startTime = System.nanoTime();
+        Map<Integer, String> map3 = new HashMap<>();
+        map3.putAll(map1);
+        endTime = System.nanoTime();
+        System.err.println("map3.putAll costTime:" + (endTime - startTime));
+
+        startTime = System.nanoTime();
+        for (Integer i : map1.keySet()) {
+            String s = map1.get(i);
+        }
+        endTime = System.nanoTime();
+        System.err.println("map1.for costTime:" + (endTime - startTime));
+
+        startTime = System.nanoTime();
+        for (Integer i : map2.keySet()) {
+            String s = map1.get(i);
+        }
+        endTime = System.nanoTime();
+        System.err.println("map2.for costTime:" + (endTime - startTime));
+
     }
 
     private static void testWrite() throws Exception {

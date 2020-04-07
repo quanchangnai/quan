@@ -57,7 +57,12 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
 <#if definitionType ==5>
 
     public ${name}(${idType} ${idName}) {
-        this.${idName}.setLogValue(${idName}, _getRoot());
+        this.${idName}.setValue(${idName});
+    }
+
+    @Override
+    public String _getName() {
+        return _NAME;
     }
 
     /**
@@ -211,11 +216,11 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
                         reader.readStartArray();
                         while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
                             <#if field.primitiveValueType>
-                            value.${field.name}.add(<#if convertTypes[field.type]??>(${field.basicType}) </#if>reader.read${basicTypes[field.valueType]}());
+                            value.${field.name}._add(<#if convertTypes[field.type]??>(${field.basicType}) </#if>reader.read${basicTypes[field.valueType]}());
                             <#elseif field.beanValueType>
-                            value.${field.name}.add(decoderContext.decodeWithChildContext(registry.get(${field.valueType}.class), reader));
+                            value.${field.name}._add(decoderContext.decodeWithChildContext(registry.get(${field.valueType}.class), reader));
                             <#else>
-                            value.${field.name}.add(reader.read${field.valueType?cap_first}());
+                            value.${field.name}._add(reader.read${field.valueType?cap_first}());
                             </#if>
                         }
                         reader.readEndArray();
@@ -223,9 +228,9 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
                         reader.readStartDocument();
                         while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
                             <#if field.primitiveValueType>
-                            value.${field.name}.put(<#if convertTypes[field.keyType]??>(${field.basicValueType}) </#if>reader.read${basicTypes[field.keyType]}(), <#if convertTypes[field.valueType]??>(${field.basicValueType})</#if>reader.read${basicTypes[field.valueType]}());
+                            value.${field.name}._put(<#if convertTypes[field.keyType]??>(${field.basicValueType}) </#if>reader.read${basicTypes[field.keyType]}(), <#if convertTypes[field.valueType]??>(${field.basicValueType})</#if>reader.read${basicTypes[field.valueType]}());
                             <#else>
-                            value.${field.name}.put(<#if convertTypes[field.keyType]??>(${field.basicValueType}) </#if>reader.read${basicTypes[field.keyType]}(), decoderContext.decodeWithChildContext(registry.get(${field.classValueType}.class), reader));
+                            value.${field.name}._put(<#if convertTypes[field.keyType]??>(${field.basicValueType}) </#if>reader.read${basicTypes[field.keyType]}(), decoderContext.decodeWithChildContext(registry.get(${field.classValueType}.class), reader));
                             </#if>
                         }
                         reader.readEndDocument();

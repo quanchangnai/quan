@@ -22,7 +22,7 @@ public final class SetField<E> extends Node implements Set<E>, Field<PSet<E>> {
 
     @Override
     public void _setChildrenLogRoot(Data root) {
-        for (E e : getValue()) {
+        for (E e : getLogValue()) {
             if (e instanceof Entity) {
                 ((Entity) e)._setLogRoot(root);
             }
@@ -36,6 +36,11 @@ public final class SetField<E> extends Node implements Set<E>, Field<PSet<E>> {
 
     @Override
     public PSet<E> getValue() {
+        return set;
+    }
+
+    @Override
+    public PSet<E> getLogValue() {
         FieldLog<PSet<E>> log = getLog(false);
         if (log != null) {
             return log.getValue();
@@ -45,53 +50,58 @@ public final class SetField<E> extends Node implements Set<E>, Field<PSet<E>> {
 
     @Override
     public int size() {
-        return getValue().size();
+        return getLogValue().size();
     }
 
     @Override
     public boolean isEmpty() {
-        return getValue().isEmpty();
+        return getLogValue().isEmpty();
     }
 
     @Override
     public boolean contains(Object o) {
-        return getValue().contains(o);
+        return getLogValue().contains(o);
+    }
+
+
+    private class It implements Iterator<E> {
+
+        private Iterator<E> it = getLogValue().iterator();
+
+        private E current;
+
+        @Override
+        public boolean hasNext() {
+            return it.hasNext();
+        }
+
+        @Override
+        public E next() {
+            return current = it.next();
+        }
+
+        @Override
+        public void remove() {
+            if (current == null) {
+                throw new IllegalStateException();
+            }
+            SetField.this.remove(current);
+        }
     }
 
     @Override
     public Iterator<E> iterator() {
-        return new Iterator<E>() {
-            private Iterator<E> it = getValue().iterator();
-            private E current;
-
-            @Override
-            public boolean hasNext() {
-                return it.hasNext();
-            }
-
-            @Override
-            public E next() {
-                return current = it.next();
-            }
-
-            @Override
-            public void remove() {
-                if (current == null) {
-                    throw new IllegalStateException();
-                }
-                SetField.this.remove(current);
-            }
-        };
+        return new It();
     }
 
     @Override
     public Object[] toArray() {
-        return getValue().toArray();
+        return getLogValue().toArray();
     }
 
     @Override
     public <T> T[] toArray(T[] a) {
-        return getValue().toArray(a);
+        return getLogValue().toArray(a);
     }
 
     private FieldLog<PSet<E>> getLog(boolean add) {
@@ -120,15 +130,32 @@ public final class SetField<E> extends Node implements Set<E>, Field<PSet<E>> {
         PSet<E> oldSet = log.getValue();
         PSet<E> newSet = oldSet.plus(e);
 
+        if (oldSet == newSet) {
+            return false;
+        }
+
+        log.setValue(newSet);
         if (e instanceof Entity) {
             ((Entity) e)._setLogRoot(_getRoot());
         }
 
-        if (oldSet != newSet) {
-            log.setValue(newSet);
-            return true;
+        return true;
+    }
+
+    public boolean _add(E e) {
+        Validations.validateCollectionValue(e);
+        PSet<E> oldSet = set;
+        set = set.plus(e);
+
+        if (oldSet == set) {
+            return false;
         }
-        return false;
+
+        if (e instanceof Entity) {
+            ((Entity) e)._setRoot(_getRoot());
+        }
+
+        return true;
     }
 
     @Override
@@ -138,22 +165,21 @@ public final class SetField<E> extends Node implements Set<E>, Field<PSet<E>> {
         PSet<E> oldSet = log.getValue();
         PSet<E> newSet = oldSet.minus(o);
 
-        for (E e : oldSet) {
-            if (e.equals(o) && e instanceof Entity) {
-                ((Entity) e)._setLogRoot(null);
-            }
+        if (oldSet == newSet) {
+            return false;
         }
 
-        if (oldSet != newSet) {
-            log.setValue(newSet);
-            return true;
+        log.setValue(newSet);
+        if (o instanceof Entity) {
+            ((Entity) o)._setLogRoot(null);
         }
-        return false;
+
+        return true;
     }
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        return getValue().containsAll(c);
+        return getLogValue().containsAll(c);
     }
 
     @Override
@@ -213,7 +239,7 @@ public final class SetField<E> extends Node implements Set<E>, Field<PSet<E>> {
 
     @Override
     public String toString() {
-        return String.valueOf(getValue());
+        return String.valueOf(getLogValue());
     }
 
 }

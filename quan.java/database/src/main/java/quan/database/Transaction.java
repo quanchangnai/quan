@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * 基于乐观锁的事务
@@ -41,17 +42,13 @@ public class Transaction {
     /**
      * 事务成功执行提交后的回调，不随事务结束而清除
      */
-    private static List<CommitListener> commitListeners = new ArrayList<>();
+    private static List<Consumer<Set<Data>>> listeners = new ArrayList<>();
 
     /**
-     * 事务执行成功之后需要执行的任务
+     * 事务执行结束之后再执行的特殊任务
      */
-    private List<Runnable> successTasks = new ArrayList<>();
+    private LinkedHashMap<Runnable, Boolean> endTasks = new LinkedHashMap<>();
 
-    /**
-     * 事务执行失败之后需要执行的任务
-     */
-    private List<Runnable> failedTasks = new ArrayList<>();
 
     public boolean isFailed() {
         return failed;
@@ -123,37 +120,30 @@ public class Transaction {
     /**
      * 结束当前事务
      */
-    private static void end(boolean failed) {
-        Transaction transaction = get(true);
-        Set<Data> changes = new LinkedHashSet<>();
+    private static void end(Transaction transaction) {
+        //清空当前线程持有的事务对象
+        threadLocal.set(null);
 
-        try {
-            transaction.failed = transaction.failed || failed;
-            if (!transaction.failed) {
-                transaction.commit();
-                changes.addAll(transaction.dataLogs);
-                changes = Collections.unmodifiableSet(changes);
+        //事务执行成功，提交事务
+        if (!transaction.failed) {
+            transaction.commit();
+        }
+
+        //执行事务结束后的特殊任务
+        for (Runnable task : transaction.endTasks.keySet()) {
+            if (transaction.failed != transaction.endTasks.get(task)) {
+                continue;
             }
-            transaction.clearLogs();
-        } finally {
-            threadLocal.set(null);
-            if (transaction.failed) {
-                executeAfterTasks(transaction.failedTasks);
-            } else {
-                for (CommitListener commitListener : commitListeners) {
-                    try {
-                        commitListener.onCommit(changes);
-                    } catch (Exception e) {
-                        logger.error("", e);
-                    }
-                }
-                executeAfterTasks(transaction.successTasks);
+            try {
+                task.run();
+            } catch (Exception e) {
+                logger.error("", e);
             }
         }
     }
 
     /**
-     * 打断事务,事务将失败回滚
+     * 打断事务,事务将失败回滚，但不会打印异常信息
      */
     public static void breakdown() {
         Transaction.get(true).failed = true;
@@ -192,30 +182,21 @@ public class Transaction {
             throw new IllegalStateException("当前已经在事务中了");
         }
 
-        Transaction.begin();
+        Transaction transaction = Transaction.begin();
         boolean failed = false;
 
         try {
-            failed = task.run();
+            failed = !task.run();
         } catch (Throwable e) {
             failed = true;
             if (!(e instanceof BreakdownException)) {
                 throw e;
             }
         } finally {
-            end(failed);
+            transaction.failed = transaction.failed || failed;
+            end(transaction);
         }
 
-    }
-
-
-    /**
-     * 清空当前事务日志，事务执行结束或者事务逻辑发生冲突时需要
-     */
-    private void clearLogs() {
-        dataLogs.clear();
-        fieldLogs.clear();
-        rootLogs.clear();
     }
 
     /**
@@ -229,37 +210,33 @@ public class Transaction {
             fieldLog.commit();
         }
 
-    }
-
-    private static void executeAfterTasks(List<Runnable> afterTasks) {
-        for (Runnable afterTask : afterTasks) {
+        Set<Data> changes = Collections.unmodifiableSet(dataLogs);
+        for (Consumer<Set<Data>> listener : listeners) {
             try {
-                afterTask.run();
+                listener.accept(changes);
             } catch (Exception e) {
                 logger.error("", e);
             }
         }
-        afterTasks.clear();
     }
-
-    public static void listenCommit(CommitListener listener) {
-        commitListeners.add(listener);
-    }
-
 
     /**
-     * 在事务执行完成之后执行的特殊任务 run task after commit
+     * 监听所有事务的提交事件
+     *
+     * @param listener 修改过的数据作为监听器的参数
+     */
+    public static void listen(Consumer<Set<Data>> listener) {
+        listeners.add(listener);
+    }
+
+    /**
+     * 在当前事务执行完成之后再执行特殊任务
      *
      * @param task      需要执行的任务
      * @param committed true:事务提交之后执行,false:事务回滚之后执行
      */
-    public static void runTaskAfterCommit(Runnable task, boolean committed) {
-        Transaction transaction = Transaction.get(true);
-        if (committed) {
-            transaction.successTasks.add(task);
-        } else {
-            transaction.failedTasks.add(task);
-        }
+    public static void run(Runnable task, boolean committed) {
+        Transaction.get(true).endTasks.put(task, committed);
     }
 
     /**
@@ -267,6 +244,5 @@ public class Transaction {
      */
     static class BreakdownException extends RuntimeException {
     }
-
 
 }

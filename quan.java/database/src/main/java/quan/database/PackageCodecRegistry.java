@@ -15,7 +15,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * 注册指定包名下面所有的编解码器
+ * 支持注册指定包名下面所有的编解码器的注册表
  * Created by quanchangnai on 2020/4/1.
  */
 public class PackageCodecRegistry implements CodecRegistry {

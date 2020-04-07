@@ -19,7 +19,7 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
 
     @Override
     public void _setChildrenLogRoot(Data root) {
-        for (E e : getValue()) {
+        for (E e : getLogValue()) {
             if (e instanceof Entity) {
                 ((Entity) e)._setLogRoot(root);
             }
@@ -33,6 +33,11 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
 
     @Override
     public PVector<E> getValue() {
+        return list;
+    }
+
+    @Override
+    public PVector<E> getLogValue() {
         ListLog<PVector<E>> log = getLog(false);
         if (log != null) {
             return log.getValue();
@@ -50,17 +55,17 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
 
     @Override
     public int size() {
-        return getValue().size();
+        return getLogValue().size();
     }
 
     @Override
     public boolean isEmpty() {
-        return getValue().isEmpty();
+        return getLogValue().isEmpty();
     }
 
     @Override
     public boolean contains(Object o) {
-        return getValue().contains(o);
+        return getLogValue().contains(o);
     }
 
 
@@ -125,12 +130,12 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
 
     @Override
     public Object[] toArray() {
-        return getValue().toArray();
+        return getLogValue().toArray();
     }
 
     @Override
     public <T> T[] toArray(T[] a) {
-        return getValue().toArray(a);
+        return getLogValue().toArray(a);
     }
 
     private ListLog<PVector<E>> getLog(boolean add) {
@@ -156,14 +161,24 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
 
         ListLog<PVector<E>> log = getLog(true);
         log.incModCount();
-        PVector<E> oldList = log.getValue();
-        log.setValue(log.getValue().plus(e));
 
+        log.setValue(log.getValue().plus(e));
         if (e instanceof Entity) {
             ((Entity) e)._setLogRoot(_getRoot());
         }
 
-        return oldList != log.getValue();
+        return true;
+    }
+
+    public boolean _add(E e) {
+        Validations.validateCollectionValue(e);
+
+        list = list.plus(e);
+        if (e instanceof Entity) {
+            ((Entity) e)._setRoot(_getRoot());
+        }
+
+        return true;
     }
 
     @Override
@@ -174,21 +189,20 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
         PVector<E> oldList = log.getValue();
         log.setValue(log.getValue().minus(o));
 
-        if (oldList != log.getValue()) {
-            for (E e : oldList) {
-                if (e.equals(o) && e instanceof Entity) {
-                    ((Entity) e)._setLogRoot(null);
-                    break;
-                }
-            }
-            return true;
+        if (oldList == log.getValue()) {
+            return false;
         }
-        return false;
+
+        if (o instanceof Entity) {
+            ((Entity) o)._setLogRoot(null);
+        }
+
+        return true;
     }
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        return getValue().containsAll(c);
+        return getLogValue().containsAll(c);
     }
 
     @Override
@@ -260,7 +274,7 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
 
     @Override
     public E get(int index) {
-        return getValue().get(index);
+        return getLogValue().get(index);
     }
 
     @Override
@@ -329,12 +343,12 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
 
     @Override
     public int indexOf(Object o) {
-        return getValue().indexOf(o);
+        return getLogValue().indexOf(o);
     }
 
     @Override
     public int lastIndexOf(Object o) {
-        return getValue().lastIndexOf(o);
+        return getLogValue().lastIndexOf(o);
     }
 
     private class ListIt extends It implements ListIterator<E> {
@@ -416,11 +430,11 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
 
     @Override
     public List<E> subList(int fromIndex, int toIndex) {
-        return getValue().subList(fromIndex, toIndex);
+        return getLogValue().subList(fromIndex, toIndex);
     }
 
     @Override
     public String toString() {
-        return String.valueOf(getValue());
+        return String.valueOf(getLogValue());
     }
 }

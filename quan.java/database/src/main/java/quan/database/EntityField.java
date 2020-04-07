@@ -21,7 +21,7 @@ public final class EntityField<V extends Entity> extends SimpleField<V> {
             transaction.addDataLog(root);
         }
 
-        V oldValue = getValue();
+        V oldValue = getLogValue();
         if (oldValue != null) {
             oldValue._setLogRoot(null);
         }

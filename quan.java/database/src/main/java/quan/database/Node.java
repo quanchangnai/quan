@@ -29,7 +29,7 @@ public abstract class Node {
     }
 
     protected void _setLogRoot(Data root) {
-        Transaction transaction = Transaction.get();
+        Transaction transaction = Transaction.get(true);
         RootLog rootLog = transaction.getRootLog(this);
         if (rootLog != null) {
             rootLog.setRoot(root);

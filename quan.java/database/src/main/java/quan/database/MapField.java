@@ -18,7 +18,7 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field<PMap<
     }
 
     public void _setChildrenLogRoot(Data root) {
-        for (V value : getValue().values()) {
+        for (V value : getLogValue().values()) {
             if (value instanceof Entity) {
                 ((Entity) value)._setLogRoot(root);
             }
@@ -31,6 +31,11 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field<PMap<
 
     @Override
     public PMap<K, V> getValue() {
+        return map;
+    }
+
+    @Override
+    public PMap<K, V> getLogValue() {
         FieldLog<PMap<K, V>> log = getLog(false);
         if (log != null) {
             return log.getValue();
@@ -40,27 +45,27 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field<PMap<
 
     @Override
     public int size() {
-        return getValue().size();
+        return getLogValue().size();
     }
 
     @Override
     public boolean isEmpty() {
-        return getValue().isEmpty();
+        return getLogValue().isEmpty();
     }
 
     @Override
     public boolean containsKey(Object key) {
-        return getValue().containsKey(key);
+        return getLogValue().containsKey(key);
     }
 
     @Override
     public boolean containsValue(Object value) {
-        return getValue().containsValue(value);
+        return getLogValue().containsValue(value);
     }
 
     @Override
     public V get(Object key) {
-        return getValue().get(key);
+        return getLogValue().get(key);
     }
 
     private FieldLog<PMap<K, V>> getLog(boolean add) {
@@ -95,6 +100,24 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field<PMap<
 
         if (oldValue instanceof Entity) {
             ((Entity) oldValue)._setLogRoot(null);
+        }
+
+        return oldValue;
+    }
+
+    public V _put(K key, V value) {
+        Validations.validateMapKey(key);
+        Validations.validateCollectionValue(value);
+
+        V oldValue = map.get(key);
+        map = map.plus(key, value);
+
+        if (value instanceof Entity) {
+            ((Entity) value)._setRoot(_getRoot());
+        }
+
+        if (oldValue instanceof Entity) {
+            ((Entity) oldValue)._setRoot(null);
         }
 
         return oldValue;
@@ -289,7 +312,9 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field<PMap<
                 @Override
                 public Iterator<Entry<K, V>> iterator() {
                     return new Iterator<Entry<K, V>>() {
-                        private Iterator<Entry<K, V>> it = getValue().entrySet().iterator();
+                        //entrySet iterator
+                        private Iterator<Entry<K, V>> it = getLogValue().entrySet().iterator();
+
                         private Entry<K, V> current;
 
                         @Override
@@ -309,6 +334,7 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field<PMap<
                         public Entry<K, V> next() {
                             return current = it.next();
                         }
+
                     };
                 }
 
@@ -319,6 +345,6 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field<PMap<
 
     @Override
     public String toString() {
-        return String.valueOf(getValue());
+        return String.valueOf(getLogValue());
     }
 }
