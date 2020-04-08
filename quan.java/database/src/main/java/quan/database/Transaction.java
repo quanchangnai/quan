@@ -58,23 +58,23 @@ public class Transaction {
     }
 
 
-    public void addDataLog(Data data) {
+    void addDataLog(Data data) {
         dataLogs.add(data);
     }
 
-    public void addFieldLog(FieldLog fieldLog) {
+    void addFieldLog(FieldLog fieldLog) {
         fieldLogs.put(fieldLog.getField(), fieldLog);
     }
 
-    public FieldLog getFieldLog(Field field) {
+    FieldLog getFieldLog(Field field) {
         return fieldLogs.get(field);
     }
 
-    public void addRootLog(RootLog rootLog) {
+    void addRootLog(RootLog rootLog) {
         rootLogs.put(rootLog.getNode(), rootLog);
     }
 
-    public RootLog getRootLog(Node node) {
+    RootLog getRootLog(Node node) {
         return rootLogs.get(node);
     }
 

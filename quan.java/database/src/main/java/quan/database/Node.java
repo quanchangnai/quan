@@ -6,7 +6,7 @@ import quan.database.log.RootLog;
  * 数据节点
  * Created by quanchangnai on 2019/6/24.
  */
-public abstract class Node {
+public abstract class Node extends LogAccessor {
 
     private Data root;
 
@@ -17,7 +17,7 @@ public abstract class Node {
     protected Data _getLogRoot() {
         Transaction transaction = Transaction.get();
         if (transaction != null) {
-            RootLog rootLog = transaction.getRootLog(this);
+            RootLog rootLog = _getRootLog(transaction, this);
             if (rootLog != null) {
                 return rootLog.getRoot();
             }
@@ -27,11 +27,11 @@ public abstract class Node {
 
     protected void _setLogRoot(Data root) {
         Transaction transaction = Transaction.get(true);
-        RootLog rootLog = transaction.getRootLog(this);
+        RootLog rootLog = _getRootLog(transaction, this);
         if (rootLog != null) {
             rootLog.setRoot(root);
         } else {
-            transaction.addRootLog(new RootLog(this, root));
+            _addRootLog(transaction, new RootLog(this, root));
         }
 
         _setChildrenLogRoot(root);

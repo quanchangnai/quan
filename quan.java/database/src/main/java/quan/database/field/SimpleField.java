@@ -1,15 +1,16 @@
 package quan.database.field;
 
 import quan.database.Data;
-import quan.database.log.FieldLog;
+import quan.database.LogAccessor;
 import quan.database.Transaction;
 import quan.database.Validations;
+import quan.database.log.FieldLog;
 
 /**
  * Created by quanchangnai on 2019/6/22.
  */
 @SuppressWarnings("unchecked")
-public class SimpleField<V> implements Field<V> {
+public class SimpleField<V> extends LogAccessor implements Field<V> {
 
     private V value;
 
@@ -25,7 +26,7 @@ public class SimpleField<V> implements Field<V> {
     public V getLogValue() {
         Transaction transaction = Transaction.get();
         if (transaction != null) {
-            FieldLog<V> log = (FieldLog<V>) transaction.getFieldLog(this);
+            FieldLog<V> log = (FieldLog<V>) _getFieldLog(transaction, this);
             if (log != null) {
                 return log.getValue();
             }
@@ -42,14 +43,14 @@ public class SimpleField<V> implements Field<V> {
 
         Transaction transaction = Transaction.get(true);
         if (root != null) {
-            transaction.addDataLog(root);
+            _addDataLog(transaction, root);
         }
 
-        FieldLog<V> log = (FieldLog<V>) transaction.getFieldLog(this);
+        FieldLog<V> log = (FieldLog<V>) _getFieldLog(transaction, this);
         if (log != null) {
             log.setValue(value);
         } else {
-            transaction.addFieldLog(new FieldLog<>(this, value));
+            _addFieldLog(transaction, new FieldLog<>(this, value));
         }
 
     }

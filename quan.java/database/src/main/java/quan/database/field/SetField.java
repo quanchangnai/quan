@@ -112,11 +112,11 @@ public final class SetField<E> extends Node implements Set<E>, Field<PSet<E>> {
             return null;
         }
 
-        FieldLog<PSet<E>> log = (FieldLog<PSet<E>>) transaction.getFieldLog(this);
+        FieldLog<PSet<E>> log = (FieldLog<PSet<E>>) _getFieldLog(transaction, this);
         if (add && log == null) {
             log = new FieldLog<>(this, set);
-            transaction.addFieldLog(log);
-            transaction.addDataLog(_getLogRoot());
+            _addFieldLog(transaction, log);
+            _addDataLog(transaction, _getLogRoot());
         }
 
         return log;

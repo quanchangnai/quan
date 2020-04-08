@@ -76,11 +76,11 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field<PMap<
             return null;
         }
 
-        FieldLog<PMap<K, V>> log = (FieldLog<PMap<K, V>>) transaction.getFieldLog(this);
+        FieldLog<PMap<K, V>> log = (FieldLog<PMap<K, V>>) _getFieldLog(transaction, this);
         if (add && log == null) {
             log = new FieldLog<>(this, map);
-            transaction.addFieldLog(log);
-            transaction.addDataLog(_getLogRoot());
+            _addFieldLog(transaction, log);
+            _addDataLog(transaction, _getLogRoot());
         }
 
         return log;

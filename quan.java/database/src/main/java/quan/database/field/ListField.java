@@ -146,11 +146,11 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
             return null;
         }
 
-        ListLog<PVector<E>> log = (ListLog<PVector<E>>) transaction.getFieldLog(this);
+        ListLog<PVector<E>> log = (ListLog<PVector<E>>) _getFieldLog(transaction, this);
         if (add && log == null) {
             log = new ListLog<>(this, list);
-            transaction.addFieldLog(log);
-            transaction.addDataLog(_getLogRoot());
+            _addFieldLog(transaction, log);
+            _addDataLog(transaction, _getLogRoot());
         }
 
         return log;

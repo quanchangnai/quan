@@ -24,7 +24,7 @@ public final class EntityField<V extends Entity> extends Node implements Field<V
     public V getLogValue() {
         Transaction transaction = Transaction.get();
         if (transaction != null) {
-            FieldLog<V> log = (FieldLog<V>) transaction.getFieldLog(this);
+            FieldLog<V> log = (FieldLog<V>) _getFieldLog(transaction, this);
             if (log != null) {
                 return log.getValue();
             }
@@ -41,18 +41,18 @@ public final class EntityField<V extends Entity> extends Node implements Field<V
         Validations.validateEntityRoot(value);
 
         Transaction transaction = Transaction.get(true);
-        transaction.addDataLog(_getLogRoot());
+        _addDataLog(transaction, _getLogRoot());
 
         V oldValue = getLogValue();
         if (oldValue != null) {
             _setLogRoot(oldValue, null);
         }
 
-        FieldLog<V> log = (FieldLog<V>) transaction.getFieldLog(this);
+        FieldLog<V> log = (FieldLog<V>) _getFieldLog(transaction, this);
         if (log != null) {
             log.setValue(value);
         } else {
-            transaction.addFieldLog(new FieldLog<>(this, value));
+            _addFieldLog(transaction, new FieldLog<>(this, value));
         }
 
         if (value != null) {
