@@ -5,6 +5,7 @@ import org.bson.*;
 import org.bson.codecs.*;
 import org.bson.codecs.configuration.CodecRegistry;
 import quan.database.*;
+import quan.database.field.*;
 
 /**
  * 道具<br/>
@@ -22,11 +23,11 @@ public class ItemEntity extends Entity {
 
 
     public int getId() {
-        return id.getValue();
+        return id.getLogValue();
     }
 
     public ItemEntity setId(int id) {
-        this.id.setLogValue(id, _getRoot());
+        this.id.setLogValue(id, _getLogRoot());
         return this;
     }
 
@@ -36,11 +37,11 @@ public class ItemEntity extends Entity {
     }
 
     public String getName() {
-        return name.getValue();
+        return name.getLogValue();
     }
 
     public ItemEntity setName(String name) {
-        this.name.setLogValue(name, _getRoot());
+        this.name.setLogValue(name, _getLogRoot());
         return this;
     }
 

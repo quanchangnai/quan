@@ -1,7 +1,9 @@
-package quan.database;
+package quan.database.field;
 
 import org.pcollections.Empty;
 import org.pcollections.PSet;
+import quan.database.*;
+import quan.database.log.FieldLog;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -24,7 +26,7 @@ public final class SetField<E> extends Node implements Set<E>, Field<PSet<E>> {
     public void _setChildrenLogRoot(Data root) {
         for (E e : getLogValue()) {
             if (e instanceof Entity) {
-                ((Entity) e)._setLogRoot(root);
+                _setLogRoot((Entity) e, root);
             }
         }
     }
@@ -114,7 +116,7 @@ public final class SetField<E> extends Node implements Set<E>, Field<PSet<E>> {
         if (add && log == null) {
             log = new FieldLog<>(this, set);
             transaction.addFieldLog(log);
-            transaction.addDataLog(_getRoot());
+            transaction.addDataLog(_getLogRoot());
         }
 
         return log;
@@ -136,7 +138,7 @@ public final class SetField<E> extends Node implements Set<E>, Field<PSet<E>> {
 
         log.setValue(newSet);
         if (e instanceof Entity) {
-            ((Entity) e)._setLogRoot(_getRoot());
+            _setLogRoot((Entity) e, _getLogRoot());
         }
 
         return true;
@@ -152,7 +154,7 @@ public final class SetField<E> extends Node implements Set<E>, Field<PSet<E>> {
         }
 
         if (e instanceof Entity) {
-            ((Entity) e)._setRoot(_getRoot());
+            _setLogRoot((Entity) e, _getLogRoot());
         }
 
         return true;
@@ -171,7 +173,7 @@ public final class SetField<E> extends Node implements Set<E>, Field<PSet<E>> {
 
         log.setValue(newSet);
         if (o instanceof Entity) {
-            ((Entity) o)._setLogRoot(null);
+            _setLogRoot((Entity) o, null);
         }
 
         return true;
@@ -195,7 +197,7 @@ public final class SetField<E> extends Node implements Set<E>, Field<PSet<E>> {
 
         for (E e : c) {
             if (e instanceof Entity) {
-                ((Entity) e)._setLogRoot(_getRoot());
+                _setLogRoot((Entity) e, _getLogRoot());
             }
         }
 

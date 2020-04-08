@@ -1,4 +1,9 @@
-package quan.database;
+package quan.database.field;
+
+import quan.database.Data;
+import quan.database.log.FieldLog;
+import quan.database.Transaction;
+import quan.database.Validations;
 
 /**
  * Created by quanchangnai on 2019/6/22.
@@ -7,9 +12,6 @@ package quan.database;
 public class SimpleField<V> implements Field<V> {
 
     private V value;
-
-    protected SimpleField() {
-    }
 
     public SimpleField(V value) {
         this.value = value;

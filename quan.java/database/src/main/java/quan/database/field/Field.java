@@ -1,4 +1,4 @@
-package quan.database;
+package quan.database.field;
 
 /**
  * 数据字段包装器

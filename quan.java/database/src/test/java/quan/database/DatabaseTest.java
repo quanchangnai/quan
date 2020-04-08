@@ -70,13 +70,15 @@ public class DatabaseTest {
 //        }
     }
 
+    private static final double timeBase = 1000000D;
+
     private static void testMongoCollection1(MongoDatabase testDatabase) {
-        long startTime = System.currentTimeMillis();
+        long startTime = System.nanoTime();
         Transaction.execute(() -> {
             doTestMongoCollection1(testDatabase);
             return true;
         });
-        System.err.println("testMongoCollection1 costTime:" + (System.currentTimeMillis() - startTime));
+        System.err.println("testMongoCollection1 costTime:" + (System.nanoTime() - startTime)/timeBase);
     }
 
     private static void doTestMongoCollection1(MongoDatabase testDatabase) {
@@ -86,10 +88,10 @@ public class DatabaseTest {
 
         long startTime, endTime;
 
-        startTime = System.currentTimeMillis();
+        startTime = System.nanoTime();
         RoleData roleDataMax = roleDataCollection.find().sort(Sorts.descending("_id")).first();
-        endTime = System.currentTimeMillis();
-        System.err.println("find costTime:" + (endTime - startTime));
+        endTime = System.nanoTime();
+        System.err.println("find costTime:" + (endTime - startTime)/timeBase);
 
         System.err.println("roleDataMax:" + roleDataMax);
 
@@ -103,42 +105,39 @@ public class DatabaseTest {
             roleDataMax.getSet().add(i % 2 == 1);
         }
 
-        startTime = System.currentTimeMillis();
+        startTime = System.nanoTime();
         UpdateResult updateResult = roleDataCollection.replaceOne(Filters.eq(roleDataMax._getId()), roleDataMax, new ReplaceOptions().upsert(true));
-        endTime = System.currentTimeMillis();
-        System.err.println("replaceOne costTime:" + (endTime - startTime) + ",updateResult:" + updateResult);
+        endTime = System.nanoTime();
+        System.err.println("replaceOne costTime:" + (endTime - startTime)/timeBase + ",updateResult:" + updateResult);
 
         roleDataCollection.insertOne(new RoleData(roleDataMax.getId() + 1));
         roleDataCollection.insertOne(new RoleData(roleDataMax.getId() + 2));
         roleDataCollection.insertOne(new RoleData(roleDataMax.getId() + 3));
 
-        startTime = System.currentTimeMillis();
+        startTime = System.nanoTime();
         List<RoleData> roleDataList = new ArrayList<>();
         for (long i = roleDataMax.getId() + 5; i < roleDataMax.getId() + 20; i++) {
             RoleData roleData = new RoleData(i);
             roleData.setName("aaa" + i);
             roleData.setItem(new ItemEntity().setId((int) i).setName("item" + i));
-            for (long j = i; j < i + 200; j++) {
+            for (long j = i; j < i + 20; j++) {
                 roleData.getList().add("s" + j);
                 roleData.getList2().add(new ItemEntity().setId((int) i).setName("item2-" + i));
             }
             roleDataList.add(roleData);
         }
+        endTime = System.nanoTime();
+        System.err.println("roleDataList costTime:" + (endTime - startTime)/timeBase);
 
-        endTime = System.currentTimeMillis();
-        System.err.println("roleDataList costTime:" + (endTime - startTime));
-
-        startTime = System.currentTimeMillis();
-
+        startTime = System.nanoTime();
         roleDataCollection.insertMany(roleDataList);
-
-        endTime = System.currentTimeMillis();
-        System.err.println("insertMany costTime:" + (endTime - startTime));
+        endTime = System.nanoTime();
+        System.err.println("insertMany costTime:" + (endTime - startTime)/timeBase);
     }
 
     private static void testMongoCollection2(MongoDatabase testDatabase) {
 
-        long testMongoCollection2StartTime = System.currentTimeMillis();
+        long testMongoCollection2StartTime = System.nanoTime();
 
         System.err.println("testMongoCollection2 start===========");
 
@@ -146,10 +145,10 @@ public class DatabaseTest {
 
         long startTime, endTime;
 
-        startTime = System.currentTimeMillis();
+        startTime = System.nanoTime();
         RoleData2 roleDataMax = roleDataCollection2.find().sort(Sorts.descending("_id")).first();
-        endTime = System.currentTimeMillis();
-        System.err.println("find costTime:" + (endTime - startTime));
+        endTime = System.nanoTime();
+        System.err.println("find costTime:" + (endTime - startTime)/timeBase);
 
         System.err.println("roleDataMax:" + roleDataMax);
 
@@ -163,39 +162,36 @@ public class DatabaseTest {
             roleDataMax.getSet().add(i % 2 == 1);
         }
 
-        startTime = System.currentTimeMillis();
+        startTime = System.nanoTime();
         UpdateResult updateResult = roleDataCollection2.replaceOne(Filters.eq(roleDataMax._getId()), roleDataMax, new ReplaceOptions().upsert(true));
-        endTime = System.currentTimeMillis();
-        System.err.println("replaceOne costTime:" + (endTime - startTime) + ",updateResult:" + updateResult);
+        endTime = System.nanoTime();
+        System.err.println("replaceOne costTime:" + (endTime - startTime)/timeBase + ",updateResult:" + updateResult);
 
         roleDataCollection2.insertOne(new RoleData2(roleDataMax.getId() + 1));
         roleDataCollection2.insertOne(new RoleData2(roleDataMax.getId() + 2));
         roleDataCollection2.insertOne(new RoleData2(roleDataMax.getId() + 3));
 
-        startTime = System.currentTimeMillis();
+        startTime = System.nanoTime();
         List<RoleData2> roleDataList = new ArrayList<>();
         for (long i = roleDataMax.getId() + 5; i < roleDataMax.getId() + 20; i++) {
             RoleData2 roleData = new RoleData2(i);
             roleData.setName("aaa" + i);
             roleData.setItem(new ItemEntity2().setId((int) i).setName("item" + i));
-            for (long j = i; j < i + 200; j++) {
+            for (long j = i; j < i + 20; j++) {
                 roleData.getList().add("s" + j);
                 roleData.getList2().add(new ItemEntity2().setId((int) i).setName("item2-" + i));
             }
             roleDataList.add(roleData);
         }
+        endTime = System.nanoTime();
+        System.err.println("roleDataList costTime:" + (endTime - startTime)/timeBase);
 
-        endTime = System.currentTimeMillis();
-        System.err.println("roleDataList costTime:" + (endTime - startTime));
-
-        startTime = System.currentTimeMillis();
-
+        startTime = System.nanoTime();
         roleDataCollection2.insertMany(roleDataList);
+        endTime = System.nanoTime();
+        System.err.println("insertMany costTime:" + (endTime - startTime)/timeBase);
 
-        endTime = System.currentTimeMillis();
-        System.err.println("insertMany costTime:" + (endTime - startTime));
-
-        System.err.println("testMongoCollection2 costTime:" + (System.currentTimeMillis() - testMongoCollection2StartTime));
+        System.err.println("testMongoCollection2 costTime:" + (System.nanoTime() - testMongoCollection2StartTime)/timeBase);
     }
 
     private static void testMap() {

@@ -36,8 +36,8 @@ public abstract class ConfigGenerator extends Generator {
     public ConfigGenerator() {
     }
 
-    public ConfigGenerator(Properties properties) {
-        super(properties);
+    public ConfigGenerator(Properties options) {
+        super(options);
     }
 
     public void setTableType(String tableType) {

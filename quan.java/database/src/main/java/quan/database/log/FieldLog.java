@@ -1,4 +1,6 @@
-package quan.database;
+package quan.database.log;
+
+import quan.database.field.Field;
 
 /**
  * 记录字段值

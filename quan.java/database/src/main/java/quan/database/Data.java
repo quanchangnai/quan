@@ -1,7 +1,7 @@
 package quan.database;
 
 /**
- * 数据
+ * 数据，对应表中的一行
  * Created by quanchangnai on 2019/5/16.
  */
 public abstract class Data<I> extends Entity {
@@ -11,13 +11,14 @@ public abstract class Data<I> extends Entity {
      */
     public static final String _ID = "_id";
 
+
     @Override
-    protected final Data<I> _getRoot() {
+    protected final Data<I> _getLogRoot() {
         return this;
     }
 
     /**
-     * 数据的表名，对应MongoDB的集合名
+     * 数据对应的表名
      */
     public abstract String _getName();
 

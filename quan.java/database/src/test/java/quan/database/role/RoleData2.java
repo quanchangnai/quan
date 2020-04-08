@@ -16,7 +16,7 @@ import java.util.*;
  */
 public class RoleData2 {
 
-    public static final String _NAME = "role_data";
+    public static final String _NAME = "role_data2";
 
     /**
      * 角色ID
@@ -281,7 +281,7 @@ public class RoleData2 {
 
     @Override
     public String toString() {
-        return "RoleData{" +
+        return "RoleData2{" +
                 "id=" + id +
                 ",name='" + name + '\'' +
                 ",roleType=" + RoleType.valueOf(roleType) +

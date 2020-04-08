@@ -1,4 +1,6 @@
-package quan.database;
+package quan.database.log;
+
+import quan.database.field.Field;
 
 /**
  * Created by quanchangnai on 2019/8/29.

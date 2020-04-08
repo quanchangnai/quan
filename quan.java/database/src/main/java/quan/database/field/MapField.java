@@ -1,7 +1,9 @@
-package quan.database;
+package quan.database.field;
 
 import org.pcollections.Empty;
 import org.pcollections.PMap;
+import quan.database.*;
+import quan.database.log.FieldLog;
 
 import java.util.*;
 
@@ -20,7 +22,7 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field<PMap<
     public void _setChildrenLogRoot(Data root) {
         for (V value : getLogValue().values()) {
             if (value instanceof Entity) {
-                ((Entity) value)._setLogRoot(root);
+                _setLogRoot((Entity) value, _getLogRoot());
             }
         }
     }
@@ -78,7 +80,7 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field<PMap<
         if (add && log == null) {
             log = new FieldLog<>(this, map);
             transaction.addFieldLog(log);
-            transaction.addDataLog(_getRoot());
+            transaction.addDataLog(_getLogRoot());
         }
 
         return log;
@@ -95,11 +97,11 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field<PMap<
         log.setValue(log.getValue().plus(key, value));
 
         if (value instanceof Entity) {
-            ((Entity) value)._setLogRoot(_getRoot());
+            _setLogRoot((Entity) value, _getLogRoot());
         }
 
         if (oldValue instanceof Entity) {
-            ((Entity) oldValue)._setLogRoot(null);
+            _setLogRoot((Entity) oldValue, null);
         }
 
         return oldValue;
@@ -113,11 +115,11 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field<PMap<
         map = map.plus(key, value);
 
         if (value instanceof Entity) {
-            ((Entity) value)._setRoot(_getRoot());
+            _setLogRoot((Entity) value, _getLogRoot());
         }
 
         if (oldValue instanceof Entity) {
-            ((Entity) oldValue)._setRoot(null);
+            _setLogRoot((Entity) oldValue, null);
         }
 
         return oldValue;
@@ -131,7 +133,7 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field<PMap<
         log.setValue(log.getValue().minus(key));
 
         if (value instanceof Entity) {
-            ((Entity) value)._setLogRoot(null);
+            _setLogRoot((Entity) value, null);
         }
         return value;
     }
@@ -153,11 +155,11 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field<PMap<
         for (K key : m.keySet()) {
             V newValue = m.get(key);
             if (newValue instanceof Entity) {
-                ((Entity) newValue)._setLogRoot(_getRoot());
+                _setLogRoot((Entity) newValue, _getLogRoot());
             }
             V oldValue = oldMap.get(key);
             if (oldValue != newValue && oldValue instanceof Entity) {
-                ((Entity) oldValue)._setLogRoot(null);
+                _setLogRoot((Entity) oldValue, null);
             }
         }
     }

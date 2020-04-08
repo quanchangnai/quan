@@ -1,7 +1,6 @@
 package quan.database;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import quan.database.log.RootLog;
 
 /**
  * 数据节点
@@ -9,11 +8,13 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class Node {
 
-    protected Logger logger = LoggerFactory.getLogger(getClass());
-
     private Data root;
 
-    protected Data _getRoot() {
+    protected void _setRoot(Data root) {
+        this.root = root;
+    }
+
+    protected Data _getLogRoot() {
         Transaction transaction = Transaction.get();
         if (transaction != null) {
             RootLog rootLog = transaction.getRootLog(this);
@@ -22,10 +23,6 @@ public abstract class Node {
             }
         }
         return root;
-    }
-
-    protected void _setRoot(Data root) {
-        this.root = root;
     }
 
     protected void _setLogRoot(Data root) {
@@ -45,5 +42,14 @@ public abstract class Node {
     }
 
     protected abstract void _setChildrenLogRoot(Data root);
+
+
+    public abstract static class Setter {
+
+        protected static void _setRoot(Node node, Data root) {
+            node._setRoot(root);
+        }
+
+    }
 
 }

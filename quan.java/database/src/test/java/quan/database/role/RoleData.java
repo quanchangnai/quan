@@ -5,6 +5,7 @@ import org.bson.*;
 import org.bson.codecs.*;
 import org.bson.codecs.configuration.CodecRegistry;
 import quan.database.*;
+import quan.database.field.*;
 import quan.database.item.ItemEntity;
 
 /**
@@ -81,21 +82,21 @@ public class RoleData extends Data<Long> {
 
     private SimpleField<Double> d = new SimpleField<>(0D);
 
-    private EntityField<ItemEntity> item = new EntityField<>();
+    private EntityField<ItemEntity> item = new EntityField<>(_getLogRoot());
 
-    private MapField<Integer, ItemEntity> items = new MapField<>(_getRoot());
+    private MapField<Integer, ItemEntity> items = new MapField<>(_getLogRoot());
 
-    private SetField<Boolean> set = new SetField<>(_getRoot());
+    private SetField<Boolean> set = new SetField<>(_getLogRoot());
 
-    private ListField<String> list = new ListField<>(_getRoot());
+    private ListField<String> list = new ListField<>(_getLogRoot());
 
-    private MapField<Integer, Integer> map = new MapField<>(_getRoot());
+    private MapField<Integer, Integer> map = new MapField<>(_getLogRoot());
 
-    private SetField<ItemEntity> set2 = new SetField<>(_getRoot());
+    private SetField<ItemEntity> set2 = new SetField<>(_getLogRoot());
 
-    private ListField<ItemEntity> list2 = new ListField<>(_getRoot());
+    private ListField<ItemEntity> list2 = new ListField<>(_getLogRoot());
 
-    private MapField<Integer, ItemEntity> map2 = new MapField<>(_getRoot());
+    private MapField<Integer, ItemEntity> map2 = new MapField<>(_getLogRoot());
 
 
     public RoleData(Long id) {
@@ -123,11 +124,11 @@ public class RoleData extends Data<Long> {
     }
 
     public String getName() {
-        return name.getValue();
+        return name.getLogValue();
     }
 
     public RoleData setName(String name) {
-        this.name.setLogValue(name, _getRoot());
+        this.name.setLogValue(name, _getLogRoot());
         return this;
     }
 
@@ -135,23 +136,23 @@ public class RoleData extends Data<Long> {
      * 角色类型
      */
     public RoleType getRoleType() {
-        return RoleType.valueOf(roleType.getValue());
+        return RoleType.valueOf(roleType.getLogValue());
     }
 
     /**
      * 角色类型
      */
     public RoleData setRoleType(RoleType roleType) {
-        this.roleType.setLogValue(roleType.value(), _getRoot());
+        this.roleType.setLogValue(roleType.value(), _getLogRoot());
         return this;
     }
 
     public boolean getB() {
-        return b.getValue();
+        return b.getLogValue();
     }
 
     public RoleData setB(boolean b) {
-        this.b.setLogValue(b, _getRoot());
+        this.b.setLogValue(b, _getLogRoot());
         return this;
     }
 
@@ -159,14 +160,14 @@ public class RoleData extends Data<Long> {
      * sssss
      */
     public short getS() {
-        return s.getValue();
+        return s.getLogValue();
     }
 
     /**
      * sssss
      */
     public RoleData setS(short s) {
-        this.s.setLogValue(s, _getRoot());
+        this.s.setLogValue(s, _getLogRoot());
         return this;
     }
 
@@ -182,14 +183,14 @@ public class RoleData extends Data<Long> {
      * iiii
      */
     public int getI() {
-        return i.getValue();
+        return i.getLogValue();
     }
 
     /**
      * iiii
      */
     public RoleData setI(int i) {
-        this.i.setLogValue(i, _getRoot());
+        this.i.setLogValue(i, _getLogRoot());
         return this;
     }
 
@@ -205,14 +206,14 @@ public class RoleData extends Data<Long> {
      * ffff
      */
     public float getF() {
-        return f.getValue();
+        return f.getLogValue();
     }
 
     /**
      * ffff
      */
     public RoleData setF(float f) {
-        this.f.setLogValue(f, _getRoot());
+        this.f.setLogValue(f, _getLogRoot());
         return this;
     }
 
@@ -225,11 +226,11 @@ public class RoleData extends Data<Long> {
     }
 
     public double getD() {
-        return d.getValue();
+        return d.getLogValue();
     }
 
     public RoleData setD(double d) {
-        this.d.setLogValue(d, _getRoot());
+        this.d.setLogValue(d, _getLogRoot());
         return this;
     }
 
@@ -242,14 +243,14 @@ public class RoleData extends Data<Long> {
      * 道具
      */
     public ItemEntity getItem() {
-        return item.getValue();
+        return item.getLogValue();
     }
 
     /**
      * 道具
      */
     public RoleData setItem(ItemEntity item) {
-        this.item.setLogValue(item, _getRoot());
+        this.item.setLogValue(item);
         return this;
     }
 
@@ -283,11 +284,7 @@ public class RoleData extends Data<Long> {
 
     @Override
     protected void _setChildrenLogRoot(Data root) {
-        ItemEntity $item = this.item.getValue();
-        if ($item != null) {
-            _setLogRoot($item, root);
-        }
-
+        _setLogRoot(item, root);
         _setLogRoot(items, root);
         _setLogRoot(set, root);
         _setLogRoot(list, root);

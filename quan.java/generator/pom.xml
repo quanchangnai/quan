@@ -11,8 +11,13 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>generator</artifactId>
 
-    <build>
+    <properties>
         <finalName>quan-generator</finalName>
+        <mainClass>quan.generator.Generator</mainClass>
+    </properties>
+
+    <build>
+        <finalName>${finalName}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -20,10 +25,10 @@
                 <version>3.2.2</version>
                 <executions>
                     <execution>
-                        <phase>package</phase>
                         <goals>
                             <goal>shade</goal>
                         </goals>
+                        <phase>package</phase>
                     </execution>
                 </executions>
                 <configuration>
@@ -31,9 +36,31 @@
                     <shadedArtifactAttached>false</shadedArtifactAttached>
                     <transformers>
                         <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                            <mainClass>quan.generator.Generator</mainClass>
+                            <mainClass>${mainClass}</mainClass>
                         </transformer>
                     </transformers>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.graalvm.nativeimage</groupId>
+                <artifactId>native-image-maven-plugin</artifactId>
+                <version>20.0.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>native-image</goal>
+                        </goals>
+                        <phase>package</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <skip>true</skip>
+                    <imageName>${finalName}</imageName>
+                    <mainClass>${mainClass}</mainClass>
+                    <buildArgs>
+                        --no-fallback
+                    </buildArgs>
                 </configuration>
             </plugin>
         </plugins>
@@ -59,6 +86,12 @@
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
             <version>2.3.29</version>
+        </dependency>
+        <dependency>
+            <groupId>org.graalvm.sdk</groupId>
+            <artifactId>graal-sdk</artifactId>
+            <version>20.0.0</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

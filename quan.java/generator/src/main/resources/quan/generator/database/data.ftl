@@ -5,6 +5,7 @@ import org.bson.*;
 import org.bson.codecs.*;
 import org.bson.codecs.configuration.CodecRegistry;
 import quan.database.*;
+import quan.database.field.*;
 <#list imports as import>
 import ${import};
 </#list>
@@ -32,9 +33,9 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
 
 <#list fields as field>
     <#if field.type == "set" || field.type == "list">
-    private ${field.classType}<${field.classValueType}> ${field.name} = new ${field.classType}<>(_getRoot());
+    private ${field.classType}<${field.classValueType}> ${field.name} = new ${field.classType}<>(_getLogRoot());
     <#elseif field.type == "map">
-    private ${field.classType}<${field.classKeyType}, ${field.classValueType}> ${field.name} = new ${field.classType}<>(_getRoot());
+    private ${field.classType}<${field.classKeyType}, ${field.classValueType}> ${field.name} = new ${field.classType}<>(_getLogRoot());
     <#elseif field.type = "string">
     private SimpleField<${field.classType}> ${field.name} = new SimpleField<>("");
     <#elseif field.type = "short">
@@ -50,7 +51,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
     <#elseif field.type = "bool">
     private SimpleField<${field.classType}> ${field.name} = new SimpleField<>(false);
     <#else>
-    private EntityField<${field.classType}> ${field.name} = new EntityField<>();
+    private EntityField<${field.classType}> ${field.name} = new EntityField<>(_getLogRoot());
     </#if>
 
 </#list>
@@ -97,7 +98,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
 
     <#elseif field.enumType>
     public ${field.type} get${field.name?cap_first}() {
-        return ${field.type}.valueOf(${field.name}.getValue());
+        return ${field.type}.valueOf(${field.name}.getLogValue());
     }
 
     <#if field.comment !="">
@@ -106,13 +107,13 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
      */
     </#if>
     public ${name} set${field.name?cap_first}(${field.basicType} ${field.name}) {
-        this.${field.name}.setLogValue(${field.name}.value(), _getRoot());
+        this.${field.name}.setLogValue(${field.name}.value(), _getLogRoot());
         return this;
     }
 
     <#else>
     public ${field.basicType} get${field.name?cap_first}() {
-        return ${field.name}.getValue();
+        return ${field.name}.getLogValue();
     }
 
     <#if field.comment !="">
@@ -121,7 +122,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
      */
     </#if>
     public ${name} set${field.name?cap_first}(${field.basicType} ${field.name}) {
-        this.${field.name}.setLogValue(${field.name}, _getRoot());
+        this.${field.name}.setLogValue(${field.name}<#if !field.beanType>, _getLogRoot()</#if>);
         return this;
     }
         <#if field.numberType>
@@ -142,17 +143,8 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
     @Override
     protected void _setChildrenLogRoot(Data root) {
 <#list fields as field>
-    <#if field.collectionType>
+    <#if field.collectionType || field.beanType>
         _setLogRoot(${field.name}, root);
-    <#elseif !field.builtinType && !field.enumType>
-        <#if field_index gt 0 && fields[field_index-1].collectionType>
-
-        </#if>
-        ${field.type} $${field.name} = this.${field.name}.getValue();
-        if ($${field.name} != null) {
-            _setLogRoot($${field.name}, root);
-        }
-
     </#if>
 </#list>
     }

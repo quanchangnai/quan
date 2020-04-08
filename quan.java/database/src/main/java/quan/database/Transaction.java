@@ -2,12 +2,15 @@ package quan.database;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import quan.database.field.Field;
+import quan.database.log.FieldLog;
+import quan.database.log.RootLog;
 
 import java.util.*;
 import java.util.function.Consumer;
 
 /**
- * 基于乐观锁的事务
+ * 事务实现，底层仅支持单线程，多线程并发时需要自己加锁，否则隔离级别就是读已提交
  * Created by quanchangnai on 2019/5/16.
  */
 public class Transaction {

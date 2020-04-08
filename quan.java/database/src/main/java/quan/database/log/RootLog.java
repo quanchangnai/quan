@@ -1,10 +1,13 @@
-package quan.database;
+package quan.database.log;
+
+import quan.database.Data;
+import quan.database.Node;
 
 /**
  * 记录节点的根
  * Created by quanchangnai on 2019/5/17.
  */
-public class RootLog {
+public class RootLog extends Node.Setter {
 
     private Node node;
 
@@ -29,7 +32,7 @@ public class RootLog {
     }
 
     public void commit() {
-        node._setRoot(root);
+        _setRoot(node, root);
     }
 
 }

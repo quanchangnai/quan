@@ -1,7 +1,9 @@
-package quan.database;
+package quan.database.field;
 
 import org.pcollections.Empty;
 import org.pcollections.PVector;
+import quan.database.*;
+import quan.database.log.ListLog;
 
 import java.util.*;
 
@@ -21,7 +23,7 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
     public void _setChildrenLogRoot(Data root) {
         for (E e : getLogValue()) {
             if (e instanceof Entity) {
-                ((Entity) e)._setLogRoot(root);
+                _setLogRoot((Entity) e, root);
             }
         }
     }
@@ -148,7 +150,7 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
         if (add && log == null) {
             log = new ListLog<>(this, list);
             transaction.addFieldLog(log);
-            transaction.addDataLog(_getRoot());
+            transaction.addDataLog(_getLogRoot());
         }
 
         return log;
@@ -164,7 +166,7 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
 
         log.setValue(log.getValue().plus(e));
         if (e instanceof Entity) {
-            ((Entity) e)._setLogRoot(_getRoot());
+            _setLogRoot((Entity) e, _getLogRoot());
         }
 
         return true;
@@ -175,7 +177,7 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
 
         list = list.plus(e);
         if (e instanceof Entity) {
-            ((Entity) e)._setRoot(_getRoot());
+            _setLogRoot((Entity) e, _getLogRoot());
         }
 
         return true;
@@ -194,7 +196,7 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
         }
 
         if (o instanceof Entity) {
-            ((Entity) o)._setLogRoot(null);
+            _setLogRoot((Entity) o, null);
         }
 
         return true;
@@ -219,7 +221,7 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
 
         for (E e : c) {
             if (e instanceof Entity) {
-                ((Entity) e)._setLogRoot(_getRoot());
+                _setLogRoot((Entity) e, _getLogRoot());
             }
         }
 
@@ -241,7 +243,7 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
 
         for (E e : c) {
             if (e instanceof Entity) {
-                ((Entity) e)._setLogRoot(_getRoot());
+                _setLogRoot((Entity) e, _getLogRoot());
             }
         }
 
@@ -301,12 +303,12 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
         log.setValue(log.getValue().with(index, e));
 
         if (e instanceof Entity) {
-            ((Entity) e)._setLogRoot(_getRoot());
+            _setLogRoot((Entity) e, _getLogRoot());
         }
 
         E old = oldList.get(index);
         if (old instanceof Entity) {
-            ((Entity) old)._setLogRoot(null);
+            _setLogRoot((Entity) e, null);
         }
 
         return old;
@@ -321,7 +323,7 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
         log.setValue(log.getValue().plus(index, e));
 
         if (e instanceof Entity) {
-            ((Entity) e)._setLogRoot(_getRoot());
+            _setLogRoot((Entity) e, _getLogRoot());
         }
     }
 
@@ -335,7 +337,7 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
 
         E old = oldList.get(index);
         if (old instanceof Entity) {
-            ((Entity) old)._setLogRoot(null);
+            _setLogRoot((Entity) old, null);
         }
 
         return old;
