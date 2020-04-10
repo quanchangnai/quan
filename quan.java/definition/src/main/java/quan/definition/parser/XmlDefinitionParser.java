@@ -31,8 +31,7 @@ public class XmlDefinitionParser extends DefinitionParser {
     protected void parseClasses(File definitionFile) {
         Element rootElement;
         try (InputStreamReader definitionReader = new InputStreamReader(new FileInputStream(definitionFile), definitionFileEncoding)) {
-            SAXReader saxReader = new SAXReader();
-            rootElement = saxReader.read(definitionReader).getRootElement();
+            rootElement = new SAXReader().read(definitionReader).getRootElement();
             if (rootElement == null || !rootElement.getName().equals("package")) {
                 return;
             }
