@@ -27,7 +27,7 @@ public abstract class DefinitionParser {
 
     protected String enumPackagePrefix;
 
-    protected String definitionCharEncoding = Charset.defaultCharset().name();
+    protected String definitionFileEncoding = Charset.defaultCharset().name();
 
     private LinkedHashSet<String> definitionPaths = new LinkedHashSet<>();
 
@@ -57,9 +57,9 @@ public abstract class DefinitionParser {
         return category;
     }
 
-    public void setDefinitionCharEncoding(String definitionCharEncoding) {
-        if (!StringUtils.isBlank(definitionCharEncoding)) {
-            this.definitionCharEncoding = definitionCharEncoding;
+    public void setDefinitionFileEncoding(String definitionFileEncoding) {
+        if (!StringUtils.isBlank(definitionFileEncoding)) {
+            this.definitionFileEncoding = definitionFileEncoding;
         }
     }
 
