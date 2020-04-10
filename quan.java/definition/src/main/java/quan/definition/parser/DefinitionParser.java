@@ -11,6 +11,7 @@ import quan.definition.config.ConfigDefinition;
 import quan.definition.message.MessageHeadDefinition;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.util.*;
 
 /**
@@ -25,6 +26,8 @@ public abstract class DefinitionParser {
     protected String packagePrefix;
 
     protected String enumPackagePrefix;
+
+    protected String definitionCharEncoding = Charset.defaultCharset().name();
 
     private LinkedHashSet<String> definitionPaths = new LinkedHashSet<>();
 
@@ -52,6 +55,12 @@ public abstract class DefinitionParser {
 
     public Category getCategory() {
         return category;
+    }
+
+    public void setDefinitionCharEncoding(String definitionCharEncoding) {
+        if (!StringUtils.isBlank(definitionCharEncoding)) {
+            this.definitionCharEncoding = definitionCharEncoding;
+        }
     }
 
     public void setDefinitionPaths(Collection<String> definitionPaths) {

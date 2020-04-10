@@ -1,7 +1,7 @@
 package quan.definition.parser;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Attribute;
-import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import quan.definition.*;
@@ -13,6 +13,9 @@ import quan.definition.message.MessageDefinition;
 import quan.definition.message.MessageHeadDefinition;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,15 +32,23 @@ public class XmlDefinitionParser extends DefinitionParser {
     @Override
     protected void parseClasses(File definitionFile) {
         Element rootElement;
-        try {
-            rootElement = new SAXReader().read(definitionFile).getRootElement();
+        try (InputStreamReader definitionReader = new InputStreamReader(new FileInputStream(definitionFile), definitionCharEncoding)) {
+            SAXReader saxReader = new SAXReader();
+            rootElement = saxReader.read(definitionReader).getRootElement();
             if (rootElement == null || !rootElement.getName().equals("package")) {
                 return;
             }
-        } catch (DocumentException e) {
-            String error = String.format("解析定义文件[%s]出错", definitionFile);
+
+        } catch (Exception e) {
+            String error;
+            try {
+                error = String.format("解析定义文件[%s]出错", definitionFile.getCanonicalPath());
+            } catch (Exception ex) {
+                error = String.format("解析定义文件[%s]出错", definitionFile);
+            }
             addValidatedError(error);
             logger.error(error, e);
+            e.printStackTrace();
             return;
         }
 

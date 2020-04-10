@@ -36,6 +36,8 @@ public abstract class Generator {
 
     protected boolean enable = true;
 
+    protected String definitionCharEncoding;
+
     protected Set<String> definitionPaths = new HashSet<>();
 
     protected String packagePrefix;
@@ -97,12 +99,16 @@ public abstract class Generator {
         if (parser == null) {
             return;
         }
+
+        parser.setDefinitionCharEncoding(definitionCharEncoding);
         parser.setCategory(category());
+
         if (!parser.getDefinitionPaths().isEmpty() && definitionPaths.isEmpty()) {
             definitionPaths.addAll(parser.getDefinitionPaths());
         } else {
             parser.setDefinitionPaths(definitionPaths);
         }
+
         this.parser = parser;
     }
 
@@ -134,6 +140,11 @@ public abstract class Generator {
             definitionPaths.addAll(Arrays.asList(definitionPath.split(",")));
         }
 
+        String definitionCharEncoding = options.getProperty(category() + ".definitionCharEncoding");
+        if (!StringUtils.isBlank(definitionCharEncoding)) {
+            this.definitionCharEncoding = definitionCharEncoding;
+        }
+        
         String codePath = options.getProperty(category() + "." + supportLanguage() + ".codePath");
         if (!StringUtils.isBlank(codePath)) {
             setCodePath(codePath);

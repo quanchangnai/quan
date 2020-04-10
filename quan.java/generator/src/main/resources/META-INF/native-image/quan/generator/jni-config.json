@@ -1,0 +1,6 @@
+[
+{
+  "name":"quan.generator.Generator",
+  "methods":[{"name":"main","parameterTypes":["java.lang.String[]"] }]
+}
+]
