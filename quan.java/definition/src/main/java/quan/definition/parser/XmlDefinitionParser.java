@@ -45,7 +45,6 @@ public class XmlDefinitionParser extends DefinitionParser {
             }
             addValidatedError(error);
             logger.error(error, e);
-            e.printStackTrace();
             return;
         }
 
