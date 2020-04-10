@@ -178,7 +178,7 @@ public class ItemConfig extends Config {
 
 
     @Override
-    protected ItemConfig create(JSONObject json) {
+    public ItemConfig create(JSONObject json) {
         return new ItemConfig(json);
     }
 

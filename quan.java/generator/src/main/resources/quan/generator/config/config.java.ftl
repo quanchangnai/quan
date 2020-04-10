@@ -171,7 +171,7 @@ public class ${name} extends <#if parentName??>${parentName}<#elseif definitionT
 
  <#if definitionType ==6>
     @Override
-    protected ${name} create(JSONObject json) {
+    public ${name} create(JSONObject json) {
         return new ${name}(json);
     }
 <#else>

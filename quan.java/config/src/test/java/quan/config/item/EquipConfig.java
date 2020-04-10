@@ -40,7 +40,7 @@ public class EquipConfig extends ItemConfig {
 
 
     @Override
-    protected EquipConfig create(JSONObject json) {
+    public EquipConfig create(JSONObject json) {
         return new EquipConfig(json);
     }
 

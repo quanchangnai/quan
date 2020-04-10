@@ -51,7 +51,7 @@ public class QuestTargetConfig extends Config {
 
 
     @Override
-    protected QuestTargetConfig create(JSONObject json) {
+    public QuestTargetConfig create(JSONObject json) {
         return new QuestTargetConfig(json);
     }
 

@@ -119,7 +119,7 @@ public class WeaponConfig extends EquipConfig {
 
 
     @Override
-    protected WeaponConfig create(JSONObject json) {
+    public WeaponConfig create(JSONObject json) {
         return new WeaponConfig(json);
     }
 

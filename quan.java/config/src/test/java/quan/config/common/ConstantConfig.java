@@ -73,7 +73,7 @@ public class ConstantConfig extends Config {
 
 
     @Override
-    protected ConstantConfig create(JSONObject json) {
+    public ConstantConfig create(JSONObject json) {
         return new ConstantConfig(json);
     }
 
