@@ -1,6 +1,5 @@
 package quan.definition.parser;
 
-import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Attribute;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
@@ -15,7 +14,6 @@ import quan.definition.message.MessageHeadDefinition;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,9 +30,8 @@ public class XmlDefinitionParser extends DefinitionParser {
     @Override
     protected void parseClasses(File definitionFile) {
         Element rootElement;
-        try (InputStreamReader definitionReader = new InputStreamReader(new FileInputStream(definitionFile), definitionCharEncoding)) {
-            SAXReader saxReader = new SAXReader();
-            rootElement = saxReader.read(definitionReader).getRootElement();
+        try (InputStreamReader definitionReader = new InputStreamReader(new FileInputStream(definitionFile), definitionFileEncoding)) {
+            rootElement = new SAXReader().read(definitionReader).getRootElement();
             if (rootElement == null || !rootElement.getName().equals("package")) {
                 return;
             }
@@ -48,7 +45,6 @@ public class XmlDefinitionParser extends DefinitionParser {
             }
             addValidatedError(error);
             logger.error(error, e);
-            e.printStackTrace();
             return;
         }
 
