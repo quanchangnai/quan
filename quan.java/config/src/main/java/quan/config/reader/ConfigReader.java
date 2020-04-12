@@ -30,7 +30,7 @@ public abstract class ConfigReader {
 
     protected ConfigConverter converter;
 
-    //表格正文起始行号，默认是第3行,第1行固定是表头，中间是注释等，行号从1开始
+    //表格正文开始行号，默认是第3行,第1行固定是表头，中间是注释等，行号从1开始
     protected int tableBodyStartRow = 3;
 
     protected Config prototype;
