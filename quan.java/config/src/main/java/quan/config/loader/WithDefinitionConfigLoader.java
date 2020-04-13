@@ -17,7 +17,7 @@ import quan.definition.Category;
 import quan.definition.FieldDefinition;
 import quan.definition.Language;
 import quan.definition.config.ConfigDefinition;
-import quan.definition.config.IndexDefinition;
+import quan.definition.IndexDefinition;
 import quan.definition.parser.DefinitionParser;
 import quan.definition.parser.XmlDefinitionParser;
 
@@ -224,7 +224,7 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
     private Collection<String> getConfigTables(ConfigDefinition configDefinition) {
         if (tableType == TableType.json) {
             //Json的表名实际上就是配置类名
-            return configDefinition.getDescendantsAndMe();
+            return configDefinition.getMeAndDescendants();
         } else {
             return configDefinition.getAllTables();
         }

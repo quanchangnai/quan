@@ -8,9 +8,12 @@
 
     <data name="RoleData" key="id">角色
         <field name="id" type="long"/>角色ID
-        <field name="name" type="string"/>
+        <field name="name" type="string" index="u"/>
         <field name="roleType" type="RoleType"/>角色类型
+        <field name="a" type="int"/>
+        <field name="a2" type="int"/>
         <field name="b" type="bool"/>
+        <field name="b2" type="int"/>
         <field name="s" type="short"/>sssss
         <field name="i" type="int"/>iiii
         <field name="f" type="float"/>ffff
@@ -23,6 +26,8 @@
         <field name="set2" type="set:ItemEntity"/>
         <field name="list2" type="list:ItemEntity"/>
         <field name="map2" type="map:int:ItemEntity" ignore="true"/>
+        <index type="u" fields="a,a2"/>两字段唯一索引
+        <index type="normal" fields="b,b2"/>两字段普通索引
     </data>
 
 </package>

@@ -26,9 +26,9 @@ public class DataUpdater implements Consumer<Set<Data<?>>> {
     @Override
     public void accept(Set<Data<?>> changes) {
         for (Data<?> change : changes) {
-            MongoCollection<Data<?>> collection = collections.get(change._getName());
+            MongoCollection<Data<?>> collection = collections.get(change._name());
             if (collection != null) {
-                collection.replaceOne(Filters.eq(change._getId()), change, replaceOptions);
+                collection.replaceOne(Filters.eq(change._id()), change, replaceOptions);
             }
         }
     }

@@ -4,7 +4,6 @@ import com.google.common.base.CaseFormat;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import quan.definition.config.ConfigDefinition;
-import quan.definition.config.IndexDefinition;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -95,10 +94,9 @@ public class FieldDefinition extends Definition {
     }
 
     @Override
-    protected Pattern namePattern() {
+    public Pattern namePattern() {
         return Constants.FIELD_NAME_PATTERN;
     }
-
 
 
     public String getOriginType() {

@@ -2,7 +2,6 @@ package quan.definition;
 
 import org.apache.commons.lang3.StringUtils;
 import quan.definition.config.ConfigDefinition;
-import quan.definition.config.IndexDefinition;
 import quan.definition.data.DataDefinition;
 import quan.definition.message.MessageDefinition;
 import quan.definition.message.MessageHeadDefinition;
@@ -22,7 +21,7 @@ public class BeanDefinition extends ClassDefinition {
     //配置的所有后代类
     protected Set<String> descendants = new HashSet<>();
 
-    private TreeSet<String> descendantsAndMe = new TreeSet<>();
+    private TreeSet<String> meAndDescendants = new TreeSet<>();
 
     //配置的所有子类
     protected Set<BeanDefinition> children = new HashSet<>();
@@ -68,7 +67,7 @@ public class BeanDefinition extends ClassDefinition {
     }
 
     @Override
-    protected Pattern namePattern() {
+    public Pattern namePattern() {
         if (category == Category.data) {
             return Constants.ENTITY_NAME_PATTERN;
         }
@@ -113,12 +112,12 @@ public class BeanDefinition extends ClassDefinition {
         return descendants;
     }
 
-    public TreeSet<String> getDescendantsAndMe() {
-        if (descendantsAndMe.isEmpty()) {
-            descendantsAndMe.addAll(descendants);
-            descendantsAndMe.add(getName());
+    public TreeSet<String> getMeAndDescendants() {
+        if (meAndDescendants.isEmpty()) {
+            meAndDescendants.addAll(descendants);
+            meAndDescendants.add(getName());
         }
-        return descendantsAndMe;
+        return meAndDescendants;
     }
 
     public int getDescendantMaxFieldCount() {

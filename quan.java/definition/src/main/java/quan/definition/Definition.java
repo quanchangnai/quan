@@ -87,7 +87,7 @@ public abstract class Definition {
 
     public abstract String getDefinitionTypeName();
 
-    protected abstract Pattern namePattern();
+    public abstract Pattern namePattern();
 
     @Override
     public String toString() {

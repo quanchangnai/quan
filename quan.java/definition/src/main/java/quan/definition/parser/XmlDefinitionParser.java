@@ -6,7 +6,6 @@ import org.dom4j.io.SAXReader;
 import quan.definition.*;
 import quan.definition.config.ConfigDefinition;
 import quan.definition.config.ConstantDefinition;
-import quan.definition.config.IndexDefinition;
 import quan.definition.data.DataDefinition;
 import quan.definition.message.MessageDefinition;
 import quan.definition.message.MessageHeadDefinition;
@@ -163,11 +162,19 @@ public class XmlDefinitionParser extends DefinitionParser {
             }
 
             if (classDefinition instanceof ConfigDefinition) {
+                ConfigDefinition configDefinition = (ConfigDefinition) classDefinition;
                 if (fieldElementName.equals("index")) {
-                    parseIndex((ConfigDefinition) classDefinition, classElement, fieldElement, i);
+                    configDefinition.addIndex(parseIndex(classElement, fieldElement, i));
                 }
                 if (fieldElementName.equals("constant")) {
-                    parseConstant((ConfigDefinition) classDefinition, classElement, fieldElement, i);
+                    parseConstant(configDefinition, classElement, fieldElement, i);
+                }
+            }
+
+            if (classDefinition instanceof DataDefinition) {
+                DataDefinition dataDefinition = (DataDefinition) classDefinition;
+                if (fieldElementName.equals("index")) {
+                    dataDefinition.addIndex(parseIndex(classElement, fieldElement, i));
                 }
             }
         }
@@ -198,9 +205,9 @@ public class XmlDefinitionParser extends DefinitionParser {
         classDefinition.addField(fieldDefinition);
     }
 
-    private void parseIndex(ConfigDefinition configDefinition, Element classElement, Element indexElement, int i) {
+    private IndexDefinition parseIndex(Element classElement, Element indexElement, int i) {
         IndexDefinition indexDefinition = new IndexDefinition();
-        indexDefinition.setParser(configDefinition.getParser());
+        indexDefinition.setParser(this);
         indexDefinition.setCategory(getCategory());
 
         indexDefinition.setName(indexElement.attributeValue("name"));
@@ -212,7 +219,7 @@ public class XmlDefinitionParser extends DefinitionParser {
 
         indexDefinition.setComment(comment);
 
-        configDefinition.addIndex(indexDefinition);
+        return indexDefinition;
     }
 
     private void parseConstant(ConfigDefinition configDefinition, Element classElement, Element constantElement, int i) {

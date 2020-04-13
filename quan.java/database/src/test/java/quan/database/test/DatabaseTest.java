@@ -108,7 +108,7 @@ public class DatabaseTest {
         }
 
         startTime = System.nanoTime();
-        UpdateResult updateResult = roleDataCollection.replaceOne(Filters.eq(roleDataMax._getId()), roleDataMax, new ReplaceOptions().upsert(true));
+        UpdateResult updateResult = roleDataCollection.replaceOne(Filters.eq(roleDataMax._id()), roleDataMax, new ReplaceOptions().upsert(true));
         endTime = System.nanoTime();
         System.err.println("replaceOne costTime:" + (endTime - startTime)/timeBase + ",updateResult:" + updateResult);
 

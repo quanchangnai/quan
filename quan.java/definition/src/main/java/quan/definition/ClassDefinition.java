@@ -48,7 +48,7 @@ public abstract class ClassDefinition extends Definition {
     }
 
     @Override
-    protected Pattern namePattern() {
+    public Pattern namePattern() {
         return Constants.CLASS_NAME_PATTERN;
     }
 
@@ -138,17 +138,7 @@ public abstract class ClassDefinition extends Definition {
     }
 
     public FieldDefinition getField(String fieldName) {
-        if (nameFields.containsKey(fieldName)) {
-            return nameFields.get(fieldName);
-        }
-
-        for (FieldDefinition field : fields) {
-            if (field.getName().equals(fieldName)) {
-                return field;
-            }
-        }
-
-        return null;
+        return nameFields.get(fieldName);
     }
 
 
@@ -237,11 +227,11 @@ public abstract class ClassDefinition extends Definition {
     }
 
     protected void validateField(FieldDefinition fieldDefinition) {
-        validateFieldNameSelf(fieldDefinition);
+        validateFieldName(fieldDefinition);
         validateFieldNameDuplicate(fieldDefinition);
     }
 
-    protected void validateFieldNameSelf(FieldDefinition fieldDefinition) {
+    protected void validateFieldName(FieldDefinition fieldDefinition) {
         if (fieldDefinition.getName() == null) {
             addValidatedError(getValidatedName("的") + "字段名不能为空");
             return;

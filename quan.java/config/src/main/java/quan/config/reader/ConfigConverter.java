@@ -97,7 +97,7 @@ public class ConfigConverter {
         if (columnNum == fieldDefinition.getColumnNums().get(0)) {
             if (beanDefinition.hasChild()) {
                 //第1列是类名
-                if (beanDefinition.getDescendantsAndMe().contains(columnValue)) {
+                if (beanDefinition.getMeAndDescendants().contains(columnValue)) {
                     object = new JSONObject();
                     object.put("class", columnValue);
                 } else if (!StringUtils.isBlank(columnValue)) {
@@ -425,7 +425,7 @@ public class ConfigConverter {
         //有子类，按具体类型转换
         if (beanDefinition.hasChild()) {
             String actualBean = values[0];
-            if (!beanDefinition.getDescendantsAndMe().contains(actualBean)) {
+            if (!beanDefinition.getMeAndDescendants().contains(actualBean)) {
                 throw new ConvertException(ConvertException.ErrorType.typeError, actualBean, beanDefinition.getName());
             }
             object.put("class", actualBean);

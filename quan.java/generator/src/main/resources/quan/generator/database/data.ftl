@@ -19,7 +19,30 @@ import ${import};
 public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionType ==5>Data<${idType}></#if> {
 <#if definitionType ==5>
 
+    /**
+     * 数据对应的表名
+     */
     public static final String _NAME = "${underscoreName}";
+
+    /**
+     * 数据索引
+     */
+    public static final Set<Index> _INDEXES;
+
+    static {
+        Set<Index> indexes = new HashSet<>();
+    <#list indexes as index>
+        <#if index.fields?size==1>
+        indexes.add(new Index(Arrays.asList(${name}.${index.fields[0].underscoreName}), ${index.unique?c}));
+        <#elseif  index.fields?size==2>
+        indexes.add(new Index(Arrays.asList(${name}.${index.fields[0].underscoreName}, ${name}.${index.fields[1].underscoreName}), ${index.unique?c}));
+        <#elseif index.fields?size==3>
+        indexes.add(new Index(Arrays.asList(${name}.${index.fields[0].underscoreName}, ${name}.${index.fields[1].underscoreName}, ${name}.${index.fields[2].underscoreName}), ${index.unique?c}));
+        </#if>
+    </#list>
+        _INDEXES = Collections.unmodifiableSet(indexes);
+    }
+
 </#if>
 <#list fields as field>
 
@@ -61,18 +84,30 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
         this.${idName}.setValue(${idName});
     }
 
+    /**
+     * 数据对应的表名
+     */
     @Override
-    public String _getName() {
+    public String _name() {
         return _NAME;
     }
 
     /**
-     * 主键
+     * 数据主键(_id)
      */
     @Override
-    public ${idType} _getId() {
+    public ${idType} _id() {
         return ${idName}.getValue();
     }
+
+    /**
+     * 数据索引
+     */
+    @Override
+    public Set<Index> _indexes() {
+        return _INDEXES;
+    }
+
 </#if>
 
 <#list fields as field>
@@ -244,7 +279,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
         public void encode(BsonWriter writer, ${name} value, EncoderContext encoderContext) {
             writer.writeStartDocument();
             <#if definitionType ==5>
-            writer.write${classTypes[idType]}(${name}._ID, value._getId());
+            writer.write${classTypes[idType]}(${name}._ID, value._id());
             </#if>
 
             <#list fields as field>

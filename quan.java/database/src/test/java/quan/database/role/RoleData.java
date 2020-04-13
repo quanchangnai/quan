@@ -14,7 +14,24 @@ import quan.database.item.ItemEntity;
  */
 public class RoleData extends Data<Long> {
 
+    /**
+     * 数据对应的表名
+     */
     public static final String _NAME = "role_data";
+
+    /**
+     * 数据索引
+     */
+    public static final Set<Index> _INDEXES;
+
+    static {
+        Set<Index> indexes = new HashSet<>();
+        indexes.add(new Index(Arrays.asList(RoleData.A, RoleData.A2), true));
+        indexes.add(new Index(Arrays.asList(RoleData.B, RoleData.B2), false));
+        indexes.add(new Index(Arrays.asList(RoleData.NAME), true));
+        _INDEXES = Collections.unmodifiableSet(indexes);
+    }
+
 
     /**
      * 角色ID
@@ -28,7 +45,13 @@ public class RoleData extends Data<Long> {
      */
     public static final String ROLE_TYPE = "roleType";
 
+    public static final String A = "a";
+
+    public static final String A2 = "a2";
+
     public static final String B = "b";
+
+    public static final String B2 = "b2";
 
     /**
      * sssss
@@ -72,7 +95,13 @@ public class RoleData extends Data<Long> {
 
     private SimpleField<Integer> roleType = new SimpleField<>(0);
 
+    private SimpleField<Integer> a = new SimpleField<>(0);
+
+    private SimpleField<Integer> a2 = new SimpleField<>(0);
+
     private SimpleField<Boolean> b = new SimpleField<>(false);
+
+    private SimpleField<Integer> b2 = new SimpleField<>(0);
 
     private SimpleField<Short> s = new SimpleField<>((short) 0);
 
@@ -103,18 +132,30 @@ public class RoleData extends Data<Long> {
         this.id.setValue(id);
     }
 
+    /**
+     * 数据对应的表名
+     */
     @Override
-    public String _getName() {
+    public String _name() {
         return _NAME;
     }
 
     /**
-     * 主键
+     * 数据主键(_id)
      */
     @Override
-    public Long _getId() {
+    public Long _id() {
         return id.getValue();
     }
+
+    /**
+     * 数据索引
+     */
+    @Override
+    public Set<Index> _indexes() {
+        return _INDEXES;
+    }
+
 
     /**
      * 角色ID
@@ -147,12 +188,54 @@ public class RoleData extends Data<Long> {
         return this;
     }
 
+    public int getA() {
+        return a.getLogValue();
+    }
+
+    public RoleData setA(int a) {
+        this.a.setLogValue(a, _getLogRoot());
+        return this;
+    }
+
+    public RoleData addA(int a) {
+        setA(getA() + a);
+        return this;
+    }
+
+    public int getA2() {
+        return a2.getLogValue();
+    }
+
+    public RoleData setA2(int a2) {
+        this.a2.setLogValue(a2, _getLogRoot());
+        return this;
+    }
+
+    public RoleData addA2(int a2) {
+        setA2(getA2() + a2);
+        return this;
+    }
+
     public boolean getB() {
         return b.getLogValue();
     }
 
     public RoleData setB(boolean b) {
         this.b.setLogValue(b, _getLogRoot());
+        return this;
+    }
+
+    public int getB2() {
+        return b2.getLogValue();
+    }
+
+    public RoleData setB2(int b2) {
+        this.b2.setLogValue(b2, _getLogRoot());
+        return this;
+    }
+
+    public RoleData addB2(int b2) {
+        setB2(getB2() + b2);
         return this;
     }
 
@@ -300,7 +383,10 @@ public class RoleData extends Data<Long> {
                 "id=" + id +
                 ",name='" + name + '\'' +
                 ",roleType=" + RoleType.valueOf(roleType.getValue()) +
+                ",a=" + a +
+                ",a2=" + a2 +
                 ",b=" + b +
+                ",b2=" + b2 +
                 ",s=" + s +
                 ",i=" + i +
                 ",f=" + f +
@@ -342,8 +428,17 @@ public class RoleData extends Data<Long> {
                     case RoleData.ROLE_TYPE:
                         value.roleType.setValue(reader.readInt32());
                         break;
+                    case RoleData.A:
+                        value.a.setValue(reader.readInt32());
+                        break;
+                    case RoleData.A2:
+                        value.a2.setValue(reader.readInt32());
+                        break;
                     case RoleData.B:
                         value.b.setValue(reader.readBoolean());
+                        break;
+                    case RoleData.B2:
+                        value.b2.setValue(reader.readInt32());
                         break;
                     case RoleData.S:
                         value.s.setValue((short) reader.readInt32());
@@ -414,11 +509,14 @@ public class RoleData extends Data<Long> {
         @Override
         public void encode(BsonWriter writer, RoleData value, EncoderContext encoderContext) {
             writer.writeStartDocument();
-            writer.writeInt64(RoleData._ID, value._getId());
+            writer.writeInt64(RoleData._ID, value._id());
 
             writer.writeString(RoleData.NAME, value.name.getValue());
             writer.writeInt32(RoleData.ROLE_TYPE, value.roleType.getValue());
+            writer.writeInt32(RoleData.A, value.a.getValue());
+            writer.writeInt32(RoleData.A2, value.a2.getValue());
             writer.writeBoolean(RoleData.B, value.b.getValue());
+            writer.writeInt32(RoleData.B2, value.b2.getValue());
             writer.writeInt32(RoleData.S, value.s.getValue());
             writer.writeInt32(RoleData.I, value.i.getValue());
             writer.writeDouble(RoleData.F, value.f.getValue());

@@ -2,10 +2,10 @@ package quan.definition.data;
 
 import com.google.common.base.CaseFormat;
 import org.apache.commons.lang3.StringUtils;
-import quan.definition.BeanDefinition;
-import quan.definition.Category;
-import quan.definition.Constants;
+import quan.definition.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -19,6 +19,8 @@ public class DataDefinition extends BeanDefinition {
 
     //ID字段的名字
     private String idName = "id";
+
+    private List<IndexDefinition> indexes = new ArrayList<>();
 
     {
         category = Category.data;
@@ -45,7 +47,7 @@ public class DataDefinition extends BeanDefinition {
     }
 
     @Override
-    protected Pattern namePattern() {
+    public Pattern namePattern() {
         return Constants.DATA_NAME_PATTERN;
     }
 
@@ -72,6 +74,14 @@ public class DataDefinition extends BeanDefinition {
         return "数据";
     }
 
+    public void addIndex(IndexDefinition indexDefinition) {
+        indexes.add(indexDefinition);
+    }
+
+    public List<IndexDefinition> getIndexes() {
+        return indexes;
+    }
+
     @Override
     public void validate() {
         super.validate();
@@ -82,6 +92,28 @@ public class DataDefinition extends BeanDefinition {
         if (getFields().stream().noneMatch(t -> t.getName().equals(getIdName()))) {
             addValidatedError(getValidatedName() + "的主键[" + getIdName() + "]不存在");
         }
+
+        validateIndexes();
     }
+
+
+    protected void validateIndexes() {
+        for (FieldDefinition field : fields) {
+            if (!IndexDefinition.isIndex(field.getIndex())) {
+                continue;
+            }
+
+            if (!field.isPrimitiveType() && !field.isEnumType() && field.getType() != null) {
+                addValidatedError(getValidatedName("的") + field.getValidatedName() + "类型[" + field.getType() + "]不支持索引，允许的类型为" + Constants.PRIMITIVE_TYPES + "或枚举");
+                continue;
+            }
+
+            indexes.add(new IndexDefinition(field));
+        }
+
+        indexes.forEach(index -> index.validateIndex(this, false));
+
+    }
+
 
 }

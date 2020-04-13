@@ -6,6 +6,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import quan.definition.ClassDefinition;
 import quan.definition.Constants;
 import quan.definition.FieldDefinition;
+import quan.definition.IndexDefinition;
 
 import java.util.List;
 import java.util.Map;
