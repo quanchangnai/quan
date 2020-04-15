@@ -132,7 +132,9 @@ namespace ${getFullPackageName("cs")}
 	    	base.Encode(buffer);
 
 <#list fields as field>
-	<#if field.type=="set" || field.type=="list">
+	 <#if field.ignore>
+        <#continue/>
+	<#elseif field.type=="set" || field.type=="list">
 		<#if field_index gt 0>
 
         </#if>
@@ -189,7 +191,9 @@ namespace ${getFullPackageName("cs")}
 	    	base.Decode(buffer);
 
 <#list fields as field>
-	<#if field.type=="set" || field.type=="list">
+	 <#if field.ignore>
+        <#continue/>
+	<#elseif field.type=="set" || field.type=="list">
 		<#if field_index gt 0>
 
         </#if>

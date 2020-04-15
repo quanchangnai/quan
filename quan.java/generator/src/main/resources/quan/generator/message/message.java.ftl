@@ -124,7 +124,9 @@ public<#if definitionType ==9> abstract</#if> class ${name} extends <#if definit
         super.encode(buffer);
 
 <#list fields as field>
-    <#if field.type=="set" || field.type=="list">
+    <#if field.ignore>
+        <#continue/>
+    <#elseif field.type=="set" || field.type=="list">
         <#if field_index gt 0>
 
         </#if>
@@ -183,7 +185,9 @@ public<#if definitionType ==9> abstract</#if> class ${name} extends <#if definit
         super.decode(buffer);
 
 <#list fields as field>
-    <#if field.type=="set" || field.type=="list">
+    <#if field.ignore>
+        <#continue/>
+    <#elseif field.type=="set" || field.type=="list">
         <#if field_index gt 0>
 
         </#if>

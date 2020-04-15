@@ -47,14 +47,14 @@ public class FieldDefinition extends Definition {
     //消息字段,小数保留的精度
     private int scale = -1;
 
-    //数据库字段,忽略存储
+    //消息、数据字段,忽略编码
     private boolean ignore;
+
+    //消息、数据字段置字段,索引类型
+    private String index;
 
     //配置字段,对应表格中的列
     private String column;
-
-    //配置字段,索引类型
-    private String index;
 
     //配置字段,集合类型字段的分隔符
     private String delimiter;

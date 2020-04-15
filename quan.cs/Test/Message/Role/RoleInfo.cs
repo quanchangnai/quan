@@ -88,12 +88,6 @@ namespace Test.Message.Role
 		    foreach (var setValue in Set) {
 			    buffer.WriteInt(setValue);
 		    }
-
-		    buffer.WriteInt(Map.Count);
-		    foreach (var mapKey in Map.Keys) {
-		        buffer.WriteInt(mapKey);
-			    buffer.WriteInt(Map[mapKey]);
-		    }
 		}
 
 		public override void Decode(Buffer buffer)
@@ -118,11 +112,6 @@ namespace Test.Message.Role
 		    var setSize = buffer.ReadInt();
 		    for (var i = 0; i < setSize; i++) {
 			    Set.Add(buffer.ReadInt());
-		    }
-
-		    var mapSize = buffer.ReadInt();
-		    for (var i = 0; i < mapSize; i++) {
-			    Map.Add(buffer.ReadInt(), buffer.ReadInt());
 		    }
 		}
 

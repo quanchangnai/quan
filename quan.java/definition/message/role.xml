@@ -18,7 +18,7 @@
         <field name="data" type="bytes"/>
         <field name="list" type="list:int"/>
         <field name="set" type="set:int"/>
-        <field name="map" type="map:int:int"/>
+        <field name="map" type="map:int:int" ignore="true"/>
     </bean>
 
     <message name="CRoleLogin" id="1" lang="cs,java,lua">角色登录，自定义ID

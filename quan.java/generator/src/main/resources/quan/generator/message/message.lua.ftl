@@ -105,7 +105,9 @@ function ${name}:encode(buffer)
 
 </#if>
 <#list allFields as field>
-    <#if field.type=="set" || field.type=="list">
+    <#if field.ignore>
+        <#continue/>
+    <#elseif field.type=="set" || field.type=="list">
         <#if field_index gt 0>
 
         </#if>
@@ -185,7 +187,9 @@ function ${name}.decode(buffer, self)
 
 </#if>
 <#list allFields as field>
-    <#if field.type=="set" || field.type=="list">
+    <#if field.ignore>
+        <#continue/>
+    <#elseif field.type=="set" || field.type=="list">
         <#if field_index gt 0>
 
         </#if>

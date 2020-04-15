@@ -94,12 +94,6 @@ function RoleInfo:encode(buffer)
         buffer:writeInt(value);
     end
 
-    buffer:writeInt(table.size(self.map))
-    for key, value in pairs(self.map) do
-        buffer:writeInt(key)
-        buffer:writeInt(value)
-    end
-
     return buffer
 end
 
@@ -130,10 +124,6 @@ function RoleInfo.decode(buffer, self)
 
     for i = 1, buffer:readInt() do
         self.set[i] = buffer:readInt()
-    end
-
-    for i = 1, buffer:readInt() do
-        self.map[buffer:readInt()] = buffer:readInt()
     end
 
     return self

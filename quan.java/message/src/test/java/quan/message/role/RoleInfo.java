@@ -168,12 +168,6 @@ public class RoleInfo extends Bean {
         for (int $set$Value : this.set) {
             buffer.writeInt($set$Value);
         }
-
-        buffer.writeInt(this.map.size());
-        for (int $map$Key : this.map.keySet()) {
-            buffer.writeInt($map$Key);
-            buffer.writeInt(this.map.get($map$Key));
-        }
     }
 
     @Override
@@ -198,11 +192,6 @@ public class RoleInfo extends Bean {
         int $set$Size = buffer.readInt();
         for (int i = 0; i < $set$Size; i++) {
             this.set.add(buffer.readInt());
-        }
-
-        int $map$Size = buffer.readInt();
-        for (int i = 0; i < $map$Size; i++) {
-            this.map.put(buffer.readInt(), buffer.readInt());
         }
     }
 
