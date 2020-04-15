@@ -17,9 +17,11 @@ public class ItemEntity extends Entity {
 
     public static final String NAME = "name";
 
+
     private SimpleField<Integer> id = new SimpleField<>(0);
 
     private SimpleField<String> name = new SimpleField<>("");
+
 
 
     public int getId() {

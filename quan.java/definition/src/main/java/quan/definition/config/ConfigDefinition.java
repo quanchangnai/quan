@@ -263,7 +263,7 @@ public class ConfigDefinition extends BeanDefinition {
             validateField(field);
         }
 
-        validateIndexes();
+        IndexDefinition.validateIndex(this, indexes, selfIndexes, selfFields);
     }
 
     @Override
@@ -429,39 +429,6 @@ public class ConfigDefinition extends BeanDefinition {
             validateFieldLanguage(field);
         }
     }
-
-    protected void validateIndexes() {
-        for (FieldDefinition field : selfFields) {
-            if (!IndexDefinition.isIndex(field.getIndex())) {
-                continue;
-            }
-
-            if (!field.isPrimitiveType() && !field.isEnumType() && field.getType() != null) {
-                addValidatedError(getValidatedName("的") + field.getValidatedName() + "类型[" + field.getType() + "]不支持索引，允许的类型为" + Constants.PRIMITIVE_TYPES + "或枚举");
-                continue;
-            }
-
-            addIndex(new IndexDefinition(field));
-        }
-
-        if (indexes.isEmpty()) {
-            addValidatedError(getValidatedName() + "至少需要一个索引");
-            return;
-        }
-
-        selfIndexes.forEach(index -> index.validateIndex(this, false));
-
-        Set<String> indexNames = new HashSet<>();
-        for (IndexDefinition indexDefinition : indexes) {
-            if (indexNames.contains(indexDefinition.getName())) {
-                addValidatedError(getValidatedName() + "的索引名[" + indexDefinition.getName() + "]重复");
-                continue;
-            }
-            indexNames.add(indexDefinition.getName());
-        }
-
-    }
-
 
     /**
      * 转义分隔符里的正则表达式特殊字符

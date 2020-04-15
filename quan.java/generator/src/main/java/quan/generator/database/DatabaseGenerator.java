@@ -82,7 +82,7 @@ public class DatabaseGenerator extends Generator {
         if (beanDefinition instanceof DataDefinition) {
             DataDefinition dataDefinition = (DataDefinition) beanDefinition;
             if (fieldDefinition.getName().equals(dataDefinition.getIdName())) {
-                dataDefinition.setIdType(classTypes.get(fieldDefinition.getType()));
+                dataDefinition.setIdField(fieldDefinition);
             }
         }
     }

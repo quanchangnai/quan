@@ -2,9 +2,7 @@ package quan.definition;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -109,13 +107,45 @@ public class IndexDefinition extends Definition {
     }
 
 
-    public void validateIndex(BeanDefinition owner, boolean validateName) {
-        if (validateName) {
-            if (getName() == null) {
-                owner.addValidatedError(owner.getValidatedName() + "的索引名不能为空");
-            } else if (!namePattern().matcher(getName()).matches()) {
-                owner.addValidatedError(owner.getValidatedName("的") + "索引名[" + getName() + "]格式错误,正确格式:" + namePattern());
+    public static void validateIndex(BeanDefinition owner, List<IndexDefinition> indexes, List<IndexDefinition> selfIndexes, List<FieldDefinition> fields) {
+        for (FieldDefinition field : fields) {
+            if (!IndexDefinition.isIndex(field.getIndex())) {
+                continue;
             }
+
+            if (!field.isPrimitiveType() && !field.isEnumType() && field.getType() != null) {
+                owner.addValidatedError(owner.getValidatedName("的") + field.getValidatedName() + "类型[" + field.getType() + "]不支持索引，允许的类型为" + Constants.PRIMITIVE_TYPES + "或枚举");
+                continue;
+            }
+
+            IndexDefinition indexDefinition = new IndexDefinition(field);
+            indexes.add(indexDefinition);
+            if (indexes != selfIndexes) {
+                selfIndexes.add(indexDefinition);
+            }
+        }
+
+        selfIndexes.forEach(index -> index.validateIndex(owner));
+
+        Set<String> indexNames = new HashSet<>();
+        for (IndexDefinition indexDefinition : indexes) {
+            if (indexDefinition.getName() == null) {
+                continue;
+            }
+            if (indexNames.contains(indexDefinition.getName())) {
+                owner.addValidatedError(owner.getValidatedName() + "的索引名[" + indexDefinition.getName() + "]重复");
+                continue;
+            }
+            indexNames.add(indexDefinition.getName());
+        }
+
+    }
+
+    private void validateIndex(BeanDefinition owner) {
+        if (getName() == null) {
+            owner.addValidatedError(owner.getValidatedName() + "的索引名不能为空");
+        } else if (!namePattern().matcher(getName()).matches()) {
+            owner.addValidatedError(owner.getValidatedName("的") + "索引名[" + getName() + "]格式错误,正确格式:" + namePattern());
         }
 
 

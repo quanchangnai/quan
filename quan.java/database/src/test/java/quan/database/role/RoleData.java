@@ -22,14 +22,14 @@ public class RoleData extends Data<Long> {
     /**
      * 数据索引
      */
-    public static final Set<Index> _INDEXES;
+    public static final Map<String, Index> _INDEXES;
 
     static {
-        Set<Index> indexes = new HashSet<>();
-        indexes.add(new Index(Arrays.asList(RoleData.A, RoleData.A2), true));
-        indexes.add(new Index(Arrays.asList(RoleData.B, RoleData.B2), false));
-        indexes.add(new Index(Arrays.asList(RoleData.NAME), true));
-        _INDEXES = Collections.unmodifiableSet(indexes);
+        Map<String, Index> indexes = new HashMap<>();
+        indexes.put("unique", new Index("unique", Arrays.asList(RoleData.A, RoleData.A2), true));
+        indexes.put("normal", new Index("normal", Arrays.asList(RoleData.B, RoleData.B2), false));
+        indexes.put("name", new Index("name", Collections.singletonList(RoleData.NAME), true));
+        _INDEXES = Collections.unmodifiableMap(indexes);
     }
 
 
@@ -89,6 +89,7 @@ public class RoleData extends Data<Long> {
 
     public static final String MAP2 = "map2";
 
+
     private SimpleField<Long> id = new SimpleField<>(0L);
 
     private SimpleField<String> name = new SimpleField<>("");
@@ -128,7 +129,7 @@ public class RoleData extends Data<Long> {
     private MapField<Integer, ItemEntity> map2 = new MapField<>(_getLogRoot());
 
 
-    public RoleData(Long id) {
+    public RoleData(long id) {
         this.id.setValue(id);
     }
 
@@ -152,7 +153,7 @@ public class RoleData extends Data<Long> {
      * 数据索引
      */
     @Override
-    public Set<Index> _indexes() {
+    public Map<String, Index> _indexes() {
         return _INDEXES;
     }
 

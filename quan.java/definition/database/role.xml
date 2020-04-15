@@ -6,7 +6,7 @@
         <field name="type2" value="2"/>角色类型2
     </enum>
 
-    <data name="RoleData" key="id">角色
+    <data name="RoleData" id="id">角色
         <field name="id" type="long"/>角色ID
         <field name="name" type="string" index="u"/>
         <field name="roleType" type="RoleType"/>角色类型
@@ -26,8 +26,8 @@
         <field name="set2" type="set:ItemEntity"/>
         <field name="list2" type="list:ItemEntity"/>
         <field name="map2" type="map:int:ItemEntity" ignore="true"/>
-        <index type="u" fields="a,a2"/>两字段唯一索引
-        <index type="normal" fields="b,b2"/>两字段普通索引
+        <index name="unique" type="u" fields="a,a2"/>两字段唯一索引
+        <index name="normal" type="normal" fields="b,b2"/>两字段普通索引
     </data>
 
 </package>

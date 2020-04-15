@@ -7,16 +7,19 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.Sorts;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.BsonReader;
 import org.bson.BsonWriter;
+import org.bson.Document;
+import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.json.JsonReader;
 import org.bson.json.JsonWriter;
 import org.pcollections.Empty;
 import org.pcollections.PMap;
-import quan.database.PackageCodecRegistry;
+import quan.database.DataCodecRegistry;
 import quan.database.Transaction;
 import quan.database.item.ItemEntity;
 import quan.database.item.ItemEntity2;
@@ -49,7 +52,7 @@ public class DatabaseTest {
     private static void testMongoClient() throws Exception {
         MongoClientSettings.Builder mongoClientSettings = MongoClientSettings.builder();
         mongoClientSettings.applyConnectionString(new ConnectionString("mongodb://127.0.0.1:27017"));
-        mongoClientSettings.codecRegistry(new PackageCodecRegistry("quan"));
+        mongoClientSettings.codecRegistry(CodecRegistries.fromRegistries(new DataCodecRegistry("quan"), MongoClientSettings.getDefaultCodecRegistry()));
         MongoClient mongoClient = MongoClients.create(mongoClientSettings.build());
 
         MongoDatabase testDatabase = mongoClient.getDatabase("test");
@@ -80,7 +83,7 @@ public class DatabaseTest {
             doTestMongoCollection1(testDatabase);
             return true;
         });
-        System.err.println("testMongoCollection1 costTime:" + (System.nanoTime() - startTime)/timeBase);
+        System.err.println("testMongoCollection1 costTime:" + (System.nanoTime() - startTime) / timeBase);
     }
 
     private static void doTestMongoCollection1(MongoDatabase testDatabase) {
@@ -88,12 +91,18 @@ public class DatabaseTest {
         System.err.println("testMongoCollection1 start===========");
         MongoCollection<RoleData> roleDataCollection = testDatabase.getCollection(RoleData._NAME, RoleData.class);
 
+        for (Document index : roleDataCollection.listIndexes()) {
+            System.err.println("index:" + new HashMap<>(index));
+        }
+
+//        roleDataCollection.createIndex(new Document("name", 1), new IndexOptions().unique(false));
+
         long startTime, endTime;
 
         startTime = System.nanoTime();
         RoleData roleDataMax = roleDataCollection.find().sort(Sorts.descending("_id")).first();
         endTime = System.nanoTime();
-        System.err.println("find costTime:" + (endTime - startTime)/timeBase);
+        System.err.println("find costTime:" + (endTime - startTime) / timeBase);
 
         System.err.println("roleDataMax:" + roleDataMax);
 
@@ -110,7 +119,7 @@ public class DatabaseTest {
         startTime = System.nanoTime();
         UpdateResult updateResult = roleDataCollection.replaceOne(Filters.eq(roleDataMax._id()), roleDataMax, new ReplaceOptions().upsert(true));
         endTime = System.nanoTime();
-        System.err.println("replaceOne costTime:" + (endTime - startTime)/timeBase + ",updateResult:" + updateResult);
+        System.err.println("replaceOne costTime:" + (endTime - startTime) / timeBase + ",updateResult:" + updateResult);
 
         roleDataCollection.insertOne(new RoleData(roleDataMax.getId() + 1));
         roleDataCollection.insertOne(new RoleData(roleDataMax.getId() + 2));
@@ -129,12 +138,12 @@ public class DatabaseTest {
             roleDataList.add(roleData);
         }
         endTime = System.nanoTime();
-        System.err.println("roleDataList costTime:" + (endTime - startTime)/timeBase);
+        System.err.println("roleDataList costTime:" + (endTime - startTime) / timeBase);
 
         startTime = System.nanoTime();
         roleDataCollection.insertMany(roleDataList);
         endTime = System.nanoTime();
-        System.err.println("insertMany costTime:" + (endTime - startTime)/timeBase);
+        System.err.println("insertMany costTime:" + (endTime - startTime) / timeBase);
     }
 
     private static void testMongoCollection2(MongoDatabase testDatabase) {
@@ -150,7 +159,7 @@ public class DatabaseTest {
         startTime = System.nanoTime();
         RoleData2 roleDataMax = roleDataCollection2.find().sort(Sorts.descending("_id")).first();
         endTime = System.nanoTime();
-        System.err.println("find costTime:" + (endTime - startTime)/timeBase);
+        System.err.println("find costTime:" + (endTime - startTime) / timeBase);
 
         System.err.println("roleDataMax:" + roleDataMax);
 
@@ -167,7 +176,7 @@ public class DatabaseTest {
         startTime = System.nanoTime();
         UpdateResult updateResult = roleDataCollection2.replaceOne(Filters.eq(roleDataMax._getId()), roleDataMax, new ReplaceOptions().upsert(true));
         endTime = System.nanoTime();
-        System.err.println("replaceOne costTime:" + (endTime - startTime)/timeBase + ",updateResult:" + updateResult);
+        System.err.println("replaceOne costTime:" + (endTime - startTime) / timeBase + ",updateResult:" + updateResult);
 
         roleDataCollection2.insertOne(new RoleData2(roleDataMax.getId() + 1));
         roleDataCollection2.insertOne(new RoleData2(roleDataMax.getId() + 2));
@@ -186,14 +195,14 @@ public class DatabaseTest {
             roleDataList.add(roleData);
         }
         endTime = System.nanoTime();
-        System.err.println("roleDataList costTime:" + (endTime - startTime)/timeBase);
+        System.err.println("roleDataList costTime:" + (endTime - startTime) / timeBase);
 
         startTime = System.nanoTime();
         roleDataCollection2.insertMany(roleDataList);
         endTime = System.nanoTime();
-        System.err.println("insertMany costTime:" + (endTime - startTime)/timeBase);
+        System.err.println("insertMany costTime:" + (endTime - startTime) / timeBase);
 
-        System.err.println("testMongoCollection2 costTime:" + (System.nanoTime() - testMongoCollection2StartTime)/timeBase);
+        System.err.println("testMongoCollection2 costTime:" + (System.nanoTime() - testMongoCollection2StartTime) / timeBase);
     }
 
     private static void testMap() {

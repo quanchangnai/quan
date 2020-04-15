@@ -14,11 +14,11 @@ import java.util.regex.Pattern;
  */
 public class DataDefinition extends BeanDefinition {
 
-    //ID字段的类型
-    private String idType;
-
     //ID字段的名字
     private String idName = "id";
+
+    //ID字段
+    private FieldDefinition idField;
 
     private List<IndexDefinition> indexes = new ArrayList<>();
 
@@ -41,6 +41,17 @@ public class DataDefinition extends BeanDefinition {
     }
 
     @Override
+    public int getDefinitionType() {
+        return 5;
+    }
+
+    @Override
+    public String getDefinitionTypeName() {
+        return "数据";
+    }
+
+
+    @Override
     public void setName(String name) {
         super.setName(name);
         underscoreName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, getName());
@@ -51,27 +62,17 @@ public class DataDefinition extends BeanDefinition {
         return Constants.DATA_NAME_PATTERN;
     }
 
-    public String getIdType() {
-        return idType;
-    }
-
-    public DataDefinition setIdType(String idType) {
-        this.idType = idType;
-        return this;
-    }
-
     public String getIdName() {
         return idName;
     }
 
-    @Override
-    public int getDefinitionType() {
-        return 5;
+    public FieldDefinition getIdField() {
+        return idField;
     }
 
-    @Override
-    public String getDefinitionTypeName() {
-        return "数据";
+    public DataDefinition setIdField(FieldDefinition idField) {
+        this.idField = idField;
+        return this;
     }
 
     public void addIndex(IndexDefinition indexDefinition) {
@@ -93,26 +94,7 @@ public class DataDefinition extends BeanDefinition {
             addValidatedError(getValidatedName() + "的主键[" + getIdName() + "]不存在");
         }
 
-        validateIndexes();
-    }
-
-
-    protected void validateIndexes() {
-        for (FieldDefinition field : fields) {
-            if (!IndexDefinition.isIndex(field.getIndex())) {
-                continue;
-            }
-
-            if (!field.isPrimitiveType() && !field.isEnumType() && field.getType() != null) {
-                addValidatedError(getValidatedName("的") + field.getValidatedName() + "类型[" + field.getType() + "]不支持索引，允许的类型为" + Constants.PRIMITIVE_TYPES + "或枚举");
-                continue;
-            }
-
-            indexes.add(new IndexDefinition(field));
-        }
-
-        indexes.forEach(index -> index.validateIndex(this, false));
-
+        IndexDefinition.validateIndex(this, indexes, indexes, fields);
     }
 
 

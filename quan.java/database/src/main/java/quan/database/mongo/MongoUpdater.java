@@ -1,8 +1,9 @@
-package quan.database;
+package quan.database.mongo;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.ReplaceOptions;
+import quan.database.Data;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,16 +11,16 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 /**
- * 数据更新器，把数据修改更新到MongoDB
+ * MongoDB数据更新器，把被修改的数据更新到MongoDB
  * Created by quanchangnai on 2020/4/7.
  */
-public class DataUpdater implements Consumer<Set<Data<?>>> {
+public class MongoUpdater implements Consumer<Set<Data<?>>> {
 
     private Map<String, MongoCollection<Data<?>>> collections = new HashMap<>();
 
     private ReplaceOptions replaceOptions = new ReplaceOptions().upsert(true);
 
-    public DataUpdater(Map<String, MongoCollection<Data<?>>> collections) {
+    public MongoUpdater(Map<String, MongoCollection<Data<?>>> collections) {
         this.collections.putAll(collections);
     }
 

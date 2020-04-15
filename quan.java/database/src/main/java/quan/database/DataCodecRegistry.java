@@ -1,8 +1,6 @@
 package quan.database;
 
-import com.mongodb.MongoClientSettings;
 import org.bson.codecs.Codec;
-import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,26 +13,19 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * 支持注册指定包名下面所有的编解码器的注册表
+ * 数据编解码器注册表，支持注册指定包名下面所有的编解码器
  * Created by quanchangnai on 2020/4/1.
  */
-public class PackageCodecRegistry implements CodecRegistry {
+public class DataCodecRegistry implements CodecRegistry {
 
-    protected final static Logger logger = LoggerFactory.getLogger(PackageCodecRegistry.class);
+    protected final static Logger logger = LoggerFactory.getLogger(DataCodecRegistry.class);
 
     private Map<Class<?>, Codec<?>> codecs = new HashMap<>();
 
-    @SuppressWarnings("unchecked")
-    private CodecRegistry registry = CodecRegistries.fromRegistries(new CodecRegistry() {
-        public <T> Codec<T> get(Class<T> clazz) {
-            return (Codec<T>) codecs.get(clazz);
-        }
-    }, MongoClientSettings.getDefaultCodecRegistry());
-
-    public PackageCodecRegistry() {
+    public DataCodecRegistry() {
     }
 
-    public PackageCodecRegistry(String codecPackage) {
+    public DataCodecRegistry(String codecPackage) {
         register(codecPackage);
     }
 
@@ -64,6 +55,7 @@ public class PackageCodecRegistry implements CodecRegistry {
 
     @Override
     public <T> Codec<T> get(Class<T> clazz) {
-        return registry.get(clazz);
+        return (Codec<T>) codecs.get(clazz);
     }
+
 }
