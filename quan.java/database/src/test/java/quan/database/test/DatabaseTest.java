@@ -7,7 +7,6 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.Sorts;
 import com.mongodb.client.result.UpdateResult;
@@ -23,6 +22,7 @@ import quan.database.DataCodecRegistry;
 import quan.database.Transaction;
 import quan.database.item.ItemEntity;
 import quan.database.item.ItemEntity2;
+import quan.database.mongo.MongoManager;
 import quan.database.role.RoleData;
 import quan.database.role.RoleData2;
 
@@ -57,13 +57,15 @@ public class DatabaseTest {
 
         MongoDatabase testDatabase = mongoClient.getDatabase("test");
 
+        MongoManager mongoManager = new MongoManager("mongodb://127.0.0.1:27017", "test", "quan");
+
 //        Transaction.listenCommit(changes -> System.err.println("changes:" + changes));
 
         for (int i = 0; i < 10; i++) {
             System.err.println("=============" + i);
-            testMongoCollection1(testDatabase);
+            testMongoCollection1(mongoManager);
             System.err.println();
-            testMongoCollection2(testDatabase);
+            testMongoCollection2(mongoManager);
             System.err.println();
         }
 
@@ -77,25 +79,23 @@ public class DatabaseTest {
 
     private static final double timeBase = 1000000D;
 
-    private static void testMongoCollection1(MongoDatabase testDatabase) {
+    private static void testMongoCollection1(MongoManager mongoManager) {
         long startTime = System.nanoTime();
         Transaction.execute(() -> {
-            doTestMongoCollection1(testDatabase);
+            doTestMongoCollection1(mongoManager);
             return true;
         });
         System.err.println("testMongoCollection1 costTime:" + (System.nanoTime() - startTime) / timeBase);
     }
 
-    private static void doTestMongoCollection1(MongoDatabase testDatabase) {
+    private static void doTestMongoCollection1(MongoManager mongoManager) {
 
         System.err.println("testMongoCollection1 start===========");
-        MongoCollection<RoleData> roleDataCollection = testDatabase.getCollection(RoleData._NAME, RoleData.class);
+        MongoCollection<RoleData> roleDataCollection = mongoManager.getCollection(RoleData.class);
 
         for (Document index : roleDataCollection.listIndexes()) {
             System.err.println("index:" + new HashMap<>(index));
         }
-
-//        roleDataCollection.createIndex(new Document("name", 1), new IndexOptions().unique(false));
 
         long startTime, endTime;
 
@@ -121,9 +121,9 @@ public class DatabaseTest {
         endTime = System.nanoTime();
         System.err.println("replaceOne costTime:" + (endTime - startTime) / timeBase + ",updateResult:" + updateResult);
 
-        roleDataCollection.insertOne(new RoleData(roleDataMax.getId() + 1));
-        roleDataCollection.insertOne(new RoleData(roleDataMax.getId() + 2));
-        roleDataCollection.insertOne(new RoleData(roleDataMax.getId() + 3));
+        roleDataCollection.insertOne(new RoleData(roleDataMax.getId() + 1).setName("name:" + roleDataMax.getId() + 1));
+        roleDataCollection.insertOne(new RoleData(roleDataMax.getId() + 2).setName("name:" + roleDataMax.getId() + 2));
+        roleDataCollection.insertOne(new RoleData(roleDataMax.getId() + 3).setName("name:" + roleDataMax.getId() + 3));
 
         startTime = System.nanoTime();
         List<RoleData> roleDataList = new ArrayList<>();
@@ -146,13 +146,13 @@ public class DatabaseTest {
         System.err.println("insertMany costTime:" + (endTime - startTime) / timeBase);
     }
 
-    private static void testMongoCollection2(MongoDatabase testDatabase) {
+    private static void testMongoCollection2(MongoManager mongoManager) {
 
         long testMongoCollection2StartTime = System.nanoTime();
 
         System.err.println("testMongoCollection2 start===========");
 
-        MongoCollection<RoleData2> roleDataCollection2 = testDatabase.getCollection(RoleData2._NAME, RoleData2.class);
+        MongoCollection<RoleData2> roleDataCollection2 = mongoManager.getDatabase().getCollection(RoleData2._NAME, RoleData2.class);
 
         long startTime, endTime;
 

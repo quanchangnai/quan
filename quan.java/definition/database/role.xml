@@ -26,8 +26,8 @@
         <field name="set2" type="set:ItemEntity"/>
         <field name="list2" type="list:ItemEntity"/>
         <field name="map2" type="map:int:ItemEntity" ignore="true"/>
-        <index name="unique" type="u" fields="a,a2"/>两字段唯一索引
-        <index name="normal" type="normal" fields="b,b2"/>两字段普通索引
+        <index name="aa" type="normal" fields="a,a2"/>两字段普通索引
+        <index name="bb" type="normal" fields="b,b2"/>
     </data>
 
 </package>

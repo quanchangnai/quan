@@ -26,8 +26,8 @@ public class RoleData extends Data<Long> {
 
     static {
         Map<String, Index> indexes = new HashMap<>();
-        indexes.put("unique", new Index("unique", Arrays.asList(RoleData.A, RoleData.A2), true));
-        indexes.put("normal", new Index("normal", Arrays.asList(RoleData.B, RoleData.B2), false));
+        indexes.put("aa", new Index("aa", Arrays.asList(RoleData.A, RoleData.A2), false));
+        indexes.put("bb", new Index("bb", Arrays.asList(RoleData.B, RoleData.B2), false));
         indexes.put("name", new Index("name", Collections.singletonList(RoleData.NAME), true));
         _INDEXES = Collections.unmodifiableMap(indexes);
     }

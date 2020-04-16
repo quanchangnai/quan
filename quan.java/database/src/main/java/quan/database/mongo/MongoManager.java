@@ -2,12 +2,14 @@ package quan.database.mongo;
 
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
+import com.mongodb.assertions.Assertions;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.IndexModel;
 import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.Indexes;
 import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.slf4j.Logger;
@@ -19,6 +21,7 @@ import quan.database.DataCodecRegistry;
 import java.util.*;
 
 /**
+ * MongoDB管理器
  * Created by quanchangnai on 2020/4/13.
  */
 @SuppressWarnings("unchecked")
@@ -32,9 +35,12 @@ public class MongoManager {
 
     private Map<Class, MongoCollection> collections = new HashMap<>();
 
+    private MongoUpdater updater;
+
     public MongoManager(String connectionString, String databaseName, String dataPackage) {
+        Assertions.notNull("connectionString", connectionString);
         MongoClientSettings.Builder builder = MongoClientSettings.builder();
-        builder.applyConnectionString(new ConnectionString(Objects.requireNonNull(connectionString)));
+        builder.applyConnectionString(new ConnectionString(connectionString));
         init(builder, databaseName, dataPackage);
     }
 
@@ -43,11 +49,14 @@ public class MongoManager {
     }
 
     private void init(MongoClientSettings.Builder builder, String databaseName, String dataPackage) {
-        DataCodecRegistry dataCodecRegistry = new DataCodecRegistry(Objects.requireNonNull(dataPackage));
+        Assertions.notNull("databaseName", databaseName);
+        Assertions.notNull("dataPackage", dataPackage);
+        DataCodecRegistry dataCodecRegistry = new DataCodecRegistry(dataPackage);
         builder.codecRegistry(CodecRegistries.fromRegistries(dataCodecRegistry, MongoClientSettings.getDefaultCodecRegistry()));
 
         client = MongoClients.create(builder.build());
-        database = client.getDatabase(Objects.requireNonNull(databaseName));
+        database = client.getDatabase(databaseName);
+        updater = new MongoUpdater(this);
 
         ClassUtils.loadClasses(dataPackage, Data.class).forEach(this::initCollection);
     }
@@ -55,13 +64,13 @@ public class MongoManager {
     private void initCollection(Class<?> clazz) {
         String collectionName;
         Map<String, Data.Index> collectionIndexes;
+
         try {
             collectionName = (String) clazz.getField("_NAME").get(clazz);
-            collectionIndexes = (Map<String, Data.Index>) clazz.getField("_INDEXES").get(clazz);
+            collectionIndexes = new HashMap<>((Map<String, Data.Index>) clazz.getField("_INDEXES").get(clazz));
         } catch (Exception e) {
             logger.error("", e);
             return;
-
         }
 
         MongoCollection<?> collection = database.getCollection(collectionName, clazz);
@@ -70,7 +79,7 @@ public class MongoManager {
         Set<String> dropIndexes = new HashSet<>();
         for (Document index : collection.listIndexes()) {
             String indexName = index.getString("name");
-            if (((Document) index.get("key")).containsKey(Data._ID)) {
+            if (indexName.equals("_id_")) {
                 continue;
             }
             if (collectionIndexes.containsKey(indexName)) {
@@ -80,19 +89,16 @@ public class MongoManager {
             }
         }
 
+        dropIndexes.forEach(collection::dropIndex);
+
         List<IndexModel> createIndexModels = new ArrayList<>();
         for (Data.Index index : collectionIndexes.values()) {
-            Document document = new Document();
-            for (String field : index.getFields()) {
-                document.put(field, 1);
-            }
-            createIndexModels.add(new IndexModel(document, new IndexOptions().unique(index.isUnique())));
+            createIndexModels.add(new IndexModel(Indexes.ascending(index.getFields()), new IndexOptions().name(index.getName()).unique(index.isUnique())));
         }
-        collection.createIndexes(createIndexModels);
+        if (!createIndexModels.isEmpty()) {
+            collection.createIndexes(createIndexModels);
+        }
 
-        for (String dropIndex : dropIndexes) {
-            collection.dropIndex(dropIndex);
-        }
     }
 
     public MongoClient getClient() {
@@ -107,4 +113,7 @@ public class MongoManager {
         return (MongoCollection<D>) collections.get(clazz);
     }
 
+    public MongoUpdater getUpdater() {
+        return updater;
+    }
 }
