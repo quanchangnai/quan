@@ -60,20 +60,10 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
     private ${field.classType}<${field.classValueType}> ${field.name} = new ${field.classType}<>(_getLogRoot());
     <#elseif field.type == "map">
     private ${field.classType}<${field.classKeyType}, ${field.classValueType}> ${field.name} = new ${field.classType}<>(_getLogRoot());
-    <#elseif field.type = "string">
-    private SimpleField<${field.classType}> ${field.name} = new SimpleField<>("");
-    <#elseif field.type = "short">
-    private SimpleField<${field.classType}> ${field.name} = new SimpleField<>((short) 0);
-    <#elseif field.type = "int" || field.enumType>
-    private SimpleField<Integer> ${field.name} = new SimpleField<>(0);
-    <#elseif field.type = "long">
-    private SimpleField<${field.classType}> ${field.name} = new SimpleField<>(0L);
-    <#elseif field.type = "float">
-    private SimpleField<${field.classType}> ${field.name} = new SimpleField<>(0F);
-    <#elseif field.type = "double">
-    private SimpleField<${field.classType}> ${field.name} = new SimpleField<>(0D);
-    <#elseif field.type = "bool">
-    private SimpleField<${field.classType}> ${field.name} = new SimpleField<>(false);
+    <#elseif field.enumType>
+    private IntField ${field.name} = new IntField();
+    <#elseif field.primitiveType>
+    private ${field.type?cap_first}Field ${field.name} = new ${field.type?cap_first}Field();
     <#else>
     private EntityField<${field.classType}> ${field.name} = new EntityField<>(_getLogRoot());
     </#if>

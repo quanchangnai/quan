@@ -11,7 +11,7 @@ import java.util.*;
  * Created by quanchangnai on 2019/5/21.
  */
 @SuppressWarnings({"unchecked"})
-public final class ListField<E> extends Node implements List<E>, Field<PVector<E>> {
+public final class ListField<E> extends Node implements List<E>, Field {
 
     private PVector<E> list = Empty.vector();
 
@@ -28,30 +28,28 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
         }
     }
 
-    @Override
+    public PVector<E> getValue() {
+        return list;
+    }
+
     public void setValue(PVector<E> list) {
         this.list = list;
     }
 
     @Override
-    public PVector<E> getValue() {
-        return list;
+    public void setValue(Object list) {
+        this.list = (PVector<E>) list;
     }
 
-    @Override
     public PVector<E> getLogValue() {
-        ListLog<PVector<E>> log = getLog(false);
+        PVector<E> log = (PVector<E>) _getFieldLog(Transaction.get(true), this);
         if (log != null) {
-            return log.getValue();
+            return log;
         }
         return list;
     }
 
     private int getModCount() {
-        ListLog<PVector<E>> log = getLog(false);
-        if (log != null) {
-            return log.getModCount();
-        }
         return 0;
     }
 
@@ -140,31 +138,16 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
         return getLogValue().toArray(a);
     }
 
-    private ListLog<PVector<E>> getLog(boolean add) {
-        Transaction transaction = Transaction.get(add);
-        if (transaction == null) {
-            return null;
-        }
-
-        ListLog<PVector<E>> log = (ListLog<PVector<E>>) _getFieldLog(transaction, this);
-        if (add && log == null) {
-            log = new ListLog<>(this, list);
-            _addFieldLog(transaction, log);
-            _addDataLog(transaction, _getLogRoot());
-        }
-
-        return log;
-    }
-
 
     @Override
     public boolean add(E e) {
         Validations.validateCollectionValue(e);
 
-        ListLog<PVector<E>> log = getLog(true);
-        log.incModCount();
+        PVector<E> log = getLogValue();
+//        log.incModCount();
 
-        log.setValue(log.getValue().plus(e));
+        _addFieldLog(Transaction.get(true), this, log.plus(e), null);
+
         if (e instanceof Entity) {
             _setLogRoot((Entity) e, _getLogRoot());
         }
@@ -185,15 +168,14 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
 
     @Override
     public boolean remove(Object o) {
-        ListLog<PVector<E>> log = getLog(true);
-        log.incModCount();
+        PVector<E> oldList = getLogValue();
+        PVector<E> newList = oldList.minus(o);
 
-        PVector<E> oldList = log.getValue();
-        log.setValue(log.getValue().minus(o));
-
-        if (oldList == log.getValue()) {
+        if (oldList == newList) {
             return false;
         }
+
+        _addFieldLog(Transaction.get(true), this, newList, null);
 
         if (o instanceof Entity) {
             _setLogRoot((Entity) o, null);
@@ -209,15 +191,14 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
 
     @Override
     public boolean addAll(Collection<? extends E> c) {
-        for (E e : c) {
-            Validations.validateCollectionValue(e);
+        c.forEach(Validations::validateCollectionValue);
+
+        PVector<E> oldList = getLogValue();
+        PVector<E> newList = oldList.plusAll(c);
+
+        if (oldList == newList) {
+            return false;
         }
-
-        ListLog<PVector<E>> log = getLog(true);
-        log.incModCount();
-
-        PVector<E> oldList = log.getValue();
-        log.setValue(log.getValue().plusAll(c));
 
         for (E e : c) {
             if (e instanceof Entity) {
@@ -225,21 +206,20 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
             }
         }
 
-        return oldList != log.getValue();
+        return true;
     }
 
     @Override
     public boolean addAll(int index, Collection<? extends E> c) {
         Objects.requireNonNull(c);
-        for (E e : c) {
-            Validations.validateCollectionValue(e);
+        c.forEach(Validations::validateCollectionValue);
+
+        PVector<E> oldList = getLogValue();
+        PVector<E> newList = oldList.plusAll(index, c);
+
+        if (oldList == newList) {
+            return false;
         }
-
-        ListLog<PVector<E>> log = getLog(true);
-        log.incModCount();
-
-        PVector<E> oldList = log.getValue();
-        log.setValue(log.getValue().plusAll(index, c));
 
         for (E e : c) {
             if (e instanceof Entity) {
@@ -247,7 +227,7 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
             }
         }
 
-        return oldList != log.getValue();
+        return true;
     }
 
     @Override
@@ -264,14 +244,12 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
 
     @Override
     public void clear() {
-        ListLog<PVector<E>> log = getLog(true);
-        if (log.getValue().isEmpty()) {
+        if (getLogValue().isEmpty()) {
             return;
         }
 
-        log.incModCount();
         _setChildrenLogRoot(null);
-        log.setValue(Empty.vector());
+        _addFieldLog(Transaction.get(true), this, Empty.vector(), null);
     }
 
     @Override
@@ -296,11 +274,9 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
     public E set(int index, E e) {
         Validations.validateCollectionValue(e);
 
-        ListLog<PVector<E>> log = getLog(true);
-        log.incModCount();
-
-        PVector<E> oldList = log.getValue();
-        log.setValue(log.getValue().with(index, e));
+        PVector<E> oldList = getLogValue();
+        PVector<E> newList = oldList.with(index, e);
+        _addFieldLog(Transaction.get(true), this, newList, null);
 
         if (e instanceof Entity) {
             _setLogRoot((Entity) e, _getLogRoot());
@@ -318,9 +294,9 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
     public void add(int index, E e) {
         Validations.validateCollectionValue(e);
 
-        ListLog<PVector<E>> log = getLog(true);
-        log.incModCount();
-        log.setValue(log.getValue().plus(index, e));
+        PVector<E> oldList = getLogValue();
+        PVector<E> newList = oldList.plus(index, e);
+        _addFieldLog(Transaction.get(true), this, newList, null);
 
         if (e instanceof Entity) {
             _setLogRoot((Entity) e, _getLogRoot());
@@ -329,11 +305,9 @@ public final class ListField<E> extends Node implements List<E>, Field<PVector<E
 
     @Override
     public E remove(int index) {
-        ListLog<PVector<E>> log = getLog(true);
-        log.incModCount();
-
-        PVector<E> oldList = log.getValue();
-        log.setValue(log.getValue().minus(index));
+        PVector<E> oldList = getLogValue();
+        PVector<E> newList = oldList.minus(index);
+        _addFieldLog(Transaction.get(true), this, newList, null);
 
         E old = oldList.get(index);
         if (old instanceof Entity) {

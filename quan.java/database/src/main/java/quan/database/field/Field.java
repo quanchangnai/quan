@@ -4,12 +4,8 @@ package quan.database.field;
  * 数据字段包装器
  * Created by quanchangnai on 2019/6/22.
  */
-public interface Field<V> {
+public interface Field {
 
-    V getValue();
-
-    V getLogValue();
-
-    void setValue(V value);
+    void setValue(Object value);
 
 }

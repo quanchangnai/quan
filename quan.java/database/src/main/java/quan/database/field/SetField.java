@@ -3,7 +3,6 @@ package quan.database.field;
 import org.pcollections.Empty;
 import org.pcollections.PSet;
 import quan.database.*;
-import quan.database.log.FieldLog;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -14,7 +13,7 @@ import java.util.Set;
  * Created by quanchangnai on 2019/5/21.
  */
 @SuppressWarnings({"unchecked"})
-public final class SetField<E> extends Node implements Set<E>, Field<PSet<E>> {
+public final class SetField<E> extends Node implements Set<E>, Field {
 
     private PSet<E> set = Empty.set();
 
@@ -31,21 +30,23 @@ public final class SetField<E> extends Node implements Set<E>, Field<PSet<E>> {
         }
     }
 
-    @Override
+    public PSet<E> getValue() {
+        return set;
+    }
+
     public void setValue(PSet<E> set) {
         this.set = set;
     }
 
     @Override
-    public PSet<E> getValue() {
-        return set;
+    public void setValue(Object set) {
+        this.set = (PSet<E>) set;
     }
 
-    @Override
     public PSet<E> getLogValue() {
-        FieldLog<PSet<E>> log = getLog(false);
+        PSet<E> log = (PSet<E>) _getFieldLog(Transaction.get(true), this);
         if (log != null) {
-            return log.getValue();
+            return log;
         }
         return set;
     }
@@ -106,37 +107,20 @@ public final class SetField<E> extends Node implements Set<E>, Field<PSet<E>> {
         return getLogValue().toArray(a);
     }
 
-    private FieldLog<PSet<E>> getLog(boolean add) {
-        Transaction transaction = Transaction.get(add);
-        if (transaction == null) {
-            return null;
-        }
-
-        FieldLog<PSet<E>> log = (FieldLog<PSet<E>>) _getFieldLog(transaction, this);
-        if (add && log == null) {
-            log = new FieldLog<>(this, set);
-            _addFieldLog(transaction, log);
-            _addDataLog(transaction, _getLogRoot());
-        }
-
-        return log;
-    }
-
 
     @Override
     public boolean add(E e) {
         Validations.validateCollectionValue(e);
 
-        FieldLog<PSet<E>> log = getLog(true);
-
-        PSet<E> oldSet = log.getValue();
+        PSet<E> oldSet = getLogValue();
         PSet<E> newSet = oldSet.plus(e);
 
         if (oldSet == newSet) {
             return false;
         }
 
-        log.setValue(newSet);
+        _addFieldLog(Transaction.get(true), this, newSet, null);
+
         if (e instanceof Entity) {
             _setLogRoot((Entity) e, _getLogRoot());
         }
@@ -162,19 +146,19 @@ public final class SetField<E> extends Node implements Set<E>, Field<PSet<E>> {
 
     @Override
     public boolean remove(Object o) {
-        FieldLog<PSet<E>> log = getLog(true);
-
-        PSet<E> oldSet = log.getValue();
+        PSet<E> oldSet = getLogValue();
         PSet<E> newSet = oldSet.minus(o);
 
         if (oldSet == newSet) {
             return false;
         }
 
-        log.setValue(newSet);
+        _addFieldLog(Transaction.get(true), this, newSet, null);
+
         if (o instanceof Entity) {
             _setLogRoot((Entity) o, null);
         }
+
 
         return true;
     }
@@ -187,13 +171,16 @@ public final class SetField<E> extends Node implements Set<E>, Field<PSet<E>> {
     @Override
     public boolean addAll(Collection<? extends E> c) {
         Objects.requireNonNull(c);
-        for (E e : c) {
-            Validations.validateCollectionValue(e);
+        c.forEach(Validations::validateCollectionValue);
+
+        PSet<E> oldSet = getLogValue();
+        PSet<E> newSet = oldSet.plusAll(c);
+
+        if (oldSet == newSet) {
+            return false;
         }
 
-        FieldLog<PSet<E>> log = getLog(true);
-        PSet<E> oldSet = log.getValue();
-        log.setValue(oldSet.plusAll(c));
+        _addFieldLog(Transaction.get(true), this, newSet, null);
 
         for (E e : c) {
             if (e instanceof Entity) {
@@ -201,7 +188,7 @@ public final class SetField<E> extends Node implements Set<E>, Field<PSet<E>> {
             }
         }
 
-        return oldSet != log.getValue();
+        return true;
     }
 
     @Override
@@ -231,12 +218,12 @@ public final class SetField<E> extends Node implements Set<E>, Field<PSet<E>> {
 
     @Override
     public void clear() {
-        FieldLog<PSet<E>> log = getLog(true);
-        if (log.getValue().isEmpty()) {
+        if (getLogValue().isEmpty()) {
             return;
         }
+
         _setChildrenLogRoot(null);
-        log.setValue(Empty.set());
+        _addFieldLog(Transaction.get(true), this, Empty.set(), null);
     }
 
     @Override

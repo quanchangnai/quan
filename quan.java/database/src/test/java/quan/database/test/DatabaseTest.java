@@ -1,7 +1,10 @@
 package quan.database.test;
 
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.Sorts;
+import com.mongodb.client.result.UpdateResult;
 import org.bson.BsonReader;
 import org.bson.BsonWriter;
 import org.bson.json.JsonReader;
@@ -113,7 +116,7 @@ public class DatabaseTest {
 
 //        startTime = System.nanoTime();
         List<RoleData> roleDataList = new ArrayList<>();
-        for (long i = roleData3.getId() + 1; i < roleData3.getId() + 10; i++) {
+        for (long i = roleData3.getId() + 1; i < roleData3.getId() + 20; i++) {
             RoleData roleData = new RoleData(i);
             roleData.setName("aaa" + i);
             roleData.setItem(new ItemEntity().setId((int) i).setName("item" + i));
@@ -152,7 +155,6 @@ public class DatabaseTest {
 
         if (roleDataMax == null) {
             roleDataMax = new RoleData2(1L);
-            roleDataMax.setName("aaa");
         }
 
         for (int i = 0; i < 20; i++) {
@@ -161,7 +163,7 @@ public class DatabaseTest {
         }
 
 //        startTime = System.nanoTime();
-//        UpdateResult updateResult = roleDataCollection2.replaceOne(Filters.eq(roleDataMax._getId()), roleDataMax, new ReplaceOptions().upsert(true));
+        UpdateResult updateResult = roleDataCollection2.replaceOne(Filters.eq(roleDataMax._getId()), roleDataMax, new ReplaceOptions().upsert(true));
 //        endTime = System.nanoTime();
 //        System.err.println("replaceOne costTime:" + (endTime - startTime) / timeBase + ",updateResult:" + updateResult);
 
@@ -174,7 +176,7 @@ public class DatabaseTest {
 
 //        startTime = System.nanoTime();
         List<RoleData2> roleDataList = new ArrayList<>();
-        for (long i = roleData3.getId() + 1; i < roleDataMax.getId() + 10; i++) {
+        for (long i = roleData3.getId() + 1; i < roleData3.getId() + 20; i++) {
             RoleData2 roleData = new RoleData2(i);
             roleData.setName("aaa" + i);
             roleData.setItem(new ItemEntity2().setId((int) i).setName("item" + i));
@@ -188,7 +190,8 @@ public class DatabaseTest {
 //        System.err.println("roleDataList costTime:" + (endTime - startTime) / timeBase);
 
 //        startTime = System.nanoTime();
-        roleDataCollection2.insertMany(roleDataList);
+//        roleDataCollection2.insertMany(roleDataList);
+        roleDataList.forEach(roleDataCollection2::insertOne);
 //        endTime = System.nanoTime();
 //        System.err.println("insertMany costTime:" + (endTime - startTime) / timeBase);
 

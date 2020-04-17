@@ -90,27 +90,27 @@ public class RoleData extends Data<Long> {
     public static final String MAP2 = "map2";
 
 
-    private SimpleField<Long> id = new SimpleField<>(0L);
+    private LongField id = new LongField();
 
-    private SimpleField<String> name = new SimpleField<>("");
+    private StringField name = new StringField();
 
-    private SimpleField<Integer> roleType = new SimpleField<>(0);
+    private IntField roleType = new IntField();
 
-    private SimpleField<Integer> a = new SimpleField<>(0);
+    private IntField a = new IntField();
 
-    private SimpleField<Integer> a2 = new SimpleField<>(0);
+    private IntField a2 = new IntField();
 
-    private SimpleField<Boolean> b = new SimpleField<>(false);
+    private BoolField b = new BoolField();
 
-    private SimpleField<Integer> b2 = new SimpleField<>(0);
+    private IntField b2 = new IntField();
 
-    private SimpleField<Short> s = new SimpleField<>((short) 0);
+    private ShortField s = new ShortField();
 
-    private SimpleField<Integer> i = new SimpleField<>(0);
+    private IntField i = new IntField();
 
-    private SimpleField<Float> f = new SimpleField<>(0F);
+    private FloatField f = new FloatField();
 
-    private SimpleField<Double> d = new SimpleField<>(0D);
+    private DoubleField d = new DoubleField();
 
     private EntityField<ItemEntity> item = new EntityField<>(_getLogRoot());
 

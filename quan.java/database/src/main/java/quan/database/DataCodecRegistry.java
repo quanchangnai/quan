@@ -16,6 +16,7 @@ import java.util.Set;
  * 数据编解码器注册表，支持注册指定包名下面所有的编解码器
  * Created by quanchangnai on 2020/4/1.
  */
+@SuppressWarnings("unchecked")
 public class DataCodecRegistry implements CodecRegistry {
 
     protected final static Logger logger = LoggerFactory.getLogger(DataCodecRegistry.class);

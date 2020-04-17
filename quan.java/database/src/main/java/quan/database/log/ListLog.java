@@ -5,12 +5,11 @@ import quan.database.field.Field;
 /**
  * Created by quanchangnai on 2019/8/29.
  */
-public class ListLog<V> extends FieldLog<V> {
+public class ListLog {
 
     private int modCount;
 
-    public ListLog(Field<V> field, V value) {
-        super(field, value);
+    public ListLog(Field field, Object value) {
     }
 
     public int getModCount() {

@@ -3,8 +3,6 @@ package quan.database;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.database.field.Field;
-import quan.database.log.FieldLog;
-import quan.database.log.RootLog;
 
 import java.util.*;
 
@@ -34,12 +32,12 @@ public class Transaction {
     /**
      * 记录节点的根
      */
-    private Map<Node, RootLog> rootLogs = new HashMap<>();
+    private Map<Node, Data> rootLogs = new HashMap<>();
 
     /**
      * 记录字段值
      */
-    private Map<Field, FieldLog> fieldLogs = new HashMap<>();
+    private Map<Field, Object> fieldLogs = new HashMap<>();
 
     /**
      * 数据更新器
@@ -56,24 +54,22 @@ public class Transaction {
         return failed;
     }
 
-
-    void addDataLog(Data data) {
-        dataLogs.add(data);
+    void addFieldLog(Field field, Object value, Data root) {
+        fieldLogs.put(field, value);
+        if (root != null) {
+            dataLogs.add(root);
+        }
     }
 
-    void addFieldLog(FieldLog fieldLog) {
-        fieldLogs.put(fieldLog.getField(), fieldLog);
-    }
-
-    FieldLog getFieldLog(Field field) {
+    Object getFieldLog(Field field) {
         return fieldLogs.get(field);
     }
 
-    void addRootLog(RootLog rootLog) {
-        rootLogs.put(rootLog.getNode(), rootLog);
+    void addRootLog(Node node, Data root) {
+        rootLogs.put(node, root);
     }
 
-    RootLog getRootLog(Node node) {
+    Data getRootLog(Node node) {
         return rootLogs.get(node);
     }
 
@@ -88,11 +84,11 @@ public class Transaction {
     /**
      * 获取当前事务
      *
-     * @param validate 校验当前是否处于事务之中
+     * @param check 检测当前是否处于事务之中
      */
-    public static Transaction get(boolean validate) {
+    public static Transaction get(boolean check) {
         Transaction transaction = threadLocal.get();
-        if (validate && transaction == null) {
+        if (check && transaction == null) {
             throw new IllegalStateException("当前不在事务中");
         }
         return transaction;
@@ -205,11 +201,12 @@ public class Transaction {
      * 事务提交
      */
     private void commit() {
-        for (RootLog rootLog : rootLogs.values()) {
-            rootLog.commit();
+        for (Node node : rootLogs.keySet()) {
+            node._setRoot(rootLogs.get(node));
         }
-        for (FieldLog fieldLog : fieldLogs.values()) {
-            fieldLog.commit();
+
+        for (Field field : fieldLogs.keySet()) {
+            field.setValue(fieldLogs.get(field));
         }
 
         List<Data> updates = Collections.unmodifiableList(new ArrayList<>(dataLogs));
