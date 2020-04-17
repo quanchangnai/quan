@@ -7,7 +7,6 @@ import quan.database.log.FieldLog;
 import quan.database.log.RootLog;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 /**
  * 事务实现，多线程并发时需要自己加锁，否则隔离级别就是读已提交
@@ -43,9 +42,9 @@ public class Transaction {
     private Map<Field, FieldLog> fieldLogs = new HashMap<>();
 
     /**
-     * 事务成功执行提交后的回调，不随事务结束而清除
+     * 数据更新器
      */
-    private static List<Consumer<Set<Data>>> listeners = new ArrayList<>();
+    private static List<DataUpdater> updaters = new ArrayList<>();
 
     /**
      * 事务执行结束之后再执行的特殊任务
@@ -213,10 +212,10 @@ public class Transaction {
             fieldLog.commit();
         }
 
-        Set<Data> changes = Collections.unmodifiableSet(dataLogs);
-        for (Consumer<Set<Data>> listener : listeners) {
+        List<Data> updates = Collections.unmodifiableList(new ArrayList<>(dataLogs));
+        for (DataUpdater updater : updaters) {
             try {
-                listener.accept(changes);
+                updater.update(updates);
             } catch (Exception e) {
                 logger.error("", e);
             }
@@ -224,12 +223,10 @@ public class Transaction {
     }
 
     /**
-     * 监听所有事务的提交事件
-     *
-     * @param listener 修改过的数据作为监听器的参数
+     * 添加数据更新器
      */
-    public static void listen(Consumer<Set<Data>> listener) {
-        listeners.add(listener);
+    public static void addUpdater(DataUpdater updater) {
+        updaters.add(updater);
     }
 
     /**
@@ -240,6 +237,10 @@ public class Transaction {
      */
     public static void run(Runnable task, boolean committed) {
         Transaction.get(true).endTasks.put(task, committed);
+    }
+
+    public static void run(Runnable task) {
+        Transaction.get(true).endTasks.put(task, true);
     }
 
     /**

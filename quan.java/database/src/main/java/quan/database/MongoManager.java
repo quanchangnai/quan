@@ -1,4 +1,4 @@
-package quan.database.mongo;
+package quan.database;
 
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
@@ -7,16 +7,12 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.IndexModel;
-import com.mongodb.client.model.IndexOptions;
-import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.*;
 import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.common.ClassUtils;
-import quan.database.Data;
-import quan.database.DataCodecRegistry;
 
 import java.util.*;
 
@@ -25,9 +21,15 @@ import java.util.*;
  * Created by quanchangnai on 2020/4/13.
  */
 @SuppressWarnings("unchecked")
-public class MongoManager {
+public class MongoManager implements DataUpdater {
 
     private static final Logger logger = LoggerFactory.getLogger(MongoManager.class);
+
+    private static final ReplaceOptions replaceOptions = new ReplaceOptions().upsert(true);
+
+    private String databaseName;
+
+    private String dataPackage;
 
     private MongoClient client;
 
@@ -35,30 +37,42 @@ public class MongoManager {
 
     private Map<Class, MongoCollection> collections = new HashMap<>();
 
-    private MongoUpdater updater;
+    private MongoManager(MongoClient client, String databaseName, String dataPackage) {
+        this.client = client;
+        this.databaseName = databaseName;
+        this.dataPackage = dataPackage;
+    }
 
     public MongoManager(String connectionString, String databaseName, String dataPackage) {
+        this.databaseName = Assertions.notNull("databaseName", databaseName);
+        this.dataPackage = Assertions.notNull("dataPackage", dataPackage);
         Assertions.notNull("connectionString", connectionString);
+
         MongoClientSettings.Builder builder = MongoClientSettings.builder();
         builder.applyConnectionString(new ConnectionString(connectionString));
-        init(builder, databaseName, dataPackage);
+
+        initClient(builder);
     }
 
     public MongoManager(MongoClientSettings.Builder builder, String databaseName, String dataPackage) {
-        init(builder, databaseName, dataPackage);
+        this.databaseName = Assertions.notNull("databaseName", databaseName);
+        this.dataPackage = Assertions.notNull("dataPackage", dataPackage);
+
+        initClient(builder);
     }
 
-    private void init(MongoClientSettings.Builder builder, String databaseName, String dataPackage) {
-        Assertions.notNull("databaseName", databaseName);
-        Assertions.notNull("dataPackage", dataPackage);
+    private void initClient(MongoClientSettings.Builder builder) {
         DataCodecRegistry dataCodecRegistry = new DataCodecRegistry(dataPackage);
         builder.codecRegistry(CodecRegistries.fromRegistries(dataCodecRegistry, MongoClientSettings.getDefaultCodecRegistry()));
-
         client = MongoClients.create(builder.build());
-        database = client.getDatabase(databaseName);
-        updater = new MongoUpdater(this);
 
+        initDatabase();
+    }
+
+    private void initDatabase() {
+        database = client.getDatabase(databaseName);
         ClassUtils.loadClasses(dataPackage, Data.class).forEach(this::initCollection);
+        Transaction.addUpdater(this);
     }
 
     private void initCollection(Class<?> clazz) {
@@ -93,12 +107,22 @@ public class MongoManager {
 
         List<IndexModel> createIndexModels = new ArrayList<>();
         for (Data.Index index : collectionIndexes.values()) {
-            createIndexModels.add(new IndexModel(Indexes.ascending(index.getFields()), new IndexOptions().name(index.getName()).unique(index.isUnique())));
+            IndexOptions indexOptions = new IndexOptions().name(index.getName()).unique(index.isUnique());
+            createIndexModels.add(new IndexModel(Indexes.ascending(index.getFields()), indexOptions));
         }
         if (!createIndexModels.isEmpty()) {
             collection.createIndexes(createIndexModels);
         }
 
+    }
+
+    public MongoManager create(String databaseName) {
+        if (databaseName.equals(this.databaseName)) {
+            return this;
+        }
+        MongoManager manager = new MongoManager(client, databaseName, dataPackage);
+        manager.initDatabase();
+        return manager;
     }
 
     public MongoClient getClient() {
@@ -113,7 +137,18 @@ public class MongoManager {
         return (MongoCollection<D>) collections.get(clazz);
     }
 
-    public MongoUpdater getUpdater() {
-        return updater;
+    @Override
+    public void update(List<Data> updates) {
+        for (Data data : updates) {
+            DataUpdater updater = data._getUpdater();
+            if (updater != null && updater != this) {
+                continue;
+            }
+            MongoCollection collection = collections.get(data.getClass());
+            if (collection == null) {
+                continue;
+            }
+            collection.replaceOne(Filters.eq(data._id()), data, replaceOptions);
+        }
     }
 }

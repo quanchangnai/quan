@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 数据，对应一张表，每个实例对应表中的一行
+ * 数据对应一张表，每个实例对应表中的一行
  * Created by quanchangnai on 2019/5/16.
  */
 public abstract class Data<I> extends Entity {
@@ -34,6 +34,24 @@ public abstract class Data<I> extends Entity {
      * 数据索引
      */
     public abstract Map<String, Index> _indexes();
+
+    /**
+     * 数据更新器
+     */
+    private volatile DataUpdater updater;
+
+    public final DataUpdater _getUpdater() {
+        return updater;
+    }
+
+    /**
+     * 设置该数据的更新器
+     *
+     * @param updater 更新器不为空时，该数据只会被设置的更新器更新
+     */
+    public final void _setUpdater(DataUpdater updater) {
+        this.updater = updater;
+    }
 
     /**
      * 数据索引
