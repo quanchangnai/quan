@@ -98,14 +98,14 @@ public class Transaction {
      * 获取当前事务
      */
     public static Transaction get() {
-        return get(false);
+        return threadLocal.get();
     }
 
     /**
      * 开始事务
      */
     private static Transaction begin() {
-        Transaction transaction = get();
+        Transaction transaction = threadLocal.get();
         if (transaction == null) {
             transaction = new Transaction();
             threadLocal.set(transaction);
@@ -152,18 +152,22 @@ public class Transaction {
      * 在事务中执行任务，执行线程为调用方法的当前线程
      */
     public static void execute(Task task) {
-        if (isInside()) {
-            insideExecute(task);
+        Transaction transaction = threadLocal.get();
+        if (transaction != null) {
+            _executeInside(transaction, task);
         } else {
-            outsideExecute(task);
+            _executeOutside(Transaction.begin(), task);
         }
     }
 
     /**
      * 在事务内部执行
      */
-    public static void insideExecute(Task task) {
-        Transaction transaction = get(true);
+    public static void executeInside(Task task) {
+        _executeInside(get(true), task);
+    }
+
+    private static void _executeInside(Transaction transaction, Task task) {
         if (!task.run()) {
             transaction.failed = true;
         }
@@ -172,17 +176,16 @@ public class Transaction {
 
     /**
      * 在事务外部执行，需要开启新事务
-     *
-     * @param task 事务逻辑
      */
-    public static void outsideExecute(Task task) {
+    public static void executeOutside(Task task) {
         if (Transaction.isInside()) {
             throw new IllegalStateException("当前已经在事务中了");
         }
+        _executeOutside(Transaction.begin(), task);
+    }
 
-        Transaction transaction = Transaction.begin();
+    private static void _executeOutside(Transaction transaction, Task task) {
         boolean failed = false;
-
         try {
             failed = !task.run();
         } catch (Throwable e) {

@@ -44,7 +44,7 @@ public class DataCodecRegistry implements CodecRegistry {
             }
 
             try {
-                Codec codec = (Codec) codecClass.getDeclaredConstructor(CodecRegistry.class).newInstance(this);
+                Codec<?> codec = (Codec<?>) codecClass.getDeclaredConstructor(CodecRegistry.class).newInstance(this);
                 codecs.put(codec.getEncoderClass(), codec);
             } catch (NoSuchMethodException ignored) {
                 //直接忽略
