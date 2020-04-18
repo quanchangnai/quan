@@ -12,12 +12,15 @@ import java.util.Set;
 /**
  * Created by quanchangnai on 2019/5/21.
  */
-@SuppressWarnings({"unchecked", "rawtypes"})
+@SuppressWarnings("unchecked")
 public final class SetField<E> extends Node implements Set<E>, Field {
 
     private PSet<E> set = Empty.set();
 
-    public SetField(Data root) {
+    private Delegate<E> delegate = new Delegate<>(this);
+
+
+    public SetField(Data<?> root) {
         _setRoot(root);
     }
 
@@ -25,13 +28,17 @@ public final class SetField<E> extends Node implements Set<E>, Field {
         return set;
     }
 
+    public Delegate<E> getDelegate() {
+        return delegate;
+    }
+
     @Override
-    public void commit(Object log) {
+    protected void commit(Object log) {
         this.set = (PSet<E>) log;
     }
 
     @Override
-    public void _setChildrenLogRoot(Data root) {
+    public void _setChildrenLogRoot(Data<?> root) {
         for (E e : getLog()) {
             if (e instanceof Entity) {
                 _setLogRoot((Entity) e, root);
@@ -120,7 +127,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
             return false;
         }
 
-        Data root = _getLogRoot(transaction);
+        Data<?> root = _getLogRoot(transaction);
 
         if (e instanceof Entity) {
             _setLogRoot((Entity) e, root);
@@ -186,7 +193,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
             return false;
         }
 
-        Data root = _getLogRoot(transaction);
+        Data<?> root = _getLogRoot(transaction);
 
         _setFieldLog(transaction, this, newSet, root);
 
@@ -245,4 +252,83 @@ public final class SetField<E> extends Node implements Set<E>, Field {
         return String.valueOf(getLog());
     }
 
+
+    private static class Delegate<E> implements Set<E> {
+
+        private SetField<E> field;
+
+        public Delegate(SetField<E> field) {
+            this.field = field;
+        }
+
+        @Override
+        public int size() {
+            return field.size();
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return field.isEmpty();
+        }
+
+        @Override
+        public boolean contains(Object o) {
+            return field.contains(o);
+        }
+
+        @Override
+        public Iterator<E> iterator() {
+            return field.iterator();
+        }
+
+        @Override
+        public Object[] toArray() {
+            return field.toArray();
+        }
+
+        @Override
+        public <T> T[] toArray(T[] a) {
+            return field.toArray(a);
+        }
+
+        @Override
+        public boolean add(E e) {
+            return field.add(e);
+        }
+
+        @Override
+        public boolean remove(Object o) {
+            return field.remove(o);
+        }
+
+        @Override
+        public boolean containsAll(Collection<?> c) {
+            return field.containsAll(c);
+        }
+
+        @Override
+        public boolean addAll(Collection<? extends E> c) {
+            return field.addAll(c);
+        }
+
+        @Override
+        public boolean removeAll(Collection<?> c) {
+            return field.removeAll(c);
+        }
+
+        @Override
+        public boolean retainAll(Collection<?> c) {
+            return field.retainAll(c);
+        }
+
+        @Override
+        public void clear() {
+            field.clear();
+        }
+
+        @Override
+        public String toString() {
+            return field.toString();
+        }
+    }
 }

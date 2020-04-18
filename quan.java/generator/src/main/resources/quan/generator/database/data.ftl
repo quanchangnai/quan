@@ -65,7 +65,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
     <#elseif field.primitiveType>
     private ${field.type?cap_first}Field ${field.name} = new ${field.type?cap_first}Field();
     <#else>
-    private EntityField<${field.classType}> ${field.name} = new EntityField<>(_getLogRoot());
+    private EntityField<${field.classType}> ${field.name} = new EntityField<>();
     </#if>
 
 </#list>
@@ -114,12 +114,12 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
     </#if>
     <#if field.type == "list" || field.type == "set">
     public ${field.basicType}<${field.classValueType}> get${field.name?cap_first}() {
-        return ${field.name};
+        return ${field.name}.getDelegate();
     }
 
     <#elseif field.type == "map">
     public ${field.basicType}<${field.classKeyType}, ${field.classValueType}> get${field.name?cap_first}() {
-        return ${field.name};
+        return ${field.name}.getDelegate();
     }
 
     <#elseif definitionType ==5 && field.name == idName>
@@ -153,7 +153,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
      */
     </#if>
     public ${name} set${field.name?cap_first}(${field.basicType} ${field.name}) {
-        this.${field.name}.setLog(${field.name}<#if !field.beanType>, _getLogRoot()</#if>);
+        this.${field.name}.setLog(${field.name}, _getLogRoot());
         return this;
     }
         <#if field.numberType>
@@ -172,9 +172,9 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
     </#if>
 </#list>
     @Override
-    protected void _setChildrenLogRoot(Data root) {
+    protected void _setChildrenLogRoot(Data<?> root) {
 <#list fields as field>
-    <#if field.collectionType || field.beanType>
+    <#if field.collectionType>
         _setLogRoot(${field.name}, root);
     </#if>
 </#list>

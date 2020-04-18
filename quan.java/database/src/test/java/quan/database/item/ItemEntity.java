@@ -48,7 +48,7 @@ public class ItemEntity extends Entity {
     }
 
     @Override
-    protected void _setChildrenLogRoot(Data root) {
+    protected void _setChildrenLogRoot(Data<?> root) {
     }
 
     @Override

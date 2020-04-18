@@ -9,12 +9,14 @@ import java.util.*;
 /**
  * Created by quanchangnai on 2019/5/21.
  */
-@SuppressWarnings({"unchecked", "rawtypes"})
+@SuppressWarnings("unchecked")
 public final class ListField<E> extends Node implements List<E>, Field {
 
     private PVector<E> list = Empty.vector();
 
-    public ListField(Data root) {
+    private Delegate<E> delegate = new Delegate<>(this);
+
+    public ListField(Data<?> root) {
         _setRoot(root);
     }
 
@@ -22,13 +24,17 @@ public final class ListField<E> extends Node implements List<E>, Field {
         return list;
     }
 
+    public Delegate<E> getDelegate() {
+        return delegate;
+    }
+
     @Override
-    public void commit(Object log) {
+    protected void commit(Object log) {
         this.list = ((Log) log).list;
     }
 
     @Override
-    public void _setChildrenLogRoot(Data root) {
+    public void _setChildrenLogRoot(Data<?> root) {
         for (E e : getLogList()) {
             if (e instanceof Entity) {
                 _setLogRoot((Entity) e, root);
@@ -224,7 +230,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
             return false;
         }
 
-        Data root = _getLogRoot(transaction);
+        Data<?> root = _getLogRoot(transaction);
 
         for (E e : c) {
             if (e instanceof Entity) {
@@ -445,4 +451,133 @@ public final class ListField<E> extends Node implements List<E>, Field {
 
     }
 
+
+    private static class Delegate<E> implements List<E> {
+
+        private ListField<E> field;
+
+        public Delegate(ListField<E> field) {
+            this.field = field;
+        }
+
+        @Override
+        public int size() {
+            return field.size();
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return field.isEmpty();
+        }
+
+        @Override
+        public boolean contains(Object o) {
+            return field.contains(o);
+        }
+
+        @Override
+        public Iterator<E> iterator() {
+            return field.iterator();
+        }
+
+        @Override
+        public Object[] toArray() {
+            return field.toArray();
+        }
+
+        @Override
+        public <T> T[] toArray(T[] a) {
+            return field.toArray(a);
+        }
+
+        @Override
+        public boolean add(E e) {
+            return field.add(e);
+        }
+
+        @Override
+        public boolean remove(Object o) {
+            return field.remove(o);
+        }
+
+        @Override
+        public boolean containsAll(Collection<?> c) {
+            return field.containsAll(c);
+        }
+
+        @Override
+        public boolean addAll(Collection<? extends E> c) {
+            return field.addAll(c);
+        }
+
+        @Override
+        public boolean addAll(int index, Collection<? extends E> c) {
+            return field.addAll(index, c);
+        }
+
+        @Override
+        public boolean removeAll(Collection<?> c) {
+            return field.removeAll(c);
+        }
+
+        @Override
+        public void clear() {
+            field.clear();
+        }
+
+        @Override
+        public E get(int index) {
+            return field.get(index);
+        }
+
+        @Override
+        public boolean retainAll(Collection<?> c) {
+            return field.retainAll(c);
+        }
+
+        @Override
+        public E set(int index, E e) {
+            return field.set(index, e);
+        }
+
+        @Override
+        public void add(int index, E e) {
+            field.add(index, e);
+        }
+
+        @Override
+        public E remove(int index) {
+            return field.remove(index);
+        }
+
+        @Override
+        public int indexOf(Object o) {
+            return field.indexOf(o);
+        }
+
+        @Override
+        public int lastIndexOf(Object o) {
+            return field.lastIndexOf(o);
+        }
+
+        @Override
+        public ListIterator<E> listIterator() {
+            return field.listIterator();
+        }
+
+        @Override
+        public ListIterator<E> listIterator(int index) {
+            return field.listIterator(index);
+        }
+
+        @Override
+        public List<E> subList(int fromIndex, int toIndex) {
+            return field.subList(fromIndex, toIndex);
+        }
+
+        @Override
+        public String toString() {
+            return field.toString();
+        }
+    }
 }

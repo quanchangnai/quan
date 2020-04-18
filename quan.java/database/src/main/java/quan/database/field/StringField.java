@@ -1,13 +1,15 @@
 package quan.database.field;
 
 import quan.database.Data;
-import quan.database.LogAccessor;
+import quan.database.Loggable;
 import quan.database.Transaction;
+
+import java.util.Objects;
 
 /**
  * Created by quanchangnai on 2020/4/17.
  */
-public class StringField extends LogAccessor implements Field {
+public class StringField extends Loggable implements Field {
 
     private String value = "";
 
@@ -20,7 +22,7 @@ public class StringField extends LogAccessor implements Field {
     }
 
     @Override
-    public void commit(Object log) {
+    protected void commit(Object log) {
         this.value = (String) log;
     }
 
@@ -35,8 +37,9 @@ public class StringField extends LogAccessor implements Field {
         return value;
     }
 
-    public void setLog(String value, Data root) {
+    public void setLog(String value, Data<?> root) {
+        Objects.requireNonNull(value);
         _setFieldLog(Transaction.get(true), this, value, root);
     }
-    
+
 }

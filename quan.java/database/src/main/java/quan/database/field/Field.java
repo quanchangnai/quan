@@ -6,6 +6,4 @@ package quan.database.field;
  */
 public interface Field {
 
-    void commit(Object log);
-
 }

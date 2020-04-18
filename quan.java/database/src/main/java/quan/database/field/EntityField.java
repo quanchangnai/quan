@@ -5,13 +5,12 @@ import quan.database.*;
 /**
  * Created by quanchangnai on 2019/5/16.
  */
-@SuppressWarnings({"unchecked", "rawtypes"})
-public final class EntityField<V extends Entity> extends Node implements Field {
+@SuppressWarnings("unchecked")
+public final class EntityField<V extends Entity> extends Loggable implements Field {
 
     private V value;
 
-    public EntityField(Data root) {
-        _setRoot(root);
+    public EntityField() {
     }
 
     public V getValue() {
@@ -23,47 +22,50 @@ public final class EntityField<V extends Entity> extends Node implements Field {
     }
 
     @Override
-    public void commit(Object log) {
+    protected void commit(Object log) {
         this.value = (V) log;
     }
 
     public V getLog() {
-        return getLog(Transaction.get());
-    }
-
-    private V getLog(Transaction transaction) {
+        Transaction transaction = Transaction.get(false);
         if (transaction != null) {
-            V log = (V) _getFieldLog(transaction, this);
+            Log<V> log = (Log<V>) _getFieldLog(transaction, this);
             if (log != null) {
-                return log;
+                return log.value;
             }
         }
         return value;
     }
 
-
-    public void setLog(V value) {
+    public void setLog(V value, Data<?> root) {
         Validations.validateEntityRoot(value);
 
         Transaction transaction = Transaction.get(true);
-        V log = getLog(transaction);
-        Data root = _getLogRoot(transaction);
+        Log<V> log = (Log<V>) _getFieldLog(transaction, this);
 
-        if (log != null) {
-            _setLogRoot(log, null);
+        if (log == null) {
+            log = new Log<>(this.value);
+            _setFieldLog(transaction, this, log, root);
         }
+
+        if (log.value != null) {
+            _setNodeLog(transaction, log.value, null);
+        }
+
         if (value != null) {
-            _setLogRoot(value, root);
+            _setNodeLog(transaction, value, null);
         }
-
-        _setFieldLog(transaction, this, value, root);
     }
 
-    @Override
-    protected void _setChildrenLogRoot(Data root) {
-        if (value != null) {
-            _setLogRoot(value, root);
+
+    private static class Log<V> {
+
+        V value;
+
+        public Log(V value) {
+            this.value = value;
         }
+
     }
 
 }

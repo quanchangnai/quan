@@ -1,13 +1,13 @@
 package quan.database.field;
 
 import quan.database.Data;
-import quan.database.LogAccessor;
+import quan.database.Loggable;
 import quan.database.Transaction;
 
 /**
  * Created by quanchangnai on 2020/4/17.
  */
-public class LongField extends LogAccessor implements Field{
+public class LongField extends Loggable implements Field{
 
     private long value;
 
@@ -20,7 +20,7 @@ public class LongField extends LogAccessor implements Field{
     }
 
     @Override
-    public void commit(Object log) {
+    protected void commit(Object log) {
         this.value = (long) log;
     }
 
@@ -35,7 +35,7 @@ public class LongField extends LogAccessor implements Field{
         return value;
     }
 
-    public void setLog(long value, Data root) {
+    public void setLog(long value, Data<?> root) {
         _setFieldLog(Transaction.get(true), this, value, root);
     }
 

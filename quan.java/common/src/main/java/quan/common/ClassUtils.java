@@ -45,7 +45,7 @@ public class ClassUtils {
     public static synchronized void redefineClass(byte[] classBytes) {
         try {
             String className = readClassName(classBytes);
-            Class clazz = Class.forName(className);
+            Class<?> clazz = Class.forName(className);
             ClassDefinition definition = new ClassDefinition(clazz, classBytes);
 
             ByteBuddyAgent.install().redefineClasses(definition);

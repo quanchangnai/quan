@@ -1,13 +1,13 @@
 package quan.database.field;
 
 import quan.database.Data;
-import quan.database.LogAccessor;
+import quan.database.Loggable;
 import quan.database.Transaction;
 
 /**
  * Created by quanchangnai on 2020/4/17.
  */
-public class DoubleField extends LogAccessor implements Field {
+public class DoubleField extends Loggable implements Field {
 
     private double value;
 
@@ -20,7 +20,7 @@ public class DoubleField extends LogAccessor implements Field {
     }
 
     @Override
-    public void commit(Object log) {
+    protected void commit(Object log) {
         this.value = (double) log;
     }
 
@@ -35,7 +35,7 @@ public class DoubleField extends LogAccessor implements Field {
         return value;
     }
 
-    public void setLog(double value, Data root) {
+    public void setLog(double value, Data<?> root) {
         _setFieldLog(Transaction.get(true), this, value, root);
     }
 

@@ -27,12 +27,12 @@ public class Transaction {
     /**
      * 记录数据是否有修改
      */
-    private Set<Data> dataLogs = new LinkedHashSet<>();
+    private Set<Data<?>> dataLogs = new LinkedHashSet<>();
 
     /**
      * 记录节点的根
      */
-    private Map<Node, Data> nodeLogs = new HashMap<>();
+    private Map<Node, Data<?>> nodeLogs = new HashMap<>();
 
     /**
      * 记录字段值
@@ -54,7 +54,7 @@ public class Transaction {
         return failed;
     }
 
-    void setFieldLog(Field field, Object value, Data data) {
+    void setFieldLog(Field field, Object value, Data<?> data) {
         fieldLogs.put(field, value);
         if (data != null) {
             dataLogs.add(data);
@@ -65,11 +65,11 @@ public class Transaction {
         return fieldLogs.get(field);
     }
 
-    void setNodeLog(Node node, Data root) {
+    void setNodeLog(Node node, Data<?> root) {
         nodeLogs.put(node, root);
     }
 
-    Data getNodeLog(Node node) {
+    Data<?> getNodeLog(Node node) {
         return nodeLogs.get(node);
     }
 
@@ -202,14 +202,14 @@ public class Transaction {
      */
     private void commit() {
         for (Node node : nodeLogs.keySet()) {
-            node._setRoot(nodeLogs.get(node));
+            node.commit(nodeLogs.get(node));
         }
 
         for (Field field : fieldLogs.keySet()) {
-            field.commit(fieldLogs.get(field));
+            ((Loggable) field).commit(fieldLogs.get(field));
         }
 
-        List<Data> updates = Collections.unmodifiableList(new ArrayList<>(dataLogs));
+        List<Data<?>> updates = Collections.unmodifiableList(new ArrayList<>(dataLogs));
         for (DataUpdater updater : updaters) {
             try {
                 updater.update(updates);

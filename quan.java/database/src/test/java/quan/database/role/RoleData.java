@@ -112,7 +112,7 @@ public class RoleData extends Data<Long> {
 
     private DoubleField d = new DoubleField();
 
-    private EntityField<ItemEntity> item = new EntityField<>(_getLogRoot());
+    private EntityField<ItemEntity> item = new EntityField<>();
 
     private MapField<Integer, ItemEntity> items = new MapField<>(_getLogRoot());
 
@@ -334,41 +334,40 @@ public class RoleData extends Data<Long> {
      * 道具
      */
     public RoleData setItem(ItemEntity item) {
-        this.item.setLog(item);
+        this.item.setLog(item, _getLogRoot());
         return this;
     }
 
     public Map<Integer, ItemEntity> getItems() {
-        return items;
+        return items.getDelegate();
     }
 
     public Set<Boolean> getSet() {
-        return set;
+        return set.getDelegate();
     }
 
     public List<String> getList() {
-        return list;
+        return list.getDelegate();
     }
 
     public Map<Integer, Integer> getMap() {
-        return map;
+        return map.getDelegate();
     }
 
     public Set<ItemEntity> getSet2() {
-        return set2;
+        return set2.getDelegate();
     }
 
     public List<ItemEntity> getList2() {
-        return list2;
+        return list2.getDelegate();
     }
 
     public Map<Integer, ItemEntity> getMap2() {
-        return map2;
+        return map2.getDelegate();
     }
 
     @Override
-    protected void _setChildrenLogRoot(Data root) {
-        _setLogRoot(item, root);
+    protected void _setChildrenLogRoot(Data<?> root) {
         _setLogRoot(items, root);
         _setLogRoot(set, root);
         _setLogRoot(list, root);

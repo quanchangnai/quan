@@ -8,6 +8,6 @@ import java.util.List;
  */
 public interface DataUpdater {
 
-    void update(List<Data> updates);
+    void update(List<Data<?>> updates);
 
 }

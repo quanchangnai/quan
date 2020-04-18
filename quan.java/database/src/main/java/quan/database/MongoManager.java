@@ -138,13 +138,13 @@ public class MongoManager implements DataUpdater {
     }
 
     @Override
-    public void update(List<Data> updates) {
-        for (Data data : updates) {
+    public void update(List<Data<?>> updates) {
+        for (Data<?> data : updates) {
             DataUpdater updater = data._getUpdater();
             if (updater != null && updater != this) {
                 continue;
             }
-            MongoCollection collection = collections.get(data.getClass());
+            MongoCollection<Data> collection = collections.get(data.getClass());
             if (collection == null) {
                 continue;
             }
