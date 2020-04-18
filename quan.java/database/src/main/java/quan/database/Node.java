@@ -16,9 +16,8 @@ public abstract class Node extends Loggable {
         return this.root;
     }
 
-    @Override
-    protected void commit(Object log) {
-        this.root = (Data<?>) log;
+    protected void commit(Data<?> root) {
+        this.root = root;
     }
 
     protected Data<?> _getLogRoot() {
@@ -27,7 +26,7 @@ public abstract class Node extends Loggable {
 
     protected Data<?> _getLogRoot(Transaction transaction) {
         if (transaction != null) {
-            Data<?> root = _getNodeLog(transaction, this);
+            Data<?> root = _getRootLog(transaction, this);
             if (root != null) {
                 return root;
             }
@@ -37,7 +36,7 @@ public abstract class Node extends Loggable {
 
     protected void _setLogRoot(Data<?> root) {
         Transaction transaction = Transaction.get(true);
-        _setNodeLog(transaction, this, root);
+        _setRootLog(transaction, this, root);
         _setChildrenLogRoot(root);
     }
 
@@ -48,7 +47,9 @@ public abstract class Node extends Loggable {
     }
 
     protected static void _setLogRoot(Node node, Data<?> root) {
-        node._setLogRoot(root);
+        if (node != null) {
+            node._setLogRoot(root);
+        }
     }
 
 }

@@ -25,14 +25,14 @@ public class Transaction {
     private boolean failed;
 
     /**
-     * 记录数据是否有修改
+     * 记录被修改过的数据
      */
     private Set<Data<?>> dataLogs = new LinkedHashSet<>();
 
     /**
      * 记录节点的根
      */
-    private Map<Node, Data<?>> nodeLogs = new HashMap<>();
+    private Map<Node, Data<?>> rootLogs = new HashMap<>();
 
     /**
      * 记录字段值
@@ -65,12 +65,12 @@ public class Transaction {
         return fieldLogs.get(field);
     }
 
-    void setNodeLog(Node node, Data<?> root) {
-        nodeLogs.put(node, root);
+    void setRootLog(Node node, Data<?> root) {
+        rootLogs.put(node, root);
     }
 
-    Data<?> getNodeLog(Node node) {
-        return nodeLogs.get(node);
+    Data<?> getRootLog(Node node) {
+        return rootLogs.get(node);
     }
 
     /**
@@ -201,12 +201,12 @@ public class Transaction {
      * 事务提交
      */
     private void commit() {
-        for (Node node : nodeLogs.keySet()) {
-            node.commit(nodeLogs.get(node));
+        for (Node node : rootLogs.keySet()) {
+            node.commit(rootLogs.get(node));
         }
 
         for (Field field : fieldLogs.keySet()) {
-            ((Loggable) field).commit(fieldLogs.get(field));
+            field.commit(fieldLogs.get(field));
         }
 
         List<Data<?>> updates = Collections.unmodifiableList(new ArrayList<>(dataLogs));

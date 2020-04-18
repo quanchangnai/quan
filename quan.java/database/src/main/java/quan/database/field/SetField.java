@@ -24,7 +24,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
         _setRoot(root);
     }
 
-    public PSet<E> getValue() {
+    public PSet<E> getSet() {
         return set;
     }
 
@@ -33,20 +33,20 @@ public final class SetField<E> extends Node implements Set<E>, Field {
     }
 
     @Override
-    protected void commit(Object log) {
-        this.set = (PSet<E>) log;
+    public void commit(Object logSet) {
+        this.set = (PSet<E>) logSet;
     }
 
     @Override
     public void _setChildrenLogRoot(Data<?> root) {
-        for (E e : getLog()) {
+        for (E e : getLogSet()) {
             if (e instanceof Entity) {
                 _setLogRoot((Entity) e, root);
             }
         }
     }
 
-    private PSet<E> getLog(Transaction transaction) {
+    private PSet<E> getLogSet(Transaction transaction) {
         PSet<E> log = (PSet<E>) _getFieldLog(transaction, this);
         if (log != null) {
             return log;
@@ -54,29 +54,29 @@ public final class SetField<E> extends Node implements Set<E>, Field {
         return set;
     }
 
-    private PSet<E> getLog() {
-        return getLog(Transaction.get(false));
+    private PSet<E> getLogSet() {
+        return getLogSet(Transaction.get(false));
     }
 
     @Override
     public int size() {
-        return getLog().size();
+        return getLogSet().size();
     }
 
     @Override
     public boolean isEmpty() {
-        return getLog().isEmpty();
+        return getLogSet().isEmpty();
     }
 
     @Override
     public boolean contains(Object o) {
-        return getLog().contains(o);
+        return getLogSet().contains(o);
     }
 
 
     private class It implements Iterator<E> {
 
-        private Iterator<E> it = getLog().iterator();
+        private Iterator<E> it = getLogSet().iterator();
 
         private E current;
 
@@ -106,12 +106,12 @@ public final class SetField<E> extends Node implements Set<E>, Field {
 
     @Override
     public Object[] toArray() {
-        return getLog().toArray();
+        return getLogSet().toArray();
     }
 
     @Override
     public <T> T[] toArray(T[] a) {
-        return getLog().toArray(a);
+        return getLogSet().toArray(a);
     }
 
 
@@ -120,7 +120,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
         Validations.validateCollectionValue(e);
 
         Transaction transaction = Transaction.get(true);
-        PSet<E> oldSet = getLog(transaction);
+        PSet<E> oldSet = getLogSet(transaction);
         PSet<E> newSet = oldSet.plus(e);
 
         if (oldSet == newSet) {
@@ -158,7 +158,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
     @Override
     public boolean remove(Object o) {
         Transaction transaction = Transaction.get(true);
-        PSet<E> oldSet = getLog(transaction);
+        PSet<E> oldSet = getLogSet(transaction);
         PSet<E> newSet = oldSet.minus(o);
 
         if (oldSet == newSet) {
@@ -177,7 +177,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        return getLog().containsAll(c);
+        return getLogSet().containsAll(c);
     }
 
     @Override
@@ -186,7 +186,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
         c.forEach(Validations::validateCollectionValue);
 
         Transaction transaction = Transaction.get(true);
-        PSet<E> oldSet = getLog(transaction);
+        PSet<E> oldSet = getLogSet(transaction);
         PSet<E> newSet = oldSet.plusAll(c);
 
         if (oldSet == newSet) {
@@ -239,7 +239,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
     @Override
     public void clear() {
         Transaction transaction = Transaction.get(true);
-        if (getLog(transaction).isEmpty()) {
+        if (getLogSet(transaction).isEmpty()) {
             return;
         }
 
@@ -249,7 +249,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
 
     @Override
     public String toString() {
-        return String.valueOf(getLog());
+        return String.valueOf(getLogSet());
     }
 
 

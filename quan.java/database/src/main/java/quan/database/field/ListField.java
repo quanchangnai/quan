@@ -20,7 +20,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
         _setRoot(root);
     }
 
-    public PVector<E> getValue() {
+    public PVector<E> getList() {
         return list;
     }
 
@@ -29,8 +29,8 @@ public final class ListField<E> extends Node implements List<E>, Field {
     }
 
     @Override
-    protected void commit(Object log) {
-        this.list = ((Log) log).list;
+    public void commit(Object log) {
+        this.list = ((Log<E>) log).list;
     }
 
     @Override

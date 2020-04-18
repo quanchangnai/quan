@@ -129,7 +129,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
 
     <#elseif field.enumType>
     public ${field.type} get${field.name?cap_first}() {
-        return ${field.type}.valueOf(${field.name}.getLog());
+        return ${field.type}.valueOf(${field.name}.getLogValue());
     }
 
     <#if field.comment !="">
@@ -138,13 +138,13 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
      */
     </#if>
     public ${name} set${field.name?cap_first}(${field.basicType} ${field.name}) {
-        this.${field.name}.setLog(${field.name}.value(), _getLogRoot());
+        this.${field.name}.setLogValue(${field.name}.value(), _getLogRoot());
         return this;
     }
 
     <#else>
     public ${field.basicType} get${field.name?cap_first}() {
-        return ${field.name}.getLog();
+        return ${field.name}.getLogValue();
     }
 
     <#if field.comment !="">
@@ -153,7 +153,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
      */
     </#if>
     public ${name} set${field.name?cap_first}(${field.basicType} ${field.name}) {
-        this.${field.name}.setLog(${field.name}, _getLogRoot());
+        this.${field.name}.setLogValue(${field.name}, _getLogRoot());
         return this;
     }
         <#if field.numberType>
@@ -176,6 +176,8 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
 <#list fields as field>
     <#if field.collectionType>
         _setLogRoot(${field.name}, root);
+    <#elseif field.beanType>
+        _setLogRoot(${field.name}.getLogValue(), root);
     </#if>
 </#list>
     }
@@ -301,9 +303,9 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
                     <#if field_index gt 0 >
 
                     </#if>
-            if (!value.${field.name}.getValue().isEmpty()) {
+            if (!value.${field.name}.get${field.type?cap_first}().isEmpty()) {
                 writer.writeStartArray(${name}.${field.underscoreName});
-                for (${field.classValueType} ${field.name}Value : value.${field.name}.getValue()) {
+                for (${field.classValueType} ${field.name}Value : value.${field.name}.get${field.type?cap_first}()) {
                     <#if field.primitiveValueType>
                     writer.write${bsonTypes[field.valueType]}(${field.name}Value);
                     <#elseif field.beanValueType>
@@ -321,14 +323,14 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
                     <#if field_index gt 0 >
 
                     </#if>
-            if (!value.${field.name}.getValue().isEmpty()) {
+            if (!value.${field.name}.getMap().isEmpty()) {
                 writer.writeStartDocument(${name}.${field.underscoreName});
-                for (${field.classKeyType} ${field.name}Key : value.${field.name}.getValue().keySet()) {
+                for (${field.classKeyType} ${field.name}Key : value.${field.name}.getMap().keySet()) {
                     writer.write${bsonTypes[field.keyType]}(${field.name}Key);
                     <#if field.primitiveValueType>
-                    writer.write${bsonTypes[field.valueType]}(value.${field.name}.getValue().get(${field.name}Key));
+                    writer.write${bsonTypes[field.valueType]}(value.${field.name}.getMap().get(${field.name}Key));
                     <#elseif field.beanValueType>
-                    encoderContext.encodeWithChildContext(registry.get(${field.classValueType}.class), writer, value.${field.name}.getValue().get(${field.name}Key));
+                    encoderContext.encodeWithChildContext(registry.get(${field.classValueType}.class), writer, value.${field.name}.getMap().get(${field.name}Key));
                     <#else>
                     writer.write${field.valueType?cap_first}(${field.name}Value);
                     </#if>

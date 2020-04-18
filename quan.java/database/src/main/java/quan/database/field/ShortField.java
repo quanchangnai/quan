@@ -20,22 +20,22 @@ public class ShortField extends Loggable implements Field {
     }
 
     @Override
-    protected void commit(Object log) {
-        this.value = (short) log;
+    public void commit(Object logValue) {
+        this.value = (short) logValue;
     }
 
-    public short getLog() {
+    public short getLogValue() {
         Transaction transaction = Transaction.get();
         if (transaction != null) {
-            Short log = (Short) _getFieldLog(transaction, this);
-            if (log != null) {
-                return log;
+            Short logValue = (Short) _getFieldLog(transaction, this);
+            if (logValue != null) {
+                return logValue;
             }
         }
         return value;
     }
 
-    public void setLog(short value, Data<?> root) {
+    public void setLogValue(short value, Data<?> root) {
         _setFieldLog(Transaction.get(true), this, value, root);
     }
 

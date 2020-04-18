@@ -1,12 +1,16 @@
 package quan.database.role;
 
-import java.util.*;
-import org.bson.*;
-import org.bson.codecs.*;
+import org.bson.BsonReader;
+import org.bson.BsonType;
+import org.bson.BsonWriter;
+import org.bson.codecs.DecoderContext;
+import org.bson.codecs.EncoderContext;
 import org.bson.codecs.configuration.CodecRegistry;
-import quan.database.*;
+import quan.database.Data;
 import quan.database.field.*;
 import quan.database.item.ItemEntity;
+
+import java.util.*;
 
 /**
  * 角色<br/>
@@ -166,11 +170,11 @@ public class RoleData extends Data<Long> {
     }
 
     public String getName() {
-        return name.getLog();
+        return name.getLogValue();
     }
 
     public RoleData setName(String name) {
-        this.name.setLog(name, _getLogRoot());
+        this.name.setLogValue(name, _getLogRoot());
         return this;
     }
 
@@ -178,23 +182,23 @@ public class RoleData extends Data<Long> {
      * 角色类型
      */
     public RoleType getRoleType() {
-        return RoleType.valueOf(roleType.getLog());
+        return RoleType.valueOf(roleType.getLogValue());
     }
 
     /**
      * 角色类型
      */
     public RoleData setRoleType(RoleType roleType) {
-        this.roleType.setLog(roleType.value(), _getLogRoot());
+        this.roleType.setLogValue(roleType.value(), _getLogRoot());
         return this;
     }
 
     public int getA() {
-        return a.getLog();
+        return a.getLogValue();
     }
 
     public RoleData setA(int a) {
-        this.a.setLog(a, _getLogRoot());
+        this.a.setLogValue(a, _getLogRoot());
         return this;
     }
 
@@ -204,11 +208,11 @@ public class RoleData extends Data<Long> {
     }
 
     public int getA2() {
-        return a2.getLog();
+        return a2.getLogValue();
     }
 
     public RoleData setA2(int a2) {
-        this.a2.setLog(a2, _getLogRoot());
+        this.a2.setLogValue(a2, _getLogRoot());
         return this;
     }
 
@@ -218,20 +222,20 @@ public class RoleData extends Data<Long> {
     }
 
     public boolean getB() {
-        return b.getLog();
+        return b.getLogValue();
     }
 
     public RoleData setB(boolean b) {
-        this.b.setLog(b, _getLogRoot());
+        this.b.setLogValue(b, _getLogRoot());
         return this;
     }
 
     public int getB2() {
-        return b2.getLog();
+        return b2.getLogValue();
     }
 
     public RoleData setB2(int b2) {
-        this.b2.setLog(b2, _getLogRoot());
+        this.b2.setLogValue(b2, _getLogRoot());
         return this;
     }
 
@@ -244,14 +248,14 @@ public class RoleData extends Data<Long> {
      * sssss
      */
     public short getS() {
-        return s.getLog();
+        return s.getLogValue();
     }
 
     /**
      * sssss
      */
     public RoleData setS(short s) {
-        this.s.setLog(s, _getLogRoot());
+        this.s.setLogValue(s, _getLogRoot());
         return this;
     }
 
@@ -267,14 +271,14 @@ public class RoleData extends Data<Long> {
      * iiii
      */
     public int getI() {
-        return i.getLog();
+        return i.getLogValue();
     }
 
     /**
      * iiii
      */
     public RoleData setI(int i) {
-        this.i.setLog(i, _getLogRoot());
+        this.i.setLogValue(i, _getLogRoot());
         return this;
     }
 
@@ -290,14 +294,14 @@ public class RoleData extends Data<Long> {
      * ffff
      */
     public float getF() {
-        return f.getLog();
+        return f.getLogValue();
     }
 
     /**
      * ffff
      */
     public RoleData setF(float f) {
-        this.f.setLog(f, _getLogRoot());
+        this.f.setLogValue(f, _getLogRoot());
         return this;
     }
 
@@ -310,11 +314,11 @@ public class RoleData extends Data<Long> {
     }
 
     public double getD() {
-        return d.getLog();
+        return d.getLogValue();
     }
 
     public RoleData setD(double d) {
-        this.d.setLog(d, _getLogRoot());
+        this.d.setLogValue(d, _getLogRoot());
         return this;
     }
 
@@ -327,14 +331,14 @@ public class RoleData extends Data<Long> {
      * 道具
      */
     public ItemEntity getItem() {
-        return item.getLog();
+        return item.getLogValue();
     }
 
     /**
      * 道具
      */
     public RoleData setItem(ItemEntity item) {
-        this.item.setLog(item, _getLogRoot());
+        this.item.setLogValue(item, _getLogRoot());
         return this;
     }
 
@@ -368,6 +372,7 @@ public class RoleData extends Data<Long> {
 
     @Override
     protected void _setChildrenLogRoot(Data<?> root) {
+        _setLogRoot(item.getLogValue(), root);
         _setLogRoot(items, root);
         _setLogRoot(set, root);
         _setLogRoot(list, root);
@@ -527,51 +532,51 @@ public class RoleData extends Data<Long> {
                 encoderContext.encodeWithChildContext(registry.get(ItemEntity.class), writer, value.item.getValue());
             }
 
-            if (!value.items.getValue().isEmpty()) {
+            if (!value.items.getMap().isEmpty()) {
                 writer.writeStartDocument(RoleData.ITEMS);
-                for (Integer itemsKey : value.items.getValue().keySet()) {
+                for (Integer itemsKey : value.items.getMap().keySet()) {
                     writer.writeInt32(itemsKey);
-                    encoderContext.encodeWithChildContext(registry.get(ItemEntity.class), writer, value.items.getValue().get(itemsKey));
+                    encoderContext.encodeWithChildContext(registry.get(ItemEntity.class), writer, value.items.getMap().get(itemsKey));
                 }
                 writer.writeEndDocument();
             }
 
-            if (!value.set.getValue().isEmpty()) {
+            if (!value.set.getSet().isEmpty()) {
                 writer.writeStartArray(RoleData.SET);
-                for (Boolean setValue : value.set.getValue()) {
+                for (Boolean setValue : value.set.getSet()) {
                     writer.writeBoolean(setValue);
                 }
                 writer.writeEndArray();
             }
 
-            if (!value.list.getValue().isEmpty()) {
+            if (!value.list.getList().isEmpty()) {
                 writer.writeStartArray(RoleData.LIST);
-                for (String listValue : value.list.getValue()) {
+                for (String listValue : value.list.getList()) {
                     writer.writeString(listValue);
                 }
                 writer.writeEndArray();
             }
 
-            if (!value.map.getValue().isEmpty()) {
+            if (!value.map.getMap().isEmpty()) {
                 writer.writeStartDocument(RoleData.MAP);
-                for (Integer mapKey : value.map.getValue().keySet()) {
+                for (Integer mapKey : value.map.getMap().keySet()) {
                     writer.writeInt32(mapKey);
-                    writer.writeInt32(value.map.getValue().get(mapKey));
+                    writer.writeInt32(value.map.getMap().get(mapKey));
                 }
                 writer.writeEndDocument();
             }
 
-            if (!value.set2.getValue().isEmpty()) {
+            if (!value.set2.getSet().isEmpty()) {
                 writer.writeStartArray(RoleData.SET2);
-                for (ItemEntity set2Value : value.set2.getValue()) {
+                for (ItemEntity set2Value : value.set2.getSet()) {
                     encoderContext.encodeWithChildContext(registry.get(ItemEntity.class), writer, set2Value);
                 }
                 writer.writeEndArray();
             }
 
-            if (!value.list2.getValue().isEmpty()) {
+            if (!value.list2.getList().isEmpty()) {
                 writer.writeStartArray(RoleData.LIST2);
-                for (ItemEntity list2Value : value.list2.getValue()) {
+                for (ItemEntity list2Value : value.list2.getList()) {
                     encoderContext.encodeWithChildContext(registry.get(ItemEntity.class), writer, list2Value);
                 }
                 writer.writeEndArray();
