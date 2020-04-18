@@ -32,7 +32,7 @@ public class Transaction {
     /**
      * 记录节点的根
      */
-    private Map<Node, Data> rootLogs = new HashMap<>();
+    private Map<Node, Data> nodeLogs = new HashMap<>();
 
     /**
      * 记录字段值
@@ -54,10 +54,10 @@ public class Transaction {
         return failed;
     }
 
-    void addFieldLog(Field field, Object value, Data root) {
+    void setFieldLog(Field field, Object value, Data data) {
         fieldLogs.put(field, value);
-        if (root != null) {
-            dataLogs.add(root);
+        if (data != null) {
+            dataLogs.add(data);
         }
     }
 
@@ -65,12 +65,12 @@ public class Transaction {
         return fieldLogs.get(field);
     }
 
-    void addRootLog(Node node, Data root) {
-        rootLogs.put(node, root);
+    void setNodeLog(Node node, Data root) {
+        nodeLogs.put(node, root);
     }
 
-    Data getRootLog(Node node) {
-        return rootLogs.get(node);
+    Data getNodeLog(Node node) {
+        return nodeLogs.get(node);
     }
 
     /**
@@ -201,12 +201,12 @@ public class Transaction {
      * 事务提交
      */
     private void commit() {
-        for (Node node : rootLogs.keySet()) {
-            node._setRoot(rootLogs.get(node));
+        for (Node node : nodeLogs.keySet()) {
+            node._setRoot(nodeLogs.get(node));
         }
 
         for (Field field : fieldLogs.keySet()) {
-            field.setValue(fieldLogs.get(field));
+            field.commit(fieldLogs.get(field));
         }
 
         List<Data> updates = Collections.unmodifiableList(new ArrayList<>(dataLogs));

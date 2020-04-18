@@ -12,10 +12,17 @@ public abstract class Node extends LogAccessor {
         this.root = root;
     }
 
+    protected Data _getRoot() {
+        return this.root;
+    }
+
     protected Data _getLogRoot() {
-        Transaction transaction = Transaction.get();
+        return _getLogRoot(Transaction.get());
+    }
+
+    protected Data _getLogRoot(Transaction transaction) {
         if (transaction != null) {
-            Data root = _getRootLog(transaction, this);
+            Data root = _getNodeLog(transaction, this);
             if (root != null) {
                 return root;
             }
@@ -25,16 +32,19 @@ public abstract class Node extends LogAccessor {
 
     protected void _setLogRoot(Data root) {
         Transaction transaction = Transaction.get(true);
-        _addRootLog(transaction, this, root);
+        _setNodeLog(transaction, this, root);
         _setChildrenLogRoot(root);
+    }
+
+    protected abstract void _setChildrenLogRoot(Data root);
+
+    protected static void _setRoot(Node node, Data root) {
+        node._setRoot(root);
     }
 
     protected static void _setLogRoot(Node node, Data root) {
         node._setLogRoot(root);
     }
-
-    protected abstract void _setChildrenLogRoot(Data root);
-
 
     public abstract static class Setter {
 

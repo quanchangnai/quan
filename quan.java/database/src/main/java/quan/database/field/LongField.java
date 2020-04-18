@@ -3,7 +3,6 @@ package quan.database.field;
 import quan.database.Data;
 import quan.database.LogAccessor;
 import quan.database.Transaction;
-import quan.database.Validations;
 
 /**
  * Created by quanchangnai on 2020/4/17.
@@ -21,11 +20,11 @@ public class LongField extends LogAccessor implements Field{
     }
 
     @Override
-    public void setValue(Object value) {
-        this.value = (long) value;
+    public void commit(Object log) {
+        this.value = (long) log;
     }
 
-    public long getLogValue() {
+    public long getLog() {
         Transaction transaction = Transaction.get();
         if (transaction != null) {
             Long logValue = (Long) _getFieldLog(transaction, this);
@@ -36,8 +35,8 @@ public class LongField extends LogAccessor implements Field{
         return value;
     }
 
-    public void setLogValue(long value, Data root) {
-        _addFieldLog(Transaction.get(true), this, value, root);
+    public void setLog(long value, Data root) {
+        _setFieldLog(Transaction.get(true), this, value, root);
     }
 
 }

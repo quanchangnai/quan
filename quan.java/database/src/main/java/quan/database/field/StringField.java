@@ -20,24 +20,23 @@ public class StringField extends LogAccessor implements Field {
     }
 
     @Override
-    public void setValue(Object value) {
-        this.value = (String) value;
+    public void commit(Object log) {
+        this.value = (String) log;
     }
 
-    public String getLogValue() {
+    public String getLog() {
         Transaction transaction = Transaction.get();
         if (transaction != null) {
-            String logValue = (String) _getFieldLog(transaction, this);
-            if (logValue != null) {
-                return logValue;
+            String log = (String) _getFieldLog(transaction, this);
+            if (log != null) {
+                return log;
             }
         }
         return value;
     }
 
-    public void setLogValue(String value, Data root) {
-        _addFieldLog(Transaction.get(true), this, value, root);
+    public void setLog(String value, Data root) {
+        _setFieldLog(Transaction.get(true), this, value, root);
     }
-
-
+    
 }

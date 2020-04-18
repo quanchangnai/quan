@@ -166,11 +166,11 @@ public class RoleData extends Data<Long> {
     }
 
     public String getName() {
-        return name.getLogValue();
+        return name.getLog();
     }
 
     public RoleData setName(String name) {
-        this.name.setLogValue(name, _getLogRoot());
+        this.name.setLog(name, _getLogRoot());
         return this;
     }
 
@@ -178,23 +178,23 @@ public class RoleData extends Data<Long> {
      * 角色类型
      */
     public RoleType getRoleType() {
-        return RoleType.valueOf(roleType.getLogValue());
+        return RoleType.valueOf(roleType.getLog());
     }
 
     /**
      * 角色类型
      */
     public RoleData setRoleType(RoleType roleType) {
-        this.roleType.setLogValue(roleType.value(), _getLogRoot());
+        this.roleType.setLog(roleType.value(), _getLogRoot());
         return this;
     }
 
     public int getA() {
-        return a.getLogValue();
+        return a.getLog();
     }
 
     public RoleData setA(int a) {
-        this.a.setLogValue(a, _getLogRoot());
+        this.a.setLog(a, _getLogRoot());
         return this;
     }
 
@@ -204,11 +204,11 @@ public class RoleData extends Data<Long> {
     }
 
     public int getA2() {
-        return a2.getLogValue();
+        return a2.getLog();
     }
 
     public RoleData setA2(int a2) {
-        this.a2.setLogValue(a2, _getLogRoot());
+        this.a2.setLog(a2, _getLogRoot());
         return this;
     }
 
@@ -218,20 +218,20 @@ public class RoleData extends Data<Long> {
     }
 
     public boolean getB() {
-        return b.getLogValue();
+        return b.getLog();
     }
 
     public RoleData setB(boolean b) {
-        this.b.setLogValue(b, _getLogRoot());
+        this.b.setLog(b, _getLogRoot());
         return this;
     }
 
     public int getB2() {
-        return b2.getLogValue();
+        return b2.getLog();
     }
 
     public RoleData setB2(int b2) {
-        this.b2.setLogValue(b2, _getLogRoot());
+        this.b2.setLog(b2, _getLogRoot());
         return this;
     }
 
@@ -244,14 +244,14 @@ public class RoleData extends Data<Long> {
      * sssss
      */
     public short getS() {
-        return s.getLogValue();
+        return s.getLog();
     }
 
     /**
      * sssss
      */
     public RoleData setS(short s) {
-        this.s.setLogValue(s, _getLogRoot());
+        this.s.setLog(s, _getLogRoot());
         return this;
     }
 
@@ -267,14 +267,14 @@ public class RoleData extends Data<Long> {
      * iiii
      */
     public int getI() {
-        return i.getLogValue();
+        return i.getLog();
     }
 
     /**
      * iiii
      */
     public RoleData setI(int i) {
-        this.i.setLogValue(i, _getLogRoot());
+        this.i.setLog(i, _getLogRoot());
         return this;
     }
 
@@ -290,14 +290,14 @@ public class RoleData extends Data<Long> {
      * ffff
      */
     public float getF() {
-        return f.getLogValue();
+        return f.getLog();
     }
 
     /**
      * ffff
      */
     public RoleData setF(float f) {
-        this.f.setLogValue(f, _getLogRoot());
+        this.f.setLog(f, _getLogRoot());
         return this;
     }
 
@@ -310,11 +310,11 @@ public class RoleData extends Data<Long> {
     }
 
     public double getD() {
-        return d.getLogValue();
+        return d.getLog();
     }
 
     public RoleData setD(double d) {
-        this.d.setLogValue(d, _getLogRoot());
+        this.d.setLog(d, _getLogRoot());
         return this;
     }
 
@@ -327,14 +327,14 @@ public class RoleData extends Data<Long> {
      * 道具
      */
     public ItemEntity getItem() {
-        return item.getLogValue();
+        return item.getLog();
     }
 
     /**
      * 道具
      */
     public RoleData setItem(ItemEntity item) {
-        this.item.setLogValue(item);
+        this.item.setLog(item);
         return this;
     }
 

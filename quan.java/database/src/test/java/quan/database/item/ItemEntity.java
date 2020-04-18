@@ -25,11 +25,11 @@ public class ItemEntity extends Entity {
 
 
     public int getId() {
-        return id.getLogValue();
+        return id.getLog();
     }
 
     public ItemEntity setId(int id) {
-        this.id.setLogValue(id, _getLogRoot());
+        this.id.setLog(id, _getLogRoot());
         return this;
     }
 
@@ -39,11 +39,11 @@ public class ItemEntity extends Entity {
     }
 
     public String getName() {
-        return name.getLogValue();
+        return name.getLog();
     }
 
     public ItemEntity setName(String name) {
-        this.name.setLogValue(name, _getLogRoot());
+        this.name.setLog(name, _getLogRoot());
         return this;
     }
 

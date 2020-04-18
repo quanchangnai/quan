@@ -20,23 +20,23 @@ public class BoolField extends LogAccessor implements Field {
     }
 
     @Override
-    public void setValue(Object value) {
-        this.value = (Boolean) value;
+    public void commit(Object log) {
+        this.value = (Boolean) log;
     }
 
-    public boolean getLogValue() {
+    public boolean getLog() {
         Transaction transaction = Transaction.get();
         if (transaction != null) {
-            Boolean logValue = (Boolean) _getFieldLog(transaction, this);
-            if (logValue != null) {
-                return logValue;
+            Boolean log = (Boolean) _getFieldLog(transaction, this);
+            if (log != null) {
+                return log;
             }
         }
         return value;
     }
 
-    public void setLogValue(boolean value, Data root) {
-        _addFieldLog(Transaction.get(true), this, value, root);
+    public void setLog(boolean value, Data root) {
+        _setFieldLog(Transaction.get(true), this, value, root);
     }
 
 }

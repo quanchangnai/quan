@@ -20,23 +20,23 @@ public class DoubleField extends LogAccessor implements Field {
     }
 
     @Override
-    public void setValue(Object value) {
-        this.value = (double) value;
+    public void commit(Object log) {
+        this.value = (double) log;
     }
 
-    public double getLogValue() {
+    public double getLog() {
         Transaction transaction = Transaction.get();
         if (transaction != null) {
-            Double logValue = (Double) _getFieldLog(transaction, this);
-            if (logValue != null) {
-                return logValue;
+            Double log = (Double) _getFieldLog(transaction, this);
+            if (log != null) {
+                return log;
             }
         }
         return value;
     }
 
-    public void setLogValue(double value, Data root) {
-        _addFieldLog(Transaction.get(true), this, value, root);
+    public void setLog(double value, Data root) {
+        _setFieldLog(Transaction.get(true), this, value, root);
     }
 
 }

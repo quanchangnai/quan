@@ -129,7 +129,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
 
     <#elseif field.enumType>
     public ${field.type} get${field.name?cap_first}() {
-        return ${field.type}.valueOf(${field.name}.getLogValue());
+        return ${field.type}.valueOf(${field.name}.getLog());
     }
 
     <#if field.comment !="">
@@ -138,13 +138,13 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
      */
     </#if>
     public ${name} set${field.name?cap_first}(${field.basicType} ${field.name}) {
-        this.${field.name}.setLogValue(${field.name}.value(), _getLogRoot());
+        this.${field.name}.setLog(${field.name}.value(), _getLogRoot());
         return this;
     }
 
     <#else>
     public ${field.basicType} get${field.name?cap_first}() {
-        return ${field.name}.getLogValue();
+        return ${field.name}.getLog();
     }
 
     <#if field.comment !="">
@@ -153,7 +153,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
      */
     </#if>
     public ${name} set${field.name?cap_first}(${field.basicType} ${field.name}) {
-        this.${field.name}.setLogValue(${field.name}<#if !field.beanType>, _getLogRoot()</#if>);
+        this.${field.name}.setLog(${field.name}<#if !field.beanType>, _getLogRoot()</#if>);
         return this;
     }
         <#if field.numberType>

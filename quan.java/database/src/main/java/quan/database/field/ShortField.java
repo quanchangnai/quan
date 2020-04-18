@@ -3,7 +3,6 @@ package quan.database.field;
 import quan.database.Data;
 import quan.database.LogAccessor;
 import quan.database.Transaction;
-import quan.database.Validations;
 
 /**
  * Created by quanchangnai on 2020/4/17.
@@ -21,23 +20,23 @@ public class ShortField extends LogAccessor implements Field {
     }
 
     @Override
-    public void setValue(Object value) {
-        this.value = (short) value;
+    public void commit(Object log) {
+        this.value = (short) log;
     }
 
-    public short getLogValue() {
+    public short getLog() {
         Transaction transaction = Transaction.get();
         if (transaction != null) {
-            Short logValue = (Short) _getFieldLog(transaction, this);
-            if (logValue != null) {
-                return logValue;
+            Short log = (Short) _getFieldLog(transaction, this);
+            if (log != null) {
+                return log;
             }
         }
         return value;
     }
 
-    public void setLogValue(short value, Data root) {
-        _addFieldLog(Transaction.get(true), this, value, root);
+    public void setLog(short value, Data root) {
+        _setFieldLog(Transaction.get(true), this, value, root);
     }
 
 }

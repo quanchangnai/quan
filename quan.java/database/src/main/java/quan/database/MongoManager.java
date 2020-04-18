@@ -20,7 +20,7 @@ import java.util.*;
  * MongoDB管理器
  * Created by quanchangnai on 2020/4/13.
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class MongoManager implements DataUpdater {
 
     private static final Logger logger = LoggerFactory.getLogger(MongoManager.class);

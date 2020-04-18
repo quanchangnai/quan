@@ -12,7 +12,7 @@ import java.util.Set;
 /**
  * Created by quanchangnai on 2019/5/21.
  */
-@SuppressWarnings({"unchecked"})
+@SuppressWarnings({"unchecked", "rawtypes"})
 public final class SetField<E> extends Node implements Set<E>, Field {
 
     private PSet<E> set = Empty.set();
@@ -21,55 +21,55 @@ public final class SetField<E> extends Node implements Set<E>, Field {
         _setRoot(root);
     }
 
+    public PSet<E> getValue() {
+        return set;
+    }
+
+    @Override
+    public void commit(Object log) {
+        this.set = (PSet<E>) log;
+    }
+
     @Override
     public void _setChildrenLogRoot(Data root) {
-        for (E e : getLogValue()) {
+        for (E e : getLog()) {
             if (e instanceof Entity) {
                 _setLogRoot((Entity) e, root);
             }
         }
     }
 
-    public PSet<E> getValue() {
-        return set;
-    }
-
-    public void setValue(PSet<E> set) {
-        this.set = set;
-    }
-
-    @Override
-    public void setValue(Object set) {
-        this.set = (PSet<E>) set;
-    }
-
-    public PSet<E> getLogValue() {
-        PSet<E> log = (PSet<E>) _getFieldLog(Transaction.get(true), this);
+    private PSet<E> getLog(Transaction transaction) {
+        PSet<E> log = (PSet<E>) _getFieldLog(transaction, this);
         if (log != null) {
             return log;
         }
         return set;
     }
 
+    private PSet<E> getLog() {
+        return getLog(Transaction.get(false));
+    }
+
     @Override
     public int size() {
-        return getLogValue().size();
+        return getLog().size();
     }
 
     @Override
     public boolean isEmpty() {
-        return getLogValue().isEmpty();
+        return getLog().isEmpty();
     }
 
     @Override
     public boolean contains(Object o) {
-        return getLogValue().contains(o);
+        return getLog().contains(o);
     }
 
 
     private class It implements Iterator<E> {
 
-        private Iterator<E> it = getLogValue().iterator();
+        private Iterator<E> it = getLog().iterator();
 
         private E current;
 
@@ -99,12 +99,12 @@ public final class SetField<E> extends Node implements Set<E>, Field {
 
     @Override
     public Object[] toArray() {
-        return getLogValue().toArray();
+        return getLog().toArray();
     }
 
     @Override
     public <T> T[] toArray(T[] a) {
-        return getLogValue().toArray(a);
+        return getLog().toArray(a);
     }
 
 
@@ -112,33 +112,37 @@ public final class SetField<E> extends Node implements Set<E>, Field {
     public boolean add(E e) {
         Validations.validateCollectionValue(e);
 
-        PSet<E> oldSet = getLogValue();
+        Transaction transaction = Transaction.get(true);
+        PSet<E> oldSet = getLog(transaction);
         PSet<E> newSet = oldSet.plus(e);
 
         if (oldSet == newSet) {
             return false;
         }
 
-        _addFieldLog(Transaction.get(true), this, newSet, null);
+        Data root = _getLogRoot(transaction);
 
         if (e instanceof Entity) {
-            _setLogRoot((Entity) e, _getLogRoot());
+            _setLogRoot((Entity) e, root);
         }
+
+        _setFieldLog(transaction, this, newSet, root);
 
         return true;
     }
 
     public boolean _add(E e) {
         Validations.validateCollectionValue(e);
+
         PSet<E> oldSet = set;
-        set = set.plus(e);
+        set = oldSet.plus(e);
 
         if (oldSet == set) {
             return false;
         }
 
         if (e instanceof Entity) {
-            _setLogRoot((Entity) e, _getLogRoot());
+            _setRoot((Entity) e, _getRoot());
         }
 
         return true;
@@ -146,14 +150,15 @@ public final class SetField<E> extends Node implements Set<E>, Field {
 
     @Override
     public boolean remove(Object o) {
-        PSet<E> oldSet = getLogValue();
+        Transaction transaction = Transaction.get(true);
+        PSet<E> oldSet = getLog(transaction);
         PSet<E> newSet = oldSet.minus(o);
 
         if (oldSet == newSet) {
             return false;
         }
 
-        _addFieldLog(Transaction.get(true), this, newSet, null);
+        _setFieldLog(transaction, this, newSet, _getLogRoot(transaction));
 
         if (o instanceof Entity) {
             _setLogRoot((Entity) o, null);
@@ -165,7 +170,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        return getLogValue().containsAll(c);
+        return getLog().containsAll(c);
     }
 
     @Override
@@ -173,18 +178,21 @@ public final class SetField<E> extends Node implements Set<E>, Field {
         Objects.requireNonNull(c);
         c.forEach(Validations::validateCollectionValue);
 
-        PSet<E> oldSet = getLogValue();
+        Transaction transaction = Transaction.get(true);
+        PSet<E> oldSet = getLog(transaction);
         PSet<E> newSet = oldSet.plusAll(c);
 
         if (oldSet == newSet) {
             return false;
         }
 
-        _addFieldLog(Transaction.get(true), this, newSet, null);
+        Data root = _getLogRoot(transaction);
+
+        _setFieldLog(transaction, this, newSet, root);
 
         for (E e : c) {
             if (e instanceof Entity) {
-                _setLogRoot((Entity) e, _getLogRoot());
+                _setLogRoot((Entity) e, root);
             }
         }
 
@@ -193,42 +201,48 @@ public final class SetField<E> extends Node implements Set<E>, Field {
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        Objects.requireNonNull(c);
         boolean modified = false;
+
         for (Object o : c) {
             if (remove(o)) {
                 modified = true;
             }
         }
+
         return modified;
     }
 
     @Override
     public boolean retainAll(Collection<?> c) {
         Objects.requireNonNull(c);
+
         boolean modified = false;
         Iterator<E> iterator = iterator();
-        while (iterator.hasNext())
+
+        while (iterator.hasNext()) {
             if (!c.contains(iterator.next())) {
                 iterator.remove();
                 modified = true;
             }
+        }
+
         return modified;
     }
 
     @Override
     public void clear() {
-        if (getLogValue().isEmpty()) {
+        Transaction transaction = Transaction.get(true);
+        if (getLog(transaction).isEmpty()) {
             return;
         }
 
         _setChildrenLogRoot(null);
-        _addFieldLog(Transaction.get(true), this, Empty.set(), null);
+        _setFieldLog(transaction, this, Empty.set(), _getLogRoot(transaction));
     }
 
     @Override
     public String toString() {
-        return String.valueOf(getLogValue());
+        return String.valueOf(getLog());
     }
 
 }

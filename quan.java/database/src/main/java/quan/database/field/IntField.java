@@ -3,7 +3,6 @@ package quan.database.field;
 import quan.database.Data;
 import quan.database.LogAccessor;
 import quan.database.Transaction;
-import quan.database.Validations;
 
 /**
  * Created by quanchangnai on 2020/4/17.
@@ -21,23 +20,23 @@ public class IntField extends LogAccessor implements Field {
     }
 
     @Override
-    public void setValue(Object value) {
-        this.value = (int) value;
+    public void commit(Object log) {
+        this.value = (int) log;
     }
 
-    public int getLogValue() {
+    public int getLog() {
         Transaction transaction = Transaction.get();
         if (transaction != null) {
-            Integer logValue = (Integer) _getFieldLog(transaction, this);
-            if (logValue != null) {
-                return logValue;
+            Integer log = (Integer) _getFieldLog(transaction, this);
+            if (log != null) {
+                return log;
             }
         }
         return value;
     }
 
-    public void setLogValue(int value, Data root) {
-        _addFieldLog(Transaction.get(true), this, value, root);
+    public void setLog(int value, Data root) {
+        _setFieldLog(Transaction.get(true), this, value, root);
     }
 
 }

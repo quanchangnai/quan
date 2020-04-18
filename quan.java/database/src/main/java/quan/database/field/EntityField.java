@@ -5,7 +5,7 @@ import quan.database.*;
 /**
  * Created by quanchangnai on 2019/5/16.
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "rawtypes"})
 public final class EntityField<V extends Entity> extends Node implements Field {
 
     private V value;
@@ -18,8 +18,20 @@ public final class EntityField<V extends Entity> extends Node implements Field {
         return value;
     }
 
-    public V getLogValue() {
-        Transaction transaction = Transaction.get();
+    public void setValue(V value) {
+        this.value = value;
+    }
+
+    @Override
+    public void commit(Object log) {
+        this.value = (V) log;
+    }
+
+    public V getLog() {
+        return getLog(Transaction.get());
+    }
+
+    private V getLog(Transaction transaction) {
         if (transaction != null) {
             V log = (V) _getFieldLog(transaction, this);
             if (log != null) {
@@ -29,29 +41,22 @@ public final class EntityField<V extends Entity> extends Node implements Field {
         return value;
     }
 
-    public void setValue(V value) {
-        this.value = value;
-    }
 
-    @Override
-    public void setValue(Object value) {
-        this.value = (V) value;
-    }
-
-    public void setLogValue(V value) {
+    public void setLog(V value) {
         Validations.validateEntityRoot(value);
 
-        V oldValue = getLogValue();
-        if (oldValue != null) {
-            _setLogRoot(oldValue, null);
+        Transaction transaction = Transaction.get(true);
+        V log = getLog(transaction);
+        Data root = _getLogRoot(transaction);
+
+        if (log != null) {
+            _setLogRoot(log, null);
         }
-
-        _addFieldLog(Transaction.get(true), this, value, _getLogRoot());
-
         if (value != null) {
-            _setLogRoot(value, _getLogRoot());
+            _setLogRoot(value, root);
         }
 
+        _setFieldLog(transaction, this, value, root);
     }
 
     @Override

@@ -7,20 +7,20 @@ import quan.database.field.Field;
  */
 public class LogAccessor {
 
-    protected static void _addFieldLog(Transaction transaction, Field field, Object value, Data root) {
-        transaction.addFieldLog(field, value, root);
+    protected static void _setFieldLog(Transaction transaction, Field field, Object log, Data root) {
+        transaction.setFieldLog(field, log, root);
     }
 
     protected static Object _getFieldLog(Transaction transaction, Field field) {
         return transaction.getFieldLog(field);
     }
 
-    protected static void _addRootLog(Transaction transaction, Node node, Data root) {
-        transaction.addRootLog(node, root);
+    protected static void _setNodeLog(Transaction transaction, Node node, Data root) {
+        transaction.setNodeLog(node, root);
     }
 
-    protected static Data _getRootLog(Transaction transaction, Node node) {
-        return transaction.getRootLog(node);
+    protected static Data _getNodeLog(Transaction transaction, Node node) {
+        return transaction.getNodeLog(node);
     }
 
 }
