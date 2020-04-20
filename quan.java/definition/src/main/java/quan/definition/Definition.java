@@ -1,6 +1,5 @@
 package quan.definition;
 
-import com.google.common.base.CaseFormat;
 import org.apache.commons.lang3.StringUtils;
 import quan.definition.parser.DefinitionParser;
 

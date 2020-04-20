@@ -46,9 +46,8 @@ public class ClassUtils {
         try {
             String className = readClassName(classBytes);
             Class<?> clazz = Class.forName(className);
-            ClassDefinition definition = new ClassDefinition(clazz, classBytes);
-
-            ByteBuddyAgent.install().redefineClasses(definition);
+            ClassDefinition classDefinition = new ClassDefinition(clazz, classBytes);
+            ByteBuddyAgent.install().redefineClasses(classDefinition);
         } catch (Exception e) {
             logger.error("重定义类失败", e);
         }

@@ -34,13 +34,16 @@ public class DatabaseTest {
 
 //        testMongoClient();
 
-        test();
+//        test();
 
 //        testWrite();
 //        testRead();
 
 //        testMap();
 
+        RoleTest test1 = Transaction.proxy(RoleTest.class);
+        test1.test1();
+        test1.test2();
 
     }
 
@@ -69,10 +72,7 @@ public class DatabaseTest {
     private static void testMongoCollection1(MongoManager mongoManager) {
         System.err.println("testMongoCollection1 start===========");
         long startTime = System.nanoTime();
-        Transaction.execute(() -> {
-            doTestMongoCollection1(mongoManager);
-            return true;
-        });
+        Transaction.execute(() -> doTestMongoCollection1(mongoManager));
         System.err.println("testMongoCollection1 costTime:" + (System.nanoTime() - startTime) / timeBase);
     }
 
@@ -185,7 +185,6 @@ public class DatabaseTest {
             }
 
             System.err.println("roleDataList costTime:" + (System.nanoTime() - startTime) / timeBase);
-            return true;
         });
 
     }

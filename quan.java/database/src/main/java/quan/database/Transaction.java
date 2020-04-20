@@ -1,10 +1,15 @@
 package quan.database;
 
+import net.sf.cglib.proxy.Callback;
+import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.MethodInterceptor;
+import net.sf.cglib.proxy.NoOp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.database.field.Field;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * 事务实现，多线程并发时需要自己加锁，否则隔离级别就是读已提交
@@ -149,55 +154,32 @@ public class Transaction {
     }
 
     /**
-     * 在事务中执行任务，执行线程为调用方法的当前线程
+     * 标记事务失败
      */
-    public static void execute(Task task) {
-        Transaction transaction = threadLocal.get();
-        if (transaction != null) {
-            _executeInside(transaction, task);
-        } else {
-            _executeOutside(Transaction.begin(), task);
-        }
+    public static void fail() {
+        Transaction.get(true).failed = true;
     }
 
     /**
-     * 在事务内部执行
+     * 在事务中执行任务
      */
-    public static void executeInside(Task task) {
-        _executeInside(get(true), task);
-    }
-
-    private static void _executeInside(Transaction transaction, Task task) {
-        if (!task.run()) {
-            transaction.failed = true;
+    public static void execute(Runnable task) {
+        if (threadLocal.get() != null) {
+            task.run();
+            return;
         }
-    }
 
-
-    /**
-     * 在事务外部执行，需要开启新事务
-     */
-    public static void executeOutside(Task task) {
-        if (Transaction.isInside()) {
-            throw new IllegalStateException("当前已经在事务中了");
-        }
-        _executeOutside(Transaction.begin(), task);
-    }
-
-    private static void _executeOutside(Transaction transaction, Task task) {
-        boolean failed = false;
+        Transaction transaction = Transaction.begin();
         try {
-            failed = !task.run();
+            task.run();
         } catch (Throwable e) {
-            failed = true;
+            transaction.failed = true;
             if (!(e instanceof BreakdownException)) {
                 throw e;
             }
         } finally {
-            transaction.failed = transaction.failed || failed;
             end(transaction);
         }
-
     }
 
     /**
@@ -230,17 +212,66 @@ public class Transaction {
     }
 
     /**
-     * 在当前事务执行完成之后再执行特殊任务
+     * 在当前事务执行结束之后再执行特殊任务
      *
      * @param task      需要执行的任务
      * @param committed true:事务提交之后执行,false:事务回滚之后执行
      */
-    public static void run(Runnable task, boolean committed) {
+    public static void runAfterEnd(Runnable task, boolean committed) {
         Transaction.get(true).endTasks.put(task, committed);
     }
 
-    public static void run(Runnable task) {
+    public static void runAfterCommit(Runnable task) {
         Transaction.get(true).endTasks.put(task, true);
+    }
+
+    /**
+     * 创建代理对象方式实现声明式事务
+     *
+     * @param clazz     目标类型
+     * @param argTypes  构造方法参数类型
+     * @param argValues 构造方法参数值
+     */
+    public static <T> T proxy(Class<T> clazz, Class[] argTypes, Object[] argValues) {
+        Objects.requireNonNull(clazz, "目标类型不能为空");
+
+        Enhancer enhancer = new Enhancer();
+        enhancer.setSuperclass(clazz);
+        enhancer.setCallbackFilter(method -> method.isAnnotationPresent(Transactional.class) ? 0 : 1);
+
+        MethodInterceptor interceptor = (obj, method, args, proxy) -> {
+            AtomicReference<Throwable> exception = new AtomicReference<>();
+            Transaction.execute(() -> {
+                try {
+                    proxy.invokeSuper(obj, args);
+                } catch (Throwable e) {
+                    if (e instanceof BreakdownException) {
+                        throw (BreakdownException) e;
+                    } else {
+                        exception.set(e);
+                    }
+                }
+            });
+
+            if (exception.get() != null) {
+                throw exception.get();
+            }
+            return null;
+        };
+
+
+        enhancer.setCallbacks(new Callback[]{interceptor, NoOp.INSTANCE});
+
+        return (T) enhancer.create(argTypes, argValues);
+    }
+
+    /**
+     * 创建代理对象方式实现声明式事务
+     *
+     * @param clazz 目标类型
+     */
+    public static <T> T proxy(Class<T> clazz) {
+        return proxy(clazz, new Class<?>[]{}, new Object[]{});
     }
 
     /**

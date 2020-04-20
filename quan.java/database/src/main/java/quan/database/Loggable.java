@@ -16,7 +16,9 @@ public abstract class Loggable {
     }
 
     protected static void _setRootLog(Transaction transaction, Node node, Data<?> root) {
-        transaction.setRootLog(node, root);
+        if (node != null) {
+            transaction.setRootLog(node, root);
+        }
     }
 
     protected static Data<?> _getRootLog(Transaction transaction, Node node) {
