@@ -47,7 +47,7 @@ public class Transaction {
     /**
      * 数据更新器
      */
-    private static List<DataUpdater> updaters = new ArrayList<>();
+    private static LinkedHashSet<DataUpdater> updaters = new LinkedHashSet<>();
 
     /**
      * 事务执行结束之后再执行的特殊任务
@@ -207,32 +207,34 @@ public class Transaction {
     /**
      * 添加数据更新器
      */
-    public static void addUpdater(DataUpdater updater) {
+    static void addUpdater(DataUpdater updater) {
         updaters.add(updater);
     }
 
-    /**
-     * 在当前事务执行结束之后再执行特殊任务
-     *
-     * @param task      需要执行的任务
-     * @param committed true:事务提交之后执行,false:事务回滚之后执行
+    /***
+     * 在当前事务执行提交之后再执行特殊任务
      */
-    public static void runAfterEnd(Runnable task, boolean committed) {
-        Transaction.get(true).endTasks.put(task, committed);
-    }
-
     public static void runAfterCommit(Runnable task) {
         Transaction.get(true).endTasks.put(task, true);
     }
 
     /**
-     * 创建代理对象方式实现声明式事务
+     * 在当前事务执行回滚之后再执行特殊任务
+     */
+    public static void runAfterRollback(Runnable task) {
+        Transaction.get(true).endTasks.put(task, false);
+    }
+
+
+    /**
+     * 创建实现了声明式事务的代理对象
      *
      * @param clazz     目标类型
      * @param argTypes  构造方法参数类型
      * @param argValues 构造方法参数值
      */
-    public static <T> T proxy(Class<T> clazz, Class[] argTypes, Object[] argValues) {
+    @SuppressWarnings("unchecked")
+    public static <T> T proxy(Class<T> clazz, Class<?>[] argTypes, Object[] argValues) {
         Objects.requireNonNull(clazz, "目标类型不能为空");
 
         Enhancer enhancer = new Enhancer();
@@ -241,9 +243,11 @@ public class Transaction {
 
         MethodInterceptor interceptor = (obj, method, args, proxy) -> {
             AtomicReference<Throwable> exception = new AtomicReference<>();
+            AtomicReference<Object> result = new AtomicReference<>();
+            //在事务中执行原始方法
             Transaction.execute(() -> {
                 try {
-                    proxy.invokeSuper(obj, args);
+                    result.set(proxy.invokeSuper(obj, args));
                 } catch (Throwable e) {
                     if (e instanceof BreakdownException) {
                         throw (BreakdownException) e;
@@ -255,23 +259,28 @@ public class Transaction {
 
             if (exception.get() != null) {
                 throw exception.get();
+            } else {
+                return result.get();
             }
-            return null;
         };
-
 
         enhancer.setCallbacks(new Callback[]{interceptor, NoOp.INSTANCE});
 
-        return (T) enhancer.create(argTypes, argValues);
+        if (argTypes == null && argValues == null) {
+            return (T) enhancer.create();
+        } else {
+            assert argTypes != null;
+            return (T) enhancer.create(argTypes, argValues);
+        }
     }
 
     /**
-     * 创建代理对象方式实现声明式事务
+     * 创建实现了声明式事务的代理对象
      *
      * @param clazz 目标类型
      */
     public static <T> T proxy(Class<T> clazz) {
-        return proxy(clazz, new Class<?>[]{}, new Object[]{});
+        return proxy(clazz, null, null);
     }
 
     /**

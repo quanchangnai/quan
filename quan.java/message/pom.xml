@@ -8,7 +8,7 @@
         <artifactId>quan</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    
+
     <modelVersion>4.0.0</modelVersion>
     <artifactId>message</artifactId>
 
@@ -21,11 +21,13 @@
             <groupId>quan</groupId>
             <artifactId>network</artifactId>
             <version>1.0-SNAPSHOT</version>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
             <version>4.1.42.Final</version>
+            <optional>true</optional>
         </dependency>
 
     </dependencies>

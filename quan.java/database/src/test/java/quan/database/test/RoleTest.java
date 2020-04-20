@@ -1,5 +1,6 @@
 package quan.database.test;
 
+import quan.database.Transaction;
 import quan.database.Transactional;
 import quan.database.item.ItemEntity;
 import quan.database.role.RoleData;
@@ -14,7 +15,7 @@ public class RoleTest {
     private RoleData roleData2 = new RoleData(2L);
 
     @Transactional
-    public void test1() {
+    public int test1() {
         System.err.println("RoleTest.test1()===============");
 
         roleData1.setName("aaa");
@@ -35,7 +36,11 @@ public class RoleTest {
         System.err.println("roleData1:" + roleData1);
         System.err.println("roleData2:" + roleData2);
 
-//        Transaction.breakdown();
+//        throw new RuntimeException("aaa");
+
+        Transaction.breakdown();
+
+        return 1;
     }
 
     public void test2() {

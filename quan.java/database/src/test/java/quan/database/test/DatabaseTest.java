@@ -32,19 +32,25 @@ public class DatabaseTest {
 
     public static void main(String[] args) throws Exception {
 
-//        testMongoClient();
-
 //        test();
 
 //        testWrite();
 //        testRead();
 
+//        testRole();
+
+        testMongoClient();
+
 //        testMap();
 
-        RoleTest test1 = Transaction.proxy(RoleTest.class);
-        test1.test1();
-        test1.test2();
 
+    }
+
+    private static void testRole() throws Exception {
+        RoleTest roleTest = Transaction.proxy(RoleTest.class);
+        int test1 = roleTest.test1();
+        System.err.println("test1:" + test1);
+        roleTest.test2();
     }
 
     private static void testMongoClient() throws Exception {
@@ -131,14 +137,16 @@ public class DatabaseTest {
 
         UpdateResult updateResult = roleDataCollection2.replaceOne(Filters.eq(roleDataMax._getId()), roleDataMax, new ReplaceOptions().upsert(true));
 
+        List<RoleData2> roleDataList = new ArrayList<>();
+
         RoleData2 roleData1 = new RoleData2(roleDataMax.getId() + 1).setName("name:" + roleDataMax.getId() + 1);
         RoleData2 roleData2 = new RoleData2(roleDataMax.getId() + 2).setName("name:" + roleDataMax.getId() + 2);
         RoleData2 roleData3 = new RoleData2(roleDataMax.getId() + 3).setName("name:" + roleDataMax.getId() + 3);
-        roleDataCollection2.insertOne(roleData1);
-        roleDataCollection2.insertOne(roleData2);
-        roleDataCollection2.insertOne(roleData3);
 
-        List<RoleData2> roleDataList = new ArrayList<>();
+        roleDataList.add(roleData1);
+        roleDataList.add(roleData2);
+        roleDataList.add(roleData3);
+
         for (long i = roleData3.getId() + 1; i < roleData3.getId() + 20; i++) {
             RoleData2 roleData = new RoleData2(i);
             roleData.setName("aaa" + i);
@@ -150,7 +158,7 @@ public class DatabaseTest {
             roleDataList.add(roleData);
         }
 
-        roleDataList.forEach(roleDataCollection2::insertOne);
+        roleDataCollection2.insertMany(roleDataList);
 
         System.err.println("testMongoCollection2 costTime:" + (System.nanoTime() - startTime) / timeBase);
     }

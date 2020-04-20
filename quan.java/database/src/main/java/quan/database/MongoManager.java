@@ -139,16 +139,17 @@ public class MongoManager implements DataUpdater {
 
     @Override
     public void update(List<Data<?>> updates) {
+        Map<MongoCollection<Data<?>>, List<WriteModel<Data<?>>>> writeModels = new HashMap<>();
+
         for (Data<?> data : updates) {
             DataUpdater updater = data._getUpdater();
             if (updater != null && updater != this) {
                 continue;
             }
-            MongoCollection<Data> collection = collections.get(data.getClass());
-            if (collection == null) {
-                continue;
-            }
-            collection.replaceOne(Filters.eq(data._id()), data, replaceOptions);
+            MongoCollection<Data<?>> collection = collections.get(data.getClass());
+            writeModels.computeIfAbsent(collection, c -> new ArrayList<>()).add(new ReplaceOneModel<>(Filters.eq(data._id()), data, replaceOptions));
         }
+
+        writeModels.forEach(MongoCollection::bulkWrite);
     }
 }
