@@ -47,12 +47,15 @@ public final class ListField<E> extends Node implements List<E>, Field {
     }
 
     private Log<E> getLog(Transaction transaction, boolean write) {
-        Log<E> log = (Log<E>) _getFieldLog(transaction, this);
-        if (write && log == null) {
-            log = new Log<>(this.list);
-            _setFieldLog(transaction, this, log, _getLogRoot(transaction));
+        if (transaction != null) {
+            Log<E> log = (Log<E>) _getFieldLog(transaction, this);
+            if (write && log == null) {
+                log = new Log<>(this.list);
+                _setFieldLog(transaction, this, log, _getLogRoot(transaction));
+            }
+            return log;
         }
-        return log;
+        return null;
     }
 
 

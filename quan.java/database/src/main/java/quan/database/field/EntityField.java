@@ -48,15 +48,15 @@ public final class EntityField<V extends Entity> extends Loggable implements Fie
             _setFieldLog(transaction, this, log, root);
         }
 
-        if (log.value != null) {
-            _setRootLog(transaction, log.value, null);
-        }
-
-        if (value != null) {
-            _setRootLog(transaction, value, null);
-        }
+        _setRootLog(transaction, log.value, null);
+        log.value = value;
+        _setRootLog(transaction, value, root);
     }
 
+    @Override
+    public String toString() {
+        return String.valueOf(getLogValue());
+    }
 
     private static class Log<V> {
 

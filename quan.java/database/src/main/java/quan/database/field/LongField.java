@@ -7,7 +7,7 @@ import quan.database.Transaction;
 /**
  * Created by quanchangnai on 2020/4/17.
  */
-public class LongField extends Loggable implements Field{
+public class LongField extends Loggable implements Field {
 
     private long value;
 
@@ -37,6 +37,11 @@ public class LongField extends Loggable implements Field{
 
     public void setLogValue(long value, Data<?> root) {
         _setFieldLog(Transaction.get(true), this, value, root);
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(getLogValue());
     }
 
 }

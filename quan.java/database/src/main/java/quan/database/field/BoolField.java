@@ -39,4 +39,9 @@ public class BoolField extends Loggable implements Field {
         _setFieldLog(Transaction.get(true), this, value, root);
     }
 
+    @Override
+    public String toString() {
+        return String.valueOf(getLogValue());
+    }
+
 }

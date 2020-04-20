@@ -43,9 +43,11 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
     }
 
     private PMap<K, V> getLogMap(Transaction transaction) {
-        PMap<K, V> logMap = (PMap<K, V>) _getFieldLog(transaction, this);
-        if (logMap != null) {
-            return logMap;
+        if (transaction != null) {
+            PMap<K, V> logMap = (PMap<K, V>) _getFieldLog(transaction, this);
+            if (logMap != null) {
+                return logMap;
+            }
         }
         return map;
     }

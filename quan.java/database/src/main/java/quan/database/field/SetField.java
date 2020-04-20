@@ -47,9 +47,11 @@ public final class SetField<E> extends Node implements Set<E>, Field {
     }
 
     private PSet<E> getLogSet(Transaction transaction) {
-        PSet<E> log = (PSet<E>) _getFieldLog(transaction, this);
-        if (log != null) {
-            return log;
+        if (transaction != null) {
+            PSet<E> log = (PSet<E>) _getFieldLog(transaction, this);
+            if (log != null) {
+                return log;
+            }
         }
         return set;
     }

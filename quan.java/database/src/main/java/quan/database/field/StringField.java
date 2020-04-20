@@ -41,4 +41,9 @@ public class StringField extends Loggable implements Field {
         _setFieldLog(Transaction.get(true), this, value, root);
     }
 
+    @Override
+    public String toString() {
+        return getLogValue();
+    }
+
 }
