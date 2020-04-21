@@ -28,7 +28,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
         return set;
     }
 
-    public Delegate<E> getDelegate() {
+    public Set<E> getDelegate() {
         return delegate;
     }
 
@@ -140,7 +140,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
         return true;
     }
 
-    public boolean _add(E e) {
+    public boolean plus(E e) {
         Validations.validateCollectionValue(e);
 
         PSet<E> oldSet = set;
@@ -172,7 +172,6 @@ public final class SetField<E> extends Node implements Set<E>, Field {
         if (o instanceof Entity) {
             _setLogRoot((Entity) o, null);
         }
-
 
         return true;
     }
@@ -254,7 +253,6 @@ public final class SetField<E> extends Node implements Set<E>, Field {
         return String.valueOf(getLogSet());
     }
 
-
     private static class Delegate<E> implements Set<E> {
 
         private SetField<E> field;
@@ -333,4 +331,5 @@ public final class SetField<E> extends Node implements Set<E>, Field {
             return field.toString();
         }
     }
+
 }

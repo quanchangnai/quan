@@ -13,7 +13,7 @@ public abstract class Node extends Loggable {
     }
 
     protected Data<?> _getRoot() {
-        return this.root;
+        return root;
     }
 
     protected void commit(Data<?> root) {

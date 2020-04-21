@@ -20,27 +20,27 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
 <#if definitionType ==5>
 
     /**
-     * 数据对应的表名
+     * 对应的表名
      */
     public static final String _NAME = "${underscoreName}";
 
     /**
-     * 数据索引
+     * 索引
      */
-    public static final Map<String, Index> _INDEXES;
+    public static final List<Index> _INDEXES;
 
     static {
-        Map<String, Index> indexes = new HashMap<>();
+        List<Index> indexes = new ArrayList<>();
     <#list indexes as index>
         <#if index.fields?size==1>
-        indexes.put("${index.name}", new Index("${index.name}", Collections.singletonList(${name}.${index.fields[0].underscoreName}), ${index.unique?c}));
-        <#elseif  index.fields?size==2>
-        indexes.put("${index.name}", new Index("${index.name}", Arrays.asList(${name}.${index.fields[0].underscoreName}, ${name}.${index.fields[1].underscoreName}), ${index.unique?c}));
+        indexes.add(new Index("${index.name}", Collections.singletonList(${name}.${index.fields[0].underscoreName}), ${index.unique?c}));
+        <#elseif index.fields?size==2>
+        indexes.add(new Index("${index.name}", Arrays.asList(${name}.${index.fields[0].underscoreName}, ${name}.${index.fields[1].underscoreName}), ${index.unique?c}));
         <#elseif index.fields?size==3>
-        indexes.put("${index.name}", new Index("${index.name}", Arrays.asList(${name}.${index.fields[0].underscoreName}, ${name}.${index.fields[1].underscoreName}, ${name}.${index.fields[2].underscoreName}), ${index.unique?c}));
+        indexes.add(new Index("${index.name}", Arrays.asList(${name}.${index.fields[0].underscoreName}, ${name}.${index.fields[1].underscoreName}, ${name}.${index.fields[2].underscoreName}), ${index.unique?c}));
         </#if>
     </#list>
-        _INDEXES = Collections.unmodifiableMap(indexes);
+        _INDEXES = Collections.unmodifiableList(indexes);
     }
 
 </#if>
@@ -54,12 +54,13 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
     public static final String ${field.underscoreName} = "${field.name}";
 </#list>
 
-
+<#assign root><#if definitionType ==5>this<#else>_getLogRoot()</#if></#assign>
 <#list fields as field>
+
     <#if field.type == "set" || field.type == "list">
-    private ${field.classType}<${field.classValueType}> ${field.name} = new ${field.classType}<>(_getLogRoot());
+    private ${field.classType}<${field.classValueType}> ${field.name} = new ${field.classType}<>(${root});
     <#elseif field.type == "map">
-    private ${field.classType}<${field.classKeyType}, ${field.classValueType}> ${field.name} = new ${field.classType}<>(_getLogRoot());
+    private ${field.classType}<${field.classKeyType}, ${field.classValueType}> ${field.name} = new ${field.classType}<>(${root});
     <#elseif field.enumType>
     private IntField ${field.name} = new IntField();
     <#elseif field.primitiveType>
@@ -67,10 +68,10 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
     <#else>
     private EntityField<${field.classType}> ${field.name} = new EntityField<>();
     </#if>
-
 </#list>
 
 <#if definitionType ==5>
+
     <#if idField.type=="string">    
     public ${name}(String ${idName}) {
         Objects.requireNonNull(${idName}, "参数[${idName}]不能为空");
@@ -81,7 +82,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
     }
 
     /**
-     * 数据对应的表名
+     * 对应的表名
      */
     @Override
     public String _name() {
@@ -89,7 +90,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
     }
 
     /**
-     * 数据主键(_id)
+     * 主键(_id)
      */
     @Override
     public ${idField.classType} _id() {
@@ -97,10 +98,10 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
     }
 
     /**
-     * 数据索引
+     * 索引
      */
     @Override
-    public Map<String, Index> _indexes() {
+    public List<Index> _indexes() {
         return _INDEXES;
     }
 
@@ -138,7 +139,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
      */
     </#if>
     public ${name} set${field.name?cap_first}(${field.basicType} ${field.name}) {
-        this.${field.name}.setLogValue(${field.name}.value(), _getLogRoot());
+        this.${field.name}.setLogValue(${field.name}.value(), ${root});
         return this;
     }
 
@@ -153,7 +154,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
      */
     </#if>
     public ${name} set${field.name?cap_first}(${field.basicType} ${field.name}) {
-        this.${field.name}.setLogValue(${field.name}, _getLogRoot());
+        this.${field.name}.setLogValue(${field.name}, ${root});
         return this;
     }
         <#if field.numberType>
@@ -171,16 +172,19 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
 
     </#if>
 </#list>
+<#if definitionType !=5>
+
     @Override
     protected void _setChildrenLogRoot(Data<?> root) {
-<#list fields as field>
-    <#if field.collectionType>
+    <#list fields as field>
+        <#if field.collectionType>
         _setLogRoot(${field.name}, root);
-    <#elseif field.beanType>
+        <#elseif field.beanType>
         _setLogRoot(${field.name}.getLogValue(), root);
-    </#if>
-</#list>
+        </#if>
+    </#list>
     }
+</#if>
 
     @Override
     public String toString() {
@@ -242,11 +246,11 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
                         reader.readStartArray();
                         while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
                             <#if field.primitiveValueType>
-                            value.${field.name}._add(<#if convertTypes[field.type]??>(${field.basicType}) </#if>reader.read${bsonTypes[field.valueType]}());
+                            value.${field.name}.plus(<#if convertTypes[field.type]??>(${field.basicType}) </#if>reader.read${bsonTypes[field.valueType]}());
                             <#elseif field.beanValueType>
-                            value.${field.name}._add(decoderContext.decodeWithChildContext(registry.get(${field.valueType}.class), reader));
+                            value.${field.name}.plus(decoderContext.decodeWithChildContext(registry.get(${field.valueType}.class), reader));
                             <#else>
-                            value.${field.name}._add(reader.read${field.valueType?cap_first}());
+                            value.${field.name}.plus(reader.read${field.valueType?cap_first}());
                             </#if>
                         }
                         reader.readEndArray();
@@ -254,9 +258,9 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
                         reader.readStartDocument();
                         while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
                             <#if field.primitiveValueType>
-                            value.${field.name}._put(<#if convertTypes[field.keyType]??>(${field.basicValueType}) </#if>reader.read${bsonTypes[field.keyType]}(), <#if convertTypes[field.valueType]??>(${field.basicValueType})</#if>reader.read${bsonTypes[field.valueType]}());
+                            value.${field.name}.plus(<#if convertTypes[field.keyType]??>(${field.basicValueType}) </#if>reader.read${bsonTypes[field.keyType]}(), <#if convertTypes[field.valueType]??>(${field.basicValueType})</#if>reader.read${bsonTypes[field.valueType]}());
                             <#else>
-                            value.${field.name}._put(<#if convertTypes[field.keyType]??>(${field.basicValueType}) </#if>reader.read${bsonTypes[field.keyType]}(), decoderContext.decodeWithChildContext(registry.get(${field.classValueType}.class), reader));
+                            value.${field.name}.plus(<#if convertTypes[field.keyType]??>(${field.basicValueType}) </#if>reader.read${bsonTypes[field.keyType]}(), decoderContext.decodeWithChildContext(registry.get(${field.classValueType}.class), reader));
                             </#if>
                         }
                         reader.readEndDocument();

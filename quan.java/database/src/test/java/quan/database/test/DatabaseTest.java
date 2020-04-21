@@ -1,9 +1,7 @@
 package quan.database.test;
 
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.ReplaceOptions;
-import com.mongodb.client.model.Sorts;
+import com.mongodb.client.model.*;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.BsonReader;
 import org.bson.BsonWriter;
@@ -37,7 +35,7 @@ public class DatabaseTest {
 //        testWrite();
 //        testRead();
 
-//        testRole();
+        testRole();
 
         testMongoClient();
 
@@ -94,7 +92,7 @@ public class DatabaseTest {
 
         for (int i = 0; i < 20; i++) {
             roleDataMax.getList().add("aaaaa" + i);
-            roleDataMax.getSet().add(i % 2 == 1);
+//            roleDataMax.getSet().add(i % 2 == 1);
         }
 
         RoleData roleData1 = new RoleData(roleDataMax.getId() + 1).setName("name:" + roleDataMax.getId() + 1);
@@ -157,6 +155,14 @@ public class DatabaseTest {
             }
             roleDataList.add(roleData);
         }
+
+//        ReplaceOptions replaceOptions = new ReplaceOptions().upsert(true);
+//        List<WriteModel<RoleData2>> writeModels = new ArrayList<>();
+//        for (RoleData2 data2 : roleDataList) {
+//            ReplaceOneModel replaceOneModel = new ReplaceOneModel(Filters.eq(data2._getId()), data2, replaceOptions);
+//            writeModels.add(replaceOneModel);
+//        }
+//        roleDataCollection2.bulkWrite(writeModels);
 
         roleDataCollection2.insertMany(roleDataList);
 

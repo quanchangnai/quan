@@ -24,7 +24,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
         return list;
     }
 
-    public Delegate<E> getDelegate() {
+    public List<E> getDelegate() {
         return delegate;
     }
 
@@ -47,17 +47,17 @@ public final class ListField<E> extends Node implements List<E>, Field {
     }
 
     private Log<E> getLog(Transaction transaction, boolean write) {
-        if (transaction != null) {
-            Log<E> log = (Log<E>) _getFieldLog(transaction, this);
-            if (write && log == null) {
-                log = new Log<>(this.list);
-                _setFieldLog(transaction, this, log, _getLogRoot(transaction));
-            }
-            return log;
+        if (transaction == null) {
+            return null;
         }
-        return null;
-    }
 
+        Log<E> log = (Log<E>) _getFieldLog(transaction, this);
+        if (write && log == null) {
+            log = new Log<>(this.list);
+            _setFieldLog(transaction, this, log, _getLogRoot(transaction));
+        }
+        return log;
+    }
 
     private PVector<E> getLogList() {
         Log<E> log = getLog(false);
@@ -89,7 +89,6 @@ public final class ListField<E> extends Node implements List<E>, Field {
     public boolean contains(Object o) {
         return getLogList().contains(o);
     }
-
 
     private class It implements Iterator<E> {
 
@@ -160,7 +159,6 @@ public final class ListField<E> extends Node implements List<E>, Field {
         return getLogList().toArray(a);
     }
 
-
     @Override
     public boolean add(E e) {
         Validations.validateCollectionValue(e);
@@ -178,7 +176,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
         return true;
     }
 
-    public boolean _add(E e) {
+    public boolean plus(E e) {
         Validations.validateCollectionValue(e);
 
         list = list.plus(e);
@@ -441,7 +439,6 @@ public final class ListField<E> extends Node implements List<E>, Field {
         return String.valueOf(getLogList());
     }
 
-
     private static class Log<E> {
 
         private PVector<E> list;
@@ -453,7 +450,6 @@ public final class ListField<E> extends Node implements List<E>, Field {
         }
 
     }
-
 
     private static class Delegate<E> implements List<E> {
 
@@ -583,4 +579,5 @@ public final class ListField<E> extends Node implements List<E>, Field {
             return field.toString();
         }
     }
+
 }

@@ -50,14 +50,9 @@ public class Transaction {
     private static LinkedHashSet<DataUpdater> updaters = new LinkedHashSet<>();
 
     /**
-     * 事务执行结束之后再执行的特殊任务
+     * 在事务执行结束之后再执行的特殊任务
      */
-    private LinkedHashMap<Runnable, Boolean> endTasks = new LinkedHashMap<>();
-
-
-    public boolean isFailed() {
-        return failed;
-    }
+    private LinkedHashMap<Runnable, Boolean> afterTasks = new LinkedHashMap<>();
 
     void setFieldLog(Field field, Object value, Data<?> data) {
         fieldLogs.put(field, value);
@@ -133,8 +128,8 @@ public class Transaction {
         }
 
         //执行事务结束后的特殊任务
-        for (Runnable task : transaction.endTasks.keySet()) {
-            if (transaction.failed != transaction.endTasks.get(task)) {
+        for (Runnable task : transaction.afterTasks.keySet()) {
+            if (transaction.failed == transaction.afterTasks.get(task)) {
                 continue;
             }
             try {
@@ -199,7 +194,7 @@ public class Transaction {
             try {
                 updater.update(updates);
             } catch (Exception e) {
-                logger.error("", e);
+                logger.error("事务提交后更新数据出错", e);
             }
         }
     }
@@ -215,14 +210,14 @@ public class Transaction {
      * 在当前事务执行提交之后再执行特殊任务
      */
     public static void runAfterCommit(Runnable task) {
-        Transaction.get(true).endTasks.put(task, true);
+        Transaction.get(true).afterTasks.put(task, true);
     }
 
     /**
      * 在当前事务执行回滚之后再执行特殊任务
      */
     public static void runAfterRollback(Runnable task) {
-        Transaction.get(true).endTasks.put(task, false);
+        Transaction.get(true).afterTasks.put(task, false);
     }
 
 

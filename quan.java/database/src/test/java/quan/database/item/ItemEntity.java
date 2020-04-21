@@ -17,11 +17,14 @@ public class ItemEntity extends Entity {
 
     public static final String NAME = "name";
 
+    public static final String LIST = "list";
+
 
     private IntField id = new IntField();
 
     private StringField name = new StringField();
 
+    private ListField<Integer> list = new ListField<>(_getLogRoot());
 
 
     public int getId() {
@@ -47,8 +50,14 @@ public class ItemEntity extends Entity {
         return this;
     }
 
+    public List<Integer> getList() {
+        return list.getDelegate();
+    }
+
+
     @Override
     protected void _setChildrenLogRoot(Data<?> root) {
+        _setLogRoot(list, root);
     }
 
     @Override
@@ -56,6 +65,7 @@ public class ItemEntity extends Entity {
         return "ItemEntity{" +
                 "id=" + id +
                 ",name='" + name + '\'' +
+                ",list=" + list +
                 '}';
 
     }
@@ -85,6 +95,13 @@ public class ItemEntity extends Entity {
                     case ItemEntity.NAME:
                         value.name.setValue(reader.readString());
                         break;
+                    case ItemEntity.LIST:
+                        reader.readStartArray();
+                        while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
+                            value.list.plus(reader.readInt32());
+                        }
+                        reader.readEndArray();
+                        break;
                     default:
                         reader.skipValue();
                 }
@@ -100,6 +117,14 @@ public class ItemEntity extends Entity {
 
             writer.writeInt32(ItemEntity.ID, value.id.getValue());
             writer.writeString(ItemEntity.NAME, value.name.getValue());
+
+            if (!value.list.getList().isEmpty()) {
+                writer.writeStartArray(ItemEntity.LIST);
+                for (Integer listValue : value.list.getList()) {
+                    writer.writeInt32(listValue);
+                }
+                writer.writeEndArray();
+            }
 
             writer.writeEndDocument();
         }

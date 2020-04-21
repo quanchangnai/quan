@@ -24,7 +24,7 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
         return map;
     }
 
-    public Delegate<K, V> getDelegate() {
+    public Map<K, V> getDelegate() {
         return delegate;
     }
 
@@ -105,7 +105,7 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
         return oldValue;
     }
 
-    public V _put(K key, V value) {
+    public V plus(K key, V value) {
         Validations.validateMapKey(key);
         Validations.validateCollectionValue(value);
 
@@ -134,7 +134,6 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
         if (value instanceof Entity) {
             _setLogRoot((Entity) value, null);
         }
-
 
         return value;
     }
@@ -343,12 +342,10 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
         return entrySet;
     }
 
-
     @Override
     public String toString() {
         return String.valueOf(getLogMap());
     }
-
 
     private static class Delegate<K, V> implements Map<K, V> {
 
@@ -423,4 +420,5 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
             return field.toString();
         }
     }
+
 }

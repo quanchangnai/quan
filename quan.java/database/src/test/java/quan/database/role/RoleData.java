@@ -1,16 +1,12 @@
 package quan.database.role;
 
-import org.bson.BsonReader;
-import org.bson.BsonType;
-import org.bson.BsonWriter;
-import org.bson.codecs.DecoderContext;
-import org.bson.codecs.EncoderContext;
+import java.util.*;
+import org.bson.*;
+import org.bson.codecs.*;
 import org.bson.codecs.configuration.CodecRegistry;
-import quan.database.Data;
+import quan.database.*;
 import quan.database.field.*;
 import quan.database.item.ItemEntity;
-
-import java.util.*;
 
 /**
  * 角色<br/>
@@ -19,21 +15,21 @@ import java.util.*;
 public class RoleData extends Data<Long> {
 
     /**
-     * 数据对应的表名
+     * 对应的表名
      */
     public static final String _NAME = "role_data";
 
     /**
-     * 数据索引
+     * 索引
      */
-    public static final Map<String, Index> _INDEXES;
+    public static final List<Index> _INDEXES;
 
     static {
-        Map<String, Index> indexes = new HashMap<>();
-        indexes.put("aa", new Index("aa", Arrays.asList(RoleData.A, RoleData.A2), false));
-        indexes.put("bb", new Index("bb", Arrays.asList(RoleData.B, RoleData.B2), false));
-        indexes.put("name", new Index("name", Collections.singletonList(RoleData.NAME), true));
-        _INDEXES = Collections.unmodifiableMap(indexes);
+        List<Index> indexes = new ArrayList<>();
+        indexes.add(new Index("aa", Arrays.asList(RoleData.A, RoleData.A2), false));
+        indexes.add(new Index("bb", Arrays.asList(RoleData.B, RoleData.B2), false));
+        indexes.add(new Index("name", Collections.singletonList(RoleData.NAME), true));
+        _INDEXES = Collections.unmodifiableList(indexes);
     }
 
 
@@ -118,19 +114,19 @@ public class RoleData extends Data<Long> {
 
     private EntityField<ItemEntity> item = new EntityField<>();
 
-    private MapField<Integer, ItemEntity> items = new MapField<>(_getLogRoot());
+    private MapField<Integer, ItemEntity> items = new MapField<>(this);
 
-    private SetField<Boolean> set = new SetField<>(_getLogRoot());
+    private SetField<Boolean> set = new SetField<>(this);
 
-    private ListField<String> list = new ListField<>(_getLogRoot());
+    private ListField<String> list = new ListField<>(this);
 
-    private MapField<Integer, Integer> map = new MapField<>(_getLogRoot());
+    private MapField<Integer, Integer> map = new MapField<>(this);
 
-    private SetField<ItemEntity> set2 = new SetField<>(_getLogRoot());
+    private SetField<ItemEntity> set2 = new SetField<>(this);
 
-    private ListField<ItemEntity> list2 = new ListField<>(_getLogRoot());
+    private ListField<ItemEntity> list2 = new ListField<>(this);
 
-    private MapField<Integer, ItemEntity> map2 = new MapField<>(_getLogRoot());
+    private MapField<Integer, ItemEntity> map2 = new MapField<>(this);
 
 
     public RoleData(long id) {
@@ -138,7 +134,7 @@ public class RoleData extends Data<Long> {
     }
 
     /**
-     * 数据对应的表名
+     * 对应的表名
      */
     @Override
     public String _name() {
@@ -146,7 +142,7 @@ public class RoleData extends Data<Long> {
     }
 
     /**
-     * 数据主键(_id)
+     * 主键(_id)
      */
     @Override
     public Long _id() {
@@ -154,10 +150,10 @@ public class RoleData extends Data<Long> {
     }
 
     /**
-     * 数据索引
+     * 索引
      */
     @Override
-    public Map<String, Index> _indexes() {
+    public List<Index> _indexes() {
         return _INDEXES;
     }
 
@@ -174,7 +170,7 @@ public class RoleData extends Data<Long> {
     }
 
     public RoleData setName(String name) {
-        this.name.setLogValue(name, _getLogRoot());
+        this.name.setLogValue(name, this);
         return this;
     }
 
@@ -189,7 +185,7 @@ public class RoleData extends Data<Long> {
      * 角色类型
      */
     public RoleData setRoleType(RoleType roleType) {
-        this.roleType.setLogValue(roleType.value(), _getLogRoot());
+        this.roleType.setLogValue(roleType.value(), this);
         return this;
     }
 
@@ -198,7 +194,7 @@ public class RoleData extends Data<Long> {
     }
 
     public RoleData setA(int a) {
-        this.a.setLogValue(a, _getLogRoot());
+        this.a.setLogValue(a, this);
         return this;
     }
 
@@ -212,7 +208,7 @@ public class RoleData extends Data<Long> {
     }
 
     public RoleData setA2(int a2) {
-        this.a2.setLogValue(a2, _getLogRoot());
+        this.a2.setLogValue(a2, this);
         return this;
     }
 
@@ -226,7 +222,7 @@ public class RoleData extends Data<Long> {
     }
 
     public RoleData setB(boolean b) {
-        this.b.setLogValue(b, _getLogRoot());
+        this.b.setLogValue(b, this);
         return this;
     }
 
@@ -235,7 +231,7 @@ public class RoleData extends Data<Long> {
     }
 
     public RoleData setB2(int b2) {
-        this.b2.setLogValue(b2, _getLogRoot());
+        this.b2.setLogValue(b2, this);
         return this;
     }
 
@@ -255,7 +251,7 @@ public class RoleData extends Data<Long> {
      * sssss
      */
     public RoleData setS(short s) {
-        this.s.setLogValue(s, _getLogRoot());
+        this.s.setLogValue(s, this);
         return this;
     }
 
@@ -278,7 +274,7 @@ public class RoleData extends Data<Long> {
      * iiii
      */
     public RoleData setI(int i) {
-        this.i.setLogValue(i, _getLogRoot());
+        this.i.setLogValue(i, this);
         return this;
     }
 
@@ -301,7 +297,7 @@ public class RoleData extends Data<Long> {
      * ffff
      */
     public RoleData setF(float f) {
-        this.f.setLogValue(f, _getLogRoot());
+        this.f.setLogValue(f, this);
         return this;
     }
 
@@ -318,7 +314,7 @@ public class RoleData extends Data<Long> {
     }
 
     public RoleData setD(double d) {
-        this.d.setLogValue(d, _getLogRoot());
+        this.d.setLogValue(d, this);
         return this;
     }
 
@@ -338,7 +334,7 @@ public class RoleData extends Data<Long> {
      * 道具
      */
     public RoleData setItem(ItemEntity item) {
-        this.item.setLogValue(item, _getLogRoot());
+        this.item.setLogValue(item, this);
         return this;
     }
 
@@ -370,17 +366,6 @@ public class RoleData extends Data<Long> {
         return map2.getDelegate();
     }
 
-    @Override
-    protected void _setChildrenLogRoot(Data<?> root) {
-        _setLogRoot(item.getLogValue(), root);
-        _setLogRoot(items, root);
-        _setLogRoot(set, root);
-        _setLogRoot(list, root);
-        _setLogRoot(map, root);
-        _setLogRoot(set2, root);
-        _setLogRoot(list2, root);
-        _setLogRoot(map2, root);
-    }
 
     @Override
     public String toString() {
@@ -463,42 +448,42 @@ public class RoleData extends Data<Long> {
                     case RoleData.ITEMS:
                         reader.readStartDocument();
                         while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
-                            value.items._put(reader.readInt32(), decoderContext.decodeWithChildContext(registry.get(ItemEntity.class), reader));
+                            value.items.plus(reader.readInt32(), decoderContext.decodeWithChildContext(registry.get(ItemEntity.class), reader));
                         }
                         reader.readEndDocument();
                         break;
                     case RoleData.SET:
                         reader.readStartArray();
                         while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
-                            value.set._add(reader.readBoolean());
+                            value.set.plus(reader.readBoolean());
                         }
                         reader.readEndArray();
                         break;
                     case RoleData.LIST:
                         reader.readStartArray();
                         while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
-                            value.list._add(reader.readString());
+                            value.list.plus(reader.readString());
                         }
                         reader.readEndArray();
                         break;
                     case RoleData.MAP:
                         reader.readStartDocument();
                         while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
-                            value.map._put(reader.readInt32(), reader.readInt32());
+                            value.map.plus(reader.readInt32(), reader.readInt32());
                         }
                         reader.readEndDocument();
                         break;
                     case RoleData.SET2:
                         reader.readStartArray();
                         while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
-                            value.set2._add(decoderContext.decodeWithChildContext(registry.get(ItemEntity.class), reader));
+                            value.set2.plus(decoderContext.decodeWithChildContext(registry.get(ItemEntity.class), reader));
                         }
                         reader.readEndArray();
                         break;
                     case RoleData.LIST2:
                         reader.readStartArray();
                         while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
-                            value.list2._add(decoderContext.decodeWithChildContext(registry.get(ItemEntity.class), reader));
+                            value.list2.plus(decoderContext.decodeWithChildContext(registry.get(ItemEntity.class), reader));
                         }
                         reader.readEndArray();
                         break;

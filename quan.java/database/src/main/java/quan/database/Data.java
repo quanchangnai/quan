@@ -7,36 +7,30 @@ import java.util.Map;
  * 数据对应一张表，每个实例对应表中的一行
  * Created by quanchangnai on 2019/5/16.
  */
-public abstract class Data<I> extends Entity {
+public abstract class Data<I> {
 
     /**
      * 主键(_id)
      */
     public static final String _ID = "_id";
 
-
-    @Override
-    protected final Data<I> _getLogRoot() {
-        return this;
-    }
-
     /**
-     * 数据对应的表名
+     * 对应的表名
      */
     public abstract String _name();
 
     /**
-     * 数据主键(_id)
+     * 主键(_id)
      */
     public abstract I _id();
 
     /**
-     * 数据索引
+     * 索引
      */
-    public abstract Map<String, Index> _indexes();
+    public abstract List<Index> _indexes();
 
     /**
-     * 数据更新器
+     * 更新器
      */
     private volatile DataUpdater updater;
 
@@ -45,7 +39,7 @@ public abstract class Data<I> extends Entity {
     }
 
     /**
-     * 设置该数据的更新器
+     * 设置更新器
      *
      * @param updater 更新器不为空时，该数据只会被设置的更新器更新
      */
@@ -85,4 +79,5 @@ public abstract class Data<I> extends Entity {
         }
 
     }
+
 }

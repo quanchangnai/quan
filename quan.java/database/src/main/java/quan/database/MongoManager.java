@@ -77,11 +77,12 @@ public class MongoManager implements DataUpdater {
 
     private void initCollection(Class<?> clazz) {
         String collectionName;
-        Map<String, Data.Index> collectionIndexes;
+        Map<String, Data.Index> collectionIndexes = new HashMap<>();
 
         try {
             collectionName = (String) clazz.getField("_NAME").get(clazz);
-            collectionIndexes = new HashMap<>((Map<String, Data.Index>) clazz.getField("_INDEXES").get(clazz));
+            List<Data.Index> indexes = (List<Data.Index>) clazz.getField("_INDEXES").get(clazz);
+            indexes.forEach(index -> collectionIndexes.put(index.getName(), index));
         } catch (Exception e) {
             logger.error("", e);
             return;
@@ -147,9 +148,11 @@ public class MongoManager implements DataUpdater {
                 continue;
             }
             MongoCollection<Data<?>> collection = collections.get(data.getClass());
-            writeModels.computeIfAbsent(collection, c -> new ArrayList<>()).add(new ReplaceOneModel<>(Filters.eq(data._id()), data, replaceOptions));
+            ReplaceOneModel<Data<?>> replaceOneModel = new ReplaceOneModel<>(Filters.eq(data._id()), data, replaceOptions);
+            writeModels.computeIfAbsent(collection, c -> new ArrayList<>()).add(replaceOneModel);
         }
 
         writeModels.forEach(MongoCollection::bulkWrite);
     }
+
 }
