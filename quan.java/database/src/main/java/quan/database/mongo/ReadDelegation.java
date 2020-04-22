@@ -42,13 +42,13 @@ public class ReadDelegation {
             return mongoClient;
         }
 
-        Field this$0Field = operationExecutor.getClass().getDeclaredField("this$0");
-        this$0Field.setAccessible(true);
-        MongoClientDelegate mongoClientDelegate = (MongoClientDelegate) this$0Field.get(operationExecutor);
+        Field field1 = operationExecutor.getClass().getDeclaredField("this$0");
+        field1.setAccessible(true);
+        MongoClientDelegate mongoClientDelegate = (MongoClientDelegate) field1.get(operationExecutor);
 
-        Field originatorField = mongoClientDelegate.getClass().getDeclaredField("originator");
-        originatorField.setAccessible(true);
-        mongoClient = (MongoClient) originatorField.get(mongoClientDelegate);
+        Field field2 = mongoClientDelegate.getClass().getDeclaredField("originator");
+        field2.setAccessible(true);
+        mongoClient = (MongoClient) field2.get(mongoClientDelegate);
 
         cache.put(operationExecutor, mongoClient);
 

@@ -183,8 +183,8 @@ public class Mongo implements DataUpdater {
 
     /**
      * 开启字节码增强功能<br/>
-     * 1.设置查询出来的数据的默认更新器
-     * 2.禁止在事务中写数据库
+     * 1.设置从数据库中查询出来的数据的默认更新器
+     * 2.禁止在内存事务中写数据库
      */
     public static void enhance() {
         ElementMatcher<TypeDescription> type = ElementMatchers.named("com.mongodb.client.internal.MongoClientDelegate$DelegateOperationExecutor");
