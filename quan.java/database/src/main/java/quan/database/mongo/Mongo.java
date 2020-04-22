@@ -184,17 +184,21 @@ public class Mongo implements DataUpdater {
     /**
      * 开启字节码增强功能<br/>
      * 1.设置查询出来的数据的默认更新器
+     * 2.禁止在事务中写数据库
      */
     public static void enhance() {
         ElementMatcher<TypeDescription> type = ElementMatchers.named("com.mongodb.client.internal.MongoClientDelegate$DelegateOperationExecutor");
-        ElementMatcher<MethodDescription> method = ElementMatchers.named("execute").and(ElementMatchers.takesArgument(3, ClientSession.class));
+        ElementMatcher<MethodDescription> readMethod = ElementMatchers.named("execute").and(ElementMatchers.takesArgument(3, ClientSession.class));
+        ElementMatcher<MethodDescription> writeMethod = ElementMatchers.named("execute").and(ElementMatchers.takesArgument(2, ClientSession.class));
 
-        AgentBuilder.Transformer transformer = (b, t, l, m) -> b.method(method).intercept(MethodDelegation.to(Delegation.class));
+        AgentBuilder.Transformer readTransformer = (b, t, l, m) -> b.method(readMethod).intercept(MethodDelegation.to(ReadDelegation.class));
+        AgentBuilder.Transformer writeTransformer = (b, t, l, m) -> b.method(writeMethod).intercept(MethodDelegation.to(WriteDelegation.class));
 
         new AgentBuilder.Default()
                 .with(AgentBuilder.TypeStrategy.Default.REBASE)
                 .type(type)
-                .transform(transformer)
+                .transform(readTransformer)
+                .transform(writeTransformer)
                 .installOn(ByteBuddyAgent.install());
     }
 

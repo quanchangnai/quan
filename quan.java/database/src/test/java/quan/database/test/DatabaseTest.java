@@ -92,7 +92,8 @@ public class DatabaseTest {
         if (roleDataMax == null) {
             roleDataMax = new RoleData(1L);
             roleDataMax.setName("aaa");
-            roleDataMax.update(mongo);
+//            roleDataMax.update(mongo);
+            roleDataCollection.insertOne(roleDataMax);
         }
 
         for (int i = 0; i < 20; i++) {

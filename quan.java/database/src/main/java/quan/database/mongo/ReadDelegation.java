@@ -19,7 +19,7 @@ import java.util.concurrent.Callable;
 /**
  * Created by quanchangnai on 2020/4/22.
  */
-public class Delegation {
+public class ReadDelegation {
 
     private static Map<OperationExecutor, MongoClient> cache = new HashMap<>();
 
@@ -41,6 +41,7 @@ public class Delegation {
         if (mongoClient != null) {
             return mongoClient;
         }
+
         Field this$0Field = operationExecutor.getClass().getDeclaredField("this$0");
         this$0Field.setAccessible(true);
         MongoClientDelegate mongoClientDelegate = (MongoClientDelegate) this$0Field.get(operationExecutor);
