@@ -1,18 +1,26 @@
-package quan.database;
+package quan.database.mongo;
 
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.assertions.Assertions;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.*;
 import com.mongodb.client.model.*;
+import net.bytebuddy.agent.ByteBuddyAgent;
+import net.bytebuddy.agent.builder.AgentBuilder;
+import net.bytebuddy.description.method.MethodDescription;
+import net.bytebuddy.description.type.TypeDescription;
+import net.bytebuddy.implementation.MethodDelegation;
+import net.bytebuddy.matcher.ElementMatcher;
+import net.bytebuddy.matcher.ElementMatchers;
 import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.common.ClassUtils;
+import quan.database.Data;
+import quan.database.DataCodecRegistry;
+import quan.database.DataUpdater;
+import quan.database.Transaction;
 
 import java.util.*;
 
@@ -21,11 +29,18 @@ import java.util.*;
  * Created by quanchangnai on 2020/4/13.
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class MongoManager implements DataUpdater {
+public class Mongo implements DataUpdater {
 
-    private static final Logger logger = LoggerFactory.getLogger(MongoManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(Mongo.class);
+
+    //<MongoClient, Map<databaseName, Mongo>>
+    private static Map<MongoClient, Map<String, Mongo>> mongoMap = new HashMap<>();
 
     private static final ReplaceOptions replaceOptions = new ReplaceOptions().upsert(true);
+
+    static {
+        enhance();
+    }
 
     private String databaseName;
 
@@ -37,13 +52,13 @@ public class MongoManager implements DataUpdater {
 
     private Map<Class, MongoCollection> collections = new HashMap<>();
 
-    private MongoManager(MongoClient client, String databaseName, String dataPackage) {
+    private Mongo(MongoClient client, String databaseName, String dataPackage) {
         this.client = client;
         this.databaseName = databaseName;
         this.dataPackage = dataPackage;
     }
 
-    public MongoManager(String connectionString, String databaseName, String dataPackage) {
+    public Mongo(String connectionString, String databaseName, String dataPackage) {
         this.databaseName = Assertions.notNull("databaseName", databaseName);
         this.dataPackage = Assertions.notNull("dataPackage", dataPackage);
         Assertions.notNull("connectionString", connectionString);
@@ -54,7 +69,7 @@ public class MongoManager implements DataUpdater {
         initClient(builder);
     }
 
-    public MongoManager(MongoClientSettings.Builder builder, String databaseName, String dataPackage) {
+    public Mongo(MongoClientSettings.Builder builder, String databaseName, String dataPackage) {
         this.databaseName = Assertions.notNull("databaseName", databaseName);
         this.dataPackage = Assertions.notNull("dataPackage", dataPackage);
 
@@ -65,13 +80,17 @@ public class MongoManager implements DataUpdater {
         DataCodecRegistry dataCodecRegistry = new DataCodecRegistry(dataPackage);
         builder.codecRegistry(CodecRegistries.fromRegistries(dataCodecRegistry, MongoClientSettings.getDefaultCodecRegistry()));
         client = MongoClients.create(builder.build());
+        mongoMap.put(client, new HashMap<>());
 
         initDatabase();
     }
 
     private void initDatabase() {
         database = client.getDatabase(databaseName);
+        mongoMap.get(client).put(databaseName, this);
+
         ClassUtils.loadClasses(dataPackage, Data.class).forEach(this::initCollection);
+
         Transaction.addUpdater(this);
     }
 
@@ -117,11 +136,11 @@ public class MongoManager implements DataUpdater {
 
     }
 
-    public MongoManager create(String databaseName) {
+    public Mongo create(String databaseName) {
         if (databaseName.equals(this.databaseName)) {
             return this;
         }
-        MongoManager manager = new MongoManager(client, databaseName, dataPackage);
+        Mongo manager = new Mongo(client, databaseName, dataPackage);
         manager.initDatabase();
         return manager;
     }
@@ -139,12 +158,11 @@ public class MongoManager implements DataUpdater {
     }
 
     @Override
-    public void update(List<Data<?>> updates) {
+    public void doUpdate(List<Data<?>> updates) {
         Map<MongoCollection<Data<?>>, List<WriteModel<Data<?>>>> writeModels = new HashMap<>();
 
         for (Data<?> data : updates) {
-            DataUpdater updater = data._getUpdater();
-            if (updater != null && updater != this) {
+            if (data._getUpdater() != this) {
                 continue;
             }
             MongoCollection<Data<?>> collection = collections.get(data.getClass());
@@ -153,6 +171,31 @@ public class MongoManager implements DataUpdater {
         }
 
         writeModels.forEach(MongoCollection::bulkWrite);
+    }
+
+    public static Mongo get(MongoClient mongoClient, String databaseName) {
+        Map<String, Mongo> map = mongoMap.get(mongoClient);
+        if (map != null) {
+            return map.get(databaseName);
+        }
+        return null;
+    }
+
+    /**
+     * 开启字节码增强功能<br/>
+     * 1.设置查询出来的数据的默认更新器
+     */
+    public static void enhance() {
+        ElementMatcher<TypeDescription> type = ElementMatchers.named("com.mongodb.client.internal.MongoClientDelegate$DelegateOperationExecutor");
+        ElementMatcher<MethodDescription> method = ElementMatchers.named("execute").and(ElementMatchers.takesArgument(3, ClientSession.class));
+
+        AgentBuilder.Transformer transformer = (b, t, l, m) -> b.method(method).intercept(MethodDelegation.to(Delegation.class));
+
+        new AgentBuilder.Default()
+                .with(AgentBuilder.TypeStrategy.Default.REBASE)
+                .type(type)
+                .transform(transformer)
+                .installOn(ByteBuddyAgent.install());
     }
 
 }

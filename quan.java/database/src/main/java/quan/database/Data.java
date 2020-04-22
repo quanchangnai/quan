@@ -1,7 +1,6 @@
 package quan.database;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 数据对应一张表，每个实例对应表中的一行
@@ -39,11 +38,9 @@ public abstract class Data<I> {
     }
 
     /**
-     * 设置更新器
-     *
-     * @param updater 更新器不为空时，该数据只会被设置的更新器更新
+     * 使用指定的更新器在提交事务后更新数据
      */
-    public final void _setUpdater(DataUpdater updater) {
+    public final void update(DataUpdater updater) {
         this.updater = updater;
     }
 

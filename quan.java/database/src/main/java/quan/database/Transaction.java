@@ -192,7 +192,7 @@ public class Transaction {
         List<Data<?>> updates = Collections.unmodifiableList(new ArrayList<>(dataLogs));
         for (DataUpdater updater : updaters) {
             try {
-                updater.update(updates);
+                updater.doUpdate(updates);
             } catch (Exception e) {
                 logger.error("事务提交后更新数据出错", e);
             }
@@ -202,7 +202,7 @@ public class Transaction {
     /**
      * 添加数据更新器
      */
-    static void addUpdater(DataUpdater updater) {
+    public static void addUpdater(DataUpdater updater) {
         updaters.add(updater);
     }
 

@@ -1,7 +1,9 @@
 package quan.database.test;
 
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.*;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.ReplaceOptions;
+import com.mongodb.client.model.Sorts;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.BsonReader;
 import org.bson.BsonWriter;
@@ -9,10 +11,10 @@ import org.bson.json.JsonReader;
 import org.bson.json.JsonWriter;
 import org.pcollections.Empty;
 import org.pcollections.PMap;
-import quan.database.MongoManager;
 import quan.database.Transaction;
 import quan.database.item.ItemEntity;
 import quan.database.item.ItemEntity2;
+import quan.database.mongo.Mongo;
 import quan.database.role.RoleData;
 import quan.database.role.RoleData2;
 
@@ -35,7 +37,7 @@ public class DatabaseTest {
 //        testWrite();
 //        testRead();
 
-        testRole();
+//        testRole();
 
         testMongoClient();
 
@@ -53,18 +55,18 @@ public class DatabaseTest {
 
     private static void testMongoClient() throws Exception {
 
-        MongoManager mongoManager = new MongoManager("mongodb://127.0.0.1:27017", "test", "quan");
+        Mongo mongo = new Mongo("mongodb://127.0.0.1:27017", "test", "quan");
 
         for (int i = 0; i < 10; i++) {
             System.err.println("=============" + i);
-            testMongoCollection1(mongoManager);
+            testMongoCollection1(mongo);
             System.err.println();
-            testMongoCollection2(mongoManager);
+            testMongoCollection2(mongo);
             System.err.println();
         }
 
 
-        mongoManager.getClient().close();
+        mongo.getClient().close();
 
 //        while (true) {
 //            Thread.sleep(10000);
@@ -73,21 +75,24 @@ public class DatabaseTest {
 
     private static final double timeBase = 1000000D;
 
-    private static void testMongoCollection1(MongoManager mongoManager) {
+    private static void testMongoCollection1(Mongo mongo) {
         System.err.println("testMongoCollection1 start===========");
         long startTime = System.nanoTime();
-        Transaction.execute(() -> doTestMongoCollection1(mongoManager));
+        Transaction.execute(() -> doTestMongoCollection1(mongo));
         System.err.println("testMongoCollection1 costTime:" + (System.nanoTime() - startTime) / timeBase);
     }
 
-    private static void doTestMongoCollection1(MongoManager mongoManager) {
-        MongoCollection<RoleData> roleDataCollection = mongoManager.getCollection(RoleData.class);
+    private static void doTestMongoCollection1(Mongo mongo) {
+        MongoCollection<RoleData> roleDataCollection = mongo.getCollection(RoleData.class);
 
         RoleData roleDataMax = roleDataCollection.find().sort(Sorts.descending("_id")).first();
+
+        System.err.println("roleDataMax:" + roleDataMax);
 
         if (roleDataMax == null) {
             roleDataMax = new RoleData(1L);
             roleDataMax.setName("aaa");
+            roleDataMax.update(mongo);
         }
 
         for (int i = 0; i < 20; i++) {
@@ -99,6 +104,8 @@ public class DatabaseTest {
         RoleData roleData2 = new RoleData(roleDataMax.getId() + 2).setName("name:" + roleDataMax.getId() + 2);
         RoleData roleData3 = new RoleData(roleDataMax.getId() + 3).setName("name:" + roleDataMax.getId() + 3);
 
+        mongo.update(roleData1, roleData2, roleData3);
+
         List<RoleData> roleDataList = new ArrayList<>();
         for (long i = roleData3.getId() + 1; i < roleData3.getId() + 20; i++) {
             RoleData roleData = new RoleData(i);
@@ -109,17 +116,20 @@ public class DatabaseTest {
                 roleData.getList2().add(new ItemEntity().setId((int) i).setName("item2-" + i));
             }
             roleDataList.add(roleData);
+            roleData.update(mongo);
         }
+
+        mongo.update(roleDataList);
 
 //        Transaction.breakdown();
     }
 
-    private static void testMongoCollection2(MongoManager mongoManager) {
+    private static void testMongoCollection2(Mongo mongo) {
         System.err.println("testMongoCollection2 start===========");
 
         long startTime = System.nanoTime();
 
-        MongoCollection<RoleData2> roleDataCollection2 = mongoManager.getDatabase().getCollection(RoleData2._NAME, RoleData2.class);
+        MongoCollection<RoleData2> roleDataCollection2 = mongo.getDatabase().getCollection(RoleData2._NAME, RoleData2.class);
 
 
         RoleData2 roleDataMax = roleDataCollection2.find().sort(Sorts.descending("_id")).first();
