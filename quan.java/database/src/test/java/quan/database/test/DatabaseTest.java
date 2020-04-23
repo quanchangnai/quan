@@ -5,7 +5,6 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.Sorts;
 import com.mongodb.client.result.UpdateResult;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.bson.BsonReader;
 import org.bson.BsonWriter;
 import org.bson.json.JsonReader;
@@ -95,7 +94,7 @@ public class DatabaseTest {
             roleDataMax.setName("aaa:1");
             roleDataMax.insert(mongo);
         } else {
-            roleDataMax.setName("max:" + RandomStringUtils.randomAlphabetic(5));
+            roleDataMax.setName("max:" + System.nanoTime());
 //            roleDataCollection.insertOne(roleDataMax);
 //            roleDataCollection.deleteOne(Filters.eq(roleDataMax.getId()));
         }

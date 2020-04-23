@@ -32,37 +32,37 @@ public abstract class Data<I> {
      */
     public abstract List<Index> _indexes();
 
-    private void setLog(DataWriter updater, State state) {
+    private void setLog(DataWriter writer, State state) {
         Transaction transaction = Transaction.get(true);
         Log log = transaction.getDataLog(this);
         if (log == null) {
-            log = new Log(updater, state);
+            log = new Log(writer, state);
             transaction.setDataLog(this, log);
         } else {
-            log.writer = updater;
+            log.writer = writer;
             log.state = state;
         }
     }
 
     /**
-     * 使用指定的更新器在提交事务后插入数据
+     * 使用指定的写入器在提交事务后插入数据
      */
-    public final void insert(DataWriter updater) {
-        setLog(updater, State.INSERTION);
+    public final void insert(DataWriter writer) {
+        setLog(writer, State.INSERTION);
     }
 
     /**
-     * 使用指定的更新器在提交事务后更新数据
+     * 使用指定的写入器在提交事务后更新数据
      */
-    public final void update(DataWriter updater) {
-        setLog(updater, State.UPDATE);
+    public final void update(DataWriter writer) {
+        setLog(writer, State.UPDATE);
     }
 
     /**
-     * 使用指定的更新器在提交事务后删除数据
+     * 使用指定的写入器在提交事务后删除数据
      */
-    public final void delete(DataWriter updater) {
-        setLog(updater, State.DELETION);
+    public final void delete(DataWriter writer) {
+        setLog(writer, State.DELETION);
     }
 
     void commit(Log log) {

@@ -8,6 +8,7 @@ import quan.network.util.TaskExecutor;
  *
  * @author quanchangnai
  */
+@SuppressWarnings("unchecked")
 public class HandlerContext {
 
     private Handler handler;
@@ -113,8 +114,6 @@ public class HandlerContext {
 
     /**
      * 触发自定义事件
-     *
-     * @param event
      */
     public void triggerEvent(Object event) {
         try {

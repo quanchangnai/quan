@@ -21,6 +21,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  *
  * @author quanchangnai
  */
+@SuppressWarnings("unchecked")
 public class ServerBootstrap extends Bootstrap {
 
     private AcceptExecutor acceptExecutor;
@@ -84,8 +85,8 @@ public class ServerBootstrap extends Bootstrap {
             setRunning(true);
 
             acceptExecutor.start();
-            for (int i = 0; i < readWriteExecutors.length; i++) {
-                readWriteExecutors[i].start();
+            for (ReadWriteExecutor readWriteExecutor : readWriteExecutors) {
+                readWriteExecutor.start();
             }
 
             ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
@@ -114,8 +115,8 @@ public class ServerBootstrap extends Bootstrap {
         acceptExecutor.stop();
         acceptExecutor = null;
 
-        for (int i = 0; i < readWriteExecutors.length; i++) {
-            readWriteExecutors[i].stop();
+        for (ReadWriteExecutor readWriteExecutor : readWriteExecutors) {
+            readWriteExecutor.stop();
         }
         readWriteExecutors = null;
     }

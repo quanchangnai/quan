@@ -12,6 +12,7 @@ import java.util.List;
 /**
  * Created by quanchangnai on 2020/4/22.
  */
+@SuppressWarnings("deprecation")
 class Cursor implements BatchCursor {
 
     private Mongo mongo;

@@ -19,6 +19,7 @@ import java.util.concurrent.Callable;
 /**
  * Created by quanchangnai on 2020/4/22.
  */
+@SuppressWarnings("deprecation")
 public class ReadDelegation {
 
     private static Map<OperationExecutor, MongoClient> cache = new HashMap<>();

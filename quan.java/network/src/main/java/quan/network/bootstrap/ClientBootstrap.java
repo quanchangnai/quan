@@ -20,6 +20,7 @@ import java.util.Set;
  *
  * @author quanchangnai
  */
+@SuppressWarnings("unchecked")
 public class ClientBootstrap extends Bootstrap {
 
     private ReadWriteExecutor readWriteExecutor;
@@ -79,7 +80,6 @@ public class ClientBootstrap extends Bootstrap {
 
         readWriteExecutor.execute(this::connect);
     }
-
 
     protected void connect() {
         try {

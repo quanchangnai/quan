@@ -32,8 +32,7 @@ public class Mongo implements DataWriter {
 
     private static final Logger logger = LoggerFactory.getLogger(Mongo.class);
 
-    //<MongoClient, Map<databaseName, Mongo>>
-    private static Map<MongoClient, Map<String, Mongo>> mongoMap = new HashMap<>();
+    private static Map<MongoClient, Map<String/*databaseName*/, Mongo>> mongoMap = new HashMap<>();
 
     private static final ReplaceOptions replaceOptions = new ReplaceOptions().upsert(true);
 
