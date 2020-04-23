@@ -14,7 +14,7 @@ public class WriteDelegation {
     @RuntimeType
     public static Object delegate(@SuperCall Callable<?> callable) throws Exception {
         if (Transaction.isInside()) {
-            throw new IllegalStateException("不能在事务中写数据库");
+            throw new IllegalStateException("不能在内存事务中写数据库");
         }
         return callable.call();
     }

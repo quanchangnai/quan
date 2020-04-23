@@ -19,8 +19,7 @@ import org.slf4j.LoggerFactory;
 import quan.common.ClassUtils;
 import quan.database.Data;
 import quan.database.DataCodecRegistry;
-import quan.database.DataUpdater;
-import quan.database.Transaction;
+import quan.database.DataWriter;
 
 import java.util.*;
 
@@ -29,7 +28,7 @@ import java.util.*;
  * Created by quanchangnai on 2020/4/13.
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class Mongo implements DataUpdater {
+public class Mongo implements DataWriter {
 
     private static final Logger logger = LoggerFactory.getLogger(Mongo.class);
 
@@ -90,8 +89,6 @@ public class Mongo implements DataUpdater {
         mongoMap.get(client).put(databaseName, this);
 
         ClassUtils.loadClasses(dataPackage, Data.class).forEach(this::initCollection);
-
-        Transaction.addUpdater(this);
     }
 
     private void initCollection(Class<?> clazz) {
@@ -158,20 +155,25 @@ public class Mongo implements DataUpdater {
     }
 
     @Override
-    public void doUpdate(List<Data<?>> updates) {
+    public void write(List<Data<?>> insertions, List<Data<?>> updates, List<Data<?>> deletions) {
         Map<MongoCollection<Data<?>>, List<WriteModel<Data<?>>>> writeModels = new HashMap<>();
 
+        for (Data<?> data : insertions) {
+            writeModels.computeIfAbsent(collections.get(data.getClass()), c -> new ArrayList<>()).add(new InsertOneModel(data));
+        }
+
         for (Data<?> data : updates) {
-            if (data._getUpdater() != this) {
-                continue;
-            }
-            MongoCollection<Data<?>> collection = collections.get(data.getClass());
             ReplaceOneModel<Data<?>> replaceOneModel = new ReplaceOneModel<>(Filters.eq(data._id()), data, replaceOptions);
-            writeModels.computeIfAbsent(collection, c -> new ArrayList<>()).add(replaceOneModel);
+            writeModels.computeIfAbsent(collections.get(data.getClass()), c -> new ArrayList<>()).add(replaceOneModel);
+        }
+
+        for (Data<?> data : deletions) {
+            writeModels.computeIfAbsent(collections.get(data.getClass()), c -> new ArrayList<>()).add(new DeleteOneModel<>(Filters.eq(data._id())));
         }
 
         writeModels.forEach(MongoCollection::bulkWrite);
     }
+
 
     public static Mongo get(MongoClient mongoClient, String databaseName) {
         Map<String, Mongo> map = mongoMap.get(mongoClient);

@@ -5,6 +5,7 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.Sorts;
 import com.mongodb.client.result.UpdateResult;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.bson.BsonReader;
 import org.bson.BsonWriter;
 import org.bson.json.JsonReader;
@@ -85,19 +86,22 @@ public class DatabaseTest {
     private static void doTestMongoCollection1(Mongo mongo) {
         MongoCollection<RoleData> roleDataCollection = mongo.getCollection(RoleData.class);
 
-        RoleData roleDataMax = roleDataCollection.find().sort(Sorts.descending("_id")).first();
+        RoleData roleDataMax = roleDataCollection.find().sort(Sorts.descending(RoleData._ID)).first();
 
         System.err.println("roleDataMax:" + roleDataMax);
 
         if (roleDataMax == null) {
             roleDataMax = new RoleData(1L);
-            roleDataMax.setName("aaa");
-            roleDataMax.update(mongo);
+            roleDataMax.setName("aaa:1");
+            roleDataMax.insert(mongo);
+        } else {
+            roleDataMax.setName("max:" + RandomStringUtils.randomAlphabetic(5));
 //            roleDataCollection.insertOne(roleDataMax);
+//            roleDataCollection.deleteOne(Filters.eq(roleDataMax.getId()));
         }
 
         for (int i = 0; i < 20; i++) {
-            roleDataMax.getList().add("aaaaa" + i);
+            roleDataMax.getList().add("name:" + i);
 //            roleDataMax.getSet().add(i % 2 == 1);
         }
 
@@ -105,22 +109,22 @@ public class DatabaseTest {
         RoleData roleData2 = new RoleData(roleDataMax.getId() + 2).setName("name:" + roleDataMax.getId() + 2);
         RoleData roleData3 = new RoleData(roleDataMax.getId() + 3).setName("name:" + roleDataMax.getId() + 3);
 
-        mongo.update(roleData1, roleData2, roleData3);
+        mongo.insert(roleData1, roleData2, roleData3);
 
         List<RoleData> roleDataList = new ArrayList<>();
         for (long i = roleData3.getId() + 1; i < roleData3.getId() + 20; i++) {
             RoleData roleData = new RoleData(i);
-            roleData.setName("aaa" + i);
-            roleData.setItem(new ItemEntity().setId((int) i).setName("item" + i));
+            roleData.setName("aaa:" + i);
+            roleData.setItem(new ItemEntity().setId((int) i).setName("item:" + i));
             for (long j = i; j < i + 20; j++) {
-                roleData.getList().add("s" + j);
-                roleData.getList2().add(new ItemEntity().setId((int) i).setName("item2-" + i));
+                roleData.getList().add("s:" + j);
+                roleData.getList2().add(new ItemEntity().setId((int) i).setName("item2:" + i));
             }
             roleDataList.add(roleData);
             roleData.update(mongo);
         }
 
-        mongo.update(roleDataList);
+        mongo.insert(roleDataList);
 
 //        Transaction.breakdown();
     }
@@ -140,7 +144,7 @@ public class DatabaseTest {
         }
 
         for (int i = 0; i < 20; i++) {
-            roleDataMax.getList().add("aaaaa" + i);
+            roleDataMax.getList().add("name:" + i);
             roleDataMax.getSet().add(i % 2 == 1);
         }
 
@@ -158,11 +162,11 @@ public class DatabaseTest {
 
         for (long i = roleData3.getId() + 1; i < roleData3.getId() + 20; i++) {
             RoleData2 roleData = new RoleData2(i);
-            roleData.setName("aaa" + i);
-            roleData.setItem(new ItemEntity2().setId((int) i).setName("item" + i));
+            roleData.setName("aaa:" + i);
+            roleData.setItem(new ItemEntity2().setId((int) i).setName("item:" + i));
             for (long j = i; j < i + 20; j++) {
-                roleData.getList().add("s" + j);
-                roleData.getList2().add(new ItemEntity2().setId((int) i).setName("item2-" + i));
+                roleData.getList().add("s:" + j);
+                roleData.getList2().add(new ItemEntity2().setId((int) i).setName("item2:" + i));
             }
             roleDataList.add(roleData);
         }

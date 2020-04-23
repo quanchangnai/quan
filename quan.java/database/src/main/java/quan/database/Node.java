@@ -16,6 +16,10 @@ public abstract class Node extends Loggable {
         return root;
     }
 
+    /**
+     * 提交节点的根
+     * @param root
+     */
     protected void commit(Data<?> root) {
         this.root = root;
     }

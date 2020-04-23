@@ -82,7 +82,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
     }
 
     /**
-     * 对应的表名
+     * 表名
      */
     @Override
     public String _name() {

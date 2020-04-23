@@ -4,6 +4,7 @@ import net.sf.cglib.proxy.Callback;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.NoOp;
+import org.apache.commons.lang3.tuple.Triple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.database.field.Field;
@@ -30,9 +31,9 @@ public class Transaction {
     private boolean failed;
 
     /**
-     * 记录被修改过的数据
+     * 记录数据的状态(插入、更新、删除)和使用的写入器
      */
-    private Set<Data<?>> dataLogs = new LinkedHashSet<>();
+    private Map<Data<?>, Data.Log> dataLogs = new LinkedHashMap<>();
 
     /**
      * 记录节点的根
@@ -45,19 +46,23 @@ public class Transaction {
     private Map<Field, Object> fieldLogs = new HashMap<>();
 
     /**
-     * 数据更新器
-     */
-    private static LinkedHashSet<DataUpdater> updaters = new LinkedHashSet<>();
-
-    /**
      * 在事务执行结束之后再执行的特殊任务
      */
     private LinkedHashMap<Runnable, Boolean> afterTasks = new LinkedHashMap<>();
 
+
+    void setDataLog(Data<?> data, Data.Log log) {
+        dataLogs.put(data, log);
+    }
+
+    Data.Log getDataLog(Data<?> data) {
+        return dataLogs.get(data);
+    }
+
     void setFieldLog(Field field, Object value, Data<?> data) {
         fieldLogs.put(field, value);
-        if (data != null) {
-            dataLogs.add(data);
+        if (data != null && data.writer != null && !dataLogs.containsKey(data)) {
+            dataLogs.put(data, new Data.Log(data.writer, data.state));
         }
     }
 
@@ -189,21 +194,38 @@ public class Transaction {
             field.commit(fieldLogs.get(field));
         }
 
-        List<Data<?>> updates = Collections.unmodifiableList(new ArrayList<>(dataLogs));
-        for (DataUpdater updater : updaters) {
+        Map<DataWriter, Triple<List<Data<?>>, List<Data<?>>, List<Data<?>>>> writers = new HashMap<>();
+        for (Data<?> data : dataLogs.keySet()) {
+            Data.Log log = dataLogs.get(data);
+            data.commit(log);
+
+            if (log.writer == null) {
+                continue;
+            }
+
+            Triple<List<Data<?>>, List<Data<?>>, List<Data<?>>> writings = writers.computeIfAbsent(log.writer, k -> Triple.of(new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
+            switch (log.state) {
+                case INSERTION:
+                    writings.getLeft().add(data);
+                    break;
+                case UPDATE:
+                    writings.getMiddle().add(data);
+                    break;
+                case DELETION:
+                    writings.getRight().add(data);
+                    break;
+            }
+        }
+
+        for (DataWriter writer : writers.keySet()) {
             try {
-                updater.doUpdate(updates);
+                Triple<List<Data<?>>, List<Data<?>>, List<Data<?>>> writings = writers.get(writer);
+                writer.write(writings.getLeft(), writings.getMiddle(), writings.getRight());
             } catch (Exception e) {
                 logger.error("事务提交后更新数据出错", e);
             }
         }
-    }
 
-    /**
-     * 添加数据更新器
-     */
-    public static void addUpdater(DataUpdater updater) {
-        updaters.add(updater);
     }
 
     /***

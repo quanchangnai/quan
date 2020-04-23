@@ -134,7 +134,7 @@ public class RoleData extends Data<Long> {
     }
 
     /**
-     * 对应的表名
+     * 表名
      */
     @Override
     public String _name() {

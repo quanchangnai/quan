@@ -24,16 +24,14 @@ public class ReadDelegation {
     private static Map<OperationExecutor, MongoClient> cache = new HashMap<>();
 
     @RuntimeType
-    public static Object delegate(@This OperationExecutor operationExecutor, @SuperCall Callable<?> callable, @Argument(0) ReadOperation readOperation) throws Exception {
-
-        if (readOperation instanceof FindOperation) {
-            FindOperation findOperation = (FindOperation) readOperation;
-            BatchCursor batchCursor = (BatchCursor) callable.call();
-            Cursor cursor = new Cursor(getMongoClient(operationExecutor), findOperation.getNamespace(), batchCursor);
-            return cursor;
+    public static Object delegate(@This OperationExecutor executor, @SuperCall Callable<?> callable, @Argument(0) ReadOperation operation) throws Exception {
+        if (!(operation instanceof FindOperation)) {
+            return callable.call();
         }
 
-        return callable.call();
+        FindOperation findOperation = (FindOperation) operation;
+        BatchCursor batchCursor = (BatchCursor) callable.call();
+        return new Cursor(getMongoClient(executor), findOperation.getNamespace(), batchCursor);
     }
 
     private static MongoClient getMongoClient(OperationExecutor operationExecutor) throws Exception {

@@ -13,8 +13,12 @@ public abstract class Data<I> {
      */
     public static final String _ID = "_id";
 
+    DataWriter writer;
+
+    State state;
+
     /**
-     * 对应的表名
+     * 表名
      */
     public abstract String _name();
 
@@ -28,20 +32,42 @@ public abstract class Data<I> {
      */
     public abstract List<Index> _indexes();
 
-    /**
-     * 更新器
-     */
-    private volatile DataUpdater updater;
+    private void setLog(DataWriter updater, State state) {
+        Transaction transaction = Transaction.get(true);
+        Log log = transaction.getDataLog(this);
+        if (log == null) {
+            log = new Log(updater, state);
+            transaction.setDataLog(this, log);
+        } else {
+            log.writer = updater;
+            log.state = state;
+        }
+    }
 
-    public final DataUpdater _getUpdater() {
-        return updater;
+    /**
+     * 使用指定的更新器在提交事务后插入数据
+     */
+    public final void insert(DataWriter updater) {
+        setLog(updater, State.INSERTION);
     }
 
     /**
      * 使用指定的更新器在提交事务后更新数据
      */
-    public final void update(DataUpdater updater) {
-        this.updater = updater;
+    public final void update(DataWriter updater) {
+        setLog(updater, State.UPDATE);
+    }
+
+    /**
+     * 使用指定的更新器在提交事务后删除数据
+     */
+    public final void delete(DataWriter updater) {
+        setLog(updater, State.DELETION);
+    }
+
+    void commit(Log log) {
+        this.writer = log.writer;
+        this.state = State.UPDATE;
     }
 
     /**
@@ -75,6 +101,25 @@ public abstract class Data<I> {
             return unique;
         }
 
+    }
+
+    static class Log {
+
+        DataWriter writer;
+
+        State state;
+
+        public Log(DataWriter writer, State state) {
+            this.writer = writer;
+            this.state = state;
+        }
+    }
+
+    /**
+     * 数据的状态,代表事务提交后对数据执行什么操作
+     */
+    enum State {
+        INSERTION, UPDATE, DELETION
     }
 
 }

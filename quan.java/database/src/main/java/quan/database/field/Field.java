@@ -6,6 +6,11 @@ package quan.database.field;
  */
 public interface Field {
 
+    /**
+     * 提交日志
+     *
+     * @param log
+     */
     void commit(Object log);
 
 }
