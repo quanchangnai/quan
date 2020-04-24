@@ -1,9 +1,12 @@
 package quan.database.test;
 
+import com.mongodb.client.ChangeStreamIterable;
+import com.mongodb.client.MongoChangeStreamCursor;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.Sorts;
+import com.mongodb.client.model.changestream.ChangeStreamDocument;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.BsonReader;
 import org.bson.BsonWriter;
@@ -57,7 +60,9 @@ public class DatabaseTest {
 
         Mongo mongo = new Mongo("mongodb://127.0.0.1:27017", "test", "quan");
 
-        for (int i = 0; i < 10; i++) {
+        testMongoCollection0(mongo);
+
+        for (int i = 0; i < 0; i++) {
             System.err.println("=============" + i);
             testMongoCollection1(mongo);
             System.err.println();
@@ -65,15 +70,30 @@ public class DatabaseTest {
             System.err.println();
         }
 
+        ChangeStreamIterable<RoleData> changeStream = mongo.getCollection(RoleData.class).watch(RoleData.class);
+        MongoChangeStreamCursor<ChangeStreamDocument<RoleData>> cursor = changeStream.cursor();
+        while (cursor.hasNext()) {
+            System.err.println("cursor.next():" + cursor.next());
+        }
 
-        mongo.getClient().close();
+//        mongo.getClient().close();
 
-//        while (true) {
-//            Thread.sleep(10000);
-//        }
+        while (true) {
+            Thread.sleep(10000);
+        }
     }
 
     private static final double timeBase = 1000000D;
+
+    private static void testMongoCollection0(Mongo mongo) {
+        Transaction.execute(() -> {
+            MongoCollection<RoleData> roleDataCollection = mongo.getCollection(RoleData.class);
+            RoleData roleData = roleDataCollection.find().first();
+//            roleData.delete(mongo);
+            roleData.free();
+            roleData.setName("name:" + System.currentTimeMillis());
+        });
+    }
 
     private static void testMongoCollection1(Mongo mongo) {
         System.err.println("testMongoCollection1 start===========");
@@ -88,7 +108,6 @@ public class DatabaseTest {
         RoleData roleDataMax = roleDataCollection.find().sort(Sorts.descending(RoleData._ID)).first();
 
         System.err.println("roleDataMax:" + roleDataMax);
-
         if (roleDataMax == null) {
             roleDataMax = new RoleData(1L);
             roleDataMax.setName("aaa:1");

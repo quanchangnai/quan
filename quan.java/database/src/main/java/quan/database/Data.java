@@ -1,6 +1,8 @@
 package quan.database;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.function.BiConsumer;
 
 /**
  * 数据对应一张表，每个实例对应表中的一行
@@ -32,7 +34,15 @@ public abstract class Data<I> {
      */
     public abstract List<Index> _indexes();
 
-    private void setLog(DataWriter writer, State state) {
+    /**
+     * 不在事务中需要设置写入器时通过反射引用此方法
+     */
+    private static BiConsumer<Data<?>, DataWriter> _setWriter = (data, writer) -> {
+        data.writer = writer;
+        data.state = State.UPDATE;
+    };
+
+    private void _setWriter(DataWriter writer, State state) {
         Transaction transaction = Transaction.get(true);
         Log log = transaction.getDataLog(this);
         if (log == null) {
@@ -48,26 +58,49 @@ public abstract class Data<I> {
      * 使用指定的写入器在提交事务后插入数据
      */
     public final void insert(DataWriter writer) {
-        setLog(writer, State.INSERTION);
+        Objects.requireNonNull(writer, "参数[writer]不能为空");
+        _setWriter(writer, State.INSERTION);
     }
 
     /**
      * 使用指定的写入器在提交事务后更新数据
      */
     public final void update(DataWriter writer) {
-        setLog(writer, State.UPDATE);
+        Objects.requireNonNull(writer, "参数[writer]不能为空");
+        _setWriter(writer, State.UPDATE);
     }
 
     /**
      * 使用指定的写入器在提交事务后删除数据
      */
     public final void delete(DataWriter writer) {
-        setLog(writer, State.DELETION);
+        Objects.requireNonNull(writer, "参数[writer]不能为空");
+        _setWriter(writer, State.DELETION);
     }
 
+    /**
+     * 设置数据为纯内纯对象，数据的修改将不会同步到数据库
+     */
+    public final void free() {
+        if (Transaction.isInside()) {
+            _setWriter(null, null);
+        } else {
+            this.writer = null;
+            this.state = null;
+        }
+    }
+
+    /**
+     * 提交日志中记录的写入器
+     */
     void commit(Log log) {
-        this.writer = log.writer;
-        this.state = State.UPDATE;
+        if (log.state == State.DELETION) {
+            this.writer = null;
+            this.state = null;
+        } else {
+            this.writer = log.writer;
+            this.state = State.UPDATE;
+        }
     }
 
     /**

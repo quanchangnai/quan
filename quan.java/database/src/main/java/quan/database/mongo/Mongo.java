@@ -187,7 +187,7 @@ public class Mongo implements DataWriter {
      * 1.设置从数据库中查询出来的数据的默认更新器
      * 2.禁止在内存事务中写数据库
      */
-    public static void enhance() {
+    private static void enhance() {
         ElementMatcher<TypeDescription> type = ElementMatchers.named("com.mongodb.client.internal.MongoClientDelegate$DelegateOperationExecutor");
         ElementMatcher<MethodDescription> readMethod = ElementMatchers.named("execute").and(ElementMatchers.takesArgument(3, ClientSession.class));
         ElementMatcher<MethodDescription> writeMethod = ElementMatchers.named("execute").and(ElementMatchers.takesArgument(2, ClientSession.class));

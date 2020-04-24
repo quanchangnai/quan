@@ -61,7 +61,7 @@ public class Transaction {
 
     void setFieldLog(Field field, Object value, Data<?> data) {
         fieldLogs.put(field, value);
-        if (data != null && data.writer != null && !dataLogs.containsKey(data)) {
+        if (data != null && data.writer != null && data.state != null && !dataLogs.containsKey(data)) {
             dataLogs.put(data, new Data.Log(data.writer, data.state));
         }
     }
@@ -199,7 +199,7 @@ public class Transaction {
             Data.Log log = dataLogs.get(data);
             data.commit(log);
 
-            if (log.writer == null) {
+            if (log.writer == null || log.state == null) {
                 continue;
             }
 

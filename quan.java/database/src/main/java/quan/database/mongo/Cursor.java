@@ -5,15 +5,36 @@ import com.mongodb.ServerAddress;
 import com.mongodb.ServerCursor;
 import com.mongodb.client.MongoClient;
 import com.mongodb.operation.BatchCursor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import quan.database.Data;
+import quan.database.DataWriter;
+import quan.database.Transaction;
 
+import java.lang.reflect.Field;
 import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.stream.Stream;
 
 /**
  * Created by quanchangnai on 2020/4/22.
  */
-@SuppressWarnings("deprecation")
+@SuppressWarnings({"deprecation", "unchecked"})
 class Cursor implements BatchCursor {
+
+    private static final Logger logger = LoggerFactory.getLogger(Cursor.class);
+
+    private static BiConsumer<Data<?>, DataWriter> setDataWriter;
+
+    static {
+        try {
+            Field field = Data.class.getDeclaredField("_setWriter");
+            field.setAccessible(true);
+            setDataWriter = (BiConsumer<Data<?>, DataWriter>) field.get(Data.class);
+        } catch (Exception e) {
+            logger.error("", e);
+        }
+    }
 
     private Mongo mongo;
 
@@ -35,13 +56,13 @@ class Cursor implements BatchCursor {
     }
 
     @Override
-    public List next() {
-        List list = batchCursor.next();
-        for (Object result : list) {
-            if (result instanceof Data) {
-                Data data = (Data) result;
-                data.update(mongo);
-            }
+    public List<?> next() {
+        List<?> list = batchCursor.next();
+        Stream<? extends Data<?>> stream = list.stream().filter(e -> e instanceof Data<?>).map(data -> (Data<?>) data);
+        if (Transaction.isInside()) {
+            stream.forEach(mongo::update);
+        } else {
+            stream.forEach(data -> setDataWriter.accept(data, mongo));
         }
         return list;
     }
@@ -57,7 +78,7 @@ class Cursor implements BatchCursor {
     }
 
     @Override
-    public List tryNext() {
+    public List<?> tryNext() {
         return batchCursor.tryNext();
     }
 
