@@ -6,7 +6,7 @@ import quan.definition.parser.XmlDefinitionParser;
 import quan.generator.config.CSharpConfigGenerator;
 import quan.generator.config.JavaConfigGenerator;
 import quan.generator.config.LuaConfigGenerator;
-import quan.generator.database.DatabaseGenerator;
+import quan.generator.data.DataGenerator;
 import quan.generator.message.CSharpMessageGenerator;
 import quan.generator.message.JavaMessageGenerator;
 import quan.generator.message.LuaMessageGenerator;
@@ -27,11 +27,11 @@ public class GeneratorTest {
 
     private static void generateData() {
         System.err.println("DatabaseGenerator.generate()==========================");
-        DatabaseGenerator databaseGenerator = new DatabaseGenerator();
-        databaseGenerator.setCodePath("database\\src\\test\\java");
-        databaseGenerator.useXmlParser("definition\\database");
-        databaseGenerator.setPackagePrefix("quan.database");
-        databaseGenerator.generate();
+        DataGenerator dataGenerator = new DataGenerator();
+        dataGenerator.setCodePath("database\\src\\test\\java");
+        dataGenerator.useXmlParser("definition\\database");
+        dataGenerator.setPackagePrefix("quan.database");
+        dataGenerator.generate();
         System.err.println();
     }
 

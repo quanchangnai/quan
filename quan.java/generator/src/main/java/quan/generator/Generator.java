@@ -13,7 +13,7 @@ import quan.definition.parser.XmlDefinitionParser;
 import quan.generator.config.CSharpConfigGenerator;
 import quan.generator.config.JavaConfigGenerator;
 import quan.generator.config.LuaConfigGenerator;
-import quan.generator.database.DatabaseGenerator;
+import quan.generator.data.DataGenerator;
 import quan.generator.message.CSharpMessageGenerator;
 import quan.generator.message.JavaMessageGenerator;
 import quan.generator.message.LuaMessageGenerator;
@@ -367,8 +367,8 @@ public abstract class Generator {
             return;
         }
 
-        DatabaseGenerator databaseGenerator = new DatabaseGenerator(options);
-        databaseGenerator.useXmlParser();
+        DataGenerator dataGenerator = new DataGenerator(options);
+        dataGenerator.useXmlParser();
 
         JavaMessageGenerator javaMessageGenerator = new JavaMessageGenerator(options);
         CSharpMessageGenerator cSharpMessageGenerator = new CSharpMessageGenerator(options);
@@ -388,7 +388,7 @@ public abstract class Generator {
         cSharpConfigGenerator.setParser(configParser);
         luaConfigGenerator.setParser(configParser);
 
-        databaseGenerator.tryGenerate(true);
+        dataGenerator.tryGenerate(true);
 
         javaMessageGenerator.tryGenerate(false);
         cSharpMessageGenerator.tryGenerate(false);
