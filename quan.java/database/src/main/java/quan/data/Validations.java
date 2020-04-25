@@ -23,7 +23,7 @@ public class Validations {
         if (entity == null) {
             return;
         }
-        Data root = entity._getLogRoot();
+        Data<?> root = entity._getLogRoot();
         if (root != null) {
             throw new IllegalStateException("参数已经受到了" + root.getClass().getSimpleName() + "[" + root._id() + "]的管理");
         }

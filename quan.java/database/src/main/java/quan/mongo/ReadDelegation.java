@@ -32,8 +32,9 @@ public class ReadDelegation {
         }
 
         FindOperation findOperation = (FindOperation) operation;
-        BatchCursor batchCursor = (BatchCursor) callable.call();
-        return new Cursor(getMongoClient(executor), findOperation.getNamespace(), batchCursor);
+        BatchCursor cursor = (BatchCursor) callable.call();
+
+        return new Cursor(getMongoClient(executor), findOperation.getNamespace(), cursor);
     }
 
     private static MongoClient getMongoClient(OperationExecutor executor) throws Exception {

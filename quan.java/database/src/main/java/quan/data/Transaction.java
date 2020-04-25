@@ -186,6 +186,14 @@ public class Transaction {
      * 事务提交
      */
     private void commit() {
+        for (Node node : rootLogs.keySet()) {
+            node.commit(rootLogs.get(node));
+        }
+
+        for (Field field : fieldLogs.keySet()) {
+            field.commit(fieldLogs.get(field));
+        }
+
         Map<DataWriter, Triple<List<Data<?>>, List<Data<?>>, List<Data<?>>>> writers = new HashMap<>();
         for (Data<?> data : dataLogs.keySet()) {
             Data.Log log = dataLogs.get(data);
@@ -209,27 +217,13 @@ public class Transaction {
             }
         }
 
-        boolean writeError = false;
         for (DataWriter writer : writers.keySet()) {
             try {
                 Triple<List<Data<?>>, List<Data<?>>, List<Data<?>>> writings = writers.get(writer);
                 writer.write(writings.getLeft(), writings.getMiddle(), writings.getRight());
             } catch (Exception e) {
-                writeError = true;
                 logger.error("事务提交后写数据库出错", e);
             }
-        }
-
-        if (writeError) {
-            return;
-        }
-
-        for (Node node : rootLogs.keySet()) {
-            node.commit(rootLogs.get(node));
-        }
-
-        for (Field field : fieldLogs.keySet()) {
-            field.commit(fieldLogs.get(field));
         }
 
     }
@@ -302,9 +296,9 @@ public class Transaction {
      *
      * @param clazz 目标类型
      */
-//    public static <T> T proxy(Class<T> clazz) {
-//        return proxy(clazz, null, null);
-//    }
+    public static <T> T proxy(Class<T> clazz) {
+        return proxy(clazz, null, null);
+    }
 
     /**
      * 创建实现了声明式事务的代理对象

@@ -34,7 +34,7 @@ public class Database implements DataWriter, MongoDatabase {
 
     private static final Logger logger = LoggerFactory.getLogger(Database.class);
 
-    private static Map<MongoClient, Map<String/*databaseName*/, Database>> databases = new HashMap<>();
+    static Map<MongoClient, Map<String/*databaseName*/, Database>> databases = new HashMap<>();
 
     private static final ReplaceOptions replaceOptions = new ReplaceOptions().upsert(true);
 
@@ -132,20 +132,13 @@ public class Database implements DataWriter, MongoDatabase {
 
     }
 
-    static Database get(MongoClient mongoClient, String databaseName) {
-        if (databases.containsKey(mongoClient)) {
-            return databases.get(mongoClient).get(databaseName);
-        }
-        return null;
-    }
-
     /**
-     * 使用当前数据库在同一个MongoClient上获取一个新的数据库对象，它使用的数据类和当前数据库对象使用的完全一样
+     * 使用当前数据库实例在同一个MongoClient上获取一个新的数据库实例，它使用的数据类和当前数据库实例使用的完全一样
      *
      * @param databaseName 新的数据库名
-     * @return 如果给定的数据库名和当前数据库名相同，将直接返回当前数据库对象
+     * @return 如果给定的数据库名和当前数据库名相同，将直接返回当前数据库实例
      */
-    public Database get(String databaseName) {
+    public Database getInstance(String databaseName) {
         if (databaseName.equals(database.getName())) {
             return this;
         }
@@ -157,13 +150,13 @@ public class Database implements DataWriter, MongoDatabase {
     }
 
     /**
-     * 使用当前数据库在同一个MongoClient上获取一个新的数据库对象
+     * 使用当前数据库实例在同一个MongoClient上获取一个新的数据库实例
      *
      * @param databaseName 新的数据库名
      * @param dataPackage  数据类包名
-     * @return 如果给定的数据库名、数据类包名和当前数据库名、数据类包名都一样，将直接返回当前数据库对象
+     * @return 如果给定的数据库名、数据类包名和当前数据库名、数据类包名都一样，将直接返回当前数据库实例
      */
-    public Database get(String databaseName, String dataPackage) {
+    public Database getInstance(String databaseName, String dataPackage) {
         if (databaseName.equals(database.getName())) {
             if (this.dataPackage.equals(dataPackage)) {
                 return this;

@@ -36,26 +36,28 @@ class Cursor implements BatchCursor {
 
     private Database database;
 
-    private BatchCursor batchCursor;
+    private BatchCursor cursor;
 
-    public Cursor(MongoClient mongoClient, MongoNamespace mongoNamespace, BatchCursor batchCursor) {
-        this.database = Database.get(mongoClient, mongoNamespace.getDatabaseName());
-        this.batchCursor = batchCursor;
+    public Cursor(MongoClient client, MongoNamespace namespace, BatchCursor cursor) {
+        if (Database.databases.containsKey(client)) {
+            this.database = Database.databases.get(client).get(namespace.getDatabaseName());
+        }
+        this.cursor = cursor;
     }
 
     @Override
     public void close() {
-        batchCursor.close();
+        cursor.close();
     }
 
     @Override
     public boolean hasNext() {
-        return batchCursor.hasNext();
+        return cursor.hasNext();
     }
 
     @Override
     public List next() {
-        List list = batchCursor.next();
+        List list = cursor.next();
         for (Object o : list) {
             if (o instanceof Data) {
                 setDataWriter.accept((Data) o, database);
@@ -66,27 +68,27 @@ class Cursor implements BatchCursor {
 
     @Override
     public void setBatchSize(int batchSize) {
-        batchCursor.setBatchSize(batchSize);
+        cursor.setBatchSize(batchSize);
     }
 
     @Override
     public int getBatchSize() {
-        return batchCursor.getBatchSize();
+        return cursor.getBatchSize();
     }
 
     @Override
     public List<?> tryNext() {
-        return batchCursor.tryNext();
+        return cursor.tryNext();
     }
 
     @Override
     public ServerCursor getServerCursor() {
-        return batchCursor.getServerCursor();
+        return cursor.getServerCursor();
     }
 
     @Override
     public ServerAddress getServerAddress() {
-        return batchCursor.getServerAddress();
+        return cursor.getServerAddress();
     }
 
 }
