@@ -1,7 +1,6 @@
 package quan.common;
 
 import net.bytebuddy.agent.ByteBuddyAgent;
-import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.jar.asm.ClassReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +25,16 @@ public class ClassUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(ClassUtils.class);
 
+    public static Instrumentation getInstrumentation() {
+        Instrumentation instrumentation;
+        try {
+            instrumentation = ByteBuddyAgent.getInstrumentation();
+        } catch (Exception e) {
+            instrumentation = ByteBuddyAgent.install();
+        }
+        return instrumentation;
+    }
+
     /**
      * 从字节码里读取类名
      *
@@ -33,8 +42,8 @@ public class ClassUtils {
      * @return 类名
      */
     public static String readClassName(byte[] classBytes) {
-        ClassReader classReader = new ClassReader(classBytes);
-        return classReader.getClassName();
+        Objects.requireNonNull(classBytes, "参数[classBytes]不能为null");
+        return new ClassReader(classBytes).getClassName();
     }
 
     /**
@@ -47,23 +56,12 @@ public class ClassUtils {
             String className = readClassName(classBytes);
             Class<?> clazz = Class.forName(className);
             ClassDefinition classDefinition = new ClassDefinition(clazz, classBytes);
-            ByteBuddyAgent.install().redefineClasses(classDefinition);
+            getInstrumentation().redefineClasses(classDefinition);
         } catch (Exception e) {
             logger.error("重定义类失败", e);
         }
 
     }
-
-    /**
-     * 开启Lambda热加载支持
-     */
-    public static void enableLambdaHotAgent() {
-        Instrumentation instrumentation = ByteBuddyAgent.install();
-        new AgentBuilder.Default()
-                .with(AgentBuilder.LambdaInstrumentationStrategy.ENABLED)
-                .installOn(instrumentation);
-    }
-
 
     public static Set<Class<?>> loadClasses(String packageName) {
         return loadClasses(packageName, null, null);
@@ -85,7 +83,7 @@ public class ClassUtils {
      * @return 符合条件的类
      */
     public static Set<Class<?>> loadClasses(String packageName, Class<?> superClass, ClassLoader classLoader) {
-        Objects.requireNonNull(packageName, "包名不能为空");
+        Objects.requireNonNull(packageName, "包名[packageName]不能为空");
         packageName = packageName.replace(".", "/");
 
         if (classLoader == null) {
