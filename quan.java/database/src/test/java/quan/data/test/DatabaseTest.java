@@ -40,9 +40,9 @@ public class DatabaseTest {
 //        testWrite();
 //        testRead();
 
-        testRole();
+//        testRole();
 
-//        testMongoClient();
+        testMongoClient();
 
 //        testMap();
 
@@ -56,18 +56,18 @@ public class DatabaseTest {
         roleTest1.test2();
 
         System.err.println("roleTest2=============");
-        RoleTest roleTest2 = Transaction.proxy(RoleTest.class, new Class[]{long.class}, new Object[]{234});
+        RoleTest roleTest2 = Transaction.proxy(RoleTest.class, new Class[]{Long.class}, new Long[]{234L});
         System.err.println("roleTest2.test1():" + roleTest2.test1());
         roleTest1.test2();
     }
 
     private static void testMongoClient() throws Exception {
 
-        Database database = new Database("mongodb://127.0.0.1:27017", "test", "quan");
+        Database database = new Database("mongodb://127.0.0.1:27017,127.0.0.1:27018,127.0.0.1:27019", "test", "quan.data");
 
         testMongoCollection0(database);
 
-        for (int i = 0; i < 0; i++) {
+        for (int i = 0; i < 10; i++) {
             System.err.println("=============" + i);
             testMongoCollection1(database);
             System.err.println();
@@ -138,6 +138,7 @@ public class DatabaseTest {
         for (long i = roleData3.getId() + 1; i < roleData3.getId() + 20; i++) {
             RoleData roleData = new RoleData(i);
             roleData.setName("aaa:" + i);
+            roleData.setB(i % 2 == 0);
             roleData.setItem(new ItemEntity().setId((int) i).setName("item:" + i));
             for (long j = i; j < i + 20; j++) {
                 roleData.getList().add("s:" + j);

@@ -56,17 +56,17 @@ public class Database implements DataWriter, MongoDatabase {
      * 简单的数据库对象构造方法
      *
      * @param connectionString MongoDB连接字符串
-     * @param databaseName     数据库名
+     * @param name             数据库名
      * @param dataPackage      数据类所在的包名
      */
-    public Database(String connectionString, String databaseName, String dataPackage) {
+    public Database(String connectionString, String name, String dataPackage) {
         this.dataPackage = Assertions.notNull("dataPackage", dataPackage);
         Assertions.notNull("connectionString", connectionString);
 
         MongoClientSettings.Builder builder = MongoClientSettings.builder();
         builder.applyConnectionString(new ConnectionString(connectionString));
 
-        initClient(builder, databaseName);
+        initClient(builder, name);
     }
 
     public Database(MongoClientSettings.Builder builder, String databaseName, String dataPackage) {
@@ -84,9 +84,9 @@ public class Database implements DataWriter, MongoDatabase {
         initDatabase(databaseName);
     }
 
-    private void initDatabase(String databaseName) {
-        database = client.getDatabase(databaseName);
-        databases.get(client).put(databaseName, this);
+    private void initDatabase(String name) {
+        database = client.getDatabase(name);
+        databases.get(client).put(name, this);
         ClassUtils.loadClasses(dataPackage, Data.class).forEach(this::initCollection);
     }
 
@@ -135,39 +135,39 @@ public class Database implements DataWriter, MongoDatabase {
     /**
      * 使用当前数据库实例在同一个MongoClient上获取一个新的数据库实例，它使用的数据类和当前数据库实例使用的完全一样
      *
-     * @param databaseName 新的数据库名
+     * @param name 新的数据库名
      * @return 如果给定的数据库名和当前数据库名相同，将直接返回当前数据库实例
      */
-    public Database getInstance(String databaseName) {
-        if (databaseName.equals(database.getName())) {
+    public Database getInstance(String name) {
+        if (name.equals(database.getName())) {
             return this;
         }
         Database database = new Database();
         database.client = client;
         database.dataPackage = dataPackage;
-        database.initDatabase(databaseName);
+        database.initDatabase(name);
         return database;
     }
 
     /**
      * 使用当前数据库实例在同一个MongoClient上获取一个新的数据库实例
      *
-     * @param databaseName 新的数据库名
-     * @param dataPackage  数据类包名
+     * @param name        新的数据库名
+     * @param dataPackage 数据类包名
      * @return 如果给定的数据库名、数据类包名和当前数据库名、数据类包名都一样，将直接返回当前数据库实例
      */
-    public Database getInstance(String databaseName, String dataPackage) {
-        if (databaseName.equals(database.getName())) {
+    public Database getInstance(String name, String dataPackage) {
+        if (name.equals(database.getName())) {
             if (this.dataPackage.equals(dataPackage)) {
                 return this;
             } else {
-                throw new IllegalArgumentException(String.format("新数据库名[%s]和当前数据库名[%s]一样，但是新数据包名[%s]和当前数据包名[%s]却不一样", databaseName, this.database, dataPackage, this.dataPackage));
+                throw new IllegalArgumentException(String.format("新数据库名[%s]和当前数据库名[%s]相同，但是新数据包名[%s]和当前数据包名[%s]却不相同", name, this.database.getName(), dataPackage, this.dataPackage));
             }
         }
         Database database = new Database();
         database.client = client;
         database.dataPackage = dataPackage;
-        database.initDatabase(databaseName);
+        database.initDatabase(name);
         return database;
     }
 
@@ -282,8 +282,8 @@ public class Database implements DataWriter, MongoDatabase {
     }
 
     @Override
-    public <TDocument> MongoCollection<TDocument> getCollection(String collectionName, Class<TDocument> tDocumentClass) {
-        return database.getCollection(collectionName, tDocumentClass);
+    public <TDocument> MongoCollection<TDocument> getCollection(String collectionName, Class<TDocument> documentClass) {
+        return database.getCollection(collectionName, documentClass);
     }
 
     @Override
@@ -297,13 +297,13 @@ public class Database implements DataWriter, MongoDatabase {
     }
 
     @Override
-    public <TResult> TResult runCommand(Bson command, Class<TResult> tResultClass) {
-        return database.runCommand(command, tResultClass);
+    public <TResult> TResult runCommand(Bson command, Class<TResult> resultClass) {
+        return database.runCommand(command, resultClass);
     }
 
     @Override
-    public <TResult> TResult runCommand(Bson command, ReadPreference readPreference, Class<TResult> tResultClass) {
-        return database.runCommand(command, readPreference, tResultClass);
+    public <TResult> TResult runCommand(Bson command, ReadPreference readPreference, Class<TResult> resultClass) {
+        return database.runCommand(command, readPreference, resultClass);
     }
 
     @Override
@@ -317,13 +317,13 @@ public class Database implements DataWriter, MongoDatabase {
     }
 
     @Override
-    public <TResult> TResult runCommand(ClientSession clientSession, Bson command, Class<TResult> tResultClass) {
-        return database.runCommand(clientSession, command, tResultClass);
+    public <TResult> TResult runCommand(ClientSession clientSession, Bson command, Class<TResult> resultClass) {
+        return database.runCommand(clientSession, command, resultClass);
     }
 
     @Override
-    public <TResult> TResult runCommand(ClientSession clientSession, Bson command, ReadPreference readPreference, Class<TResult> tResultClass) {
-        return database.runCommand(clientSession, command, readPreference, tResultClass);
+    public <TResult> TResult runCommand(ClientSession clientSession, Bson command, ReadPreference readPreference, Class<TResult> resultClass) {
+        return database.runCommand(clientSession, command, readPreference, resultClass);
     }
 
     @Override
@@ -347,8 +347,8 @@ public class Database implements DataWriter, MongoDatabase {
     }
 
     @Override
-    public <TResult> ListCollectionsIterable<TResult> listCollections(Class<TResult> tResultClass) {
-        return database.listCollections(tResultClass);
+    public <TResult> ListCollectionsIterable<TResult> listCollections(Class<TResult> resultClass) {
+        return database.listCollections(resultClass);
     }
 
     @Override
@@ -362,8 +362,8 @@ public class Database implements DataWriter, MongoDatabase {
     }
 
     @Override
-    public <TResult> ListCollectionsIterable<TResult> listCollections(ClientSession clientSession, Class<TResult> tResultClass) {
-        return database.listCollections(clientSession, tResultClass);
+    public <TResult> ListCollectionsIterable<TResult> listCollections(ClientSession clientSession, Class<TResult> resultClass) {
+        return database.listCollections(clientSession, resultClass);
     }
 
     @Override
@@ -412,8 +412,8 @@ public class Database implements DataWriter, MongoDatabase {
     }
 
     @Override
-    public <TResult> ChangeStreamIterable<TResult> watch(Class<TResult> tResultClass) {
-        return database.watch(tResultClass);
+    public <TResult> ChangeStreamIterable<TResult> watch(Class<TResult> resultClass) {
+        return database.watch(resultClass);
     }
 
     @Override
@@ -422,8 +422,8 @@ public class Database implements DataWriter, MongoDatabase {
     }
 
     @Override
-    public <TResult> ChangeStreamIterable<TResult> watch(List<? extends Bson> pipeline, Class<TResult> tResultClass) {
-        return database.watch(pipeline, tResultClass);
+    public <TResult> ChangeStreamIterable<TResult> watch(List<? extends Bson> pipeline, Class<TResult> resultClass) {
+        return database.watch(pipeline, resultClass);
     }
 
     @Override
@@ -432,8 +432,8 @@ public class Database implements DataWriter, MongoDatabase {
     }
 
     @Override
-    public <TResult> ChangeStreamIterable<TResult> watch(ClientSession clientSession, Class<TResult> tResultClass) {
-        return database.watch(clientSession, tResultClass);
+    public <TResult> ChangeStreamIterable<TResult> watch(ClientSession clientSession, Class<TResult> resultClass) {
+        return database.watch(clientSession, resultClass);
     }
 
     @Override
@@ -442,8 +442,8 @@ public class Database implements DataWriter, MongoDatabase {
     }
 
     @Override
-    public <TResult> ChangeStreamIterable<TResult> watch(ClientSession clientSession, List<? extends Bson> pipeline, Class<TResult> tResultClass) {
-        return database.watch(clientSession, pipeline, tResultClass);
+    public <TResult> ChangeStreamIterable<TResult> watch(ClientSession clientSession, List<? extends Bson> pipeline, Class<TResult> resultClass) {
+        return database.watch(clientSession, pipeline, resultClass);
     }
 
     @Override
@@ -452,8 +452,8 @@ public class Database implements DataWriter, MongoDatabase {
     }
 
     @Override
-    public <TResult> AggregateIterable<TResult> aggregate(List<? extends Bson> pipeline, Class<TResult> tResultClass) {
-        return database.aggregate(pipeline, tResultClass);
+    public <TResult> AggregateIterable<TResult> aggregate(List<? extends Bson> pipeline, Class<TResult> resultClass) {
+        return database.aggregate(pipeline, resultClass);
     }
 
     @Override
@@ -462,8 +462,8 @@ public class Database implements DataWriter, MongoDatabase {
     }
 
     @Override
-    public <TResult> AggregateIterable<TResult> aggregate(ClientSession clientSession, List<? extends Bson> pipeline, Class<TResult> tResultClass) {
-        return database.aggregate(clientSession, pipeline, tResultClass);
+    public <TResult> AggregateIterable<TResult> aggregate(ClientSession clientSession, List<? extends Bson> pipeline, Class<TResult> resultClass) {
+        return database.aggregate(clientSession, pipeline, resultClass);
     }
 
 }
