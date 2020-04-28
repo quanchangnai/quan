@@ -33,6 +33,10 @@ import java.util.Map;
  */
 public class DatabaseTest {
 
+    static {
+        Transaction.enhance();
+    }
+
     public static void main(String[] args) throws Exception {
 
 //        test();
@@ -40,7 +44,7 @@ public class DatabaseTest {
 //        testWrite();
 //        testRead();
 
-//        testRole();
+        testRole();
 
         testMongoClient();
 
@@ -51,13 +55,13 @@ public class DatabaseTest {
 
     private static void testRole() throws Exception {
         System.err.println("roleTest1=============");
-        RoleTest roleTest1 = Transaction.proxy(RoleTest.class, 123L);
-        System.err.println("roleTest1.test1():" + roleTest1.test1());
+        Role roleTest1 = new Role(123L);
+        System.err.println("roleTest1.test1():" + roleTest1.test1(111));
         roleTest1.test2();
 
         System.err.println("roleTest2=============");
-        RoleTest roleTest2 = Transaction.proxy(RoleTest.class, new Class[]{Long.class}, new Long[]{234L});
-        System.err.println("roleTest2.test1():" + roleTest2.test1());
+        Role roleTest2 = new Role(Long.valueOf(234L));
+        System.err.println("roleTest2.test1():" + roleTest2.test1(222));
         roleTest1.test2();
     }
 
@@ -91,6 +95,7 @@ public class DatabaseTest {
     private static final double timeBase = 1000000D;
 
     private static void testMongoCollection0(Database database) {
+        Transaction.enhance();
         Transaction.execute(() -> {
             MongoCollection<RoleData> roleDataCollection = database.getCollection(RoleData.class);
             RoleData roleData = roleDataCollection.find().first();

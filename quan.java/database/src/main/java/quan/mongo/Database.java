@@ -208,7 +208,7 @@ public class Database implements DataWriter, MongoDatabase {
     }
 
     /**
-     * 开启字节码增强功能<br/>
+     * 字节码增强<br/>
      * 1.设置从数据库中查询出来的数据的默认更新器
      * 2.禁止在内存事务中写数据库
      */

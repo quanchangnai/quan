@@ -8,7 +8,7 @@ import quan.data.role.RoleData;
 /**
  * Created by quanchangnai on 2020/4/20.
  */
-public class RoleTest {
+public class Role {
 
     private long roleId;
 
@@ -16,27 +16,26 @@ public class RoleTest {
 
     private RoleData roleData2 = new RoleData(2L);
 
-    public RoleTest() {
+    public Role() {
     }
 
-    public RoleTest(long roleId) {
+    public Role(long roleId) {
         this.roleId = roleId;
         System.err.println("RoleTest(long roleId)");
     }
 
-    public RoleTest(Long roleId) {
+    public Role(Long roleId) {
         this.roleId = roleId;
         System.err.println("RoleTest(Long roleId)");
     }
 
     @Transactional
-    public int test1() {
-        System.err.println("RoleTest.test1()===============" + roleId);
+    public int test1(int v) {
+        System.err.println("RoleTest.test1()===============" + roleId + "=" + v);
 
         roleData1.setName("aaa");
         roleData1.setI(1);
 //        roleData1.getSet().add(true);
-
 
         for (int i = 0; i < 10; i++) {
             roleData1.getList().add("aaa" + i);

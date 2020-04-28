@@ -1,16 +1,14 @@
 package quan.data;
 
-import net.sf.cglib.proxy.Callback;
-import net.sf.cglib.proxy.Enhancer;
-import net.sf.cglib.proxy.MethodInterceptor;
-import net.sf.cglib.proxy.NoOp;
+import net.bytebuddy.agent.ByteBuddyAgent;
 import org.apache.commons.lang3.tuple.Triple;
+import org.aspectj.weaver.loadtime.ClassPreProcessorAgentAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.data.field.Field;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 
 /**
  * 事务实现，多线程并发时需要自己加锁，否则隔离级别就是读已提交
@@ -24,6 +22,8 @@ public class Transaction {
      * 保存事务为线程本地变量
      */
     private static ThreadLocal<Transaction> threadLocal = new ThreadLocal<>();
+
+    private static volatile boolean enhanced;
 
     /**
      * 事务是否已失败
@@ -49,6 +49,17 @@ public class Transaction {
      * 在事务执行结束之后再执行的特殊任务
      */
     private LinkedHashMap<Runnable, Boolean> afterTasks = new LinkedHashMap<>();
+
+    /**
+     * 字节码增强，开启声明式事务
+     */
+    public static void enhance() {
+        if (enhanced) {
+            return;
+        }
+        enhanced = true;
+        ByteBuddyAgent.install().addTransformer(new ClassPreProcessorAgentAdapter());
+    }
 
 
     void setDataLog(Data<?> data, Data.Log log) {
@@ -146,14 +157,6 @@ public class Transaction {
     }
 
     /**
-     * 打断事务,事务将失败回滚，但不会打印异常信息
-     */
-    public static void breakdown() {
-        Transaction.get(true).failed = true;
-        throw new BreakdownException();
-    }
-
-    /**
      * 标记事务失败
      */
     public static void fail() {
@@ -174,9 +177,26 @@ public class Transaction {
             task.run();
         } catch (Throwable e) {
             transaction.failed = true;
-            if (!(e instanceof BreakdownException)) {
-                throw e;
-            }
+            throw e;
+        } finally {
+            end(transaction);
+        }
+    }
+
+    /**
+     * 在事务中执行任务
+     */
+    public static <R> R execute(Supplier<R> task) {
+        if (threadLocal.get() != null) {
+            return task.get();
+        }
+
+        Transaction transaction = Transaction.begin();
+        try {
+            return task.get();
+        } catch (Throwable e) {
+            transaction.failed = true;
+            throw e;
         } finally {
             end(transaction);
         }
@@ -240,89 +260,6 @@ public class Transaction {
      */
     public static void runAfterRollback(Runnable task) {
         Transaction.get(true).afterTasks.put(task, false);
-    }
-
-
-    /**
-     * 创建实现了声明式事务的代理对象
-     *
-     * @param clazz     目标类型
-     * @param argTypes  构造方法参数类型
-     * @param argValues 构造方法参数值
-     */
-    @SuppressWarnings("unchecked")
-    public static <T> T proxy(Class<T> clazz, Class<?>[] argTypes, Object[] argValues) {
-        Objects.requireNonNull(clazz, "目标类型不能为空");
-
-        Enhancer enhancer = new Enhancer();
-        enhancer.setSuperclass(clazz);
-        enhancer.setCallbackFilter(method -> method.isAnnotationPresent(Transactional.class) ? 0 : 1);
-
-        MethodInterceptor interceptor = (obj, method, args, proxy) -> {
-            AtomicReference<Throwable> exception = new AtomicReference<>();
-            AtomicReference<Object> result = new AtomicReference<>();
-            //在事务中执行原始方法
-            Transaction.execute(() -> {
-                try {
-                    result.set(proxy.invokeSuper(obj, args));
-                } catch (Throwable e) {
-                    if (e instanceof BreakdownException) {
-                        throw (BreakdownException) e;
-                    } else {
-                        exception.set(e);
-                    }
-                }
-            });
-
-            if (exception.get() != null) {
-                throw exception.get();
-            } else {
-                return result.get();
-            }
-        };
-
-        enhancer.setCallbacks(new Callback[]{interceptor, NoOp.INSTANCE});
-
-        if (argTypes == null && argValues == null) {
-            return (T) enhancer.create();
-        } else {
-            assert argTypes != null;
-            return (T) enhancer.create(argTypes, argValues);
-        }
-    }
-
-    /**
-     * 创建实现了声明式事务的代理对象
-     *
-     * @param clazz 目标类型
-     */
-    public static <T> T proxy(Class<T> clazz) {
-        return proxy(clazz, null, null);
-    }
-
-    /**
-     * 创建实现了声明式事务的代理对象
-     *
-     * @param clazz 目标类型
-     * @param args  构造方法参数
-     */
-    public static <T> T proxy(Class<T> clazz, Object... args) {
-        if (args == null) {
-            return proxy(clazz, null, null);
-        }
-
-        Class<?>[] argTypes = new Class[args.length];
-        for (int i = 0; i < args.length; i++) {
-            argTypes[i] = args[i].getClass();
-        }
-
-        return proxy(clazz, argTypes, args);
-    }
-
-    /**
-     * 打断事务的异常，用于标记事务失败，不会往外抛出
-     */
-    static class BreakdownException extends RuntimeException {
     }
 
 }
