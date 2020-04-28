@@ -1,8 +1,6 @@
 package quan.data;
 
-import net.bytebuddy.agent.ByteBuddyAgent;
 import org.apache.commons.lang3.tuple.Triple;
-import org.aspectj.weaver.loadtime.ClassPreProcessorAgentAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.data.field.Field;
@@ -22,8 +20,6 @@ public class Transaction {
      * 保存事务为线程本地变量
      */
     private static ThreadLocal<Transaction> threadLocal = new ThreadLocal<>();
-
-    private static volatile boolean enhanced;
 
     /**
      * 事务是否已失败
@@ -49,18 +45,6 @@ public class Transaction {
      * 在事务执行结束之后再执行的特殊任务
      */
     private LinkedHashMap<Runnable, Boolean> afterTasks = new LinkedHashMap<>();
-
-    /**
-     * 字节码增强，开启声明式事务
-     */
-    public static void enhance() {
-        if (enhanced) {
-            return;
-        }
-        enhanced = true;
-        ByteBuddyAgent.install().addTransformer(new ClassPreProcessorAgentAdapter());
-    }
-
 
     void setDataLog(Data<?> data, Data.Log log) {
         dataLogs.put(data, log);

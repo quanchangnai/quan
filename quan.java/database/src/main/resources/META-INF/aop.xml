@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE aspectj PUBLIC "-//AspectJ//DTD//EN" "http://www.eclipse.org/aspectj/dtd/aspectj.dtd">
 <aspectj>
-    <weaver options="-Xlint:ignore">
-        <include within="*"/>
+    <weaver>
+        <include within="@org.aspectj.lang.annotation.Aspect *"/>
+        <include within="@quan.data.Transactional *"/>
     </weaver>
     <aspects>
         <aspect name="quan.data.TransactionAspect"/>
