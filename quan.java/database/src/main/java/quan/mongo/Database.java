@@ -49,6 +49,27 @@ public class Database implements DataWriter, MongoDatabase {
 
     private Map<Class, MongoCollection> collections = new HashMap<>();
 
+
+    static {
+        //字节码增强
+        //1.设置从数据库中查询出来的数据的默认更新器
+        //2.禁止在内存事务中写数据库
+
+        ElementMatcher<TypeDescription> type = ElementMatchers.named("com.mongodb.client.internal.MongoClientDelegate$DelegateOperationExecutor");
+        ElementMatcher<MethodDescription> readMethod = ElementMatchers.named("execute").and(ElementMatchers.takesArgument(3, ClientSession.class));
+        ElementMatcher<MethodDescription> writeMethod = ElementMatchers.named("execute").and(ElementMatchers.takesArgument(2, ClientSession.class));
+
+        AgentBuilder.Transformer readTransformer = (b, t, c, m) -> b.method(readMethod).intercept(MethodDelegation.to(ReadDelegation.class));
+        AgentBuilder.Transformer writeTransformer = (b, t, c, m) -> b.method(writeMethod).intercept(MethodDelegation.to(WriteDelegation.class));
+
+        new AgentBuilder.Default()
+                .with(AgentBuilder.TypeStrategy.Default.REBASE)
+                .type(type)
+                .transform(readTransformer)
+                .transform(writeTransformer)
+                .installOn(ByteBuddyAgent.install());
+    }
+
     private Database() {
     }
 
@@ -137,6 +158,7 @@ public class Database implements DataWriter, MongoDatabase {
      *
      * @param name 新的数据库名
      * @return 如果给定的数据库名和当前数据库名相同，将直接返回当前数据库实例
+     * @see #getInstance(String, String)
      */
     public Database getInstance(String name) {
         if (name.equals(database.getName())) {
@@ -176,12 +198,27 @@ public class Database implements DataWriter, MongoDatabase {
     }
 
     /**
-     * 通过指定的具体数据类获取集合
+     * 通过指定的数据类获取集合
      */
     public <D extends Data> MongoCollection<D> getCollection(Class<D> clazz) {
         return (MongoCollection<D>) collections.get(clazz);
     }
 
+    /**
+     * 通过主键_id查询数据
+     */
+    public <D extends Data, I> D find(Class<D> clazz, I _id) {
+        MongoCollection<D> collection = getCollection(clazz);
+        if (collection == null) {
+            throw new IllegalArgumentException("数据类[" + clazz + "]未注册");
+        }
+        return collection.find(Filters.eq(_id)).first();
+    }
+
+
+    /**
+     * @see DataWriter#write(List, List, List)
+     */
     @Override
     public void write(List<Data<?>> insertions, List<Data<?>> updates, List<Data<?>> deletions) {
         Map<MongoCollection<Data<?>>, List<WriteModel<Data<?>>>> writeModels = new HashMap<>();
@@ -200,32 +237,6 @@ public class Database implements DataWriter, MongoDatabase {
         }
 
         writeModels.forEach(MongoCollection::bulkWrite);
-    }
-
-
-    static {
-        enhance();
-    }
-
-    /**
-     * 字节码增强<br/>
-     * 1.设置从数据库中查询出来的数据的默认更新器
-     * 2.禁止在内存事务中写数据库
-     */
-    private static void enhance() {
-        ElementMatcher<TypeDescription> type = ElementMatchers.named("com.mongodb.client.internal.MongoClientDelegate$DelegateOperationExecutor");
-        ElementMatcher<MethodDescription> readMethod = ElementMatchers.named("execute").and(ElementMatchers.takesArgument(3, ClientSession.class));
-        ElementMatcher<MethodDescription> writeMethod = ElementMatchers.named("execute").and(ElementMatchers.takesArgument(2, ClientSession.class));
-
-        AgentBuilder.Transformer readTransformer = (b, t, c, m) -> b.method(readMethod).intercept(MethodDelegation.to(ReadDelegation.class));
-        AgentBuilder.Transformer writeTransformer = (b, t, c, m) -> b.method(writeMethod).intercept(MethodDelegation.to(WriteDelegation.class));
-
-        new AgentBuilder.Default()
-                .with(AgentBuilder.TypeStrategy.Default.REBASE)
-                .type(type)
-                .transform(readTransformer)
-                .transform(writeTransformer)
-                .installOn(ByteBuddyAgent.install());
     }
 
 

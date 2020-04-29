@@ -63,14 +63,23 @@ public class ClassUtils {
 
     }
 
+    /**
+     * @see #loadClasses(String, Class, ClassLoader)
+     */
     public static Set<Class<?>> loadClasses(String packageName) {
         return loadClasses(packageName, null, null);
     }
 
+    /**
+     * @see #loadClasses(String, Class, ClassLoader)
+     */
     public static Set<Class<?>> loadClasses(String packageName, Class<?> superClass) {
         return loadClasses(packageName, superClass, null);
     }
 
+    /**
+     * @see #loadClasses(String, Class, ClassLoader)
+     */
     public static Set<Class<?>> loadClasses(String packageName, ClassLoader classLoader) {
         return loadClasses(packageName, null, classLoader);
     }

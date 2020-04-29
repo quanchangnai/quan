@@ -7,12 +7,12 @@ import org.aspectj.weaver.loadtime.ClassPreProcessorAgentAdapter;
  */
 public class AspectUtils {
 
-    private static volatile boolean enabled;
+    private static boolean enabled;
 
     /**
      * 启用AOP
      */
-    public static void enable() {
+    public synchronized static void enable() {
         if (enabled) {
             return;
         }

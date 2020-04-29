@@ -16,7 +16,6 @@ public class TransactionAspect {
     @Around("@annotation(quan.data.Transactional)")
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
         AtomicReference<Throwable> exception = new AtomicReference<>();
-
         Object result = Transaction.execute(() -> {
             try {
                 return joinPoint.proceed();
@@ -26,10 +25,10 @@ public class TransactionAspect {
             }
         });
 
-        if (exception.get() != null) {
-            throw exception.get();
-        } else {
+        if (result != null) {
             return result;
+        } else {
+            throw exception.get();
         }
     }
 

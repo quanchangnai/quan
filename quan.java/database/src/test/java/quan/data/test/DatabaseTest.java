@@ -48,7 +48,7 @@ public class DatabaseTest {
 
         testRole();
 
-//        testMongoClient();
+        testMongoClient();
 
 //        testMap();
 
