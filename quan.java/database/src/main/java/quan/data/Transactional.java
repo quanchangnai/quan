@@ -1,11 +1,11 @@
 package quan.data;
 
-import quan.common.AspectUtils;
+import quan.common.ClassUtils;
 
 import java.lang.annotation.*;
 
 /**
- * 声明式事务注解，需要先使用{@link AspectUtils#enable()}启用AOP
+ * 声明式事务注解，需要先使用{@link ClassUtils#aop()}}启用AOP
  */
 @Documented
 @Inherited

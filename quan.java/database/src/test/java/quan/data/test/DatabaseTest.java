@@ -14,7 +14,7 @@ import org.bson.json.JsonReader;
 import org.bson.json.JsonWriter;
 import org.pcollections.Empty;
 import org.pcollections.PMap;
-import quan.common.AspectUtils;
+import quan.common.ClassUtils;
 import quan.data.Transaction;
 import quan.data.item.ItemEntity;
 import quan.data.item.ItemEntity2;
@@ -35,7 +35,7 @@ import java.util.Map;
 public class DatabaseTest {
 
     static {
-        AspectUtils.enable();
+        ClassUtils.aop();
     }
 
 

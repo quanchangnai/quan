@@ -2,6 +2,7 @@ package quan.common;
 
 import net.bytebuddy.agent.ByteBuddyAgent;
 import net.bytebuddy.jar.asm.ClassReader;
+import org.aspectj.weaver.loadtime.ClassPreProcessorAgentAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,14 +26,21 @@ public class ClassUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(ClassUtils.class);
 
-    public static Instrumentation getInstrumentation() {
-        Instrumentation instrumentation;
-        try {
-            instrumentation = ByteBuddyAgent.getInstrumentation();
-        } catch (Exception e) {
-            instrumentation = ByteBuddyAgent.install();
+    private static boolean aop;
+
+    /**
+     * 启用AOP
+     */
+    public synchronized static void aop() {
+        if (aop) {
+            return;
         }
-        return instrumentation;
+        aop = true;
+        getInstrumentation().addTransformer(new ClassPreProcessorAgentAdapter());
+    }
+
+    public static Instrumentation getInstrumentation() {
+        return ByteBuddyAgent.install();
     }
 
     /**
