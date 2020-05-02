@@ -35,7 +35,7 @@ import java.util.Map;
 public class DatabaseTest {
 
     static {
-        ClassUtils.aop();
+        ClassUtils.enableAop();
     }
 
 

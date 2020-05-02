@@ -31,7 +31,7 @@ public class ClassUtils {
     /**
      * 启用AOP
      */
-    public synchronized static void aop() {
+    public synchronized static void enableAop() {
         if (aop) {
             return;
         }
