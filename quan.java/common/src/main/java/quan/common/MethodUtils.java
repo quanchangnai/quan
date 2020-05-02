@@ -6,7 +6,6 @@ import java.util.Collection;
 /**
  * Created by quanchangnai on 2019/6/26.
  */
-@SuppressWarnings({"unchecked"})
 public class MethodUtils {
 
     private static boolean validateCaller = true;
@@ -15,7 +14,7 @@ public class MethodUtils {
         MethodUtils.validateCaller = validateCaller;
     }
 
-    public static Class getCallerClass() {
+    public static Class<?> getCallerClass() {
         StackTraceElement[] stackTrace = new Exception().getStackTrace();
         if (stackTrace.length <= 2) {
             return null;
@@ -29,10 +28,12 @@ public class MethodUtils {
 
     }
 
-    private static void validateCallerClass(Collection<Class> allowClasses, int calleeIndex) {
+    private static void doValidateCallerClass(Collection<Class<?>> allowClasses) {
         if (!validateCaller) {
             return;
         }
+
+        int calleeIndex = 2;
 
         StackTraceElement[] stackTrace = new Exception().getStackTrace();
         if (stackTrace.length < calleeIndex + 2) {
@@ -53,7 +54,7 @@ public class MethodUtils {
         }
 
         boolean allowCall = false;
-        for (Class allowClass : allowClasses) {
+        for (Class<?> allowClass : allowClasses) {
             if (allowClass.isAssignableFrom(callerClass)) {
                 allowCall = true;
             }
@@ -65,11 +66,12 @@ public class MethodUtils {
         }
     }
 
-
-    private static void validateCallerPackage(Collection<Package> allowPackages, int calleeIndex) {
+    private static void doValidateCallerPackage(Collection<Package> allowPackages) {
         if (!validateCaller) {
             return;
         }
+
+        int calleeIndex = 2;
 
         StackTraceElement[] stackTrace = new Exception().getStackTrace();
         if (stackTrace.length < calleeIndex + 2) {
@@ -105,20 +107,20 @@ public class MethodUtils {
         }
     }
 
-    public static void validateCallerClass(Collection<Class> allowClasses) {
-        validateCallerClass(allowClasses, 2);
+    public static void validateCallerClass(Collection<Class<?>> allowClasses) {
+        doValidateCallerClass(allowClasses);
     }
 
-    public static void validateCallerClass(Class allowClass) {
-        validateCallerClass(Arrays.asList(allowClass), 2);
+    public static void validateCallerClass(Class<?>... allowClass) {
+        doValidateCallerClass(Arrays.asList(allowClass));
     }
 
     public static void validateCallerPackage(Collection<Package> allowPackages) {
-        validateCallerPackage(allowPackages, 2);
+        doValidateCallerPackage(allowPackages);
     }
 
-    public static void validateCallerPackage(Package allowPackage) {
-        validateCallerPackage(Arrays.asList(allowPackage), 2);
+    public static void validateCallerPackage(Package... allowPackage) {
+        doValidateCallerPackage(Arrays.asList(allowPackage));
     }
 
 }
