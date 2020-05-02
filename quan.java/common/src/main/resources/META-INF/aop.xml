@@ -2,9 +2,6 @@
 <!DOCTYPE aspectj PUBLIC "-//AspectJ//DTD//EN" "http://www.eclipse.org/aspectj/dtd/aspectj.dtd">
 <aspectj>
     <weaver>
-        <include within="@quan.data.Transactional *"/>
+        <include within="@org.aspectj.lang.annotation.Aspect *"/>
     </weaver>
-    <aspects>
-        <aspect name="quan.data.TransactionAspect"/>
-    </aspects>
 </aspectj>
