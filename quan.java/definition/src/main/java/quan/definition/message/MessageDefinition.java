@@ -72,7 +72,7 @@ public class MessageDefinition extends BeanDefinition {
 
     @Override
     protected void validateFieldNameDuplicate(FieldDefinition fieldDefinition) {
-        MessageHeadDefinition headDefinition = parser.getMessageHead();
+        HeadDefinition headDefinition = parser.getMessageHead();
         if (fieldDefinition.getName() != null && headDefinition != null) {
             headDefinition.validate();
             if (headDefinition.getField(fieldDefinition.getName()) != null) {
@@ -90,7 +90,7 @@ public class MessageDefinition extends BeanDefinition {
         return fieldName.equals("id");
     }
 
-    public MessageHeadDefinition getHead() {
+    public HeadDefinition getHead() {
         return parser.getMessageHead();
     }
 

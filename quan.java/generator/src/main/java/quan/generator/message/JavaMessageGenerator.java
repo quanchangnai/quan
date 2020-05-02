@@ -3,7 +3,7 @@ package quan.generator.message;
 import quan.definition.ClassDefinition;
 import quan.definition.Language;
 import quan.definition.message.MessageDefinition;
-import quan.definition.message.MessageHeadDefinition;
+import quan.definition.message.HeadDefinition;
 
 import java.util.Properties;
 
@@ -53,9 +53,9 @@ public class JavaMessageGenerator extends MessageGenerator {
     @Override
     protected void prepareClass(ClassDefinition classDefinition) {
         if (classDefinition instanceof MessageDefinition) {
-            MessageHeadDefinition messageHeadDefinition = ((MessageDefinition) classDefinition).getHead();
-            if (messageHeadDefinition != null && !messageHeadDefinition.getFullPackageName(supportLanguage()).equals(classDefinition.getFullPackageName(supportLanguage()))) {
-                classDefinition.getImports().add(messageHeadDefinition.getFullName(supportLanguage()));
+            HeadDefinition headDefinition = ((MessageDefinition) classDefinition).getHead();
+            if (headDefinition != null && !headDefinition.getFullPackageName(supportLanguage()).equals(classDefinition.getFullPackageName(supportLanguage()))) {
+                classDefinition.getImports().add(headDefinition.getFullName(supportLanguage()));
             }
         }
         super.prepareClass(classDefinition);

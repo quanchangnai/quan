@@ -6,7 +6,7 @@ import quan.definition.ClassDefinition;
 import quan.definition.FieldDefinition;
 import quan.definition.Language;
 import quan.definition.message.MessageDefinition;
-import quan.definition.message.MessageHeadDefinition;
+import quan.definition.message.HeadDefinition;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -46,7 +46,7 @@ public class LuaMessageGenerator extends MessageGenerator {
         List<MessageDefinition> messageDefinitions = new ArrayList<>();
 
         for (ClassDefinition classDefinition : classDefinitions) {
-            if (classDefinition instanceof MessageHeadDefinition) {
+            if (classDefinition instanceof HeadDefinition) {
                 continue;
             }
             if (classDefinition instanceof MessageDefinition) {

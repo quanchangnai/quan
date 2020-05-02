@@ -5,7 +5,7 @@ import quan.definition.BeanDefinition;
 import quan.definition.Category;
 import quan.definition.ClassDefinition;
 import quan.definition.message.MessageDefinition;
-import quan.definition.message.MessageHeadDefinition;
+import quan.definition.message.HeadDefinition;
 import quan.generator.Generator;
 
 import java.io.IOException;
@@ -45,7 +45,7 @@ public abstract class MessageGenerator extends Generator {
             Template messageTemplate = freemarkerCfg.getTemplate("message." + supportLanguage() + ".ftl");
             templates.put(MessageDefinition.class, messageTemplate);
             templates.put(BeanDefinition.class, messageTemplate);
-            templates.put(MessageHeadDefinition.class, messageTemplate);
+            templates.put(HeadDefinition.class, messageTemplate);
         } catch (IOException e) {
             logger.error("", e);
         }

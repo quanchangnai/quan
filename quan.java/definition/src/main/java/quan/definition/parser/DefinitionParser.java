@@ -8,7 +8,7 @@ import quan.definition.BeanDefinition;
 import quan.definition.Category;
 import quan.definition.ClassDefinition;
 import quan.definition.config.ConfigDefinition;
-import quan.definition.message.MessageHeadDefinition;
+import quan.definition.message.HeadDefinition;
 
 import java.io.File;
 import java.nio.charset.Charset;
@@ -37,7 +37,7 @@ public abstract class DefinitionParser {
     protected List<ClassDefinition> parsedClasses = new ArrayList<>();
 
     //消息头定义，最多只能有一个
-    protected MessageHeadDefinition messageHeadDefinition;
+    protected HeadDefinition headDefinition;
 
     //已校验过的类定义，类名:类定义
     private Map<String, ClassDefinition> validatedClasses = new HashMap<>();
@@ -110,8 +110,8 @@ public abstract class DefinitionParser {
         return validatedClasses.get(name);
     }
 
-    public MessageHeadDefinition getMessageHead() {
-        return messageHeadDefinition;
+    public HeadDefinition getMessageHead() {
+        return headDefinition;
     }
 
     public ConfigDefinition getConfig(String name) {

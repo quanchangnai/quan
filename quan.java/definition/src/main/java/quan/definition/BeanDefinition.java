@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import quan.definition.config.ConfigDefinition;
 import quan.definition.data.DataDefinition;
 import quan.definition.message.MessageDefinition;
-import quan.definition.message.MessageHeadDefinition;
+import quan.definition.message.HeadDefinition;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -467,7 +467,7 @@ public class BeanDefinition extends ClassDefinition {
         }
         return !(classDefinition instanceof DataDefinition
                 || classDefinition instanceof MessageDefinition
-                || classDefinition instanceof MessageHeadDefinition
+                || classDefinition instanceof HeadDefinition
                 || classDefinition instanceof ConfigDefinition);
     }
 
