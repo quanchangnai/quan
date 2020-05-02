@@ -52,7 +52,7 @@ public class Database implements DataWriter, MongoDatabase {
 
     static {
         //字节码增强
-        //1.设置从数据库中查询出来的数据的默认更新器
+        //1.查询时,设置数据的默认写入器
         //2.禁止在内存事务中写数据库
 
         ElementMatcher<TypeDescription> type = ElementMatchers.named("com.mongodb.client.internal.MongoClientDelegate$DelegateOperationExecutor");
@@ -154,7 +154,7 @@ public class Database implements DataWriter, MongoDatabase {
     }
 
     /**
-     * 使用当前数据库实例在同一个MongoClient上获取一个新的数据库实例，它使用的数据类和当前数据库实例使用的完全一样
+     * 使用当前数据库实例在同一个MongoClient上获取一个新的数据库实例，它使用的数据类和当前数据库实例的完全一样
      *
      * @param name 新的数据库名
      * @return 如果给定的数据库名和当前数据库名相同，将直接返回当前数据库实例

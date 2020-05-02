@@ -22,7 +22,7 @@ import java.util.concurrent.Callable;
 @SuppressWarnings({"deprecation", "rawtypes"})
 public class ReadDelegation {
 
-    //一般情况只会创建一个MongoClient，这里兼容一下多个的情况
+    //一般情况只会创建一个MongoClient，这里兼容一下可能有多个数据源的情况
     private static Map<OperationExecutor, MongoClient> clients = new HashMap<>();
 
     @RuntimeType
