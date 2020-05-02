@@ -18,9 +18,7 @@ local ${name} = {
     id = ${id?c}
 </#if>
 }
-<#if headedFields??>
-    <#assign allFields = headedFields>
-<#else>
+<#if !allFields??>
     <#assign allFields = fields>
 </#if>
 

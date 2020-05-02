@@ -247,9 +247,7 @@ public<#if definitionType ==9> abstract</#if> class ${name} extends <#if definit
 </#list>
     }
 
-<#if headedFields??>
-    <#assign allFields = headedFields>
-<#else>
+<#if !allFields??>
     <#assign allFields = fields>
 </#if>
     @Override

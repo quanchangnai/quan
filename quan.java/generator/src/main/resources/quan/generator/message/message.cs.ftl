@@ -253,9 +253,7 @@ namespace ${getFullPackageName("cs")}
 </#list>
 		}
 
-<#if headedFields??>
-	<#assign allFields = headedFields>
-<#else>
+<#if !allFields??>
 	<#assign allFields = fields>
 </#if>
 		public override string ToString()

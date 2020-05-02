@@ -14,19 +14,21 @@ import java.util.List;
  */
 public class MessageDefinition extends BeanDefinition {
 
-    //支持定义消息ID，一般情况下由哈希生成
-    private String strId;
+    //支持自定义消息ID，一般情况下由哈希生成
+    private String sid;
 
     private int id;
 
+    //消息所有字段，包含消息头
+    private List<FieldDefinition> allFields = new ArrayList<>();
+
     {
         category = Category.message;
-
     }
 
-    public MessageDefinition(String strId) {
-        if (!StringUtils.isBlank(strId)) {
-            this.strId = strId.trim();
+    public MessageDefinition(String sid) {
+        if (!StringUtils.isBlank(sid)) {
+            this.sid = sid.trim();
         }
     }
 
@@ -55,16 +57,16 @@ public class MessageDefinition extends BeanDefinition {
 
 
     public boolean isDefinedId() {
-        return !StringUtils.isBlank(strId);
+        return !StringUtils.isBlank(sid);
     }
 
     @Override
     public void validate() {
-        if (strId != null) {
+        if (sid != null) {
             try {
-                id = Integer.parseInt(strId);
+                id = Integer.parseInt(sid);
             } catch (NumberFormatException e) {
-                addValidatedError(getValidatedName("的") + "ID[" + strId + "]不合法");
+                addValidatedError(getValidatedName("的") + "ID[" + sid + "]不合法");
             }
         }
         super.validate();
@@ -94,12 +96,14 @@ public class MessageDefinition extends BeanDefinition {
         return parser.getMessageHead();
     }
 
-    public List<FieldDefinition> getHeadedFields() {
-        List<FieldDefinition> headedFields = new ArrayList<>();
-        if (getHead() != null) {
-            headedFields.addAll(getHead().getFields());
+    public List<FieldDefinition> getAllFields() {
+        if (allFields.isEmpty()) {
+            if (getHead() != null) {
+                allFields.addAll(getHead().getFields());
+            }
+            allFields.addAll(getFields());
         }
-        headedFields.addAll(getFields());
-        return headedFields;
+        return allFields;
     }
+
 }
