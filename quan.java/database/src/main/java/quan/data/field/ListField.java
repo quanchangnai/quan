@@ -43,7 +43,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
     }
 
     private Log<E> getLog(boolean write) {
-        return getLog(Transaction.check(), write);
+        return getLog(Transaction.get(), write);
     }
 
     private Log<E> getLog(Transaction transaction, boolean write) {

@@ -53,7 +53,7 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
     }
 
     private PMap<K, V> getLogMap() {
-        return getLogMap(Transaction.check());
+        return getLogMap(Transaction.get());
     }
 
     @Override

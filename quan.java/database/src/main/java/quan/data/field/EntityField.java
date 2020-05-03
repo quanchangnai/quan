@@ -27,7 +27,7 @@ public final class EntityField<V extends Entity> extends Loggable implements Fie
     }
 
     public V getLogValue() {
-        Transaction transaction = Transaction.check();
+        Transaction transaction = Transaction.get();
         if (transaction != null) {
             Log<V> log = (Log<V>) _getFieldLog(transaction, this);
             if (log != null) {

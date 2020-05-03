@@ -57,7 +57,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
     }
 
     private PSet<E> getLogSet() {
-        return getLogSet(Transaction.check());
+        return getLogSet(Transaction.get());
     }
 
     @Override
