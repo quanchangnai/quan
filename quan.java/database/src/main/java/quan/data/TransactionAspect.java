@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @Aspect
 public class TransactionAspect {
 
-    @Around("@annotation(quan.data.Transactional)")
+    @Around("@annotation(quan.data.Transactional) && !staticinitialization(*)")
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
         AtomicReference<Throwable> exception = new AtomicReference<>();
         Object result = Transaction.execute(() -> {
@@ -25,10 +25,10 @@ public class TransactionAspect {
             }
         });
 
-        if (result != null) {
-            return result;
-        } else {
+        if (exception.get() != null) {
             throw exception.get();
+        } else {
+            return result;
         }
     }
 

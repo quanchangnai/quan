@@ -8,7 +8,7 @@ import quan.data.role.RoleData;
 /**
  * Created by quanchangnai on 2020/4/20.
  */
-//@Transactional
+@Transactional
 public class Role {
 
     private long roleId;
