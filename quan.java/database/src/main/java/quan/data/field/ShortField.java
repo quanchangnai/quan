@@ -36,7 +36,7 @@ public class ShortField extends Loggable implements Field {
     }
 
     public void setLogValue(short value, Data<?> root) {
-        _setFieldLog(Transaction.get(true), this, value, root);
+        _setFieldLog(Transaction.check(), this, value, root);
     }
 
     @Override

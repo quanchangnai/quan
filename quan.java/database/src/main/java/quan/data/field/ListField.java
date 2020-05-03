@@ -43,7 +43,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
     }
 
     private Log<E> getLog(boolean write) {
-        return getLog(Transaction.get(write), write);
+        return getLog(Transaction.check(), write);
     }
 
     private Log<E> getLog(Transaction transaction, boolean write) {
@@ -163,7 +163,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
     public boolean add(E e) {
         Validations.validateCollectionValue(e);
 
-        Transaction transaction = Transaction.get(true);
+        Transaction transaction = Transaction.check();
         Log<E> log = getLog(transaction, true);
 
         log.modCount++;
@@ -221,7 +221,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
         Objects.requireNonNull(c);
         c.forEach(Validations::validateCollectionValue);
 
-        Transaction transaction = Transaction.get(true);
+        Transaction transaction = Transaction.check();
         Log<E> log = getLog(transaction, true);
 
         PVector<E> oldList = log.list;
@@ -293,7 +293,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
     public E set(int index, E e) {
         Validations.validateCollectionValue(e);
 
-        Transaction transaction = Transaction.get(true);
+        Transaction transaction = Transaction.check();
         Log<E> log = getLog(transaction, true);
 
         PVector<E> oldList = log.list;
@@ -316,7 +316,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
     public void add(int index, E e) {
         Validations.validateCollectionValue(e);
 
-        Transaction transaction = Transaction.get(true);
+        Transaction transaction = Transaction.check();
         Log<E> log = getLog(transaction, true);
 
         log.modCount++;

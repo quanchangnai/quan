@@ -27,7 +27,7 @@ public final class EntityField<V extends Entity> extends Loggable implements Fie
     }
 
     public V getLogValue() {
-        Transaction transaction = Transaction.get(false);
+        Transaction transaction = Transaction.check();
         if (transaction != null) {
             Log<V> log = (Log<V>) _getFieldLog(transaction, this);
             if (log != null) {
@@ -40,7 +40,7 @@ public final class EntityField<V extends Entity> extends Loggable implements Fie
     public void setLogValue(V value, Data<?> root) {
         Validations.validateEntityRoot(value);
 
-        Transaction transaction = Transaction.get(true);
+        Transaction transaction = Transaction.check();
         Log<V> log = (Log<V>) _getFieldLog(transaction, this);
 
         if (log == null) {

@@ -53,7 +53,7 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
     }
 
     private PMap<K, V> getLogMap() {
-        return getLogMap(Transaction.get(false));
+        return getLogMap(Transaction.check());
     }
 
     @Override
@@ -86,7 +86,7 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
         Validations.validateMapKey(key);
         Validations.validateCollectionValue(value);
 
-        Transaction transaction = Transaction.get(true);
+        Transaction transaction = Transaction.check();
         PMap<K, V> oldMap = getLogMap(transaction);
         V oldValue = oldMap.get(key);
         PMap<K, V> newMap = oldMap.plus(key, value);
@@ -125,7 +125,7 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
 
     @Override
     public V remove(Object key) {
-        Transaction transaction = Transaction.get(true);
+        Transaction transaction = Transaction.check();
         PMap<K, V> oldMap = getLogMap(transaction);
 
         V value = oldMap.get(key);
@@ -143,7 +143,7 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
         m.keySet().forEach(Validations::validateMapKey);
         m.values().forEach(Validations::validateCollectionValue);
 
-        Transaction transaction = Transaction.get(true);
+        Transaction transaction = Transaction.check();
         PMap<K, V> oldMap = getLogMap(transaction);
         Data<?> root = _getLogRoot(transaction);
 
@@ -163,7 +163,7 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
 
     @Override
     public void clear() {
-        Transaction transaction = Transaction.get(true);
+        Transaction transaction = Transaction.check();
         if (getLogMap(transaction).isEmpty()) {
             return;
         }

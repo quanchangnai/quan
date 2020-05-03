@@ -74,7 +74,7 @@ public class Role {
         Transaction.runAfterCommit(() -> System.err.println("runAfterCommit"));
         Transaction.runAfterRollback(() -> System.err.println("runAfterRollback"));
 
-        Transaction.fail();
+        Transaction.rollback();
 
         return 1;
     }

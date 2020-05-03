@@ -38,7 +38,7 @@ public abstract class Node extends Loggable {
     }
 
     protected void _setLogRoot(Data<?> root) {
-        Transaction transaction = Transaction.get(true);
+        Transaction transaction = Transaction.check();
         _setRootLog(transaction, this, root);
         _setChildrenLogRoot(root);
     }

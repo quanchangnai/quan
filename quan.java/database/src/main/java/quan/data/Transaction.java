@@ -74,21 +74,18 @@ public class Transaction {
     }
 
     /**
-     * 当前是不是处于事务之中
+     * 判断当前是否处于事务之中
      */
     public static boolean isInside() {
         return threadLocal.get() != null;
     }
 
-
     /**
-     * 获取当前事务
-     *
-     * @param check 检测当前是否处于事务之中
+     * 检测当前是否处于事务之中，如果当前在事务之中则返回当前事务，否则报错
      */
-    public static Transaction get(boolean check) {
+    public static Transaction check() {
         Transaction transaction = threadLocal.get();
-        if (check && transaction == null) {
+        if (transaction == null) {
             throw new IllegalStateException("当前不在事务中");
         }
         return transaction;
@@ -113,38 +110,6 @@ public class Transaction {
             throw new IllegalStateException("当前已经在事务中了");
         }
         return transaction;
-    }
-
-    /**
-     * 结束当前事务
-     */
-    private static void end(Transaction transaction) {
-        //清空当前线程持有的事务对象
-        threadLocal.set(null);
-
-        //事务执行成功，提交事务
-        if (!transaction.failed) {
-            transaction.commit();
-        }
-
-        //执行事务结束后的特殊任务
-        for (Runnable task : transaction.afterTasks.keySet()) {
-            if (transaction.failed == transaction.afterTasks.get(task)) {
-                continue;
-            }
-            try {
-                task.run();
-            } catch (Exception e) {
-                logger.error("", e);
-            }
-        }
-    }
-
-    /**
-     * 标记事务失败
-     */
-    public static void fail() {
-        Transaction.get(true).failed = true;
     }
 
     /**
@@ -186,8 +151,42 @@ public class Transaction {
         }
     }
 
+
     /**
-     * 事务提交
+     * 结束当前事务
+     */
+    private static void end(Transaction transaction) {
+        //清空当前线程持有的事务对象
+        threadLocal.set(null);
+
+        //事务执行成功，提交事务
+        if (!transaction.failed) {
+            transaction.commit();
+        }
+
+        //执行事务结束后的特殊任务
+        for (Runnable task : transaction.afterTasks.keySet()) {
+            if (transaction.failed == transaction.afterTasks.get(task)) {
+                continue;
+            }
+            try {
+                task.run();
+            } catch (Exception e) {
+                logger.error("", e);
+            }
+        }
+    }
+
+    /**
+     * 回滚当前事务
+     */
+    public static void rollback() {
+        //标记事务为失败状态
+        Transaction.check().failed = true;
+    }
+
+    /**
+     * 提交事务
      */
     private void commit() {
         for (Node node : rootLogs.keySet()) {
@@ -236,14 +235,14 @@ public class Transaction {
      * 在当前事务执行提交之后再执行特殊任务
      */
     public static void runAfterCommit(Runnable task) {
-        Transaction.get(true).afterTasks.put(task, true);
+        Transaction.check().afterTasks.put(task, true);
     }
 
     /**
      * 在当前事务执行回滚之后再执行特殊任务
      */
     public static void runAfterRollback(Runnable task) {
-        Transaction.get(true).afterTasks.put(task, false);
+        Transaction.check().afterTasks.put(task, false);
     }
 
 }

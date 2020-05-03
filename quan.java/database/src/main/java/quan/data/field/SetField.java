@@ -57,7 +57,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
     }
 
     private PSet<E> getLogSet() {
-        return getLogSet(Transaction.get(false));
+        return getLogSet(Transaction.check());
     }
 
     @Override
@@ -121,7 +121,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
     public boolean add(E e) {
         Validations.validateCollectionValue(e);
 
-        Transaction transaction = Transaction.get(true);
+        Transaction transaction = Transaction.check();
         PSet<E> oldSet = getLogSet(transaction);
         PSet<E> newSet = oldSet.plus(e);
 
@@ -159,7 +159,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
 
     @Override
     public boolean remove(Object o) {
-        Transaction transaction = Transaction.get(true);
+        Transaction transaction = Transaction.check();
         PSet<E> oldSet = getLogSet(transaction);
         PSet<E> newSet = oldSet.minus(o);
 
@@ -186,7 +186,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
         Objects.requireNonNull(c);
         c.forEach(Validations::validateCollectionValue);
 
-        Transaction transaction = Transaction.get(true);
+        Transaction transaction = Transaction.check();
         PSet<E> oldSet = getLogSet(transaction);
         PSet<E> newSet = oldSet.plusAll(c);
 
@@ -239,7 +239,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
 
     @Override
     public void clear() {
-        Transaction transaction = Transaction.get(true);
+        Transaction transaction = Transaction.check();
         if (getLogSet(transaction).isEmpty()) {
             return;
         }

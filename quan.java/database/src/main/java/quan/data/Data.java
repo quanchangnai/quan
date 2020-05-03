@@ -43,7 +43,7 @@ public abstract class Data<I> {
     };
 
     private void _setWriter(DataWriter writer, State state) {
-        Transaction transaction = Transaction.get(true);
+        Transaction transaction = Transaction.check();
         Log log = transaction.getDataLog(this);
         if (log == null) {
             log = new Log(writer, state);

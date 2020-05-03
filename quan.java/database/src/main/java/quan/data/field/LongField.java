@@ -36,7 +36,7 @@ public class LongField extends Loggable implements Field {
     }
 
     public void setLogValue(long value, Data<?> root) {
-        _setFieldLog(Transaction.get(true), this, value, root);
+        _setFieldLog(Transaction.check(), this, value, root);
     }
 
     @Override

@@ -38,7 +38,7 @@ public class StringField extends Loggable implements Field {
 
     public void setLogValue(String value, Data<?> root) {
         Validations.validateFieldValue(value);
-        _setFieldLog(Transaction.get(true), this, value, root);
+        _setFieldLog(Transaction.check(), this, value, root);
     }
 
     @Override
