@@ -3,8 +3,11 @@
 <aspectj>
     <weaver>
         <include within="@quan.data.Transactional *"/>
+        <include within="com.mongodb.client.internal.MongoClientImpl"/>
+        <include within="com.mongodb.client.internal.MongoClientDelegate.DelegateOperationExecutor"/>
     </weaver>
     <aspects>
         <aspect name="quan.data.TransactionAspect"/>
+        <aspect name="quan.mongo.DatabaseAspect"/>
     </aspects>
 </aspectj>

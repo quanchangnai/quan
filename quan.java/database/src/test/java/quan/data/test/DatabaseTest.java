@@ -69,7 +69,7 @@ public class DatabaseTest {
 
     private static void testMongoClient() throws Exception {
 
-        Database database = new Database("mongodb://127.0.0.1:27017,127.0.0.1:27018,127.0.0.1:27019", "test", "quan.data");
+        Database database = new Database("mongodb://127.0.0.1:27017", "test", "quan.data");
 
         testMongoCollection0(database);
 
@@ -87,7 +87,7 @@ public class DatabaseTest {
             System.err.println("cursor.next():" + cursor.next());
         }
 
-//        mongo.getClient().close();
+        database.getClient().close();
 
         while (true) {
             Thread.sleep(10000);
@@ -100,9 +100,11 @@ public class DatabaseTest {
         Transaction.execute(() -> {
             MongoCollection<RoleData> roleDataCollection = database.getCollection(RoleData.class);
             RoleData roleData = roleDataCollection.find().first();
-//            roleData.delete(mongo);
-            roleData.free();
-            roleData.setName("name:" + System.currentTimeMillis());
+            if (roleData != null) {
+//                roleData.delete(database);
+                roleData.free();
+                roleData.setName("name:" + System.currentTimeMillis());
+            }
         });
     }
 

@@ -5,13 +5,6 @@ import com.mongodb.assertions.Assertions;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.*;
 import com.mongodb.client.model.*;
-import net.bytebuddy.agent.ByteBuddyAgent;
-import net.bytebuddy.agent.builder.AgentBuilder;
-import net.bytebuddy.description.method.MethodDescription;
-import net.bytebuddy.description.type.TypeDescription;
-import net.bytebuddy.implementation.MethodDelegation;
-import net.bytebuddy.matcher.ElementMatcher;
-import net.bytebuddy.matcher.ElementMatchers;
 import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
@@ -56,23 +49,7 @@ public class Database implements DataWriter, MongoDatabase {
     private boolean asyncWrite;
 
     static {
-        //字节码增强
-        //1.查询时,设置数据的默认写入器
-        //2.禁止在内存事务中写数据库
-
-        ElementMatcher<TypeDescription> type = ElementMatchers.named("com.mongodb.client.internal.MongoClientDelegate$DelegateOperationExecutor");
-        ElementMatcher<MethodDescription> readMethod = ElementMatchers.named("execute").and(ElementMatchers.takesArgument(3, ClientSession.class));
-        ElementMatcher<MethodDescription> writeMethod = ElementMatchers.named("execute").and(ElementMatchers.takesArgument(2, ClientSession.class));
-
-        AgentBuilder.Transformer readTransformer = (b, t, c, m) -> b.method(readMethod).intercept(MethodDelegation.to(ReadDelegation.class));
-        AgentBuilder.Transformer writeTransformer = (b, t, c, m) -> b.method(writeMethod).intercept(MethodDelegation.to(WriteDelegation.class));
-
-        new AgentBuilder.Default()
-                .with(AgentBuilder.TypeStrategy.Default.REBASE)
-                .type(type)
-                .transform(readTransformer)
-                .transform(writeTransformer)
-                .installOn(ByteBuddyAgent.install());
+        ClassUtils.enableAop();
     }
 
     private Database(MongoClient client, String dataPackage, boolean asyncWrite) {
