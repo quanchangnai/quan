@@ -24,6 +24,8 @@ import quan.data.DataCodecRegistry;
 import quan.data.DataWriter;
 
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * 数据库
@@ -35,6 +37,8 @@ public class Database implements DataWriter, MongoDatabase {
     private static final Logger logger = LoggerFactory.getLogger(Database.class);
 
     static Map<MongoClient, Map<String/*databaseName*/, Database>> databases = new HashMap<>();
+
+    static Map<MongoClient, List<ExecutorService>> executors = new HashMap<>();
 
     private static final ReplaceOptions replaceOptions = new ReplaceOptions().upsert(true);
 
@@ -49,6 +53,7 @@ public class Database implements DataWriter, MongoDatabase {
 
     private Map<Class, MongoCollection> collections = new HashMap<>();
 
+    private boolean asyncWrite;
 
     static {
         //字节码增强
@@ -70,7 +75,14 @@ public class Database implements DataWriter, MongoDatabase {
                 .installOn(ByteBuddyAgent.install());
     }
 
-    private Database() {
+    private Database(MongoClient client, String dataPackage, boolean asyncWrite) {
+        this.client = client;
+        this.dataPackage = dataPackage;
+        this.asyncWrite = asyncWrite;
+    }
+
+    public Database(String connectionString, String name, String dataPackage) {
+        this(connectionString, name, dataPackage, false);
     }
 
     /**
@@ -79,8 +91,10 @@ public class Database implements DataWriter, MongoDatabase {
      * @param connectionString MongoDB连接字符串
      * @param name             数据库名
      * @param dataPackage      数据类所在的包名
+     * @param asyncWrite       是否异步写数据库
      */
-    public Database(String connectionString, String name, String dataPackage) {
+    public Database(String connectionString, String name, String dataPackage, boolean asyncWrite) {
+        this.asyncWrite = asyncWrite;
         this.dataPackage = Assertions.notNull("dataPackage", dataPackage);
         Assertions.notNull("connectionString", connectionString);
 
@@ -91,6 +105,11 @@ public class Database implements DataWriter, MongoDatabase {
     }
 
     public Database(MongoClientSettings.Builder builder, String databaseName, String dataPackage) {
+        this(builder, databaseName, dataPackage, false);
+    }
+
+    public Database(MongoClientSettings.Builder builder, String databaseName, String dataPackage, boolean asyncWrite) {
+        this.asyncWrite = asyncWrite;
         this.dataPackage = Assertions.notNull("dataPackage", dataPackage);
         initClient(builder, databaseName);
     }
@@ -101,6 +120,14 @@ public class Database implements DataWriter, MongoDatabase {
         builder.codecRegistry(CodecRegistries.fromRegistries(dataCodecRegistry, MongoClientSettings.getDefaultCodecRegistry()));
         client = MongoClients.create(builder.build());
         databases.put(client, new HashMap<>());
+
+        if (asyncWrite) {
+            List<ExecutorService> executorList = new ArrayList<>();
+            for (int i = 0; i < Runtime.getRuntime().availableProcessors(); i++) {
+                executorList.add(Executors.newSingleThreadExecutor());
+            }
+            executors.put(client, executorList);
+        }
 
         initDatabase(databaseName);
     }
@@ -164,9 +191,7 @@ public class Database implements DataWriter, MongoDatabase {
         if (name.equals(database.getName())) {
             return this;
         }
-        Database database = new Database();
-        database.client = client;
-        database.dataPackage = dataPackage;
+        Database database = new Database(client, dataPackage, asyncWrite);
         database.initDatabase(name);
         return database;
     }
@@ -186,15 +211,17 @@ public class Database implements DataWriter, MongoDatabase {
                 throw new IllegalArgumentException(String.format("新数据库名[%s]和当前数据库名[%s]相同，但是新数据包名[%s]和当前数据包名[%s]却不相同", name, this.database.getName(), dataPackage, this.dataPackage));
             }
         }
-        Database database = new Database();
-        database.client = client;
-        database.dataPackage = dataPackage;
+        Database database = new Database(client, dataPackage, asyncWrite);
         database.initDatabase(name);
         return database;
     }
 
     public MongoClient getClient() {
         return client;
+    }
+
+    public boolean isAsyncWrite() {
+        return asyncWrite;
     }
 
     /**
@@ -236,7 +263,14 @@ public class Database implements DataWriter, MongoDatabase {
             writeModels.computeIfAbsent(collections.get(data.getClass()), c -> new ArrayList<>()).add(new DeleteOneModel<>(Filters.eq(data._id())));
         }
 
-        writeModels.forEach(MongoCollection::bulkWrite);
+        if (asyncWrite) {
+            for (MongoCollection<Data<?>> collection : writeModels.keySet()) {
+                int index = collection.getDocumentClass().hashCode() % executors.size();
+                executors.get(client).get(index).execute(() -> collection.bulkWrite(writeModels.get(collection)));
+            }
+        } else {
+            writeModels.forEach(MongoCollection::bulkWrite);
+        }
     }
 
 
