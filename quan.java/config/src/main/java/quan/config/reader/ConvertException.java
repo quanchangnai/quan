@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * 用于携带配置转换错误信息
  * Created by quanchangnai on 2019/8/7.
  */
 class ConvertException extends RuntimeException {
@@ -57,4 +58,5 @@ class ConvertException extends RuntimeException {
         mapInvalidValue,
         mapDuplicateKey,
     }
+
 }

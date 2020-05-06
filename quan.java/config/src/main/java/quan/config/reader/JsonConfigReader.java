@@ -3,7 +3,6 @@ package quan.config.reader;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import quan.config.Config;
-import quan.config.reader.ConfigReader;
 
 import java.io.File;
 import java.io.FileInputStream;

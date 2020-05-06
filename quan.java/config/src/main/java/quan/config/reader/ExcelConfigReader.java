@@ -2,7 +2,6 @@ package quan.config.reader;
 
 import com.alibaba.fastjson.JSONObject;
 import org.apache.poi.ss.usermodel.*;
-import quan.config.reader.ConfigReader;
 import quan.definition.config.ConfigDefinition;
 
 import java.io.File;
