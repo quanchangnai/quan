@@ -12,12 +12,8 @@ import quan.config.reader.CSVConfigReader;
 import quan.config.reader.ConfigReader;
 import quan.config.reader.ExcelConfigReader;
 import quan.config.reader.JsonConfigReader;
-import quan.definition.BeanDefinition;
-import quan.definition.Category;
-import quan.definition.FieldDefinition;
-import quan.definition.Language;
+import quan.definition.*;
 import quan.definition.config.ConfigDefinition;
-import quan.definition.IndexDefinition;
 import quan.definition.parser.DefinitionParser;
 import quan.definition.parser.XmlDefinitionParser;
 
@@ -469,6 +465,13 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
     }
 
     /**
+     * @see #reloadByTableName(Collection)
+     */
+    public void reloadByTableName(String... tableNames) {
+        reloadByTableName(Arrays.asList(tableNames));
+    }
+
+    /**
      * 通过表格原名重加载
      */
     public void reloadByOriginalName(Collection<String> originalNames) {
@@ -485,6 +488,13 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
         }
 
         reloadByConfigName(configNames);
+    }
+
+    /**
+     * @see #reloadByOriginalName(Collection)
+     */
+    public void reloadByOriginalName(String... originalNames) {
+        reloadByOriginalName(Arrays.asList(originalNames));
     }
 
 

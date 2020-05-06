@@ -9,7 +9,6 @@ import quan.config.Config;
 import quan.config.ConfigValidator;
 import quan.config.TableType;
 import quan.config.ValidatedException;
-import quan.config.loader.LoadMode;
 import quan.config.reader.ConfigReader;
 
 import java.lang.reflect.Method;
@@ -106,9 +105,12 @@ public abstract class ConfigLoader {
         doLoadAll();
 
         if (needValidate()) {
+            List<String> errors = new ArrayList<>();
             for (ConfigValidator validator : validators) {
                 try {
-                    validator.validateConfig();
+                    validator.validateConfig(errors);
+                    validatedErrors.addAll(errors);
+                    errors.clear();
                 } catch (ValidatedException e) {
                     validatedErrors.addAll(e.getErrors());
                 } catch (Exception e) {
@@ -188,6 +190,13 @@ public abstract class ConfigLoader {
      * 通过配置类名重加载
      */
     public abstract void reloadByConfigName(Collection<String> configNames);
+
+    /**
+     * @see #reloadByConfigName(Collection)
+     */
+    public void reloadByConfigName(String... configNames) {
+        reloadByConfigName(Arrays.asList(configNames));
+    }
 
     protected ConfigReader getReader(String table) {
         ConfigReader configReader = readers.get(table);
