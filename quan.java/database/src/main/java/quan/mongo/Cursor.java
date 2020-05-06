@@ -1,9 +1,7 @@
 package quan.mongo;
 
-import com.mongodb.MongoNamespace;
 import com.mongodb.ServerAddress;
 import com.mongodb.ServerCursor;
-import com.mongodb.client.MongoClient;
 import com.mongodb.operation.BatchCursor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,10 +36,8 @@ class Cursor implements BatchCursor {
 
     private BatchCursor cursor;
 
-    public Cursor(MongoClient client, MongoNamespace namespace, BatchCursor cursor) {
-        if (Database.databases.containsKey(client)) {
-            this.database = Database.databases.get(client).get(namespace.getDatabaseName());
-        }
+    public Cursor(Database database, BatchCursor cursor) {
+        this.database = database;
         this.cursor = cursor;
     }
 
@@ -58,10 +54,8 @@ class Cursor implements BatchCursor {
     @Override
     public List next() {
         List list = cursor.next();
-        for (Object o : list) {
-            if (o instanceof Data) {
-                setDataWriter.accept((Data) o, database);
-            }
+        if (database != null) {
+            list.stream().filter(d -> d instanceof Data).forEach(d -> setDataWriter.accept((Data) d, database));
         }
         return list;
     }

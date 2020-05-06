@@ -24,7 +24,7 @@ import java.util.concurrent.ExecutorService;
  * Created by quanchangnai on 2020/5/5.
  */
 @Aspect
-@SuppressWarnings({"deprecation", "rawtypes"})
+@SuppressWarnings("deprecation")
 public class DatabaseAspect {
 
     //一般情况只会创建一个MongoClient，这里兼容一下可能有多个数据源的情况
@@ -42,11 +42,17 @@ public class DatabaseAspect {
             return joinPoint.proceed();
         }
 
-        MongoClient client = getMongoClient((OperationExecutor) joinPoint.getThis());
-        FindOperation findOperation = (FindOperation) operation;
         BatchCursor cursor = (BatchCursor) joinPoint.proceed();
+        MongoClient client = getMongoClient((OperationExecutor) joinPoint.getThis());
 
-        return new Cursor(client, findOperation.getNamespace(), cursor);
+        Database database = null;
+        Map<String, Database> clientDatabases = Database.databases.get(client);
+        if (clientDatabases != null) {
+            String databaseName = ((FindOperation) operation).getNamespace().getDatabaseName();
+            database = clientDatabases.get(databaseName);
+        }
+
+        return new Cursor(database, cursor);
     }
 
     //禁止在内存事务中写数据库
@@ -60,9 +66,9 @@ public class DatabaseAspect {
     @Before("execution(* com.mongodb.client.internal.MongoClientImpl.close())")
     public void beforeClose(JoinPoint joinPoint) {
         MongoClient client = (MongoClient) joinPoint.getThis();
-        List<ExecutorService> executors = Database.executors.get(client);
-        if (executors != null) {
-            executors.forEach(ExecutorService::shutdown);
+        List<ExecutorService> clientExecutors = Database.executors.get(client);
+        if (clientExecutors != null) {
+            clientExecutors.forEach(ExecutorService::shutdown);
         }
     }
 
