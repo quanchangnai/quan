@@ -242,7 +242,7 @@ public class Database implements DataWriter, MongoDatabase {
 
         if (asyncWrite) {
             for (MongoCollection<Data<?>> collection : writeModels.keySet()) {
-                int index = collection.getDocumentClass().hashCode() % executors.size();
+                int index = (collection.getDocumentClass().hashCode() & 0x7FFFFFFF) % executors.size();
                 executors.get(client).get(index).execute(() -> collection.bulkWrite(writeModels.get(collection)));
             }
         } else {

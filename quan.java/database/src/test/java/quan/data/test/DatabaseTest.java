@@ -48,7 +48,7 @@ public class DatabaseTest {
 
         testRole();
 
-        testMongoClient();
+        testDatabase();
 
 //        testMap();
 
@@ -67,9 +67,10 @@ public class DatabaseTest {
         roleTest1.test2();
     }
 
-    private static void testMongoClient() throws Exception {
+    private static void testDatabase() throws Exception {
 
-        Database database = new Database("mongodb://127.0.0.1:27017,127.0.0.1:27018,127.0.0.1:27019", "test", "quan.data");
+        String connectionString = "mongodb://127.0.0.1:27017,127.0.0.1:27018,127.0.0.1:27019";
+        Database database = new Database(connectionString, "test", "quan.data");
 
         testMongoCollection0(database);
 

@@ -186,6 +186,4 @@ public class ClassUtils {
         }
     }
 
-    public static void main(String[] args) {
-    }
 }
