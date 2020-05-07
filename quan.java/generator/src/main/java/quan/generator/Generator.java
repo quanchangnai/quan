@@ -160,10 +160,10 @@ public abstract class Generator {
      */
     protected void checkOptions() {
         if (definitionPaths.isEmpty()) {
-            throw new IllegalArgumentException(category().comment() + "的定义文件路径[definitionPaths]不能为空");
+            throw new IllegalArgumentException(category().alias() + "的定义文件路径[definitionPaths]不能为空");
         }
         if (codePath == null) {
-            throw new IllegalArgumentException(category().comment() + "的目标代码[" + supportLanguage() + "]文件路径[codePath]不能为空");
+            throw new IllegalArgumentException(category().alias() + "的目标代码[" + supportLanguage() + "]文件路径[codePath]不能为空");
         }
     }
 
@@ -185,7 +185,7 @@ public abstract class Generator {
 
     protected void parseDefinitions() {
         if (parser == null) {
-            throw new IllegalArgumentException(category().comment() + "的定义解析器[definitionParser]不能为空");
+            throw new IllegalArgumentException(category().alias() + "的定义解析器[definitionParser]不能为空");
         }
         parser.setPackagePrefix(packagePrefix);
         parser.setEnumPackagePrefix(enumPackagePrefix);
@@ -236,7 +236,7 @@ public abstract class Generator {
         }
 
         generate(classDefinitions);
-        logger.info("生成{}{}完成\n", supportLanguage(), category().comment());
+        logger.info("生成{}{}完成\n", supportLanguage(), category().alias());
     }
 
     protected void generate(List<ClassDefinition> classDefinitions) {
@@ -251,18 +251,18 @@ public abstract class Generator {
         String fileName = classDefinition.getName() + "." + supportLanguage();
 
         if (!filePath.exists() && !filePath.mkdirs()) {
-            logger.info("生成{}[{}]失败，无法创建目录[{}]", category().comment(), filePath + File.separator + fileName, filePath);
+            logger.info("生成{}[{}]失败，无法创建目录[{}]", category().alias(), filePath + File.separator + fileName, filePath);
             return;
         }
 
         try (Writer writer = new OutputStreamWriter(new FileOutputStream(new File(filePath, fileName)), StandardCharsets.UTF_8)) {
             template.process(classDefinition, writer);
         } catch (Exception e) {
-            logger.info("生成{}[{}]失败", category().comment(), filePath + File.separator + fileName, e);
+            logger.info("生成{}[{}]失败", category().alias(), filePath + File.separator + fileName, e);
             return;
         }
 
-        logger.info("生成{}[{}]完成", category().comment(), filePath + File.separator + fileName);
+        logger.info("生成{}[{}]完成", category().alias(), filePath + File.separator + fileName);
 
     }
 
@@ -342,7 +342,7 @@ public abstract class Generator {
             return;
         }
 
-        logger.error("生成{}代码失败，解析目录{}下的定义文件共发现{}条错误", category().comment(), parser.getDefinitionPaths(), errors.size());
+        logger.error("生成{}代码失败，解析目录{}下的定义文件共发现{}条错误", category().alias(), parser.getDefinitionPaths(), errors.size());
         for (int i = 1; i <= errors.size(); i++) {
             String error = errors.get(i - 1);
             logger.error(error);

@@ -99,11 +99,11 @@ public class Database implements DataWriter, MongoDatabase {
         databases.put(client, new HashMap<>());
 
         if (asyncWrite) {
-            List<ExecutorService> executorList = new ArrayList<>();
+            List<ExecutorService> clientExecutors = new ArrayList<>();
             for (int i = 0; i < Runtime.getRuntime().availableProcessors(); i++) {
-                executorList.add(Executors.newSingleThreadExecutor());
+                clientExecutors.add(Executors.newSingleThreadExecutor());
             }
-            executors.put(client, executorList);
+            executors.put(client, clientExecutors);
         }
 
         initDatabase(databaseName);
@@ -241,9 +241,14 @@ public class Database implements DataWriter, MongoDatabase {
         }
 
         if (asyncWrite) {
+            List<ExecutorService> clientExecutors = executors.get(client);
+            if (clientExecutors == null) {
+                logger.info("MongoClient已经关闭了");
+                return;
+            }
             for (MongoCollection<Data<?>> collection : writeModels.keySet()) {
-                int index = (collection.getDocumentClass().hashCode() & 0x7FFFFFFF) % executors.size();
-                executors.get(client).get(index).execute(() -> collection.bulkWrite(writeModels.get(collection)));
+                int index = (collection.getDocumentClass().hashCode() & 0x7FFFFFFF) % clientExecutors.size();
+                clientExecutors.get(index).execute(() -> collection.bulkWrite(writeModels.get(collection)));
             }
         } else {
             writeModels.forEach(MongoCollection::bulkWrite);

@@ -89,8 +89,6 @@ public abstract class ClassDefinition extends Definition {
 
     /**
      * 和具体语言无关的简单类名[不含前缀的包名.类名]
-     *
-     * @return
      */
     public String getSimpleName() {
         return packageName + "." + getName();
@@ -107,7 +105,6 @@ public abstract class ClassDefinition extends Definition {
     public String getFullPackageName(Language lang) {
         return getFullPackageName(lang.name());
     }
-
 
     public String getFullName(String lang) {
         return getFullPackageName(lang) + "." + getName();
@@ -221,7 +218,7 @@ public abstract class ClassDefinition extends Definition {
 
 
     /**
-     * 依赖validate()的结果，必须等所有类的validate()执行完成后再执行
+     * 依赖{@link #validate()}的结果，必须等所有类的{@link #validate()}执行完成后再执行
      */
     public void validate2() {
     }

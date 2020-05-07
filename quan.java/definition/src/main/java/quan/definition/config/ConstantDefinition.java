@@ -150,6 +150,6 @@ public class ConstantDefinition extends ClassDefinition {
         if (valueFieldDefinition == null) {
             addValidatedError(getValidatedName() + "的value[" + valueField + "]不是" + configDefinition.getValidatedName() + "的字段");
         }
-
     }
+
 }

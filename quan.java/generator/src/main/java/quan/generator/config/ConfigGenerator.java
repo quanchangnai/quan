@@ -78,15 +78,15 @@ public abstract class ConfigGenerator extends Generator {
     protected void checkOptions() {
         super.checkOptions();
         if (tableType == null) {
-            throw new IllegalArgumentException(category().comment() + "的表格类型[tableType]不能为空");
+            throw new IllegalArgumentException(category().alias() + "的表格类型[tableType]不能为空");
         }
         try {
             TableType.valueOf(tableType);
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(category().comment() + "的表格类型[tableType]不合法,当前值:" + tableType + ",合法值:" + Arrays.toString(TableType.values()));
+            throw new IllegalArgumentException(category().alias() + "的表格类型[tableType]不合法,当前值:" + tableType + ",合法值:" + Arrays.toString(TableType.values()));
         }
         if (StringUtils.isBlank(tablePath)) {
-            throw new IllegalArgumentException(category().comment() + "的表格文件路径[tablePath]不能为空");
+            throw new IllegalArgumentException(category().alias() + "的表格文件路径[tablePath]不能为空");
         }
 
         if (!StringUtils.isBlank(tableBodyStartRow)) {
@@ -95,7 +95,7 @@ public abstract class ConfigGenerator extends Generator {
                     throw new Exception();
                 }
             } catch (Exception e) {
-                throw new IllegalArgumentException(category().comment() + "的表格正文开始行号[tableBodyStartRow]不合法，合法值为空值或者大于1的整数");
+                throw new IllegalArgumentException(category().alias() + "的表格正文开始行号[tableBodyStartRow]不合法，合法值为空值或者大于1的整数");
             }
         }
     }
@@ -131,7 +131,7 @@ public abstract class ConfigGenerator extends Generator {
      */
     protected void initConfigLoader(TableType tableType, String tablePath, int tableBodyStartRow) {
         if (parser == null) {
-            throw new IllegalArgumentException(category().comment() + "的定义解析器[definitionParser]不能为空");
+            throw new IllegalArgumentException(category().alias() + "的定义解析器[definitionParser]不能为空");
         }
         configLoader = new WithDefinitionConfigLoader(tablePath);
         configLoader.setParser(parser);

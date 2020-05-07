@@ -12,13 +12,13 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
- * 字段定义，被数据库、消息和配置共用
+ * 字段定义，被数据、消息和配置共用
  * Created by quanchangnai on 2017/7/6.
  */
 public class FieldDefinition extends Definition {
 
-    //字段类型的原始定义,集合类型包含其元素类型
-    private String originType;
+    //定义的字段类型,集合类型包含其元素类型
+    private String types;
 
     //拆分后的字段类型
     private String type;
@@ -35,43 +35,43 @@ public class FieldDefinition extends Definition {
     private String classKeyType;
     private String classValueType;
 
-    //字段类型是否有循环依赖
+    //字段类型依赖是否有循环
     private boolean cycle;
 
-    //枚举字段值
+    //枚举值
     private String value;
 
-    //消息字段,是否可选
+    //消息:是否可选
     private boolean optional;
 
-    //消息字段,小数保留的精度
+    //消息:小数保留的精度
     private int scale = -1;
 
-    //消息、数据字段,忽略编码
+    //消息、数据:忽略编码
     private boolean ignore;
 
-    //消息、数据字段置字段,索引类型
+    ///配置、数据:索引类型
     private String index;
 
-    //配置字段,对应表格中的列
+    //配置:对应表格中的列
     private String column;
 
-    //配置字段,集合类型字段的分隔符
+    //配置:集合类型字段的分隔符
     private String delimiter;
 
-    //配置字段,转义后的集合类型字段的分隔符
+    //配置:转义后的集合类型字段的分隔符
     private String escapedDelimiter;
 
-    //配置字段,引用[配置.字段]
+    //配置:引用[配置.字段]
     private String ref;
 
-    //配置字段,是支持还是排除设置的语言
+    //配置:是支持还是排除设置的语言
     private boolean excludeLanguage;
 
-    //配置字段,支持或者排除的语言
+    //配置:支持或者排除的语言
     protected Set<String> languages = new HashSet<>();
 
-    //配置字段,字段对应的表格列号,对象或者集合类型可能会对应多列，校验表头时设置
+    //配置:字段对应的表格列号,对象或者集合类型可能会对应多列，校验表头时设置
     private List<Integer> columnNums = new ArrayList<>();
 
     public FieldDefinition() {
@@ -99,15 +99,15 @@ public class FieldDefinition extends Definition {
     }
 
 
-    public String getOriginType() {
-        return originType;
+    public String getTypes() {
+        return types;
     }
 
-    public void setOriginType(String originType) {
-        if (StringUtils.isBlank(originType)) {
+    public void setTypes(String types) {
+        if (StringUtils.isBlank(types)) {
             return;
         }
-        this.originType = originType;
+        this.types = types;
     }
 
     public String getType() {

@@ -4,13 +4,14 @@ public enum Category {
 
     data("数据"), message("消息"), config("配置");
 
-    private final String comment;
+    private final String alias;
 
-    Category(String comment) {
-        this.comment = comment;
+    Category(String alias) {
+        this.alias = alias;
     }
 
-    public String comment() {
-        return comment;
+    public String alias() {
+        return alias;
     }
+    
 }

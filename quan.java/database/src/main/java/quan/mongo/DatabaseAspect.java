@@ -66,7 +66,7 @@ public class DatabaseAspect {
     @Before("execution(* com.mongodb.client.internal.MongoClientImpl.close())")
     public void beforeClose(JoinPoint joinPoint) {
         MongoClient client = (MongoClient) joinPoint.getThis();
-        List<ExecutorService> clientExecutors = Database.executors.get(client);
+        List<ExecutorService> clientExecutors = Database.executors.remove(client);
         if (clientExecutors != null) {
             clientExecutors.forEach(ExecutorService::shutdown);
         }
