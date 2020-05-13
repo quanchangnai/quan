@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.stage.Screen?>
-<BorderPane maxHeight="${screen.visualBounds.height}" maxWidth="${screen.visualBounds.height}" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800" prefWidth="600"
+<BorderPane maxHeight="${screen.visualBounds.height}" maxWidth="${screen.visualBounds.width}" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600" prefWidth="800"
             xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="quan.test.roster.RosterController">
     <fx:define>
         <Screen fx:factory="getPrimary" fx:id="screen"/>
