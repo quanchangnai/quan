@@ -36,9 +36,7 @@ public class RosterController implements Initializable {
         int pageSize = 100;
         fillEmployeesData(0, pageSize);
 
-        pagination.currentPageIndexProperty().addListener((observable, oldValue, newValue) -> {
-            fillEmployeesData(newValue.intValue(), pageSize);
-        });
+        pagination.currentPageIndexProperty().addListener((observable, oldValue, newValue) -> fillEmployeesData(newValue.intValue(), pageSize));
 
     }
 
@@ -46,18 +44,22 @@ public class RosterController implements Initializable {
         TableColumn<Employee, Integer> idColumn = (TableColumn<Employee, Integer>) tableView.getColumns().get(0);
         idColumn.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+        idColumn.setOnEditCommit(e -> e.getRowValue().setId(e.getNewValue()));
 
         TableColumn<Employee, String> nameColumn = (TableColumn<Employee, String>) tableView.getColumns().get(1);
         nameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        nameColumn.setOnEditCommit(e -> e.getRowValue().setName(e.getNewValue()));
 
         TableColumn<Employee, String> phoneColumn = (TableColumn<Employee, String>) tableView.getColumns().get(2);
         phoneColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         phoneColumn.setCellValueFactory(new PropertyValueFactory<>("phone"));
+        phoneColumn.setOnEditCommit(e -> e.getRowValue().setPhone(e.getNewValue()));
 
         TableColumn<Employee, String> addressColumn = (TableColumn<Employee, String>) tableView.getColumns().get(3);
         addressColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         addressColumn.setCellValueFactory(new PropertyValueFactory<>("address"));
+        addressColumn.setOnEditCommit(e -> e.getRowValue().setAddress(e.getNewValue()));
     }
 
     private void fillEmployeesData(int pageIndex, int pageSize) {

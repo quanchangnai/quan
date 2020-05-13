@@ -10,7 +10,7 @@
         <Screen fx:factory="getPrimary" fx:id="screen"/>
     </fx:define>
     <center>
-        <TableView fx:id="tableView" prefHeight="507.0" prefWidth="821.0" style="-fx-background-color: transparent;" BorderPane.alignment="CENTER">
+        <TableView fx:id="tableView" editable="true" prefHeight="507.0" prefWidth="821.0" style="-fx-background-color: transparent;" BorderPane.alignment="CENTER">
             <columns>
                 <TableColumn prefWidth="75.0" text="ID"/>
                 <TableColumn prefWidth="130.0" text="名字"/>
