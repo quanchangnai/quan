@@ -240,9 +240,7 @@ public abstract class Generator {
     }
 
     protected void generate(List<ClassDefinition> classDefinitions) {
-        for (ClassDefinition classDefinition : classDefinitions) {
-            generate(classDefinition);
-        }
+        classDefinitions.forEach(this::generate);
     }
 
     protected void generate(ClassDefinition classDefinition) {
@@ -402,4 +400,5 @@ public abstract class Generator {
 
         logger.info("生成完成，耗时{}s", (System.currentTimeMillis() - startTime) / 1000D);
     }
+
 }

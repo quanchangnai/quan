@@ -5,8 +5,8 @@ import quan.definition.BeanDefinition;
 import quan.definition.ClassDefinition;
 import quan.definition.FieldDefinition;
 import quan.definition.Language;
-import quan.definition.message.MessageDefinition;
 import quan.definition.message.HeadDefinition;
+import quan.definition.message.MessageDefinition;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -53,7 +53,6 @@ public class LuaMessageGenerator extends MessageGenerator {
                 messageDefinitions.add((MessageDefinition) classDefinition);
             }
             generate(classDefinition);
-
         }
 
         generateFactory(messageDefinitions);
