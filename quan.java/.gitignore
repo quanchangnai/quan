@@ -3,7 +3,10 @@
 .project
 .classpath
 .setting*
+.gradle
 target/
 classes
 .temp
 /config/json
+build/
+out/
