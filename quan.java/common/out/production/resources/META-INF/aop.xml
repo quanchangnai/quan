@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE aspectj PUBLIC "-//AspectJ//DTD//EN" "http://www.eclipse.org/aspectj/dtd/aspectj.dtd">
-<aspectj>
-    <weaver>
-        <include within="@org.aspectj.lang.annotation.Aspect *"/>
-    </weaver>
-</aspectj>
