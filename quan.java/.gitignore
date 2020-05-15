@@ -4,9 +4,13 @@
 .classpath
 .setting*
 .gradle
-target/
-classes
+/classes/
+/*/classes/
+/target/
+/*/target/
+/build/
+/*/build/
+/out/
+/*/out/
 .temp
 /config/json
-build/
-out/
