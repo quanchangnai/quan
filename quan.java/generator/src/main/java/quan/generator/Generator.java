@@ -349,20 +349,39 @@ public abstract class Generator {
 
     public static void main(String[] args) {
         long startTime = System.currentTimeMillis();
-
         String optionsFileName = "generator.properties";
+        boolean dev = false;
+
         if (args.length > 0) {
-            optionsFileName = args[0];
+            if (args[0].equals("dev")) {
+                dev = true;
+            } else {
+                optionsFileName = args[0];
+            }
         } else {
             logger.info("使用默认位置的生成器选项配置文件[{}]\n", optionsFileName);
         }
 
         Properties options = new Properties();
-        try (FileInputStream inputStream = new FileInputStream(optionsFileName)) {
+        InputStream inputStream = null;
+        try {
+            if (dev) {
+                inputStream = Generator.class.getResourceAsStream(optionsFileName);
+            } else {
+                inputStream = new FileInputStream(optionsFileName);
+            }
             options.load(inputStream);
         } catch (IOException e) {
             logger.info("加载生成器选项配置文件[{}]出错", optionsFileName, e);
             return;
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
         DataGenerator dataGenerator = new DataGenerator(options);
