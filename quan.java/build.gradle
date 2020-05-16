@@ -7,17 +7,23 @@ plugins {
 }
 
 group = 'quan'
-version = '1.0-SNAPSHOT'
 
 jar.enabled = false
 
 subprojects {
 
     apply plugin: 'java'
-    sourceCompatibility = JavaVersion.VERSION_1_8
+
+    sourceCompatibility = JavaVersion.VERSION_11
 
     tasks.withType(JavaCompile) {
         options.encoding = 'UTF-8'
+    }
+
+    clean {
+        doLast {
+            file("$projectDir${File.separator}out").deleteDir()
+        }
     }
 
     repositories {
