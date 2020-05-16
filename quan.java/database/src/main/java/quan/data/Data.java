@@ -109,13 +109,13 @@ public abstract class Data<I> {
     public static class Index {
 
         //索引名
-        private String name;
+        private final String name;
 
         //索引字段
-        private List<String> fields;
+        private final List<String> fields;
 
         //唯一索引或者普通索引
-        private boolean unique;
+        private final boolean unique;
 
         public Index(String name, List<String> fields, boolean unique) {
             this.name = name;

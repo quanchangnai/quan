@@ -12,6 +12,7 @@ import org.bson.conversions.Bson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.common.ClassUtils;
+import quan.common.NamedThreadFactory;
 import quan.data.Data;
 import quan.data.DataCodecRegistry;
 import quan.data.DataWriter;
@@ -19,6 +20,7 @@ import quan.data.DataWriter;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 /**
  * 数据库
@@ -38,15 +40,15 @@ public class Database implements DataWriter, MongoDatabase {
     /**
      * 数据类所在的包名
      */
-    private String dataPackage;
+    private final String dataPackage;
 
-    private MongoClient client;
+    private  MongoClient client;
 
     private MongoDatabase database;
 
-    private Map<Class, MongoCollection> collections = new HashMap<>();
+    private final Map<Class, MongoCollection> collections = new HashMap<>();
 
-    private boolean asyncWrite;
+    private final boolean asyncWrite;
 
     static {
         ClassUtils.enableAop();
@@ -100,8 +102,9 @@ public class Database implements DataWriter, MongoDatabase {
 
         if (asyncWrite) {
             List<ExecutorService> clientExecutors = new ArrayList<>();
-            for (int i = 0; i < Runtime.getRuntime().availableProcessors(); i++) {
-                clientExecutors.add(Executors.newSingleThreadExecutor());
+            for (int i = 1; i <= Runtime.getRuntime().availableProcessors(); i++) {
+                ThreadFactory threadFactory = new NamedThreadFactory("database-thread-" + i);
+                clientExecutors.add(Executors.newSingleThreadExecutor(threadFactory));
             }
             executors.put(client, clientExecutors);
         }
@@ -202,7 +205,16 @@ public class Database implements DataWriter, MongoDatabase {
     }
 
     /**
-     * 通过指定的数据类获取集合
+     * 获取指定的数据类对应的执行器
+     */
+    public <D extends Data> ExecutorService getExecutor(Class<D> clazz) {
+        List<ExecutorService> clientExecutors = executors.get(client);
+        int index = (clazz.hashCode() & 0x7FFFFFFF) % clientExecutors.size();
+        return clientExecutors.get(index);
+    }
+
+    /**
+     * 获取指定的数据类对应的集合
      */
     public <D extends Data> MongoCollection<D> getCollection(Class<D> clazz) {
         return (MongoCollection<D>) collections.get(clazz);
@@ -241,14 +253,12 @@ public class Database implements DataWriter, MongoDatabase {
         }
 
         if (asyncWrite) {
-            List<ExecutorService> clientExecutors = executors.get(client);
-            if (clientExecutors == null) {
-                logger.info("MongoClient已经关闭了");
+            if (!executors.containsKey(client)) {
+                logger.info("MongoClient已经关闭了，数据无法写入数据库");
                 return;
             }
             for (MongoCollection<Data<?>> collection : writeModels.keySet()) {
-                int index = (collection.getDocumentClass().hashCode() & 0x7FFFFFFF) % clientExecutors.size();
-                clientExecutors.get(index).execute(() -> collection.bulkWrite(writeModels.get(collection)));
+                getExecutor(collection.getDocumentClass()).execute(() -> collection.bulkWrite(writeModels.get(collection)));
             }
         } else {
             writeModels.forEach(MongoCollection::bulkWrite);
