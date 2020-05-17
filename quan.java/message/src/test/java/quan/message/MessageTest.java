@@ -2,6 +2,7 @@ package quan.message;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import org.junit.Test;
 import quan.message.role.RoleInfo;
 import quan.message.role.RoleType;
 import quan.message.role.SRoleLogin;
@@ -20,18 +21,13 @@ public class MessageTest {
         messageRegistry.register("quan");
     }
 
-    public static void main(String[] args) throws Exception {
-
-        test1();
-        test2();
-        test3();
-
-    }
-
-    private static void test1() throws Exception {
+    @Test
+    public void test1() throws Exception {
         System.err.println("test1=============================");
+
         Buffer buffer = new SimpleBuffer();
-        buffer = new NettyBuffer(Unpooled.buffer());
+//        buffer = new NettyBuffer(Unpooled.buffer());
+
         buffer.writeBool(true);
         buffer.writeInt(70);
         buffer.writeInt(2423);
@@ -67,7 +63,8 @@ public class MessageTest {
 //        System.err.println(buffer.readString());
     }
 
-    private static void test2() throws Exception {
+    @Test
+    public void test2() throws Exception {
         System.err.println("test2=============================");
 
         SRoleLogin sRoleLogin1 = new SRoleLogin();
@@ -116,7 +113,8 @@ public class MessageTest {
         System.err.println("sRoleLogin3:" + sRoleLogin3);
     }
 
-    private static void test3() throws Exception {
+    @Test
+    public void test3() {
         System.err.println("test3=============================");
         ByteBuffer buffer = ByteBuffer.allocate(4);
         buffer.putInt(42);

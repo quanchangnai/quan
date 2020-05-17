@@ -14,5 +14,4 @@ public enum TestConfigValidator2 implements ConfigValidator {
         throw new RuntimeException("TestConfigValidator2校验测试");
     }
 
-
 }

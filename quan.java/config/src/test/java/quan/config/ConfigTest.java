@@ -18,27 +18,29 @@ import java.util.List;
  */
 public class ConfigTest {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
+        long startTime = System.currentTimeMillis();
 
         ConfigLoader configLoader;
-        if (true) {
-            configLoader = withDefinitionConfigLoader();
-        } else {
+        if (args.length > 0 && args[0].equals("1")) {
             configLoader = withoutDefinitionConfigLoader();
+        } else {
+            configLoader = withDefinitionConfigLoader();
         }
 
         loadConfig(configLoader);
 
         writeJson(configLoader);
 
-//        reloadAllConfig(configLoader);
-//
-//        reloadByConfigName(configLoader);
-//
-//        reloadByTableName(configLoader);
+        reloadAllConfig(configLoader);
 
-//        reloadByOriginalName(configLoader);
+        reloadByConfigName(configLoader);
 
+        reloadByTableName(configLoader);
+
+        reloadByOriginalName(configLoader);
+
+        System.err.println("ConfigTest.main()耗时:" + (System.currentTimeMillis() - startTime) / 1000D + "s");
     }
 
     private static ConfigLoader withDefinitionConfigLoader() {
@@ -66,24 +68,23 @@ public class ConfigTest {
         return configLoader;
     }
 
-    private static void loadConfig(ConfigLoader configLoader) throws Exception {
+    private static void loadConfig(ConfigLoader configLoader) {
         System.err.println("configLoader.loadConfig()=============");
         long startTime = System.currentTimeMillis();
+
         try {
             configLoader.loadAll();
         } catch (ValidatedException e) {
             printErrors(e);
         }
         printConfig();
-        System.err.println("configLoader.loadConfig()耗时:" + (System.currentTimeMillis() - startTime));
+
+        System.err.println("configLoader.loadConfig()耗时:" + (System.currentTimeMillis() - startTime) / 1000D + "s");
         System.err.println();
     }
 
     private static void writeJson(ConfigLoader configLoader) {
-        if (configLoader.getTableType() == TableType.json) {
-            return;
-        }
-        if (!(configLoader instanceof WithDefinitionConfigLoader)) {
+        if (configLoader.getTableType() == TableType.json || !(configLoader instanceof WithDefinitionConfigLoader)) {
             return;
         }
 
@@ -91,104 +92,115 @@ public class ConfigTest {
 
         System.err.println("writeJson()=============");
         long startTime = System.currentTimeMillis();
-        configLoader1.writeJson("config\\json", true, Language.cs);
-        System.err.println("writeJson()耗时:" + (System.currentTimeMillis() - startTime));
+
+        configLoader1.writeJson("config\\json", true, Language.java);
+
+        System.err.println("writeJson()耗时:" + (System.currentTimeMillis() - startTime) / 1000D + "s");
         System.err.println();
     }
 
-    private static void reloadAllConfig(ConfigLoader configLoader) throws Exception {
-        Thread.sleep(10000);
+    private static void reloadAllConfig(ConfigLoader configLoader) {
         System.err.println("reloadAllConfig()=============");
         long startTime = System.currentTimeMillis();
+
         try {
             configLoader.reloadAll();
         } catch (ValidatedException e) {
             printErrors(e);
         }
         printConfig();
+
         System.err.println("reloadAllConfig()耗时:" + (System.currentTimeMillis() - startTime));
         System.err.println();
     }
 
-    private static void reloadByConfigName(ConfigLoader configLoader) throws Exception {
-        Thread.sleep(5000);
+    private static void reloadByConfigName(ConfigLoader configLoader) {
         List<String> reloadConfigs = Arrays.asList("ItemConfig", "WeaponConfig");
         System.err.println("reloadByConfigName()=============" + reloadConfigs);
         long startTime = System.currentTimeMillis();
+
         try {
             configLoader.reloadByConfigName(reloadConfigs);
         } catch (ValidatedException e) {
             printErrors(e);
         }
         printConfig();
-        System.err.println("reloadByConfigName()耗时:" + (System.currentTimeMillis() - startTime));
+
+        System.err.println("reloadByConfigName()耗时:" + (System.currentTimeMillis() - startTime) / 1000D + "s");
         System.err.println();
     }
 
-    private static void reloadByTableName(ConfigLoader configLoader) throws Exception {
+    private static void reloadByTableName(ConfigLoader configLoader) {
         if (!(configLoader instanceof WithDefinitionConfigLoader)) {
             return;
         }
 
         WithDefinitionConfigLoader configLoader1 = (WithDefinitionConfigLoader) configLoader;
-
-        Thread.sleep(5000);
         List<String> reloadConfigs = Arrays.asList("道具", "装备1");
         System.err.println("reloadByTableName()=============" + reloadConfigs);
         long startTime = System.currentTimeMillis();
+
         try {
             configLoader1.reloadByTableName(reloadConfigs);
         } catch (ValidatedException e) {
             printErrors(e);
         }
         printConfig();
-        System.err.println("reloadByTableName()耗时:" + (System.currentTimeMillis() - startTime));
+
+        System.err.println("reloadByTableName()耗时:" + (System.currentTimeMillis() - startTime) / 1000D + "s");
         System.err.println();
     }
 
-    private static void reloadByOriginalName(ConfigLoader configLoader) throws Exception {
+    private static void reloadByOriginalName(ConfigLoader configLoader) {
         if (!(configLoader instanceof WithDefinitionConfigLoader)) {
             return;
         }
 
         WithDefinitionConfigLoader configLoader1 = (WithDefinitionConfigLoader) configLoader;
-        Thread.sleep(5000);
-        List<String> reloadConfigs = Arrays.asList("道具", "武器");
+        List<String> reloadConfigs = Arrays.asList("道具", "道具/武器");
         System.err.println("reloadByOriginalName()=============" + reloadConfigs);
         long startTime = System.currentTimeMillis();
+
         try {
             configLoader1.reloadByOriginalName(reloadConfigs);
         } catch (ValidatedException e) {
             printErrors(e);
         }
         printConfig();
-        System.err.println("reloadByOriginalName()耗时:" + (System.currentTimeMillis() - startTime));
+
+        System.err.println("reloadByOriginalName()耗时:" + (System.currentTimeMillis() - startTime) / 1000D + "s");
         System.err.println();
     }
 
     private static void printErrors(ValidatedException e) {
+        System.err.println();
         System.err.println("printErrors start============");
+
         for (String error : e.getErrors()) {
             System.err.println(error);
         }
+
         System.err.println("printErrors end============");
+        System.err.println();
     }
 
-    private static void printConfig() throws Exception {
+    private static void printConfig() {
+        System.err.println();
         System.err.println("printConfigs start============");
-        Thread.sleep(100);
+
         System.err.println("ItemConfig============");
-        ItemConfig.getConfigs().forEach(System.out::println);
+        ItemConfig.getConfigs().forEach(System.err::println);
 
         System.err.println("EquipConfig============");
-        EquipConfig.self.getConfigs().forEach(System.out::println);
+        EquipConfig.self.getConfigs().forEach(System.err::println);
 
         System.err.println("WeaponConfig============");
-        WeaponConfig.self.getConfigs().forEach(System.out::println);
+        WeaponConfig.self.getConfigs().forEach(System.err::println);
 
         System.err.println("QuestConfig============");
-        QuestConfig.getConfigs().forEach(System.out::println);
+        QuestConfig.getConfigs().forEach(System.err::println);
 
         System.err.println("printConfigs end============");
     }
+
 }

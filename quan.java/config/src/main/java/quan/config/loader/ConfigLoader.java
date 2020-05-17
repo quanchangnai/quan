@@ -116,7 +116,7 @@ public abstract class ConfigLoader {
                 } catch (Exception e) {
                     String error = String.format("配置错误:%s", e.getMessage());
                     validatedErrors.add(error);
-                    logger.debug("", e);
+                    logger.error("", e);
                 }
             }
         }

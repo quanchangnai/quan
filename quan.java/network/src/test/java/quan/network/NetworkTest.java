@@ -5,8 +5,4 @@ package quan.network;
  */
 public class NetworkTest {
 
-    public static void main(String[] args) throws Exception {
-
-    }
-
 }

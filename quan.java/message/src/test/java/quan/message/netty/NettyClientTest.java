@@ -29,9 +29,9 @@ public class NettyClientTest {
             bootstrap.channel(NioSocketChannel.class);
             bootstrap.handler(new ChannelInitializer<NioSocketChannel>() {
                 @Override
-                protected void initChannel(NioSocketChannel ch) throws Exception {
+                protected void initChannel(NioSocketChannel ch) {
                     ch.pipeline().addLast(new LengthFieldPrepender(4));
-                    ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(100000, 0, 4,0,4));
+                    ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(100000, 0, 4, 0, 4));
                     ch.pipeline().addLast(new NettyMessageCodec(MessageTest.messageRegistry));
                     ch.pipeline().addLast(new NettyClientHandler());
                 }
@@ -47,7 +47,7 @@ public class NettyClientTest {
     private static class NettyClientHandler extends SimpleChannelInboundHandler<Message> {
 
         @Override
-        protected void channelRead0(ChannelHandlerContext ctx, Message msg) throws Exception {
+        protected void channelRead0(ChannelHandlerContext ctx, Message msg) {
             System.err.println(msg);
         }
 

@@ -481,7 +481,7 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
         for (String originalName : originalNames) {
             ConfigDefinition configDefinition = parser.getTableConfigs().get(originalName);
             if (configDefinition == null) {
-                logger.error("重加载[{}]失败，不存在该配置定义", originalName);
+                logger.error("重加载[{}]失败，不存在该配置", originalName);
                 continue;
             }
             configNames.add(configDefinition.getName());

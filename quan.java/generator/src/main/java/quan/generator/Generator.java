@@ -349,12 +349,13 @@ public abstract class Generator {
 
     public static void main(String[] args) {
         long startTime = System.currentTimeMillis();
+
+        boolean test = false;
         String optionsFileName = "generator.properties";
-        boolean dev = false;
 
         if (args.length > 0) {
-            if (args[0].equals("dev")) {
-                dev = true;
+            if (args[0].equals("test")) {
+                test = true;
             } else {
                 optionsFileName = args[0];
             }
@@ -365,7 +366,7 @@ public abstract class Generator {
         Properties options = new Properties();
         InputStream inputStream = null;
         try {
-            if (dev) {
+            if (test) {
                 inputStream = Generator.class.getResourceAsStream(optionsFileName);
             } else {
                 inputStream = new FileInputStream(optionsFileName);
