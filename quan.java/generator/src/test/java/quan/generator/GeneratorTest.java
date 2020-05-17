@@ -13,7 +13,6 @@ public class GeneratorTest {
 
     @Test
     public void generate() {
-        System.err.println("generate()=============");
     }
 
 }
