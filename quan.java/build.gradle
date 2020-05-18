@@ -4,6 +4,7 @@
 
 plugins {
     id 'java'
+    id 'idea'
 }
 
 group = 'quan'
@@ -11,14 +12,21 @@ group = 'quan'
 jar.enabled = false
 
 subprojects {
-
     apply plugin: 'java'
+    apply plugin: 'idea'
 
     sourceCompatibility = JavaVersion.VERSION_1_8
 
     tasks.withType(JavaCompile) {
         options.encoding = 'UTF-8'
     }
+
+    idea.module {
+        def outputPath = "$projectDir${File.separator}build${File.separator}out${File.separator}"
+        outputDir file("${outputPath}main")
+        testOutputDir file("${outputPath}test")
+    }
+
 
     clean {
         doLast {
