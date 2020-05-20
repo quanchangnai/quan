@@ -42,7 +42,7 @@ public class Database implements DataWriter, MongoDatabase {
      */
     private final String dataPackage;
 
-    private  MongoClient client;
+    private MongoClient client;
 
     private MongoDatabase database;
 

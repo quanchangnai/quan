@@ -9,17 +9,21 @@ plugins {
 
 group = 'quan'
 
+def javaVersion = JavaVersion.VERSION_1_8
+sourceCompatibility = javaVersion
+idea.project.languageLevel = javaVersion
+
 jar.enabled = false
 
 subprojects {
     apply plugin: 'java'
     apply plugin: 'idea'
 
-    sourceCompatibility = JavaVersion.VERSION_1_8
-
     tasks.withType(JavaCompile) {
         options.encoding = 'UTF-8'
     }
+
+    sourceCompatibility = javaVersion
 
     idea.module {
         def outputPath = "$projectDir${File.separator}build${File.separator}out${File.separator}"
@@ -27,11 +31,14 @@ subprojects {
         testOutputDir file("${outputPath}test")
     }
 
-
     clean {
         doLast {
             file("$projectDir${File.separator}out").deleteDir()
         }
+    }
+
+    gradle.buildFinished {
+        file("$projectDir${File.separator}gradle").deleteDir()
     }
 
     repositories {

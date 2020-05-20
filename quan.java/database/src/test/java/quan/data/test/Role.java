@@ -71,8 +71,8 @@ public class Role {
 
 //        throw new RuntimeException("aaa");
 
-        Transaction.runAfterCommit(() -> System.err.println("runAfterCommit"));
-        Transaction.runAfterRollback(() -> System.err.println("runAfterRollback"));
+        Transaction.onSucceeded(() -> System.err.println("onSucceeded"));
+        Transaction.onFailed(() -> System.err.println("onFailed"));
 
         Transaction.rollback();
 

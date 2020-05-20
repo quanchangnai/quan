@@ -232,16 +232,16 @@ public class Transaction {
     }
 
     /***
-     * 在当前事务执行提交之后再执行特殊任务
+     * 在当前事务执行成功之后再执行特殊任务
      */
-    public static void runAfterCommit(Runnable task) {
+    public static void onSucceeded(Runnable task) {
         Transaction.check().afterTasks.put(task, true);
     }
 
     /**
-     * 在当前事务执行回滚之后再执行特殊任务
+     * 在当前事务执行失败之后再执行特殊任务
      */
-    public static void runAfterRollback(Runnable task) {
+    public static void onFailed(Runnable task) {
         Transaction.check().afterTasks.put(task, false);
     }
 

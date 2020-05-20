@@ -380,7 +380,7 @@ public abstract class Generator {
                 try {
                     inputStream.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error("", e);
                 }
             }
         }

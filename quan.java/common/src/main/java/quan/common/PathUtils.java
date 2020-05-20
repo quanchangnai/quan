@@ -27,26 +27,26 @@ public class PathUtils {
     /**
      * 递归列出子文件
      *
-     * @param path      目录
-     * @param extension 扩展名
+     * @param path 目录
+     * @param ext  扩展名
      * @return 子文件集合
      */
-    public static Set<File> listFiles(File path, String extension) {
-        Set<File> childrenFiles = new HashSet<>();
-        listFiles(path, extension, childrenFiles);
-        return childrenFiles;
+    public static Set<File> listFiles(File path, String ext) {
+        Set<File> children = new HashSet<>();
+        listFiles(path, ext, children);
+        return children;
     }
 
-    private static void listFiles(File path, String extension, Set<File> childrenFiles) {
+    private static void listFiles(File path, String ext, Set<File> children) {
         if (path.isDirectory()) {
             File[] files = path.listFiles();
             if (files != null) {
                 for (File file : files) {
-                    listFiles(file, extension, childrenFiles);
+                    listFiles(file, ext, children);
                 }
             }
-        } else if (path.getName().endsWith("." + extension)) {
-            childrenFiles.add(path);
+        } else if (path.getName().endsWith("." + ext)) {
+            children.add(path);
         }
     }
 

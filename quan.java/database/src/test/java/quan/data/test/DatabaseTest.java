@@ -8,7 +8,6 @@ import org.bson.BsonReader;
 import org.bson.BsonWriter;
 import org.bson.json.JsonReader;
 import org.bson.json.JsonWriter;
-import org.junit.Ignore;
 import org.junit.Test;
 import quan.common.ClassUtils;
 import quan.data.Transaction;
@@ -45,16 +44,16 @@ public class DatabaseTest {
         roleTest1.test2();
     }
 
-    @Ignore
+    //    @Ignore
     @Test
     public void testDatabase() {
         System.err.println("testDatabase==============");
         String connectionString = "mongodb://127.0.0.1:27017,127.0.0.1:27018,127.0.0.1:27019";
-        Database database = new Database(connectionString, "test", "quan.data");
+        Database database = new Database(connectionString, "test", "quan.data", true);
 
         testMongoCollection0(database);
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 1; i++) {
             System.err.println("=============" + i);
             testMongoCollection1(database);
             System.err.println();
