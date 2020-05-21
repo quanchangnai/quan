@@ -19,27 +19,24 @@ public class AsymmetricCipher {
 
     protected static Logger logger = LoggerFactory.getLogger(AsymmetricCipher.class);
 
-    private Algorithm algorithm;
+    private final AsymmetricAlgorithm algorithm;
 
     private PublicKey publicKey;
 
     private PrivateKey privateKey;
 
-    private AsymmetricCipher(Algorithm algorithm) {
+    private AsymmetricCipher(AsymmetricAlgorithm algorithm) {
         Objects.requireNonNull(algorithm, "加密算法不能为空");
         this.algorithm = algorithm;
     }
 
-    /**
-     * 使用已有秘钥创建密码器
-     */
-    public static AsymmetricCipher create(Algorithm algorithm, String publicKey, String privateKey) {
+    public static AsymmetricCipher create(AsymmetricAlgorithm algorithm, byte[] publicKey, byte[] privateKey) {
         AsymmetricCipher asymmetricCipher = new AsymmetricCipher(algorithm);
-        X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(Base64.getDecoder().decode(publicKey));
-        PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKey));
+        X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(publicKey);
+        PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(privateKey);
 
         try {
-            KeyFactory keyFactory = KeyFactory.getInstance(asymmetricCipher.algorithm.cipher);
+            KeyFactory keyFactory = KeyFactory.getInstance(algorithm.cipher);
             asymmetricCipher.publicKey = keyFactory.generatePublic(publicKeySpec);
             asymmetricCipher.privateKey = keyFactory.generatePrivate(privateKeySpec);
         } catch (Exception e) {
@@ -50,17 +47,12 @@ public class AsymmetricCipher {
         return asymmetricCipher;
     }
 
-    /**
-     * 使用已有秘钥创建RSA密码器
-     */
-    public static AsymmetricCipher create(String publicKey, String privateKey) {
-        return create(Algorithm.RSA, publicKey, privateKey);
+
+    public static AsymmetricCipher create(AsymmetricAlgorithm algorithm, String publicKey, String privateKey) {
+        return create(algorithm, Base64.getDecoder().decode(publicKey), Base64.getDecoder().decode(privateKey));
     }
 
-    /**
-     * 创建随机秘钥RSA密码器
-     */
-    public static AsymmetricCipher create(Algorithm algorithm, int keySize) {
+    public static AsymmetricCipher create(AsymmetricAlgorithm algorithm, int keySize) {
         AsymmetricCipher asymmetricCipher = new AsymmetricCipher(algorithm);
         KeyPairGenerator keyPairGenerator;
 
@@ -80,21 +72,11 @@ public class AsymmetricCipher {
         return asymmetricCipher;
     }
 
-    /**
-     * 创建1024位随机秘钥密码器
-     */
-    public static AsymmetricCipher create(Algorithm algorithm) {
+    public static AsymmetricCipher create(AsymmetricAlgorithm algorithm) {
         return create(algorithm, 1024);
     }
 
-    /**
-     * 创建1024位随机秘钥RSA密码器
-     */
-    public static AsymmetricCipher create() {
-        return create(Algorithm.RSA, 1024);
-    }
-
-    public Algorithm getAlgorithm() {
+    public AsymmetricAlgorithm getAlgorithm() {
         return algorithm;
     }
 
@@ -112,7 +94,7 @@ public class AsymmetricCipher {
      */
     public byte[] encryptByPublicKey(byte[] data) {
         try {
-            Cipher cipher = Cipher.getInstance(algorithm.cipher);
+            Cipher cipher = Cipher.getInstance(algorithm.transformation);
             cipher.init(Cipher.ENCRYPT_MODE, publicKey);
             return cipher.doFinal(data);
         } catch (Exception e) {
@@ -121,12 +103,13 @@ public class AsymmetricCipher {
         }
     }
 
+
     /**
      * 用公钥解密
      */
     public byte[] decryptByPublicKey(byte[] data) {
         try {
-            Cipher cipher = Cipher.getInstance(algorithm.cipher);
+            Cipher cipher = Cipher.getInstance(algorithm.transformation);
             cipher.init(Cipher.DECRYPT_MODE, publicKey);
             return cipher.doFinal(data);
         } catch (Exception e) {
@@ -140,7 +123,7 @@ public class AsymmetricCipher {
      */
     public byte[] encryptByPrivateKey(byte[] data) {
         try {
-            Cipher cipher = Cipher.getInstance(algorithm.cipher);
+            Cipher cipher = Cipher.getInstance(algorithm.transformation);
             cipher.init(Cipher.ENCRYPT_MODE, privateKey);
             return cipher.doFinal(data);
         } catch (Exception e) {
@@ -154,7 +137,7 @@ public class AsymmetricCipher {
      */
     public byte[] decryptByPrivateKey(byte[] data) {
         try {
-            Cipher cipher = Cipher.getInstance(algorithm.cipher);
+            Cipher cipher = Cipher.getInstance(algorithm.transformation);
             cipher.init(Cipher.DECRYPT_MODE, privateKey);
             return cipher.doFinal(data);
         } catch (Exception e) {
@@ -192,7 +175,6 @@ public class AsymmetricCipher {
         }
     }
 
-
     @Override
     public String toString() {
         return "RsaCipher{" +
@@ -202,54 +184,7 @@ public class AsymmetricCipher {
                 '}';
     }
 
-    public enum Algorithm {
-        RSA("RSA", "RSA/NONE/NoPadding", "MD5withRSA"),
-        DSA("DSA", "DSA/NONE/NoPadding", "SHA1withDSA");
 
-        public final String cipher;
-
-        public final String transformation;
-
-        public final String signature;
-
-        Algorithm(String cipher, String transformation, String signature) {
-            this.cipher = cipher;
-            this.transformation = transformation;
-            this.signature = signature;
-        }
-
-        @Override
-        public String toString() {
-            return "Algorithm{" +
-                    "cipher='" + cipher + '\'' +
-                    ", signature='" + signature + '\'' +
-                    '}';
-        }
-
-    }
-
-
-    public static void main(String[] args) {
-//        AsymmetricCipher cipher = AsymmetricCipher.create();
-
-        String publicKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCjoHfRKSPSURhRYJu9UtgkvP2TFjOI4fHbXUmsBgIU1TiNugP/JepY5lMZ6ISF3zg0QO5DTJ09god76BZVFKnKAsWA4Dqcv3bNVUneSZygtsB/SCzjUQ9o8bZkiCd5vaAOER/Z6g75jtl8XGtjE7GtQ/ezd37JQR7xZ2axZrWtdQIDAQAB";
-        String privateKey = "MIICdQIBADANBgkqhkiG9w0BAQEFAASCAl8wggJbAgEAAoGBAKOgd9EpI9JRGFFgm71S2CS8/ZMWM4jh8dtdSawGAhTVOI26A/8l6ljmUxnohIXfODRA7kNMnT2Ch3voFlUUqcoCxYDgOpy/ds1VSd5JnKC2wH9ILONRD2jxtmSIJ3m9oA4RH9nqDvmO2Xxca2MTsa1D97N3fslBHvFnZrFmta11AgMBAAECgYBGaYVmApghpzgZvMMII6BTnuhX5VPj8acMSQas+iDnKiIeCxAxOfWwr9zO51ov6bDb+50MZOm9UHBRB7ykfDHbxkFXCLA3Tesr2/X3+0Iyz30pu1ctCOcjlJaHQpnE09okYI9kZpkTzzK3Hkm59wE/9SOor5Ag70hrXcAApwIceQJBANKXscBScD6nySdmbxBjfPc+UwSEFIwb+XYey3hJHNY9rKuA4opRTTWMB9JaFfgeXeRP8y5Fd+B8Y1R6n9z5KKcCQQDG6FsBtEmj6mVL/ZPr2JeUAo1Z7VH9uB6bG5o2sTeeERAz3GSqZd+K7s/LSjbJ9XbIuGHoFrE4wT+uIfwD9yCDAkAyUVKEXG47WkXC50PES7ExNjAJ1TE/pPN/GK6PKBD+06+tLtdyKyjikXnQ9ftn1IGkqsG1HZ4eAjqNldsapmHjAkApMEZgJPg21Dvjr3/pD7HbuWeR3p3i3zSfQ+j8OFhfCAOF6baCvpO6zlcDLrwHuCe/ysaja8eJDCNmqKzqGUuHAkBlTjExgc35J2TY1pn4FE1pqj8Yavll4vfiDhIrRwLdVJyKq8Sjm4OzVFAkk3rMkqPR/ZL3cxb45RMmtGkYwVQ9";
-
-        AsymmetricCipher cipher = AsymmetricCipher.create(publicKey, privateKey);
-
-
-        System.err.println("===========publicKey===========");
-        System.err.println(cipher.getPublicKey());
-
-        System.err.println("===========privateKey===========");
-        System.err.println(cipher.getPrivateKey());
-
-        byte[] encrypted = cipher.encryptByPrivateKey("dadasdaswe".getBytes());
-        System.err.println("encrypted:" + Base64.getEncoder().encodeToString(encrypted));
-
-        byte[] decrypted = cipher.decryptByPublicKey(encrypted);
-        System.err.println("decrypted:" + new String(decrypted));
-    }
 
 }
 

@@ -6,7 +6,10 @@ import org.slf4j.LoggerFactory;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+import java.util.Base64;
 import java.util.Objects;
 
 
@@ -18,21 +21,18 @@ public class SymmetricCipher {
 
     protected static Logger logger = LoggerFactory.getLogger(SymmetricCipher.class);
 
-    private Algorithm algorithm;
+    private final SymmetricAlgorithm algorithm;
 
     private SecretKey secretKey;
 
     private IvParameterSpec ivParameterSpec;
 
-    private SymmetricCipher(Algorithm algorithm) {
+    private SymmetricCipher(SymmetricAlgorithm algorithm) {
         Objects.requireNonNull(algorithm, "加密算法不能为空");
         this.algorithm = algorithm;
     }
 
-    /**
-     * 创建密码器
-     */
-    public static SymmetricCipher create(Algorithm algorithm) {
+    public static SymmetricCipher create(SymmetricAlgorithm algorithm) {
         SymmetricCipher symmetricCipher = new SymmetricCipher(algorithm);
 
         try {
@@ -48,19 +48,32 @@ public class SymmetricCipher {
         return symmetricCipher;
     }
 
-    /**
-     * 创建DES密码器
-     */
-    public static SymmetricCipher create() {
-        return create(Algorithm.DES);
+    public static SymmetricCipher create(SymmetricAlgorithm algorithm, byte[] secretKey) {
+        SymmetricCipher symmetricCipher = new SymmetricCipher(algorithm);
+        SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey, algorithm.cipher);
+
+        try {
+            SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(algorithm.cipher);
+            symmetricCipher.secretKey = secretKeyFactory.generateSecret(secretKeySpec);
+            symmetricCipher.ivParameterSpec = new IvParameterSpec(symmetricCipher.secretKey.getEncoded());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        return symmetricCipher;
     }
 
-    public Algorithm getAlgorithm() {
+    public static SymmetricCipher create(SymmetricAlgorithm algorithm, String secretKey) {
+        return create(algorithm, Base64.getDecoder().decode(secretKey));
+    }
+
+    public SymmetricAlgorithm getAlgorithm() {
         return algorithm;
     }
 
-    public byte[] getSecretKey() {
-        return secretKey.getEncoded();
+    public String getSecretKey() {
+        return Base64.getEncoder().encodeToString(secretKey.getEncoded());
     }
 
     /**
@@ -90,33 +103,6 @@ public class SymmetricCipher {
             e.printStackTrace();
             return null;
         }
-    }
-
-    public enum Algorithm {
-        DES("DES", "DES/CBC/PKCS5Padding", 56),
-        AES("AES", "AES/CBC/PKCS5PADDING", 128);
-
-        public final String cipher;
-
-        public final String transformation;
-
-        public final int keySize;
-
-        Algorithm(String cipher, String transformation, int keySize) {
-            this.cipher = cipher;
-            this.transformation = transformation;
-            this.keySize = keySize;
-        }
-
-        @Override
-        public String toString() {
-            return "Algorithm{" +
-                    "cipher='" + cipher + '\'' +
-                    ", transformation='" + transformation + '\'' +
-                    ", keySize=" + keySize +
-                    '}';
-        }
-
     }
 
 }
