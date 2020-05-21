@@ -4,7 +4,7 @@ import org.bson.codecs.Codec;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import quan.common.ClassUtils;
+import quan.common.utils.ClassUtils;
 
 import java.lang.reflect.Modifier;
 import java.util.HashMap;

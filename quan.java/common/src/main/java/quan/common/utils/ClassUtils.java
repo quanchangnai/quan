@@ -1,4 +1,4 @@
-package quan.common;
+package quan.common.utils;
 
 import net.bytebuddy.agent.ByteBuddyAgent;
 import net.bytebuddy.jar.asm.ClassReader;

@@ -11,7 +11,7 @@ import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.conversions.Bson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import quan.common.ClassUtils;
+import quan.common.utils.ClassUtils;
 import quan.common.NamedThreadFactory;
 import quan.data.Data;
 import quan.data.DataCodecRegistry;

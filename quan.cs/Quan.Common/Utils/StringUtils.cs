@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Quan.Common
+namespace Quan.Common.Utils
 {
     public static class StringUtils
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 </#if>
 using Newtonsoft.Json.Linq;
-using Quan.Common;
+using Quan.Common.Utils;
 <#if !(parentName??) || definitionType == 6>
 using Quan.Config;
 </#if>

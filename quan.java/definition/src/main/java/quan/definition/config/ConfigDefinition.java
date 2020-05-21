@@ -1,7 +1,7 @@
 package quan.definition.config;
 
 import org.apache.commons.lang3.StringUtils;
-import quan.common.PathUtils;
+import quan.common.utils.PathUtils;
 import quan.definition.*;
 
 import java.io.File;

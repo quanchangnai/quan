@@ -9,7 +9,7 @@ import org.bson.BsonWriter;
 import org.bson.json.JsonReader;
 import org.bson.json.JsonWriter;
 import org.junit.Test;
-import quan.common.ClassUtils;
+import quan.common.utils.ClassUtils;
 import quan.data.Transaction;
 import quan.data.item.ItemEntity;
 import quan.data.item.ItemEntity2;

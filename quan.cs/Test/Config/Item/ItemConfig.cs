@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using Newtonsoft.Json.Linq;
-using Quan.Common;
+using Quan.Common.Utils;
 using Quan.Config;
 using System;
 
