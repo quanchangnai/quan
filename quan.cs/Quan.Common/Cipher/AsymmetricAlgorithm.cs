@@ -18,5 +18,10 @@ namespace Quan.Common.Cipher
             Transformation = transformation;
             Signature = signature;
         }
+
+        public override string ToString()
+        {
+            return $"{nameof(Cipher)}: {Cipher}, {nameof(Transformation)}: {Transformation}, {nameof(Signature)}: {Signature}";
+        }
     }
 }

@@ -1,8 +1,5 @@
 package quan.common.cipher;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -18,8 +15,6 @@ import java.util.Objects;
  */
 public class SymmetricCipher {
 
-    protected static Logger logger = LoggerFactory.getLogger(SymmetricCipher.class);
-
     private final SymmetricAlgorithm algorithm;
 
     private SecretKey secretKey;
@@ -32,6 +27,10 @@ public class SymmetricCipher {
         this.ivParameterSpec = new IvParameterSpec(algorithm.iv.getBytes());
     }
 
+    public static SymmetricCipher create() {
+        return create(SymmetricAlgorithm.DES);
+    }
+
     public static SymmetricCipher create(SymmetricAlgorithm algorithm) {
         SymmetricCipher symmetricCipher = new SymmetricCipher(algorithm);
 
@@ -40,8 +39,7 @@ public class SymmetricCipher {
             keyGenerator.init(algorithm.keySize);
             symmetricCipher.secretKey = keyGenerator.generateKey();
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException(e);
         }
 
         return symmetricCipher;
@@ -78,8 +76,7 @@ public class SymmetricCipher {
             cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivParameterSpec);
             return cipher.doFinal(data);
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException(e);
         }
     }
 
@@ -92,8 +89,7 @@ public class SymmetricCipher {
             cipher.init(Cipher.DECRYPT_MODE, secretKey, ivParameterSpec);
             return cipher.doFinal(data);
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException(e);
         }
     }
 

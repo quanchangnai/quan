@@ -21,5 +21,10 @@ namespace Quan.Common.Cipher
             Iv = iv;
             KeySize = keySize;
         }
+
+        public override string ToString()
+        {
+            return $"{nameof(Cipher)}: {Cipher}, {nameof(Transformation)}: {Transformation}, {nameof(Iv)}: {Iv}, {nameof(KeySize)}: {KeySize}";
+        }
     }
 }

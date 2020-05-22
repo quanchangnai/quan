@@ -1,8 +1,5 @@
 package quan.common.cipher;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.crypto.Cipher;
 import java.security.*;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -12,12 +9,10 @@ import java.util.Objects;
 
 
 /**
- * 非对称加密器，支持RSA、DES算法，支持数字签名
+ * 非对称加密器，支持RSA、DSA算法，支持数字签名
  * Created by quanchangnai on 2020/5/21.
  */
 public class AsymmetricCipher {
-
-    protected static Logger logger = LoggerFactory.getLogger(AsymmetricCipher.class);
 
     private final AsymmetricAlgorithm algorithm;
 
@@ -28,6 +23,10 @@ public class AsymmetricCipher {
     private AsymmetricCipher(AsymmetricAlgorithm algorithm) {
         Objects.requireNonNull(algorithm, "加密算法不能为空");
         this.algorithm = algorithm;
+    }
+
+    public static AsymmetricCipher create() {
+        return create(AsymmetricAlgorithm.RSA, 1024);
     }
 
     public static AsymmetricCipher create(AsymmetricAlgorithm algorithm) {
@@ -41,8 +40,7 @@ public class AsymmetricCipher {
         try {
             keyPairGenerator = KeyPairGenerator.getInstance(algorithm.cipher);
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException(e);
         }
 
         keyPairGenerator.initialize(keySize);
@@ -64,8 +62,7 @@ public class AsymmetricCipher {
             asymmetricCipher.publicKey = keyFactory.generatePublic(publicKeySpec);
             asymmetricCipher.privateKey = keyFactory.generatePrivate(privateKeySpec);
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException(e);
         }
 
         return asymmetricCipher;
@@ -79,7 +76,6 @@ public class AsymmetricCipher {
     public AsymmetricAlgorithm getAlgorithm() {
         return algorithm;
     }
-
 
     public byte[] getPublicKey() {
         return publicKey.getEncoded();
@@ -110,8 +106,7 @@ public class AsymmetricCipher {
             cipher.init(Cipher.ENCRYPT_MODE, usePrivateKey ? privateKey : publicKey);
             return cipher.doFinal(data);
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException(e);
         }
     }
 
@@ -137,8 +132,7 @@ public class AsymmetricCipher {
             cipher.init(Cipher.DECRYPT_MODE, usePublicKey ? publicKey : privateKey);
             return cipher.doFinal(data);
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException(e);
         }
     }
 
@@ -155,25 +149,24 @@ public class AsymmetricCipher {
      */
     public byte[] sign(byte[] data) {
         try {
-            Signature signature = Signature.getInstance(algorithm.signature);
-            signature.initSign(privateKey);
-            signature.update(data);
-            return signature.sign();
+            Signature signer = Signature.getInstance(algorithm.signature);
+            signer.initSign(privateKey);
+            signer.update(data);
+            return signer.sign();
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException(e);
         }
     }
 
     /**
      * 用公钥验签
      */
-    public boolean verify(byte[] data, byte[] sign) {
+    public boolean verify(byte[] data, byte[] signature) {
         try {
-            Signature signature = Signature.getInstance(algorithm.signature);
-            signature.initVerify(publicKey);
-            signature.update(data);
-            return signature.verify(sign);
+            Signature signer = Signature.getInstance(algorithm.signature);
+            signer.initVerify(publicKey);
+            signer.update(data);
+            return signer.verify(signature);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

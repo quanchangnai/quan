@@ -23,6 +23,10 @@ namespace Quan.Common.Cipher
 
         private readonly AsymmetricKeyParameter _privateKeyParameter;
 
+        public AsymmetricCipher() : this(AsymmetricAlgorithm.Rsa)
+        {
+        }
+
         public AsymmetricCipher(AsymmetricAlgorithm algorithm, int keySize = 1024)
         {
             Algorithm = algorithm ?? throw new NullReferenceException("加密算法不能为空");
@@ -124,12 +128,12 @@ namespace Quan.Common.Cipher
         /// <summary>
         /// 用公钥验签
         /// </summary>
-        public bool Verify(byte[] data, byte[] sign)
+        public bool Verify(byte[] data, byte[] signature)
         {
             var signer = SignerUtilities.GetSigner(Algorithm.Signature);
             signer.Init(false, _publicKeyParameter);
             signer.BlockUpdate(data, 0, data.Length);
-            return signer.VerifySignature(sign);
+            return signer.VerifySignature(signature);
         }
     }
 }

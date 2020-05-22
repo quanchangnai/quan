@@ -69,13 +69,13 @@ public class CipherTest {
         System.err.println("===========privateKey===========");
         System.err.println(asymmetricCipher.getBase64PrivateKey());
 
-        byte[] sign = asymmetricCipher.sign(data.getBytes());
-        System.err.println("sign:" + Base64.getEncoder().encodeToString(sign));
+        byte[] signature = asymmetricCipher.sign(data.getBytes());
+        System.err.println("signature:" + Base64.getEncoder().encodeToString(signature));
 
-        boolean verify = asymmetricCipher.verify(data.getBytes(), sign);
-        System.err.println("verify:" + verify);
+        boolean verification = asymmetricCipher.verify(data.getBytes(), signature);
+        System.err.println("verification:" + verification);
 
-        Assert.assertTrue(verify);
+        Assert.assertTrue(verification);
         System.err.println();
     }
 

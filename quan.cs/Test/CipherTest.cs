@@ -12,6 +12,7 @@ namespace Test
             Console.WriteLine(data);
 
             var cipher = new AsymmetricCipher(AsymmetricAlgorithm.Rsa);
+
             Console.WriteLine("=====================publicKey================");
             Console.WriteLine(cipher.Base64PublicKey);
             Console.WriteLine();
@@ -83,13 +84,13 @@ namespace Test
             var cipher = new AsymmetricCipher(AsymmetricAlgorithm.Dsa, publicKey, privateKey);
 
             var data = Encoding.UTF8.GetBytes(text);
-            var sign = cipher.Sign(data);
-            Console.WriteLine($"sign:{Convert.ToBase64String(sign)}");
+            var signature = cipher.Sign(data);
+            Console.WriteLine($"signature:{Convert.ToBase64String(signature)}");
 
-            sign = Convert.FromBase64String("MCwCFGSjitt2rP7A8p3mcFmjjkuvAsCUAhQvlzprmCWVqEbLrs928Kl2QA2h2g==");
+            signature = Convert.FromBase64String("MCwCFGSjitt2rP7A8p3mcFmjjkuvAsCUAhQvlzprmCWVqEbLrs928Kl2QA2h2g==");
 
-            var verify = cipher.Verify(data, sign);
-            Console.WriteLine($"verify:{verify}");
+            var verification = cipher.Verify(data, signature);
+            Console.WriteLine($"verification:{verification}");
         }
 
 
