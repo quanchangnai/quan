@@ -1,11 +1,8 @@
 using System;
-using System.IO;
-using System.Security.Cryptography;
-using System.Text;
 using Org.BouncyCastle.Crypto;
-using Org.BouncyCastle.Crypto.Engines;
+using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Parameters;
-using Org.BouncyCastle.OpenSsl;
+using Org.BouncyCastle.Pkcs;
 using Org.BouncyCastle.Security;
 using Org.BouncyCastle.X509;
 
@@ -16,73 +13,123 @@ namespace Quan.Common.Cipher
     /// </summary>
     public class AsymmetricCipher
     {
-        private readonly string _algorithm = "RSA/ECB/PKCS1Padding";
+        public readonly AsymmetricAlgorithm Algorithm;
 
-        private readonly string _publicKey;
+        private byte[] _publicKey;
 
-        private readonly string _privateKey;
+        private byte[] _privateKey;
 
         private readonly AsymmetricKeyParameter _publicKeyParameter;
 
-        private readonly AsymmetricKeyParameter _privateParameter;
+        private readonly AsymmetricKeyParameter _privateKeyParameter;
 
-        public AsymmetricCipher()
+        public AsymmetricCipher(AsymmetricAlgorithm algorithm, int keySize = 1024)
         {
-            var provider = new RSACryptoServiceProvider();
-            _publicKey = provider.ToXmlString(true);
-            _privateKey = provider.ToXmlString(false);
+            Algorithm = algorithm ?? throw new NullReferenceException("加密算法不能为空");
+            var keyGenerator = GeneratorUtilities.GetKeyPairGenerator(algorithm.Cipher);
+            var random = new SecureRandom();
+
+            if (algorithm == AsymmetricAlgorithm.Dsa)
+            {
+                var dsaParametersGenerator = new DsaParametersGenerator();
+                dsaParametersGenerator.Init(keySize, 100, random);
+                keyGenerator.Init(new DsaKeyGenerationParameters(random, dsaParametersGenerator.GenerateParameters()));
+            }
+            else
+            {
+                keyGenerator.Init(new KeyGenerationParameters(new SecureRandom(), keySize));
+            }
+
+            var keyPair = keyGenerator.GenerateKeyPair();
+            _publicKeyParameter = keyPair.Public;
+            _privateKeyParameter = keyPair.Private;
         }
 
-        public AsymmetricCipher(string publicKey, string privateKey)
+        public AsymmetricCipher(AsymmetricAlgorithm algorithm, byte[] publicKey, byte[] privateKey)
         {
+            Algorithm = algorithm ?? throw new NullReferenceException("加密算法不能为空");
+            _publicKeyParameter = PublicKeyFactory.CreateKey(publicKey);
+            _privateKeyParameter = PrivateKeyFactory.CreateKey(privateKey);
             _publicKey = publicKey;
             _privateKey = privateKey;
-            _publicKeyParameter = PublicKeyFactory.CreateKey(Convert.FromBase64String(publicKey));
-            _privateParameter = PrivateKeyFactory.CreateKey(Convert.FromBase64String(privateKey));
         }
 
-        public byte[] EncryptByPublicKey(byte[] data)
+        public AsymmetricCipher(AsymmetricAlgorithm algorithm, string publicKey, string privateKey) :
+            this(algorithm, Convert.FromBase64String(publicKey), Convert.FromBase64String(privateKey))
         {
-            var cipher = CipherUtilities.GetCipher(_algorithm);
-            cipher.Init(true, _publicKeyParameter);
+        }
+
+        public byte[] PublicKey
+        {
+            get
+            {
+                if (_publicKey == null)
+                {
+                    _publicKey = SubjectPublicKeyInfoFactory.CreateSubjectPublicKeyInfo(_publicKeyParameter).GetDerEncoded();
+                }
+
+                return (byte[]) _publicKey.Clone();
+            }
+        }
+
+        public byte[] PrivateKey
+        {
+            get
+            {
+                if (_privateKey == null)
+                {
+                    _privateKey = PrivateKeyInfoFactory.CreatePrivateKeyInfo(_privateKeyParameter).GetDerEncoded();
+                }
+
+                return (byte[]) _privateKey.Clone();
+            }
+        }
+
+        public string Base64PublicKey => Convert.ToBase64String(PublicKey);
+
+        public string Base64PrivateKey => Convert.ToBase64String(PrivateKey);
+
+
+        /// <summary>
+        /// 加密
+        /// </summary>
+        public byte[] Encrypt(byte[] data, bool usePrivateKey = true)
+        {
+            var cipher = CipherUtilities.GetCipher(Algorithm.Transformation);
+            cipher.Init(true, usePrivateKey ? _privateKeyParameter : _publicKeyParameter);
             return cipher.DoFinal(data);
         }
 
-        public byte[] DecryptByPublicKey(byte[] data)
+        /// <summary>
+        /// 解密
+        /// </summary>
+        public byte[] Decrypt(byte[] data, bool usePublicKey = true)
         {
-            var cipher = CipherUtilities.GetCipher(_algorithm);
-            cipher.Init(false, _publicKeyParameter);
+            var cipher = CipherUtilities.GetCipher(Algorithm.Transformation);
+            cipher.Init(false, usePublicKey ? _publicKeyParameter : _privateKeyParameter);
             return cipher.DoFinal(data);
         }
 
-        public byte[] EncryptByPrivateKey(byte[] data)
+        /// <summary>
+        /// 用私钥签名
+        /// </summary>
+        public byte[] Sign(byte[] data)
         {
-            var cipher = CipherUtilities.GetCipher(_algorithm);
-            cipher.Init(true, _privateParameter);
-            return cipher.DoFinal(data);
+            var signer = SignerUtilities.GetSigner(Algorithm.Signature);
+            signer.Init(true, _privateKeyParameter);
+            signer.BlockUpdate(data, 0, data.Length);
+            return signer.GenerateSignature();
         }
 
-        public byte[] DecryptByPrivateKey(byte[] data)
+        /// <summary>
+        /// 用公钥验签
+        /// </summary>
+        public bool Verify(byte[] data, byte[] sign)
         {
-            var cipher = CipherUtilities.GetCipher(_algorithm);
-            cipher.Init(false, _privateParameter);
-            return cipher.DoFinal(data);
-        }
-
-        public static void Test()
-        {
-            var publicKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCjoHfRKSPSURhRYJu9UtgkvP2TFjOI4fHbXUmsBgIU1TiNugP/JepY5lMZ6ISF3zg0QO5DTJ09god76BZVFKnKAsWA4Dqcv3bNVUneSZygtsB/SCzjUQ9o8bZkiCd5vaAOER/Z6g75jtl8XGtjE7GtQ/ezd37JQR7xZ2axZrWtdQIDAQAB";
-            var privateKey =
-                "MIICdQIBADANBgkqhkiG9w0BAQEFAASCAl8wggJbAgEAAoGBAKOgd9EpI9JRGFFgm71S2CS8/ZMWM4jh8dtdSawGAhTVOI26A/8l6ljmUxnohIXfODRA7kNMnT2Ch3voFlUUqcoCxYDgOpy/ds1VSd5JnKC2wH9ILONRD2jxtmSIJ3m9oA4RH9nqDvmO2Xxca2MTsa1D97N3fslBHvFnZrFmta11AgMBAAECgYBGaYVmApghpzgZvMMII6BTnuhX5VPj8acMSQas+iDnKiIeCxAxOfWwr9zO51ov6bDb+50MZOm9UHBRB7ykfDHbxkFXCLA3Tesr2/X3+0Iyz30pu1ctCOcjlJaHQpnE09okYI9kZpkTzzK3Hkm59wE/9SOor5Ag70hrXcAApwIceQJBANKXscBScD6nySdmbxBjfPc+UwSEFIwb+XYey3hJHNY9rKuA4opRTTWMB9JaFfgeXeRP8y5Fd+B8Y1R6n9z5KKcCQQDG6FsBtEmj6mVL/ZPr2JeUAo1Z7VH9uB6bG5o2sTeeERAz3GSqZd+K7s/LSjbJ9XbIuGHoFrE4wT+uIfwD9yCDAkAyUVKEXG47WkXC50PES7ExNjAJ1TE/pPN/GK6PKBD+06+tLtdyKyjikXnQ9ftn1IGkqsG1HZ4eAjqNldsapmHjAkApMEZgJPg21Dvjr3/pD7HbuWeR3p3i3zSfQ+j8OFhfCAOF6baCvpO6zlcDLrwHuCe/ysaja8eJDCNmqKzqGUuHAkBlTjExgc35J2TY1pn4FE1pqj8Yavll4vfiDhIrRwLdVJyKq8Sjm4OzVFAkk3rMkqPR/ZL3cxb45RMmtGkYwVQ9";
-
-            var cipher = new AsymmetricCipher(publicKey, privateKey);
-
-            var encrypted = cipher.EncryptByPrivateKey(Encoding.UTF8.GetBytes("dadasdaswe"));
-            Console.WriteLine($"encrypted:{Convert.ToBase64String(encrypted)}");
-            // var decrypted = cipher.DecryptByPublicKey(encrypted);
-            var decrypted = cipher.DecryptByPublicKey(Convert.FromBase64String("G1YUdj8OxVRRLe0AZFmbhQZjvHfrSsTb2IxvxIKLZ42w27G/TyrLiPz0vptKhoNmUKyzWqe53jkmTnF+JcigykElyXnsXFTKMp/eGuCxTHBTvVLZWQNhw/nvmrK+ajAPU15CzV2po0Xj+2SCffsP0+WG/gXjVSeQAuIqeLcLbZM="));
-
-            Console.WriteLine($"decrypted:{Encoding.UTF8.GetString(decrypted)}");
+            var signer = SignerUtilities.GetSigner(Algorithm.Signature);
+            signer.Init(false, _publicKeyParameter);
+            signer.BlockUpdate(data, 0, data.Length);
+            return signer.VerifySignature(sign);
         }
     }
 }

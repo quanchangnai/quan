@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CipherTest.cs" />
     <Compile Include="ConfigTest.cs" />
     <Compile Include="Config\Common\ConstantConfig.cs" />
     <Compile Include="Config\Common\ItemConstant.cs" />

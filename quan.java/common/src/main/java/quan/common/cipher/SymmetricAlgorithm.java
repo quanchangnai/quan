@@ -1,28 +1,33 @@
 package quan.common.cipher;
 
 public enum SymmetricAlgorithm {
-        DES("DES", "DES/CBC/PKCS5Padding", 56),
-        AES("AES", "AES/CBC/PKCS5PADDING", 128);
 
-        public final String cipher;
+    DES("DES", "DES/CBC/PKCS5Padding", "12345678", 56),
 
-        public final String transformation;
+    AES("AES", "AES/CBC/PKCS5Padding", "1234567812345678", 128);
 
-        public final int keySize;
+    public final String cipher;
 
-        SymmetricAlgorithm(String cipher, String transformation, int keySize) {
-            this.cipher = cipher;
-            this.transformation = transformation;
-            this.keySize = keySize;
-        }
+    public final String transformation;
 
-        @Override
-        public String toString() {
-            return "Algorithm{" +
-                    "cipher='" + cipher + '\'' +
-                    ", transformation='" + transformation + '\'' +
-                    ", keySize=" + keySize +
-                    '}';
-        }
+    public final String iv;
 
+    public final int keySize;
+
+    SymmetricAlgorithm(String cipher, String transformation, String iv, int keySize) {
+        this.cipher = cipher;
+        this.transformation = transformation;
+        this.iv = iv;
+        this.keySize = keySize;
     }
+
+    @Override
+    public String toString() {
+        return "Algorithm{" +
+                "cipher='" + cipher + '\'' +
+                ", transformation='" + transformation + '\'' +
+                ", keySize=" + keySize +
+                '}';
+    }
+
+}

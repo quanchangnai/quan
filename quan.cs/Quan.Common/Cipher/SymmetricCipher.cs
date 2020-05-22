@@ -1,90 +1,63 @@
 using System;
-using System.IO;
-using System.Security.Cryptography;
 using System.Text;
+using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Security;
 
 namespace Quan.Common.Cipher
 {
-    /// <summary>
-    /// 对称加密器，支持DES、AES算法
-    /// </summary>
-    public enum SymmetricAlgorithm
-    {
-        Des, Aes
-    }
-
     /// <summary>
     /// 对称加密器
     /// </summary>
     public class SymmetricCipher
     {
-        public SymmetricAlgorithm Algorithm { get; private set; }
+        private readonly ParametersWithIV _keyParameter;
 
-        private ICryptoTransform _encryptor;
+        public readonly SymmetricAlgorithm Algorithm;
 
-        private ICryptoTransform _decryptor;
-
-        private SymmetricCipher()
+        public SymmetricCipher(SymmetricAlgorithm algorithm, byte[] secretKey = null)
         {
-        }
+            Algorithm = algorithm ?? throw new NullReferenceException("加密算法不能为空");
 
-        public static SymmetricCipher Create(SymmetricAlgorithm algorithm = SymmetricAlgorithm.Des, byte[] secretKey = null)
-        {
-            var cipher = new SymmetricCipher {Algorithm = algorithm};
-
-            if (algorithm == SymmetricAlgorithm.Des)
+            if (secretKey == null)
             {
-                var provider = new DESCryptoServiceProvider();
-                secretKey = secretKey ?? provider.Key;
-                cipher._encryptor = provider.CreateEncryptor(secretKey, secretKey);
-                cipher._decryptor = provider.CreateDecryptor(secretKey, secretKey);
-            }
-            else
-            {
-                var provider = new AesCryptoServiceProvider();
-                secretKey = secretKey ?? provider.Key;
-                cipher._encryptor = provider.CreateEncryptor(secretKey, secretKey);
-                cipher._decryptor = provider.CreateDecryptor(secretKey, secretKey);
+                var keyGenerator = GeneratorUtilities.GetKeyGenerator(algorithm.Cipher);
+                keyGenerator.Init(new KeyGenerationParameters(new SecureRandom(), algorithm.KeySize));
+                secretKey = keyGenerator.GenerateKey();
             }
 
-            return cipher;
+            _keyParameter = new ParametersWithIV(ParameterUtilities.CreateKeyParameter(algorithm.Cipher, secretKey), Encoding.UTF8.GetBytes(algorithm.Iv));
         }
+
+        public SymmetricCipher(SymmetricAlgorithm algorithm, string secretKey)
+        {
+            Algorithm = algorithm ?? throw new NullReferenceException("加密算法不能为空");
+            _keyParameter = new ParametersWithIV(ParameterUtilities.CreateKeyParameter(algorithm.Cipher, Convert.FromBase64String(secretKey)), Encoding.UTF8.GetBytes(algorithm.Iv));
+        }
+
+        public byte[] SecretKey => ((KeyParameter) _keyParameter.Parameters).GetKey();
+
+        public string Base64SecretKey => Convert.ToBase64String(SecretKey);
 
 
         /// <summary>
         /// 加密
         /// </summary>
-        /// <param name="data"></param>
-        /// <returns></returns>
         public byte[] Encrypt(byte[] data)
         {
-            var memoryStream = new MemoryStream();
-            var cryptoStream = new CryptoStream(memoryStream, _encryptor, CryptoStreamMode.Write);
-            cryptoStream.Write(data, 0, data.Length);
-            cryptoStream.FlushFinalBlock();
-            return memoryStream.ToArray();
+            var cipher = CipherUtilities.GetCipher(Algorithm.Transformation);
+            cipher.Init(true, _keyParameter);
+            return cipher.DoFinal(data);
         }
 
         /// <summary>
         /// 解密
         /// </summary>
-        /// <param name="data"></param>
-        /// <returns></returns>
         public byte[] Decrypt(byte[] data)
         {
-            var memoryStream = new MemoryStream();
-            var cryptoStream = new CryptoStream(memoryStream, _decryptor, CryptoStreamMode.Write);
-            cryptoStream.Write(data, 0, data.Length);
-            cryptoStream.FlushFinalBlock();
-            return memoryStream.ToArray();
-        }
-
-        public static void Test()
-        {
-            var cipher = Create();
-            var encrypted = cipher.Encrypt(Encoding.UTF8.GetBytes("dadasdaswe"));
-            var decrypted = cipher.Decrypt(encrypted);
-            Console.WriteLine($"decrypted:${Encoding.UTF8.GetString(decrypted)}");
+            var cipher = CipherUtilities.GetCipher(Algorithm.Transformation);
+            cipher.Init(false, _keyParameter);
+            return cipher.DoFinal(data);
         }
     }
 }

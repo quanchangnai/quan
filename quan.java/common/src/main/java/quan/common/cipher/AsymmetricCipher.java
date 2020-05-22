@@ -30,26 +30,8 @@ public class AsymmetricCipher {
         this.algorithm = algorithm;
     }
 
-    public static AsymmetricCipher create(AsymmetricAlgorithm algorithm, byte[] publicKey, byte[] privateKey) {
-        AsymmetricCipher asymmetricCipher = new AsymmetricCipher(algorithm);
-        X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(publicKey);
-        PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(privateKey);
-
-        try {
-            KeyFactory keyFactory = KeyFactory.getInstance(algorithm.cipher);
-            asymmetricCipher.publicKey = keyFactory.generatePublic(publicKeySpec);
-            asymmetricCipher.privateKey = keyFactory.generatePrivate(privateKeySpec);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-
-        return asymmetricCipher;
-    }
-
-
-    public static AsymmetricCipher create(AsymmetricAlgorithm algorithm, String publicKey, String privateKey) {
-        return create(algorithm, Base64.getDecoder().decode(publicKey), Base64.getDecoder().decode(privateKey));
+    public static AsymmetricCipher create(AsymmetricAlgorithm algorithm) {
+        return create(algorithm, 1024);
     }
 
     public static AsymmetricCipher create(AsymmetricAlgorithm algorithm, int keySize) {
@@ -72,30 +54,60 @@ public class AsymmetricCipher {
         return asymmetricCipher;
     }
 
-    public static AsymmetricCipher create(AsymmetricAlgorithm algorithm) {
-        return create(algorithm, 1024);
+    public static AsymmetricCipher create(AsymmetricAlgorithm algorithm, byte[] publicKey, byte[] privateKey) {
+        AsymmetricCipher asymmetricCipher = new AsymmetricCipher(algorithm);
+        X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(publicKey);
+        PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(privateKey);
+
+        try {
+            KeyFactory keyFactory = KeyFactory.getInstance(algorithm.cipher);
+            asymmetricCipher.publicKey = keyFactory.generatePublic(publicKeySpec);
+            asymmetricCipher.privateKey = keyFactory.generatePrivate(privateKeySpec);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        return asymmetricCipher;
+    }
+
+
+    public static AsymmetricCipher create(AsymmetricAlgorithm algorithm, String publicKey, String privateKey) {
+        return create(algorithm, Base64.getDecoder().decode(publicKey), Base64.getDecoder().decode(privateKey));
     }
 
     public AsymmetricAlgorithm getAlgorithm() {
         return algorithm;
     }
 
-    public String getPrivateKey() {
+
+    public byte[] getPublicKey() {
+        return publicKey.getEncoded();
+    }
+
+    public byte[] getPrivateKey() {
+        return privateKey.getEncoded();
+    }
+
+    public String getBase64PublicKey() {
+        return Base64.getEncoder().encodeToString(publicKey.getEncoded());
+    }
+
+    public String getBase64PrivateKey() {
         return Base64.getEncoder().encodeToString(privateKey.getEncoded());
     }
 
-    public String getPublicKey() {
-        return Base64.getEncoder().encodeToString(privateKey.getEncoded());
-    }
-
-
     /**
-     * 用公钥加密
+     * 加密
+     *
+     * @param data          待加密数据
+     * @param usePrivateKey 使用私钥还是公钥加密
+     * @return 已加密数据
      */
-    public byte[] encryptByPublicKey(byte[] data) {
+    public byte[] encrypt(byte[] data, boolean usePrivateKey) {
         try {
             Cipher cipher = Cipher.getInstance(algorithm.transformation);
-            cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+            cipher.init(Cipher.ENCRYPT_MODE, usePrivateKey ? privateKey : publicKey);
             return cipher.doFinal(data);
         } catch (Exception e) {
             e.printStackTrace();
@@ -105,12 +117,24 @@ public class AsymmetricCipher {
 
 
     /**
-     * 用公钥解密
+     * 使用私钥加密
      */
-    public byte[] decryptByPublicKey(byte[] data) {
+    public byte[] encrypt(byte[] data) {
+        return encrypt(data, true);
+    }
+
+
+    /**
+     * 解密
+     *
+     * @param data         待解密数据
+     * @param usePublicKey 使用公钥还是私钥解密
+     * @return 已解密数据
+     */
+    public byte[] decrypt(byte[] data, boolean usePublicKey) {
         try {
             Cipher cipher = Cipher.getInstance(algorithm.transformation);
-            cipher.init(Cipher.DECRYPT_MODE, publicKey);
+            cipher.init(Cipher.DECRYPT_MODE, usePublicKey ? publicKey : privateKey);
             return cipher.doFinal(data);
         } catch (Exception e) {
             e.printStackTrace();
@@ -119,32 +143,12 @@ public class AsymmetricCipher {
     }
 
     /**
-     * 用私钥加密
+     * 使用公钥解密
      */
-    public byte[] encryptByPrivateKey(byte[] data) {
-        try {
-            Cipher cipher = Cipher.getInstance(algorithm.transformation);
-            cipher.init(Cipher.ENCRYPT_MODE, privateKey);
-            return cipher.doFinal(data);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+    public byte[] decrypt(byte[] data) {
+        return decrypt(data, true);
     }
 
-    /**
-     * 用私钥解密
-     */
-    public byte[] decryptByPrivateKey(byte[] data) {
-        try {
-            Cipher cipher = Cipher.getInstance(algorithm.transformation);
-            cipher.init(Cipher.DECRYPT_MODE, privateKey);
-            return cipher.doFinal(data);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
 
     /**
      * 用私钥签名
@@ -179,12 +183,10 @@ public class AsymmetricCipher {
     public String toString() {
         return "RsaCipher{" +
                 "algorithm='" + algorithm + '\'' +
-                ", publicKey=" + getPublicKey() +
-                ", privateKey=" + getPrivateKey() +
+                ", publicKey=" + getBase64PublicKey() +
+                ", privateKey=" + getBase64PrivateKey() +
                 '}';
     }
-
-
 
 }
 

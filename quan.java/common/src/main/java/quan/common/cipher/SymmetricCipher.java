@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
@@ -30,6 +29,7 @@ public class SymmetricCipher {
     private SymmetricCipher(SymmetricAlgorithm algorithm) {
         Objects.requireNonNull(algorithm, "加密算法不能为空");
         this.algorithm = algorithm;
+        this.ivParameterSpec = new IvParameterSpec(algorithm.iv.getBytes());
     }
 
     public static SymmetricCipher create(SymmetricAlgorithm algorithm) {
@@ -39,7 +39,6 @@ public class SymmetricCipher {
             KeyGenerator keyGenerator = KeyGenerator.getInstance(algorithm.cipher);
             keyGenerator.init(algorithm.keySize);
             symmetricCipher.secretKey = keyGenerator.generateKey();
-            symmetricCipher.ivParameterSpec = new IvParameterSpec(symmetricCipher.secretKey.getEncoded());
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -50,17 +49,7 @@ public class SymmetricCipher {
 
     public static SymmetricCipher create(SymmetricAlgorithm algorithm, byte[] secretKey) {
         SymmetricCipher symmetricCipher = new SymmetricCipher(algorithm);
-        SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey, algorithm.cipher);
-
-        try {
-            SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(algorithm.cipher);
-            symmetricCipher.secretKey = secretKeyFactory.generateSecret(secretKeySpec);
-            symmetricCipher.ivParameterSpec = new IvParameterSpec(symmetricCipher.secretKey.getEncoded());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-
+        symmetricCipher.secretKey = new SecretKeySpec(secretKey, algorithm.cipher);
         return symmetricCipher;
     }
 
@@ -72,7 +61,11 @@ public class SymmetricCipher {
         return algorithm;
     }
 
-    public String getSecretKey() {
+    public byte[] getSecretKey() {
+        return secretKey.getEncoded();
+    }
+
+    public String getBase64SecretKey() {
         return Base64.getEncoder().encodeToString(secretKey.getEncoded());
     }
 
@@ -96,7 +89,6 @@ public class SymmetricCipher {
     public byte[] decrypt(byte[] data) {
         try {
             Cipher cipher = Cipher.getInstance(algorithm.transformation);
-            IvParameterSpec ivParameterSpec = new IvParameterSpec(secretKey.getEncoded());
             cipher.init(Cipher.DECRYPT_MODE, secretKey, ivParameterSpec);
             return cipher.doFinal(data);
         } catch (Exception e) {
