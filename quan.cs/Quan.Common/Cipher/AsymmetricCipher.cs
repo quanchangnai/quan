@@ -23,10 +23,6 @@ namespace Quan.Common.Cipher
 
         private readonly AsymmetricKeyParameter _privateKeyParameter;
 
-        public AsymmetricCipher() : this(AsymmetricAlgorithm.Rsa)
-        {
-        }
-
         public AsymmetricCipher(AsymmetricAlgorithm algorithm, int keySize = 1024)
         {
             Algorithm = algorithm ?? throw new NullReferenceException("加密算法不能为空");
@@ -60,10 +56,6 @@ namespace Quan.Common.Cipher
 
         public AsymmetricCipher(AsymmetricAlgorithm algorithm, string publicKey, string privateKey) :
             this(algorithm, Convert.FromBase64String(publicKey), Convert.FromBase64String(privateKey))
-        {
-        }
-
-        public AsymmetricCipher(string publicKey, string privateKey) : this(AsymmetricAlgorithm.Rsa, publicKey, privateKey)
         {
         }
 

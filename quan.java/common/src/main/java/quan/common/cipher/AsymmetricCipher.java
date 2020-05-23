@@ -20,10 +20,6 @@ public class AsymmetricCipher {
 
     private final PrivateKey privateKey;
 
-    public AsymmetricCipher() {
-        this(AsymmetricAlgorithm.RSA, 1024);
-    }
-
     public AsymmetricCipher(AsymmetricAlgorithm algorithm) {
         this(algorithm, 1024);
     }
@@ -60,10 +56,6 @@ public class AsymmetricCipher {
 
     public AsymmetricCipher(AsymmetricAlgorithm algorithm, String publicKey, String privateKey) {
         this(algorithm, Base64.getDecoder().decode(publicKey), Base64.getDecoder().decode(privateKey));
-    }
-
-    public AsymmetricCipher(String publicKey, String privateKey) {
-        this(AsymmetricAlgorithm.RSA, publicKey, privateKey);
     }
 
     public AsymmetricAlgorithm getAlgorithm() {
@@ -171,8 +163,8 @@ public class AsymmetricCipher {
 
     @Override
     public String toString() {
-        return "RsaCipher{" +
-                "algorithm='" + algorithm + '\'' +
+        return "AsymmetricCipher{" +
+                "algorithm=" + algorithm +
                 ", publicKey=" + getBase64PublicKey() +
                 ", privateKey=" + getBase64PrivateKey() +
                 '}';

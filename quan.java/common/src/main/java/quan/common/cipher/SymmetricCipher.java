@@ -16,11 +16,7 @@ public class SymmetricCipher {
 
     private final SymmetricAlgorithm algorithm;
 
-    private SecretKey secretKey;
-
-    public SymmetricCipher() {
-        this(SymmetricAlgorithm.DES);
-    }
+    private final SecretKey secretKey;
 
     public SymmetricCipher(SymmetricAlgorithm algorithm) {
         this.algorithm = Objects.requireNonNull(algorithm, "加密算法不能为空");
@@ -40,10 +36,6 @@ public class SymmetricCipher {
 
     public SymmetricCipher(SymmetricAlgorithm algorithm, String secretKey) {
         this(algorithm, Base64.getDecoder().decode(secretKey));
-    }
-
-    public SymmetricCipher(String secretKey) {
-        this(SymmetricAlgorithm.DES, secretKey);
     }
 
     public SymmetricAlgorithm getAlgorithm() {
@@ -84,5 +76,12 @@ public class SymmetricCipher {
         }
     }
 
+    @Override
+    public String toString() {
+        return "SymmetricCipher{" +
+                "algorithm=" + algorithm +
+                ", secretKey=" + getBase64SecretKey() +
+                '}';
+    }
 }
 

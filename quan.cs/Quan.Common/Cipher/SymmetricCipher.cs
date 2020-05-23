@@ -14,11 +14,7 @@ namespace Quan.Common.Cipher
         private readonly ICipherParameters _keyParameter;
 
         public readonly SymmetricAlgorithm Algorithm;
-
-        public SymmetricCipher() : this(SymmetricAlgorithm.Des)
-        {
-        }
-
+        
         public SymmetricCipher(SymmetricAlgorithm algorithm, byte[] secretKey = null)
         {
             Algorithm = algorithm ?? throw new NullReferenceException("加密算法不能为空");
@@ -41,11 +37,6 @@ namespace Quan.Common.Cipher
         public SymmetricCipher(SymmetricAlgorithm algorithm, string secretKey) : this(algorithm, Convert.FromBase64String(secretKey))
         {
         }
-
-        public SymmetricCipher(string secretKey) : this(SymmetricAlgorithm.Des, secretKey)
-        {
-        }
-
         public byte[] SecretKey
         {
             get
