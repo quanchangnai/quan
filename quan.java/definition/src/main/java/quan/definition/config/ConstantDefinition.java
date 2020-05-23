@@ -20,7 +20,7 @@ public class ConstantDefinition extends ClassDefinition {
 
     private ConfigDefinition configDefinition;
 
-    //是否使用枚举实现，Java支持动态读取枚举值，C#支持整数枚举，其他不支持的语言该参数没有意义
+    //是否使用枚举或者模拟枚举实现，不支持的语言该参数没有意义
     private boolean useEnum = true;
 
     private String keyField;

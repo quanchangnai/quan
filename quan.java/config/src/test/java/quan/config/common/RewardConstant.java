@@ -6,14 +6,14 @@ import quan.config.item.Reward;
 /**
  * 自动生成
  */
-public class RewardConstant {
+public enum RewardConstant {
 
-    public static List<Reward> constant1() {
-        return ConstantConfig.getByKey("constant1").getRewardList();
-    }
+    constant1,
 
-    public static List<Reward> constant2() {
-        return ConstantConfig.getByKey("constant2").getRewardList();
+    constant2;
+
+    public List<Reward> value() {
+        return ConstantConfig.getByKey(name()).getRewardList();
     }
 
 }

@@ -6,10 +6,20 @@ namespace Test.Config.Common
     /// <summary>
     /// 自动生成
     /// </summary>
-    public class RewardConstant 
+    public class RewardConstant
     {
-        public static IList<Reward> Constant1 => ConstantConfig.GetByKey("constant1").RewardList;
+        private readonly string _key;
 
-        public static IList<Reward> Constant2 => ConstantConfig.GetByKey("constant2").RewardList;
+        private RewardConstant(string key)
+        {
+            _key = key;
+        }
+
+        public IList<Reward> Value => ConstantConfig.GetByKey(_key).RewardList;
+
+
+        public static readonly RewardConstant Constant1 = new RewardConstant("constant1");
+
+        public static readonly RewardConstant Constant2 = new RewardConstant("constant2");
     }
 }

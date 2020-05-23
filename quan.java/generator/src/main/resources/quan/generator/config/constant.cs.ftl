@@ -27,6 +27,37 @@ namespace ${getFullPackageName("cs")}
         </#if>
     </#list>
      }
+<#elseif useEnum>
+    public class ${name}
+    {
+        private readonly string _key;
+
+        private ${name}(string key)
+        {
+            _key = key;
+        }
+
+    <#if valueField.type=="map">
+        public ${valueField.basicType}<${valueField.keyType},${valueField.keyType}> Value => ${configDefinition.name}.GetBy${keyField.name?cap_first}(_key).${valueField.name?cap_first};
+    <#elseif valueField.type=="list" || valueField.type=="set">
+        public ${valueField.basicType}<${valueField.valueType}> Value => ${configDefinition.name}.GetBy${keyField.name?cap_first}(_key).${valueField.name?cap_first};
+    <#else>
+        public ${valueField.basicType} Value => ${configDefinition.name}.GetBy${keyField.name?cap_first}(_key).${valueField.name?cap_first};
+    </#if>
+
+
+    <#list rows?keys as key>
+        <#if rows[key].right !="">
+        /// <summary>
+        /// ${rows[key].right}
+        /// </summary>
+        </#if>
+        public static readonly ${name} ${key?cap_first} = new ${name}("${key}");
+        <#if key?has_next>
+
+        </#if>
+    </#list>
+    }
 <#else>
     public class ${name} 
     {

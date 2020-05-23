@@ -7,7 +7,7 @@
         <field name="rewardList" type="list:Reward" column="奖励List"/>
         <field name="comment" type="string" column="备注"/>
         <constant name="ItemConstant" enum="false" key="key" value="itemId" comment="comment"/>
-        <constant name="RewardConstant" enum="false" key="key" value="rewardList"/>
+        <constant name="RewardConstant" enum="true" key="key" value="rewardList"/>
     </config>
 
 </package>
