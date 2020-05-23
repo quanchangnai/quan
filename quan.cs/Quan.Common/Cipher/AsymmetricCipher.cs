@@ -30,7 +30,7 @@ namespace Quan.Common.Cipher
         public AsymmetricCipher(AsymmetricAlgorithm algorithm, int keySize = 1024)
         {
             Algorithm = algorithm ?? throw new NullReferenceException("加密算法不能为空");
-            var keyGenerator = GeneratorUtilities.GetKeyPairGenerator(algorithm.Cipher);
+            var keyGenerator = GeneratorUtilities.GetKeyPairGenerator(algorithm.Generation);
             var random = new SecureRandom();
 
             if (algorithm == AsymmetricAlgorithm.Dsa)
@@ -60,6 +60,10 @@ namespace Quan.Common.Cipher
 
         public AsymmetricCipher(AsymmetricAlgorithm algorithm, string publicKey, string privateKey) :
             this(algorithm, Convert.FromBase64String(publicKey), Convert.FromBase64String(privateKey))
+        {
+        }
+
+        public AsymmetricCipher(string publicKey, string privateKey) : this(AsymmetricAlgorithm.Rsa, publicKey, privateKey)
         {
         }
 
@@ -99,7 +103,8 @@ namespace Quan.Common.Cipher
         /// </summary>
         public byte[] Encrypt(byte[] data, bool usePrivateKey = true)
         {
-            var cipher = CipherUtilities.GetCipher(Algorithm.Transformation);
+            Algorithm.CheckEncrypt();
+            var cipher = CipherUtilities.GetCipher(Algorithm.Encryption);
             cipher.Init(true, usePrivateKey ? _privateKeyParameter : _publicKeyParameter);
             return cipher.DoFinal(data);
         }
@@ -109,7 +114,8 @@ namespace Quan.Common.Cipher
         /// </summary>
         public byte[] Decrypt(byte[] data, bool usePublicKey = true)
         {
-            var cipher = CipherUtilities.GetCipher(Algorithm.Transformation);
+            Algorithm.CheckEncrypt();
+            var cipher = CipherUtilities.GetCipher(Algorithm.Encryption);
             cipher.Init(false, usePublicKey ? _publicKeyParameter : _privateKeyParameter);
             return cipher.DoFinal(data);
         }
@@ -119,6 +125,7 @@ namespace Quan.Common.Cipher
         /// </summary>
         public byte[] Sign(byte[] data)
         {
+            Algorithm.CheckSign();
             var signer = SignerUtilities.GetSigner(Algorithm.Signature);
             signer.Init(true, _privateKeyParameter);
             signer.BlockUpdate(data, 0, data.Length);
@@ -130,6 +137,7 @@ namespace Quan.Common.Cipher
         /// </summary>
         public bool Verify(byte[] data, byte[] signature)
         {
+            Algorithm.CheckSign();
             var signer = SignerUtilities.GetSigner(Algorithm.Signature);
             signer.Init(false, _publicKeyParameter);
             signer.BlockUpdate(data, 0, data.Length);

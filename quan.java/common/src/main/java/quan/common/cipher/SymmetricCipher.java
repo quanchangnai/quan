@@ -3,7 +3,6 @@ package quan.common.cipher;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
 import java.util.Objects;
@@ -19,40 +18,32 @@ public class SymmetricCipher {
 
     private SecretKey secretKey;
 
-    private IvParameterSpec ivParameterSpec;
-
-    private SymmetricCipher(SymmetricAlgorithm algorithm) {
-        Objects.requireNonNull(algorithm, "加密算法不能为空");
-        this.algorithm = algorithm;
-        this.ivParameterSpec = new IvParameterSpec(algorithm.iv.getBytes());
+    public SymmetricCipher() {
+        this(SymmetricAlgorithm.DES);
     }
 
-    public static SymmetricCipher create() {
-        return create(SymmetricAlgorithm.DES);
-    }
-
-    public static SymmetricCipher create(SymmetricAlgorithm algorithm) {
-        SymmetricCipher symmetricCipher = new SymmetricCipher(algorithm);
-
+    public SymmetricCipher(SymmetricAlgorithm algorithm) {
+        this.algorithm = Objects.requireNonNull(algorithm, "加密算法不能为空");
         try {
-            KeyGenerator keyGenerator = KeyGenerator.getInstance(algorithm.cipher);
+            KeyGenerator keyGenerator = KeyGenerator.getInstance(algorithm.generation);
             keyGenerator.init(algorithm.keySize);
-            symmetricCipher.secretKey = keyGenerator.generateKey();
+            this.secretKey = keyGenerator.generateKey();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
-        return symmetricCipher;
     }
 
-    public static SymmetricCipher create(SymmetricAlgorithm algorithm, byte[] secretKey) {
-        SymmetricCipher symmetricCipher = new SymmetricCipher(algorithm);
-        symmetricCipher.secretKey = new SecretKeySpec(secretKey, algorithm.cipher);
-        return symmetricCipher;
+    public SymmetricCipher(SymmetricAlgorithm algorithm, byte[] secretKey) {
+        this.algorithm = Objects.requireNonNull(algorithm, "加密算法不能为空");
+        this.secretKey = new SecretKeySpec(secretKey, algorithm.generation);
     }
 
-    public static SymmetricCipher create(SymmetricAlgorithm algorithm, String secretKey) {
-        return create(algorithm, Base64.getDecoder().decode(secretKey));
+    public SymmetricCipher(SymmetricAlgorithm algorithm, String secretKey) {
+        this(algorithm, Base64.getDecoder().decode(secretKey));
+    }
+
+    public SymmetricCipher(String secretKey) {
+        this(SymmetricAlgorithm.DES, secretKey);
     }
 
     public SymmetricAlgorithm getAlgorithm() {
@@ -72,8 +63,8 @@ public class SymmetricCipher {
      */
     public byte[] encrypt(byte[] data) {
         try {
-            Cipher cipher = Cipher.getInstance(algorithm.transformation);
-            cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivParameterSpec);
+            Cipher cipher = Cipher.getInstance(algorithm.encryption);
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey, algorithm.getIv());
             return cipher.doFinal(data);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -85,8 +76,8 @@ public class SymmetricCipher {
      */
     public byte[] decrypt(byte[] data) {
         try {
-            Cipher cipher = Cipher.getInstance(algorithm.transformation);
-            cipher.init(Cipher.DECRYPT_MODE, secretKey, ivParameterSpec);
+            Cipher cipher = Cipher.getInstance(algorithm.encryption);
+            cipher.init(Cipher.DECRYPT_MODE, secretKey, algorithm.getIv());
             return cipher.doFinal(data);
         } catch (Exception e) {
             throw new RuntimeException(e);

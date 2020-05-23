@@ -2,29 +2,38 @@ namespace Quan.Common.Cipher
 {
     public class SymmetricAlgorithm
     {
+        //Data Encryption Standard
         public static readonly SymmetricAlgorithm Des = new SymmetricAlgorithm("DES", "DES/CBC/PKCS5Padding", "12345678", 56);
 
+        //三重DES
+        public static readonly SymmetricAlgorithm DesEde = new SymmetricAlgorithm("DESEde", "DESEde/CBC/PKCS5Padding", "12345678", 168);
+
+        //Advanced Encryption Standard
         public static readonly SymmetricAlgorithm Aes = new SymmetricAlgorithm("AES", "AES/CBC/PKCS5Padding", "1234567812345678", 128);
 
-        public readonly string Cipher;
+        //密钥生成算法
+        public readonly string Generation;
 
-        public readonly string Transformation;
+        //加密、解密算法
+        public readonly string Encryption;
 
+        //初始向量
         public readonly string Iv;
 
+        //密钥大小
         public readonly int KeySize;
 
-        public SymmetricAlgorithm(string cipher, string transformation, string iv, int keySize)
+        public SymmetricAlgorithm(string generation, string encryption, string iv, int keySize)
         {
-            Cipher = cipher;
-            Transformation = transformation;
+            Generation = generation;
+            Encryption = encryption;
             Iv = iv;
             KeySize = keySize;
         }
 
         public override string ToString()
         {
-            return $"{nameof(Cipher)}: {Cipher}, {nameof(Transformation)}: {Transformation}, {nameof(Iv)}: {Iv}, {nameof(KeySize)}: {KeySize}";
+            return $"{nameof(Generation)}: {Generation}, {nameof(Encryption)}: {Encryption}, {nameof(Iv)}: {Iv}, {nameof(KeySize)}: {KeySize}";
         }
     }
 }

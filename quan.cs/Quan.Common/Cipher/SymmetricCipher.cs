@@ -11,9 +11,13 @@ namespace Quan.Common.Cipher
     /// </summary>
     public class SymmetricCipher
     {
-        private readonly ParametersWithIV _keyParameter;
+        private readonly ICipherParameters _keyParameter;
 
         public readonly SymmetricAlgorithm Algorithm;
+
+        public SymmetricCipher() : this(SymmetricAlgorithm.Des)
+        {
+        }
 
         public SymmetricCipher(SymmetricAlgorithm algorithm, byte[] secretKey = null)
         {
@@ -21,21 +25,39 @@ namespace Quan.Common.Cipher
 
             if (secretKey == null)
             {
-                var keyGenerator = GeneratorUtilities.GetKeyGenerator(algorithm.Cipher);
+                var keyGenerator = GeneratorUtilities.GetKeyGenerator(algorithm.Generation);
                 keyGenerator.Init(new KeyGenerationParameters(new SecureRandom(), algorithm.KeySize));
                 secretKey = keyGenerator.GenerateKey();
             }
 
-            _keyParameter = new ParametersWithIV(ParameterUtilities.CreateKeyParameter(algorithm.Cipher, secretKey), Encoding.UTF8.GetBytes(algorithm.Iv));
+            _keyParameter = ParameterUtilities.CreateKeyParameter(algorithm.Generation, secretKey);
+
+            if (algorithm.Iv != null)
+            {
+                _keyParameter = new ParametersWithIV(_keyParameter, Encoding.UTF8.GetBytes(algorithm.Iv));
+            }
         }
 
-        public SymmetricCipher(SymmetricAlgorithm algorithm, string secretKey)
+        public SymmetricCipher(SymmetricAlgorithm algorithm, string secretKey) : this(algorithm, Convert.FromBase64String(secretKey))
         {
-            Algorithm = algorithm ?? throw new NullReferenceException("加密算法不能为空");
-            _keyParameter = new ParametersWithIV(ParameterUtilities.CreateKeyParameter(algorithm.Cipher, Convert.FromBase64String(secretKey)), Encoding.UTF8.GetBytes(algorithm.Iv));
         }
 
-        public byte[] SecretKey => ((KeyParameter) _keyParameter.Parameters).GetKey();
+        public SymmetricCipher(string secretKey) : this(SymmetricAlgorithm.Des, secretKey)
+        {
+        }
+
+        public byte[] SecretKey
+        {
+            get
+            {
+                if (_keyParameter is KeyParameter parameter)
+                {
+                    return parameter.GetKey();
+                }
+
+                return ((KeyParameter) ((ParametersWithIV) _keyParameter).Parameters).GetKey();
+            }
+        }
 
         public string Base64SecretKey => Convert.ToBase64String(SecretKey);
 
@@ -45,7 +67,7 @@ namespace Quan.Common.Cipher
         /// </summary>
         public byte[] Encrypt(byte[] data)
         {
-            var cipher = CipherUtilities.GetCipher(Algorithm.Transformation);
+            var cipher = CipherUtilities.GetCipher(Algorithm.Encryption);
             cipher.Init(true, _keyParameter);
             return cipher.DoFinal(data);
         }
@@ -55,7 +77,7 @@ namespace Quan.Common.Cipher
         /// </summary>
         public byte[] Decrypt(byte[] data)
         {
-            var cipher = CipherUtilities.GetCipher(Algorithm.Transformation);
+            var cipher = CipherUtilities.GetCipher(Algorithm.Encryption);
             cipher.Init(false, _keyParameter);
             return cipher.DoFinal(data);
         }

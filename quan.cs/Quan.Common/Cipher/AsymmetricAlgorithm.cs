@@ -1,27 +1,49 @@
+using System;
+
 namespace Quan.Common.Cipher
 {
     public class AsymmetricAlgorithm
     {
         public static readonly AsymmetricAlgorithm Rsa = new AsymmetricAlgorithm("RSA", "RSA/ECB/PKCS1Padding", "MD5withRSA");
 
+        //Digital Signature Algorithm
         public static readonly AsymmetricAlgorithm Dsa = new AsymmetricAlgorithm("DSA", null, "SHA1withDSA");
 
-        public readonly string Cipher;
+        //密钥生成算法
+        public readonly string Generation;
 
-        public readonly string Transformation;
+        //加密、解密算法
+        public readonly string Encryption;
 
+        //签名、验签算法
         public readonly string Signature;
 
-        public AsymmetricAlgorithm(string cipher, string transformation, string signature)
+        public AsymmetricAlgorithm(string generation, string encryption, string signature)
         {
-            Cipher = cipher;
-            Transformation = transformation;
+            Generation = generation;
+            Encryption = encryption;
             Signature = signature;
+        }
+
+        public void CheckEncrypt()
+        {
+            if (Encryption == null)
+            {
+                throw new NotSupportedException($"{Generation}算法不支持加密、解密");
+            }
+        }
+
+        public void CheckSign()
+        {
+            if (Signature == null)
+            {
+                throw new NotSupportedException($"{Generation}算法不支持签名、验签");
+            }
         }
 
         public override string ToString()
         {
-            return $"{nameof(Cipher)}: {Cipher}, {nameof(Transformation)}: {Transformation}, {nameof(Signature)}: {Signature}";
+            return $"{nameof(Generation)}: {Generation}, {nameof(Encryption)}: {Encryption}, {nameof(Signature)}: {Signature}";
         }
     }
 }
