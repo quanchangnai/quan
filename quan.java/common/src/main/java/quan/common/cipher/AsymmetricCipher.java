@@ -16,14 +16,25 @@ public class AsymmetricCipher {
 
     private final AsymmetricAlgorithm algorithm;
 
-    private final PublicKey publicKey;
+    private PublicKey publicKey;
 
-    private final PrivateKey privateKey;
+    private PrivateKey privateKey;
 
+    /**
+     * 随机生成密钥构造，默认密钥长度1024
+     *
+     * @param algorithm 算法
+     */
     public AsymmetricCipher(AsymmetricAlgorithm algorithm) {
         this(algorithm, 1024);
     }
 
+    /**
+     * 随机生成密钥构造
+     *
+     * @param algorithm 算法
+     * @param keySize   密钥长度
+     */
     public AsymmetricCipher(AsymmetricAlgorithm algorithm, int keySize) {
         this.algorithm = Objects.requireNonNull(algorithm, "加密算法不能为空");
         KeyPairGenerator keyPairGenerator;
@@ -41,21 +52,38 @@ public class AsymmetricCipher {
         this.privateKey = keyPair.getPrivate();
     }
 
+    /**
+     * 指定已有密钥构造，至少要提供公私钥中的一个
+     *
+     * @param algorithm  算法
+     * @param publicKey  公钥
+     * @param privateKey 私钥
+     */
     public AsymmetricCipher(AsymmetricAlgorithm algorithm, byte[] publicKey, byte[] privateKey) {
         this.algorithm = Objects.requireNonNull(algorithm, "加密算法不能为空");
+        if (publicKey == null && privateKey != null) {
+            throw new IllegalArgumentException("公钥和私钥不能都为空");
+        }
 
         try {
             KeyFactory keyFactory = KeyFactory.getInstance(algorithm.generation);
-            this.publicKey = keyFactory.generatePublic(new X509EncodedKeySpec(publicKey));
-            this.privateKey = keyFactory.generatePrivate(new PKCS8EncodedKeySpec(privateKey));
+            if (publicKey != null) {
+                this.publicKey = keyFactory.generatePublic(new X509EncodedKeySpec(publicKey));
+            }
+            if (privateKey != null) {
+                this.privateKey = keyFactory.generatePrivate(new PKCS8EncodedKeySpec(privateKey));
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
     }
 
+    /**
+     * @see #AsymmetricCipher(AsymmetricAlgorithm, byte[], byte[])
+     */
     public AsymmetricCipher(AsymmetricAlgorithm algorithm, String publicKey, String privateKey) {
-        this(algorithm, Base64.getDecoder().decode(publicKey), Base64.getDecoder().decode(privateKey));
+        this(algorithm, publicKey != null ? Base64.getDecoder().decode(publicKey) : null, privateKey != null ? Base64.getDecoder().decode(privateKey) : null);
     }
 
     public AsymmetricAlgorithm getAlgorithm() {
@@ -63,18 +91,30 @@ public class AsymmetricCipher {
     }
 
     public byte[] getPublicKey() {
+        if (publicKey == null) {
+            return null;
+        }
         return publicKey.getEncoded();
     }
 
     public byte[] getPrivateKey() {
+        if (privateKey == null) {
+            return null;
+        }
         return privateKey.getEncoded();
     }
 
     public String getBase64PublicKey() {
+        if (publicKey == null) {
+            return null;
+        }
         return Base64.getEncoder().encodeToString(publicKey.getEncoded());
     }
 
     public String getBase64PrivateKey() {
+        if (privateKey == null) {
+            return null;
+        }
         return Base64.getEncoder().encodeToString(privateKey.getEncoded());
     }
 
@@ -87,9 +127,13 @@ public class AsymmetricCipher {
      */
     public byte[] encrypt(byte[] data, boolean usePrivateKey) {
         algorithm.checkEncryption();
+        Key key = usePrivateKey ? privateKey : publicKey;
+        if (key == null) {
+            throw new IllegalStateException("未设置" + (usePrivateKey ? "私" : "公") + "钥");
+        }
         try {
             Cipher cipher = Cipher.getInstance(algorithm.encryption);
-            cipher.init(Cipher.ENCRYPT_MODE, usePrivateKey ? privateKey : publicKey);
+            cipher.init(Cipher.ENCRYPT_MODE, key);
             return cipher.doFinal(data);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -114,9 +158,13 @@ public class AsymmetricCipher {
      */
     public byte[] decrypt(byte[] data, boolean usePublicKey) {
         algorithm.checkEncryption();
+        Key key = usePublicKey ? publicKey : privateKey;
+        if (key == null) {
+            throw new IllegalStateException("未设置" + (usePublicKey ? "公" : "私") + "钥");
+        }
         try {
             Cipher cipher = Cipher.getInstance(algorithm.encryption);
-            cipher.init(Cipher.DECRYPT_MODE, usePublicKey ? publicKey : privateKey);
+            cipher.init(Cipher.DECRYPT_MODE, key);
             return cipher.doFinal(data);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -136,6 +184,9 @@ public class AsymmetricCipher {
      */
     public byte[] sign(byte[] data) {
         algorithm.checkSignature();
+        if (privateKey == null) {
+            throw new IllegalStateException("未设置私钥");
+        }
         try {
             Signature signer = Signature.getInstance(algorithm.signature);
             signer.initSign(privateKey);
@@ -151,6 +202,9 @@ public class AsymmetricCipher {
      */
     public boolean verify(byte[] data, byte[] signature) {
         algorithm.checkSignature();
+        if (privateKey == null) {
+            throw new IllegalStateException("未设置公钥");
+        }
         try {
             Signature signer = Signature.getInstance(algorithm.signature);
             signer.initVerify(publicKey);

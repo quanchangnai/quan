@@ -3,10 +3,10 @@ package quan.common.cipher;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
 import java.util.Objects;
-
 
 /**
  * 对称加密器，支持DES、AES算法
@@ -18,8 +18,16 @@ public class SymmetricCipher {
 
     private final SecretKey secretKey;
 
+    private IvParameterSpec iv;
+
+    /**
+     * 随机生成密钥构造
+     *
+     * @param algorithm 算法
+     */
     public SymmetricCipher(SymmetricAlgorithm algorithm) {
         this.algorithm = Objects.requireNonNull(algorithm, "加密算法不能为空");
+        this.iv = algorithm.getIv();
         try {
             KeyGenerator keyGenerator = KeyGenerator.getInstance(algorithm.generation);
             keyGenerator.init(algorithm.keySize);
@@ -29,13 +37,35 @@ public class SymmetricCipher {
         }
     }
 
+    /**
+     * 指定已有密钥构造
+     *
+     * @param algorithm 密钥
+     * @param secretKey 密钥
+     */
     public SymmetricCipher(SymmetricAlgorithm algorithm, byte[] secretKey) {
         this.algorithm = Objects.requireNonNull(algorithm, "加密算法不能为空");
         this.secretKey = new SecretKeySpec(secretKey, algorithm.generation);
+        this.iv = algorithm.getIv();
     }
 
+    /**
+     * @see #SymmetricCipher(SymmetricAlgorithm, byte[])
+     */
     public SymmetricCipher(SymmetricAlgorithm algorithm, String secretKey) {
         this(algorithm, Base64.getDecoder().decode(secretKey));
+    }
+
+    /**
+     * 自定义初始向量
+     */
+    public SymmetricCipher setIv(byte[] iv) {
+        int legalLength = algorithm.getIv().getIV().length;
+        if (iv == null || iv.length != legalLength) {
+            throw new IllegalArgumentException("初始向量不合法,长度必须为" + legalLength + "个字节");
+        }
+        this.iv = new IvParameterSpec(iv);
+        return this;
     }
 
     public SymmetricAlgorithm getAlgorithm() {
@@ -56,7 +86,7 @@ public class SymmetricCipher {
     public byte[] encrypt(byte[] data) {
         try {
             Cipher cipher = Cipher.getInstance(algorithm.encryption);
-            cipher.init(Cipher.ENCRYPT_MODE, secretKey, algorithm.getIv());
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey, iv);
             return cipher.doFinal(data);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -69,7 +99,7 @@ public class SymmetricCipher {
     public byte[] decrypt(byte[] data) {
         try {
             Cipher cipher = Cipher.getInstance(algorithm.encryption);
-            cipher.init(Cipher.DECRYPT_MODE, secretKey, algorithm.getIv());
+            cipher.init(Cipher.DECRYPT_MODE, secretKey, iv);
             return cipher.doFinal(data);
         } catch (Exception e) {
             throw new RuntimeException(e);

@@ -19,7 +19,7 @@ public enum SymmetricAlgorithm {
     //加密、解密算法
     public final String encryption;
 
-    //初始向量
+    //默认初始向量
     private IvParameterSpec iv;
 
     //密钥大小

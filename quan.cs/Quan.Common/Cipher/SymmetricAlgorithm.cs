@@ -17,7 +17,7 @@ namespace Quan.Common.Cipher
         //加密、解密算法
         public readonly string Encryption;
 
-        //初始向量
+        //默认初始向量
         public readonly string Iv;
 
         //密钥大小
