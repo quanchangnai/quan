@@ -13,6 +13,7 @@ public enum SymmetricAlgorithm {
     //Advanced Encryption Standard
     AES("AES", "AES/CBC/PKCS5Padding", "1234567812345678", 128);
 
+
     //密钥生成算法
     public final String generation;
 
@@ -20,7 +21,10 @@ public enum SymmetricAlgorithm {
     public final String encryption;
 
     //默认初始向量
-    private IvParameterSpec iv;
+    private byte[] iv;
+
+    //默认初始向量
+    private IvParameterSpec ivParameterSpec;
 
     //密钥大小
     public final int keySize;
@@ -28,22 +32,28 @@ public enum SymmetricAlgorithm {
     SymmetricAlgorithm(String generation, String encryption, String iv, int keySize) {
         this.generation = generation;
         this.encryption = encryption;
-        if (iv != null) {
-            this.iv = new IvParameterSpec(iv.getBytes());
-        }
         this.keySize = keySize;
+        if (iv != null) {
+            this.iv = iv.getBytes();
+            this.ivParameterSpec = new IvParameterSpec(iv.getBytes());
+        }
     }
 
-    public IvParameterSpec getIv() {
+    public byte[] getIv() {
         return iv;
     }
+
+    public IvParameterSpec getIvParameterSpec() {
+        return ivParameterSpec;
+    }
+
 
     @Override
     public String toString() {
         return "SymmetricAlgorithm{" +
                 "generation='" + generation + '\'' +
                 ", encryption='" + encryption + '\'' +
-                ", iv='" + (iv != null ? new String(iv.getIV()) : "null") + '\'' +
+                ", iv='" + (iv != null ? new String(iv) : "null") + '\'' +
                 ", keySize=" + keySize +
                 '}';
     }

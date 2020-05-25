@@ -1,5 +1,4 @@
 using System;
-using System.Text;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Security;
@@ -16,10 +15,10 @@ namespace Quan.Common.Cipher
         private ICipherParameters _keyParameter;
 
         /// <summary>
-        /// 指定密钥或者随机生成密钥构造
+        /// 指定密钥构造或者随机生成密钥构造
         /// </summary>
         /// <param name="algorithm">算法</param>
-        /// <param name="secretKey">指定的秘钥，为null时随机生成密钥</param>
+        /// <param name="secretKey">指定的密钥，该参数值为null则随机生成密钥</param>
         public SymmetricCipher(SymmetricAlgorithm algorithm, byte[] secretKey = null)
         {
             Algorithm = algorithm ?? throw new NullReferenceException("加密算法不能为空");
@@ -31,7 +30,11 @@ namespace Quan.Common.Cipher
                 secretKey = keyGenerator.GenerateKey();
             }
 
-            _keyParameter = new ParametersWithIV(ParameterUtilities.CreateKeyParameter(algorithm.Generation, secretKey), Encoding.UTF8.GetBytes(algorithm.Iv));
+            _keyParameter = ParameterUtilities.CreateKeyParameter(algorithm.Generation, secretKey);
+            if (algorithm.Iv != null)
+            {
+                _keyParameter = new ParametersWithIV(_keyParameter, algorithm.Iv);
+            }
         }
 
         public SymmetricCipher(SymmetricAlgorithm algorithm, string secretKey) : this(algorithm, Convert.FromBase64String(secretKey))
@@ -45,6 +48,11 @@ namespace Quan.Common.Cipher
         {
             set
             {
+                if (Algorithm.Iv == null)
+                {
+                    throw new ArgumentException($"算法[{Algorithm.Encryption}]不支持设置初始向量");
+                }
+
                 var legalLength = Algorithm.Iv.Length;
                 if (value == null || value.Length != legalLength)
                 {

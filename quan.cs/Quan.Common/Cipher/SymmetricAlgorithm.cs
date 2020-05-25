@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace Quan.Common.Cipher
 {
     public class SymmetricAlgorithm
@@ -18,7 +20,7 @@ namespace Quan.Common.Cipher
         public readonly string Encryption;
 
         //默认初始向量
-        public readonly string Iv;
+        public readonly byte[] Iv;
 
         //密钥大小
         public readonly int KeySize;
@@ -27,13 +29,16 @@ namespace Quan.Common.Cipher
         {
             Generation = generation;
             Encryption = encryption;
-            Iv = iv;
             KeySize = keySize;
+            if (iv != null)
+            {
+                Iv = Encoding.Default.GetBytes(iv);
+            }
         }
 
         public override string ToString()
         {
-            return $"{nameof(Generation)}: {Generation}, {nameof(Encryption)}: {Encryption}, {nameof(Iv)}: {Iv}, {nameof(KeySize)}: {KeySize}";
+            return $"{nameof(Generation)}: {Generation}, {nameof(Encryption)}: {Encryption}, {nameof(Iv)}: {Encoding.Default.GetString(Iv)}, {nameof(KeySize)}: {KeySize}";
         }
     }
 }

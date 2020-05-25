@@ -6,6 +6,48 @@ namespace Test
 {
     public class CipherTest
     {
+        public static void TestAll()
+        {
+            TestSymmetricEncrypt1();
+            TestSymmetricEncrypt2();
+            TestAsymmetricEncrypt1();
+            TestAsymmetricEncrypt2();
+            TestAsymmetricSign1();
+            TestAsymmetricSign2();
+        }
+
+        public static void TestSymmetricEncrypt1()
+        {
+            Console.WriteLine("TestSymmetric1");
+
+            var cipher = new SymmetricCipher(SymmetricAlgorithm.Des);
+
+            Console.WriteLine($"secretKey:{cipher.Base64SecretKey}");
+
+            var encrypted = cipher.Encrypt(Encoding.UTF8.GetBytes("对称加密测试1"));
+            Console.WriteLine($"encrypted:{Convert.ToBase64String(encrypted)}");
+
+            var decrypted = cipher.Decrypt(encrypted);
+            Console.WriteLine($"decrypted:{Encoding.UTF8.GetString(decrypted)}");
+        }
+
+
+        public static void TestSymmetricEncrypt2()
+        {
+            Console.WriteLine("TestSymmetric2");
+
+            var secretKey = Convert.FromBase64String("6V2SlGS25bw=");
+            var cipher = new SymmetricCipher(SymmetricAlgorithm.Des, secretKey);
+
+            var encrypted = cipher.Encrypt(Encoding.UTF8.GetBytes("对称加密测试2"));
+            Console.WriteLine($"encrypted:{Convert.ToBase64String(encrypted)}");
+
+            // encrypted = Convert.FromBase64String("uMi0zTne1HMv5sU1HB2WI/CsNvBUn5y3");
+
+            var decrypted = cipher.Decrypt(encrypted);
+            Console.WriteLine($"decrypted:{Encoding.UTF8.GetString(decrypted)}");
+        }
+
         public static void TestAsymmetricEncrypt1()
         {
             var data = "非对称加密测试1";
@@ -92,39 +134,6 @@ namespace Test
 
             var verification = cipher.Verify(data, signature);
             Console.WriteLine($"verification:{verification}");
-        }
-
-
-        public static void TestSymmetricEncrypt1()
-        {
-            Console.WriteLine("TestSymmetric1");
-
-            var cipher = new SymmetricCipher(SymmetricAlgorithm.Des);
-
-            Console.WriteLine($"secretKey:{cipher.Base64SecretKey}");
-
-            var encrypted = cipher.Encrypt(Encoding.UTF8.GetBytes("对称加密测试1"));
-            Console.WriteLine($"encrypted:{Convert.ToBase64String(encrypted)}");
-
-            var decrypted = cipher.Decrypt(encrypted);
-            Console.WriteLine($"decrypted:{Encoding.UTF8.GetString(decrypted)}");
-        }
-
-
-        public static void TestSymmetricEncrypt2()
-        {
-            Console.WriteLine("TestSymmetric2");
-
-            var secretKey = Convert.FromBase64String("6V2SlGS25bw=");
-            var cipher = new SymmetricCipher(SymmetricAlgorithm.Des, secretKey);
-
-            var encrypted = cipher.Encrypt(Encoding.UTF8.GetBytes("对称加密测试2"));
-            Console.WriteLine($"encrypted:{Convert.ToBase64String(encrypted)}");
-
-            // encrypted = Convert.FromBase64String("uMi0zTne1HMv5sU1HB2WI/CsNvBUn5y3");
-
-            var decrypted = cipher.Decrypt(encrypted);
-            Console.WriteLine($"decrypted:{Encoding.UTF8.GetString(decrypted)}");
         }
     }
 }

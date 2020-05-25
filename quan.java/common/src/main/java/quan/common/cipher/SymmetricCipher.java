@@ -27,7 +27,7 @@ public class SymmetricCipher {
      */
     public SymmetricCipher(SymmetricAlgorithm algorithm) {
         this.algorithm = Objects.requireNonNull(algorithm, "加密算法不能为空");
-        this.iv = algorithm.getIv();
+        this.iv = algorithm.getIvParameterSpec();
         try {
             KeyGenerator keyGenerator = KeyGenerator.getInstance(algorithm.generation);
             keyGenerator.init(algorithm.keySize);
@@ -40,13 +40,13 @@ public class SymmetricCipher {
     /**
      * 指定已有密钥构造
      *
-     * @param algorithm 密钥
+     * @param algorithm 算法
      * @param secretKey 密钥
      */
     public SymmetricCipher(SymmetricAlgorithm algorithm, byte[] secretKey) {
         this.algorithm = Objects.requireNonNull(algorithm, "加密算法不能为空");
         this.secretKey = new SecretKeySpec(secretKey, algorithm.generation);
-        this.iv = algorithm.getIv();
+        this.iv = algorithm.getIvParameterSpec();
     }
 
     /**
@@ -60,9 +60,11 @@ public class SymmetricCipher {
      * 自定义初始向量
      */
     public SymmetricCipher setIv(byte[] iv) {
-        int legalLength = algorithm.getIv().getIV().length;
-        if (iv == null || iv.length != legalLength) {
-            throw new IllegalArgumentException("初始向量不合法,长度必须为" + legalLength + "个字节");
+        if (algorithm.getIv() == null) {
+            throw new UnsupportedOperationException("算法[" + algorithm.encryption + "]不支持初始向量");
+        }
+        if (iv == null || iv.length != algorithm.getIv().length) {
+            throw new IllegalArgumentException("初始向量不合法,长度必须为" + algorithm.getIv().length + "个字节");
         }
         this.iv = new IvParameterSpec(iv);
         return this;
