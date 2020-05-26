@@ -36,10 +36,10 @@ public enum AsymmetricAlgorithm {
 
     @Override
     public String toString() {
-        return "Algorithm{" +
+        return "AsymmetricAlgorithm{" +
                 "generation='" + generation + '\'' +
+                ", encryption='" + encryption + '\'' +
                 ", signature='" + signature + '\'' +
                 '}';
     }
-
 }

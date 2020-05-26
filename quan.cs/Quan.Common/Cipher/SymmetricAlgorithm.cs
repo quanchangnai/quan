@@ -7,7 +7,7 @@ namespace Quan.Common.Cipher
         //Data Encryption Standard
         public static readonly SymmetricAlgorithm Des = new SymmetricAlgorithm("DES", "DES/CBC/PKCS5Padding", "12345678", 56);
 
-        //三重DES
+        //Triple DES
         public static readonly SymmetricAlgorithm DesEde = new SymmetricAlgorithm("DESEde", "DESEde/CBC/PKCS5Padding", "12345678", 168);
 
         //Advanced Encryption Standard

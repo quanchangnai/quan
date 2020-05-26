@@ -8,6 +8,7 @@ import org.bson.BsonReader;
 import org.bson.BsonWriter;
 import org.bson.json.JsonReader;
 import org.bson.json.JsonWriter;
+import org.junit.Ignore;
 import org.junit.Test;
 import quan.common.utils.ClassUtils;
 import quan.data.Transaction;
@@ -44,7 +45,7 @@ public class DatabaseTest {
         roleTest1.test2();
     }
 
-    //    @Ignore
+    @Ignore
     @Test
     public void testDatabase() {
         System.err.println("testDatabase==============");

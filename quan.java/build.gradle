@@ -14,16 +14,18 @@ sourceCompatibility = javaVersion
 idea.project.languageLevel = javaVersion
 
 jar.enabled = false
+uploadArchives.enabled = false
 
 subprojects {
     apply plugin: 'java'
     apply plugin: 'idea'
 
+    version = 1.0
+    sourceCompatibility = javaVersion
+
     tasks.withType(JavaCompile) {
         options.encoding = 'UTF-8'
     }
-
-    sourceCompatibility = javaVersion
 
     idea.module {
         def outputPath = "$projectDir${File.separator}build${File.separator}out${File.separator}"
@@ -47,6 +49,12 @@ subprojects {
         mavenCentral()
         maven {
             url = 'https://maven.aliyun.com/repository/central'
+        }
+    }
+
+    uploadArchives {
+        repositories {
+            mavenLocal()
         }
     }
 

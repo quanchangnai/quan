@@ -7,7 +7,7 @@ public enum SymmetricAlgorithm {
     //Data Encryption Standard
     DES("DES", "DES/CBC/PKCS5Padding", "12345678", 56),
 
-    //三重DES
+    //Triple DES
     DESEde("DESEde", "DESEde/CBC/PKCS5Padding", "12345678", 168),
 
     //Advanced Encryption Standard
@@ -35,7 +35,7 @@ public enum SymmetricAlgorithm {
         this.keySize = keySize;
         if (iv != null) {
             this.iv = iv.getBytes();
-            this.ivParameterSpec = new IvParameterSpec(iv.getBytes());
+            this.ivParameterSpec = new IvParameterSpec(this.iv);
         }
     }
 

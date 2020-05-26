@@ -5,6 +5,7 @@ import com.mongodb.assertions.Assertions;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.*;
 import com.mongodb.client.model.*;
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
@@ -12,7 +13,6 @@ import org.bson.conversions.Bson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.common.utils.ClassUtils;
-import quan.common.NamedThreadFactory;
 import quan.data.Data;
 import quan.data.DataCodecRegistry;
 import quan.data.DataWriter;
@@ -102,8 +102,8 @@ public class Database implements DataWriter, MongoDatabase {
 
         if (asyncWrite) {
             List<ExecutorService> clientExecutors = new ArrayList<>();
+            ThreadFactory threadFactory = new BasicThreadFactory.Builder().namingPattern("database-thread-%d").daemon(true).build();
             for (int i = 1; i <= Runtime.getRuntime().availableProcessors(); i++) {
-                ThreadFactory threadFactory = new NamedThreadFactory("database-thread-" + i);
                 clientExecutors.add(Executors.newSingleThreadExecutor(threadFactory));
             }
             executors.put(client, clientExecutors);
