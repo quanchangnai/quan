@@ -106,10 +106,10 @@ public class MessageTest {
         System.err.println("sRoleLogin2:" + sRoleLogin2);
 //        System.err.println("sRoleLogin2.seq:" + sRoleLogin2.getSeq());
 
-        ByteBuf byteBuf = Unpooled.buffer();
-        sRoleLogin1.encode(byteBuf);
+        Buffer buffer = new SimpleBuffer();
+        sRoleLogin1.encode(buffer);
         SRoleLogin sRoleLogin3 = new SRoleLogin();
-        sRoleLogin3.decode(byteBuf);
+        sRoleLogin3.decode(buffer);
         System.err.println("sRoleLogin3:" + sRoleLogin3);
     }
 

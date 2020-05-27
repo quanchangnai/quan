@@ -1,7 +1,5 @@
 package quan.message;
 
-import io.netty.buffer.ByteBuf;
-
 import java.io.IOException;
 
 /**
@@ -17,14 +15,6 @@ public abstract class Bean {
 
     public final void decode(byte[] bytes) throws IOException {
         decode(new SimpleBuffer(bytes));
-    }
-
-    public final void encode(ByteBuf byteBuf) throws IOException {
-        encode(new NettyBuffer(byteBuf));
-    }
-
-    public final void decode(ByteBuf byteBuf) throws IOException {
-        decode(new NettyBuffer(byteBuf));
     }
 
     public void encode(Buffer buffer) throws IOException {

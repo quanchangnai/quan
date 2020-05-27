@@ -6,4 +6,5 @@ apply plugin: 'java-library'
 
 dependencies {
     api project(':common')
+    implementation project(':message')
 }
