@@ -1,4 +1,4 @@
-package quan.network.nio.codec;
+package quan.network.codec;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -11,7 +11,7 @@ import java.util.List;
  *
  * @author quanchangnai
  */
-public class StringCodec extends AbstractCodec {
+public class StringCodec extends Codec {
 
     private final Charset charset;
 

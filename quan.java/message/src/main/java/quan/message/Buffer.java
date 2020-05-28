@@ -262,7 +262,7 @@ public abstract class Buffer {
         try {
             lon = checkScale(n, scale);
         } catch (IllegalArgumentException e) {
-            throw new IOException(e.getMessage());
+            throw new IOException(e);
         }
 
         writeLong(lon);
@@ -272,4 +272,5 @@ public abstract class Buffer {
     public void writeString(String s) {
         writeBytes(s.getBytes(StandardCharsets.UTF_8));
     }
+
 }

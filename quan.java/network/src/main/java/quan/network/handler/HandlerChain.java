@@ -1,9 +1,9 @@
-package quan.network.nio.handler;
+package quan.network.handler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import quan.network.nio.Connection;
-import quan.network.nio.TaskExecutor;
+import quan.network.TaskExecutor;
+import quan.network.Connection;
 
 import java.nio.ByteBuffer;
 import java.util.Objects;
@@ -94,7 +94,7 @@ public class HandlerChain {
     }
 
     public void triggerExceptionCaught(Throwable cause) {
-        head.triggerExceptionCaught(cause);
+        head.triggerException(cause);
     }
 
     private class HeadHandlerContext extends HandlerContext implements Handler {
@@ -116,7 +116,7 @@ public class HandlerChain {
                 connection.send(ByteBuffer.wrap((byte[]) msg));
             } else {
                 Exception exception = new IllegalArgumentException("发送的消息经过处理器链后的最终结果必须是ByteBuffer或者byte[]类型");
-                handlerContext.triggerExceptionCaught(exception);
+                handlerContext.triggerException(exception);
             }
         }
 

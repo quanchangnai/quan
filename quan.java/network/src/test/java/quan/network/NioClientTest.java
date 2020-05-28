@@ -1,16 +1,19 @@
 package quan.network;
 
-import quan.network.nio.NioClient;
-import quan.network.nio.handler.Handler;
-import quan.network.nio.handler.HandlerChain;
-import quan.network.nio.handler.HandlerConfigurer;
-import quan.network.nio.handler.HandlerContext;
-import quan.network.nio.codec.LengthFieldCodec;
-import quan.network.nio.codec.StringCodec;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import quan.network.codec.FrameCodec;
+import quan.network.codec.StringCodec;
+import quan.network.handler.Handler;
+import quan.network.handler.HandlerChain;
+import quan.network.handler.HandlerConfigurer;
+import quan.network.handler.HandlerContext;
 
 import java.net.StandardSocketOptions;
 
 public class NioClientTest {
+
+    protected static final Logger logger = LoggerFactory.getLogger(NioClientTest.class);
 
     public static void main(String[] args) {
         NioClient client = new NioClient("127.0.0.1", 8007);
@@ -20,13 +23,13 @@ public class NioClientTest {
         client.setHandler(new HandlerConfigurer() {
             @Override
             public void configureHandler(HandlerChain handlerChain) {
-                handlerChain.addLast(new LengthFieldCodec(4, true));
+                handlerChain.addLast(new FrameCodec(4, true));
                 handlerChain.addLast(new StringCodec());
                 handlerChain.addLast(new TestClientHandler());
 
             }
         });
-        client.setReconnectTime(15 * 1000);
+        client.setReconnectInterval(15 * 1000);
         client.start();
 
 
@@ -36,24 +39,22 @@ public class NioClientTest {
 
         @Override
         public void onConnected(HandlerContext handlerContext) {
-            System.err.println("onConnected");
+            logger.info("onConnected");
         }
 
         @Override
         public void onDisconnected(HandlerContext handlerContext) {
-            System.err.println("onDisconnected");
+            logger.info("onDisconnected");
         }
 
         @Override
         public void onReceived(final HandlerContext handlerContext, final String msg) {
-            System.err.println("onReceived:" + msg);
+            logger.info("onReceived:" + msg);
         }
 
         @Override
         public void onExceptionCaught(HandlerContext handlerContext, Throwable cause) {
-            System.err.println("onExceptionCaught");
-            cause.printStackTrace();
-
+            logger.info("onExceptionCaught", cause);
         }
 
     }

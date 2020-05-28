@@ -1,4 +1,4 @@
-package quan.network.nio.handler;
+package quan.network.handler;
 
 /**
  * 处理器配置器
@@ -13,7 +13,7 @@ public abstract class HandlerConfigurer implements Handler {
             configureHandler(handlerContext.getHandlerChain());
             handlerContext.triggerConnected();
         } catch (Exception e) {
-            handlerContext.triggerExceptionCaught(e);
+            handlerContext.triggerException(e);
         } finally {
             handlerContext.getHandlerChain().remove(this);
         }

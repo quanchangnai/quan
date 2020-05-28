@@ -1,4 +1,4 @@
-package quan.network.nio.codec;
+package quan.network.codec;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * 消息编解码器
  */
-public class MessageCodec extends AbstractCodec {
+public class MessageCodec extends Codec {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 

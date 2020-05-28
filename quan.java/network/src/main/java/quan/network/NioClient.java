@@ -1,8 +1,8 @@
-package quan.network.nio;
+package quan.network;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import quan.network.nio.handler.Handler;
+import quan.network.handler.Handler;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -41,7 +41,7 @@ public class NioClient {
 
     private boolean autoReconnect = true;
 
-    private long reconnectTime = 60 * 1000;
+    private long reconnectInterval = 60 * 1000;
 
 
     public NioClient(int port) {
@@ -117,12 +117,12 @@ public class NioClient {
         this.autoReconnect = autoReconnect;
     }
 
-    public long getReconnectTime() {
-        return reconnectTime;
+    public long getReconnectInterval() {
+        return reconnectInterval;
     }
 
-    public void setReconnectTime(long reconnectTime) {
-        this.reconnectTime = reconnectTime;
+    public void setReconnectInterval(long reconnectInterval) {
+        this.reconnectInterval = reconnectInterval;
     }
 
     public void start() {
@@ -139,7 +139,6 @@ public class NioClient {
 
         running = true;
         readWriteExecutor.start();
-
         readWriteExecutor.execute(this::connect);
     }
 
@@ -148,8 +147,10 @@ public class NioClient {
             if (!isRunning()) {
                 return;
             }
+
             SocketChannel socketChannel = SocketChannel.open();
             socketChannel.configureBlocking(false);
+
             for (SocketOption<?> socketOption : socketOptions.keySet()) {
                 Object optionValue = socketOptions.get(socketOption);
                 if (optionValue instanceof Integer) {
@@ -158,6 +159,7 @@ public class NioClient {
                     socketChannel.setOption((SocketOption<Boolean>) socketOption, (Boolean) optionValue);
                 }
             }
+
             readWriteExecutor.registerChannel(socketChannel);
             socketChannel.connect(new InetSocketAddress(getIp(), getPort()));
         } catch (IOException e) {
@@ -177,7 +179,7 @@ public class NioClient {
             return;
         }
         try {
-            Thread.sleep(getReconnectTime());
+            Thread.sleep(getReconnectInterval());
         } catch (InterruptedException e) {
             logger.error("", e);
         }
@@ -242,7 +244,6 @@ public class NioClient {
         private void select() throws IOException {
             // 等待io事件
             selector.select();
-
             Iterator<SelectionKey> selectedKeys = selector.selectedKeys().iterator();
 
             while (isRunning() && selectedKeys.hasNext()) {
@@ -259,6 +260,7 @@ public class NioClient {
                             tryReconnect();
                             break;
                         }
+
                         socketChannel.register(selector, SelectionKey.OP_READ);
                         Connection connection = new Connection(selectedKey, this, client.getReadBufferSize(), client.getWriteBufferSize());
                         connection.getHandlerChain().addLast(client.getHandler());
@@ -293,5 +295,4 @@ public class NioClient {
             }
         }
     }
-
 }

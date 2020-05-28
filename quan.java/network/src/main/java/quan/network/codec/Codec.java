@@ -1,7 +1,7 @@
-package quan.network.nio.codec;
+package quan.network.codec;
 
-import quan.network.nio.handler.Handler;
-import quan.network.nio.handler.HandlerContext;
+import quan.network.handler.Handler;
+import quan.network.handler.HandlerContext;
 
 import java.util.HashSet;
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.Set;
  * 抽象编解码器
  * Created by quanchangnai on 2020/5/27.
  */
-public abstract class AbstractCodec implements Handler<Object> {
+public abstract class Codec implements Handler<Object> {
 
     protected final Set<Class<?>> encodeTypes = new HashSet<>();
 

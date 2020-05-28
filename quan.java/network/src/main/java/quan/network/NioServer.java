@@ -1,6 +1,6 @@
-package quan.network.nio;
+package quan.network;
 
-import quan.network.nio.handler.Handler;
+import quan.network.handler.Handler;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -179,7 +179,7 @@ public class NioServer {
         readWriteExecutors = null;
     }
 
-    private ReadWriteExecutor nextReadWriteThreadExecutor() {
+    private ReadWriteExecutor nextReadWriteExecutor() {
         if (readWriteExecutorIndex > readWriteExecutors.length - 1) {
             readWriteExecutorIndex = 0;
         }
@@ -226,28 +226,30 @@ public class NioServer {
         private void select() throws IOException {
             // 等待io事件
             selector.select();
-
             Iterator<SelectionKey> selectedKeys = selector.selectedKeys().iterator();
+
             while (isRunning() && selectedKeys.hasNext()) {
                 SelectionKey selectedKey = selectedKeys.next();
                 selectedKeys.remove();
 
-                if (selectedKey.isValid() && selectedKey.isAcceptable()) {
-                    ServerSocketChannel serverSocketChannel = (ServerSocketChannel) selectedKey.channel();
-                    SocketChannel socketChannel = serverSocketChannel.accept();
-                    socketChannel.configureBlocking(false);
-                    for (SocketOption<?> socketOption : server.getSocketOptions().keySet()) {
-                        Object optionValue = server.getSocketOptions().get(socketOption);
-                        if (optionValue instanceof Integer) {
-                            socketChannel.setOption((SocketOption<Integer>) socketOption, (Integer) optionValue);
-                        } else if (optionValue instanceof Boolean) {
-                            socketChannel.setOption((SocketOption<Boolean>) socketOption, (Boolean) optionValue);
-                        }
-                    }
-
-                    ReadWriteExecutor readWriteExecutor = server.nextReadWriteThreadExecutor();
-                    readWriteExecutor.registerChannel(socketChannel);
+                if (!selectedKey.isValid() || !selectedKey.isAcceptable()) {
+                    continue;
                 }
+
+                ServerSocketChannel serverSocketChannel = (ServerSocketChannel) selectedKey.channel();
+                SocketChannel socketChannel = serverSocketChannel.accept();
+                socketChannel.configureBlocking(false);
+
+                for (SocketOption<?> socketOption : server.getSocketOptions().keySet()) {
+                    Object optionValue = server.getSocketOptions().get(socketOption);
+                    if (optionValue instanceof Integer) {
+                        socketChannel.setOption((SocketOption<Integer>) socketOption, (Integer) optionValue);
+                    } else if (optionValue instanceof Boolean) {
+                        socketChannel.setOption((SocketOption<Boolean>) socketOption, (Boolean) optionValue);
+                    }
+                }
+
+                server.nextReadWriteExecutor().registerChannel(socketChannel);
             }
         }
 
@@ -266,7 +268,6 @@ public class NioServer {
                     server.stop();
                 }
             }
-
         }
     }
 
@@ -349,7 +350,6 @@ public class NioServer {
         private void select() throws IOException {
             // 等待io事件
             selector.select();
-
             Iterator<SelectionKey> selectedKeys = selector.selectedKeys().iterator();
 
             while (isRunning() && selectedKeys.hasNext()) {
@@ -368,5 +368,4 @@ public class NioServer {
             }
         }
     }
-
 }

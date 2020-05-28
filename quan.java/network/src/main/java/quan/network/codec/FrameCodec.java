@@ -1,4 +1,4 @@
-package quan.network.nio.codec;
+package quan.network.codec;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -10,17 +10,17 @@ import java.util.List;
  *
  * @author quanchangnai
  */
-public class LengthFieldCodec extends AbstractCodec {
+public class FrameCodec extends Codec {
 
     /**
      * 长度字段本身占多长
      */
     private final int lengthFieldLength;
+
     /**
      * 总长度是否包含长度字段
      */
-
-    private final boolean lengthFieldInclude;
+    private final boolean includeLengthField;
 
     /**
      * 上次解码缓存下来的半包
@@ -33,15 +33,15 @@ public class LengthFieldCodec extends AbstractCodec {
         decodeTypes.add(ByteBuffer.class);
     }
 
-    public LengthFieldCodec() {
+    public FrameCodec() {
         this.lengthFieldLength = 2;
-        this.lengthFieldInclude = false;
+        this.includeLengthField = false;
     }
 
-    public LengthFieldCodec(int lengthFieldLength, boolean lengthFieldInclude) {
+    public FrameCodec(int lengthFieldLength, boolean includeLengthField) {
         super();
         this.lengthFieldLength = lengthFieldLength;
-        this.lengthFieldInclude = lengthFieldInclude;
+        this.includeLengthField = includeLengthField;
         validateLengthFieldLength();
     }
 
@@ -69,15 +69,11 @@ public class LengthFieldCodec extends AbstractCodec {
         while (srcMsgBuffer.hasRemaining()) {
             if (srcMsgBuffer.remaining() >= lengthFieldLength) {
                 int length = getLengthField(srcMsgBuffer);
-                int lengthExcludeLengthField = length;
-                if (lengthFieldInclude) {
-                    lengthExcludeLengthField = length - lengthFieldLength;
-                }
-                if (srcMsgBuffer.remaining() >= lengthExcludeLengthField) {
-                    byte[] decodedBytes = new byte[lengthExcludeLengthField];
+                int dataLength = includeLengthField ? length - lengthFieldLength : length;
+                if (srcMsgBuffer.remaining() >= dataLength) {
+                    byte[] decodedBytes = new byte[dataLength];
                     srcMsgBuffer.get(decodedBytes);
-                    ByteBuffer decodedBuffer = ByteBuffer.wrap(decodedBytes);
-                    decodedMsgBuffers.add(decodedBuffer);
+                    decodedMsgBuffers.add(ByteBuffer.wrap(decodedBytes));
                 } else {
                     lastBuffer = ByteBuffer.allocate(lengthFieldLength + srcMsgBuffer.remaining());
                     putLengthField(lastBuffer, length);
@@ -99,7 +95,7 @@ public class LengthFieldCodec extends AbstractCodec {
         ByteBuffer srcMsgBuffer = (ByteBuffer) msg;
         int length = srcMsgBuffer.remaining();
         ByteBuffer encodedMsgBuffer = ByteBuffer.allocate(lengthFieldLength + length);
-        if (lengthFieldInclude) {
+        if (includeLengthField) {
             length += lengthFieldLength;
         }
         putLengthField(encodedMsgBuffer, length);

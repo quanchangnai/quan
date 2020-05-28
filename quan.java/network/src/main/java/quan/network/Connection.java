@@ -1,9 +1,9 @@
-package quan.network.nio;
+package quan.network;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import quan.network.nio.handler.HandlerChain;
-import quan.network.nio.handler.HandlerContext;
+import quan.network.handler.HandlerChain;
+import quan.network.handler.HandlerContext;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -264,13 +264,13 @@ public class Connection {
      */
     public void send(ByteBuffer msg) {
         if (executor.isInMyThread()) {
-            send0(msg);
+            doSend(msg);
         } else {
-            executor.execute(() -> send0(msg));
+            executor.execute(() -> doSend(msg));
         }
     }
 
-    private void send0(ByteBuffer msg) {
+    protected void doSend(ByteBuffer msg) {
         if (!selectionKey.isValid()) {
             return;
         }
@@ -285,6 +285,14 @@ public class Connection {
      * 关闭连接，不能在具体逻辑中直接调用，具体逻辑中应该调用{@link HandlerContext#close()}
      */
     public void close() {
+        if (executor.isInMyThread()) {
+            doClose();
+        } else {
+            executor.execute(this::doClose);
+        }
+    }
+
+    protected void doClose() {
         try {
             if (!this.isConnected()) {
                 return;

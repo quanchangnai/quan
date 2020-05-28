@@ -2,13 +2,12 @@ package quan.network;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import quan.network.nio.NioServer;
-import quan.network.nio.handler.Handler;
-import quan.network.nio.handler.HandlerChain;
-import quan.network.nio.handler.HandlerConfigurer;
-import quan.network.nio.handler.HandlerContext;
-import quan.network.nio.codec.LengthFieldCodec;
-import quan.network.nio.codec.StringCodec;
+import quan.network.codec.FrameCodec;
+import quan.network.codec.StringCodec;
+import quan.network.handler.Handler;
+import quan.network.handler.HandlerChain;
+import quan.network.handler.HandlerConfigurer;
+import quan.network.handler.HandlerContext;
 
 import java.net.StandardSocketOptions;
 
@@ -25,7 +24,7 @@ public class NioServerTest {
         server.setHandler(new HandlerConfigurer() {
             @Override
             public void configureHandler(HandlerChain handlerChain) {
-                handlerChain.addLast(new LengthFieldCodec(4, true));
+                handlerChain.addLast(new FrameCodec(4, true));
                 handlerChain.addLast(new StringCodec());
                 handlerChain.addLast(new TestServerHandler());
             }
@@ -34,7 +33,7 @@ public class NioServerTest {
 
         server.start();
 
-        logger.error("服务器启动成功");
+        logger.info("服务器启动成功");
     }
 
 
@@ -42,7 +41,7 @@ public class NioServerTest {
 
         @Override
         public void onConnected(HandlerContext handlerContext) {
-            System.err.println("onConnected");
+            logger.info("onConnected");
 
             new Thread(() -> {
                 while (true) {
@@ -63,19 +62,18 @@ public class NioServerTest {
 
         @Override
         public void onReceived(HandlerContext handlerContext, String msg) {
-            System.err.println("onReceived:" + msg);
+            logger.info("onReceived:" + msg);
             handlerContext.send(msg);
         }
 
         @Override
         public void onExceptionCaught(HandlerContext handlerContext, Throwable cause) {
-            System.err.println("onExceptionCaught");
-            cause.printStackTrace();
+            logger.error("onExceptionCaught", cause);
         }
 
         @Override
         public void onEventTriggered(HandlerContext handlerContext, Object event) {
-            System.err.println("onEventTriggered:" + event);
+            logger.info("onEventTriggered:{}", event);
             handlerContext.send("aaa:" + System.nanoTime());
         }
     }

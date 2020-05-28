@@ -1,7 +1,7 @@
-package quan.network.nio.handler;
+package quan.network.handler;
 
-import quan.network.nio.Connection;
-import quan.network.nio.TaskExecutor;
+import quan.network.TaskExecutor;
+import quan.network.Connection;
 
 /**
  * 处理器上下文
@@ -42,73 +42,73 @@ public class HandlerContext {
 
     public void triggerConnected() {
         if (getExecutor().isInMyThread()) {
-            triggerNextHandlerConnected();
+            onConnected();
         } else {
-            getExecutor().execute(this::triggerNextHandlerConnected);
+            getExecutor().execute(this::onConnected);
         }
     }
 
-    private void triggerNextHandlerConnected() {
+    private void onConnected() {
         try {
             if (next != null && next.getHandler() != null) {
                 next.getHandler().onConnected(next);
             }
         } catch (Exception e) {
-            triggerNextHandlerExceptionCaught(e);
+            onExceptionCaught(e);
         }
     }
 
     public void triggerDisconnected() {
         if (getExecutor().isInMyThread()) {
-            triggerNextHandlerDisconnected();
+            onDisconnected();
         } else {
-            getExecutor().execute(this::triggerNextHandlerDisconnected);
+            getExecutor().execute(this::onDisconnected);
         }
     }
 
-    private void triggerNextHandlerDisconnected() {
+    private void onDisconnected() {
         try {
             if (next != null && next.getHandler() != null) {
                 next.getHandler().onDisconnected(next);
             }
         } catch (Exception e) {
-            triggerNextHandlerExceptionCaught(e);
+            onExceptionCaught(e);
         }
     }
 
     public void triggerReceived(Object msg) {
         if (getExecutor().isInMyThread()) {
-            triggerNextHandlerReceived(msg);
+            onReceived(msg);
         } else {
-            getExecutor().execute(() -> triggerNextHandlerReceived(msg));
+            getExecutor().execute(() -> onReceived(msg));
         }
     }
 
-    private void triggerNextHandlerReceived(Object msg) {
+    private void onReceived(Object msg) {
         try {
             if (next != null && next.getHandler() != null) {
                 next.getHandler().onReceived(next, msg);
             }
         } catch (Exception e) {
-            triggerNextHandlerExceptionCaught(e);
+            onExceptionCaught(e);
         }
     }
 
-    public void triggerExceptionCaught(Throwable cause) {
+    public void triggerException(Throwable cause) {
         if (getExecutor().isInMyThread()) {
-            triggerNextHandlerExceptionCaught(cause);
+            onExceptionCaught(cause);
         } else {
-            getExecutor().execute(() -> triggerNextHandlerExceptionCaught(cause));
+            getExecutor().execute(() -> onExceptionCaught(cause));
         }
     }
 
-    private void triggerNextHandlerExceptionCaught(Throwable cause) {
+    private void onExceptionCaught(Throwable cause) {
         try {
             if (next != null && next.getHandler() != null) {
                 next.getHandler().onExceptionCaught(next, cause);
             }
         } catch (Exception e) {
-            next.triggerExceptionCaught(e);
+            next.triggerException(e);
         }
     }
 
@@ -116,48 +116,56 @@ public class HandlerContext {
      * 触发自定义事件
      */
     public void triggerEvent(Object event) {
+        if (getExecutor().isInMyThread()) {
+            onEventTriggered(event);
+        } else {
+            getExecutor().execute(() -> onEventTriggered(event));
+        }
+    }
+
+    public void onEventTriggered(Object event) {
         try {
             if (next != null && next.getHandler() != null) {
                 next.getHandler().onEventTriggered(next, event);
             }
         } catch (Exception e) {
-            next.triggerExceptionCaught(e);
+            onExceptionCaught(e);
         }
     }
 
     public void send(Object msg) {
         if (getExecutor().isInMyThread()) {
-            triggerPrevHandlerSend(msg);
+            onSend(msg);
         } else {
-            getExecutor().execute(() -> triggerPrevHandlerSend(msg));
+            getExecutor().execute(() -> onSend(msg));
         }
     }
 
-    private void triggerPrevHandlerSend(Object msg) {
+    private void onSend(Object msg) {
         try {
             if (prev != null && prev.getHandler() != null) {
                 prev.getHandler().onSend(prev, msg);
             }
         } catch (Exception e) {
-            triggerNextHandlerExceptionCaught(e);
+            onExceptionCaught(e);
         }
     }
 
     public void close() {
         if (getExecutor().isInMyThread()) {
-            triggerPrevHandlerClose();
+            onClose();
         } else {
-            getExecutor().execute(this::triggerPrevHandlerClose);
+            getExecutor().execute(this::onClose);
         }
     }
 
-    private void triggerPrevHandlerClose() {
+    private void onClose() {
         try {
             if (prev != null && prev.getHandler() != null) {
                 (prev.getHandler()).onClose(prev);
             }
         } catch (Exception e) {
-            triggerNextHandlerExceptionCaught(e);
+            onExceptionCaught(e);
         }
     }
 

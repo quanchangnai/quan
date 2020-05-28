@@ -1,4 +1,4 @@
-package quan.network.nio.handler;
+package quan.network.handler;
 
 /**
  * 网络IO处理器
@@ -33,7 +33,7 @@ public interface Handler<M> {
      * 捕获异常了
      */
     default void onExceptionCaught(HandlerContext handlerContext, Throwable cause) {
-        handlerContext.triggerExceptionCaught(cause);
+        handlerContext.triggerException(cause);
     }
 
     /**
