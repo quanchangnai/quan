@@ -301,7 +301,7 @@ public class Connection {
             socketChannel.close();
             triggerDisconnected();
         } catch (IOException e) {
-            logger.error("关闭连接异常", e);
+            triggerExceptionCaught(e);
         }
     }
 

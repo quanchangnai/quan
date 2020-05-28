@@ -39,7 +39,6 @@ public class FrameCodec extends Codec {
     }
 
     public FrameCodec(int lengthFieldLength, boolean includeLengthField) {
-        super();
         this.lengthFieldLength = lengthFieldLength;
         this.includeLengthField = includeLengthField;
         validateLengthFieldLength();

@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 集成Netty的消息编解码器
@@ -20,7 +21,7 @@ public class NettyMessageCodec extends ByteToMessageCodec<Message> {
 
     public NettyMessageCodec(MessageRegistry messageRegistry) {
         super(Message.class);
-        this.messageRegistry = messageRegistry;
+        this.messageRegistry = Objects.requireNonNull(messageRegistry, "消息注册表不能为空");
     }
 
     @Override

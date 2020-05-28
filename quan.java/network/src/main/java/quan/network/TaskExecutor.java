@@ -47,7 +47,7 @@ public class TaskExecutor implements Executor, Runnable {
             }
             try {
                 after();
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 logger.error("", e);
             }
         }

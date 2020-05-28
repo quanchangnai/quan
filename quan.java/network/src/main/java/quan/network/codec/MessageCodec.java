@@ -10,6 +10,7 @@ import quan.message.SimpleBuffer;
 import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 消息编解码器
@@ -27,7 +28,7 @@ public class MessageCodec extends Codec {
     }
 
     public MessageCodec(MessageRegistry messageRegistry) {
-        this.messageRegistry = messageRegistry;
+        this.messageRegistry = Objects.requireNonNull(messageRegistry, "消息注册表不能为空");
     }
 
     @Override
