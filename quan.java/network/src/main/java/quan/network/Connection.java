@@ -10,10 +10,10 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * nio网络连接的封装，提供读写数据等功能
@@ -51,7 +51,7 @@ public class Connection {
 
     private Queue<ByteBuffer> msgQueue = new LinkedList<>();
 
-    private Map<Object, Object> attrs = new HashMap<>();
+    private Map<Object, Object> attachments = new ConcurrentHashMap<>();
 
     public Connection(SelectionKey selectionKey, TaskExecutor executor, int readBufferSize, int writeBufferSize) {
         this.executor = executor;
@@ -74,18 +74,6 @@ public class Connection {
         return connected;
     }
 
-    public Object putAttr(Object key, Object value) {
-        return attrs.put(key, value);
-    }
-
-    public Object getAttr(Object key) {
-        return attrs.get(key);
-    }
-
-    public Object removeAttr(Object key) {
-        return attrs.remove(key);
-    }
-
     public InetSocketAddress getRemoteAddress() {
         try {
             return (InetSocketAddress) socketChannel.getRemoteAddress();
@@ -93,6 +81,10 @@ public class Connection {
             logger.error("获取地址失败", e);
         }
         return null;
+    }
+
+    public Map<Object, Object> getAttachments() {
+        return attachments;
     }
 
     /**

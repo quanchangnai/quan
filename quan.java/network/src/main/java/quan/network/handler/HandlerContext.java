@@ -3,8 +3,10 @@ package quan.network.handler;
 import quan.network.TaskExecutor;
 import quan.network.Connection;
 
+import java.util.Map;
+
 /**
- * 处理器上下文
+ * 处理器上下文,用来表示处理器链上的一个节点
  *
  * @author quanchangnai
  */
@@ -169,16 +171,8 @@ public class HandlerContext {
         }
     }
 
-    public Object putAttr(Object key, Object value) {
-        return chain.getConnection().putAttr(key, value);
-    }
-
-    public Object getAttr(Object key) {
-        return chain.getConnection().getAttr(key);
-    }
-
-    public Object removeAttr(Object key) {
-        return chain.getConnection().removeAttr(key);
+    public Map<Object, Object> getAttachments() {
+        return chain.getConnection().getAttachments();
     }
 
 }
