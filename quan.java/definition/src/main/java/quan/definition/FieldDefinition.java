@@ -376,6 +376,9 @@ public class FieldDefinition extends Definition {
     }
 
     public String getColumn() {
+        if (StringUtils.isBlank(column)) {
+            return getName();
+        }
         return column;
     }
 

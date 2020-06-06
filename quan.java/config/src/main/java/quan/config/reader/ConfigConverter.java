@@ -139,6 +139,10 @@ public class ConfigConverter {
      * 转换枚举字段，支持枚举值或者枚举名
      */
     private Object convertEnumType(EnumDefinition enumDefinition, String value) {
+        if (StringUtils.isBlank(value)) {
+            return null;
+        }
+
         int enumValue = 0;
         try {
             enumValue = Integer.parseInt(value);

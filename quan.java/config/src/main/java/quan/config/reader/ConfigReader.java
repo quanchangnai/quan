@@ -197,8 +197,9 @@ public abstract class ConfigReader {
             if (configDefinition.isIndexField(fieldDefinition) && !constantKeyField) {
                 validatedErrors.add(String.format("配置[%s]的第[%d]行第[%s]列[%s]的索引值不能为空", table, row, columnStr, columnName));
             }
-            //必填字段校验
-            if (!fieldDefinition.isOptional() && fieldDefinition.isBeanType() && fieldDefinition.getColumnNums().size() == 1) {
+            //没有默认值的必填字段校验
+            boolean notNull = fieldDefinition.isEnumType() || fieldDefinition.isTimeType() || fieldDefinition.isBeanType() && fieldDefinition.getColumnNums().size() == 1;
+            if (!fieldDefinition.isOptional() && notNull) {
                 validatedErrors.add(String.format("配置[%s]的第[%d]行第[%s]列[%s]不能为空", table, row, columnStr, columnName));
             }
             return;
