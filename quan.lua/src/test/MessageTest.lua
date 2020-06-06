@@ -64,7 +64,7 @@ local function testBuffer()
 
     print("=================")
 
-    local file = io.open("E:\\buffer", "w")
+    local file = io.open("../../.temp/message/buffer", "w")
     file:write(buffer.bytes)
     file:flush()
 
@@ -118,7 +118,7 @@ local function testMessage1()
     local sRoleLogin2 = sRoleLogin2.decode(buffer)
 
     local buffer = SRoleLogin.encode(sRoleLogin2)
-    local file = io.open("E:\\SRoleLogin", "w")
+    local file = io.open("../../.temp/message/SRoleLogin", "w")
     file:write(buffer.bytes)
     file:flush()
 

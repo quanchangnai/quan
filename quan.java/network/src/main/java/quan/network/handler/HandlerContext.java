@@ -125,7 +125,7 @@ public class HandlerContext {
         }
     }
 
-    public void onEventTriggered(Object event) {
+    private void onEventTriggered(Object event) {
         try {
             if (next != null && next.getHandler() != null) {
                 next.getHandler().onEventTriggered(next, event);
