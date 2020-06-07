@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * 帧长度可变的编解码器，基于一个长度字段实现
+ * 帧长度可变的编码解码器，基于一个长度字段实现
  *
  * @author quanchangnai
  */

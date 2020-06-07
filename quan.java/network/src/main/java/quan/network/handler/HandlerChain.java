@@ -36,7 +36,7 @@ public class HandlerChain {
     }
 
     public void addLast(Handler handler) {
-        Objects.requireNonNull(handler, "参数handler不能为空");
+        Objects.requireNonNull(handler, "参数[handler]不能为空");
         HandlerContext handlerContext = new HandlerContext(handler, this);
         handlerContext.prev = tail.prev;
         handlerContext.next = tail;
@@ -45,7 +45,7 @@ public class HandlerChain {
     }
 
     public void addFirst(Handler handler) {
-        Objects.requireNonNull(handler, "参数handler不能为空");
+        Objects.requireNonNull(handler, "参数[handler]不能为空");
         HandlerContext handlerContext = new HandlerContext(handler, this);
         handlerContext.prev = head;
         handlerContext.next = head.next;
@@ -54,7 +54,7 @@ public class HandlerChain {
     }
 
     public void remove(Handler handler) {
-        Objects.requireNonNull(handler, "参数handler不能为空");
+        Objects.requireNonNull(handler, "参数[handler]不能为空");
         HandlerContext handlerContext = head;
         while (handlerContext != tail) {
             if (handlerContext.getHandler() == handler) {
@@ -111,7 +111,7 @@ public class HandlerChain {
             } else if (msg instanceof byte[]) {
                 connection.send(ByteBuffer.wrap((byte[]) msg));
             } else {
-                Exception exception = new IllegalArgumentException("发送的消息经过处理器链后的最终结果必须是ByteBuffer或者byte[]类型");
+                Exception exception = new IllegalArgumentException("发送的消息经过处理之后的类型必须是ByteBuffer或者byte[]");
                 handlerContext.triggerExceptionCaught(exception);
             }
         }

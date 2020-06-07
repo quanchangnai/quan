@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * 抽象编解码器
+ * 抽象编码解码器
  * Created by quanchangnai on 2020/5/27.
  */
 public abstract class Codec implements Handler<Object> {

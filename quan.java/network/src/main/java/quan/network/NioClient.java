@@ -126,8 +126,8 @@ public class NioClient {
     }
 
     public void start() {
-        Objects.requireNonNull(handler, "参数[handler]不能为空")
-        ;
+        Objects.requireNonNull(handler, "参数[handler]不能为空");
+
         if (isRunning()) {
             stop();
         }
