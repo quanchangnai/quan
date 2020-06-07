@@ -25,15 +25,15 @@ public interface Handler<M> {
     /**
      * 收到消息了
      */
-    default void onReceived(HandlerContext handlerContext, M msg) throws Exception {
-        handlerContext.triggerReceived(msg);
+    default void onMsgReceived(HandlerContext handlerContext, M msg) throws Exception {
+        handlerContext.triggerMsgReceived(msg);
     }
 
     /**
      * 捕获异常了
      */
     default void onExceptionCaught(HandlerContext handlerContext, Throwable cause) {
-        handlerContext.triggerException(cause);
+        handlerContext.triggerExceptionCaught(cause);
     }
 
     /**
@@ -46,8 +46,8 @@ public interface Handler<M> {
     /**
      * 发送消息
      */
-    default void onSend(HandlerContext handlerContext, Object msg) throws Exception {
-        handlerContext.send(msg);
+    default void onSendMsg(HandlerContext handlerContext, Object msg) throws Exception {
+        handlerContext.sendMsg(msg);
     }
 
     /**

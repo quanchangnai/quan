@@ -195,7 +195,7 @@ public class DatabaseTest {
     public void testWriteBson() throws Exception {
         System.err.println("testWriteBson==========");
 
-        File outPath = new File("out");
+        File outPath = new File("build" + File.separator + "tmp");
         if (!outPath.mkdir()) {
             System.err.println("outPath.mkdir():false");
         }
@@ -217,7 +217,7 @@ public class DatabaseTest {
     public void testReadBson() throws Exception {
         System.err.println("testReadBson==========");
 
-        BsonReader bsonReader = new JsonReader(new FileReader("out" + File.separator + "test.json"));
+        BsonReader bsonReader = new JsonReader(new FileReader("build" + File.separator + "tmp" + File.separator + "test.json"));
 
         bsonReader.readStartDocument();
         System.err.println(bsonReader.readInt32("aaa"));

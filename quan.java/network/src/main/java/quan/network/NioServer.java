@@ -125,46 +125,52 @@ public class NioServer {
     }
 
     public void start() {
-        Objects.requireNonNull(getHandler(), "handler不能为空");
+        Objects.requireNonNull(handler, "参数[handler]不能为空");
 
         if (isRunning()) {
             stop();
         }
 
         try {
-            acceptExecutor = new AcceptExecutor(this);
-            if (readWriteThreadNum <= 0) {
-                readWriteThreadNum = Runtime.getRuntime().availableProcessors() * 2;
-            }
-            readWriteExecutors = new ReadWriteExecutor[readWriteThreadNum];
-            for (int i = 0; i < readWriteThreadNum; i++) {
-                readWriteExecutors[i] = new ReadWriteExecutor(this);
-            }
-
-            running = true;
-
-            acceptExecutor.start();
-            for (ReadWriteExecutor readWriteExecutor : readWriteExecutors) {
-                readWriteExecutor.start();
-            }
-
-            ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
-            serverSocketChannel.configureBlocking(false);
-            for (SocketOption<?> socketOption : getServerSocketOptions().keySet()) {
-                Object optionValue = getServerSocketOptions().get(socketOption);
-                if (optionValue instanceof Integer) {
-                    serverSocketChannel.setOption((SocketOption<Integer>) socketOption, (Integer) optionValue);
-                } else if (optionValue instanceof Boolean) {
-                    serverSocketChannel.setOption((SocketOption<Boolean>) socketOption, (Boolean) optionValue);
-                }
-            }
-            serverSocketChannel.socket().bind(new InetSocketAddress(getIp(), getPort()));
-            acceptExecutor.registerChannel(serverSocketChannel);
-
+            doStart();
         } catch (Exception e) {
             stop();
             throw new RuntimeException(e);
         }
+    }
+
+    private void doStart() throws Exception {
+        acceptExecutor = new AcceptExecutor(this);
+        if (readWriteThreadNum <= 0) {
+            readWriteThreadNum = Runtime.getRuntime().availableProcessors() * 2;
+        }
+
+        readWriteExecutors = new ReadWriteExecutor[readWriteThreadNum];
+        for (int i = 0; i < readWriteThreadNum; i++) {
+            readWriteExecutors[i] = new ReadWriteExecutor(this);
+        }
+
+        running = true;
+
+        acceptExecutor.start();
+        for (ReadWriteExecutor readWriteExecutor : readWriteExecutors) {
+            readWriteExecutor.start();
+        }
+
+        ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
+        serverSocketChannel.configureBlocking(false);
+
+        for (SocketOption<?> socketOption : getServerSocketOptions().keySet()) {
+            Object optionValue = getServerSocketOptions().get(socketOption);
+            if (optionValue instanceof Integer) {
+                serverSocketChannel.setOption((SocketOption<Integer>) socketOption, (Integer) optionValue);
+            } else if (optionValue instanceof Boolean) {
+                serverSocketChannel.setOption((SocketOption<Boolean>) socketOption, (Boolean) optionValue);
+            }
+        }
+
+        serverSocketChannel.socket().bind(new InetSocketAddress(getIp(), getPort()));
+        acceptExecutor.registerChannel(serverSocketChannel);
     }
 
     public void stop() {

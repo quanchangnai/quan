@@ -1,9 +1,10 @@
 package quan.network.handler;
 
 import quan.network.TaskExecutor;
-import quan.network.Connection;
 
+import java.net.InetSocketAddress;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 处理器上下文,用来表示处理器链上的一个节点
@@ -34,16 +35,12 @@ public class HandlerContext {
         return chain;
     }
 
-    public Connection getConnection() {
-        return chain.getConnection();
-    }
-
     public TaskExecutor getExecutor() {
         return chain.getExecutor();
     }
 
     public void triggerConnected() {
-        if (getExecutor().isInMyThread()) {
+        if (getExecutor().isInMyTerritory()) {
             onConnected();
         } else {
             getExecutor().execute(this::onConnected);
@@ -61,7 +58,7 @@ public class HandlerContext {
     }
 
     public void triggerDisconnected() {
-        if (getExecutor().isInMyThread()) {
+        if (getExecutor().isInMyTerritory()) {
             onDisconnected();
         } else {
             getExecutor().execute(this::onDisconnected);
@@ -78,26 +75,26 @@ public class HandlerContext {
         }
     }
 
-    public void triggerReceived(Object msg) {
-        if (getExecutor().isInMyThread()) {
-            onReceived(msg);
+    public void triggerMsgReceived(Object msg) {
+        if (getExecutor().isInMyTerritory()) {
+            onMsgReceived(msg);
         } else {
-            getExecutor().execute(() -> onReceived(msg));
+            getExecutor().execute(() -> onMsgReceived(msg));
         }
     }
 
-    private void onReceived(Object msg) {
+    private void onMsgReceived(Object msg) {
         try {
             if (next != null && next.getHandler() != null) {
-                next.getHandler().onReceived(next, msg);
+                next.getHandler().onMsgReceived(next, msg);
             }
         } catch (Exception e) {
             onExceptionCaught(e);
         }
     }
 
-    public void triggerException(Throwable cause) {
-        if (getExecutor().isInMyThread()) {
+    public void triggerExceptionCaught(Throwable cause) {
+        if (getExecutor().isInMyTerritory()) {
             onExceptionCaught(cause);
         } else {
             getExecutor().execute(() -> onExceptionCaught(cause));
@@ -110,7 +107,7 @@ public class HandlerContext {
                 next.getHandler().onExceptionCaught(next, cause);
             }
         } catch (Exception e) {
-            next.triggerException(e);
+            next.triggerExceptionCaught(e);
         }
     }
 
@@ -118,7 +115,7 @@ public class HandlerContext {
      * 触发自定义事件
      */
     public void triggerEvent(Object event) {
-        if (getExecutor().isInMyThread()) {
+        if (getExecutor().isInMyTerritory()) {
             onEventTriggered(event);
         } else {
             getExecutor().execute(() -> onEventTriggered(event));
@@ -135,18 +132,19 @@ public class HandlerContext {
         }
     }
 
-    public void send(Object msg) {
-        if (getExecutor().isInMyThread()) {
-            onSend(msg);
+    public void sendMsg(Object msg) {
+        Objects.requireNonNull(msg, "参数[msg]不能为空");
+        if (getExecutor().isInMyTerritory()) {
+            onSendMsg(msg);
         } else {
-            getExecutor().execute(() -> onSend(msg));
+            getExecutor().execute(() -> onSendMsg(msg));
         }
     }
 
-    private void onSend(Object msg) {
+    private void onSendMsg(Object msg) {
         try {
             if (prev != null && prev.getHandler() != null) {
-                prev.getHandler().onSend(prev, msg);
+                prev.getHandler().onSendMsg(prev, msg);
             }
         } catch (Exception e) {
             onExceptionCaught(e);
@@ -154,7 +152,7 @@ public class HandlerContext {
     }
 
     public void close() {
-        if (getExecutor().isInMyThread()) {
+        if (getExecutor().isInMyTerritory()) {
             onClose();
         } else {
             getExecutor().execute(this::onClose);
@@ -171,8 +169,12 @@ public class HandlerContext {
         }
     }
 
+    public InetSocketAddress getRemoteAddress() {
+        return chain.connection.getRemoteAddress();
+    }
+
     public Map<Object, Object> getAttachments() {
-        return chain.getConnection().getAttachments();
+        return chain.connection.getAttachments();
     }
 
 }

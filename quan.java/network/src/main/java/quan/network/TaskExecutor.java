@@ -3,6 +3,7 @@ package quan.network;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -22,12 +23,17 @@ public class TaskExecutor implements Executor, Runnable {
 
     private BlockingQueue<Runnable> taskQueue = new LinkedBlockingQueue<>();
 
-    public boolean isInMyThread() {
+    /**
+     * 判断当前线程是不是执行器关联的线程
+     */
+    public boolean isInMyTerritory() {
         return Thread.currentThread().getId() == thread.getId();
     }
 
     @Override
+    @SuppressWarnings("NullableProblems")
     public void execute(Runnable task) {
+        Objects.requireNonNull(task, "参数[task]不能为空");
         try {
             taskQueue.put(task);
         } catch (InterruptedException e) {

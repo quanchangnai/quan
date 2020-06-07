@@ -2,8 +2,8 @@ package quan.network.handler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import quan.network.TaskExecutor;
 import quan.network.Connection;
+import quan.network.TaskExecutor;
 
 import java.nio.ByteBuffer;
 import java.util.Objects;
@@ -17,7 +17,7 @@ public class HandlerChain {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private Connection connection;
+    protected Connection connection;
 
     private HandlerContext head;
 
@@ -29,10 +29,6 @@ public class HandlerChain {
         this.tail = new TailHandlerContext(null, this);
         this.head.next = tail;
         this.tail.prev = head;
-    }
-
-    public Connection getConnection() {
-        return connection;
     }
 
     public TaskExecutor getExecutor() {
@@ -90,11 +86,11 @@ public class HandlerChain {
     }
 
     public void triggerReceived(Object msg) {
-        head.triggerReceived(msg);
+        head.triggerMsgReceived(msg);
     }
 
     public void triggerExceptionCaught(Throwable cause) {
-        head.triggerException(cause);
+        head.triggerExceptionCaught(cause);
     }
 
     private class HeadHandlerContext extends HandlerContext implements Handler {
@@ -109,20 +105,20 @@ public class HandlerChain {
         }
 
         @Override
-        public void onSend(HandlerContext handlerContext, Object msg) {
+        public void onSendMsg(HandlerContext handlerContext, Object msg) {
             if (msg instanceof ByteBuffer) {
                 connection.send((ByteBuffer) msg);
             } else if (msg instanceof byte[]) {
                 connection.send(ByteBuffer.wrap((byte[]) msg));
             } else {
                 Exception exception = new IllegalArgumentException("发送的消息经过处理器链后的最终结果必须是ByteBuffer或者byte[]类型");
-                handlerContext.triggerException(exception);
+                handlerContext.triggerExceptionCaught(exception);
             }
         }
 
         @Override
         public void close() {
-            getConnection().close();
+            connection.close();
         }
     }
 

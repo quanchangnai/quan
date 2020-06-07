@@ -107,7 +107,7 @@ public class FrameCodec extends Codec {
     private void validateLengthFieldLength() {
         List<Integer> allowLengthFieldLengthList = Arrays.asList(1, 2, 4);
         if (!allowLengthFieldLengthList.contains(lengthFieldLength)) {
-            throw new IllegalArgumentException("lengthFieldLength不合法，允许的值为：" + allowLengthFieldLengthList);
+            throw new IllegalArgumentException("参数[lengthFieldLength]不合法，允许的值为：" + allowLengthFieldLengthList);
         }
     }
 

@@ -50,7 +50,7 @@ public class NioServerTest {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    handlerContext.send("aaa:" + System.nanoTime());
+                    handlerContext.sendMsg("aaa:" + System.nanoTime());
                 }
             }).start();
         }
@@ -61,9 +61,9 @@ public class NioServerTest {
         }
 
         @Override
-        public void onReceived(HandlerContext handlerContext, String msg) {
-            logger.info("onReceived:" + msg);
-            handlerContext.send(msg);
+        public void onMsgReceived(HandlerContext handlerContext, String msg) {
+            logger.info("onMsgReceived:" + msg);
+            handlerContext.sendMsg(msg);
         }
 
         @Override
@@ -74,7 +74,7 @@ public class NioServerTest {
         @Override
         public void onEventTriggered(HandlerContext handlerContext, Object event) {
             logger.info("onEventTriggered:{}", event);
-            handlerContext.send("aaa:" + System.nanoTime());
+            handlerContext.sendMsg("aaa:" + System.nanoTime());
         }
     }
 
