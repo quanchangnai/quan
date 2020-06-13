@@ -13,16 +13,16 @@ import ${import};
 </#if>
  * 自动生成
  */
-public<#if definitionType ==9> abstract</#if> class ${name} extends <#if definitionType ==2>Bean<#elseif definitionType ==3 && head??>${head.name}<#else>Message</#if> {
+public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#elseif kind ==3 && head??>${head.name}<#else>Message</#if> {
 
-<#if definitionType ==3>
+<#if kind ==3>
     /**
      * 消息ID
      */
     public static final int ID = ${id?c};
 
 </#if>
-<#if definitionType ==9>
+<#if kind ==9>
     <#assign fieldModifier = "protected">
 <#else>
     <#assign fieldModifier = "private">
@@ -49,7 +49,7 @@ public<#if definitionType ==9> abstract</#if> class ${name} extends <#if definit
 
 </#list>
 
-<#if definitionType ==3>
+<#if kind ==3>
     /**
      * 消息ID
      */
@@ -112,7 +112,7 @@ public<#if definitionType ==9> abstract</#if> class ${name} extends <#if definit
 
     </#if>
 </#list>
-<#if definitionType ==3>
+<#if kind ==3>
     @Override
     public ${name} create() {
         return new ${name}();

@@ -15,9 +15,9 @@ namespace ${getFullPackageName("cs")}
 </#if>
 	/// 自动生成
 	/// </summary>
-    public<#if definitionType ==9> abstract</#if> class ${name} : <#if definitionType ==2>Bean<#elseif definitionType ==3 && head??>${head.name}<#else>MessageBase</#if>
+    public<#if kind ==9> abstract</#if> class ${name} : <#if kind ==2>Bean<#elseif kind ==3 && head??>${head.name}<#else>MessageBase</#if>
     {
-<#if definitionType ==3>
+<#if kind ==3>
 		/// <summary>
 		/// 消息ID
 		/// </summary>
@@ -120,7 +120,7 @@ namespace ${getFullPackageName("cs")}
     </#if>
 </#list>
 
-<#if definitionType ==3>
+<#if kind ==3>
 		public override MessageBase Create()
 		{
 			return new ${name}();

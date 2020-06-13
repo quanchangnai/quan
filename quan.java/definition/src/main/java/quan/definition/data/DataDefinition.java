@@ -41,12 +41,12 @@ public class DataDefinition extends BeanDefinition {
     }
 
     @Override
-    public int getDefinitionType() {
+    public int getKind() {
         return 5;
     }
 
     @Override
-    public String getDefinitionTypeName() {
+    public String getKindName() {
         return "数据";
     }
 
@@ -58,7 +58,7 @@ public class DataDefinition extends BeanDefinition {
     }
 
     @Override
-    public Pattern namePattern() {
+    public Pattern getNamePattern() {
         return Constants.DATA_NAME_PATTERN;
     }
 

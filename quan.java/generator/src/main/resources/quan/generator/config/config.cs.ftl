@@ -1,10 +1,10 @@
-<#if definitionType == 6>
+<#if kind == 6>
 using System.Collections.Generic;
 using System.Collections.Immutable;
 </#if>
 using Newtonsoft.Json.Linq;
 using Quan.Common.Utils;
-<#if !(parentName??) || definitionType == 6>
+<#if !(parentName??) || kind == 6>
 using Quan.Config;
 </#if>
 <#list imports as import>
@@ -19,7 +19,7 @@ namespace ${getFullPackageName("cs")}
 </#if>
 	/// 自动生成
 	/// </summary>
-    public class ${name} : <#if parentName??>${parentName}<#elseif definitionType ==2>Bean<#else>ConfigBase</#if>
+    public class ${name} : <#if parentName??>${parentName}<#elseif kind ==2>Bean<#else>ConfigBase</#if>
     {
 <#if !selfFields??>
     <#assign selfFields = fields>
@@ -113,7 +113,7 @@ namespace ${getFullPackageName("cs")}
 </#list>
         }
 
- <#if definitionType ==6>
+ <#if kind ==6>
         protected override ConfigBase Create(JObject json)
         {
             return new ${name}(json);
@@ -161,7 +161,7 @@ namespace ${getFullPackageName("cs")}
             </#list>
                    '}';
         }
-<#if definitionType ==6>
+<#if kind ==6>
 
         // 所有${name}
         private static volatile IList<${name}> _configs = new List<${name}>();

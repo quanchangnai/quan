@@ -33,7 +33,7 @@ public class MessageDefinition extends BeanDefinition {
     }
 
     @Override
-    public int getDefinitionType() {
+    public int getKind() {
         return 3;
     }
 
@@ -43,7 +43,7 @@ public class MessageDefinition extends BeanDefinition {
     }
 
     @Override
-    public String getDefinitionTypeName() {
+    public String getKindName() {
         return "消息";
     }
 

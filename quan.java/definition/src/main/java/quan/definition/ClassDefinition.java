@@ -43,12 +43,12 @@ public abstract class ClassDefinition extends Definition {
 
 
     @Override
-    public String getDefinitionTypeName() {
+    public String getKindName() {
         return "类";
     }
 
     @Override
-    public Pattern namePattern() {
+    public Pattern getNamePattern() {
         return Constants.CLASS_NAME_PATTERN;
     }
 
@@ -206,9 +206,9 @@ public abstract class ClassDefinition extends Definition {
 
     protected void validateNameAndLanguage() {
         if (getName() == null) {
-            addValidatedError(getDefinitionTypeName() + "名不能为空");
-        } else if (!namePattern().matcher(getName()).matches()) {
-            addValidatedError(getDefinitionTypeName() + "名[" + getName() + "]格式错误,正确格式:" + namePattern());
+            addValidatedError(getKindName() + "名不能为空");
+        } else if (!getNamePattern().matcher(getName()).matches()) {
+            addValidatedError(getKindName() + "名[" + getName() + "]格式错误,正确格式:" + getNamePattern());
         }
 
         if (!languages.isEmpty() && !Language.names().containsAll(languages)) {
@@ -235,8 +235,8 @@ public abstract class ClassDefinition extends Definition {
         }
 
         //校验字段名格式
-        if (!fieldDefinition.namePattern().matcher(fieldDefinition.getName()).matches()) {
-            addValidatedError(getValidatedName("的") + "字段名[" + fieldDefinition.getName() + "]格式错误,正确格式:" + fieldDefinition.namePattern());
+        if (!fieldDefinition.getNamePattern().matcher(fieldDefinition.getName()).matches()) {
+            addValidatedError(getValidatedName("的") + "字段名[" + fieldDefinition.getName() + "]格式错误,正确格式:" + fieldDefinition.getNamePattern());
             return;
         }
 

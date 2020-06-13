@@ -1,10 +1,10 @@
 package ${getFullPackageName("java")};
 
-<#if definitionType == 6>
+<#if kind == 6>
 import java.util.*;
 </#if>
 import com.alibaba.fastjson.*;
-<#if !(parentName??) || definitionType == 6>
+<#if !(parentName??) || kind == 6>
 import quan.config.*;
 </#if>
 <#list imports as import>
@@ -17,7 +17,7 @@ import ${import};
 </#if>
  * 自动生成
  */
-public class ${name} extends <#if parentName??>${parentName}<#elseif definitionType ==2>Bean<#else>Config</#if> {
+public class ${name} extends <#if parentName??>${parentName}<#elseif kind ==2>Bean<#else>Config</#if> {
 <#if !selfFields??>
     <#assign selfFields = fields>
 </#if>
@@ -169,7 +169,7 @@ public class ${name} extends <#if parentName??>${parentName}<#elseif definitionT
 
 </#list>
 
- <#if definitionType ==6>
+ <#if kind ==6>
     @Override
     public ${name} create(JSONObject json) {
         return new ${name}(json);
@@ -387,7 +387,7 @@ public class ${name} extends <#if parentName??>${parentName}<#elseif definitionT
     ${tab}}
     </#macro>
 
- <#if definitionType ==6>
+ <#if kind ==6>
 
     <#if parent??>
     public static class self {

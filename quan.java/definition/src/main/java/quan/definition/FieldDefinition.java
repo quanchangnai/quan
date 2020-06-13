@@ -78,12 +78,12 @@ public class FieldDefinition extends Definition {
     }
 
     @Override
-    public int getDefinitionType() {
+    public int getKind() {
         return 4;
     }
 
     @Override
-    public String getDefinitionTypeName() {
+    public String getKindName() {
         return "字段";
     }
 
@@ -94,7 +94,7 @@ public class FieldDefinition extends Definition {
     }
 
     @Override
-    public Pattern namePattern() {
+    public Pattern getNamePattern() {
         return Constants.FIELD_NAME_PATTERN;
     }
 

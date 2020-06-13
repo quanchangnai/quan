@@ -58,17 +58,17 @@ public class ConfigDefinition extends BeanDefinition {
     }
 
     @Override
-    public int getDefinitionType() {
+    public int getKind() {
         return 6;
     }
 
     @Override
-    public String getDefinitionTypeName() {
+    public String getKindName() {
         return "配置";
     }
 
     @Override
-    public Pattern namePattern() {
+    public Pattern getNamePattern() {
         return Constants.CONFIG_NAME_PATTERN;
     }
 

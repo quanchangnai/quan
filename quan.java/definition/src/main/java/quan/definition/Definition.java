@@ -49,7 +49,7 @@ public abstract class Definition {
     }
 
     public String getValidatedName(String append) {
-        String definitionTypeName = getDefinitionTypeName();
+        String definitionTypeName = getKindName();
         String validatedName;
         if (name != null) {
             validatedName = definitionTypeName + "[" + name + "]" + append;
@@ -82,11 +82,11 @@ public abstract class Definition {
         this.comment = comment.trim();
     }
 
-    public abstract int getDefinitionType();
+    public abstract int getKind();
 
-    public abstract String getDefinitionTypeName();
+    public abstract String getKindName();
 
-    public abstract Pattern namePattern();
+    public abstract Pattern getNamePattern();
 
     @Override
     public String toString() {
@@ -94,5 +94,6 @@ public abstract class Definition {
                 "name='" + name + '\'' +
                 '}';
     }
+
 }
 

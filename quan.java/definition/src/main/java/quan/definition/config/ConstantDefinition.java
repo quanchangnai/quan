@@ -32,12 +32,12 @@ public class ConstantDefinition extends ClassDefinition {
     private Map<String, Pair<String, String>> rows = new TreeMap<>();
 
     @Override
-    public int getDefinitionType() {
+    public int getKind() {
         return 8;
     }
 
     @Override
-    public String getDefinitionTypeName() {
+    public String getKindName() {
         return "常量";
     }
 

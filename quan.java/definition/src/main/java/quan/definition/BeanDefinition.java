@@ -48,7 +48,7 @@ public class BeanDefinition extends ClassDefinition {
     }
 
     @Override
-    public int getDefinitionType() {
+    public int getKind() {
         return 2;
     }
 
@@ -59,7 +59,7 @@ public class BeanDefinition extends ClassDefinition {
     }
 
     @Override
-    public String getDefinitionTypeName() {
+    public String getKindName() {
         if (category == Category.data) {
             return "数据实体";
         }
@@ -67,11 +67,11 @@ public class BeanDefinition extends ClassDefinition {
     }
 
     @Override
-    public Pattern namePattern() {
+    public Pattern getNamePattern() {
         if (category == Category.data) {
             return Constants.ENTITY_NAME_PATTERN;
         }
-        return super.namePattern();
+        return super.getNamePattern();
     }
 
     public List<FieldDefinition> getSelfFields() {

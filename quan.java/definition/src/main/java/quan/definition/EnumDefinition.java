@@ -11,7 +11,7 @@ public class EnumDefinition extends ClassDefinition {
     private Map<Integer, FieldDefinition> valuesFields = new HashMap<>();
 
     @Override
-    public int getDefinitionType() {
+    public int getKind() {
         return 1;
     }
 
@@ -42,7 +42,7 @@ public class EnumDefinition extends ClassDefinition {
 
 
     @Override
-    public String getDefinitionTypeName() {
+    public String getKindName() {
         return "枚举";
     }
 

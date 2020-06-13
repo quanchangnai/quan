@@ -5,7 +5,7 @@ import quan.definition.Category;
 import quan.definition.FieldDefinition;
 
 /**
- * 消息头定义，被所有消息共用，主要用与定义消息的功能字段
+ * 消息头定义，被所有消息共用，主要用于定义消息的公共字段
  * Created by quanchangnai on 2019/9/11.
  */
 public class HeadDefinition extends BeanDefinition {
@@ -19,11 +19,11 @@ public class HeadDefinition extends BeanDefinition {
 
 
     @Override
-    public int getDefinitionType() {
+    public int getKind() {
         return 9;
     }
 
-    public String getDefinitionTypeName() {
+    public String getKindName() {
         return "消息头";
     }
 

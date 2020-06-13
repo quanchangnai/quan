@@ -13,7 +13,7 @@ local ${import[import?last_index_of(".")+1..]} = require("${import}")
 local ${name} = {
     ---类名
     class = "${name}",
-<#if definitionType ==3>
+<#if kind ==3>
     ---消息ID
     id = ${id?c}
 </#if>
@@ -81,7 +81,7 @@ function ${name}.new(args)
     return instance
 end
 
-<#if definitionType ==3>
+<#if kind ==3>
 ---
 ---<#if comment !="">${comment}<#else>${name}</#if>.编码
 ---@return quan.message.Buffer
@@ -161,7 +161,7 @@ function ${name}:encode(buffer)
     return buffer
 end
 
-<#if definitionType ==3>
+<#if kind ==3>
 ---
 ---<#if comment !="">${comment}<#else>${name}</#if>.解码
 ---@param buffer quan.message.Buffer 不能为空

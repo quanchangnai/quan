@@ -16,8 +16,8 @@ import ${import};
 </#if>
  * 自动生成
  */
-public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionType ==5>Data<${idField.classType}></#if> {
-<#if definitionType ==5>
+public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idField.classType}></#if> {
+<#if kind ==5>
 
     /**
      * 对应的表名
@@ -54,7 +54,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
     public static final String ${field.underscoreName} = "${field.name}";
 </#list>
 
-<#assign root><#if definitionType ==5>this<#else>_getLogRoot()</#if></#assign>
+<#assign root><#if kind ==5>this<#else>_getLogRoot()</#if></#assign>
 <#list fields as field>
 
     <#if field.type == "set" || field.type == "list">
@@ -70,7 +70,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
     </#if>
 </#list>
 
-<#if definitionType ==5>
+<#if kind ==5>
 
     <#if idField.type=="string">    
     public ${name}(String ${idName}) {
@@ -123,7 +123,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
         return ${field.name}.getDelegate();
     }
 
-    <#elseif definitionType ==5 && field.name == idName>
+    <#elseif kind ==5 && field.name == idName>
     public ${field.basicType} get${field.name?cap_first}() {
         return ${field.name}.getValue();
     }
@@ -172,7 +172,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
 
     </#if>
 </#list>
-<#if definitionType !=5>
+<#if kind !=5>
 
     @Override
     protected void _setChildrenLogRoot(Data<?> root) {
@@ -223,7 +223,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
         @Override
         public ${name} decode(BsonReader reader, DecoderContext decoderContext) {
             reader.readStartDocument();
-            <#if definitionType ==5>
+            <#if kind ==5>
             ${name} value = new ${name}(reader.read${bsonTypes[idField.type]}(${name}._ID));
             <#else>
             ${name} value = new ${name}(); 
@@ -232,7 +232,7 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
             while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
                 switch (reader.readName()) {
                     <#list fields as field>
-                        <#if field.ignore || definitionType == 5 && field.name == idName >
+                        <#if field.ignore || kind == 5 && field.name == idName >
                             <#continue/>
                         </#if>
                     case ${name}.${field.underscoreName}:
@@ -281,12 +281,12 @@ public class ${name} extends <#if definitionType ==2>Entity<#elseif definitionTy
         @Override
         public void encode(BsonWriter writer, ${name} value, EncoderContext encoderContext) {
             writer.writeStartDocument();
-            <#if definitionType ==5>
+            <#if kind ==5>
             writer.write${bsonTypes[idField.type]}(${name}._ID, value._id());
             </#if>
 
             <#list fields as field>
-                <#if field.ignore || definitionType == 5 && field.name == idName >
+                <#if field.ignore || kind == 5 && field.name == idName >
                     <#continue/>
                 <#elseif field.enumType>
             writer.writeInt32(${name}.${field.underscoreName}, value.${field.name}.getValue());

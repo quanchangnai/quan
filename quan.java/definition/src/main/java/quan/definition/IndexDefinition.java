@@ -37,17 +37,17 @@ public class IndexDefinition extends Definition {
     }
 
     @Override
-    public int getDefinitionType() {
+    public int getKind() {
         return 7;
     }
 
     @Override
-    public String getDefinitionTypeName() {
+    public String getKindName() {
         return "索引";
     }
 
     @Override
-    public Pattern namePattern() {
+    public Pattern getNamePattern() {
         return Constants.FIELD_NAME_PATTERN;
     }
 
@@ -144,8 +144,8 @@ public class IndexDefinition extends Definition {
     private void validateIndex(BeanDefinition owner) {
         if (getName() == null) {
             owner.addValidatedError(owner.getValidatedName() + "的索引名不能为空");
-        } else if (!namePattern().matcher(getName()).matches()) {
-            owner.addValidatedError(owner.getValidatedName("的") + "索引名[" + getName() + "]格式错误,正确格式:" + namePattern());
+        } else if (!getNamePattern().matcher(getName()).matches()) {
+            owner.addValidatedError(owner.getValidatedName("的") + "索引名[" + getName() + "]格式错误,正确格式:" + getNamePattern());
         }
 
 
