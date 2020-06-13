@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * 消息编解码器
+ * 消息编码解码器
  */
 public class MessageCodec extends Codec {
 
@@ -28,7 +28,7 @@ public class MessageCodec extends Codec {
     }
 
     public MessageCodec(MessageRegistry messageRegistry) {
-        this.messageRegistry = Objects.requireNonNull(messageRegistry, "消息注册表不能为空");
+        this.messageRegistry = Objects.requireNonNull(messageRegistry, "参数消息注册表[messageRegistry]不能为空");
     }
 
     @Override
@@ -47,7 +47,7 @@ public class MessageCodec extends Codec {
         if (message != null) {
             message.decode(buffer);
         } else {
-            logger.error("消息{}创建失败", msgId);
+            logger.error("消息[{}]创建失败", msgId);
         }
 
         return Collections.singletonList(message);

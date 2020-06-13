@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * 帧长度可变的编解码器，基于一个长度字段实现
+ * 帧长度可变的编码解码器，基于一个长度字段实现
  *
  * @author quanchangnai
  */
@@ -107,7 +107,7 @@ public class FrameCodec extends Codec {
     private void validateLengthFieldLength() {
         List<Integer> allowLengthFieldLengthList = Arrays.asList(1, 2, 4);
         if (!allowLengthFieldLengthList.contains(lengthFieldLength)) {
-            throw new IllegalArgumentException("lengthFieldLength不合法，允许的值为：" + allowLengthFieldLengthList);
+            throw new IllegalArgumentException("参数[lengthFieldLength]不合法，允许的值为：" + allowLengthFieldLengthList);
         }
     }
 

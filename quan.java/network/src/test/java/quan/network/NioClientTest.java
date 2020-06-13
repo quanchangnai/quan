@@ -48,8 +48,8 @@ public class NioClientTest {
         }
 
         @Override
-        public void onReceived(final HandlerContext handlerContext, final String msg) {
-            logger.info("onReceived:" + msg);
+        public void onMsgReceived(final HandlerContext handlerContext, final String msg) {
+            logger.info("onMsgReceived:" + msg);
         }
 
         @Override

@@ -13,7 +13,7 @@ public abstract class HandlerConfigurer implements Handler {
             configureHandler(handlerContext.getHandlerChain());
             handlerContext.triggerConnected();
         } catch (Exception e) {
-            handlerContext.triggerException(e);
+            handlerContext.triggerExceptionCaught(e);
         } finally {
             handlerContext.getHandlerChain().remove(this);
         }

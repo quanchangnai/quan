@@ -252,10 +252,10 @@ public class Connection {
     }
 
     /**
-     * 发送消息，不能在具体逻辑中直接调用，具体逻辑中应该调用{@link HandlerContext#send(Object)}
+     * 发送消息，不能在具体逻辑中直接调用，具体逻辑中应该调用{@link HandlerContext#sendMsg(Object)}
      */
     public void send(ByteBuffer msg) {
-        if (executor.isInMyThread()) {
+        if (executor.isInMyTerritory()) {
             doSend(msg);
         } else {
             executor.execute(() -> doSend(msg));
@@ -277,7 +277,7 @@ public class Connection {
      * 关闭连接，不能在具体逻辑中直接调用，具体逻辑中应该调用{@link HandlerContext#close()}
      */
     public void close() {
-        if (executor.isInMyThread()) {
+        if (executor.isInMyTerritory()) {
             doClose();
         } else {
             executor.execute(this::doClose);
