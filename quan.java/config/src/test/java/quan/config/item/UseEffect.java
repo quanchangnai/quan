@@ -26,6 +26,8 @@ public class UseEffect extends Bean {
     public static UseEffect create(JSONObject json) {
         String clazz = json.getOrDefault("class", "").toString();
         switch (clazz) {
+            case "UseEffect3":
+                return UseEffect3.create(json);
             case "UseEffect2":
                 return UseEffect2.create(json);
             case "UseEffect":

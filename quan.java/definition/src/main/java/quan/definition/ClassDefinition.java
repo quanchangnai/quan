@@ -166,6 +166,18 @@ public abstract class ClassDefinition extends Definition {
         languages = pair.getRight();
     }
 
+    public boolean isExcludeLanguage() {
+        return excludeLanguage;
+    }
+
+    public void setExcludeLanguage(boolean excludeLanguage) {
+        this.excludeLanguage = excludeLanguage;
+    }
+
+    public Set<String> getLanguages() {
+        return languages;
+    }
+
     public Set<String> getImports() {
         return imports;
     }

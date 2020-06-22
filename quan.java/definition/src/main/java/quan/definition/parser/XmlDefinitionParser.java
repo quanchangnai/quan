@@ -1,5 +1,6 @@
 package quan.definition.parser;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Attribute;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
@@ -7,8 +8,8 @@ import quan.definition.*;
 import quan.definition.config.ConfigDefinition;
 import quan.definition.config.ConstantDefinition;
 import quan.definition.data.DataDefinition;
-import quan.definition.message.MessageDefinition;
 import quan.definition.message.HeadDefinition;
+import quan.definition.message.MessageDefinition;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -90,13 +91,11 @@ public class XmlDefinitionParser extends DefinitionParser {
             classDefinition.setName(classElement.attributeValue("name"));
             classDefinition.setLang(classElement.attributeValue("lang"));
 
-            String comment = rootElement.node(i - 1).getText();
-            comment = comment.replaceAll("[\r\n]", "").trim();
-            if (comment.equals("")) {
-                comment = classElement.node(0).getText();
-                comment = comment.replaceAll("[\r\n]", "").trim();
+            String comment = rootElement.node(i - 1).getText().replaceAll("[\r\n]", "");
+            if (StringUtils.isBlank(comment)) {
+                comment = classElement.node(0).getText().replaceAll("[\r\n]", "");
             }
-            classDefinition.setComment(comment);
+            classDefinition.setComment(comment.trim());
 
             parseClassChildren(classDefinition, classElement);
         }
@@ -155,27 +154,45 @@ public class XmlDefinitionParser extends DefinitionParser {
                 continue;
             }
 
-            Element fieldElement = (Element) classElement.node(i);
-            String fieldElementName = fieldElement.getName();
-            if (fieldElementName.equals("field")) {
-                parseField(classDefinition, classElement, fieldElement, i);
+            Element childElement = (Element) classElement.node(i);
+            String childName = childElement.getName();
+
+            if (childName.equals("field")) {
+                parseField(classDefinition, classElement, childElement, i);
             }
 
             if (classDefinition instanceof ConfigDefinition) {
                 ConfigDefinition configDefinition = (ConfigDefinition) classDefinition;
-                if (fieldElementName.equals("index")) {
-                    configDefinition.addIndex(parseIndex(classElement, fieldElement, i));
+                if (childName.equals("index")) {
+                    configDefinition.addIndex(parseIndex(classElement, childElement, i));
                 }
-                if (fieldElementName.equals("constant")) {
-                    parseConstant(configDefinition, classElement, fieldElement, i);
+                if (childName.equals("constant")) {
+                    parseConstant(configDefinition, classElement, childElement, i);
                 }
             }
 
-            if (classDefinition instanceof DataDefinition) {
+            if (classDefinition instanceof DataDefinition && childName.equals("index")) {
                 DataDefinition dataDefinition = (DataDefinition) classDefinition;
-                if (fieldElementName.equals("index")) {
-                    dataDefinition.addIndex(parseIndex(classElement, fieldElement, i));
-                }
+                dataDefinition.addIndex(parseIndex(classElement, childElement, i));
+            }
+
+            if (category == Category.config && classDefinition instanceof BeanDefinition && childName.equals("bean")) {
+                BeanDefinition beanDefinition = (BeanDefinition) createClassDefinition(childElement);
+                beanDefinition.setParentName(classDefinition.getName());
+                parsedClasses.add(beanDefinition);
+
+                beanDefinition.setParser(this);
+                beanDefinition.setName(childElement.attributeValue("name"));
+                beanDefinition.setDefinitionFile(classDefinition.getDefinitionFile());
+                beanDefinition.setDefinitionText(classDefinition.getDefinitionText());
+                beanDefinition.setPackageName(classDefinition.getPackageName());
+                beanDefinition.getPackageNames().putAll(classDefinition.getPackageNames());
+                beanDefinition.setExcludeLanguage(classDefinition.isExcludeLanguage());
+                beanDefinition.getLanguages().addAll(classDefinition.getLanguages());
+                String comment = childElement.node(0).getText().replaceAll("[\r\n]", "").trim();
+                beanDefinition.setComment(comment);
+
+                parseClassChildren(beanDefinition, childElement);
             }
         }
     }
@@ -198,8 +215,7 @@ public class XmlDefinitionParser extends DefinitionParser {
             fieldDefinition.setLanguage(fieldElement.attributeValue("lang"));
         }
 
-        String comment = classElement.node(i + 1).getText();
-        comment = comment.replaceAll("[\r\n]", "").trim();
+        String comment = classElement.node(i + 1).getText().replaceAll("[\r\n]", "").trim();
         fieldDefinition.setComment(comment);
 
         classDefinition.addField(fieldDefinition);
@@ -214,9 +230,7 @@ public class XmlDefinitionParser extends DefinitionParser {
         indexDefinition.setType(indexElement.attributeValue("type"));
         indexDefinition.setFieldNames(indexElement.attributeValue("fields"));
 
-        String comment = classElement.node(i + 1).getText();
-        comment = comment.replaceAll("[\r\n]", "").trim();
-
+        String comment = classElement.node(i + 1).getText().replaceAll("[\r\n]", "").trim();
         indexDefinition.setComment(comment);
 
         return indexDefinition;
@@ -233,9 +247,7 @@ public class XmlDefinitionParser extends DefinitionParser {
         constantDefinition.setValueField(constantElement.attributeValue("value"));
         constantDefinition.setCommentField(constantElement.attributeValue("comment"));
 
-        String comment = classElement.node(i + 1).getText();
-        comment = comment.replaceAll("[\r\n]", "").trim();
-
+        String comment = classElement.node(i + 1).getText().replaceAll("[\r\n]", "").trim();
         constantDefinition.setComment(comment);
 
         parsedClasses.add(constantDefinition);

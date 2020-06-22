@@ -23,6 +23,8 @@ namespace Test.Config.Item
             var clazz = json["class"].Value<string>() ?? "";
             switch (clazz) 
             {
+                case "UseEffect3":
+                    return UseEffect3.Create(json);
                 case "UseEffect2":
                     return UseEffect2.Create(json);
                 case "UseEffect":

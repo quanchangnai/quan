@@ -14,10 +14,13 @@
 
     <bean name="UseEffect" delimiter="_">使用效果
         <field name="aaa" type="int"/>
+        <bean name="UseEffect2">使用效果2
+            <field name="bbb" type="int"/>
+        </bean>
     </bean>
 
-    <bean name="UseEffect2" parent="UseEffect">使用效果2
-        <field name="bbb" type="int"/>
+    <bean name="UseEffect3" parent="UseEffect">使用效果3
+        <field name="ccc" type="int"/>
     </bean>
 
 
