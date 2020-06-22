@@ -20,11 +20,11 @@ import java.util.Set;
  */
 public class ConfigConverter {
 
-    private static SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy.MM.dd HH.mm.ss");
+    private static SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd");
+    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-    private static SimpleDateFormat timeFormat = new SimpleDateFormat("HH.mm.ss");
+    private static SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
 
     private DefinitionParser parser;
 
