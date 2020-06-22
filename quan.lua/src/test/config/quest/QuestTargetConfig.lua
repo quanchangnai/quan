@@ -8,7 +8,7 @@ local Config = require("quan.config.Config")
 
 ---所有QuestTargetConfig
 local configs = {
-    { id = 1, noon = 16200000, noon_ = "12.30.00" },
+    { id = 1, noon = 0, noon_ = "" },
 }
 
 ---索引:ID
