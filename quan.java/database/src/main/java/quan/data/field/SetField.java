@@ -12,7 +12,7 @@ import java.util.Set;
 /**
  * Created by quanchangnai on 2019/5/21.
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "NullableProblems"})
 public final class SetField<E> extends Node implements Set<E>, Field {
 
     private PSet<E> set = Empty.set();
@@ -111,6 +111,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
         return getLogSet().toArray();
     }
 
+    @SuppressWarnings("SuspiciousToArrayCall")
     @Override
     public <T> T[] toArray(T[] a) {
         return getLogSet().toArray(a);
@@ -253,6 +254,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
         return String.valueOf(getLogSet());
     }
 
+    @SuppressWarnings("NullableProblems")
     private static class Delegate<E> implements Set<E> {
 
         private SetField<E> field;
@@ -286,6 +288,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
             return field.toArray();
         }
 
+        @SuppressWarnings("SuspiciousToArrayCall")
         @Override
         public <T> T[] toArray(T[] a) {
             return field.toArray(a);

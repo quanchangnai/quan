@@ -9,7 +9,7 @@ import java.util.*;
 /**
  * Created by quanchangnai on 2019/5/20.
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "NullableProblems"})
 public final class MapField<K, V> extends Node implements Map<K, V>, Field {
 
     private PMap<K, V> map = Empty.map();
@@ -128,6 +128,7 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
         Transaction transaction = Transaction.check();
         PMap<K, V> oldMap = getLogMap(transaction);
 
+        @SuppressWarnings("SuspiciousMethodCalls")
         V value = oldMap.get(key);
         _setFieldLog(transaction, this, oldMap.minus(key), _getLogRoot(transaction));
 

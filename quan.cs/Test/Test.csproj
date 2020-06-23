@@ -59,6 +59,7 @@
     <Compile Include="Config\Item\Reward.cs" />
     <Compile Include="Config\Item\UseEffect.cs" />
     <Compile Include="Config\Item\UseEffect2.cs" />
+    <Compile Include="Config\Item\UseEffect3.cs" />
     <Compile Include="Config\Item\WeaponConfig.cs" />
     <Compile Include="Config\Quest\QuestConfig.cs" />
     <Compile Include="Config\Quest\QuestTargetConfig.cs" />

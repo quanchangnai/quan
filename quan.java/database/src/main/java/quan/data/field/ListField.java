@@ -9,7 +9,7 @@ import java.util.*;
 /**
  * Created by quanchangnai on 2019/5/21.
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "NullableProblems"})
 public final class ListField<E> extends Node implements List<E>, Field {
 
     private PVector<E> list = Empty.vector();
@@ -154,6 +154,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
         return getLogList().toArray();
     }
 
+    @SuppressWarnings("SuspiciousToArrayCall")
     @Override
     public <T> T[] toArray(T[] a) {
         return getLogList().toArray(a);
@@ -280,10 +281,11 @@ public final class ListField<E> extends Node implements List<E>, Field {
         Iterator<E> iterator = iterator();
 
         while (iterator.hasNext()) {
-            if (!c.contains(iterator.next())) {
-                iterator.remove();
-                modified = true;
+            if (c.contains(iterator.next())) {
+                continue;
             }
+            iterator.remove();
+            modified = true;
         }
 
         return modified;
@@ -451,6 +453,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
 
     }
 
+    @SuppressWarnings("NullableProblems")
     private static class Delegate<E> implements List<E> {
 
         private ListField<E> field;
@@ -484,6 +487,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
             return field.toArray();
         }
 
+        @SuppressWarnings("SuspiciousToArrayCall")
         @Override
         public <T> T[] toArray(T[] a) {
             return field.toArray(a);
