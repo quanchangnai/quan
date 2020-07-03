@@ -220,7 +220,7 @@ public abstract class ClassDefinition extends Definition {
         if (getName() == null) {
             addValidatedError(getKindName() + "名不能为空");
         } else if (!getNamePattern().matcher(getName()).matches()) {
-            addValidatedError(getKindName() + "名[" + getName() + "]格式错误,正确格式:" + getNamePattern());
+            addValidatedError(getKindName() + "[" + getName() + "]名字格式错误,正确格式:" + getNamePattern());
         }
 
         if (!languages.isEmpty() && !Language.names().containsAll(languages)) {
@@ -286,9 +286,9 @@ public abstract class ClassDefinition extends Definition {
     }
 
     protected void addValidatedError(String error, ClassDefinition other) {
-        String position = ",定位:" + getDefinitionFile();
+        String position = ",所在定义文件:" + getDefinitionFile();
         if (other != null) {
-            position = "," + other.getDefinitionFile();
+            position = "和" + other.getDefinitionFile();
         }
 
         error += position;

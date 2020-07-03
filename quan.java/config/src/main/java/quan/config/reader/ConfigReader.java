@@ -56,6 +56,10 @@ public abstract class ConfigReader {
             converter = new ConfigConverter(configDefinition.getParser());
         }
 
+        if (!tableFile.exists()) {
+            validatedErrors.add(String.format("配置[%s]不存在", tableFile.getName()));
+        }
+
         initPrototype();
     }
 
@@ -90,7 +94,7 @@ public abstract class ConfigReader {
     }
 
     public List<JSONObject> readJsons() {
-        if (jsons.isEmpty()) {
+        if (jsons.isEmpty() && tableFile.exists()) {
             read();
         }
         return jsons;
