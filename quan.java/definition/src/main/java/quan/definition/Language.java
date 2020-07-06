@@ -12,7 +12,27 @@ import java.util.Set;
  */
 public enum Language {
 
-    java, cs, lua;
+    java {
+        @Override
+        public Set<String> reservedWords() {
+            return Constants.JAVA_RESERVED_WORDS;
+        }
+    },
+
+    cs {
+        @Override
+        public Set<String> reservedWords() {
+            return Constants.CS_RESERVED_WORDS;
+        }
+    },
+
+    lua {
+        @Override
+        public Set<String> reservedWords() {
+            return Constants.LUA_RESERVED_WORDS;
+        }
+    };
+
 
     private static Set<String> names;
 
@@ -46,5 +66,7 @@ public enum Language {
 
         return Pair.of(exclude, languages);
     }
+
+    public abstract Set<String> reservedWords();
 
 }

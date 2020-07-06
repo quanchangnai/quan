@@ -259,15 +259,15 @@ public abstract class ClassDefinition extends Definition {
 
     protected boolean isReservedWord(String fieldName) {
         if (category == Category.data) {
-            return Constants.JAVA_RESERVED_WORDS.contains(fieldName);
+            return Language.java.reservedWords().contains(fieldName);
         }
-        if (Constants.JAVA_RESERVED_WORDS.contains(fieldName)) {
+        if (Language.java.reservedWords().contains(fieldName)) {
             return true;
         }
-        if (Constants.CS_RESERVED_WORDS.contains(fieldName)) {
+        if (Language.cs.reservedWords().contains(fieldName)) {
             return true;
         }
-        return Constants.LUA_RESERVED_WORDS.contains(fieldName);
+        return Language.lua.reservedWords().contains(fieldName);
     }
 
     protected void validateFieldNameDuplicate(FieldDefinition fieldDefinition) {

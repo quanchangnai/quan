@@ -139,12 +139,12 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
      * 加载JSON格式配置数据
      *
      * @param configDefinition 配置定义
-     * @param self             true:只包含自己的数据，false:包含自己和子孙配置的数据
+     * @param onlySelf         true:只包含自己的数据，false:包含自己和子孙配置的数据
      * @return SON格式配置数据
      */
-    public List<JSONObject> loadJsons(ConfigDefinition configDefinition, boolean self) {
+    public List<JSONObject> loadJsons(ConfigDefinition configDefinition, boolean onlySelf) {
         TreeSet<String> configTables = new TreeSet<>();
-        if (self) {
+        if (onlySelf) {
             if (tableType == TableType.json) {
                 configTables.add(configDefinition.getName());
             } else {
@@ -234,9 +234,7 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
         Map<JSONObject, String> jsonTables = new HashMap();
 
         for (String table : getConfigTables(configDefinition)) {
-            ConfigReader configReader = getReader(table);
-            List<JSONObject> tableJsons = configReader.readJsons();
-
+            List<JSONObject> tableJsons = getReader(table).readJsons();
             for (JSONObject json : tableJsons) {
                 jsonTables.put(json, table + "." + tableType);
                 //校验索引

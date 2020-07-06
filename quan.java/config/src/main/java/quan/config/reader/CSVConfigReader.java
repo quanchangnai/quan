@@ -51,11 +51,23 @@ public class CSVConfigReader extends ConfigReader {
 
         for (int i = tableBodyStartRow; i <= records.size(); i++) {
             CSVRecord record = records.get(i - 1);
-            JSONObject rowJson = new JSONObject(true);
+            JSONObject rowJson = null;
+
             for (int j = 1; j <= columnNames.size(); j++) {
-                addColumnToRow(rowJson, columnNames.get(j - 1), record.get(j - 1).trim(), i, j);
+                String columnValue = record.get(j - 1).trim();
+                if (j == 1) {
+                    if (columnValue.startsWith("#")) {
+                        break;
+                    } else {
+                        rowJson = new JSONObject(true);
+                    }
+                }
+                addColumnToRow(rowJson, columnNames.get(j - 1), columnValue, i, j);
             }
-            jsons.add(rowJson);
+
+            if (rowJson != null) {
+                jsons.add(rowJson);
+            }
         }
     }
 

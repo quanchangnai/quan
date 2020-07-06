@@ -48,11 +48,23 @@ public class ExcelConfigReader extends ConfigReader {
 
             for (int i = tableBodyStartRow; i <= rowNum; i++) {
                 Row row = sheet.getRow(i - 1);
-                JSONObject rowJson = new JSONObject(true);
+                JSONObject rowJson = null;
+
                 for (int j = 1; j <= columnNames.size(); j++) {
-                    addColumnToRow(rowJson, columnNames.get(j - 1), dataFormatter.formatCellValue(row.getCell(j - 1)).trim(), i, j);
+                    String columnValue = dataFormatter.formatCellValue(row.getCell(j - 1)).trim();
+                    if (j == 1) {
+                        if (columnValue.startsWith("#")) {
+                            break;
+                        } else {
+                            rowJson = new JSONObject(true);
+                        }
+                    }
+                    addColumnToRow(rowJson, columnNames.get(j - 1), columnValue, i, j);
                 }
-                jsons.add(rowJson);
+
+                if (rowJson != null) {
+                    jsons.add(rowJson);
+                }
             }
         } catch (Exception e) {
             logger.error("读取配置[{}]出错", tableFile.getName(), e);
