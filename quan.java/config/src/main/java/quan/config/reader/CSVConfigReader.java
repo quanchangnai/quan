@@ -49,20 +49,20 @@ public class CSVConfigReader extends ConfigReader {
             return;
         }
 
-        for (int i = tableBodyStartRow; i <= records.size(); i++) {
-            CSVRecord record = records.get(i - 1);
+        for (int r = tableBodyStartRow; r <= records.size(); r++) {
+            CSVRecord record = records.get(r - 1);
             JSONObject rowJson = null;
 
-            for (int j = 1; j <= columnNames.size(); j++) {
-                String columnValue = record.get(j - 1).trim();
-                if (j == 1) {
+            for (int c = 1; c <= columnNames.size(); c++) {
+                String columnValue = record.get(c - 1).trim();
+                if (c == 1) {
                     if (columnValue.startsWith("#")) {
                         break;
                     } else {
                         rowJson = new JSONObject(true);
                     }
                 }
-                addColumnToRow(rowJson, columnNames.get(j - 1), columnValue, i, j);
+                addColumnToRow(rowJson, columnNames.get(c - 1), columnValue, r, c);
             }
 
             if (rowJson != null) {

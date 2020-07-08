@@ -15,7 +15,7 @@ import java.util.List;
 public class MessageDefinition extends BeanDefinition {
 
     //支持自定义消息ID，一般情况下由哈希生成
-    private String sid;
+    private String strId;
 
     private int id;
 
@@ -26,9 +26,9 @@ public class MessageDefinition extends BeanDefinition {
         category = Category.message;
     }
 
-    public MessageDefinition(String sid) {
-        if (!StringUtils.isBlank(sid)) {
-            this.sid = sid.trim();
+    public MessageDefinition(String strId) {
+        if (!StringUtils.isBlank(strId)) {
+            this.strId = strId.trim();
         }
     }
 
@@ -57,16 +57,16 @@ public class MessageDefinition extends BeanDefinition {
 
 
     public boolean isDefinedId() {
-        return !StringUtils.isBlank(sid);
+        return !StringUtils.isBlank(strId);
     }
 
     @Override
     public void validate() {
-        if (sid != null) {
+        if (strId != null) {
             try {
-                id = Integer.parseInt(sid);
+                id = Integer.parseInt(strId);
             } catch (NumberFormatException e) {
-                addValidatedError(getValidatedName("的") + "ID[" + sid + "]不合法");
+                addValidatedError(getValidatedName("的") + "ID[" + strId + "]不合法");
             }
         }
         super.validate();

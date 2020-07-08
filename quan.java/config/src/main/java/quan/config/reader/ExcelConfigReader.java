@@ -25,7 +25,7 @@ public class ExcelConfigReader extends ConfigReader {
         clear();
 
         try (Workbook workbook = WorkbookFactory.create(new FileInputStream(tableFile))) {
-            //只解析第一个工作表，其他的忽略
+            //只解析第一个工作表
             Sheet sheet = workbook.getSheetAt(0);
             //总行数
             int rowNum = sheet.getPhysicalNumberOfRows();
@@ -46,20 +46,20 @@ public class ExcelConfigReader extends ConfigReader {
                 return;
             }
 
-            for (int i = tableBodyStartRow; i <= rowNum; i++) {
-                Row row = sheet.getRow(i - 1);
+            for (int r = tableBodyStartRow; r <= rowNum; r++) {
+                Row row = sheet.getRow(r - 1);
                 JSONObject rowJson = null;
 
-                for (int j = 1; j <= columnNames.size(); j++) {
-                    String columnValue = dataFormatter.formatCellValue(row.getCell(j - 1)).trim();
-                    if (j == 1) {
+                for (int c = 1; c <= columnNames.size(); c++) {
+                    String columnValue = dataFormatter.formatCellValue(row.getCell(c - 1)).trim();
+                    if (c == 1) {
                         if (columnValue.startsWith("#")) {
                             break;
                         } else {
                             rowJson = new JSONObject(true);
                         }
                     }
-                    addColumnToRow(rowJson, columnNames.get(j - 1), columnValue, i, j);
+                    addColumnToRow(rowJson, columnNames.get(c - 1), columnValue, r, c);
                 }
 
                 if (rowJson != null) {

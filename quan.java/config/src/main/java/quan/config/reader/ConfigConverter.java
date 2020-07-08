@@ -311,6 +311,7 @@ public class ConfigConverter {
         return array;
     }
 
+    @SuppressWarnings("SuspiciousMethodCalls")
     public JSONObject convertColumnMap(FieldDefinition fieldDefinition, JSONObject rowJson, String value) {
         //map类型字段对应1列
         if (fieldDefinition.getColumnNums().size() == 1) {
@@ -373,6 +374,7 @@ public class ConfigConverter {
         return object;
     }
 
+    @SuppressWarnings("SuspiciousMethodCalls")
     private JSONObject convertMap(FieldDefinition fieldDefinition, String value) {
         JSONObject object = new JSONObject();
         if (StringUtils.isBlank(value)) {

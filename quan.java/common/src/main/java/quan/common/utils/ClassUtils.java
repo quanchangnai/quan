@@ -12,10 +12,7 @@ import java.lang.instrument.ClassDefinition;
 import java.lang.instrument.Instrumentation;
 import java.net.JarURLConnection;
 import java.net.URL;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -104,28 +101,35 @@ public class ClassUtils {
         packageName = packageName.replace(".", "/");
 
         if (classLoader == null) {
-            classLoader = ClassUtils.class.getClassLoader();
+            classLoader = Thread.currentThread().getContextClassLoader();
         }
 
-        Set<String> classNames = new HashSet<>();
-        Set<Class<?>> classes = new HashSet<>();
 
         Enumeration<URL> urls;
         try {
             urls = classLoader.getResources(packageName);
         } catch (IOException e) {
             logger.error("", e);
-            return classes;
+            return Collections.emptySet();
         }
 
+        Set<String> classNames = new HashSet<>();
         while (urls.hasMoreElements()) {
             try {
-                parseUrl(classNames, urls.nextElement(), packageName);
+                URL url = urls.nextElement();
+                if (url.getProtocol().equals("jar")) {
+                    parseJar(classNames, ((JarURLConnection) url.openConnection()).getJarFile());
+                } else if (url.getProtocol().equals("file")) {
+                    parsePath(classNames, new File(url.toURI()), packageName);
+                } else {
+                    logger.error("不支持该URL协议:" + url.getProtocol());
+                }
             } catch (Exception e) {
                 logger.error("", e);
             }
         }
 
+        Set<Class<?>> classes = new HashSet<>();
         for (String className : classNames) {
             Class<?> clazz;
             try {
@@ -141,17 +145,6 @@ public class ClassUtils {
         }
 
         return classes;
-
-    }
-
-    private static void parseUrl(Set<String> classNames, URL url, String packageName) throws Exception {
-        if (url.getProtocol().equals("jar")) {
-            parseJar(classNames, ((JarURLConnection) url.openConnection()).getJarFile());
-        } else if (url.getProtocol().equals("file")) {
-            parsePath(classNames, new File(url.toURI()), packageName);
-        } else {
-            logger.error("不支持该url protocol:" + url.getProtocol());
-        }
     }
 
     private static void parseJar(Set<String> classNames, JarFile jarFile) {
@@ -178,11 +171,9 @@ public class ClassUtils {
 
         for (File classFile : classFiles) {
             String classFilePath = classFile.getCanonicalPath();
-            if (classFilePath.endsWith(".class")) {
-                String className = classFilePath.substring(rootPath.length(), classFilePath.lastIndexOf(".class"));
-                className = className.replace(File.separator, ".");
-                classNames.add(className);
-            }
+            String className = classFilePath.substring(rootPath.length(), classFilePath.lastIndexOf(".class"));
+            className = className.replace(File.separator, ".");
+            classNames.add(className);
         }
     }
 

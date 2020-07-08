@@ -23,7 +23,6 @@
         <field name="ccc" type="int"/>
     </bean>
 
-
     <config name="ItemConfig" table="道具/道具">
         <field name="id" type="int" column="ID" index="unique"/>
         <field name="key" type="string" column="常量Key" index="u"/>
