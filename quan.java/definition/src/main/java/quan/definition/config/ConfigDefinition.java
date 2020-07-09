@@ -407,7 +407,7 @@ public class ConfigDefinition extends BeanDefinition {
             addValidatedError(getValidatedName() + "[" + field.getType() + "]类型字段" + field.getValidatedName() + "的分隔符[" + delimiter + "]必须是" + charNumError + "个字符");
         }
 
-        BeanDefinition fieldValueBean = parser.getBean(field.getValueType());
+        BeanDefinition fieldValueBean = field.getValueBean();
         if (fieldValueBean != null) {
             validateBeanDelimiter(fieldValueBean, delimiters);
         }

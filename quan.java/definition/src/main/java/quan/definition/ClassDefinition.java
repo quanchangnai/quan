@@ -87,11 +87,19 @@ public abstract class ClassDefinition extends Definition {
         return getPackageName(lang.name());
     }
 
+
+    public String getWholeName() {
+        return getWholeName(this, getName());
+    }
+
     /**
      * 和具体语言环境无关的完整类名[不含前缀的包名.类名]
      */
-    public String getWholeName() {
-        return packageName + "." + getName();
+    public static String getWholeName(ClassDefinition owner, String className) {
+        if (!StringUtils.isBlank(className) && !className.contains(".")) {
+            className = owner.getPackageName() + "." + className;
+        }
+        return className;
     }
 
     public String getFullPackageName(String lang) {

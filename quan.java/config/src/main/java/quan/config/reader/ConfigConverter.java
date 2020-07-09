@@ -15,6 +15,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import static quan.definition.ClassDefinition.getWholeName;
+
 /**
  * Created by quanchangnai on 2019/8/7.
  */
@@ -78,7 +80,7 @@ public class ConfigConverter {
         } else if (type.equals("map")) {
             return convertMap(fieldDefinition, value);
         } else if (fieldDefinition.isBeanType()) {
-            return convertBean(fieldDefinition.getBean(), value);
+            return convertBean(fieldDefinition, fieldDefinition.getBean(), value);
         } else if (fieldDefinition.isEnumType()) {
             return convertEnumType(fieldDefinition.getEnum(), value);
         }
@@ -90,7 +92,7 @@ public class ConfigConverter {
 
         //字段对应一列
         if (fieldDefinition.getColumnNums().size() == 1) {
-            return convertBean(beanDefinition, columnValue);
+            return convertBean(fieldDefinition, beanDefinition, columnValue);
         }
 
         //字段对应多列
@@ -113,16 +115,16 @@ public class ConfigConverter {
             return null;
         }
 
-        BeanDefinition actualBeanDefinition = beanDefinition;
         if (beanDefinition.hasChild()) {
-            actualBeanDefinition = parser.getBean(object.getString("class"));
+            String clazz = object.getString("class");
+            beanDefinition = parser.getBean(getWholeName(fieldDefinition.getOwner(), clazz));
         }
 
-        if (actualBeanDefinition == null) {
+        if (beanDefinition == null) {
             return object;
         }
 
-        for (FieldDefinition beanField : actualBeanDefinition.getFields()) {
+        for (FieldDefinition beanField : beanDefinition.getFields()) {
             if (!object.containsKey(beanField.getName())) {
                 Object convertedColumnValue = convert(beanField, columnValue);
                 if (convertedColumnValue != null) {
@@ -265,7 +267,7 @@ public class ConfigConverter {
             if (fieldDefinition.isPrimitiveValueType()) {
                 o = convertPrimitiveType(fieldDefinition.getValueType(), v);
             } else {
-                o = convertBean(parser.getBean(fieldDefinition.getValueType()), v);
+                o = convertBean(fieldDefinition, fieldDefinition.getValueBean(), v);
             }
             if (o != null) {
                 array.add(o);
@@ -359,7 +361,7 @@ public class ConfigConverter {
                 if (fieldDefinition.isPrimitiveValueType()) {
                     objectValue = convertPrimitiveType(fieldDefinition.getValueType(), value);
                 } else {
-                    objectValue = convertBean(parser.getBean(fieldDefinition.getValueType()), value);
+                    objectValue = convertBean(fieldDefinition, fieldDefinition.getValueBean(), value);
                 }
             } catch (Exception ignored) {
             }
@@ -402,7 +404,7 @@ public class ConfigConverter {
                 if (fieldDefinition.isPrimitiveValueType()) {
                     v = convertPrimitiveType(fieldDefinition.getValueType(), values[i + 1]);
                 } else {
-                    v = convertBean(parser.getBean(fieldDefinition.getValueType()), values[i + 1]);
+                    v = convertBean(fieldDefinition, fieldDefinition.getValueBean(), values[i + 1]);
                 }
             } catch (Exception ignored) {
             }
@@ -417,33 +419,31 @@ public class ConfigConverter {
     }
 
 
-    private JSONObject convertBean(BeanDefinition beanDefinition, String value) {
+    private JSONObject convertBean(FieldDefinition ownerFieldDefinition, BeanDefinition beanDefinition, String value) {
         if (StringUtils.isBlank(value)) {
             return null;
         }
-
         String[] values = value.split(beanDefinition.getEscapedDelimiter(), -1);
 
         JSONObject object = new JSONObject();
 
-        BeanDefinition actualBeanDefinition = beanDefinition;
 
         //有子类，按具体类型转换
         if (beanDefinition.hasChild()) {
-            String actualBean = values[0];
-            if (!beanDefinition.getMeAndDescendants().contains(actualBean)) {
-                throw new ConvertException(ConvertException.ErrorType.typeError, actualBean, beanDefinition.getName());
+            String beanClass = values[0];
+            if (!beanDefinition.getMeAndDescendants().contains(beanClass)) {
+                throw new ConvertException(ConvertException.ErrorType.typeError, beanClass, beanDefinition.getName());
             }
-            object.put("class", actualBean);
-            actualBeanDefinition = parser.getBean(actualBean);
+            object.put("class", beanClass);
+            beanDefinition = parser.getBean(getWholeName(ownerFieldDefinition.getOwner(), beanClass));
         }
 
-        for (int i = 0; i < actualBeanDefinition.getFields().size(); i++) {
+        for (int i = 0; i < beanDefinition.getFields().size(); i++) {
             int valueIndex = i;
             if (beanDefinition.hasChild()) {
                 valueIndex++;
             }
-            FieldDefinition fieldDefinition = actualBeanDefinition.getFields().get(i);
+            FieldDefinition fieldDefinition = beanDefinition.getFields().get(i);
             Object v = convert(fieldDefinition, values[valueIndex]);
             object.put(fieldDefinition.getName(), v);
         }

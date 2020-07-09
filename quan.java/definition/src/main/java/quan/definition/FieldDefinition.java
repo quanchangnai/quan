@@ -148,10 +148,7 @@ public class FieldDefinition extends Definition implements Cloneable {
      * 如果给定的类型不包含包名则加上包名
      */
     protected String getClassType(String type) {
-        if (!StringUtils.isBlank(type) && !type.contains(".")) {
-            type = owner.getPackageName() + "." + type;
-        }
-        return type;
+        return ClassDefinition.getWholeName(owner, type);
     }
 
     public boolean isBuiltinType() {
