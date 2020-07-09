@@ -88,9 +88,9 @@ public abstract class ClassDefinition extends Definition {
     }
 
     /**
-     * 和具体语言无关的简单类名[不含前缀的包名.类名]
+     * 和具体语言环境无关的完整类名[不含前缀的包名.类名]
      */
-    public String getSimpleName() {
+    public String getWholeName() {
         return packageName + "." + getName();
     }
 
@@ -131,6 +131,7 @@ public abstract class ClassDefinition extends Definition {
     }
 
     public void addField(FieldDefinition fieldDefinition) {
+        fieldDefinition.setOwner(this);
         fields.add(fieldDefinition);
     }
 

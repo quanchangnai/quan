@@ -158,20 +158,20 @@ public abstract class DefinitionParser {
             if (classDefinition.getName() == null) {
                 continue;
             }
-            ClassDefinition existingClassDefinition = validatedClasses.get(classDefinition.getName());
-            if (existingClassDefinition != null) {
+            ClassDefinition classDefinition1 = validatedClasses.get(classDefinition.getWholeName());
+            if (classDefinition1 != null) {
                 String error = "定义文件[" + classDefinition.getDefinitionFile() + "]";
-                if (!classDefinition.getDefinitionFile().equals(existingClassDefinition.getDefinitionFile())) {
-                    error += "和[" + existingClassDefinition.getDefinitionFile() + "]";
+                if (!classDefinition.getDefinitionFile().equals(classDefinition1.getDefinitionFile())) {
+                    error += "和[" + classDefinition1.getDefinitionFile() + "]";
                 }
                 error += "有同名类[" + classDefinition.getName() + "]";
                 validatedErrors.add(error);
             } else {
-                validatedClasses.put(classDefinition.getName(), classDefinition);
+                validatedClasses.put(classDefinition.getWholeName(), classDefinition);
             }
 
-            ClassDefinition similarClassDefinition = dissimilarClasses.get(classDefinition.getName().toLowerCase());
-            if (similarClassDefinition != null && !similarClassDefinition.getName().equals(classDefinition.getName())) {
+            ClassDefinition similarClassDefinition = dissimilarClasses.get(classDefinition.getWholeName().toLowerCase());
+            if (similarClassDefinition != null && !similarClassDefinition.getWholeName().equals(classDefinition.getWholeName())) {
                 String error = "定义文件[" + classDefinition.getDefinitionFile() + "]的类[" + similarClassDefinition.getName() + "]和";
                 if (!classDefinition.getDefinitionFile().equals(similarClassDefinition.getDefinitionFile())) {
                     error += "[" + similarClassDefinition.getDefinitionFile() + "]的";

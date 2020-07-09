@@ -101,7 +101,7 @@ public abstract class MessageGenerator extends Generator {
     protected void hashId(Map<Integer, MessageDefinition> definedIdMessageDefinitions, Set<MessageDefinition> hashIdMessageDefinitions, int begin, int end) {
         Map<Integer, List<MessageDefinition>> conflictedMessagesMap = new HashMap<>();
         for (MessageDefinition messageDefinition : hashIdMessageDefinitions) {
-            int messageId = begin + (messageDefinition.getSimpleName().hashCode() & 0x7FFFFFFF) % (end - begin);
+            int messageId = begin + (messageDefinition.getWholeName().hashCode() & 0x7FFFFFFF) % (end - begin);
             if (definedIdMessageDefinitions.containsKey(messageId)) {
                 parser.addValidatedError(String.format(messageDefinition.getValidatedName("和自定义ID的") + definedIdMessageDefinitions.get(messageId).getValidatedName() + "的ID[%d]冲突", messageId));
             }
@@ -111,7 +111,7 @@ public abstract class MessageGenerator extends Generator {
         Set<MessageDefinition> allConflictedMessages = new HashSet<>();
         for (Integer messageId : conflictedMessagesMap.keySet()) {
             List<MessageDefinition> conflictedMessages = conflictedMessagesMap.get(messageId);
-            conflictedMessages.sort(Comparator.comparing(MessageDefinition::getSimpleName));
+            conflictedMessages.sort(Comparator.comparing(MessageDefinition::getWholeName));
             conflictedMessages.get(0).setId(messageId);
             if (conflictedMessages.size() > 1) {
                 if (rehashId) {

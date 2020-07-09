@@ -70,7 +70,7 @@ public abstract class ConfigLoader {
     /**
      * 设置自定义配置校验器所在的包并实例化校验器对象
      */
-    public void setValidatorsPackage(String packageName) {
+    public void setValidatorPackage(String packageName) {
         if (StringUtils.isBlank(packageName)) {
             return;
         }

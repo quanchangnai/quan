@@ -124,13 +124,13 @@ public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idFiel
     }
 
     <#elseif kind ==5 && field.name == idName>
-    public ${field.basicType} get${field.name?cap_first}() {
+    public ${field.type} get${field.name?cap_first}() {
         return ${field.name}.getValue();
     }
 
     <#elseif field.enumType>
-    public ${field.type} get${field.name?cap_first}() {
-        return ${field.type}.valueOf(${field.name}.getLogValue());
+    public ${field.classType} get${field.name?cap_first}() {
+        return ${field.classType}.valueOf(${field.name}.getLogValue());
     }
 
     <#if field.comment !="">
@@ -138,12 +138,12 @@ public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idFiel
      * ${field.comment}
      */
     </#if>
-    public ${name} set${field.name?cap_first}(${field.basicType} ${field.name}) {
+    public ${name} set${field.name?cap_first}(${field.classType} ${field.name}) {
         this.${field.name}.setLogValue(${field.name}.value(), ${root});
         return this;
     }
 
-    <#else>
+    <#elseif field.builtinType>
     public ${field.basicType} get${field.name?cap_first}() {
         return ${field.name}.getLogValue();
     }
@@ -164,11 +164,26 @@ public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idFiel
      * ${field.comment}
      */
         </#if>
-    public ${name} add${field.name?cap_first}(${field.basicType} ${field.name}) {
+    public ${name} add${field.name?cap_first}(${field.type} ${field.name}) {
         set${field.name?cap_first}(<#if field.type=="short">(short) (</#if>get${field.name?cap_first}() + ${field.name}<#if field.type=="short">)</#if>);
         return this;
     }
         </#if>
+
+    <#else>
+    public ${field.classType} get${field.name?cap_first}() {
+        return ${field.name}.getLogValue();
+    }
+
+    <#if field.comment !="">
+    /**
+     * ${field.comment}
+     */
+    </#if>
+    public ${name} set${field.name?cap_first}(${field.classType} ${field.name}) {
+        this.${field.name}.setLogValue(${field.name}, ${root});
+        return this;
+    }
 
     </#if>
 </#list>
@@ -197,7 +212,7 @@ public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idFiel
             <#if field.type == "string">
                 <#lt>${field.name}='" + ${field.name} + '\'' +
             <#elseif field.enumType>
-                <#lt>${field.name}=" + ${field.type}.valueOf(${field.name}.getValue()) +
+                <#lt>${field.name}=" + ${field.classType}.valueOf(${field.name}.getValue()) +
             <#else>
                 <#lt>${field.name}=" + ${field.name} +
             </#if>
@@ -239,16 +254,16 @@ public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idFiel
                         <#if field.enumType>
                         value.${field.name}.setValue(reader.readInt32());
                         <#elseif field.primitiveType>
-                        value.${field.name}.setValue(<#if convertTypes[field.type]??>(${field.basicType}) </#if>reader.read${bsonTypes[field.type]}());
+                        value.${field.name}.setValue(<#if convertTypes[field.type]??>(${field.type}) </#if>reader.read${bsonTypes[field.type]}());
                         <#elseif field.beanType>
-                        value.${field.name}.setValue(decoderContext.decodeWithChildContext(registry.get(${field.type}.class), reader));
+                        value.${field.name}.setValue(decoderContext.decodeWithChildContext(registry.get(${field.classType}.class), reader));
                         <#elseif field.type == "list" || field.type == "set">
                         reader.readStartArray();
                         while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
                             <#if field.primitiveValueType>
-                            value.${field.name}.plus(<#if convertTypes[field.type]??>(${field.basicType}) </#if>reader.read${bsonTypes[field.valueType]}());
+                            value.${field.name}.plus(<#if convertTypes[field.type]??>(${field.classType}) </#if>reader.read${bsonTypes[field.valueType]}());
                             <#elseif field.beanValueType>
-                            value.${field.name}.plus(decoderContext.decodeWithChildContext(registry.get(${field.valueType}.class), reader));
+                            value.${field.name}.plus(decoderContext.decodeWithChildContext(registry.get(${field.classValueType}.class), reader));
                             <#else>
                             value.${field.name}.plus(reader.read${field.valueType?cap_first}());
                             </#if>
@@ -265,7 +280,7 @@ public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idFiel
                         }
                         reader.readEndDocument();
                         <#else>
-                        value.${field.name}.setValue(reader.read${field.type?cap_first}());
+                        value.${field.name}.setValue(reader.read${field.classType?cap_first}());
                         </#if>
                         break;
                     </#list>
@@ -298,7 +313,7 @@ public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idFiel
                     </#if>
             if (value.${field.name}.getValue() != null) {
                 writer.writeName(${name}.${field.underscoreName});
-                encoderContext.encodeWithChildContext(registry.get(${field.type}.class), writer, value.${field.name}.getValue());
+                encoderContext.encodeWithChildContext(registry.get(${field.classType}.class), writer, value.${field.name}.getValue());
             }
                     <#if field_has_next && fields[field_index+1].primitiveType >
 
@@ -345,7 +360,7 @@ public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idFiel
 
                     </#if>
                 <#else>
-            writer.write${field.type?cap_first}("${field.name}", value.${field.name}.getValue());   
+            writer.write${field.type?cap_first}("${field.name}", value.${field.name}.getValue());
                 </#if>
             </#list>
 

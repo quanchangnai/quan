@@ -5,8 +5,8 @@
         <field name="id" type="int" column="ID"/>
         <field name="name" type="string" column="名字"/>
         <field name="type" type="QuestType" column="类型" index="normal"/>
-        <field name="target" type="int" column="任务目标" ref="QuestTargetConfig.id"/>
-        <field name="reward" type="Reward" column="奖励"/>
+        <field name="target" type="int" column="任务目标" ref="QuestTargetConfig@id"/>
+        <field name="reward" type="item.Reward" column="奖励"/>
         <field name="a1" type="int" column="A1"/>
         <field name="a2" type="int" column="A2"/>
         <field name="b1" type="int" column="B1"/>

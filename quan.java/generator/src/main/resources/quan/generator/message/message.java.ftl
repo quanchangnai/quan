@@ -42,9 +42,9 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
     <#elseif field.builtinType || field.enumType>
     ${fieldModifier} ${field.basicType} ${field.name};
     <#elseif !field.optional>
-    ${fieldModifier} ${field.basicType} ${field.name} = new ${field.type}();
+    ${fieldModifier} ${field.classType} ${field.name} = new ${field.type}();
     <#else>
-    ${fieldModifier} ${field.basicType} ${field.name};
+    ${fieldModifier} ${field.classType} ${field.name};
     </#if>
 
 </#list>
@@ -90,7 +90,7 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
         return ${field.name};
     }
 
-    <#else>
+    <#elseif field.builtinType>
     public ${field.basicType} get${field.name?cap_first}() {
         return ${field.name};
     }
@@ -101,10 +101,28 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
      */
     </#if>
     public ${name} set${field.name?cap_first}(${field.basicType} ${field.name}) {
-        <#if (!field.builtinType && !field.optional && !field.enumType) || field.type == "string" || field.type == "bytes">
+        <#if field.type == "string" || field.type == "bytes">
         Objects.requireNonNull(${field.name});<#if field.scale gt 0>, ${field.scale}</#if>
         <#elseif (field.type=="float"||field.type=="double") && field.scale gt 0>
         Buffer.checkScale(${field.name}, ${field.scale});
+        </#if>
+        this.${field.name} = ${field.name};
+        return this;
+    }
+
+    <#else>
+    public ${field.classType} get${field.name?cap_first}() {
+        return ${field.name};
+    }
+
+    <#if field.comment !="">
+    /**
+     * ${field.comment}
+     */
+    </#if>
+    public ${name} set${field.name?cap_first}(${field.classType} ${field.name}) {
+        <#if !field.enumType && !field.optional>
+        Objects.requireNonNull(${field.name});
         </#if>
         this.${field.name} = ${field.name};
         return this;
@@ -234,7 +252,7 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
         </#if>
         if (buffer.readBool()) {
             if (this.${field.name} == null) {
-                this.${field.name} = new ${field.type}();
+                this.${field.name} = new ${field.classType}();
             }
             this.${field.name}.decode(buffer);
         }

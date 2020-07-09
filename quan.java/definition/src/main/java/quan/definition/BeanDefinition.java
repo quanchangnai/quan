@@ -85,10 +85,9 @@ public class BeanDefinition extends ClassDefinition {
     }
 
     public BeanDefinition setParentName(String parentName) {
-        if (StringUtils.isBlank(parentName)) {
-            return this;
+        if (!StringUtils.isBlank(parentName)) {
+            this.parentName = parentName.trim();
         }
-        this.parentName = parentName.trim();
         return this;
     }
 
@@ -96,8 +95,16 @@ public class BeanDefinition extends ClassDefinition {
         return parentName;
     }
 
+    public String getWholeParentName() {
+        String _parentName = parentName;
+        if (_parentName != null && !_parentName.contains(".")) {
+            _parentName = getPackageName() + "." + _parentName;
+        }
+        return _parentName;
+    }
+
     public BeanDefinition getParent() {
-        return parser.getBean(getParentName());
+        return parser.getBean(getWholeParentName());
     }
 
     public Set<BeanDefinition> getChildren() {
@@ -163,7 +170,15 @@ public class BeanDefinition extends ClassDefinition {
             }
             ancestors.add(parent.getName());
 
-            fields.addAll(0, parent.selfFields);
+            for (int i = parent.selfFields.size() - 1; i >= 0; i--) {
+                try {
+                    FieldDefinition parentField = (FieldDefinition) parent.selfFields.get(i).clone();
+                    parentField.setOwner(this);
+                    fields.add(0, parentField);
+                } catch (CloneNotSupportedException e) {
+                    e.printStackTrace();
+                }
+            }
             parent.descendants.add(getName());
 
             parent = parent.getParent();
@@ -381,9 +396,9 @@ public class BeanDefinition extends ClassDefinition {
         }
 
         if (!field.getType().equals("map")) {
-            String[] fieldRefs = field.getRef().split("\\.", -1);
+            String[] fieldRefs = field.getRef().split("@", -1);
             if (fieldRefs.length != 2) {
-                addValidatedError(getValidatedName() + field.getValidatedName() + "的引用格式错误[" + field.getRef() + "]，正确格式:[配置.字段]");
+                addValidatedError(getValidatedName() + field.getValidatedName() + "的引用格式错误[" + field.getRef() + "]，正确格式:[配置@字段]");
                 return;
             }
             validateFieldRef(field, false, fieldRefs[0], fieldRefs[1]);
@@ -392,16 +407,16 @@ public class BeanDefinition extends ClassDefinition {
 
         //map类型字段引用校验
         String[] fieldRefs = field.getRef().split(":", -1);
-        String refPatternError = getValidatedName("的") + field.getValidatedName() + "类型[map]的引用格式错误[" + field.getRef() + "]，正确格式:[键引用的配置.字段]或者[键引用配置.字段:值引用的配置.字段]";
+        String refPatternError = getValidatedName("的") + field.getValidatedName() + "类型[map]的引用格式错误[" + field.getRef() + "]，正确格式:[键引用的配置@字段]或者[键引用配置@字段:值引用的配置@字段]";
         if (fieldRefs.length != 1 && fieldRefs.length != 2) {
             addValidatedError(refPatternError);
             return;
         }
 
-        String[] fieldKeyRefs = fieldRefs[0].split("\\.", -1);
+        String[] fieldKeyRefs = fieldRefs[0].split("@", -1);
         String[] fieldValueRefs = null;
         if (fieldRefs.length == 2) {
-            fieldValueRefs = fieldRefs[1].split("\\.", -1);
+            fieldValueRefs = fieldRefs[1].split("@", -1);
         }
 
         if (fieldKeyRefs.length != 2) {
@@ -419,10 +434,17 @@ public class BeanDefinition extends ClassDefinition {
         }
     }
 
-    protected void validateFieldRef(FieldDefinition field, boolean keType, String refConfigName, String refFiledName) {
-        String refConfigAndField = refConfigName + "." + refFiledName;
+    protected String getRefConfigName(String refConfigName) {
+        if (!refConfigName.contains(".")) {
+            return getPackageName() + "." + refConfigName;
+        }
+        return refConfigName;
+    }
 
-        ConfigDefinition refConfig = parser.getConfig(refConfigName);
+    protected void validateFieldRef(FieldDefinition field, boolean keType, String refConfigName, String refFiledName) {
+        String refConfigAndField = refConfigName + "@" + refFiledName;
+
+        ConfigDefinition refConfig = parser.getConfig(getRefConfigName(refConfigName));
         if (refConfig == null) {
             addValidatedError(getValidatedName() + field.getValidatedName() + "的引用配置[" + refConfigName + "]不存在");
             return;

@@ -43,8 +43,10 @@ public class ${name} extends <#if parentName??>${parentName}<#elseif kind ==2>Be
     //${field.comment}
     </#if>
     protected final String ${field.name}_;
-    <#else >
+    <#elseif field.builtinType>
     protected final ${field.basicType} ${field.name};
+    <#else>
+    protected final ${field.classType} ${field.name};
     </#if>
 </#list>
 
@@ -120,7 +122,7 @@ public class ${name} extends <#if parentName??>${parentName}<#elseif kind ==2>Be
         </#if>
         JSONObject $${field.name} = json.getJSONObject("${field.name}");
         if ($${field.name} != null) {
-            this.${field.name} = ${field.type}.create($${field.name});
+            this.${field.name} = ${field.classType}.create($${field.name});
         } else {
             this.${field.name} = null;
         }
@@ -161,8 +163,12 @@ public class ${name} extends <#if parentName??>${parentName}<#elseif kind ==2>Be
     public final String get${field.name?cap_first}_() {
         return ${field.name}_;
     }
-    <#else >
+    <#elseif field.builtinType>
     public final ${field.basicType} get${field.name?cap_first}() {
+        return ${field.name};
+    }
+    <#else >
+    public final ${field.classType} get${field.name?cap_first}() {
         return ${field.name};
     }
     </#if>

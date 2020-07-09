@@ -28,7 +28,7 @@
         <field name="roleInfoList" type="list:RoleInfo"/>角色信息
         <field name="roleInfoSet" type="set:RoleInfo"/>角色信息
         <field name="roleInfoMap" type="map:long:RoleInfo"/>角色信息
-        <field name="userInfo" type="UserInfo" optional="true"/>用户信息
+        <field name="userInfo" type="user.UserInfo" optional="true"/>用户信息
     </message>
 
     <message name="SRoleLogin">角色登录，哈希生成ID
@@ -38,7 +38,7 @@
         <field name="roleInfoList" type="list:RoleInfo"/>角色信息
         <field name="roleInfoSet" type="set:RoleInfo"/>角色信息
         <field name="roleInfoMap" type="map:long:RoleInfo"/>角色信息
-        <field name="userInfo" type="UserInfo" optional="true"/>用户信息
+        <field name="userInfo" type="user.UserInfo" optional="true"/>用户信息
     </message>
 
 </package>

@@ -32,7 +32,7 @@ public enum ${name} {
     }
     <#elseif valueField.type=="list" || valueField.type=="set">
 
-    public ${valueField.basicType}<${valueField.valueType}> value() {
+    public ${valueField.basicType}<${valueField.classValueType}> value() {
         return ${configDefinition.name}.getBy${keyField.name?cap_first}(name()).get${valueField.name?cap_first}();
     }
     <#else>
@@ -55,7 +55,7 @@ public class ${name} {
         return ${configDefinition.name}.getBy${keyField.name?cap_first}("${key}").get${valueField.name?cap_first}();
     }
     <#elseif valueField.type=="list" || valueField.type=="set">
-    public static ${valueField.basicType}<${valueField.valueType}> ${key}() {
+    public static ${valueField.basicType}<${valueField.classValueType}> ${key}() {
         return ${configDefinition.name}.getBy${keyField.name?cap_first}("${key}").get${valueField.name?cap_first}();
     }
     <#else>

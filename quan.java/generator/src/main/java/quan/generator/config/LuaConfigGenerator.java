@@ -51,126 +51,129 @@ public class LuaConfigGenerator extends ConfigGenerator {
     }
 
     private String configLuaString(ConfigDefinition configDefinition, JSONObject object) {
-        StringBuilder builder = new StringBuilder();
-        beanLuaString(builder, configDefinition, object);
-        return builder.toString();
+        StringBuilder luaBuilder = new StringBuilder();
+        beanLuaString(configDefinition, configDefinition, object, luaBuilder);
+        return luaBuilder.toString();
     }
 
-    private void beanLuaString(StringBuilder builder, BeanDefinition beanDefinition, JSONObject object) {
+    private void beanLuaString(ConfigDefinition configDefinition, BeanDefinition beanDefinition, JSONObject object, StringBuilder luaBuilder) {
         if (object == null) {
-            builder.append("nil");
+            luaBuilder.append("nil");
             return;
         }
 
-        BeanDefinition actualBeanDefinition = beanDefinition;
         String clazz = object.getString("class");
         if (!StringUtils.isEmpty(clazz)) {
-            actualBeanDefinition = parser.getBean(clazz);
+            if (!clazz.contains(".")) {
+                clazz = configDefinition.getPackageName() + "." + clazz;
+            }
+            beanDefinition = parser.getBean(clazz);
         }
 
-        if (actualBeanDefinition == null) {
-            builder.append("nil");
+        if (beanDefinition == null) {
+            luaBuilder.append("nil");
             return;
         }
 
-        builder.append("{ ");
+        luaBuilder.append("{ ");
 
         if (!StringUtils.isEmpty(clazz)) {
-            builder.append("class = ").append("\"").append(clazz).append("\", ");
+            luaBuilder.append("class = ").append("\"").append(clazz).append("\", ");
         }
 
         boolean start = true;
-        for (FieldDefinition field : actualBeanDefinition.getFields()) {
+        for (FieldDefinition field : beanDefinition.getFields()) {
             if (!field.supportLanguage(this.supportLanguage())) {
                 continue;
             }
             if (!start) {
-                builder.append(", ");
+                luaBuilder.append(", ");
             }
             start = false;
 
-            builder.append(field.getName()).append(" = ");
+            luaBuilder.append(field.getName()).append(" = ");
 
             if (field.getType().equals("string")) {
-                builder.append("\"").append(object.getOrDefault(field.getName(), "")).append("\"");
+                luaBuilder.append("\"").append(object.getOrDefault(field.getName(), "")).append("\"");
             } else if (field.isNumberType()) {
-                builder.append(object.getOrDefault(field.getName(), "0"));
+                luaBuilder.append(object.getOrDefault(field.getName(), "0"));
             } else if (field.isTimeType()) {
                 Date date = object.getDate(field.getName());
-                builder.append(date != null ? date.getTime() : 0);
-                builder.append(", ").append(field.getName()).append("_ = ");
-                builder.append("\"").append(object.getOrDefault(field.getName() + "_", "")).append("\"");
+                luaBuilder.append(date != null ? date.getTime() : 0);
+                luaBuilder.append(", ").append(field.getName()).append("_ = ");
+                luaBuilder.append("\"").append(object.getOrDefault(field.getName() + "_", "")).append("\"");
             } else if (field.getType().equals("map")) {
-                mapLuaString(builder, field, object.getJSONObject(field.getName()));
+                mapLuaString(configDefinition, field, object.getJSONObject(field.getName()), luaBuilder);
             } else if (field.getType().equals("list") || field.getType().equals("set")) {
-                arrayLuaString(builder, field, object.getJSONArray(field.getName()));
+                arrayLuaString(configDefinition, field, object.getJSONArray(field.getName()), luaBuilder);
             } else if (field.isBeanType()) {
-                beanLuaString(builder, field.getBean(), object.getJSONObject(field.getName()));
+                beanLuaString(configDefinition, field.getBean(), object.getJSONObject(field.getName()), luaBuilder);
             } else {
-                builder.append(object.getOrDefault(field.getName(), "nil"));
+                luaBuilder.append(object.getOrDefault(field.getName(), "nil"));
             }
 
         }
 
-        builder.append(" }");
+        luaBuilder.append(" }");
     }
 
-    private void mapLuaString(StringBuilder builder, FieldDefinition field, JSONObject object) {
+    private void mapLuaString(ConfigDefinition configDefinition, FieldDefinition field, JSONObject object, StringBuilder luaBuilder) {
         if (object == null) {
-            builder.append("{ }");
+            luaBuilder.append("{ }");
             return;
         }
 
-        builder.append("{ ");
+        luaBuilder.append("{ ");
         boolean start = true;
 
         for (String key : object.keySet()) {
             if (!start) {
-                builder.append(", ");
+                luaBuilder.append(", ");
             }
             start = false;
 
             if (field.getKeyType().equals("string")) {
-                builder.append(key);
+                luaBuilder.append(key);
             } else {
-                builder.append("[").append(key).append("]");
+                luaBuilder.append("[").append(key).append("]");
             }
 
-            builder.append(" = ");
+            luaBuilder.append(" = ");
 
             if (field.getValueType().equals("string")) {
-                builder.append("\"").append(object.getString(key)).append("\"");
+                luaBuilder.append("\"").append(object.getString(key)).append("\"");
             } else if (field.isBeanValueType()) {
-                beanLuaString(builder, field.getValueBean(), object.getJSONObject(key));
+                beanLuaString(configDefinition, field.getValueBean(), object.getJSONObject(key), luaBuilder);
             } else {
-                builder.append(object.get(key));
+                luaBuilder.append(object.get(key));
             }
         }
 
-        builder.append(" }");
+        luaBuilder.append(" }");
     }
 
-    private void arrayLuaString(StringBuilder builder, FieldDefinition field, JSONArray array) {
+    private void arrayLuaString(ConfigDefinition configDefinition, FieldDefinition field, JSONArray array, StringBuilder luaBuilder) {
         if (array == null) {
-            builder.append("{ }");
+            luaBuilder.append("{ }");
             return;
         }
-        builder.append("{ ");
+        luaBuilder.append("{ ");
         boolean start = true;
         for (int i = 0; i < array.size(); i++) {
             if (!start) {
-                builder.append(", ");
+                luaBuilder.append(", ");
             }
             start = false;
             if (field.getValueType().equals("string")) {
-                builder.append("\"").append(array.getString(i)).append("\"");
+                luaBuilder.append("\"").append(array.getString(i)).append("\"");
             } else if (field.isBeanValueType()) {
-                beanLuaString(builder, field.getValueBean(), array.getJSONObject(i));
+                beanLuaString(configDefinition, field.getValueBean(), array.getJSONObject(i), luaBuilder);
             } else {
-                builder.append(array.get(i));
+                luaBuilder.append(array.get(i));
             }
         }
 
-        builder.append(" }");
+        luaBuilder.append(" }");
     }
+
 }

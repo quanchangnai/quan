@@ -87,7 +87,7 @@ namespace ${getFullPackageName("cs")}
             }
         }
 
-    <#elseif field.builtinType || field.enumType>
+    <#elseif field.builtinType>
         <#if field.comment !="">
         /// <summary>
 		/// ${field.comment}
@@ -95,15 +95,15 @@ namespace ${getFullPackageName("cs")}
         </#if>
 		public ${field.basicType} ${field.name?cap_first} { get; set; }
 
-    <#elseif !field.optional>
-		private ${field.basicType} _${field.name} = new ${field.type}();
+    <#elseif !field.optional && !field.enumType>
+		private ${field.classType} _${field.name} = new ${field.classType}();
 
         <#if field.comment !="">
         /// <summary>
 		/// ${field.comment}
 		/// </summary>
         </#if>
-		public ${field.basicType} ${field.name?cap_first}
+		public ${field.classType} ${field.name?cap_first}
 		{
 	    	get => _${field.name};
 	    	set => _${field.name} = value ?? throw new NullReferenceException();
@@ -115,7 +115,7 @@ namespace ${getFullPackageName("cs")}
 		/// ${field.comment}
 		/// </summary>
         </#if>
-		private ${field.basicType} ${field.name?cap_first} { get; set; }
+		public ${field.classType} ${field.name?cap_first} { get; set; }
 
     </#if>
 </#list>
@@ -202,7 +202,7 @@ namespace ${getFullPackageName("cs")}
 		<#if field.builtinValueType>
 			    ${field.name?cap_first}.Add(buffer.Read${field.valueType?cap_first}());
 		<#else>
-			    var ${field.name}Value = new ${field.valueType}();
+			    var ${field.name}Value = new ${field.classValueType}();
 			  	${field.name}Value.Decode(buffer);
 			    ${field.name?cap_first}.Add(${field.name}Value);
 		</#if>
@@ -220,7 +220,7 @@ namespace ${getFullPackageName("cs")}
 			    ${field.name?cap_first}.Add(buffer.Read${field.keyType?cap_first}(), buffer.Read${field.valueType?cap_first}());
 		<#else>
 			    var ${field.name}Key = buffer.Read${field.keyType?cap_first}();
-			    var ${field.name}Value = new ${field.valueType}();
+			    var ${field.name}Value = new ${field.classValueType}();
 				${field.name}Value.Decode(buffer);
 			    ${field.name?cap_first}.Add(${field.name}Key, ${field.name}Value);
 		</#if>
@@ -240,7 +240,7 @@ namespace ${getFullPackageName("cs")}
         </#if>
 		    if (buffer.ReadBool()) {
 		        if (${field.name?cap_first} == null) {
-		            ${field.name?cap_first} = new ${field.type}();
+		            ${field.name?cap_first} = new ${field.classType}();
 		        }
 		        ${field.name?cap_first}.Decode(buffer);
             }

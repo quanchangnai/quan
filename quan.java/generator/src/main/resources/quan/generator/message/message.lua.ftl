@@ -148,7 +148,7 @@ function ${name}:encode(buffer)
         </#if>
     buffer:writeBool(self.${field.name} ~= nil);
     if self.${field.name} ~= nil then
-        ${field.type}.encode(self.${field.name}, buffer)
+        ${field.classType}.encode(self.${field.name}, buffer)
     end
     <#if field_has_next && !allFields[field_index+1].collectionType && (allFields[field_index+1].primitiveType || allFields[field_index+1].enumType || !allFields[field_index+1].optional) >
 
@@ -226,7 +226,7 @@ function ${name}.decode(buffer, self)
 
         </#if>
     if buffer:readBool() then
-        self.${field.name} = ${field.type}.decode(buffer)
+        self.${field.name} = ${field.classType}.decode(buffer)
     end
     <#if field_has_next && !allFields[field_index+1].collectionType && (allFields[field_index+1].primitiveType || allFields[field_index+1].enumType || !allFields[field_index+1].optional) >
 

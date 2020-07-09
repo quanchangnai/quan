@@ -44,8 +44,10 @@ namespace ${getFullPackageName("cs")}
         public readonly ${field.basicType} ${field.name?cap_first};
 
         public readonly string ${field.name?cap_first}_;
-    <#else >
+    <#elseif field.builtinType>
         public readonly ${field.basicType} ${field.name?cap_first};
+    <#else >
+        public readonly ${field.classType} ${field.name?cap_first};
     </#if>
 
 </#list>
@@ -61,7 +63,7 @@ namespace ${getFullPackageName("cs")}
 
         </#if>
             var ${field.name}1 = json["${field.name}"]?.Value<JArray>();
-            var ${field.name}2 = Immutable${field.classType}<${field.valueType}>.Empty;
+            var ${field.name}2 = Immutable${field.classType}<${field.classValueType}>.Empty;
             if (${field.name}1 != null)
             {
                 foreach (var ${field.name}Value in ${field.name}1)
@@ -108,7 +110,7 @@ namespace ${getFullPackageName("cs")}
     <#elseif field.enumType>
             ${field.name?cap_first} = (${field.type}) (json["${field.name}"]?.Value<int>() ?? default);
     <#else>
-            ${field.name?cap_first} = json.ContainsKey("${field.name}") ? ${field.type}.Create(json["${field.name}"].Value<JObject>()) : null;
+            ${field.name?cap_first} = json.ContainsKey("${field.name}") ? ${field.classType}.Create(json["${field.name}"].Value<JObject>()) : null;
     </#if>
 </#list>
         }

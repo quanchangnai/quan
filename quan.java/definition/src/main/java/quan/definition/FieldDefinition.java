@@ -15,7 +15,9 @@ import java.util.regex.Pattern;
  * 字段定义，被数据、消息和配置共用
  * Created by quanchangnai on 2017/7/6.
  */
-public class FieldDefinition extends Definition {
+public class FieldDefinition extends Definition implements Cloneable {
+
+    private ClassDefinition owner;
 
     //定义的字段类型,集合类型包含其元素类型
     private String types;
@@ -87,6 +89,15 @@ public class FieldDefinition extends Definition {
         return "字段";
     }
 
+    public ClassDefinition getOwner() {
+        return owner;
+    }
+
+    public FieldDefinition setOwner(ClassDefinition owner) {
+        this.owner = owner;
+        return this;
+    }
+
     @Override
     public void setName(String name) {
         super.setName(name);
@@ -114,13 +125,33 @@ public class FieldDefinition extends Definition {
         return type;
     }
 
-
     public void setType(String type) {
         if (!StringUtils.isBlank(type)) {
             this.type = type.trim();
         } else {
             this.type = null;
         }
+    }
+
+    /**
+     * 如果给定的类型包含包名则截掉包名
+     */
+    protected String getSimpleClassType(String type) {
+        int index = type.indexOf(".");
+        if (index >= 0) {
+            return type.substring(index + 1);
+        }
+        return type;
+    }
+
+    /**
+     * 如果给定的类型不包含包名则加上包名
+     */
+    protected String getClassType(String type) {
+        if (!StringUtils.isBlank(type) && !type.contains(".")) {
+            type = owner.getPackageName() + "." + type;
+        }
+        return type;
     }
 
     public boolean isBuiltinType() {
@@ -158,7 +189,7 @@ public class FieldDefinition extends Definition {
     }
 
     public EnumDefinition getEnum() {
-        ClassDefinition classDefinition = parser.getClass(getType());
+        ClassDefinition classDefinition = getClassDefinition();
         if (classDefinition instanceof EnumDefinition) {
             return (EnumDefinition) classDefinition;
         }
@@ -170,11 +201,11 @@ public class FieldDefinition extends Definition {
     }
 
     public ClassDefinition getClassDefinition() {
-        return parser.getClass(getType());
+        return parser.getClass(getClassType(type));
     }
 
     public BeanDefinition getBean() {
-        ClassDefinition classDefinition = parser.getClass(getType());
+        ClassDefinition classDefinition = getClassDefinition();
         if (BeanDefinition.isBeanDefinition(classDefinition)) {
             return (BeanDefinition) classDefinition;
         }
@@ -266,7 +297,7 @@ public class FieldDefinition extends Definition {
         if (!isCollectionType()) {
             return null;
         }
-        ClassDefinition classDefinition = parser.getClass(getValueType());
+        ClassDefinition classDefinition = parser.getClass(getClassType(getValueType()));
         if (BeanDefinition.isBeanDefinition(classDefinition)) {
             return (BeanDefinition) classDefinition;
         }
@@ -315,9 +346,9 @@ public class FieldDefinition extends Definition {
 
     public String getClassType() {
         if (classType == null) {
-            return getType();
+            return getSimpleClassType(type);
         }
-        return classType;
+        return getSimpleClassType(classType);
     }
 
     public void setClassType(String classType) {
@@ -337,9 +368,9 @@ public class FieldDefinition extends Definition {
 
     public String getClassValueType() {
         if (classValueType == null) {
-            return getValueType();
+            return getSimpleClassType(getValueType());
         }
-        return classValueType;
+        return getSimpleClassType(classValueType);
     }
 
     public void setClassValueType(String classValueType) {
@@ -456,20 +487,20 @@ public class FieldDefinition extends Definition {
             ConfigDefinition refConfig = null;
 
             if (keyRef && fieldRefs.length >= 1) {
-                refConfig = parser.getConfig(fieldRefs[0].split("\\.", -1)[0]);
+                refConfig = parser.getConfig(getClassType(fieldRefs[0].split("@", -1)[0]));
             }
             if (!keyRef && fieldRefs.length == 2) {
-                refConfig = parser.getConfig(fieldRefs[1].split("\\.", -1)[0]);
+                refConfig = parser.getConfig(getClassType(fieldRefs[1].split("@", -1)[0]));
             }
             return refConfig;
         }
 
         //list set 原生类型
-        String[] fieldRefs = ref.split("\\.", -1);
+        String[] fieldRefs = ref.split("@", -1);
         if (fieldRefs.length != 2) {
             return null;
         }
-        return parser.getConfig(fieldRefs[0]);
+        return parser.getConfig(getClassType(fieldRefs[0]));
     }
 
     /**
@@ -482,20 +513,21 @@ public class FieldDefinition extends Definition {
         if (StringUtils.isBlank(ref)) {
             return null;
         }
+
         if (type.equals("map")) {
             String[] fieldRefs = ref.split(",", -1);
             ConfigDefinition refConfig;
 
             if (keyRef && fieldRefs.length >= 1) {
-                String[] fieldKeyRefs = fieldRefs[0].split("\\.", -1);
-                refConfig = parser.getConfig(fieldKeyRefs[0]);
+                String[] fieldKeyRefs = fieldRefs[0].split("@", -1);
+                refConfig = parser.getConfig(getClassType(fieldKeyRefs[0]));
                 if (refConfig != null) {
                     return refConfig.getField(fieldKeyRefs[1]);
                 }
             }
             if (!keyRef && fieldRefs.length == 2) {
-                String[] fieldValueRefs = fieldRefs[1].split("\\.", -1);
-                refConfig = parser.getConfig(fieldValueRefs[0]);
+                String[] fieldValueRefs = fieldRefs[1].split("@", -1);
+                refConfig = parser.getConfig(getClassType(fieldValueRefs[0]));
                 if (refConfig != null) {
                     return refConfig.getField(fieldValueRefs[1]);
                 }
@@ -504,12 +536,12 @@ public class FieldDefinition extends Definition {
         }
 
         //list set 原生类型
-        String[] fieldRefs = ref.split("\\.", -1);
+        String[] fieldRefs = ref.split("@", -1);
         if (fieldRefs.length != 2) {
             return null;
         }
 
-        ConfigDefinition refConfig = parser.getConfig(fieldRefs[0]);
+        ConfigDefinition refConfig = parser.getConfig(getClassType(fieldRefs[0]));
         if (refConfig != null) {
             return refConfig.getField(fieldRefs[1]);
         }
@@ -572,4 +604,10 @@ public class FieldDefinition extends Definition {
         }
         return true;
     }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+
 }

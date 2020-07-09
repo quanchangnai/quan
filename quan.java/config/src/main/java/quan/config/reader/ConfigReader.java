@@ -130,7 +130,7 @@ public abstract class ConfigReader {
     protected void validateColumnNames(List<String> columns) {
         configDefinition.getFields().forEach(f -> f.getColumnNums().clear());
 
-        Set<FieldDefinition> lackFields = new HashSet<>(configDefinition.getFields());
+        Set<FieldDefinition> lackingFields = new HashSet<>(configDefinition.getFields());
         Set<String> validatedColumns = new HashSet<>();
 
         for (int i = 0; i < columns.size(); i++) {
@@ -139,7 +139,7 @@ public abstract class ConfigReader {
             if (fieldDefinition == null) {
                 continue;
             }
-            lackFields.remove(fieldDefinition);
+            lackingFields.remove(fieldDefinition);
 
             if (validatedColumns.contains(columnName) && !fieldDefinition.isCollectionType() && !fieldDefinition.isBeanType()) {
                 validatedErrors.add(String.format("配置[%s]的字段类型[%s]不支持对应多列[%s]", table, fieldDefinition.getType(), columnName));
@@ -159,7 +159,7 @@ public abstract class ConfigReader {
             }
         }
 
-        for (FieldDefinition fieldDefinition : lackFields) {
+        for (FieldDefinition fieldDefinition : lackingFields) {
             validatedErrors.add(String.format("配置[%s]缺少字段[%s]对应的列[%s]", table, fieldDefinition.getName(), fieldDefinition.getColumn()));
         }
     }

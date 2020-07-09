@@ -64,7 +64,7 @@ namespace Test.Message.Role
         /// <summary>
 		/// 用户信息
 		/// </summary>
-		private UserInfo UserInfo { get; set; }
+		public UserInfo UserInfo { get; set; }
 
 
 		public override MessageBase Create()

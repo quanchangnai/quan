@@ -82,7 +82,7 @@ public class ConfigDefinition extends BeanDefinition {
 
     @Override
     public ConfigDefinition getParent() {
-        return parser.getConfig(getParentName());
+        return parser.getConfig(getWholeParentName());
     }
 
     public ConfigDefinition setTable(String table) {
@@ -111,6 +111,9 @@ public class ConfigDefinition extends BeanDefinition {
         }
 
         for (String configName : getMeAndDescendants()) {
+            if (!configName.contains(".")) {
+                configName = getPackageName() + "." + configName;
+            }
             ConfigDefinition configDefinition = parser.getConfig(configName);
             if (configDefinition == null) {
                 continue;
@@ -272,7 +275,7 @@ public class ConfigDefinition extends BeanDefinition {
             return;
         }
 
-        ClassDefinition parentClass = parser.getClass(parentName);
+        ClassDefinition parentClass = parser.getClass(getWholeParentName());
         if (parentClass == null) {
             addValidatedError(getValidatedName() + "的父配置[" + parentName + "]不存在");
             return;

@@ -4,7 +4,7 @@
     <config name="ConstantConfig" table="常量">
         <field name="key" type="string" column="常量Key" index="u"/>
         <field name="itemId" type="int" column="道具ID"/>
-        <field name="rewardList" type="list:Reward" column="奖励List"/>
+        <field name="rewardList" type="list:item.Reward" column="奖励List"/>
         <field name="comment" type="string" column="备注"/>
         <constant name="ItemConstant" enum="false" key="key" value="itemId" comment="comment"/>
         <constant name="RewardConstant" enum="true" key="key" value="rewardList"/>
