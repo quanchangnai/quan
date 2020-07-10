@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import quan.definition.BeanDefinition;
+import quan.definition.ClassDefinition;
 import quan.definition.EnumDefinition;
 import quan.definition.FieldDefinition;
 import quan.definition.parser.DefinitionParser;
@@ -80,7 +81,7 @@ public class ConfigConverter {
         } else if (type.equals("map")) {
             return convertMap(fieldDefinition, value);
         } else if (fieldDefinition.isBeanType()) {
-            return convertBean(fieldDefinition, fieldDefinition.getBean(), value);
+            return convertBean(fieldDefinition.getOwner(), fieldDefinition.getBean(), value);
         } else if (fieldDefinition.isEnumType()) {
             return convertEnumType(fieldDefinition.getEnum(), value);
         }
@@ -92,7 +93,7 @@ public class ConfigConverter {
 
         //字段对应一列
         if (fieldDefinition.getColumnNums().size() == 1) {
-            return convertBean(fieldDefinition, beanDefinition, columnValue);
+            return convertBean(fieldDefinition.getOwner(), beanDefinition, columnValue);
         }
 
         //字段对应多列
@@ -267,7 +268,7 @@ public class ConfigConverter {
             if (fieldDefinition.isPrimitiveValueType()) {
                 o = convertPrimitiveType(fieldDefinition.getValueType(), v);
             } else {
-                o = convertBean(fieldDefinition, fieldDefinition.getValueBean(), v);
+                o = convertBean(fieldDefinition.getOwner(), fieldDefinition.getValueBean(), v);
             }
             if (o != null) {
                 array.add(o);
@@ -361,7 +362,7 @@ public class ConfigConverter {
                 if (fieldDefinition.isPrimitiveValueType()) {
                     objectValue = convertPrimitiveType(fieldDefinition.getValueType(), value);
                 } else {
-                    objectValue = convertBean(fieldDefinition, fieldDefinition.getValueBean(), value);
+                    objectValue = convertBean(fieldDefinition.getOwner(), fieldDefinition.getValueBean(), value);
                 }
             } catch (Exception ignored) {
             }
@@ -404,7 +405,7 @@ public class ConfigConverter {
                 if (fieldDefinition.isPrimitiveValueType()) {
                     v = convertPrimitiveType(fieldDefinition.getValueType(), values[i + 1]);
                 } else {
-                    v = convertBean(fieldDefinition, fieldDefinition.getValueBean(), values[i + 1]);
+                    v = convertBean(fieldDefinition.getOwner(), fieldDefinition.getValueBean(), values[i + 1]);
                 }
             } catch (Exception ignored) {
             }
@@ -419,7 +420,7 @@ public class ConfigConverter {
     }
 
 
-    private JSONObject convertBean(FieldDefinition ownerFieldDefinition, BeanDefinition beanDefinition, String value) {
+    private JSONObject convertBean(ClassDefinition owner, BeanDefinition beanDefinition, String value) {
         if (StringUtils.isBlank(value)) {
             return null;
         }
@@ -427,20 +428,20 @@ public class ConfigConverter {
 
         JSONObject object = new JSONObject();
 
-
         //有子类，按具体类型转换
-        if (beanDefinition.hasChild()) {
+        boolean beanHasChild = beanDefinition.hasChild();
+        if (beanHasChild) {
             String beanClass = values[0];
             if (!beanDefinition.getMeAndDescendants().contains(beanClass)) {
                 throw new ConvertException(ConvertException.ErrorType.typeError, beanClass, beanDefinition.getName());
             }
             object.put("class", beanClass);
-            beanDefinition = parser.getBean(getWholeName(ownerFieldDefinition.getOwner(), beanClass));
+            beanDefinition = parser.getBean(getWholeName(owner, beanClass));
         }
 
         for (int i = 0; i < beanDefinition.getFields().size(); i++) {
             int valueIndex = i;
-            if (beanDefinition.hasChild()) {
+            if (beanHasChild) {
                 valueIndex++;
             }
             FieldDefinition fieldDefinition = beanDefinition.getFields().get(i);

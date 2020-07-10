@@ -56,10 +56,11 @@ public class CSharpConfigGenerator extends ConfigGenerator {
     }
 
     @Override
-    protected void prepareBeanFieldImports(BeanDefinition beanDefinition, FieldDefinition fieldDefinition) {
-        super.prepareBeanFieldImports(beanDefinition, fieldDefinition);
-        if (fieldDefinition.isTimeType()) {
-            beanDefinition.getImports().add("System");
+    protected void prepareFieldImports(FieldDefinition fieldDefinition) {
+        super.prepareFieldImports(fieldDefinition);
+        BeanDefinition owner = (BeanDefinition) fieldDefinition.getOwner();
+        if (fieldDefinition.isTimeType() && owner.getSelfFields().contains(fieldDefinition)) {
+            owner.getImports().add("System");
         }
     }
 

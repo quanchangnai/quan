@@ -9,7 +9,9 @@ import java.util.regex.Pattern;
  * 索引定义
  * Created by quanchangnai on 2019/7/14.
  */
-public class IndexDefinition extends Definition {
+public class IndexDefinition extends Definition implements Cloneable {
+
+    private BeanDefinition owner;
 
     //索引类型
     private String type;
@@ -49,6 +51,15 @@ public class IndexDefinition extends Definition {
     @Override
     public Pattern getNamePattern() {
         return Constants.FIELD_NAME_PATTERN;
+    }
+
+    public BeanDefinition getOwner() {
+        return owner;
+    }
+
+    public IndexDefinition setOwner(BeanDefinition owner) {
+        this.owner = owner;
+        return this;
     }
 
     public boolean isUnique() {
@@ -106,26 +117,31 @@ public class IndexDefinition extends Definition {
         return this;
     }
 
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
 
-    public static void validateIndex(BeanDefinition owner, List<IndexDefinition> indexes, List<IndexDefinition> selfIndexes, List<FieldDefinition> fields) {
+    public static void validate(List<IndexDefinition> indexes, List<IndexDefinition> selfIndexes, List<FieldDefinition> fields) {
         for (FieldDefinition field : fields) {
             if (!IndexDefinition.isIndex(field.getIndex())) {
                 continue;
             }
 
             if (!field.isPrimitiveType() && !field.isEnumType() && field.getType() != null) {
-                owner.addValidatedError(owner.getValidatedName("的") + field.getValidatedName() + "类型[" + field.getType() + "]不支持索引，允许的类型为" + Constants.PRIMITIVE_TYPES + "或枚举");
+                field.getOwner().addValidatedError(field.getOwner().getValidatedName("的") + field.getValidatedName() + "类型[" + field.getType() + "]不支持索引，允许的类型为" + Constants.PRIMITIVE_TYPES + "或枚举");
                 continue;
             }
 
             IndexDefinition indexDefinition = new IndexDefinition(field);
+            indexDefinition.setOwner((BeanDefinition) field.getOwner());
             indexes.add(indexDefinition);
             if (indexes != selfIndexes) {
                 selfIndexes.add(indexDefinition);
             }
         }
 
-        selfIndexes.forEach(index -> index.validateIndex(owner));
+        selfIndexes.forEach(index -> index.validate());
 
         Set<String> indexNames = new HashSet<>();
         for (IndexDefinition indexDefinition : indexes) {
@@ -133,7 +149,7 @@ public class IndexDefinition extends Definition {
                 continue;
             }
             if (indexNames.contains(indexDefinition.getName())) {
-                owner.addValidatedError(owner.getValidatedName() + "的索引名[" + indexDefinition.getName() + "]重复");
+                indexDefinition.getOwner().addValidatedError(indexDefinition.getOwner().getValidatedName() + "的索引名[" + indexDefinition.getName() + "]重复");
                 continue;
             }
             indexNames.add(indexDefinition.getName());
@@ -141,7 +157,7 @@ public class IndexDefinition extends Definition {
 
     }
 
-    private void validateIndex(BeanDefinition owner) {
+    private void validate() {
         if (getName() == null) {
             owner.addValidatedError(owner.getValidatedName() + "的索引名不能为空");
         } else if (!getNamePattern().matcher(getName()).matches()) {

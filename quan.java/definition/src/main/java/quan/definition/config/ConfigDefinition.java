@@ -142,6 +142,7 @@ public class ConfigDefinition extends BeanDefinition {
     }
 
     public void addIndex(IndexDefinition indexDefinition) {
+        indexDefinition.setOwner(this);
         indexes.add(indexDefinition);
         selfIndexes.add(indexDefinition);
     }
@@ -266,45 +267,38 @@ public class ConfigDefinition extends BeanDefinition {
             validateField(field);
         }
 
-        IndexDefinition.validateIndex(this, indexes, selfIndexes, selfFields);
+        IndexDefinition.validate(indexes, selfIndexes, selfFields);
     }
 
     @Override
     protected void validateParent() {
-        if (StringUtils.isEmpty(parentName)) {
-            return;
-        }
-
-        ClassDefinition parentClass = parser.getClass(getWholeParentName());
-        if (parentClass == null) {
-            addValidatedError(getValidatedName() + "的父配置[" + parentName + "]不存在");
-            return;
-        }
-
-        if (!(parentClass instanceof ConfigDefinition)) {
-            addValidatedError(getValidatedName() + "的父类[" + parentName + "]只能是配置类");
-            return;
-        }
+        super.validateParent();
 
         ConfigDefinition parent = getParent();
+        if (parent == null) {
+            return;
+        }
 
         if (!parent.getSupportedLanguages().containsAll(getSupportedLanguages())) {
             addValidatedError(getValidatedName() + "支持的语言范围" + supportedLanguages + "必须小于或等于其父配置[" + parentName + "]所支持的语言范围" + parent.supportedLanguages);
         }
 
-        parent.children.add(this);
-
         Set<String> ancestors = new HashSet<>();
         while (parent != null) {
             if (ancestors.contains(parent.getName())) {
-                addValidatedError(getValidatedName() + "和父子关系" + ancestors + "不能有循环");
                 return;
             }
             ancestors.add(parent.getName());
 
-            fields.addAll(0, parent.selfFields);
-            indexes.addAll(0, parent.selfIndexes);
-            parent.descendants.add(getName());
+            for (int i = parent.selfIndexes.size() - 1; i >= 0; i--) {
+                try {
+                    IndexDefinition parentIndex = (IndexDefinition) parent.selfIndexes.get(i).clone();
+                    parentIndex.setOwner(this);
+                    indexes.add(0, parentIndex);
+                } catch (CloneNotSupportedException e) {
+                    e.printStackTrace();
+                }
+            }
 
             parent = parent.getParent();
         }

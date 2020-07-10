@@ -53,20 +53,21 @@ public class CSharpMessageGenerator extends MessageGenerator {
     }
 
     @Override
-    protected void prepareClass(ClassDefinition classDefinition) {
-        if (classDefinition instanceof MessageDefinition) {
-            HeadDefinition headDefinition = ((MessageDefinition) classDefinition).getHead();
-            if (headDefinition != null && !headDefinition.getFullPackageName(supportLanguage()).equals(classDefinition.getFullPackageName(supportLanguage()))) {
-                classDefinition.getImports().add(headDefinition.getFullPackageName(supportLanguage()));
+    protected void prepareBean(BeanDefinition beanDefinition) {
+        super.prepareBean(beanDefinition);
+        if (beanDefinition instanceof MessageDefinition) {
+            HeadDefinition headDefinition = ((MessageDefinition) beanDefinition).getHead();
+            if (headDefinition != null && !headDefinition.getFullPackageName(supportLanguage()).equals(beanDefinition.getFullPackageName(supportLanguage()))) {
+                beanDefinition.getImports().add(headDefinition.getFullPackageName(supportLanguage()));
             }
         }
-        super.prepareClass(classDefinition);
     }
+
     @Override
-    protected void prepareBeanFieldImports(BeanDefinition beanDefinition, FieldDefinition fieldDefinition) {
-        super.prepareBeanFieldImports(beanDefinition, fieldDefinition);
+    protected void prepareFieldImports(FieldDefinition fieldDefinition) {
+        super.prepareFieldImports(fieldDefinition);
         if (fieldDefinition.isTimeType()) {
-            beanDefinition.getImports().add("System");
+            fieldDefinition.getOwner().getImports().add("System");
         }
     }
 }

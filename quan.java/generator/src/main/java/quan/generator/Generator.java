@@ -266,35 +266,28 @@ public abstract class Generator {
 
     protected void prepareClass(ClassDefinition classDefinition) {
         if (classDefinition instanceof BeanDefinition) {
-            BeanDefinition beanDefinition = (BeanDefinition) classDefinition;
-            for (FieldDefinition fieldDefinition : beanDefinition.getSelfFields()) {
-                prepareField(classDefinition, fieldDefinition);
-            }
+            prepareBean((BeanDefinition) classDefinition);
+        }
+    }
 
-            Set<BeanDefinition> dependentBeans = new HashSet<>(beanDefinition.getChildren());
-            if (beanDefinition.getParent() != null && !(beanDefinition instanceof ConfigDefinition)) {
-                dependentBeans.add(beanDefinition.getParent());
-            }
+    protected void prepareBean(BeanDefinition beanDefinition) {
+        for (FieldDefinition fieldDefinition : beanDefinition.getFields()) {
+            prepareField(fieldDefinition);
+        }
 
-            for (BeanDefinition dependentBean : dependentBeans) {
-                if (!dependentBean.getFullPackageName(supportLanguage()).equals(classDefinition.getFullPackageName(supportLanguage()))) {
-                    beanDefinition.getImports().add(dependentBean.getOtherImport(supportLanguage()));
-                }
-            }
-        } else {
-            for (FieldDefinition fieldDefinition : classDefinition.getFields()) {
-                prepareField(classDefinition, fieldDefinition);
+        Set<BeanDefinition> dependentBeans = new HashSet<>(beanDefinition.getChildren());
+        if (beanDefinition.getParent() != null && !(beanDefinition instanceof ConfigDefinition)) {
+            dependentBeans.add(beanDefinition.getParent());
+        }
+
+        for (BeanDefinition dependentBean : dependentBeans) {
+            if (!dependentBean.getFullPackageName(supportLanguage()).equals(beanDefinition.getFullPackageName(supportLanguage()))) {
+                beanDefinition.getImports().add(dependentBean.getOtherImport(supportLanguage()));
             }
         }
     }
 
-    protected void prepareField(ClassDefinition classDefinition, FieldDefinition fieldDefinition) {
-        if (classDefinition instanceof BeanDefinition) {
-            prepareBeanField((BeanDefinition) classDefinition, fieldDefinition);
-        }
-    }
-
-    protected void prepareBeanField(BeanDefinition beanDefinition, FieldDefinition fieldDefinition) {
+    protected void prepareField(FieldDefinition fieldDefinition) {
         String fieldType = fieldDefinition.getType();
         if (fieldDefinition.isBuiltinType()) {
             fieldDefinition.setBasicType(basicTypes.get(fieldType));
@@ -315,18 +308,19 @@ public abstract class Generator {
             }
         }
 
-        prepareBeanFieldImports(beanDefinition, fieldDefinition);
+        prepareFieldImports(fieldDefinition);
     }
 
-    protected void prepareBeanFieldImports(BeanDefinition beanDefinition, FieldDefinition fieldDefinition) {
+    protected void prepareFieldImports(FieldDefinition fieldDefinition) {
+        BeanDefinition owner = (BeanDefinition) fieldDefinition.getOwner();
         ClassDefinition fieldClass = fieldDefinition.getClassDefinition();
-        if (fieldClass != null && !fieldClass.getFullPackageName(supportLanguage()).equals(beanDefinition.getFullPackageName(supportLanguage()))) {
-            beanDefinition.getImports().add(fieldClass.getOtherImport(supportLanguage()));
+        if (fieldClass != null && !fieldClass.getFullPackageName(supportLanguage()).equals(owner.getFullPackageName(supportLanguage()))) {
+            owner.getImports().add(fieldClass.getOtherImport(supportLanguage()));
         }
 
         BeanDefinition fieldValueBean = fieldDefinition.getValueBean();
-        if (fieldValueBean != null && !fieldValueBean.getFullPackageName(supportLanguage()).equals(beanDefinition.getFullPackageName(supportLanguage()))) {
-            beanDefinition.getImports().add(fieldValueBean.getOtherImport(supportLanguage()));
+        if (fieldValueBean != null && !fieldValueBean.getFullPackageName(supportLanguage()).equals(owner.getFullPackageName(supportLanguage()))) {
+            owner.getImports().add(fieldValueBean.getOtherImport(supportLanguage()));
         }
     }
 

@@ -77,12 +77,12 @@ public class DataGenerator extends Generator {
     }
 
     @Override
-    protected void prepareBeanField(BeanDefinition beanDefinition, FieldDefinition fieldDefinition) {
-        super.prepareBeanField(beanDefinition, fieldDefinition);
-        if (beanDefinition instanceof DataDefinition) {
-            DataDefinition dataDefinition = (DataDefinition) beanDefinition;
-            if (fieldDefinition.getName().equals(dataDefinition.getIdName())) {
-                dataDefinition.setIdField(fieldDefinition);
+    protected void prepareField(FieldDefinition fieldDefinition) {
+        super.prepareField(fieldDefinition);
+        if (fieldDefinition.getOwner() instanceof DataDefinition) {
+            DataDefinition owner = (DataDefinition) fieldDefinition.getOwner();
+            if (fieldDefinition.getName().equals(owner.getIdName())) {
+                owner.setIdField(fieldDefinition);
             }
         }
     }

@@ -42,14 +42,14 @@ public class LuaConfigGenerator extends ConfigGenerator {
     }
 
     @Override
-    protected void prepareClass(ClassDefinition classDefinition) {
-        if (configLoader != null && classDefinition instanceof ConfigDefinition) {
-            ConfigDefinition configDefinition = (ConfigDefinition) classDefinition;
+    protected void prepareBean(BeanDefinition beanDefinition) {
+        super.prepareBean(beanDefinition);
+        if (configLoader != null && beanDefinition instanceof ConfigDefinition) {
+            ConfigDefinition configDefinition = (ConfigDefinition) beanDefinition;
             List<JSONObject> configJsons = configLoader.loadJsons(configDefinition, true);
             List<String> rows = configJsons.stream().map(o -> configLuaString(configDefinition, o)).collect(Collectors.toList());
             configDefinition.setRows(rows);
         }
-        super.prepareClass(classDefinition);
     }
 
     private String configLuaString(ConfigDefinition configDefinition, JSONObject object) {

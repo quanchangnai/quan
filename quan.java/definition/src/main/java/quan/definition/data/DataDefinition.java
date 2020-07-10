@@ -50,7 +50,6 @@ public class DataDefinition extends BeanDefinition {
         return "数据";
     }
 
-
     @Override
     public void setName(String name) {
         super.setName(name);
@@ -76,6 +75,7 @@ public class DataDefinition extends BeanDefinition {
     }
 
     public void addIndex(IndexDefinition indexDefinition) {
+        indexDefinition.setOwner(this);
         indexes.add(indexDefinition);
     }
 
@@ -94,8 +94,7 @@ public class DataDefinition extends BeanDefinition {
             addValidatedError(getValidatedName() + "的主键[" + getIdName() + "]不存在");
         }
 
-        IndexDefinition.validateIndex(this, indexes, indexes, fields);
+        IndexDefinition.validate(indexes, indexes, fields);
     }
-
 
 }

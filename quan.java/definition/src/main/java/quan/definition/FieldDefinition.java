@@ -19,7 +19,7 @@ public class FieldDefinition extends Definition implements Cloneable {
 
     private ClassDefinition owner;
 
-    //定义的字段类型,集合类型包含其元素类型
+    //原始定义的字段类型,集合类型包含其元素类型
     private String types;
 
     //拆分后的字段类型

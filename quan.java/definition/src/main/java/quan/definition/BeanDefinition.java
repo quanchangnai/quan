@@ -96,11 +96,7 @@ public class BeanDefinition extends ClassDefinition {
     }
 
     public String getWholeParentName() {
-        String _parentName = parentName;
-        if (_parentName != null && !_parentName.contains(".")) {
-            _parentName = getPackageName() + "." + _parentName;
-        }
-        return _parentName;
+        return ClassDefinition.getWholeName(this, parentName);
     }
 
     public BeanDefinition getParent() {
@@ -153,11 +149,11 @@ public class BeanDefinition extends ClassDefinition {
 
         BeanDefinition parent = getParent();
         if (parent == null) {
-            addValidatedError(getValidatedName() + "的父类[" + parentName + "]不存在");
+            addValidatedError(getValidatedName() + "的父" + getKindName() + "[" + parentName + "]不存在");
             return;
         }
-        if (parent.getClass() != BeanDefinition.class) {
-            addValidatedError(getValidatedName() + "的父类[" + parentName + "]类型不合法");
+        if (parent.getClass() != getClass()) {
+            addValidatedError(getValidatedName() + "的父" + getKindName() + "[" + parentName + "]类型不合法");
         }
 
         parent.children.add(this);
@@ -165,7 +161,7 @@ public class BeanDefinition extends ClassDefinition {
         Set<String> ancestors = new HashSet<>();
         while (parent != null) {
             if (ancestors.contains(parent.getName())) {
-                addValidatedError(getValidatedName() + "和父子关系" + ancestors + "不能有循环");
+                addValidatedError(getValidatedName() + "和" + ancestors + "的父子关系不能有循环");
                 return;
             }
             ancestors.add(parent.getName());
@@ -179,8 +175,8 @@ public class BeanDefinition extends ClassDefinition {
                     e.printStackTrace();
                 }
             }
-            parent.descendants.add(getName());
 
+            parent.descendants.add(getName());
             parent = parent.getParent();
         }
 
