@@ -8,7 +8,7 @@ import quan.definition.*;
 import quan.definition.config.ConfigDefinition;
 import quan.definition.config.ConstantDefinition;
 import quan.definition.data.DataDefinition;
-import quan.definition.message.HeadDefinition;
+import quan.definition.message.HeaderDefinition;
 import quan.definition.message.MessageDefinition;
 
 import java.io.File;
@@ -123,11 +123,11 @@ public class XmlDefinitionParser extends DefinitionParser {
                     classDefinition = new MessageDefinition(classElement.attributeValue("id"));
                 }
                 break;
-            case "message-head":
+            case "message-header":
                 if (category == Category.message) {
-                    if (headDefinition == null) {
-                        headDefinition = new HeadDefinition();
-                        classDefinition = headDefinition;
+                    if (headerDefinition == null) {
+                        headerDefinition = new HeaderDefinition();
+                        classDefinition = headerDefinition;
                     } else {
                         addValidatedError("消息头不能重复定义");
                     }

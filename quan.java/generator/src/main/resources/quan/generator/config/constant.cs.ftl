@@ -42,7 +42,7 @@ namespace ${getFullPackageName("cs")}
     <#elseif valueField.type=="list" || valueField.type=="set">
         public ${valueField.basicType}<${valueField.classValueType}> Value => ${configDefinition.name}.GetBy${keyField.name?cap_first}(_key).${valueField.name?cap_first};
     <#else>
-        public ${valueField.basicType} Value => ${configDefinition.name}.GetBy${keyField.name?cap_first}(_key).${valueField.name?cap_first};
+        public ${valueField.classType} Value => ${configDefinition.name}.GetBy${keyField.name?cap_first}(_key).${valueField.name?cap_first};
     </#if>
 
 

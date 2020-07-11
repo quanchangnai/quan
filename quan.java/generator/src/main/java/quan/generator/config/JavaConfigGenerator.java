@@ -1,6 +1,7 @@
 package quan.generator.config;
 
 import quan.definition.Language;
+import quan.definition.config.ConstantDefinition;
 
 import java.util.Properties;
 
@@ -47,8 +48,15 @@ public class JavaConfigGenerator extends ConfigGenerator {
     }
 
     @Override
-    protected Language supportLanguage() {
+    protected Language language() {
         return Language.java;
     }
 
+    @Override
+    protected void prepareConstant(ConstantDefinition constantDefinition) {
+        super.prepareConstant(constantDefinition);
+        if (constantDefinition.getValueField().isCollectionType()) {
+            constantDefinition.getImports().add("java.util.*");
+        }
+    }
 }

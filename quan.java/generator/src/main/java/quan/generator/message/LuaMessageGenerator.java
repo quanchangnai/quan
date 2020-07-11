@@ -3,9 +3,9 @@ package quan.generator.message;
 import freemarker.template.Template;
 import quan.definition.BeanDefinition;
 import quan.definition.ClassDefinition;
-import quan.definition.FieldDefinition;
+import quan.definition.DependentSource;
 import quan.definition.Language;
-import quan.definition.message.HeadDefinition;
+import quan.definition.message.HeaderDefinition;
 import quan.definition.message.MessageDefinition;
 
 import java.io.*;
@@ -27,7 +27,7 @@ public class LuaMessageGenerator extends MessageGenerator {
     }
 
     @Override
-    protected Language supportLanguage() {
+    protected Language language() {
         return Language.lua;
     }
 
@@ -35,7 +35,7 @@ public class LuaMessageGenerator extends MessageGenerator {
     protected void initFreemarker() {
         super.initFreemarker();
         try {
-            registryTemplate = freemarkerCfg.getTemplate("registry." + supportLanguage() + ".ftl");
+            registryTemplate = freemarkerCfg.getTemplate("registry." + language() + ".ftl");
         } catch (IOException e) {
             logger.error("", e);
         }
@@ -46,7 +46,7 @@ public class LuaMessageGenerator extends MessageGenerator {
         List<MessageDefinition> messageDefinitions = new ArrayList<>();
 
         for (ClassDefinition classDefinition : classDefinitions) {
-            if (classDefinition instanceof HeadDefinition) {
+            if (classDefinition instanceof HeaderDefinition) {
                 continue;
             }
             if (classDefinition instanceof MessageDefinition) {
@@ -65,7 +65,7 @@ public class LuaMessageGenerator extends MessageGenerator {
             return;
         }
 
-        String fileName = "MessageRegistry." + supportLanguage();
+        String fileName = "MessageRegistry." + language();
         try (Writer writer = new OutputStreamWriter(new FileOutputStream(new File(filePath, fileName)), StandardCharsets.UTF_8)) {
             Map<String, List<MessageDefinition>> messages = new HashMap<>();
             messages.put("messages", messageDefinitions);
@@ -79,16 +79,22 @@ public class LuaMessageGenerator extends MessageGenerator {
     }
 
     @Override
-    protected void prepareFieldImports(FieldDefinition fieldDefinition) {
-        ClassDefinition owner = fieldDefinition.getOwner();
-        BeanDefinition fieldBean = fieldDefinition.getBean();
-        if (fieldBean != null) {
-            owner.getImports().add(fieldBean.getFullName(supportLanguage()));
+    protected void prepareClass(ClassDefinition classDefinition) {
+        if (classDefinition instanceof BeanDefinition) {
+            prepareBean((BeanDefinition) classDefinition);
         }
 
-        BeanDefinition fieldValueBean = fieldDefinition.getValueBean();
-        if (fieldValueBean != null) {
-            owner.getImports().add(fieldValueBean.getFullName(supportLanguage()));
+        Map<String, TreeMap<DependentSource, ClassDefinition>> dependentClasses = classDefinition.getDependentClasses();
+        for (String name : dependentClasses.keySet()) {
+            ClassDefinition firstDependentClass = dependentClasses.get(name).firstEntry().getValue();
+            classDefinition.getImports().add(firstDependentClass.getOtherImport(language()));
+        }
+
+        if (classDefinition instanceof MessageDefinition) {
+            HeaderDefinition headerDefinition = ((MessageDefinition) classDefinition).getHeader();
+            if (headerDefinition != null) {
+                classDefinition.getImports().remove(headerDefinition.getOtherImport(language()));
+            }
         }
     }
 }

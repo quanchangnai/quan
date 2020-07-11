@@ -25,17 +25,17 @@ namespace Test.Config.Item
         /// <summary>
         /// 奖励List
         /// </summary>
-        public readonly IList<Reward> RewardList;
+        public readonly IList<Test.Config.Item.Reward> RewardList;
 
         /// <summary>
         /// 奖励Set
         /// </summary>
-        public readonly ISet<Reward> RewardSet;
+        public readonly ISet<Test.Config.Item.Reward> RewardSet;
 
         /// <summary>
         /// 奖励Map
         /// </summary>
-        public readonly IDictionary<int, Reward> RewardMap;
+        public readonly IDictionary<int, Test.Config.Item.Reward> RewardMap;
 
         /// <summary>
         /// List2
@@ -49,34 +49,34 @@ namespace Test.Config.Item
             W2 = json["w2"]?.Value<int>() ?? default;
 
             var rewardList1 = json["rewardList"]?.Value<JArray>();
-            var rewardList2 = ImmutableList<Reward>.Empty;
+            var rewardList2 = ImmutableList<Test.Config.Item.Reward>.Empty;
             if (rewardList1 != null)
             {
                 foreach (var rewardListValue in rewardList1)
                 {
-                    rewardList2 =rewardList2.Add(Reward.Create(rewardListValue.Value<JObject>()));
+                    rewardList2 =rewardList2.Add(Test.Config.Item.Reward.Create(rewardListValue.Value<JObject>()));
                 }
             }
             RewardList = rewardList2;
 
             var rewardSet1 = json["rewardSet"]?.Value<JArray>();
-            var rewardSet2 = ImmutableHashSet<Reward>.Empty;
+            var rewardSet2 = ImmutableHashSet<Test.Config.Item.Reward>.Empty;
             if (rewardSet1 != null)
             {
                 foreach (var rewardSetValue in rewardSet1)
                 {
-                    rewardSet2 =rewardSet2.Add(Reward.Create(rewardSetValue.Value<JObject>()));
+                    rewardSet2 =rewardSet2.Add(Test.Config.Item.Reward.Create(rewardSetValue.Value<JObject>()));
                 }
             }
             RewardSet = rewardSet2;
 
             var rewardMap1 = json["rewardMap"]?.Value<JObject>();
-            var rewardMap2 = ImmutableDictionary<int, Reward>.Empty;
+            var rewardMap2 = ImmutableDictionary<int, Test.Config.Item.Reward>.Empty;
             if (rewardMap1 != null)
             {
                 foreach (var rewardMapKeyValue in rewardMap1)
                 {
-                    rewardMap2 = rewardMap2.Add(int.Parse(rewardMapKeyValue.Key), Reward.Create(rewardMapKeyValue.Value.Value<JObject>()));
+                    rewardMap2 = rewardMap2.Add(int.Parse(rewardMapKeyValue.Key), Test.Config.Item.Reward.Create(rewardMapKeyValue.Value.Value<JObject>()));
                 }
             }
             RewardMap = rewardMap2;

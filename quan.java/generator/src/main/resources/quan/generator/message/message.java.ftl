@@ -13,7 +13,7 @@ import ${import};
 </#if>
  * 自动生成
  */
-public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#elseif kind ==3 && head??>${head.name}<#else>Message</#if> {
+public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#elseif kind ==3 && header??>${header.name}<#else>Message</#if> {
 
 <#if kind ==3>
     /**
@@ -59,8 +59,8 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
     }
 
 </#if>
-<#if head??>
-    <#list head.fields as field>
+<#if header??>
+    <#list header.fields as field>
         <#if field.comment !="">
     /**
      * ${field.comment}

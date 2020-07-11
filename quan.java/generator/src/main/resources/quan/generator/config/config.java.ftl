@@ -4,7 +4,7 @@ package ${getFullPackageName("java")};
 import java.util.*;
 </#if>
 import com.alibaba.fastjson.*;
-<#if !(parentName??) || kind == 6>
+<#if !(parentClassName??) || kind == 6>
 import quan.config.*;
 </#if>
 <#list imports as import>
@@ -17,13 +17,13 @@ import ${import};
 </#if>
  * 自动生成
  */
-public class ${name} extends <#if parentName??>${parentName}<#elseif kind ==2>Bean<#else>Config</#if> {
+public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif kind ==2>Bean<#else>Config</#if> {
 <#if !selfFields??>
     <#assign selfFields = fields>
 </#if>
-<#assign supportJava = supportLanguage("java")>
+<#assign supportJava = isSupportLanguage("java")>
 <#list selfFields as field>
-    <#if !(supportJava &&field.supportLanguage("java"))>
+    <#if !(supportJava &&field.isSupportLanguage("java"))>
         <#continue>
     </#if>
 
@@ -55,7 +55,7 @@ public class ${name} extends <#if parentName??>${parentName}<#elseif kind ==2>Be
         super(json);
 
 <#list selfFields as field>
-    <#if !(supportJava &&field.supportLanguage("java"))>
+    <#if !(supportJava &&field.isSupportLanguage("java"))>
         <#continue>
     </#if>
     <#if field.type=="string">
@@ -134,7 +134,7 @@ public class ${name} extends <#if parentName??>${parentName}<#elseif kind ==2>Be
     }
 
 <#list selfFields as field>
-    <#if !(supportJava &&field.supportLanguage("java"))>
+    <#if !(supportJava &&field.isSupportLanguage("java"))>
         <#continue>
     </#if>
     <#if field.comment !="">
@@ -182,12 +182,12 @@ public class ${name} extends <#if parentName??>${parentName}<#elseif kind ==2>Be
     }
 <#else>
     public static ${name} create(JSONObject json) {
-        <#if (children?size>0)>
+        <#if (dependentChildren?size>0)>
         String clazz = json.getOrDefault("class", "").toString();
         switch (clazz) {
-            <#list children as child>
-            case "${child.name}":
-                return ${child.name}.create(json);
+            <#list dependentChildren?keys as key>
+            case "${dependentChildren[key].left}":
+                return ${dependentChildren[key].right}.create(json);
             </#list>
             case "${name}":
                 return new ${name}(json);
@@ -204,7 +204,7 @@ public class ${name} extends <#if parentName??>${parentName}<#elseif kind ==2>Be
     public String toString() {
         return "${name}{" +
         <#list fields as field>
-            <#if !(supportJava &&field.supportLanguage("java"))>
+            <#if !(supportJava &&field.isSupportLanguage("java"))>
                 <#continue>
             </#if>
                 "<#rt>

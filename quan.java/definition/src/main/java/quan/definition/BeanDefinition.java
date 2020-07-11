@@ -1,9 +1,13 @@
 package quan.definition;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.MutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import quan.definition.DependentSource.DependentType;
 import quan.definition.config.ConfigDefinition;
 import quan.definition.data.DataDefinition;
-import quan.definition.message.HeadDefinition;
+import quan.definition.message.HeaderDefinition;
 import quan.definition.message.MessageDefinition;
 
 import java.util.*;
@@ -18,6 +22,9 @@ public class BeanDefinition extends ClassDefinition {
     //配置的父类
     protected String parentName;
 
+    //和具体语言相关的父类名，可能会包含包名
+    protected String parentClassName;
+
     //配置的所有后代类
     protected Set<String> descendants = new HashSet<>();
 
@@ -25,6 +32,9 @@ public class BeanDefinition extends ClassDefinition {
 
     //配置的所有子类
     protected Set<BeanDefinition> children = new HashSet<>();
+
+    //和语言无关的带包子类名:子类名,和语言相关的完整子类名
+    protected Map<String, MutablePair<String, String>> dependentChildren = new HashMap<>();
 
     protected int descendantMaxFieldCount;
 
@@ -95,8 +105,20 @@ public class BeanDefinition extends ClassDefinition {
         return parentName;
     }
 
+    public BeanDefinition setParentClassName(String parentClassName) {
+        this.parentClassName = parentClassName;
+        return this;
+    }
+
+    public String getParentClassName() {
+        if (parentClassName == null) {
+            return getSimpleClassName(parentName);
+        }
+        return parentClassName;
+    }
+
     public String getWholeParentName() {
-        return ClassDefinition.getWholeName(this, parentName);
+        return getWholeClassName(this, parentName);
     }
 
     public BeanDefinition getParent() {
@@ -130,11 +152,29 @@ public class BeanDefinition extends ClassDefinition {
         return descendantMaxFieldCount;
     }
 
+    public Map<String, MutablePair<String, String>> getDependentChildren() {
+        return dependentChildren;
+    }
+
     @Override
-    public void validate() {
-        super.validate();
+    public void validate1() {
+        super.validate1();
         validateDelimiter();
+    }
+
+    @Override
+    public void validate2() {
+        super.validate2();
         validateParent();
+    }
+
+    @Override
+    public void validate3() {
+        super.validate3();
+        for (FieldDefinition field : fields) {
+            //校验字段引用
+            validateFieldRef(field);
+        }
     }
 
     protected void validateParent() {
@@ -157,6 +197,7 @@ public class BeanDefinition extends ClassDefinition {
         }
 
         parent.children.add(this);
+        parent.dependentChildren.put(this.getWholeName(), MutablePair.of(getName(), getName()));
 
         Set<String> ancestors = new HashSet<>();
         while (parent != null) {
@@ -167,13 +208,9 @@ public class BeanDefinition extends ClassDefinition {
             ancestors.add(parent.getName());
 
             for (int i = parent.selfFields.size() - 1; i >= 0; i--) {
-                try {
-                    FieldDefinition parentField = (FieldDefinition) parent.selfFields.get(i).clone();
-                    parentField.setOwner(this);
-                    fields.add(0, parentField);
-                } catch (CloneNotSupportedException e) {
-                    e.printStackTrace();
-                }
+                FieldDefinition parentField = parent.selfFields.get(i).clone();
+                parentField.setOwner(this);
+                fields.add(0, parentField);
             }
 
             parent.descendants.add(getName());
@@ -334,6 +371,24 @@ public class BeanDefinition extends ClassDefinition {
         }
     }
 
+    @Override
+    protected void validateDependents() {
+        BeanDefinition parent = getParent();
+        if (parent != null) {
+            addDependent(new DependentSource(this, DependentType.parent), parent);
+        }
+
+        for (FieldDefinition fieldDefinition : getFields()) {
+            addDependent(new DependentSource(fieldDefinition, DependentType.field), fieldDefinition.getBean());
+            addDependent(new DependentSource(fieldDefinition, DependentType.fieldValue), fieldDefinition.getValueBean());
+        }
+
+        for (BeanDefinition child : getChildren()) {
+            addDependent(new DependentSource(child, DependentType.child), child);
+        }
+    }
+
+
     public String getDelimiter() {
         return delimiter;
     }
@@ -372,17 +427,6 @@ public class BeanDefinition extends ClassDefinition {
             if (!Constants.LEGAL_DELIMITERS.contains(s)) {
                 addValidatedError(getValidatedName() + "的分隔符[" + delimiter + "]非法,合法分隔符" + Constants.LEGAL_DELIMITERS);
             }
-        }
-    }
-
-
-    @Override
-    public void validate2() {
-        super.validate2();
-
-        for (FieldDefinition field : fields) {
-            //校验字段引用
-            validateFieldRef(field);
         }
     }
 
@@ -485,7 +529,7 @@ public class BeanDefinition extends ClassDefinition {
         }
         return !(classDefinition instanceof DataDefinition
                 || classDefinition instanceof MessageDefinition
-                || classDefinition instanceof HeadDefinition
+                || classDefinition instanceof HeaderDefinition
                 || classDefinition instanceof ConfigDefinition);
     }
 

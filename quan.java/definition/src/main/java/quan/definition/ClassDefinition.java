@@ -33,10 +33,13 @@ public abstract class ClassDefinition extends Definition {
     //支持的语言
     protected Set<String> supportedLanguages;
 
-    //导包，和具体语言相关
-    private Set<String> imports = new HashSet<>();
+    //依赖的类，Map<name, <来源, ClassDefinition>>
+    protected Map<String, TreeMap<DependentSource, ClassDefinition>> dependentClasses = new HashMap<>();
 
     protected List<FieldDefinition> fields = new ArrayList<>();
+
+    //导包，和具体语言相关
+    private Set<String> imports = new HashSet<>();
 
     //字段名:字段定义
     protected Map<String, FieldDefinition> nameFields = new HashMap<>();
@@ -89,13 +92,24 @@ public abstract class ClassDefinition extends Definition {
 
 
     public String getWholeName() {
-        return getWholeName(this, getName());
+        return getWholeClassName(this, getName());
+    }
+
+    public static String getSimpleClassName(String className) {
+        if (className == null) {
+            return null;
+        }
+        int index = className.indexOf(".");
+        if (index >= 0) {
+            return className.substring(index + 1);
+        }
+        return className;
     }
 
     /**
      * 和具体语言环境无关的完整类名[不含前缀的包名.类名]
      */
-    public static String getWholeName(ClassDefinition owner, String className) {
+    public static String getWholeClassName(ClassDefinition owner, String className) {
         if (!StringUtils.isBlank(className) && !className.contains(".")) {
             className = owner.getPackageName() + "." + className;
         }
@@ -191,7 +205,7 @@ public abstract class ClassDefinition extends Definition {
         return imports;
     }
 
-    public boolean supportLanguage(Language language) {
+    public boolean isSupportLanguage(Language language) {
         boolean support = languages.isEmpty() || languages.contains(language.name());
         if (excludeLanguage) {
             support = !support;
@@ -200,8 +214,8 @@ public abstract class ClassDefinition extends Definition {
     }
 
 
-    public boolean supportLanguage(String language) {
-        return supportLanguage(Language.valueOf(language));
+    public boolean isSupportLanguage(String language) {
+        return isSupportLanguage(Language.valueOf(language));
     }
 
     public Set<String> getSupportedLanguages() {
@@ -210,19 +224,43 @@ public abstract class ClassDefinition extends Definition {
         }
         supportedLanguages = new HashSet<>();
         for (Language language : Language.values()) {
-            if (supportLanguage(language)) {
+            if (isSupportLanguage(language)) {
                 supportedLanguages.add(language.name());
             }
         }
         return supportedLanguages;
     }
 
-    public void validate() {
+    public void addDependent(DependentSource dependentSource, ClassDefinition classDefinition) {
+        if (classDefinition == null) {
+            return;
+        }
+        dependentClasses.computeIfAbsent(classDefinition.getName(), k -> new TreeMap<>()).put(dependentSource, classDefinition);
+    }
+
+    public Map<String, TreeMap<DependentSource, ClassDefinition>> getDependentClasses() {
+        return dependentClasses;
+    }
+
+    public void validate1() {
         validateNameAndLanguage();
 
         for (FieldDefinition fieldDefinition : getFields()) {
             validateField(fieldDefinition);
         }
+    }
+
+    /**
+     * 依赖{@link #validate1()}的结果，必须等所有类的{@link #validate1()}执行完成后再执行
+     */
+    public void validate2() {
+    }
+
+    /**
+     * 依赖{@link #validate2()}的结果
+     */
+    public void validate3() {
+        validateDependents();
     }
 
     protected void validateNameAndLanguage() {
@@ -235,13 +273,6 @@ public abstract class ClassDefinition extends Definition {
         if (!languages.isEmpty() && !Language.names().containsAll(languages)) {
             addValidatedError(getValidatedName() + "的语言类型" + languages + "非法,合法的语言类型" + Language.names());
         }
-    }
-
-
-    /**
-     * 依赖{@link #validate()}的结果，必须等所有类的{@link #validate()}执行完成后再执行
-     */
-    public void validate2() {
     }
 
     protected void validateField(FieldDefinition fieldDefinition) {
@@ -288,6 +319,9 @@ public abstract class ClassDefinition extends Definition {
         } else {
             nameFields.put(fieldDefinition.getName(), fieldDefinition);
         }
+    }
+
+    protected void validateDependents() {
     }
 
     protected void addValidatedError(String error) {

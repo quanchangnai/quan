@@ -3,14 +3,14 @@ package quan.message.role;
 import java.util.*;
 import java.io.IOException;
 import quan.message.*;
-import quan.message.common.HeadedMessage;
 import quan.message.user.UserInfo;
+import quan.message.common.MessageHeader;
 
 /**
  * 角色登录，哈希生成ID<br/>
  * 自动生成
  */
-public class SRoleLogin extends HeadedMessage {
+public class SRoleLogin extends MessageHeader {
 
     /**
      * 消息ID
@@ -27,13 +27,13 @@ public class SRoleLogin extends HeadedMessage {
     private RoleInfo roleInfo = new RoleInfo();
 
     //角色信息
-    private ArrayList<RoleInfo> roleInfoList = new ArrayList<>();
+    private ArrayList<quan.message.role.RoleInfo> roleInfoList = new ArrayList<>();
 
     //角色信息
-    private HashSet<RoleInfo> roleInfoSet = new HashSet<>();
+    private HashSet<quan.message.role.RoleInfo> roleInfoSet = new HashSet<>();
 
     //角色信息
-    private HashMap<Long, RoleInfo> roleInfoMap = new HashMap<>();
+    private HashMap<Long, quan.message.role.RoleInfo> roleInfoMap = new HashMap<>();
 
     //用户信息
     private UserInfo userInfo;
@@ -115,21 +115,21 @@ public class SRoleLogin extends HeadedMessage {
     /**
      * 角色信息
      */
-    public ArrayList<RoleInfo> getRoleInfoList() {
+    public ArrayList<quan.message.role.RoleInfo> getRoleInfoList() {
         return roleInfoList;
     }
 
     /**
      * 角色信息
      */
-    public HashSet<RoleInfo> getRoleInfoSet() {
+    public HashSet<quan.message.role.RoleInfo> getRoleInfoSet() {
         return roleInfoSet;
     }
 
     /**
      * 角色信息
      */
-    public HashMap<Long, RoleInfo> getRoleInfoMap() {
+    public HashMap<Long, quan.message.role.RoleInfo> getRoleInfoMap() {
         return roleInfoMap;
     }
 

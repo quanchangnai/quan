@@ -10,7 +10,7 @@ namespace Test.Message.Common
 	/// 消息头<br/>
 	/// 自动生成
 	/// </summary>
-    public abstract class HeadedMessage : MessageBase
+    public abstract class MessageHeader : MessageBase
     {
         /// <summary>
 		/// 消息序号
@@ -41,7 +41,7 @@ namespace Test.Message.Common
 
 		public override string ToString()
 		{
-			return "HeadedMessage{" +
+			return "MessageHeader{" +
 					"seq=" + Seq.ToString2() +
 					",error=" + Error.ToString2() +
 					'}';

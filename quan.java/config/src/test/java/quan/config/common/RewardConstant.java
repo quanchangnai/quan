@@ -1,7 +1,7 @@
 package quan.config.common;
 
-import java.util.*;
 import quan.config.item.Reward;
+import java.util.*;
 
 /**
  * 自动生成

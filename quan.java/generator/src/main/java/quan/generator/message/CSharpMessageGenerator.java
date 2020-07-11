@@ -1,11 +1,7 @@
 package quan.generator.message;
 
-import quan.definition.BeanDefinition;
-import quan.definition.ClassDefinition;
 import quan.definition.FieldDefinition;
 import quan.definition.Language;
-import quan.definition.message.MessageDefinition;
-import quan.definition.message.HeadDefinition;
 
 import java.util.Properties;
 
@@ -48,26 +44,16 @@ public class CSharpMessageGenerator extends MessageGenerator {
     }
 
     @Override
-    protected Language supportLanguage() {
+    protected Language language() {
         return Language.cs;
     }
 
     @Override
-    protected void prepareBean(BeanDefinition beanDefinition) {
-        super.prepareBean(beanDefinition);
-        if (beanDefinition instanceof MessageDefinition) {
-            HeadDefinition headDefinition = ((MessageDefinition) beanDefinition).getHead();
-            if (headDefinition != null && !headDefinition.getFullPackageName(supportLanguage()).equals(beanDefinition.getFullPackageName(supportLanguage()))) {
-                beanDefinition.getImports().add(headDefinition.getFullPackageName(supportLanguage()));
-            }
-        }
-    }
-
-    @Override
-    protected void prepareFieldImports(FieldDefinition fieldDefinition) {
-        super.prepareFieldImports(fieldDefinition);
+    protected void prepareField(FieldDefinition fieldDefinition) {
+        super.prepareField(fieldDefinition);
         if (fieldDefinition.isTimeType()) {
             fieldDefinition.getOwner().getImports().add("System");
         }
     }
+
 }

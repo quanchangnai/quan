@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Test.Config.Item;
 
 namespace Test.Config.Common
 {
@@ -15,7 +14,7 @@ namespace Test.Config.Common
             _key = key;
         }
 
-        public IList<Reward> Value => ConstantConfig.GetByKey(_key).RewardList;
+        public IList<Test.Config.Item.Reward> Value => ConstantConfig.GetByKey(_key).RewardList;
 
 
         public static readonly RewardConstant Constant1 = new RewardConstant("constant1");

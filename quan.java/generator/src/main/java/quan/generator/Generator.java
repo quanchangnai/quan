@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.common.utils.PathUtils;
 import quan.definition.*;
-import quan.definition.config.ConfigDefinition;
+import quan.definition.DependentSource.DependentType;
 import quan.definition.parser.DefinitionParser;
 import quan.definition.parser.XmlDefinitionParser;
 import quan.generator.config.CSharpConfigGenerator;
@@ -51,6 +51,9 @@ public abstract class Generator {
     protected Configuration freemarkerCfg;
 
     protected Map<Class<? extends ClassDefinition>, Template> templates = new HashMap<>();
+
+    //具体语言包下的类定义,<包名,<类名,类定义>
+    protected Map<String, Map<String, ClassDefinition>> packagesClasses = new HashMap<>();
 
     public Generator() {
     }
@@ -118,7 +121,7 @@ public abstract class Generator {
 
     public abstract Category category();
 
-    protected abstract Language supportLanguage();
+    protected abstract Language language();
 
     protected boolean support(ClassDefinition classDefinition) {
         return classDefinition instanceof BeanDefinition || classDefinition instanceof EnumDefinition;
@@ -130,7 +133,7 @@ public abstract class Generator {
             this.enable = false;
         }
 
-        enable = options.getProperty(category() + "." + supportLanguage() + ".enable");
+        enable = options.getProperty(category() + "." + language() + ".enable");
         if (enable == null || !enable.equals("true")) {
             this.enable = false;
         }
@@ -145,13 +148,13 @@ public abstract class Generator {
             this.definitionFileEncoding = definitionFileEncoding;
         }
 
-        String codePath = options.getProperty(category() + "." + supportLanguage() + ".codePath");
+        String codePath = options.getProperty(category() + "." + language() + ".codePath");
         if (!StringUtils.isBlank(codePath)) {
             setCodePath(codePath);
         }
 
-        packagePrefix = options.getProperty(category() + "." + supportLanguage() + ".packagePrefix");
-        enumPackagePrefix = options.getProperty(category() + "." + supportLanguage() + ".enumPackagePrefix");
+        packagePrefix = options.getProperty(category() + "." + language() + ".packagePrefix");
+        enumPackagePrefix = options.getProperty(category() + "." + language() + ".enumPackagePrefix");
     }
 
 
@@ -163,7 +166,7 @@ public abstract class Generator {
             throw new IllegalArgumentException(category().alias() + "的定义文件路径[definitionPaths]不能为空");
         }
         if (codePath == null) {
-            throw new IllegalArgumentException(category().alias() + "的目标代码[" + supportLanguage() + "]文件路径[codePath]不能为空");
+            throw new IllegalArgumentException(category().alias() + "的目标代码[" + language() + "]文件路径[codePath]不能为空");
         }
     }
 
@@ -173,7 +176,7 @@ public abstract class Generator {
         freemarkerCfg.setDefaultEncoding("UTF-8");
 
         try {
-            Template enumTemplate = freemarkerCfg.getTemplate("enum." + supportLanguage() + ".ftl");
+            Template enumTemplate = freemarkerCfg.getTemplate("enum." + language() + ".ftl");
             templates.put(EnumDefinition.class, enumTemplate);
         } catch (IOException e) {
             logger.error("", e);
@@ -225,9 +228,13 @@ public abstract class Generator {
 
         initFreemarker();
 
+        for (ClassDefinition classDefinition : parser.getClasses().values()) {
+            packagesClasses.computeIfAbsent(classDefinition.getPackageName(language()), k -> new HashMap<>()).put(classDefinition.getName(), classDefinition);
+        }
+
         List<ClassDefinition> classDefinitions = new ArrayList<>();
         for (ClassDefinition classDefinition : parser.getClasses().values()) {
-            if (!support(classDefinition) || !classDefinition.supportLanguage(this.supportLanguage())) {
+            if (!support(classDefinition) || !classDefinition.isSupportLanguage(this.language())) {
                 continue;
             }
             classDefinition.reset();
@@ -236,7 +243,9 @@ public abstract class Generator {
         }
 
         generate(classDefinitions);
-        logger.info("生成{}{}完成\n", supportLanguage(), category().alias());
+        packagesClasses.clear();
+
+        logger.info("生成{}{}完成\n", language(), category().alias());
     }
 
     protected void generate(List<ClassDefinition> classDefinitions) {
@@ -245,8 +254,8 @@ public abstract class Generator {
 
     protected void generate(ClassDefinition classDefinition) {
         Template template = templates.get(classDefinition.getClass());
-        File filePath = new File(codePath + File.separator + classDefinition.getFullPackageName(supportLanguage()).replace(".", File.separator));
-        String fileName = classDefinition.getName() + "." + supportLanguage();
+        File filePath = new File(codePath + File.separator + classDefinition.getFullPackageName(language()).replace(".", File.separator));
+        String fileName = classDefinition.getName() + "." + language();
 
         if (!filePath.exists() && !filePath.mkdirs()) {
             logger.info("生成{}[{}]失败，无法创建目录[{}]", category().alias(), filePath + File.separator + fileName, filePath);
@@ -268,23 +277,66 @@ public abstract class Generator {
         if (classDefinition instanceof BeanDefinition) {
             prepareBean((BeanDefinition) classDefinition);
         }
+
+        //不同包下的同名类依赖
+        Map<String, TreeMap<DependentSource, ClassDefinition>> dependentClasses = classDefinition.getDependentClasses();
+        for (String name : dependentClasses.keySet()) {
+            int index = 0;
+            for (DependentSource dependentSource : dependentClasses.get(name).keySet()) {
+                index++;
+                ClassDefinition dependentClassDefinition = dependentClasses.get(name).get(dependentSource);
+                String dependentClassFullName = dependentClassDefinition.getFullName(language());
+
+                if (index == 1) {
+                    int howImport = howImportDependent(classDefinition, dependentClassDefinition);
+                    if (howImport == 0) {
+                        classDefinition.getImports().add(dependentClassDefinition.getOtherImport(language()));
+                        continue;
+                    } else if (howImport > 0) {
+                        continue;
+                    }
+                }
+
+                if (dependentSource.getType() == DependentType.field) {
+                    ((FieldDefinition) dependentSource.getDefinition()).setClassType(dependentClassFullName);
+                } else if (dependentSource.getType() == DependentType.fieldValue) {
+                    ((FieldDefinition) dependentSource.getDefinition()).setClassValueType(dependentClassFullName);
+                } else if (dependentSource.getType() == DependentType.parent) {
+                    ((BeanDefinition) dependentSource.getDefinition()).setParentClassName(dependentClassFullName);
+                } else if (dependentSource.getType() == DependentType.child) {
+                    ((BeanDefinition) dependentSource.getDefinition()).getDependentChildren().get(classDefinition.getWholeName()).setRight(dependentClassFullName);
+                }
+                //消息头没有同名类
+            }
+        }
+    }
+
+    /**
+     * 判断怎么依赖类怎么导入
+     *
+     * @return 0:import(using)语句导入,1:直接使用简单类名,-1:需要使用全类名
+     */
+    protected int howImportDependent(ClassDefinition classDefinition, ClassDefinition dependentClassDefinition) {
+        Language language = language();
+        String fullPackageName = classDefinition.getFullPackageName(language);
+        String dependentFullPackageName = dependentClassDefinition.getFullPackageName(language);
+
+        if (language == Language.java) {
+            return fullPackageName.equals(dependentFullPackageName) ? 1 : 0;
+        } else if (language == Language.cs) {
+            Map<String, ClassDefinition> packageClasses = this.packagesClasses.get(classDefinition.getPackageName(language));
+            ClassDefinition packageClassDefinition = packageClasses.get(dependentClassDefinition.getName());
+            if (packageClassDefinition == null) {
+                return 0;
+            }
+            return packageClassDefinition == dependentClassDefinition ? 1 : -1;
+        }
+
+        return 0;
     }
 
     protected void prepareBean(BeanDefinition beanDefinition) {
-        for (FieldDefinition fieldDefinition : beanDefinition.getFields()) {
-            prepareField(fieldDefinition);
-        }
-
-        Set<BeanDefinition> dependentBeans = new HashSet<>(beanDefinition.getChildren());
-        if (beanDefinition.getParent() != null && !(beanDefinition instanceof ConfigDefinition)) {
-            dependentBeans.add(beanDefinition.getParent());
-        }
-
-        for (BeanDefinition dependentBean : dependentBeans) {
-            if (!dependentBean.getFullPackageName(supportLanguage()).equals(beanDefinition.getFullPackageName(supportLanguage()))) {
-                beanDefinition.getImports().add(dependentBean.getOtherImport(supportLanguage()));
-            }
-        }
+        beanDefinition.getFields().forEach(this::prepareField);
     }
 
     protected void prepareField(FieldDefinition fieldDefinition) {
@@ -308,20 +360,6 @@ public abstract class Generator {
             }
         }
 
-        prepareFieldImports(fieldDefinition);
-    }
-
-    protected void prepareFieldImports(FieldDefinition fieldDefinition) {
-        BeanDefinition owner = (BeanDefinition) fieldDefinition.getOwner();
-        ClassDefinition fieldClass = fieldDefinition.getClassDefinition();
-        if (fieldClass != null && !fieldClass.getFullPackageName(supportLanguage()).equals(owner.getFullPackageName(supportLanguage()))) {
-            owner.getImports().add(fieldClass.getOtherImport(supportLanguage()));
-        }
-
-        BeanDefinition fieldValueBean = fieldDefinition.getValueBean();
-        if (fieldValueBean != null && !fieldValueBean.getFullPackageName(supportLanguage()).equals(owner.getFullPackageName(supportLanguage()))) {
-            owner.getImports().add(fieldValueBean.getOtherImport(supportLanguage()));
-        }
     }
 
     protected void printErrors() {

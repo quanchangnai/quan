@@ -3,7 +3,6 @@ using System.Collections.Immutable;
 using Newtonsoft.Json.Linq;
 using Quan.Common.Utils;
 using Quan.Config;
-using Test.Config.Item;
 
 namespace Test.Config.Common
 {
@@ -24,9 +23,14 @@ namespace Test.Config.Common
         public readonly int ItemId;
 
         /// <summary>
+        /// 奖励
+        /// </summary>
+        public readonly Reward Reward;
+
+        /// <summary>
         /// 奖励List
         /// </summary>
-        public readonly IList<Reward> RewardList;
+        public readonly IList<Test.Config.Item.Reward> RewardList;
 
         /// <summary>
         /// 备注
@@ -38,14 +42,15 @@ namespace Test.Config.Common
         {
             Key = json["key"]?.Value<string>() ?? "";
             ItemId = json["itemId"]?.Value<int>() ?? default;
+            Reward = json.ContainsKey("reward") ? Reward.Create(json["reward"].Value<JObject>()) : null;
 
             var rewardList1 = json["rewardList"]?.Value<JArray>();
-            var rewardList2 = ImmutableList<Reward>.Empty;
+            var rewardList2 = ImmutableList<Test.Config.Item.Reward>.Empty;
             if (rewardList1 != null)
             {
                 foreach (var rewardListValue in rewardList1)
                 {
-                    rewardList2 =rewardList2.Add(Reward.Create(rewardListValue.Value<JObject>()));
+                    rewardList2 =rewardList2.Add(Test.Config.Item.Reward.Create(rewardListValue.Value<JObject>()));
                 }
             }
             RewardList = rewardList2;
@@ -63,6 +68,7 @@ namespace Test.Config.Common
             return "ConstantConfig{" +
                    "Key='" + Key + '\'' +
                    ",ItemId=" + ItemId.ToString2() +
+                   ",Reward=" + Reward.ToString2() +
                    ",RewardList=" + RewardList.ToString2() +
                    ",Comment='" + Comment + '\'' +
                    '}';

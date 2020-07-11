@@ -16,7 +16,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import static quan.definition.ClassDefinition.getWholeName;
+import static quan.definition.ClassDefinition.getWholeClassName;
 
 /**
  * Created by quanchangnai on 2019/8/7.
@@ -118,7 +118,7 @@ public class ConfigConverter {
 
         if (beanDefinition.hasChild()) {
             String clazz = object.getString("class");
-            beanDefinition = parser.getBean(getWholeName(fieldDefinition.getOwner(), clazz));
+            beanDefinition = parser.getBean(getWholeClassName(fieldDefinition.getOwner(), clazz));
         }
 
         if (beanDefinition == null) {
@@ -436,7 +436,7 @@ public class ConfigConverter {
                 throw new ConvertException(ConvertException.ErrorType.typeError, beanClass, beanDefinition.getName());
             }
             object.put("class", beanClass);
-            beanDefinition = parser.getBean(getWholeName(owner, beanClass));
+            beanDefinition = parser.getBean(getWholeClassName(owner, beanClass));
         }
 
         for (int i = 0; i < beanDefinition.getFields().size(); i++) {

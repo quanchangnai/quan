@@ -51,6 +51,7 @@
     <Compile Include="ConfigTest.cs" />
     <Compile Include="Config\Common\ConstantConfig.cs" />
     <Compile Include="Config\Common\ItemConstant.cs" />
+    <Compile Include="Config\Common\Reward.cs" />
     <Compile Include="Config\Common\RewardConstant.cs" />
     <Compile Include="Config\Item\EquipConfig.cs" />
     <Compile Include="Config\Item\ItemConfig.cs" />
@@ -65,7 +66,7 @@
     <Compile Include="Config\Quest\QuestTargetConfig.cs" />
     <Compile Include="Config\Quest\QuestType.cs" />
     <Compile Include="MessageTest.cs" />
-    <Compile Include="Message\Common\HeadedMessage.cs" />
+    <Compile Include="Message\Common\MessageHeader.cs" />
     <Compile Include="Message\Role\CRoleLogin.cs" />
     <Compile Include="Message\Role\RoleInfo.cs" />
     <Compile Include="Message\Role\RoleType.cs" />

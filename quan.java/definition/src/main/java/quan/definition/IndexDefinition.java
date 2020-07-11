@@ -118,8 +118,12 @@ public class IndexDefinition extends Definition implements Cloneable {
     }
 
     @Override
-    public Object clone() throws CloneNotSupportedException {
-        return super.clone();
+    public IndexDefinition clone() {
+        try {
+            return (IndexDefinition) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static void validate(List<IndexDefinition> indexes, List<IndexDefinition> selfIndexes, List<FieldDefinition> fields) {
@@ -141,7 +145,7 @@ public class IndexDefinition extends Definition implements Cloneable {
             }
         }
 
-        selfIndexes.forEach(index -> index.validate());
+        selfIndexes.forEach(IndexDefinition::validate);
 
         Set<String> indexNames = new HashSet<>();
         for (IndexDefinition indexDefinition : indexes) {

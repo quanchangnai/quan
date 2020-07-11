@@ -3,10 +3,8 @@ package quan.definition.config;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import quan.definition.ClassDefinition;
-import quan.definition.Constants;
-import quan.definition.FieldDefinition;
-import quan.definition.IndexDefinition;
+import quan.definition.*;
+import quan.definition.DependentSource.DependentType;
 
 import java.util.List;
 import java.util.Map;
@@ -25,7 +23,9 @@ public class ConstantDefinition extends ClassDefinition {
 
     private String keyField;
 
-    private String valueField;
+    private String valueFieldName;
+
+    private FieldDefinition valueField;
 
     private String commentField;
 
@@ -73,7 +73,7 @@ public class ConstantDefinition extends ClassDefinition {
 
     public void setValueField(String valueField) {
         if (!StringUtils.isBlank(valueField)) {
-            this.valueField = valueField;
+            this.valueFieldName = valueField;
         }
     }
 
@@ -88,7 +88,7 @@ public class ConstantDefinition extends ClassDefinition {
     }
 
     public FieldDefinition getValueField() {
-        return configDefinition.getField(valueField);
+        return valueField;
     }
 
 
@@ -98,7 +98,7 @@ public class ConstantDefinition extends ClassDefinition {
             if (key == null || !Constants.FIELD_NAME_PATTERN.matcher(key).matches()) {
                 continue;
             }
-            String value = config.getString(valueField);
+            String value = config.getString(valueFieldName);
             String comment = commentField == null ? "" : config.getString(commentField);
             rows.put(key, Pair.of(value, comment));
         }
@@ -141,15 +141,27 @@ public class ConstantDefinition extends ClassDefinition {
     }
 
     public void validateValueField() {
-        if (StringUtils.isBlank(valueField)) {
+        if (StringUtils.isBlank(valueFieldName)) {
             addValidatedError(getValidatedName("的") + "value字段不能为空");
             return;
         }
 
-        FieldDefinition valueFieldDefinition = configDefinition.getField(valueField);
+        FieldDefinition valueFieldDefinition = configDefinition.getField(valueFieldName);
         if (valueFieldDefinition == null) {
-            addValidatedError(getValidatedName() + "的value[" + valueField + "]不是" + configDefinition.getValidatedName() + "的字段");
+            addValidatedError(getValidatedName() + "的value[" + valueFieldName + "]不是" + configDefinition.getValidatedName() + "的字段");
+            return;
         }
+
+        valueField = valueFieldDefinition.clone();
+        valueField.setOwner(this);
     }
 
+
+    @Override
+    protected void validateDependents() {
+        super.validateDependents();
+        FieldDefinition valueField = getValueField();
+        addDependent(new DependentSource(valueField, DependentType.field), valueField.getBean());
+        addDependent(new DependentSource(valueField, DependentType.fieldValue), valueField.getValueBean());
+    }
 }

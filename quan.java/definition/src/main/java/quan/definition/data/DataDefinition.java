@@ -84,8 +84,8 @@ public class DataDefinition extends BeanDefinition {
     }
 
     @Override
-    public void validate() {
-        super.validate();
+    public void validate1() {
+        super.validate1();
         if (getIdName() == null) {
             addValidatedError(getValidatedName() + "的主键不能为空");
             return;

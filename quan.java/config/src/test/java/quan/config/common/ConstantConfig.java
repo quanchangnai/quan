@@ -3,7 +3,6 @@ package quan.config.common;
 import java.util.*;
 import com.alibaba.fastjson.*;
 import quan.config.*;
-import quan.config.item.Reward;
 
 /**
  * 常量<br/>
@@ -17,8 +16,11 @@ public class ConstantConfig extends Config {
     //道具ID
     protected final int itemId;
 
+    //奖励
+    protected final Reward reward;
+
     //奖励List
-    protected final List<Reward> rewardList;
+    protected final List<quan.config.item.Reward> rewardList;
 
     //备注
     protected final String comment;
@@ -30,11 +32,18 @@ public class ConstantConfig extends Config {
         this.key = json.getOrDefault("key", "").toString();
         this.itemId = json.getIntValue("itemId");
 
+        JSONObject $reward = json.getJSONObject("reward");
+        if ($reward != null) {
+            this.reward = Reward.create($reward);
+        } else {
+            this.reward = null;
+        }
+
         JSONArray $rewardList$1 = json.getJSONArray("rewardList");
-        List<Reward> $rewardList$2 = new ArrayList<>();
+        List<quan.config.item.Reward> $rewardList$2 = new ArrayList<>();
         if ($rewardList$1 != null) {
             for (int i = 0; i < $rewardList$1.size(); i++) {
-                Reward $rewardList$Value = Reward.create($rewardList$1.getJSONObject(i));
+                quan.config.item.Reward $rewardList$Value = quan.config.item.Reward.create($rewardList$1.getJSONObject(i));
                 $rewardList$2.add($rewardList$Value);
             }
         }
@@ -58,9 +67,16 @@ public class ConstantConfig extends Config {
     }
 
     /**
+     * 奖励
+     */
+    public final Reward getReward() {
+        return reward;
+    }
+
+    /**
      * 奖励List
      */
-    public final List<Reward> getRewardList() {
+    public final List<quan.config.item.Reward> getRewardList() {
         return rewardList;
     }
 
@@ -82,6 +98,7 @@ public class ConstantConfig extends Config {
         return "ConstantConfig{" +
                 "key='" + key + '\'' +
                 ",itemId=" + itemId +
+                ",reward=" + reward +
                 ",rewardList=" + rewardList +
                 ",comment='" + comment + '\'' +
                 '}';

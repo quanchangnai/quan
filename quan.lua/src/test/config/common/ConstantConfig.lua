@@ -8,10 +8,10 @@ local Config = require("quan.config.Config")
 
 ---所有ConstantConfig
 local configs = {
-    { key = "constant1", itemId = 1, rewardList = {  }, comment = "常量1" },
-    { key = "constant2", itemId = 2, rewardList = {  }, comment = "常量2" },
-    { key = "constant2", itemId = 3, rewardList = {  }, comment = "常量3" },
-    { key = "", itemId = 4, rewardList = {  }, comment = "常量4" },
+    { key = "constant1", itemId = 1, reward = nil, rewardList = {  }, comment = "常量1" },
+    { key = "constant2", itemId = 2, reward = nil, rewardList = {  }, comment = "常量2" },
+    { key = "constant2", itemId = 3, reward = nil, rewardList = {  }, comment = "常量3" },
+    { key = "", itemId = 4, reward = nil, rewardList = {  }, comment = "常量4" },
 }
 
 ---索引:常量Key

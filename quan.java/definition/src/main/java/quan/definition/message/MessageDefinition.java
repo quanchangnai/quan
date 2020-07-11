@@ -3,6 +3,8 @@ package quan.definition.message;
 import org.apache.commons.lang3.StringUtils;
 import quan.definition.BeanDefinition;
 import quan.definition.Category;
+import quan.definition.DependentSource;
+import quan.definition.DependentSource.DependentType;
 import quan.definition.FieldDefinition;
 
 import java.util.ArrayList;
@@ -61,7 +63,7 @@ public class MessageDefinition extends BeanDefinition {
     }
 
     @Override
-    public void validate() {
+    public void validate1() {
         if (strId != null) {
             try {
                 id = Integer.parseInt(strId);
@@ -69,19 +71,28 @@ public class MessageDefinition extends BeanDefinition {
                 addValidatedError(getValidatedName("的") + "ID[" + strId + "]不合法");
             }
         }
-        super.validate();
+        super.validate1();
     }
 
     @Override
     protected void validateFieldNameDuplicate(FieldDefinition fieldDefinition) {
-        HeadDefinition headDefinition = parser.getMessageHead();
-        if (fieldDefinition.getName() != null && headDefinition != null) {
-            headDefinition.validate();
-            if (headDefinition.getField(fieldDefinition.getName()) != null) {
+        HeaderDefinition headerDefinition = parser.getMessageHeader();
+        if (fieldDefinition.getName() != null && headerDefinition != null) {
+            headerDefinition.validate1();
+            if (headerDefinition.getField(fieldDefinition.getName()) != null) {
                 addValidatedError(getValidatedName("的") + "字段名[" + fieldDefinition.getName() + "]不能和消息头的字段重复");
             }
         }
         super.validateFieldNameDuplicate(fieldDefinition);
+    }
+
+    @Override
+    protected void validateDependents() {
+        HeaderDefinition header = getHeader();
+        if (header != null) {
+            addDependent(new DependentSource(header, DependentType.messageHeader), header);
+        }
+        super.validateDependents();
     }
 
     @Override
@@ -92,14 +103,14 @@ public class MessageDefinition extends BeanDefinition {
         return fieldName.equals("id");
     }
 
-    public HeadDefinition getHead() {
-        return parser.getMessageHead();
+    public HeaderDefinition getHeader() {
+        return parser.getMessageHeader();
     }
 
     public List<FieldDefinition> getAllFields() {
         if (allFields.isEmpty()) {
-            if (getHead() != null) {
-                allFields.addAll(getHead().getFields());
+            if (getHeader() != null) {
+                allFields.addAll(getHeader().getFields());
             }
             allFields.addAll(getFields());
         }

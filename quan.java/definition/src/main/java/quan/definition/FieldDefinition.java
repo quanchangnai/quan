@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import static quan.definition.ClassDefinition.getSimpleClassName;
+import static quan.definition.ClassDefinition.getWholeClassName;
+
 /**
  * 字段定义，被数据、消息和配置共用
  * Created by quanchangnai on 2017/7/6.
@@ -133,24 +136,6 @@ public class FieldDefinition extends Definition implements Cloneable {
         }
     }
 
-    /**
-     * 如果给定的类型包含包名则截掉包名
-     */
-    protected String getSimpleClassType(String type) {
-        int index = type.indexOf(".");
-        if (index >= 0) {
-            return type.substring(index + 1);
-        }
-        return type;
-    }
-
-    /**
-     * 如果给定的类型不包含包名则加上包名
-     */
-    protected String getClassType(String type) {
-        return ClassDefinition.getWholeName(owner, type);
-    }
-
     public boolean isBuiltinType() {
         return isBuiltinType(type);
     }
@@ -198,7 +183,7 @@ public class FieldDefinition extends Definition implements Cloneable {
     }
 
     public ClassDefinition getClassDefinition() {
-        return parser.getClass(getClassType(type));
+        return parser.getClass(getWholeClassName(owner, type));
     }
 
     public BeanDefinition getBean() {
@@ -294,7 +279,7 @@ public class FieldDefinition extends Definition implements Cloneable {
         if (!isCollectionType()) {
             return null;
         }
-        ClassDefinition classDefinition = parser.getClass(getClassType(getValueType()));
+        ClassDefinition classDefinition = parser.getClass(getWholeClassName(owner, getValueType()));
         if (BeanDefinition.isBeanDefinition(classDefinition)) {
             return (BeanDefinition) classDefinition;
         }
@@ -343,9 +328,9 @@ public class FieldDefinition extends Definition implements Cloneable {
 
     public String getClassType() {
         if (classType == null) {
-            return getSimpleClassType(type);
+            return getSimpleClassName(type);
         }
-        return getSimpleClassType(classType);
+        return classType;
     }
 
     public void setClassType(String classType) {
@@ -365,9 +350,9 @@ public class FieldDefinition extends Definition implements Cloneable {
 
     public String getClassValueType() {
         if (classValueType == null) {
-            return getSimpleClassType(getValueType());
+            return getSimpleClassName(getValueType());
         }
-        return getSimpleClassType(classValueType);
+        return classValueType;
     }
 
     public void setClassValueType(String classValueType) {
@@ -484,10 +469,10 @@ public class FieldDefinition extends Definition implements Cloneable {
             ConfigDefinition refConfig = null;
 
             if (keyRef && fieldRefs.length >= 1) {
-                refConfig = parser.getConfig(getClassType(fieldRefs[0].split("@", -1)[0]));
+                refConfig = parser.getConfig(getWholeClassName(owner, fieldRefs[0].split("@", -1)[0]));
             }
             if (!keyRef && fieldRefs.length == 2) {
-                refConfig = parser.getConfig(getClassType(fieldRefs[1].split("@", -1)[0]));
+                refConfig = parser.getConfig(getWholeClassName(owner, fieldRefs[1].split("@", -1)[0]));
             }
             return refConfig;
         }
@@ -497,7 +482,7 @@ public class FieldDefinition extends Definition implements Cloneable {
         if (fieldRefs.length != 2) {
             return null;
         }
-        return parser.getConfig(getClassType(fieldRefs[0]));
+        return parser.getConfig(getWholeClassName(owner, fieldRefs[0]));
     }
 
     /**
@@ -517,14 +502,14 @@ public class FieldDefinition extends Definition implements Cloneable {
 
             if (keyRef && fieldRefs.length >= 1) {
                 String[] fieldKeyRefs = fieldRefs[0].split("@", -1);
-                refConfig = parser.getConfig(getClassType(fieldKeyRefs[0]));
+                refConfig = parser.getConfig(getWholeClassName(owner, fieldKeyRefs[0]));
                 if (refConfig != null) {
                     return refConfig.getField(fieldKeyRefs[1]);
                 }
             }
             if (!keyRef && fieldRefs.length == 2) {
                 String[] fieldValueRefs = fieldRefs[1].split("@", -1);
-                refConfig = parser.getConfig(getClassType(fieldValueRefs[0]));
+                refConfig = parser.getConfig(getWholeClassName(owner, fieldValueRefs[0]));
                 if (refConfig != null) {
                     return refConfig.getField(fieldValueRefs[1]);
                 }
@@ -538,7 +523,7 @@ public class FieldDefinition extends Definition implements Cloneable {
             return null;
         }
 
-        ConfigDefinition refConfig = parser.getConfig(getClassType(fieldRefs[0]));
+        ConfigDefinition refConfig = parser.getConfig(getWholeClassName(owner, fieldRefs[0]));
         if (refConfig != null) {
             return refConfig.getField(fieldRefs[1]);
         }
@@ -565,7 +550,7 @@ public class FieldDefinition extends Definition implements Cloneable {
     /**
      * 字段本身是否支持特定语言，实际使用要先判断字段所在的配置是否支持该语言
      */
-    public boolean supportLanguage(String language) {
+    public boolean isSupportLanguage(String language) {
         boolean support = languages.isEmpty() || languages.contains(language);
         if (excludeLanguage) {
             support = !support;
@@ -573,8 +558,8 @@ public class FieldDefinition extends Definition implements Cloneable {
         return support;
     }
 
-    public boolean supportLanguage(Language language) {
-        return supportLanguage(language.name());
+    public boolean isSupportLanguage(Language language) {
+        return isSupportLanguage(language.name());
     }
 
     public List<Integer> getColumnNums() {
@@ -603,8 +588,12 @@ public class FieldDefinition extends Definition implements Cloneable {
     }
 
     @Override
-    public Object clone() throws CloneNotSupportedException {
-        return super.clone();
+    public FieldDefinition clone() {
+        try {
+            return (FieldDefinition) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

@@ -1,6 +1,7 @@
 package quan.generator.config;
 
 import quan.definition.BeanDefinition;
+import quan.definition.ClassDefinition;
 import quan.definition.FieldDefinition;
 import quan.definition.Language;
 import quan.definition.config.ConstantDefinition;
@@ -51,30 +52,27 @@ public class CSharpConfigGenerator extends ConfigGenerator {
     }
 
     @Override
-    protected Language supportLanguage() {
+    protected Language language() {
         return Language.cs;
     }
 
     @Override
-    protected void prepareFieldImports(FieldDefinition fieldDefinition) {
-        super.prepareFieldImports(fieldDefinition);
-        BeanDefinition owner = (BeanDefinition) fieldDefinition.getOwner();
-        if (fieldDefinition.isTimeType() && owner.getSelfFields().contains(fieldDefinition)) {
+    protected void prepareField(FieldDefinition fieldDefinition) {
+        super.prepareField(fieldDefinition);
+        ClassDefinition owner = fieldDefinition.getOwner();
+        if (!fieldDefinition.isTimeType()) {
+            return;
+        }
+        if (!(owner instanceof BeanDefinition) || ((BeanDefinition) owner).getSelfFields().contains(fieldDefinition)) {
             owner.getImports().add("System");
         }
     }
 
     @Override
     protected void prepareConstant(ConstantDefinition constantDefinition) {
-        FieldDefinition valueField = constantDefinition.getValueField();
-        if (valueField.isCollectionType()) {
+        super.prepareConstant(constantDefinition);
+        if (constantDefinition.getValueField().isCollectionType()) {
             constantDefinition.getImports().add("System.Collections.Generic");
-            if (!valueField.isBuiltinValueType()) {
-                constantDefinition.getImports().add(valueField.getValueBean().getFullPackageName(supportLanguage()));
-            }
-        } else if (!valueField.isBuiltinType()) {
-            constantDefinition.getImports().add(valueField.getClassDefinition().getFullPackageName(supportLanguage()));
         }
     }
-
 }

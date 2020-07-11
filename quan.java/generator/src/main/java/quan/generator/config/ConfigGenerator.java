@@ -115,8 +115,8 @@ public abstract class ConfigGenerator extends Generator {
     protected void initFreemarker() {
         super.initFreemarker();
         try {
-            Template configTemplate = freemarkerCfg.getTemplate("config." + supportLanguage() + ".ftl");
-            Template constantTemplate = freemarkerCfg.getTemplate("constant." + supportLanguage() + ".ftl");
+            Template configTemplate = freemarkerCfg.getTemplate("config." + language() + ".ftl");
+            Template constantTemplate = freemarkerCfg.getTemplate("constant." + language() + ".ftl");
 
             templates.put(BeanDefinition.class, configTemplate);
             templates.put(ConfigDefinition.class, configTemplate);
@@ -151,28 +151,21 @@ public abstract class ConfigGenerator extends Generator {
 
     @Override
     protected void prepareClass(ClassDefinition classDefinition) {
-        if (configLoader != null && classDefinition instanceof ConstantDefinition) {
-            ConstantDefinition constantDefinition = (ConstantDefinition) classDefinition;
-            List<JSONObject> configJsons = configLoader.loadJsons(constantDefinition.getConfigDefinition(), false);
-            constantDefinition.setConfigs(configJsons);
-        }
+        super.prepareClass(classDefinition);
 
         if (classDefinition instanceof ConstantDefinition) {
+            ConstantDefinition constantDefinition = (ConstantDefinition) classDefinition;
             prepareConstant((ConstantDefinition) classDefinition);
-        } else {
-            super.prepareClass(classDefinition);
+            if (configLoader != null) {
+                List<JSONObject> configJsons = configLoader.loadJsons(constantDefinition.getConfigDefinition(), false);
+                constantDefinition.setConfigs(configJsons);
+            }
         }
     }
 
     protected void prepareConstant(ConstantDefinition constantDefinition) {
         FieldDefinition valueField = constantDefinition.getValueField();
-        if (valueField.isCollectionType()) {
-            constantDefinition.getImports().add("java.util.*");
-            if (!valueField.isBuiltinValueType()) {
-                constantDefinition.getImports().add(valueField.getValueBean().getFullName(supportLanguage()));
-            }
-        } else if (!valueField.isBuiltinType()) {
-            constantDefinition.getImports().add(valueField.getClassDefinition().getFullName(supportLanguage()));
-        }
+        prepareField(valueField);
     }
+
 }

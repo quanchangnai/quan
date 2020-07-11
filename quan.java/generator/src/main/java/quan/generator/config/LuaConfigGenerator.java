@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-import static quan.definition.ClassDefinition.getWholeName;
+import static quan.definition.ClassDefinition.getWholeClassName;
 
 /**
  * Created by quanchangnai on 2020/3/15.
@@ -29,7 +29,7 @@ public class LuaConfigGenerator extends ConfigGenerator {
     }
 
     @Override
-    protected Language supportLanguage() {
+    protected Language language() {
         return Language.lua;
     }
 
@@ -66,7 +66,7 @@ public class LuaConfigGenerator extends ConfigGenerator {
 
         String clazz = object.getString("class");
         if (!StringUtils.isEmpty(clazz)) {
-            beanDefinition = parser.getBean(getWholeName(configDefinition, clazz));
+            beanDefinition = parser.getBean(getWholeClassName(configDefinition, clazz));
         }
 
         if (beanDefinition == null) {
@@ -82,7 +82,7 @@ public class LuaConfigGenerator extends ConfigGenerator {
 
         boolean start = true;
         for (FieldDefinition field : beanDefinition.getFields()) {
-            if (!field.supportLanguage(this.supportLanguage())) {
+            if (!field.isSupportLanguage(this.language())) {
                 continue;
             }
             if (!start) {

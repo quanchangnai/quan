@@ -213,7 +213,7 @@ public class ConfigDefinition extends BeanDefinition {
     }
 
     @Override
-    public void validate() {
+    public void validate1() {
         validateNameAndLanguage();
 
         if (table == null) {
@@ -249,7 +249,14 @@ public class ConfigDefinition extends BeanDefinition {
             setComment(comment.toString());
         }
 
-        validateParent();
+        for (FieldDefinition field : selfFields) {
+            validateField(field);
+        }
+    }
+
+    @Override
+    public void validate2() {
+        super.validate2();
 
         for (FieldDefinition field : fields) {
             validateFieldNameDuplicate(field);
@@ -263,11 +270,18 @@ public class ConfigDefinition extends BeanDefinition {
             }
         }
 
-        for (FieldDefinition field : selfFields) {
-            validateField(field);
-        }
-
         IndexDefinition.validate(indexes, selfIndexes, selfFields);
+    }
+
+    @Override
+    public void validate3() {
+        super.validate3();
+        for (FieldDefinition field : selfFields) {
+            //校验字段引用
+            validateFieldRef(field);
+            //校验字段支持的语言
+            validateFieldLanguage(field);
+        }
     }
 
     @Override
@@ -291,13 +305,9 @@ public class ConfigDefinition extends BeanDefinition {
             ancestors.add(parent.getName());
 
             for (int i = parent.selfIndexes.size() - 1; i >= 0; i--) {
-                try {
-                    IndexDefinition parentIndex = (IndexDefinition) parent.selfIndexes.get(i).clone();
-                    parentIndex.setOwner(this);
-                    indexes.add(0, parentIndex);
-                } catch (CloneNotSupportedException e) {
-                    e.printStackTrace();
-                }
+                IndexDefinition parentIndex = parent.selfIndexes.get(i).clone();
+                parentIndex.setOwner(this);
+                indexes.add(0, parentIndex);
             }
 
             parent = parent.getParent();
@@ -414,16 +424,6 @@ public class ConfigDefinition extends BeanDefinition {
         }
         for (FieldDefinition beanField : beanDefinition.getFields()) {
             validateFieldDelimiter(beanField, delimiters);
-        }
-    }
-
-    @Override
-    public void validate2() {
-        for (FieldDefinition field : selfFields) {
-            //校验字段引用
-            validateFieldRef(field);
-            //校验字段支持的语言
-            validateFieldLanguage(field);
         }
     }
 

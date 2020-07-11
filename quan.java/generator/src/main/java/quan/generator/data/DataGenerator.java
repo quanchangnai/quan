@@ -52,7 +52,7 @@ public class DataGenerator extends Generator {
     }
 
     @Override
-    protected Language supportLanguage() {
+    protected Language language() {
         return Language.java;
     }
 

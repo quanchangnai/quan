@@ -12,7 +12,7 @@ namespace Test.Message.Role
 	/// 角色登录，自定义ID<br/>
 	/// 自动生成
 	/// </summary>
-    public class CRoleLogin : HeadedMessage
+    public class CRoleLogin : MessageHeader
     {
 		/// <summary>
 		/// 消息ID
@@ -110,14 +110,14 @@ namespace Test.Message.Role
 
 		    var roleInfoListSize = buffer.ReadInt();
 		    for (var i = 0; i < roleInfoListSize; i++) {
-			    var roleInfoListValue = new RoleInfo();
+			    var roleInfoListValue = new Test.Message.Role.RoleInfo();
 			  	roleInfoListValue.Decode(buffer);
 			    RoleInfoList.Add(roleInfoListValue);
 		    }
 
 		    var roleInfoSetSize = buffer.ReadInt();
 		    for (var i = 0; i < roleInfoSetSize; i++) {
-			    var roleInfoSetValue = new RoleInfo();
+			    var roleInfoSetValue = new Test.Message.Role.RoleInfo();
 			  	roleInfoSetValue.Decode(buffer);
 			    RoleInfoSet.Add(roleInfoSetValue);
 		    }
@@ -125,7 +125,7 @@ namespace Test.Message.Role
 		    var roleInfoMapSize = buffer.ReadInt();
 		    for (var i = 0; i < roleInfoMapSize; i++) {
 			    var roleInfoMapKey = buffer.ReadLong();
-			    var roleInfoMapValue = new RoleInfo();
+			    var roleInfoMapValue = new Test.Message.Role.RoleInfo();
 				roleInfoMapValue.Decode(buffer);
 			    RoleInfoMap.Add(roleInfoMapKey, roleInfoMapValue);
 		    }

@@ -8,13 +8,13 @@ import quan.definition.FieldDefinition;
  * 消息头定义，被所有消息共用，主要用于定义消息的公共字段
  * Created by quanchangnai on 2019/9/11.
  */
-public class HeadDefinition extends BeanDefinition {
+public class HeaderDefinition extends BeanDefinition {
 
     private boolean validated;
 
     {
         category = Category.message;
-        setName("HeadedMessage");
+        setName("MessageHeader");
     }
 
 
@@ -28,7 +28,7 @@ public class HeadDefinition extends BeanDefinition {
     }
 
     @Override
-    public HeadDefinition setCategory(Category category) {
+    public HeaderDefinition setCategory(Category category) {
         throw new UnsupportedOperationException();
     }
 
@@ -37,7 +37,7 @@ public class HeadDefinition extends BeanDefinition {
     }
 
     @Override
-    public void validate() {
+    public void validate1() {
         if (validated) {
             return;
         }

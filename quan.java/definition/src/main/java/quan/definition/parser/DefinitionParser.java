@@ -8,7 +8,7 @@ import quan.definition.BeanDefinition;
 import quan.definition.Category;
 import quan.definition.ClassDefinition;
 import quan.definition.config.ConfigDefinition;
-import quan.definition.message.HeadDefinition;
+import quan.definition.message.HeaderDefinition;
 
 import java.io.File;
 import java.nio.charset.Charset;
@@ -37,7 +37,7 @@ public abstract class DefinitionParser {
     protected List<ClassDefinition> parsedClasses = new ArrayList<>();
 
     //消息头定义，最多只能有一个
-    protected HeadDefinition headDefinition;
+    protected HeaderDefinition headerDefinition;
 
     //已校验过的类定义，类名:类定义
     private Map<String, ClassDefinition> validatedClasses = new HashMap<>();
@@ -110,8 +110,8 @@ public abstract class DefinitionParser {
         return validatedClasses.get(name);
     }
 
-    public HeadDefinition getMessageHead() {
-        return headDefinition;
+    public HeaderDefinition getMessageHeader() {
+        return headerDefinition;
     }
 
     public ConfigDefinition getConfig(String name) {
@@ -134,7 +134,6 @@ public abstract class DefinitionParser {
         return null;
     }
 
-
     public void addValidatedError(String error) {
         validatedErrors.add(error);
     }
@@ -152,17 +151,22 @@ public abstract class DefinitionParser {
 
         definitionFiles.forEach(this::parseClasses);
 
+        validate();
+    }
+
+    protected void validate() {
         Map<String, ClassDefinition> dissimilarClasses = new HashMap<>();
 
         for (ClassDefinition classDefinition : parsedClasses) {
             if (classDefinition.getName() == null) {
                 continue;
             }
-            ClassDefinition classDefinition1 = validatedClasses.get(classDefinition.getWholeName());
-            if (classDefinition1 != null) {
+
+            ClassDefinition validatedClassDefinition = validatedClasses.get(classDefinition.getWholeName());
+            if (validatedClassDefinition != null) {
                 String error = "定义文件[" + classDefinition.getDefinitionFile() + "]";
-                if (!classDefinition.getDefinitionFile().equals(classDefinition1.getDefinitionFile())) {
-                    error += "和[" + classDefinition1.getDefinitionFile() + "]";
+                if (!classDefinition.getDefinitionFile().equals(validatedClassDefinition.getDefinitionFile())) {
+                    error += "和[" + validatedClassDefinition.getDefinitionFile() + "]";
                 }
                 error += "有同名类[" + classDefinition.getName() + "]";
                 validatedErrors.add(error);
@@ -183,13 +187,9 @@ public abstract class DefinitionParser {
             }
         }
 
-        for (ClassDefinition classDefinition : parsedClasses) {
-            classDefinition.validate();
-        }
-
-        for (ClassDefinition classDefinition : parsedClasses) {
-            classDefinition.validate2();
-        }
+        parsedClasses.forEach(ClassDefinition::validate1);
+        parsedClasses.forEach(ClassDefinition::validate2);
+        parsedClasses.forEach(ClassDefinition::validate3);
     }
 
     public void clear() {

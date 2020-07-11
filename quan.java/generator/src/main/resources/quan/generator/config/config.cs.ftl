@@ -4,7 +4,7 @@ using System.Collections.Immutable;
 </#if>
 using Newtonsoft.Json.Linq;
 using Quan.Common.Utils;
-<#if !(parentName??) || kind == 6>
+<#if !(parentClassName??) || kind == 6>
 using Quan.Config;
 </#if>
 <#list imports as import>
@@ -19,14 +19,14 @@ namespace ${getFullPackageName("cs")}
 </#if>
 	/// 自动生成
 	/// </summary>
-    public class ${name} : <#if parentName??>${parentName}<#elseif kind ==2>Bean<#else>ConfigBase</#if>
+    public class ${name} : <#if parentClassName??>${parentClassName}<#elseif kind ==2>Bean<#else>ConfigBase</#if>
     {
 <#if !selfFields??>
     <#assign selfFields = fields>
 </#if>
-<#assign supportCs = supportLanguage("cs")>
+<#assign supportCs = isSupportLanguage("cs")>
 <#list selfFields as field>
-    <#if !(supportCs &&field.supportLanguage("cs"))>
+    <#if !(supportCs &&field.isSupportLanguage("cs"))>
         <#continue>
     </#if>
     <#if field.comment !="">
@@ -55,7 +55,7 @@ namespace ${getFullPackageName("cs")}
         public ${name}(JObject json) : base(json)
         {
 <#list selfFields as field>
-    <#if !(supportCs &&field.supportLanguage("cs"))>
+    <#if !(supportCs &&field.isSupportLanguage("cs"))>
         <#continue>
     </#if>
     <#if field.type=="list" || field.type=="set">
@@ -121,15 +121,15 @@ namespace ${getFullPackageName("cs")}
             return new ${name}(json);
         }
 <#else>
-        public<#if parentName?? && parentName!=""> new</#if> static ${name} Create(JObject json)
+        public<#if parentClassName?? && parentClassName!=""> new</#if> static ${name} Create(JObject json)
         {
-            <#if (children?size>0)>
+            <#if (dependentChildren?size>0)>
             var clazz = json["class"].Value<string>() ?? "";
             switch (clazz) 
             {
-                <#list children as child>
-                case "${child.name}":
-                    return ${child.name}.Create(json);
+                <#list dependentChildren?keys as key>
+                case "${dependentChildren[key].left}":
+                    return ${dependentChildren[key].right}.Create(json);
                 </#list> 
                 case "${name}":
                     return new ${name}(json);
@@ -146,7 +146,7 @@ namespace ${getFullPackageName("cs")}
         {
             return "${name}{" +
             <#list fields as field>
-                <#if !(supportCs &&field.supportLanguage("cs"))>
+                <#if !(supportCs &&field.isSupportLanguage("cs"))>
                     <#continue>
                 </#if>
                    "<#rt>
@@ -192,7 +192,7 @@ namespace ${getFullPackageName("cs")}
 
         </#if>
     </#list>
-        public <#if parentName??>new </#if>static IList<${name}> GetConfigs()
+        public <#if parentClassName??>new </#if>static IList<${name}> GetConfigs()
         {
             return _configs;
         }
@@ -332,11 +332,11 @@ namespace ${getFullPackageName("cs")}
             {
     <#list indexes as index>
         <#if index.fields?size==1>
-                <#if parentName??>ConfigBase.</#if>Load(${index.name}Configs, config, config.${index.fields[0].name?cap_first});
+                <#if parentClassName??>ConfigBase.</#if>Load(${index.name}Configs, config, config.${index.fields[0].name?cap_first});
         <#elseif index.fields?size==2>
-                <#if parentName??>ConfigBase.</#if>Load(${index.name}Configs, config, config.${index.fields[0].name?cap_first}, config.${index.fields[1].name?cap_first});
+                <#if parentClassName??>ConfigBase.</#if>Load(${index.name}Configs, config, config.${index.fields[0].name?cap_first}, config.${index.fields[1].name?cap_first});
         <#elseif index.fields?size==3>
-                <#if parentName??>ConfigBase.</#if>Load(${index.name}Configs, config, config.${index.fields[0].name?cap_first}, config.${index.fields[1].name?cap_first}, config.${index.fields[2].name?cap_first});
+                <#if parentClassName??>ConfigBase.</#if>Load(${index.name}Configs, config, config.${index.fields[0].name?cap_first}, config.${index.fields[1].name?cap_first}, config.${index.fields[2].name?cap_first});
         </#if>
     </#list>
             }
