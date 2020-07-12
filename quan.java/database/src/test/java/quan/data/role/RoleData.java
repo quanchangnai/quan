@@ -114,7 +114,7 @@ public class RoleData extends Data<Long> {
 
     private EntityField<ItemEntity> item = new EntityField<>();
 
-    private MapField<Integer, quan.data.item.ItemEntity> items = new MapField<>(this);
+    private MapField<Integer, ItemEntity> items = new MapField<>(this);
 
     private SetField<Boolean> set = new SetField<>(this);
 
@@ -122,11 +122,11 @@ public class RoleData extends Data<Long> {
 
     private MapField<Integer, Integer> map = new MapField<>(this);
 
-    private SetField<quan.data.item.ItemEntity> set2 = new SetField<>(this);
+    private SetField<ItemEntity> set2 = new SetField<>(this);
 
-    private ListField<quan.data.item.ItemEntity> list2 = new ListField<>(this);
+    private ListField<ItemEntity> list2 = new ListField<>(this);
 
-    private MapField<Integer, quan.data.item.ItemEntity> map2 = new MapField<>(this);
+    private MapField<Integer, ItemEntity> map2 = new MapField<>(this);
 
 
     public RoleData(long id) {
@@ -338,7 +338,7 @@ public class RoleData extends Data<Long> {
         return this;
     }
 
-    public Map<Integer, quan.data.item.ItemEntity> getItems() {
+    public Map<Integer, ItemEntity> getItems() {
         return items.getDelegate();
     }
 
@@ -354,15 +354,15 @@ public class RoleData extends Data<Long> {
         return map.getDelegate();
     }
 
-    public Set<quan.data.item.ItemEntity> getSet2() {
+    public Set<ItemEntity> getSet2() {
         return set2.getDelegate();
     }
 
-    public List<quan.data.item.ItemEntity> getList2() {
+    public List<ItemEntity> getList2() {
         return list2.getDelegate();
     }
 
-    public Map<Integer, quan.data.item.ItemEntity> getMap2() {
+    public Map<Integer, ItemEntity> getMap2() {
         return map2.getDelegate();
     }
 
@@ -448,7 +448,7 @@ public class RoleData extends Data<Long> {
                     case RoleData.ITEMS:
                         reader.readStartDocument();
                         while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
-                            value.items.plus(reader.readInt32(), decoderContext.decodeWithChildContext(registry.get(quan.data.item.ItemEntity.class), reader));
+                            value.items.plus(reader.readInt32(), decoderContext.decodeWithChildContext(registry.get(ItemEntity.class), reader));
                         }
                         reader.readEndDocument();
                         break;
@@ -476,14 +476,14 @@ public class RoleData extends Data<Long> {
                     case RoleData.SET2:
                         reader.readStartArray();
                         while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
-                            value.set2.plus(decoderContext.decodeWithChildContext(registry.get(quan.data.item.ItemEntity.class), reader));
+                            value.set2.plus(decoderContext.decodeWithChildContext(registry.get(ItemEntity.class), reader));
                         }
                         reader.readEndArray();
                         break;
                     case RoleData.LIST2:
                         reader.readStartArray();
                         while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
-                            value.list2.plus(decoderContext.decodeWithChildContext(registry.get(quan.data.item.ItemEntity.class), reader));
+                            value.list2.plus(decoderContext.decodeWithChildContext(registry.get(ItemEntity.class), reader));
                         }
                         reader.readEndArray();
                         break;
@@ -521,7 +521,7 @@ public class RoleData extends Data<Long> {
                 writer.writeStartDocument(RoleData.ITEMS);
                 for (Integer itemsKey : value.items.getMap().keySet()) {
                     writer.writeInt32(itemsKey);
-                    encoderContext.encodeWithChildContext(registry.get(quan.data.item.ItemEntity.class), writer, value.items.getMap().get(itemsKey));
+                    encoderContext.encodeWithChildContext(registry.get(ItemEntity.class), writer, value.items.getMap().get(itemsKey));
                 }
                 writer.writeEndDocument();
             }
@@ -553,16 +553,16 @@ public class RoleData extends Data<Long> {
 
             if (!value.set2.getSet().isEmpty()) {
                 writer.writeStartArray(RoleData.SET2);
-                for (quan.data.item.ItemEntity set2Value : value.set2.getSet()) {
-                    encoderContext.encodeWithChildContext(registry.get(quan.data.item.ItemEntity.class), writer, set2Value);
+                for (ItemEntity set2Value : value.set2.getSet()) {
+                    encoderContext.encodeWithChildContext(registry.get(ItemEntity.class), writer, set2Value);
                 }
                 writer.writeEndArray();
             }
 
             if (!value.list2.getList().isEmpty()) {
                 writer.writeStartArray(RoleData.LIST2);
-                for (quan.data.item.ItemEntity list2Value : value.list2.getList()) {
-                    encoderContext.encodeWithChildContext(registry.get(quan.data.item.ItemEntity.class), writer, list2Value);
+                for (ItemEntity list2Value : value.list2.getList()) {
+                    encoderContext.encodeWithChildContext(registry.get(ItemEntity.class), writer, list2Value);
                 }
                 writer.writeEndArray();
             }

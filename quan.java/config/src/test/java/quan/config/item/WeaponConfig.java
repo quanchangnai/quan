@@ -17,13 +17,13 @@ public class WeaponConfig extends EquipConfig {
     protected final int w2;
 
     //奖励List
-    protected final List<quan.config.item.Reward> rewardList;
+    protected final List<Reward> rewardList;
 
     //奖励Set
-    protected final Set<quan.config.item.Reward> rewardSet;
+    protected final Set<Reward> rewardSet;
 
     //奖励Map
-    protected final Map<Integer, quan.config.item.Reward> rewardMap;
+    protected final Map<Integer, Reward> rewardMap;
 
     //List2
     protected final List<Integer> list2;
@@ -36,30 +36,30 @@ public class WeaponConfig extends EquipConfig {
         this.w2 = json.getIntValue("w2");
 
         JSONArray $rewardList$1 = json.getJSONArray("rewardList");
-        List<quan.config.item.Reward> $rewardList$2 = new ArrayList<>();
+        List<Reward> $rewardList$2 = new ArrayList<>();
         if ($rewardList$1 != null) {
             for (int i = 0; i < $rewardList$1.size(); i++) {
-                quan.config.item.Reward $rewardList$Value = quan.config.item.Reward.create($rewardList$1.getJSONObject(i));
+                Reward $rewardList$Value = Reward.create($rewardList$1.getJSONObject(i));
                 $rewardList$2.add($rewardList$Value);
             }
         }
         this.rewardList = Collections.unmodifiableList($rewardList$2);
 
         JSONArray $rewardSet$1 = json.getJSONArray("rewardSet");
-        Set<quan.config.item.Reward> $rewardSet$2 = new HashSet<>();
+        Set<Reward> $rewardSet$2 = new HashSet<>();
         if ($rewardSet$1 != null) {
             for (int i = 0; i < $rewardSet$1.size(); i++) {
-                quan.config.item.Reward $rewardSet$Value = quan.config.item.Reward.create($rewardSet$1.getJSONObject(i));
+                Reward $rewardSet$Value = Reward.create($rewardSet$1.getJSONObject(i));
                 $rewardSet$2.add($rewardSet$Value);
             }
         }
         this.rewardSet = Collections.unmodifiableSet($rewardSet$2);
 
         JSONObject $rewardMap$1 = json.getJSONObject("rewardMap");
-        Map<Integer, quan.config.item.Reward> $rewardMap$2 = new HashMap<>();
+        Map<Integer, Reward> $rewardMap$2 = new HashMap<>();
         if ($rewardMap$1 != null) {
             for (String $rewardMap$Key : $rewardMap$1.keySet()) {
-                quan.config.item.Reward $rewardMap$Value = quan.config.item.Reward.create($rewardMap$1.getJSONObject($rewardMap$Key));
+                Reward $rewardMap$Value = Reward.create($rewardMap$1.getJSONObject($rewardMap$Key));
                 $rewardMap$2.put(Integer.valueOf($rewardMap$Key), $rewardMap$Value);
             }
         }
@@ -92,21 +92,21 @@ public class WeaponConfig extends EquipConfig {
     /**
      * 奖励List
      */
-    public final List<quan.config.item.Reward> getRewardList() {
+    public final List<Reward> getRewardList() {
         return rewardList;
     }
 
     /**
      * 奖励Set
      */
-    public final Set<quan.config.item.Reward> getRewardSet() {
+    public final Set<Reward> getRewardSet() {
         return rewardSet;
     }
 
     /**
      * 奖励Map
      */
-    public final Map<Integer, quan.config.item.Reward> getRewardMap() {
+    public final Map<Integer, Reward> getRewardMap() {
         return rewardMap;
     }
 

@@ -27,13 +27,13 @@ public class CRoleLogin extends MessageHeader {
     private RoleInfo roleInfo = new RoleInfo();
 
     //角色信息
-    private ArrayList<quan.message.role.RoleInfo> roleInfoList = new ArrayList<>();
+    private ArrayList<RoleInfo> roleInfoList = new ArrayList<>();
 
     //角色信息
-    private HashSet<quan.message.role.RoleInfo> roleInfoSet = new HashSet<>();
+    private HashSet<RoleInfo> roleInfoSet = new HashSet<>();
 
     //角色信息
-    private HashMap<Long, quan.message.role.RoleInfo> roleInfoMap = new HashMap<>();
+    private HashMap<Long, RoleInfo> roleInfoMap = new HashMap<>();
 
     //用户信息
     private UserInfo userInfo;
@@ -115,21 +115,21 @@ public class CRoleLogin extends MessageHeader {
     /**
      * 角色信息
      */
-    public ArrayList<quan.message.role.RoleInfo> getRoleInfoList() {
+    public ArrayList<RoleInfo> getRoleInfoList() {
         return roleInfoList;
     }
 
     /**
      * 角色信息
      */
-    public HashSet<quan.message.role.RoleInfo> getRoleInfoSet() {
+    public HashSet<RoleInfo> getRoleInfoSet() {
         return roleInfoSet;
     }
 
     /**
      * 角色信息
      */
-    public HashMap<Long, quan.message.role.RoleInfo> getRoleInfoMap() {
+    public HashMap<Long, RoleInfo> getRoleInfoMap() {
         return roleInfoMap;
     }
 

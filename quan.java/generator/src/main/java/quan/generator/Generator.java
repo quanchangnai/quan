@@ -274,29 +274,26 @@ public abstract class Generator {
     }
 
     protected void prepareClass(ClassDefinition classDefinition) {
-        if (classDefinition instanceof BeanDefinition) {
-            prepareBean((BeanDefinition) classDefinition);
-        }
-
         //不同包下的同名类依赖
         Map<String, TreeMap<DependentSource, ClassDefinition>> dependentsClasses = classDefinition.getDependentsClasses();
         for (String dependentName : dependentsClasses.keySet()) {
-            int index = 0;
+            ClassDefinition importedClassDefinition = null;
             for (DependentSource dependentSource : dependentsClasses.get(dependentName).keySet()) {
-                index++;
                 ClassDefinition dependentClassDefinition = dependentsClasses.get(dependentName).get(dependentSource);
-                String dependentFullName = dependentClassDefinition.getFullName(language());
-
-                if (index == 1) {
+                if (dependentClassDefinition == importedClassDefinition) {
+                    continue;
+                } else if (importedClassDefinition == null) {
                     int howImport = howImportDependent(classDefinition, dependentClassDefinition);
-                    if (howImport == 0) {
-                        classDefinition.getImports().add(dependentClassDefinition.getOtherImport(language()));
-                        continue;
-                    } else if (howImport > 0) {
+                    if (howImport >= 0) {
+                        if (howImport == 0) {
+                            classDefinition.getImports().add(dependentClassDefinition.getOtherImport(language()));
+                        }
+                        importedClassDefinition = dependentClassDefinition;
                         continue;
                     }
                 }
 
+                String dependentFullName = dependentClassDefinition.getFullName(language());
                 if (dependentSource.getType() == DependentType.field) {
                     ((FieldDefinition) dependentSource.getDefinition()).setClassType(dependentFullName);
                 } else if (dependentSource.getType() == DependentType.fieldValue) {
@@ -308,6 +305,10 @@ public abstract class Generator {
                 }
                 //消息头没有同名类
             }
+        }
+
+        if (classDefinition instanceof BeanDefinition) {
+            prepareBean((BeanDefinition) classDefinition);
         }
     }
 
