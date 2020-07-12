@@ -162,7 +162,7 @@ public abstract class DefinitionParser {
                 continue;
             }
 
-            ClassDefinition validatedClassDefinition = validatedClasses.get(classDefinition.getWholeName());
+            ClassDefinition validatedClassDefinition = validatedClasses.get(classDefinition.getLongName());
             if (validatedClassDefinition != null) {
                 String error = "定义文件[" + classDefinition.getDefinitionFile() + "]";
                 if (!classDefinition.getDefinitionFile().equals(validatedClassDefinition.getDefinitionFile())) {
@@ -171,11 +171,11 @@ public abstract class DefinitionParser {
                 error += "有同名类[" + classDefinition.getName() + "]";
                 validatedErrors.add(error);
             } else {
-                validatedClasses.put(classDefinition.getWholeName(), classDefinition);
+                validatedClasses.put(classDefinition.getLongName(), classDefinition);
             }
 
-            ClassDefinition similarClassDefinition = dissimilarClasses.get(classDefinition.getWholeName().toLowerCase());
-            if (similarClassDefinition != null && !similarClassDefinition.getWholeName().equals(classDefinition.getWholeName())) {
+            ClassDefinition similarClassDefinition = dissimilarClasses.get(classDefinition.getLongName().toLowerCase());
+            if (similarClassDefinition != null && !similarClassDefinition.getLongName().equals(classDefinition.getLongName())) {
                 String error = "定义文件[" + classDefinition.getDefinitionFile() + "]的类[" + similarClassDefinition.getName() + "]和";
                 if (!classDefinition.getDefinitionFile().equals(similarClassDefinition.getDefinitionFile())) {
                     error += "[" + similarClassDefinition.getDefinitionFile() + "]的";

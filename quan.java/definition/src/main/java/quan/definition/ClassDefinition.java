@@ -33,8 +33,8 @@ public abstract class ClassDefinition extends Definition {
     //支持的语言
     protected Set<String> supportedLanguages;
 
-    //依赖的类，Map<name, <来源, ClassDefinition>>
-    protected Map<String, TreeMap<DependentSource, ClassDefinition>> dependentClasses = new HashMap<>();
+    //依赖的类，Map<依赖的类名, <来源, ClassDefinition>>
+    protected Map<String, TreeMap<DependentSource, ClassDefinition>> dependentsClasses = new HashMap<>();
 
     protected List<FieldDefinition> fields = new ArrayList<>();
 
@@ -91,11 +91,15 @@ public abstract class ClassDefinition extends Definition {
     }
 
 
-    public String getWholeName() {
-        return getWholeClassName(this, getName());
+    public String getLongName() {
+        return getLongClassName(this, getName());
     }
 
-    public static String getSimpleClassName(String className) {
+
+    /**
+     * 不带包名的类名
+     */
+    public static String getShortClassName(String className) {
         if (className == null) {
             return null;
         }
@@ -107,9 +111,9 @@ public abstract class ClassDefinition extends Definition {
     }
 
     /**
-     * 和具体语言环境无关的完整类名[不含前缀的包名.类名]
+     * 和具体语言环境无关的[不含前缀的包名.类名]
      */
-    public static String getWholeClassName(ClassDefinition owner, String className) {
+    public static String getLongClassName(ClassDefinition owner, String className) {
         if (!StringUtils.isBlank(className) && !className.contains(".")) {
             className = owner.getPackageName() + "." + className;
         }
@@ -235,11 +239,11 @@ public abstract class ClassDefinition extends Definition {
         if (classDefinition == null) {
             return;
         }
-        dependentClasses.computeIfAbsent(classDefinition.getName(), k -> new TreeMap<>()).put(dependentSource, classDefinition);
+        dependentsClasses.computeIfAbsent(classDefinition.getName(), k -> new TreeMap<>()).put(dependentSource, classDefinition);
     }
 
-    public Map<String, TreeMap<DependentSource, ClassDefinition>> getDependentClasses() {
-        return dependentClasses;
+    public Map<String, TreeMap<DependentSource, ClassDefinition>> getDependentsClasses() {
+        return dependentsClasses;
     }
 
     public void validate1() {

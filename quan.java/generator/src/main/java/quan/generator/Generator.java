@@ -279,13 +279,13 @@ public abstract class Generator {
         }
 
         //不同包下的同名类依赖
-        Map<String, TreeMap<DependentSource, ClassDefinition>> dependentClasses = classDefinition.getDependentClasses();
-        for (String name : dependentClasses.keySet()) {
+        Map<String, TreeMap<DependentSource, ClassDefinition>> dependentsClasses = classDefinition.getDependentsClasses();
+        for (String dependentName : dependentsClasses.keySet()) {
             int index = 0;
-            for (DependentSource dependentSource : dependentClasses.get(name).keySet()) {
+            for (DependentSource dependentSource : dependentsClasses.get(dependentName).keySet()) {
                 index++;
-                ClassDefinition dependentClassDefinition = dependentClasses.get(name).get(dependentSource);
-                String dependentClassFullName = dependentClassDefinition.getFullName(language());
+                ClassDefinition dependentClassDefinition = dependentsClasses.get(dependentName).get(dependentSource);
+                String dependentFullName = dependentClassDefinition.getFullName(language());
 
                 if (index == 1) {
                     int howImport = howImportDependent(classDefinition, dependentClassDefinition);
@@ -298,13 +298,13 @@ public abstract class Generator {
                 }
 
                 if (dependentSource.getType() == DependentType.field) {
-                    ((FieldDefinition) dependentSource.getDefinition()).setClassType(dependentClassFullName);
+                    ((FieldDefinition) dependentSource.getDefinition()).setClassType(dependentFullName);
                 } else if (dependentSource.getType() == DependentType.fieldValue) {
-                    ((FieldDefinition) dependentSource.getDefinition()).setClassValueType(dependentClassFullName);
+                    ((FieldDefinition) dependentSource.getDefinition()).setClassValueType(dependentFullName);
                 } else if (dependentSource.getType() == DependentType.parent) {
-                    ((BeanDefinition) dependentSource.getDefinition()).setParentClassName(dependentClassFullName);
+                    ((BeanDefinition) dependentSource.getDefinition()).setParentClassName(dependentFullName);
                 } else if (dependentSource.getType() == DependentType.child) {
-                    ((BeanDefinition) dependentSource.getDefinition()).getDependentChildren().get(classDefinition.getWholeName()).setRight(dependentClassFullName);
+                    ((BeanDefinition) dependentSource.getDefinition()).getDependentChildren().get(classDefinition.getLongName()).setRight(dependentFullName);
                 }
                 //消息头没有同名类
             }

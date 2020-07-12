@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import static quan.definition.ClassDefinition.getSimpleClassName;
-import static quan.definition.ClassDefinition.getWholeClassName;
+import static quan.definition.ClassDefinition.getShortClassName;
+import static quan.definition.ClassDefinition.getLongClassName;
 
 /**
  * 字段定义，被数据、消息和配置共用
@@ -183,7 +183,7 @@ public class FieldDefinition extends Definition implements Cloneable {
     }
 
     public ClassDefinition getClassDefinition() {
-        return parser.getClass(getWholeClassName(owner, type));
+        return parser.getClass(getLongClassName(owner, type));
     }
 
     public BeanDefinition getBean() {
@@ -279,7 +279,7 @@ public class FieldDefinition extends Definition implements Cloneable {
         if (!isCollectionType()) {
             return null;
         }
-        ClassDefinition classDefinition = parser.getClass(getWholeClassName(owner, getValueType()));
+        ClassDefinition classDefinition = parser.getClass(getLongClassName(owner, getValueType()));
         if (BeanDefinition.isBeanDefinition(classDefinition)) {
             return (BeanDefinition) classDefinition;
         }
@@ -328,7 +328,7 @@ public class FieldDefinition extends Definition implements Cloneable {
 
     public String getClassType() {
         if (classType == null) {
-            return getSimpleClassName(type);
+            return getShortClassName(type);
         }
         return classType;
     }
@@ -350,7 +350,7 @@ public class FieldDefinition extends Definition implements Cloneable {
 
     public String getClassValueType() {
         if (classValueType == null) {
-            return getSimpleClassName(getValueType());
+            return getShortClassName(getValueType());
         }
         return classValueType;
     }
@@ -469,10 +469,10 @@ public class FieldDefinition extends Definition implements Cloneable {
             ConfigDefinition refConfig = null;
 
             if (keyRef && fieldRefs.length >= 1) {
-                refConfig = parser.getConfig(getWholeClassName(owner, fieldRefs[0].split("@", -1)[0]));
+                refConfig = parser.getConfig(getLongClassName(owner, fieldRefs[0].split("@", -1)[0]));
             }
             if (!keyRef && fieldRefs.length == 2) {
-                refConfig = parser.getConfig(getWholeClassName(owner, fieldRefs[1].split("@", -1)[0]));
+                refConfig = parser.getConfig(getLongClassName(owner, fieldRefs[1].split("@", -1)[0]));
             }
             return refConfig;
         }
@@ -482,7 +482,7 @@ public class FieldDefinition extends Definition implements Cloneable {
         if (fieldRefs.length != 2) {
             return null;
         }
-        return parser.getConfig(getWholeClassName(owner, fieldRefs[0]));
+        return parser.getConfig(getLongClassName(owner, fieldRefs[0]));
     }
 
     /**
@@ -502,14 +502,14 @@ public class FieldDefinition extends Definition implements Cloneable {
 
             if (keyRef && fieldRefs.length >= 1) {
                 String[] fieldKeyRefs = fieldRefs[0].split("@", -1);
-                refConfig = parser.getConfig(getWholeClassName(owner, fieldKeyRefs[0]));
+                refConfig = parser.getConfig(getLongClassName(owner, fieldKeyRefs[0]));
                 if (refConfig != null) {
                     return refConfig.getField(fieldKeyRefs[1]);
                 }
             }
             if (!keyRef && fieldRefs.length == 2) {
                 String[] fieldValueRefs = fieldRefs[1].split("@", -1);
-                refConfig = parser.getConfig(getWholeClassName(owner, fieldValueRefs[0]));
+                refConfig = parser.getConfig(getLongClassName(owner, fieldValueRefs[0]));
                 if (refConfig != null) {
                     return refConfig.getField(fieldValueRefs[1]);
                 }
@@ -523,7 +523,7 @@ public class FieldDefinition extends Definition implements Cloneable {
             return null;
         }
 
-        ConfigDefinition refConfig = parser.getConfig(getWholeClassName(owner, fieldRefs[0]));
+        ConfigDefinition refConfig = parser.getConfig(getLongClassName(owner, fieldRefs[0]));
         if (refConfig != null) {
             return refConfig.getField(fieldRefs[1]);
         }

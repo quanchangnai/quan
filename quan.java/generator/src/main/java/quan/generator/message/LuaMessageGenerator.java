@@ -84,9 +84,9 @@ public class LuaMessageGenerator extends MessageGenerator {
             prepareBean((BeanDefinition) classDefinition);
         }
 
-        Map<String, TreeMap<DependentSource, ClassDefinition>> dependentClasses = classDefinition.getDependentClasses();
-        for (String name : dependentClasses.keySet()) {
-            ClassDefinition firstDependentClass = dependentClasses.get(name).firstEntry().getValue();
+        Map<String, TreeMap<DependentSource, ClassDefinition>> dependentsClasses = classDefinition.getDependentsClasses();
+        for (String dependentName : dependentsClasses.keySet()) {
+            ClassDefinition firstDependentClass = dependentsClasses.get(dependentName).firstEntry().getValue();
             classDefinition.getImports().add(firstDependentClass.getOtherImport(language()));
         }
 

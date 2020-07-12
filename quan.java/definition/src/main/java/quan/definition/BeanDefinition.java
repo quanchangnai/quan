@@ -1,9 +1,7 @@
 package quan.definition;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.MutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import quan.definition.DependentSource.DependentType;
 import quan.definition.config.ConfigDefinition;
 import quan.definition.data.DataDefinition;
@@ -112,13 +110,13 @@ public class BeanDefinition extends ClassDefinition {
 
     public String getParentClassName() {
         if (parentClassName == null) {
-            return getSimpleClassName(parentName);
+            return getShortClassName(parentName);
         }
         return parentClassName;
     }
 
     public String getWholeParentName() {
-        return getWholeClassName(this, parentName);
+        return getLongClassName(this, parentName);
     }
 
     public BeanDefinition getParent() {
@@ -197,7 +195,7 @@ public class BeanDefinition extends ClassDefinition {
         }
 
         parent.children.add(this);
-        parent.dependentChildren.put(this.getWholeName(), MutablePair.of(getName(), getName()));
+        parent.dependentChildren.put(this.getLongName(), MutablePair.of(getName(), getName()));
 
         Set<String> ancestors = new HashSet<>();
         while (parent != null) {
