@@ -1,11 +1,8 @@
 package quan.definition.message;
 
 import org.apache.commons.lang3.StringUtils;
-import quan.definition.BeanDefinition;
-import quan.definition.Category;
-import quan.definition.DependentSource;
+import quan.definition.*;
 import quan.definition.DependentSource.DependentType;
-import quan.definition.FieldDefinition;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +18,8 @@ public class MessageDefinition extends BeanDefinition {
 
     private int id;
 
+    private String partner;
+
     //消息所有字段，包含消息头
     private List<FieldDefinition> allFields = new ArrayList<>();
 
@@ -28,9 +27,12 @@ public class MessageDefinition extends BeanDefinition {
         category = Category.message;
     }
 
-    public MessageDefinition(String strId) {
+    public MessageDefinition(String strId, String partner) {
         if (!StringUtils.isBlank(strId)) {
             this.strId = strId.trim();
+        }
+        if (!StringUtils.isBlank(partner)) {
+            this.partner = partner.trim();
         }
     }
 
@@ -64,6 +66,8 @@ public class MessageDefinition extends BeanDefinition {
 
     @Override
     public void validate1() {
+        super.validate1();
+
         if (strId != null) {
             try {
                 id = Integer.parseInt(strId);
@@ -71,7 +75,17 @@ public class MessageDefinition extends BeanDefinition {
                 addValidatedError(getValidatedName("的") + "ID[" + strId + "]不合法");
             }
         }
-        super.validate1();
+
+        if (partner != null) {
+            ClassDefinition partnerClassDefinition = parser.getClass(ClassDefinition.getLongClassName(this, partner));
+            if (partnerClassDefinition == null) {
+                addValidatedError(getValidatedName("的") + "配对消息[" + partner + "]不存在");
+            } else if (!(partnerClassDefinition instanceof MessageDefinition)) {
+                addValidatedError(getValidatedName("的") + "配对[" + partner + "]不是消息类型");
+            } else if (partnerClassDefinition == this) {
+                addValidatedError(getValidatedName("的") + "配对消息不能是自己");
+            }
+        }
     }
 
     @Override
