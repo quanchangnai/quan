@@ -24,7 +24,7 @@ namespace ${getFullPackageName("cs")}
 		public override int Id => ${id?c};
 
 </#if>
-<#list fields as field>
+<#list selfFields as field>
     <#if field.type == "set" || field.type == "list">
         <#if field.comment !="">
         /// <summary>
@@ -131,7 +131,7 @@ namespace ${getFullPackageName("cs")}
 		{
 	    	base.Encode(buffer);
 
-<#list fields as field>
+<#list selfFields as field>
 	 <#if field.ignore>
         <#continue/>
 	<#elseif field.type=="set" || field.type=="list">
@@ -146,7 +146,7 @@ namespace ${getFullPackageName("cs")}
 				${field.name}Value.Encode(buffer);
 		</#if>
 		    }
-        <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || !fields[field_index+1].optional) >
+        <#if field_has_next && !selfFields[field_index+1].collectionType && (selfFields[field_index+1].primitiveType || !selfFields[field_index+1].optional) >
 
         </#if>
 	<#elseif field.type=="map">
@@ -162,7 +162,7 @@ namespace ${getFullPackageName("cs")}
 			    ${field.name?cap_first}[${field.name}Key].Encode(buffer);
 		</#if>
 		    }
-        <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || !fields[field_index+1].optional) >
+        <#if field_has_next && !selfFields[field_index+1].collectionType && (selfFields[field_index+1].primitiveType || !selfFields[field_index+1].optional) >
 
         </#if>
 	<#elseif field.type=="float"||field.type=="double">
@@ -177,7 +177,7 @@ namespace ${getFullPackageName("cs")}
         </#if>
 		    buffer.WriteBool(${field.name?cap_first} != null);
 		    ${field.name?cap_first}?.Encode(buffer);
-        <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || !fields[field_index+1].optional) >
+        <#if field_has_next && !selfFields[field_index+1].collectionType && (selfFields[field_index+1].primitiveType || !selfFields[field_index+1].optional) >
 
         </#if>
 	<#else>
@@ -190,7 +190,7 @@ namespace ${getFullPackageName("cs")}
 		{
 	    	base.Decode(buffer);
 
-<#list fields as field>
+<#list selfFields as field>
 	 <#if field.ignore>
         <#continue/>
 	<#elseif field.type=="set" || field.type=="list">
@@ -207,7 +207,7 @@ namespace ${getFullPackageName("cs")}
 			    ${field.name?cap_first}.Add(${field.name}Value);
 		</#if>
 		    }
-        <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || !fields[field_index+1].optional) >
+        <#if field_has_next && !selfFields[field_index+1].collectionType && (selfFields[field_index+1].primitiveType || !selfFields[field_index+1].optional) >
 
         </#if>
 	<#elseif field.type=="map">
@@ -225,7 +225,7 @@ namespace ${getFullPackageName("cs")}
 			    ${field.name?cap_first}.Add(${field.name}Key, ${field.name}Value);
 		</#if>
 		    }
-        <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || !fields[field_index+1].optional) >
+        <#if field_has_next && !selfFields[field_index+1].collectionType && (selfFields[field_index+1].primitiveType || !selfFields[field_index+1].optional) >
 
         </#if>
 	<#elseif field.type=="float"||field.type=="double">
@@ -244,7 +244,7 @@ namespace ${getFullPackageName("cs")}
 		        }
 		        ${field.name?cap_first}.Decode(buffer);
             }
-        <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || !fields[field_index+1].optional) >
+        <#if field_has_next && !selfFields[field_index+1].collectionType && (selfFields[field_index+1].primitiveType || !selfFields[field_index+1].optional) >
 
         </#if>
 	<#else>
@@ -253,13 +253,10 @@ namespace ${getFullPackageName("cs")}
 </#list>
 		}
 
-<#if !allFields??>
-	<#assign allFields = fields>
-</#if>
 		public override string ToString()
 		{
 			return "${name}{" +
-			<#list allFields as field>
+			<#list fields as field>
 					"<#rt>
 				<#if field_index gt 0>
 					<#lt>,<#rt>

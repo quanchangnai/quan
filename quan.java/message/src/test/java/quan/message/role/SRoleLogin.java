@@ -172,7 +172,7 @@ public class SRoleLogin extends MessageHeader {
         }
 
         buffer.writeInt(this.roleInfoMap.size());
-        for (long $roleInfoMap$Key : this.roleInfoMap.keySet()) {
+        for (Long $roleInfoMap$Key : this.roleInfoMap.keySet()) {
             buffer.writeLong($roleInfoMap$Key);
             this.roleInfoMap.get($roleInfoMap$Key).encode(buffer);
         }
@@ -207,7 +207,7 @@ public class SRoleLogin extends MessageHeader {
 
         int $roleInfoMap$Size = buffer.readInt();
         for (int i = 0; i < $roleInfoMap$Size; i++) {
-            long $roleInfoMap$Key = buffer.readLong();
+            Long $roleInfoMap$Key = buffer.readLong();
             RoleInfo $roleInfoMap$Value = new RoleInfo();
             $roleInfoMap$Value.decode(buffer);
             this.roleInfoMap.put($roleInfoMap$Key, $roleInfoMap$Value);

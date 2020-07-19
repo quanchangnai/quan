@@ -100,7 +100,7 @@ public class SimpleBuffer extends Buffer {
     }
 
     @Override
-    protected byte readByte() {
+    public byte readByte() {
         return bytes[readIndex++];
     }
 
@@ -110,6 +110,11 @@ public class SimpleBuffer extends Buffer {
         System.arraycopy(this.bytes, readIndex, bytes, 0, length);
         readIndex += length;
         return bytes;
+    }
+
+    @Override
+    protected void skipBytes(int length) {
+        readIndex += length;
     }
 
     @Override
@@ -133,7 +138,7 @@ public class SimpleBuffer extends Buffer {
     }
 
     @Override
-    protected void writeByte(byte b) {
+    public void writeByte(byte b) {
         bytes[writeIndex++] = b;
     }
 

@@ -4,9 +4,6 @@ import org.apache.commons.lang3.StringUtils;
 import quan.definition.*;
 import quan.definition.DependentSource.DependentType;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * 消息定义
  * Created by quanchangnai on 2017/7/6.
@@ -19,9 +16,6 @@ public class MessageDefinition extends BeanDefinition {
     private int id;
 
     private String partner;
-
-    //消息所有字段，包含消息头
-    private List<FieldDefinition> allFields = new ArrayList<>();
 
     {
         category = Category.message;
@@ -76,6 +70,10 @@ public class MessageDefinition extends BeanDefinition {
             }
         }
 
+        if (getHeader() != null) {
+            fields.addAll(0, getHeader().getFields());
+        }
+
         if (partner != null) {
             ClassDefinition partnerClassDefinition = parser.getClass(ClassDefinition.getLongClassName(this, partner));
             if (partnerClassDefinition == null) {
@@ -119,16 +117,6 @@ public class MessageDefinition extends BeanDefinition {
 
     public HeaderDefinition getHeader() {
         return parser.getMessageHeader();
-    }
-
-    public List<FieldDefinition> getAllFields() {
-        if (allFields.isEmpty()) {
-            if (getHeader() != null) {
-                allFields.addAll(getHeader().getFields());
-            }
-            allFields.addAll(getFields());
-        }
-        return allFields;
     }
 
 }

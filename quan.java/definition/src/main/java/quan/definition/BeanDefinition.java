@@ -4,9 +4,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.MutablePair;
 import quan.definition.DependentSource.DependentType;
 import quan.definition.config.ConfigDefinition;
-import quan.definition.data.DataDefinition;
-import quan.definition.message.HeaderDefinition;
-import quan.definition.message.MessageDefinition;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -42,6 +39,9 @@ public class BeanDefinition extends ClassDefinition {
     private String delimiter = "_";
 
     private String escapedDelimiter;
+
+    //消息的字段ID
+    private Set<Integer> fieldIds = new HashSet<>();
 
     public BeanDefinition() {
     }
@@ -158,6 +158,10 @@ public class BeanDefinition extends ClassDefinition {
     public void validate1() {
         super.validate1();
         validateDelimiter();
+
+        if (!fieldIds.isEmpty() && fieldIds.size() != fields.size()) {
+            addValidatedError(getValidatedName("的") + "所有字段必须要同时定义ID或者同时不定义ID");
+        }
     }
 
     @Override
@@ -236,6 +240,9 @@ public class BeanDefinition extends ClassDefinition {
 
         //校验字段依赖语言
         validateFieldBeanLanguage(field);
+
+        //校验消息的字段ID
+        validateFieldId(field);
     }
 
     protected void validateFieldType(FieldDefinition field) {
@@ -386,6 +393,29 @@ public class BeanDefinition extends ClassDefinition {
         }
     }
 
+    protected void validateFieldId(FieldDefinition field) {
+        if (category != Category.message || field.getId() == null) {
+            return;
+        }
+
+        int fieldId = -1;
+        try {
+            fieldId = Integer.parseInt(field.getId());
+        } catch (NumberFormatException e) {
+        }
+
+        if (fieldId < 1 || fieldId > 63) {
+            addValidatedError(getValidatedName("的") + "字段ID[" + field.getId() + "]必须是[1-63]的整数");
+        }
+
+        if (!fieldIds.add(fieldId)) {
+            addValidatedError(getValidatedName("的") + "字段ID[" + field.getId() + "]必须不能重复");
+        }
+    }
+
+    public boolean isDefinedFieldId() {
+        return !fieldIds.isEmpty();
+    }
 
     public String getDelimiter() {
         return delimiter;
@@ -519,16 +549,6 @@ public class BeanDefinition extends ClassDefinition {
             addValidatedError(getValidatedName() + field.getValidatedName() + "的引用字段[" + refConfigAndField + "]不是一级索引");
         }
 
-    }
-
-    public static boolean isBeanDefinition(ClassDefinition classDefinition) {
-        if (!(classDefinition instanceof BeanDefinition)) {
-            return false;
-        }
-        return !(classDefinition instanceof DataDefinition
-                || classDefinition instanceof MessageDefinition
-                || classDefinition instanceof HeaderDefinition
-                || classDefinition instanceof ConfigDefinition);
     }
 
 }

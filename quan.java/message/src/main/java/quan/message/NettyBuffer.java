@@ -56,7 +56,7 @@ public class NettyBuffer extends Buffer {
     }
 
     @Override
-    protected byte readByte() {
+    public byte readByte() {
         return buf.readByte();
     }
 
@@ -68,7 +68,12 @@ public class NettyBuffer extends Buffer {
     }
 
     @Override
-    protected void writeByte(byte b) {
+    protected void skipBytes(int length) {
+        buf.skipBytes(length);
+    }
+
+    @Override
+    public void writeByte(byte b) {
         buf.writeByte(b);
     }
 

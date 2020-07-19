@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import static quan.definition.ClassDefinition.getShortClassName;
 import static quan.definition.ClassDefinition.getLongClassName;
+import static quan.definition.ClassDefinition.getShortClassName;
 
 /**
  * 字段定义，被数据、消息和配置共用
@@ -45,6 +45,9 @@ public class FieldDefinition extends Definition implements Cloneable {
 
     //枚举值
     private String value;
+
+    //消息:字段ID
+    private String id;
 
     //消息:是否可选
     private boolean optional;
@@ -188,7 +191,7 @@ public class FieldDefinition extends Definition implements Cloneable {
 
     public BeanDefinition getBean() {
         ClassDefinition classDefinition = getClassDefinition();
-        if (BeanDefinition.isBeanDefinition(classDefinition)) {
+        if (classDefinition != null && classDefinition.getClass() == BeanDefinition.class) {
             return (BeanDefinition) classDefinition;
         }
         return null;
@@ -219,6 +222,33 @@ public class FieldDefinition extends Definition implements Cloneable {
 
     public boolean isOptional() {
         return optional;
+    }
+
+    public FieldDefinition setId(String id) {
+        if (!StringUtils.isBlank(id)) {
+            this.id = id;
+        }
+        return this;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    //消息tag
+    public int getTag() {
+        int tag;
+        if (type.equals("float")) {
+            tag = Integer.parseInt(id) << 2;
+        } else if (type.equals("double")) {
+            tag = Integer.parseInt(id) << 2 | 1;
+        } else if (type.equals("bool") || type.equals("short") || type.equals("int") || type.equals("long") || isEnumType()) {
+            tag = Integer.parseInt(id) << 2 | 2;
+        } else {
+            //bytes、string、set、list、map、bean
+            tag = Integer.parseInt(id) << 2 | 3;
+        }
+        return tag;
     }
 
     public FieldDefinition setOptional(String optional) {
@@ -280,7 +310,7 @@ public class FieldDefinition extends Definition implements Cloneable {
             return null;
         }
         ClassDefinition classDefinition = parser.getClass(getLongClassName(owner, getValueType()));
-        if (BeanDefinition.isBeanDefinition(classDefinition)) {
+        if (classDefinition != null && classDefinition.getClass() == BeanDefinition.class) {
             return (BeanDefinition) classDefinition;
         }
         return null;

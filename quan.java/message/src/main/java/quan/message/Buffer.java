@@ -80,19 +80,9 @@ public abstract class Buffer {
     /**
      * 实际读一个字节
      */
-    protected abstract byte readByte();
+    public abstract byte readByte();
 
-    public byte[] readBytes() throws IOException {
-        int length = readInt();
-        int readable = readableCount();
-        if (length > readableCount()) {
-            throw new IOException(String.format("读数据出错，希望读%d字节,实际剩余%d字节", length, readable));
-        }
-
-        return readBytes(length);
-    }
-
-    protected abstract byte[] readBytes(int length);
+    protected abstract void skipBytes(int length);
 
     public boolean readBool() throws IOException {
         return readInt() != 0;
@@ -156,6 +146,28 @@ public abstract class Buffer {
         }
     }
 
+    public byte[] readBytes() throws IOException {
+        int length = readInt();
+        int readable = readableCount();
+        if (length > readableCount()) {
+            throw new IOException(String.format("读数据出错，希望读%d字节,实际剩余%d字节", length, readable));
+        }
+
+        return readBytes(length);
+    }
+
+    protected abstract byte[] readBytes(int length);
+
+    public void skipBytes() throws IOException {
+        int length = readInt();
+        int readable = readableCount();
+        if (length > readableCount()) {
+            throw new IOException(String.format("读数据出错，希望跳过%d字节,实际剩余%d字节", length, readable));
+        }
+
+        skipBytes(length);
+    }
+
     public String readString() throws IOException {
         return new String(readBytes(), StandardCharsets.UTF_8);
     }
@@ -189,11 +201,7 @@ public abstract class Buffer {
     /**
      * 实际写一个字节
      */
-    protected abstract void writeByte(byte b);
-
-
-    public abstract void writeBytes(byte[] bytes);
-
+    public abstract void writeByte(byte b);
 
     public void writeBool(boolean b) {
         writeInt(b ? 1 : 0);
@@ -268,6 +276,12 @@ public abstract class Buffer {
         writeLong(lon);
     }
 
+    public abstract void writeBytes(byte[] bytes);
+
+    public void writeBuffer(Buffer buffer) {
+        writeInt(buffer.readableCount());
+        writeBytes(buffer.remainingBytes());
+    }
 
     public void writeString(String s) {
         writeBytes(s.getBytes(StandardCharsets.UTF_8));

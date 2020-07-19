@@ -18,9 +18,6 @@ local ${name} = {
     id = ${id?c}
 </#if>
 }
-<#if !allFields??>
-    <#assign allFields = fields>
-</#if>
 
 local function onSet(self, key, value)
     assert(not ${name}[key], "不允许修改只读属性:" .. key)
@@ -29,7 +26,7 @@ end
 
 local function toString(self)
     return "${name}{" ..
-    <#list allFields as field>
+    <#list fields as field>
             "<#rt>
         <#if field_index gt 0>
              <#lt>,<#rt>
@@ -57,7 +54,7 @@ function ${name}.new(args)
     args = args or {}
 
     local instance = {
-<#list allFields as field>
+<#list fields as field>
     <#if field.comment !="">
         ---${field.comment}
     </#if>
@@ -102,7 +99,7 @@ function ${name}:encode(buffer)
     buffer = buffer or Buffer.new()
 
 </#if>
-<#list allFields as field>
+<#list fields as field>
     <#if field.ignore>
         <#continue/>
     <#elseif field.type=="set" || field.type=="list">
@@ -117,7 +114,7 @@ function ${name}:encode(buffer)
         ${field.valueType}.encode(value, buffer)
         </#if>
     end
-    <#if field_has_next && !allFields[field_index+1].collectionType && (allFields[field_index+1].primitiveType || allFields[field_index+1].enumType || !allFields[field_index+1].optional) >
+    <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || fields[field_index+1].enumType || !fields[field_index+1].optional) >
 
     </#if>
     <#elseif field.type=="map">
@@ -133,7 +130,7 @@ function ${name}:encode(buffer)
         ${field.valueType}.encode(value, buffer)
         </#if>
     end
-    <#if field_has_next && !allFields[field_index+1].collectionType && (allFields[field_index+1].primitiveType || allFields[field_index+1].enumType || !allFields[field_index+1].optional) >
+    <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || fields[field_index+1].enumType || !fields[field_index+1].optional) >
 
     </#if>
     <#elseif field.type=="float"||field.type=="double">
@@ -150,7 +147,7 @@ function ${name}:encode(buffer)
     if self.${field.name} ~= nil then
         ${field.classType}.encode(self.${field.name}, buffer)
     end
-    <#if field_has_next && !allFields[field_index+1].collectionType && (allFields[field_index+1].primitiveType || allFields[field_index+1].enumType || !allFields[field_index+1].optional) >
+    <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || fields[field_index+1].enumType || !fields[field_index+1].optional) >
 
     </#if>
     <#else>
@@ -184,7 +181,7 @@ function ${name}.decode(buffer, self)
     self = self or ${name}.new()
 
 </#if>
-<#list allFields as field>
+<#list fields as field>
     <#if field.ignore>
         <#continue/>
     <#elseif field.type=="set" || field.type=="list">
@@ -198,7 +195,7 @@ function ${name}.decode(buffer, self)
         self.${field.name}[i] = ${field.valueType}.decode(buffer)
         </#if>
     end
-    <#if field_has_next && !allFields[field_index+1].collectionType && (allFields[field_index+1].primitiveType || allFields[field_index+1].enumType || !allFields[field_index+1].optional) >
+    <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || fields[field_index+1].enumType || !fields[field_index+1].optional) >
 
     </#if>
     <#elseif field.type=="map">
@@ -212,7 +209,7 @@ function ${name}.decode(buffer, self)
         self.${field.name}[buffer:read${field.keyType?cap_first}()] = ${field.valueType}.decode(buffer)
         </#if>
     end
-    <#if field_has_next && !allFields[field_index+1].collectionType && (allFields[field_index+1].primitiveType || allFields[field_index+1].enumType || !allFields[field_index+1].optional) >
+    <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || fields[field_index+1].enumType || !fields[field_index+1].optional) >
 
     </#if>
     <#elseif field.type=="float"||field.type=="double">
@@ -228,7 +225,7 @@ function ${name}.decode(buffer, self)
     if buffer:readBool() then
         self.${field.name} = ${field.classType}.decode(buffer)
     end
-    <#if field_has_next && !allFields[field_index+1].collectionType && (allFields[field_index+1].primitiveType || allFields[field_index+1].enumType || !allFields[field_index+1].optional) >
+    <#if field_has_next && !fields[field_index+1].collectionType && (fields[field_index+1].primitiveType || fields[field_index+1].enumType || !fields[field_index+1].optional) >
 
     </#if>
     <#else>

@@ -160,12 +160,12 @@ public class RoleInfo extends Bean {
         buffer.writeBytes(this.data);
 
         buffer.writeInt(this.list.size());
-        for (int $list$Value : this.list) {
+        for (Integer $list$Value : this.list) {
             buffer.writeInt($list$Value);
         }
 
         buffer.writeInt(this.set.size());
-        for (int $set$Value : this.set) {
+        for (Integer $set$Value : this.set) {
             buffer.writeInt($set$Value);
         }
     }
