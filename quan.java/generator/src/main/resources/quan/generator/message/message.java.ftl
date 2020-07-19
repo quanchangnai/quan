@@ -255,6 +255,63 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
     public void decode(Buffer buffer) throws IOException {
         super.decode(buffer);
 
+<#if definedFieldId>
+        for (int tag = buffer.readInt(); tag != 0; tag = buffer.readInt()) {
+            switch (tag) {
+            <#list selfFields as field>
+                <#if field.ignore>
+                    <#continue/>
+                </#if>
+                case ${field.tag}:
+                <#if field.type=="set" || field.type=="list">
+                    buffer.readInt();
+                    int $${field.name}$Size = buffer.readInt();
+                    for (int i = 0; i < $${field.name}$Size; i++) {     
+                    <#if field.builtinValueType>
+                        this.${field.name}.add(buffer.read${field.valueType?cap_first}());
+                    <#else>
+                        ${field.classValueType} $${field.name}$Value = new ${field.classValueType}();
+                        $${field.name}$Value.decode(buffer);
+                        this.${field.name}.add($${field.name}$Value);
+                    </#if>
+                    }
+                <#elseif field.type=="map">
+                    buffer.readInt();
+                    int $${field.name}$Size = buffer.readInt();
+                    for (int i = 0; i < $${field.name}$Size; i++) {
+                    <#if field.builtinValueType>
+                        this.${field.name}.put(buffer.read${field.keyType?cap_first}(), buffer.read${field.valueType?cap_first}());
+                    <#else>
+                        ${field.classKeyType} $${field.name}$Key = buffer.read${field.keyType?cap_first}();
+                        ${field.classValueType} $${field.name}$Value = new ${field.classValueType}();
+                        $${field.name}$Value.decode(buffer);
+                        this.${field.name}.put($${field.name}$Key, $${field.name}$Value);
+                    </#if>
+                    }
+                <#elseif field.type=="float"||field.type=="double">
+                    this.${field.name} = buffer.read${field.type?cap_first}(<#if field.scale gt 0>${field.scale}</#if>);
+                <#elseif field.builtinType>
+                    this.${field.name} = buffer.read${field.type?cap_first}();
+                <#elseif field.enumType>
+                    this.${field.name} = ${field.type}.valueOf(buffer.readInt());
+                <#elseif field.optional>
+                    buffer.readInt();
+                    if (buffer.readBool()) {
+                    if (this.${field.name} == null) {
+                        this.${field.name} = new ${field.classType}();
+                    }
+                    this.${field.name}.decode(buffer);
+            }
+            <#else>
+                    buffer.readInt();
+                    this.${field.name}.decode(buffer);
+            </#if>
+        </#list>
+                default:
+                    buffer.skipBytes();
+            }
+        }
+<#else>
 <#list selfFields as field>
     <#if field.ignore>
         <#continue/>
@@ -316,6 +373,7 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
         this.${field.name}.decode(buffer);
     </#if>
 </#list>
+</#if>
     }
 
     @Override
