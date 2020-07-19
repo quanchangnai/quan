@@ -21,14 +21,18 @@ public class MessageTest {
 
     @Test
     public void test() {
-        for (int a = 0; a < 64; a++) {
-            for (int k = 0; k < 4; k++) {
-                byte b = (byte) (a << 2 | k);
-                System.err.println(a + ":0b" + Integer.toBinaryString(a));
-                System.err.println(b + ":0b" + Integer.toBinaryString(b));
-                System.err.println();
-            }
-        }
+        int tag = 32 << 2 | 3;
+        System.err.println(Integer.toBinaryString(tag));
+        System.err.println(tag & 3);
+
+//        for (int a = 0; a < 64; a++) {
+//            for (int k = 0; k < 4; k++) {
+//                byte b = (byte) (a << 2 | k);
+//                System.err.println(a + ":0b" + Integer.toBinaryString(a));
+//                System.err.println(b + ":0b" + Integer.toBinaryString(b));
+//                System.err.println();
+//            }
+//        }
     }
 
     @Test

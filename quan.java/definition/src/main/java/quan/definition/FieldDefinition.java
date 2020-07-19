@@ -248,6 +248,7 @@ public class FieldDefinition extends Definition implements Cloneable {
             //bytes、string、set、list、map、bean
             tag = Integer.parseInt(id) << 2 | 3;
         }
+
         return tag;
     }
 

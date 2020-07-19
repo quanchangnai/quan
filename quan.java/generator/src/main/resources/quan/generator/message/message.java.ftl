@@ -308,7 +308,7 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
             </#if>
         </#list>
                 default:
-                    buffer.skipBytes();
+                    skipField(tag, buffer);
             }
         }
 <#else>

@@ -23,4 +23,20 @@ public abstract class Bean {
     public void decode(Buffer buffer) throws IOException {
     }
 
+    protected void skipField(int tag, Buffer buffer) throws IOException {
+        switch (tag & 0b11) {
+            case 0:
+                buffer.readFloat();
+                break;
+            case 1:
+                buffer.readDouble();
+                break;
+            case 2:
+                buffer.readLong();
+                break;
+            case 3:
+                buffer.skipBytes();
+                break;
+        }
+    }
 }
