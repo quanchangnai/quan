@@ -161,9 +161,9 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
         }
         buffer.writeBuffer($${field.name}$Buffer);
         <#else>
-         <#if field_index gt 0>
+            <#if field_index gt 0>
 
-        </#if>
+            </#if>
         buffer.writeInt(this.${field.name}.size());
         for (${field.classValueType} $${field.name}$Value : this.${field.name}) {
             <#if field.builtinValueType>
@@ -172,9 +172,9 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
             $${field.name}$Value.encode(buffer);
             </#if>
         }
-        <#if field_has_next && !selfFields[field_index+1].collectionType && (selfFields[field_index+1].primitiveType|| selfFields[field_index+1].enumType || !selfFields[field_index+1].optional) >
+            <#if field_has_next && !selfFields[field_index+1].collectionType && (selfFields[field_index+1].primitiveType|| selfFields[field_index+1].enumType || !selfFields[field_index+1].optional) >
 
-        </#if>
+            </#if>
         </#if>
     <#elseif field.type=="map">
         <#if definedFieldId>
@@ -190,9 +190,9 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
         }
         buffer.writeBuffer($${field.name}$Buffer);
         <#else>
-        <#if field_index gt 0>
+            <#if field_index gt 0>
 
-        </#if>
+            </#if>
         buffer.writeInt(this.${field.name}.size());
         for (${field.classKeyType} $${field.name}$Key : this.${field.name}.keySet()) {
             buffer.write${field.keyType?cap_first}($${field.name}$Key);
@@ -202,9 +202,9 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
             this.${field.name}.get($${field.name}$Key).encode(buffer);
             </#if>
         }
-        <#if field_has_next && !selfFields[field_index+1].collectionType && (selfFields[field_index+1].primitiveType|| selfFields[field_index+1].enumType || !selfFields[field_index+1].optional) >
+            <#if field_has_next && !selfFields[field_index+1].collectionType && (selfFields[field_index+1].primitiveType|| selfFields[field_index+1].enumType || !selfFields[field_index+1].optional) >
 
-        </#if>
+            </#if>
         </#if>
     <#elseif field.type=="float"||field.type=="double">
         buffer.write${field.type?cap_first}(this.${field.name}<#if field.scale gt 0>, ${field.scale}</#if>);
@@ -222,16 +222,16 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
         }
         buffer.writeBuffer($${field.name}$Buffer);
         <#else>
-        <#if field_index gt 0>
+            <#if field_index gt 0>
 
-        </#if>
+            </#if>
         buffer.writeBool(this.${field.name} != null);
         if (this.${field.name} != null) {
             this.${field.name}.encode(buffer);
         }
-        <#if field_has_next && !selfFields[field_index+1].collectionType && (selfFields[field_index+1].primitiveType || selfFields[field_index+1].enumType || !selfFields[field_index+1].optional) >
+            <#if field_has_next && !selfFields[field_index+1].collectionType && (selfFields[field_index+1].primitiveType || selfFields[field_index+1].enumType || !selfFields[field_index+1].optional) >
 
-        </#if>
+            </#if>
         </#if>
     <#else>
         <#if definedFieldId>
@@ -247,7 +247,7 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
     </#if>
 </#list>
 <#if definedFieldId>
-        buffer.writeInt(0);
+        buffer.writeTag(0);
 </#if>
     }
 

@@ -78,7 +78,7 @@ public class UserInfo extends Bean {
         buffer.writeTag(12);
         buffer.writeInt(this.level);
 
-        buffer.writeInt(0);
+        buffer.writeTag(0);
     }
 
     @Override

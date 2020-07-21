@@ -109,21 +109,24 @@ namespace Test.Message.Role
 		    RoleInfo.Decode(buffer);
 
 		    var roleInfoListSize = buffer.ReadInt();
-		    for (var i = 0; i < roleInfoListSize; i++) {
+		    for (var i = 0; i < roleInfoListSize; i++) 
+			{
 			    var roleInfoListValue = new RoleInfo();
 			  	roleInfoListValue.Decode(buffer);
 			    RoleInfoList.Add(roleInfoListValue);
 		    }
 
 		    var roleInfoSetSize = buffer.ReadInt();
-		    for (var i = 0; i < roleInfoSetSize; i++) {
+		    for (var i = 0; i < roleInfoSetSize; i++) 
+			{
 			    var roleInfoSetValue = new RoleInfo();
 			  	roleInfoSetValue.Decode(buffer);
 			    RoleInfoSet.Add(roleInfoSetValue);
 		    }
 
 		    var roleInfoMapSize = buffer.ReadInt();
-		    for (var i = 0; i < roleInfoMapSize; i++) {
+		    for (var i = 0; i < roleInfoMapSize; i++) 
+			{
 			    var roleInfoMapKey = buffer.ReadLong();
 			    var roleInfoMapValue = new RoleInfo();
 				roleInfoMapValue.Decode(buffer);
@@ -131,7 +134,8 @@ namespace Test.Message.Role
 		    }
 
 		    if (buffer.ReadBool()) {
-		        if (UserInfo == null) {
+		        if (UserInfo == null) 
+				{
 		            UserInfo = new UserInfo();
 		        }
 		        UserInfo.Decode(buffer);
@@ -141,16 +145,16 @@ namespace Test.Message.Role
 		public override string ToString()
 		{
 			return "CRoleLogin{" +
-					"seq=" + Seq.ToString2() +
-					",error=" + Error.ToString2() +
-					",roleId=" + RoleId.ToString2() +
-					",roleName='" + RoleName + '\'' +
-					",roleInfo=" + RoleInfo.ToString2() +
-					",roleInfoList=" + RoleInfoList.ToString2() +
-					",roleInfoSet=" + RoleInfoSet.ToString2() +
-					",roleInfoMap=" + RoleInfoMap.ToString2() +
-					",userInfo=" + UserInfo.ToString2() +
-					'}';
+				   "seq=" + Seq.ToString2() +
+				   ",error=" + Error.ToString2() +
+				   ",roleId=" + RoleId.ToString2() +
+				   ",roleName='" + RoleName + '\'' +
+				   ",roleInfo=" + RoleInfo.ToString2() +
+				   ",roleInfoList=" + RoleInfoList.ToString2() +
+				   ",roleInfoSet=" + RoleInfoSet.ToString2() +
+				   ",roleInfoMap=" + RoleInfoMap.ToString2() +
+				   ",userInfo=" + UserInfo.ToString2() +
+				   '}';
 		}
     }
 }

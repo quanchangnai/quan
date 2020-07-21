@@ -37,27 +37,49 @@ namespace Test.Message.User
 		{
 	    	base.Encode(buffer);
 
+        	buffer.WriteTag(4);
 		    buffer.WriteLong(Id);
+
+        	buffer.WriteTag(11);
 		    buffer.WriteString(Name);
+
+        	buffer.WriteTag(12);
 		    buffer.WriteInt(Level);
+
+        	buffer.WriteTag(0);
 		}
 
 		public override void Decode(Buffer buffer)
 		{
 	    	base.Decode(buffer);
 
-		    Id = buffer.ReadLong();
-		    Name = buffer.ReadString();
-		    Level = buffer.ReadInt();
+			for (var tag = buffer.ReadTag(); tag != 0; tag = buffer.ReadTag()) 
+			{
+            	switch (tag) 
+				{
+                	case 4:
+                    	Id = buffer.ReadLong();
+                    	break;
+                	case 11:
+                    	Name = buffer.ReadString();
+                    	break;
+                	case 12:
+                    	Level = buffer.ReadInt();
+                    	break;
+                	default:
+                   	 	SkipField(tag, buffer);
+						break;
+            	}
+        	}
 		}
 
 		public override string ToString()
 		{
 			return "UserInfo{" +
-					"id=" + Id.ToString2() +
-					",name='" + Name + '\'' +
-					",level=" + Level.ToString2() +
-					'}';
+				   "id=" + Id.ToString2() +
+				   ",name='" + Name + '\'' +
+				   ",level=" + Level.ToString2() +
+				   '}';
 		}
     }
 }

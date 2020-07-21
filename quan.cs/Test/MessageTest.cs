@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Threading;
 using Quan.Message;
 using Test.Message.Role;
+using Test.Message.User;
 using Buffer = Quan.Message.Buffer;
 
 namespace Test
@@ -37,7 +38,7 @@ namespace Test
 
             Console.WriteLine("buffer.ReadableCount:{0}", buffer.ReadableCount);
 
-            var fileStream = File.Open("E:\\buffer", FileMode.Open);
+            var fileStream = File.Open("D:\\buffer", FileMode.Open);
             var bytes = new byte[fileStream.Length];
             fileStream.Read(bytes, 0, bytes.Length);
             Console.WriteLine($"bytes.Length={bytes.Length}");
@@ -77,10 +78,10 @@ namespace Test
 
             var encodedBytes = sRoleLogin1.Encode();
 
-            var fileStream = File.Open("E:\\SRoleLogin", FileMode.Open);
-//            encodedBytes = new byte[fileStream.Length];
-//            fileStream.Read(encodedBytes, 0, encodedBytes.Length);
-//            fileStream.Write(encodedBytes, 0, encodedBytes.Length);
+            // var fileStream = File.Open("D:\\SRoleLogin", FileMode.Open);
+            // encodedBytes = new byte[fileStream.Length];
+            // fileStream.Read(encodedBytes, 0, encodedBytes.Length);
+            // fileStream.Write(encodedBytes, 0, encodedBytes.Length);
 
             Console.WriteLine("encodedBytes.Length:{0}", encodedBytes.Length);
 
@@ -88,7 +89,7 @@ namespace Test
             sRoleLogin2.Decode(encodedBytes);
 
             Console.WriteLine("sRoleLogin2:" + sRoleLogin2);
-//            Console.WriteLine("sRoleLogin2.Seq:" + sRoleLogin2.Seq);
+            // Console.WriteLine("sRoleLogin2.Seq:" + sRoleLogin2.Seq);
         }
 
         public static void Test3()
@@ -100,6 +101,18 @@ namespace Test
         }
 
         public static void Test4()
+        {
+            Console.WriteLine("Test4====================");
+            var fileStream = File.Open("D:\\UserInfo", FileMode.Open);
+            var bytes = new byte[fileStream.Length];
+            fileStream.Read(bytes, 0, bytes.Length);
+            Console.WriteLine($"bytes.Length={bytes.Length}");
+            var userInfo = new UserInfo();
+            userInfo.Decode(bytes);
+            Console.WriteLine($"userInfo:{userInfo}");
+        }
+
+        public static void Test5()
         {
             Console.WriteLine("Test4====================");
 

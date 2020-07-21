@@ -142,9 +142,9 @@ public class MessageTest {
 
         System.err.println("encodedBytes.length:" + encodedBytes.length);
 
-//        FileOutputStream fileOutputStream = new FileOutputStream(new File("D:\\UserInfo"));
-//        fileOutputStream.write(encodedBytes);
-//        fileOutputStream.close();
+        FileOutputStream fileOutputStream = new FileOutputStream(new File("D:\\UserInfo"));
+        fileOutputStream.write(encodedBytes);
+        fileOutputStream.close();
 
         FileInputStream fileInputStream = new FileInputStream(new File("D:\\UserInfo"));
         encodedBytes = new byte[fileInputStream.available()];

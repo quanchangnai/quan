@@ -146,9 +146,9 @@ public abstract class Buffer {
 
     public byte[] readBytes() throws IOException {
         int length = readInt();
-        int readable = readableCount();
-        if (length > readableCount()) {
-            throw new IOException(String.format("读数据出错，希望读%d字节,实际剩余%d字节", length, readable));
+        int readableCount = readableCount();
+        if (length > readableCount) {
+            throw new IOException(String.format("读数据出错，希望读%d字节,实际剩余%d字节", length, readableCount));
         }
 
         return readBytes(length);
@@ -158,9 +158,9 @@ public abstract class Buffer {
 
     public void skipBytes() throws IOException {
         int length = readInt();
-        int readable = readableCount();
-        if (length > readableCount()) {
-            throw new IOException(String.format("读数据出错，希望跳过%d字节,实际剩余%d字节", length, readable));
+        int readableCount = readableCount();
+        if (length > readableCount) {
+            throw new IOException(String.format("读数据出错，希望跳过%d字节,实际剩余%d字节", length, readableCount));
         }
 
         skipBytes(length);

@@ -105,12 +105,14 @@ namespace Test.Message.Role
 		    Data = buffer.ReadBytes();
 
 		    var listSize = buffer.ReadInt();
-		    for (var i = 0; i < listSize; i++) {
+		    for (var i = 0; i < listSize; i++) 
+			{
 			    List.Add(buffer.ReadInt());
 		    }
 
 		    var setSize = buffer.ReadInt();
-		    for (var i = 0; i < setSize; i++) {
+		    for (var i = 0; i < setSize; i++) 
+			{
 			    Set.Add(buffer.ReadInt());
 		    }
 		}
@@ -118,19 +120,19 @@ namespace Test.Message.Role
 		public override string ToString()
 		{
 			return "RoleInfo{" +
-					"id=" + Id.ToString2() +
-					",name='" + Name + '\'' +
-					",type=" + Type.ToString2() +
-					",b=" + B.ToString2() +
-					",s=" + S.ToString2() +
-					",i=" + I.ToString2() +
-					",f=" + F.ToString2() +
-					",d=" + D.ToString2() +
-					",data=" + Data.ToString2() +
-					",list=" + List.ToString2() +
-					",set=" + Set.ToString2() +
-					",map=" + Map.ToString2() +
-					'}';
+				   "id=" + Id.ToString2() +
+				   ",name='" + Name + '\'' +
+				   ",type=" + Type.ToString2() +
+				   ",b=" + B.ToString2() +
+				   ",s=" + S.ToString2() +
+				   ",i=" + I.ToString2() +
+				   ",f=" + F.ToString2() +
+				   ",d=" + D.ToString2() +
+				   ",data=" + Data.ToString2() +
+				   ",list=" + List.ToString2() +
+				   ",set=" + Set.ToString2() +
+				   ",map=" + Map.ToString2() +
+				   '}';
 		}
     }
 }

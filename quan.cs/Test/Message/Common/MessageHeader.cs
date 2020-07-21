@@ -42,9 +42,9 @@ namespace Test.Message.Common
 		public override string ToString()
 		{
 			return "MessageHeader{" +
-					"seq=" + Seq.ToString2() +
-					",error=" + Error.ToString2() +
-					'}';
+				   "seq=" + Seq.ToString2() +
+				   ",error=" + Error.ToString2() +
+				   '}';
 		}
     }
 }

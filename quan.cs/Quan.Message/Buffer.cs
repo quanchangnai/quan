@@ -131,20 +131,6 @@ namespace Quan.Message
             throw new IOException("读数据出错");
         }
 
-        public byte[] ReadBytes()
-        {
-            var length = ReadInt();
-            if (length > ReadableCount)
-            {
-                throw new IOException("读数据出错");
-            }
-
-            var bytes = new byte[length];
-            Array.Copy(_bytes, _readIndex, bytes, 0, length);
-            _readIndex += length;
-            return bytes;
-        }
-
         public bool ReadBool()
         {
             return ReadInt() != 0;
@@ -225,6 +211,31 @@ namespace Quan.Message
             return ReadLong() / Math.Pow(10, scale);
         }
 
+        public byte[] ReadBytes()
+        {
+            var length = ReadInt();
+            if (length > ReadableCount)
+            {
+                throw new IOException($"读数据出错，希望读{length}字节,实际剩余{ReadableCount}字节");
+            }
+
+            var bytes = new byte[length];
+            Array.Copy(_bytes, _readIndex, bytes, 0, length);
+            _readIndex += length;
+            return bytes;
+        }
+
+        public void SkipBytes()
+        {
+            var length = ReadInt();
+            if (length > ReadableCount)
+            {
+                throw new IOException($"读数据出错,希望跳过{length}字节,实际剩余{ReadableCount}字节");
+            }
+
+            _readIndex += length;
+        }
+
         public string ReadString()
         {
             return System.Text.Encoding.UTF8.GetString(ReadBytes());
@@ -269,14 +280,6 @@ namespace Quan.Message
                 _bytes[_writeIndex++] = (byte) (n & 0b1111111 | 0b10000000);
                 n >>= 7;
             }
-        }
-
-        public void WriteBytes(byte[] bytes)
-        {
-            OnWrite(10 + bytes.Length);
-            WriteInt(bytes.Length);
-            Array.Copy(bytes, 0, _bytes, _writeIndex, bytes.Length);
-            _writeIndex += bytes.Length;
         }
 
         public void WriteBool(bool b)
@@ -369,9 +372,33 @@ namespace Quan.Message
             }
         }
 
+        public void WriteBytes(byte[] bytes)
+        {
+            OnWrite(10 + bytes.Length);
+            WriteInt(bytes.Length);
+            Array.Copy(bytes, 0, _bytes, _writeIndex, bytes.Length);
+            _writeIndex += bytes.Length;
+        }
+
+        public void WriteBuffer(Buffer buffer)
+        {
+            WriteInt(buffer.ReadableCount);
+            WriteBytes(buffer.RemainingBytes());
+        }
+
         public void WriteString(string s)
         {
             WriteBytes(System.Text.Encoding.UTF8.GetBytes(s));
+        }
+
+        public void WriteTag(int tag)
+        {
+            _bytes[_writeIndex++] = (byte) tag;
+        }
+
+        public int ReadTag()
+        {
+            return _bytes[_readIndex++] & 0b11111111;
         }
     }
 }

@@ -22,5 +22,24 @@ namespace Quan.Message
         public virtual void Decode(Buffer buffer)
         {
         }
+
+        protected void SkipField(int tag, Buffer buffer)
+        {
+            switch (tag & 0b11)
+            {
+                case 0:
+                    buffer.ReadLong();
+                    break;
+                case 1:
+                    buffer.ReadFloat();
+                    break;
+                case 2:
+                    buffer.ReadDouble();
+                    break;
+                case 3:
+                    buffer.SkipBytes();
+                    break;
+            }
+        }
     }
 }
