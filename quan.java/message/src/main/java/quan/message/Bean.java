@@ -26,13 +26,13 @@ public abstract class Bean {
     protected void skipField(int tag, Buffer buffer) throws IOException {
         switch (tag & 0b11) {
             case 0:
-                buffer.readFloat();
+                buffer.readLong();
                 break;
             case 1:
-                buffer.readDouble();
+                buffer.readFloat();
                 break;
             case 2:
-                buffer.readLong();
+                buffer.readDouble();
                 break;
             case 3:
                 buffer.skipBytes();

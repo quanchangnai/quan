@@ -237,19 +237,18 @@ public class FieldDefinition extends Definition implements Cloneable {
 
     //消息tag
     public int getTag() {
-        int tag;
-        if (type.equals("float")) {
-            tag = Integer.parseInt(id) << 2;
+        int t;
+        if (type.equals("bool") || type.equals("short") || type.equals("int") || type.equals("long") || isEnumType() || scale >= 0) {
+            t = 0;
+        } else if (type.equals("float")) {
+            t = 1;
         } else if (type.equals("double")) {
-            tag = Integer.parseInt(id) << 2 | 1;
-        } else if (type.equals("bool") || type.equals("short") || type.equals("int") || type.equals("long") || isEnumType()) {
-            tag = Integer.parseInt(id) << 2 | 2;
+            t = 2;
         } else {
             //bytes、string、set、list、map、bean
-            tag = Integer.parseInt(id) << 2 | 3;
+            t = 3;
         }
-
-        return tag;
+        return Integer.parseInt(id) << 2 | t;
     }
 
     public FieldDefinition setOptional(String optional) {

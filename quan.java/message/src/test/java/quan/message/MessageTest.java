@@ -4,9 +4,11 @@ import org.junit.Test;
 import quan.message.role.RoleInfo;
 import quan.message.role.RoleType;
 import quan.message.role.SRoleLogin;
+import quan.message.user.UserInfo;
 
-import java.nio.ByteBuffer;
-import java.util.Arrays;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 
 /**
  * Created by quanchangnai on 2019/6/23.
@@ -21,18 +23,7 @@ public class MessageTest {
 
     @Test
     public void test() {
-        int tag = 32 << 2 | 3;
-        System.err.println(Integer.toBinaryString(tag));
-        System.err.println(tag & 3);
 
-//        for (int a = 0; a < 64; a++) {
-//            for (int k = 0; k < 4; k++) {
-//                byte b = (byte) (a << 2 | k);
-//                System.err.println(a + ":0b" + Integer.toBinaryString(a));
-//                System.err.println(b + ":0b" + Integer.toBinaryString(b));
-//                System.err.println();
-//            }
-//        }
     }
 
     @Test
@@ -54,7 +45,7 @@ public class MessageTest {
 
         System.err.println("buffer.readableCount()=" + buffer.readableCount());
 
-//        FileInputStream fileInputStream = new FileInputStream(new File("E:\\buffer"));
+//        FileInputStream fileInputStream = new FileInputStream(new File("D:\\buffer"));
 //        byte[] bytes = new byte[fileInputStream.available()];
 //        fileInputStream.read(bytes);
 //        System.err.println("bytes.length=" + bytes.length);
@@ -104,13 +95,22 @@ public class MessageTest {
         sRoleLogin1.getRoleInfoSet().add(roleInfo2);
         sRoleLogin1.getRoleInfoMap().put(roleInfo2.getId(), roleInfo2);
 
+        UserInfo userInfo = new UserInfo();
+        userInfo.setId(1);
+        userInfo.setLevel(2);
+        userInfo.setName("addadas");
+        sRoleLogin1.setUserInfo(userInfo);
+
         System.err.println("sRoleLogin1:" + sRoleLogin1);
 
         byte[] encodedBytes = sRoleLogin1.encode();
 
-//        FileInputStream fileInputStream = new FileInputStream(new File("E:\\SRoleLogin"));
-//        encodedBytes = new byte[fileInputStream.available()];
-//        fileInputStream.read(encodedBytes);
+        FileOutputStream fileOutputStream = new FileOutputStream(new File("D:\\SRoleLogin"));
+        fileOutputStream.write(encodedBytes);
+
+        FileInputStream fileInputStream = new FileInputStream(new File("D:\\SRoleLogin"));
+        encodedBytes = new byte[fileInputStream.available()];
+        fileInputStream.read(encodedBytes);
 
         System.err.println("encodedBytes.length:" + encodedBytes.length);
 
@@ -128,15 +128,34 @@ public class MessageTest {
     }
 
     @Test
-    public void test3() {
+    public void test3() throws Exception {
         System.err.println("test3=============================");
-        ByteBuffer buffer = ByteBuffer.allocate(4);
-        buffer.putInt(42);
-        buffer.flip();
-        byte[] bytes = new byte[buffer.remaining()];
-        buffer.get(bytes);
 
-        System.err.println(Arrays.toString(bytes));
+        UserInfo userInfo1 = new UserInfo();
+        userInfo1.setId(1);
+        userInfo1.setLevel(2);
+        userInfo1.setName("addadas");
+
+        System.err.println("userInfo1:" + userInfo1);
+
+        byte[] encodedBytes = userInfo1.encode();
+
+        System.err.println("encodedBytes.length:" + encodedBytes.length);
+
+//        FileOutputStream fileOutputStream = new FileOutputStream(new File("D:\\UserInfo"));
+//        fileOutputStream.write(encodedBytes);
+//        fileOutputStream.close();
+
+        FileInputStream fileInputStream = new FileInputStream(new File("D:\\UserInfo"));
+        encodedBytes = new byte[fileInputStream.available()];
+        fileInputStream.read(encodedBytes);
+        fileInputStream.close();
+
+
+        UserInfo userInfo2 = new UserInfo();
+        userInfo2.decode(encodedBytes);
+
+        System.err.println("userInfo2:" + userInfo2);
     }
 
 }

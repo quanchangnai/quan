@@ -82,8 +82,6 @@ public abstract class Buffer {
      */
     public abstract byte readByte();
 
-    protected abstract void skipBytes(int length);
-
     public boolean readBool() throws IOException {
         return readInt() != 0;
     }
@@ -168,10 +166,11 @@ public abstract class Buffer {
         skipBytes(length);
     }
 
+    protected abstract void skipBytes(int length);
+
     public String readString() throws IOException {
         return new String(readBytes(), StandardCharsets.UTF_8);
     }
-
 
     protected void writeVarInt(long n) {
         onWrite(10);
@@ -287,4 +286,11 @@ public abstract class Buffer {
         writeBytes(s.getBytes(StandardCharsets.UTF_8));
     }
 
+    public void writeTag(int tag) {
+        writeByte((byte) tag);
+    }
+
+    public int readTag() {
+        return readByte() & 0b11111111;
+    }
 }

@@ -69,18 +69,37 @@ public class UserInfo extends Bean {
     public void encode(Buffer buffer) throws IOException {
         super.encode(buffer);
 
+        buffer.writeTag(4);
         buffer.writeLong(this.id);
+
+        buffer.writeTag(11);
         buffer.writeString(this.name);
+
+        buffer.writeTag(12);
         buffer.writeInt(this.level);
+
+        buffer.writeInt(0);
     }
 
     @Override
     public void decode(Buffer buffer) throws IOException {
         super.decode(buffer);
 
-        this.id = buffer.readLong();
-        this.name = buffer.readString();
-        this.level = buffer.readInt();
+        for (int tag = buffer.readTag(); tag != 0; tag = buffer.readTag()) {
+            switch (tag) {
+                case 4:
+                    this.id = buffer.readLong();
+                    break;
+                case 11:
+                    this.name = buffer.readString();
+                    break;
+                case 12:
+                    this.level = buffer.readInt();
+                    break;
+                default:
+                    skipField(tag, buffer);
+            }
+        }
     }
 
     @Override

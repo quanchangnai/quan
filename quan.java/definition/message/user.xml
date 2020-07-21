@@ -2,9 +2,9 @@
 <package cs="User">
 
     <bean name="UserInfo">
-        <field name="id" type="long"/>ID
-        <field name="name" type="string"/>名字
-        <field name="level" type="int"/>等级
+        <field id="1" name="id" type="long"/>ID
+        <field id="2" name="name" type="string"/>名字
+        <field id="3" name="level" type="int"/>等级
     </bean>
 
 </package>

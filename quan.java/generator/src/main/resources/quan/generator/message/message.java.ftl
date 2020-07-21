@@ -146,7 +146,7 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
         <#continue/>
     </#if>
     <#if definedFieldId>
-        buffer.writeInt(${field.tag});
+        buffer.writeTag(${field.tag});
     </#if>
     <#if field.type=="set" || field.type=="list">
         <#if definedFieldId>
@@ -256,7 +256,7 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
         super.decode(buffer);
 
 <#if definedFieldId>
-        for (int tag = buffer.readInt(); tag != 0; tag = buffer.readInt()) {
+        for (int tag = buffer.readTag(); tag != 0; tag = buffer.readTag()) {
             switch (tag) {
             <#list selfFields as field>
                 <#if field.ignore>
@@ -306,6 +306,7 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
                     buffer.readInt();
                     this.${field.name}.decode(buffer);
             </#if>
+                    break;
         </#list>
                 default:
                     skipField(tag, buffer);
