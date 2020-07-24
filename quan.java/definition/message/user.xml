@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <package cs="User">
 
-    <bean name="UserInfo">
+    <bean name="UserInfo">用户信息
         <field id="1" name="id" type="long"/>ID
         <field id="2" name="name" type="string"/>名字
         <field id="3" name="level" type="int"/>等级
+        <field id="4" name="roleInfo1" type="role.RoleInfo" optional="true"/>角色信息
+        <field id="5" name="roleInfo2" type="role.RoleInfo"/>角色信息2
+        <field id="6" name="roleList" type="list:role.RoleInfo"/>角色信息List
+        <field id="7" name="roleSet" type="set:role.RoleInfo"/>角色信息Set
+        <field id="8" name="roleMap" type="map:long:role.RoleInfo"/>角色信息Map
     </bean>
 
 </package>

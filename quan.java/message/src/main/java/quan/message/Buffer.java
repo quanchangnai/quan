@@ -148,7 +148,7 @@ public abstract class Buffer {
         int length = readInt();
         int readableCount = readableCount();
         if (length > readableCount) {
-            throw new IOException(String.format("读数据出错，希望读%d字节,实际剩余%d字节", length, readableCount));
+            throw new IOException(String.format("读数据出错，希望读取%d字节,实际剩余%d字节", length, readableCount));
         }
 
         return readBytes(length);
@@ -278,7 +278,6 @@ public abstract class Buffer {
     public abstract void writeBytes(byte[] bytes);
 
     public void writeBuffer(Buffer buffer) {
-        writeInt(buffer.readableCount());
         writeBytes(buffer.remainingBytes());
     }
 

@@ -44,10 +44,11 @@ local function testBuffer()
     buffer:writeDouble(342254.653254, 2)
     buffer:writeString("搭顺风车")
     buffer:writeLong(12324)
+    buffer:writeTag(255)
 
     print("buffer:size()", buffer:size())
 
-    buffer=Buffer.new(buffer.bytes)
+    buffer = Buffer.new(buffer.bytes)
 
     print(buffer:readBool())
     print(buffer:readInt())
@@ -61,6 +62,7 @@ local function testBuffer()
     print(buffer:readDouble(2))
     print(buffer:readString())
     print(buffer:readLong())
+    print(buffer:readTag())
 
     print("=================")
 
@@ -84,7 +86,7 @@ local function testMessage1()
     print()
     print("testMessage1===========")
     local sRoleLogin1 = SRoleLogin.new({ roleId = 1111 })
-    sRoleLogin1.roleName = "张三1111"
+    sRoleLogin1.roleName = "张三3333"
 
     local roleInfo = RoleInfo.new()
     roleInfo.id = 111
@@ -108,21 +110,33 @@ local function testMessage1()
     sRoleLogin1.userInfo = UserInfo.new()
 
     sRoleLogin1.seq = 1000
+
+    print("sRoleLogin1：", sRoleLogin1)
+
     local buffer = sRoleLogin1:encode()
     print("buffer:size()", buffer:size())
 
-    --local sRoleLogin2 = SRoleLogin.decode(buffer)
+    local sRoleLogin2 = SRoleLogin.decode(buffer)
 
-    local sRoleLogin2 = MessageRegistry.create(buffer:readInt())
-    buffer:reset()
-    local sRoleLogin2 = sRoleLogin2.decode(buffer)
+    --local sRoleLogin2 = MessageRegistry.create(buffer:readInt())
+    --buffer:reset()
+    --local sRoleLogin2 = sRoleLogin2.decode(buffer)
 
-    local buffer = SRoleLogin.encode(sRoleLogin2)
-    local file = io.open("../../.temp/message/SRoleLogin", "w")
-    file:write(buffer.bytes)
-    file:flush()
+    print("sRoleLogin2：", sRoleLogin1)
 
-    print("SRoleLogin", sRoleLogin1)
+    --local buffer = SRoleLogin.encode(sRoleLogin2)
+    --local file1 = io.open("D:\\SRoleLogin", "w")
+    --file1:write(buffer.bytes)
+    --file1:flush()
+
+    local file2 = io.open("D:\\SRoleLogin", "r")
+    local bytes = file2:read("*a")
+    local sRoleLogin3 = SRoleLogin.decode(Buffer.new(bytes))
+
+    print("SRoleLogin1", sRoleLogin1)
+    print("SRoleLogin2", sRoleLogin2)
+    print("SRoleLogin3", sRoleLogin3)
+
     print("SRoleLogin.id", SRoleLogin.id)
     print("SRoleLogin.class", SRoleLogin.class)
     print("sRoleLogin2.id", sRoleLogin2.id)
@@ -151,10 +165,10 @@ local function testMessage2()
 
 end
 
-test1()
-testBuffer()
+--test1()
+--testBuffer()
 testMessage1()
-testMessage2()
+--testMessage2()
 
 
 

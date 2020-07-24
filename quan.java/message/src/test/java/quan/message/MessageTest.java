@@ -22,8 +22,7 @@ public class MessageTest {
     }
 
     @Test
-    public void test() {
-
+    public void test() throws Exception {
     }
 
     @Test
@@ -85,7 +84,7 @@ public class MessageTest {
 
         RoleInfo roleInfo2 = new RoleInfo();
         roleInfo2.setId(222);
-        roleInfo2.setName("bbb");
+        roleInfo2.setName("暗访方式的法人");
         roleInfo2.setType(RoleType.type2);
         roleInfo2.getSet().add(2213);
 
@@ -99,6 +98,11 @@ public class MessageTest {
         userInfo.setId(1);
         userInfo.setLevel(2);
         userInfo.setName("addadas");
+        userInfo.setRoleInfo1(roleInfo1);
+        userInfo.setRoleInfo2(roleInfo2);
+        userInfo.getRoleList().add(roleInfo1);
+        userInfo.getRoleMap().put(roleInfo2.getId(), roleInfo2);
+
         sRoleLogin1.setUserInfo(userInfo);
 
         System.err.println("sRoleLogin1:" + sRoleLogin1);

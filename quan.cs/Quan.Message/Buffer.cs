@@ -216,7 +216,7 @@ namespace Quan.Message
             var length = ReadInt();
             if (length > ReadableCount)
             {
-                throw new IOException($"读数据出错，希望读{length}字节,实际剩余{ReadableCount}字节");
+                throw new IOException($"读数据出错，希望读读取{length}字节,实际剩余{ReadableCount}字节");
             }
 
             var bytes = new byte[length];
@@ -382,7 +382,6 @@ namespace Quan.Message
 
         public void WriteBuffer(Buffer buffer)
         {
-            WriteInt(buffer.ReadableCount);
             WriteBytes(buffer.RemainingBytes());
         }
 

@@ -97,19 +97,18 @@ local c = 0
 local empty1
 local empty2
 
-
 print("=========1", os.time())
 
 for i = 1, n do
     empty1 = {}
-    c=c+1
+    c = c + 1
 end
 
 print("=========2", os.time())
-c=0
+c = 0
 for i = 1, n do
     empty2 = table.empty()
-    c=c+1
+    c = c + 1
 end
 
 print("=========3", os.time())

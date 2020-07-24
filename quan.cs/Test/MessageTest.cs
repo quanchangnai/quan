@@ -78,9 +78,9 @@ namespace Test
 
             var encodedBytes = sRoleLogin1.Encode();
 
-            // var fileStream = File.Open("D:\\SRoleLogin", FileMode.Open);
-            // encodedBytes = new byte[fileStream.Length];
-            // fileStream.Read(encodedBytes, 0, encodedBytes.Length);
+            var fileStream = File.Open("D:\\SRoleLogin", FileMode.Open);
+            encodedBytes = new byte[fileStream.Length];
+            fileStream.Read(encodedBytes, 0, encodedBytes.Length);
             // fileStream.Write(encodedBytes, 0, encodedBytes.Length);
 
             Console.WriteLine("encodedBytes.Length:{0}", encodedBytes.Length);

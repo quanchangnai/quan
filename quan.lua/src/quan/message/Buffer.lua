@@ -14,6 +14,8 @@ local Buffer = {
     class = "quan.message.Buffer"
 }
 
+---构造Buffer
+---@param bytes 字节串，可以为空
 function Buffer.new(bytes)
     assert(bytes == nil or type(bytes) == "string", "参数[bytes]类型错误")
     local instance = {
@@ -60,6 +62,12 @@ function Buffer:discardReadBytes()
     self.readIndex = 1;
 end
 
+local function readByte(buffer)
+    local b = buffer.bytes:byte(buffer.readIndex)
+    buffer.readIndex = buffer.readIndex + 1
+    return b
+end
+
 ---从buff重读取变长整数
 ---@param buffer
 ---@param readBits 最多读几个bit位，合法值:16,32,64
@@ -72,8 +80,7 @@ local function readVarInt(buffer, readBits)
             error("读数据出错", 2)
         end
 
-        local b = buffer.bytes:byte(buffer.readIndex)
-        buffer.readIndex = buffer.readIndex + 1
+        local b = readByte(buffer)
 
         temp = temp | (b & 0x7F) << shift;
         shift = shift + 7
@@ -138,9 +145,9 @@ end
 
 function Buffer:readBytes()
     local length = self:readInt()
-
-    if self.readIndex + length - 1 > self:size() then
-        error("读数据出错", 2)
+    local readableCount = self:readableCount()
+    if length > readableCount then
+        error(string.format("读数据出错，希望读取%d字节,实际剩余%d字节", length, readableCount), 2)
     end
 
     local bytes = self.bytes:sub(self.readIndex, self.readIndex + length - 1)
@@ -148,8 +155,22 @@ function Buffer:readBytes()
     return bytes
 end
 
+function Buffer:skipBytes()
+    local length = self:readInt()
+    local readableCount = self:readableCount()
+    if length > readableCount then
+        error(string.format("读数据出错，希望跳过%d字节,实际剩余%d字节", length, readableCount), 2)
+    end
+
+    self.readIndex = self.readIndex + length
+end
+
 function Buffer:readString()
     return self:readBytes()
+end
+
+local function writeByte(buffer, b)
+    buffer.bytes = buffer.bytes .. string.char(b)
 end
 
 local function writeVarInt(buffer, n, bits)
@@ -161,10 +182,10 @@ local function writeVarInt(buffer, n, bits)
 
     while shift < bits do
         if ((n & ~0x7F) == 0) then
-            buffer.bytes = buffer.bytes .. string.char(n & 0x7F)
+            writeByte(buffer, n & 0x7F)
             return
         else
-            buffer.bytes = buffer.bytes .. string.char(n & 0x7F | 0x80)
+            writeByte(buffer, n & 0x7F | 0x80)
             n = n >> 7
             shift = shift + 7
         end
@@ -227,8 +248,20 @@ function Buffer:writeBytes(bytes)
     self.bytes = self.bytes .. bytes
 end
 
+function Buffer:writeBuffer(buffer)
+    self:writeBytes(buffer:remainingBytes());
+end
+
 function Buffer:writeString(s)
     self:writeBytes(s)
+end
+
+function Buffer:writeTag(tag)
+    writeByte(self, tag)
+end
+
+function Buffer:readTag()
+    return readByte(self)
 end
 
 Buffer = table.readOnly(Buffer)
