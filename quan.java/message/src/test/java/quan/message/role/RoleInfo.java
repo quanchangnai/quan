@@ -160,13 +160,13 @@ public class RoleInfo extends Bean {
         buffer.writeBytes(this.data);
 
         buffer.writeInt(this.list.size());
-        for (Integer $list$Value : this.list) {
-            buffer.writeInt($list$Value);
+        for (Integer list$Value : this.list) {
+            buffer.writeInt(list$Value);
         }
 
         buffer.writeInt(this.set.size());
-        for (Integer $set$Value : this.set) {
-            buffer.writeInt($set$Value);
+        for (Integer set$Value : this.set) {
+            buffer.writeInt(set$Value);
         }
     }
 
@@ -184,13 +184,13 @@ public class RoleInfo extends Bean {
         this.d = buffer.readDouble();
         this.data = buffer.readBytes();
 
-        int $list$Size = buffer.readInt();
-        for (int i = 0; i < $list$Size; i++) {
+        int list$Size = buffer.readInt();
+        for (int i = 0; i < list$Size; i++) {
             this.list.add(buffer.readInt());
         }
 
-        int $set$Size = buffer.readInt();
-        for (int i = 0; i < $set$Size; i++) {
+        int set$Size = buffer.readInt();
+        for (int i = 0; i < set$Size; i++) {
             this.set.add(buffer.readInt());
         }
     }

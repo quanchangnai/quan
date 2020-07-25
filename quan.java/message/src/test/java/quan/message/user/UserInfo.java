@@ -148,42 +148,42 @@ public class UserInfo extends Bean {
         buffer.writeInt(this.level);
 
         buffer.writeTag(19);
-        Buffer $roleInfo1$Buffer = new SimpleBuffer();
-        $roleInfo1$Buffer.writeBool(this.roleInfo1 != null);
+        Buffer roleInfo1$Buffer = new SimpleBuffer();
+        roleInfo1$Buffer.writeBool(this.roleInfo1 != null);
         if (this.roleInfo1 != null) {
-            this.roleInfo1.encode($roleInfo1$Buffer);
+            this.roleInfo1.encode(roleInfo1$Buffer);
         }
-        buffer.writeBuffer($roleInfo1$Buffer);
+        buffer.writeBuffer(roleInfo1$Buffer);
 
         buffer.writeTag(23);
-        Buffer $roleInfo2$Buffer = new SimpleBuffer();
-        this.roleInfo2.encode($roleInfo2$Buffer);
-        buffer.writeBuffer($roleInfo2$Buffer);
+        Buffer roleInfo2$Buffer = new SimpleBuffer();
+        this.roleInfo2.encode(roleInfo2$Buffer);
+        buffer.writeBuffer(roleInfo2$Buffer);
 
         buffer.writeTag(27);
-        Buffer $roleList$Buffer = new SimpleBuffer();
-        $roleList$Buffer.writeInt(this.roleList.size());
-        for (RoleInfo $roleList$Value : this.roleList) {
-            $roleList$Value.encode($roleList$Buffer);
+        Buffer roleList$Buffer = new SimpleBuffer();
+        roleList$Buffer.writeInt(this.roleList.size());
+        for (RoleInfo roleList$Value : this.roleList) {
+            roleList$Value.encode(roleList$Buffer);
         }
-        buffer.writeBuffer($roleList$Buffer);
+        buffer.writeBuffer(roleList$Buffer);
 
         buffer.writeTag(31);
-        Buffer $roleSet$Buffer = new SimpleBuffer();
-        $roleSet$Buffer.writeInt(this.roleSet.size());
-        for (RoleInfo $roleSet$Value : this.roleSet) {
-            $roleSet$Value.encode($roleSet$Buffer);
+        Buffer roleSet$Buffer = new SimpleBuffer();
+        roleSet$Buffer.writeInt(this.roleSet.size());
+        for (RoleInfo roleSet$Value : this.roleSet) {
+            roleSet$Value.encode(roleSet$Buffer);
         }
-        buffer.writeBuffer($roleSet$Buffer);
+        buffer.writeBuffer(roleSet$Buffer);
 
         buffer.writeTag(35);
-        Buffer $roleMap$Buffer = new SimpleBuffer();
-        $roleMap$Buffer.writeInt(this.roleMap.size());
-        for (Long $roleMap$Key : this.roleMap.keySet()) {
-            $roleMap$Buffer.writeLong($roleMap$Key);
-            this.roleMap.get($roleMap$Key).encode($roleMap$Buffer);
+        Buffer roleMap$Buffer = new SimpleBuffer();
+        roleMap$Buffer.writeInt(this.roleMap.size());
+        for (Long roleMap$Key : this.roleMap.keySet()) {
+            roleMap$Buffer.writeLong(roleMap$Key);
+            this.roleMap.get(roleMap$Key).encode(roleMap$Buffer);
         }
-        buffer.writeBuffer($roleMap$Buffer);
+        buffer.writeBuffer(roleMap$Buffer);
 
         buffer.writeTag(0);
     }
@@ -218,30 +218,30 @@ public class UserInfo extends Bean {
                     break;
                 case 27:
                     buffer.readInt();
-                    int $roleList$Size = buffer.readInt();
-                    for (int i = 0; i < $roleList$Size; i++) {     
-                        RoleInfo $roleList$Value = new RoleInfo();
-                        $roleList$Value.decode(buffer);
-                        this.roleList.add($roleList$Value);
+                    int roleList$Size = buffer.readInt();
+                    for (int i = 0; i < roleList$Size; i++) {     
+                        RoleInfo roleList$Value = new RoleInfo();
+                        roleList$Value.decode(buffer);
+                        this.roleList.add(roleList$Value);
                     }
                     break;
                 case 31:
                     buffer.readInt();
-                    int $roleSet$Size = buffer.readInt();
-                    for (int i = 0; i < $roleSet$Size; i++) {     
-                        RoleInfo $roleSet$Value = new RoleInfo();
-                        $roleSet$Value.decode(buffer);
-                        this.roleSet.add($roleSet$Value);
+                    int roleSet$Size = buffer.readInt();
+                    for (int i = 0; i < roleSet$Size; i++) {     
+                        RoleInfo roleSet$Value = new RoleInfo();
+                        roleSet$Value.decode(buffer);
+                        this.roleSet.add(roleSet$Value);
                     }
                     break;
                 case 35:
                     buffer.readInt();
-                    int $roleMap$Size = buffer.readInt();
-                    for (int i = 0; i < $roleMap$Size; i++) {
-                        Long $roleMap$Key = buffer.readLong();
-                        RoleInfo $roleMap$Value = new RoleInfo();
-                        $roleMap$Value.decode(buffer);
-                        this.roleMap.put($roleMap$Key, $roleMap$Value);
+                    int roleMap$Size = buffer.readInt();
+                    for (int i = 0; i < roleMap$Size; i++) {
+                        Long roleMap$Key = buffer.readLong();
+                        RoleInfo roleMap$Value = new RoleInfo();
+                        roleMap$Value.decode(buffer);
+                        this.roleMap.put(roleMap$Key, roleMap$Value);
                     }
                     break;
                 default:

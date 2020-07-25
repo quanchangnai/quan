@@ -45,7 +45,7 @@ public abstract class Buffer {
     public abstract void discardReadBytes();
 
     /**
-     * 读取VarInt
+     * 读取变长整数
      *
      * @param readBits 最多读几个bit位，合法值:16,32,64
      */

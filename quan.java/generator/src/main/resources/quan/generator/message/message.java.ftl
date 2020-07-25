@@ -150,26 +150,26 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
     </#if>
     <#if field.type=="set" || field.type=="list">
         <#if definedFieldId>
-        Buffer $${field.name}$Buffer = new SimpleBuffer();
-        $${field.name}$Buffer.writeInt(this.${field.name}.size());
-        for (${field.classValueType} $${field.name}$Value : this.${field.name}) {
+        Buffer ${field.name}$Buffer = new SimpleBuffer();
+        ${field.name}$Buffer.writeInt(this.${field.name}.size());
+        for (${field.classValueType} ${field.name}$Value : this.${field.name}) {
             <#if field.builtinValueType>
-            $${field.name}$Buffer.write${field.valueType?cap_first}($${field.name}$Value);
+            ${field.name}$Buffer.write${field.valueType?cap_first}(${field.name}$Value);
             <#else>
-            $${field.name}$Value.encode($${field.name}$Buffer);
+            ${field.name}$Value.encode(${field.name}$Buffer);
             </#if>
         }
-        buffer.writeBuffer($${field.name}$Buffer);
+        buffer.writeBuffer(${field.name}$Buffer);
         <#else>
             <#if field?index gt 0>
 
             </#if>
         buffer.writeInt(this.${field.name}.size());
-        for (${field.classValueType} $${field.name}$Value : this.${field.name}) {
+        for (${field.classValueType} ${field.name}$Value : this.${field.name}) {
             <#if field.builtinValueType>
-            buffer.write${field.valueType?cap_first}($${field.name}$Value);
+            buffer.write${field.valueType?cap_first}(${field.name}$Value);
             <#else>
-            $${field.name}$Value.encode(buffer);
+            ${field.name}$Value.encode(buffer);
             </#if>
         }
             <#if field?has_next && !selfFields[field?index+1].collectionType && (selfFields[field?index+1].primitiveType|| selfFields[field?index+1].enumType || !selfFields[field?index+1].optional) >
@@ -178,28 +178,28 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
         </#if>
     <#elseif field.type=="map">
         <#if definedFieldId>
-        Buffer $${field.name}$Buffer = new SimpleBuffer();
-        $${field.name}$Buffer.writeInt(this.${field.name}.size());
-        for (${field.classKeyType} $${field.name}$Key : this.${field.name}.keySet()) {
-            $${field.name}$Buffer.write${field.keyType?cap_first}($${field.name}$Key);
+        Buffer ${field.name}$Buffer = new SimpleBuffer();
+        ${field.name}$Buffer.writeInt(this.${field.name}.size());
+        for (${field.classKeyType} ${field.name}$Key : this.${field.name}.keySet()) {
+            ${field.name}$Buffer.write${field.keyType?cap_first}(${field.name}$Key);
             <#if field.builtinValueType>
-            $${field.name}$Buffer.write${field.valueType?cap_first}(this.${field.name}.get($${field.name}$Key));
+            ${field.name}$Buffer.write${field.valueType?cap_first}(this.${field.name}.get(${field.name}$Key));
             <#else>
-            this.${field.name}.get($${field.name}$Key).encode($${field.name}$Buffer);
+            this.${field.name}.get(${field.name}$Key).encode(${field.name}$Buffer);
             </#if>
         }
-        buffer.writeBuffer($${field.name}$Buffer);
+        buffer.writeBuffer(${field.name}$Buffer);
         <#else>
             <#if field?index gt 0>
 
             </#if>
         buffer.writeInt(this.${field.name}.size());
-        for (${field.classKeyType} $${field.name}$Key : this.${field.name}.keySet()) {
-            buffer.write${field.keyType?cap_first}($${field.name}$Key);
+        for (${field.classKeyType} ${field.name}$Key : this.${field.name}.keySet()) {
+            buffer.write${field.keyType?cap_first}(${field.name}$Key);
             <#if field.builtinValueType>
-            buffer.write${field.valueType?cap_first}(this.${field.name}.get($${field.name}$Key));
+            buffer.write${field.valueType?cap_first}(this.${field.name}.get(${field.name}$Key));
             <#else>
-            this.${field.name}.get($${field.name}$Key).encode(buffer);
+            this.${field.name}.get(${field.name}$Key).encode(buffer);
             </#if>
         }
             <#if field?has_next && !selfFields[field?index+1].collectionType && (selfFields[field?index+1].primitiveType|| selfFields[field?index+1].enumType || !selfFields[field?index+1].optional) >
@@ -214,12 +214,12 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
         buffer.writeInt(this.${field.name} == null ? 0 : this.${field.name}.value());
     <#elseif field.optional>
         <#if definedFieldId>
-        Buffer $${field.name}$Buffer = new SimpleBuffer();
-        $${field.name}$Buffer.writeBool(this.${field.name} != null);
+        Buffer ${field.name}$Buffer = new SimpleBuffer();
+        ${field.name}$Buffer.writeBool(this.${field.name} != null);
         if (this.${field.name} != null) {
-            this.${field.name}.encode($${field.name}$Buffer);
+            this.${field.name}.encode(${field.name}$Buffer);
         }
-        buffer.writeBuffer($${field.name}$Buffer);
+        buffer.writeBuffer(${field.name}$Buffer);
         <#else>
             <#if field?index gt 0>
 
@@ -234,9 +234,9 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
         </#if>
     <#else>
         <#if definedFieldId>
-        Buffer $${field.name}$Buffer = new SimpleBuffer();
-        this.${field.name}.encode($${field.name}$Buffer);
-        buffer.writeBuffer($${field.name}$Buffer);
+        Buffer ${field.name}$Buffer = new SimpleBuffer();
+        this.${field.name}.encode(${field.name}$Buffer);
+        buffer.writeBuffer(${field.name}$Buffer);
         <#else>
         this.${field.name}.encode(buffer);
         </#if>
@@ -262,27 +262,27 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
                 case ${field.tag}:
                 <#if field.type=="set" || field.type=="list">
                     buffer.readInt();
-                    int $${field.name}$Size = buffer.readInt();
-                    for (int i = 0; i < $${field.name}$Size; i++) {     
+                    int ${field.name}$Size = buffer.readInt();
+                    for (int i = 0; i < ${field.name}$Size; i++) {     
                     <#if field.builtinValueType>
                         this.${field.name}.add(buffer.read${field.valueType?cap_first}());
                     <#else>
-                        ${field.classValueType} $${field.name}$Value = new ${field.classValueType}();
-                        $${field.name}$Value.decode(buffer);
-                        this.${field.name}.add($${field.name}$Value);
+                        ${field.classValueType} ${field.name}$Value = new ${field.classValueType}();
+                        ${field.name}$Value.decode(buffer);
+                        this.${field.name}.add(${field.name}$Value);
                     </#if>
                     }
                 <#elseif field.type=="map">
                     buffer.readInt();
-                    int $${field.name}$Size = buffer.readInt();
-                    for (int i = 0; i < $${field.name}$Size; i++) {
+                    int ${field.name}$Size = buffer.readInt();
+                    for (int i = 0; i < ${field.name}$Size; i++) {
                     <#if field.builtinValueType>
                         this.${field.name}.put(buffer.read${field.keyType?cap_first}(), buffer.read${field.valueType?cap_first}());
                     <#else>
-                        ${field.classKeyType} $${field.name}$Key = buffer.read${field.keyType?cap_first}();
-                        ${field.classValueType} $${field.name}$Value = new ${field.classValueType}();
-                        $${field.name}$Value.decode(buffer);
-                        this.${field.name}.put($${field.name}$Key, $${field.name}$Value);
+                        ${field.classKeyType} ${field.name}$Key = buffer.read${field.keyType?cap_first}();
+                        ${field.classValueType} ${field.name}$Value = new ${field.classValueType}();
+                        ${field.name}$Value.decode(buffer);
+                        this.${field.name}.put(${field.name}$Key, ${field.name}$Value);
                     </#if>
                     }
                 <#elseif field.type=="float"||field.type=="double">
@@ -317,14 +317,14 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
         <#if field?index gt 0>
 
         </#if>
-        int $${field.name}$Size = buffer.readInt();
-        for (int i = 0; i < $${field.name}$Size; i++) {
+        int ${field.name}$Size = buffer.readInt();
+        for (int i = 0; i < ${field.name}$Size; i++) {
         <#if field.builtinValueType>
             this.${field.name}.add(buffer.read${field.valueType?cap_first}());
         <#else>
-            ${field.classValueType} $${field.name}$Value = new ${field.classValueType}();
-            $${field.name}$Value.decode(buffer);
-            this.${field.name}.add($${field.name}$Value);
+            ${field.classValueType} ${field.name}$Value = new ${field.classValueType}();
+            ${field.name}$Value.decode(buffer);
+            this.${field.name}.add(${field.name}$Value);
         </#if>
         }
         <#if field?has_next && !selfFields[field?index+1].collectionType && (selfFields[field?index+1].primitiveType|| selfFields[field?index+1].enumType || !selfFields[field?index+1].optional) >
@@ -334,15 +334,15 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
         <#if field?index gt 0>
 
         </#if>
-        int $${field.name}$Size = buffer.readInt();
-        for (int i = 0; i < $${field.name}$Size; i++) {
+        int ${field.name}$Size = buffer.readInt();
+        for (int i = 0; i < ${field.name}$Size; i++) {
         <#if field.builtinValueType>
             this.${field.name}.put(buffer.read${field.keyType?cap_first}(), buffer.read${field.valueType?cap_first}());
         <#else>
-            ${field.classKeyType} $${field.name}$Key = buffer.read${field.keyType?cap_first}();
-            ${field.classValueType} $${field.name}$Value = new ${field.classValueType}();
-            $${field.name}$Value.decode(buffer);
-            this.${field.name}.put($${field.name}$Key, $${field.name}$Value);
+            ${field.classKeyType} ${field.name}$Key = buffer.read${field.keyType?cap_first}();
+            ${field.classValueType} ${field.name}$Value = new ${field.classValueType}();
+            ${field.name}$Value.decode(buffer);
+            this.${field.name}.put(${field.name}$Key, ${field.name}$Value);
         </#if>
         }
         <#if field?has_next && !selfFields[field?index+1].collectionType && (selfFields[field?index+1].primitiveType|| selfFields[field?index+1].enumType || !selfFields[field?index+1].optional) >

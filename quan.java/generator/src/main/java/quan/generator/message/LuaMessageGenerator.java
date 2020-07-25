@@ -46,9 +46,6 @@ public class LuaMessageGenerator extends MessageGenerator {
         List<MessageDefinition> messageDefinitions = new ArrayList<>();
 
         for (ClassDefinition classDefinition : classDefinitions) {
-            if (classDefinition instanceof HeaderDefinition) {
-                continue;
-            }
             if (classDefinition instanceof MessageDefinition) {
                 messageDefinitions.add((MessageDefinition) classDefinition);
             }

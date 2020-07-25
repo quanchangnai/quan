@@ -143,9 +143,27 @@ public class SimpleBuffer extends Buffer {
     }
 
     @Override
+    public void writeBuffer(Buffer buffer) {
+        if (!(buffer instanceof SimpleBuffer)) {
+            super.writeBuffer(buffer);
+            return;
+        }
+
+        SimpleBuffer simpleBuffer = (SimpleBuffer) buffer;
+        int readableCount = simpleBuffer.readableCount();
+
+        onWrite(10 + readableCount);
+
+        writeInt(readableCount);
+        System.arraycopy(simpleBuffer.bytes, simpleBuffer.readIndex, this.bytes, this.writeIndex, readableCount);
+
+        simpleBuffer.readIndex += readableCount;
+        this.writeIndex += readableCount;
+    }
+
+    @Override
     public void writeBytes(byte[] bytes) {
         onWrite(10 + bytes.length);
-
         writeInt(bytes.length);
         System.arraycopy(bytes, 0, this.bytes, writeIndex, bytes.length);
         writeIndex += bytes.length;

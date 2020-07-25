@@ -103,7 +103,7 @@ namespace Quan.Message
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="IOException"></exception>
-        private long ReadVarInt(int readBits)
+        protected long ReadVarInt(int readBits)
         {
             var shift = 0;
             long temp = 0;
@@ -262,7 +262,7 @@ namespace Quan.Message
             _bytes = newBytes;
         }
 
-        private void WriteVarInt(long n)
+        protected void WriteVarInt(long n)
         {
             OnWrite(10);
 
@@ -382,7 +382,15 @@ namespace Quan.Message
 
         public void WriteBuffer(Buffer buffer)
         {
-            WriteBytes(buffer.RemainingBytes());
+            var readableCount = buffer.ReadableCount;
+
+            OnWrite(10 + readableCount);
+            WriteInt(readableCount);
+
+            Array.Copy(buffer._bytes, buffer._readIndex, _bytes, _writeIndex, readableCount);
+
+            buffer._readIndex += readableCount;
+            _writeIndex += readableCount;
         }
 
         public void WriteString(string s)

@@ -14,9 +14,7 @@ function Message.encode(msg, buffer)
     else
         buffer = Buffer.new()
     end
-
     buffer:writeInt(msg.id);
-
     return buffer
 end
 
@@ -25,8 +23,20 @@ function Message.decode(buffer, msg)
     if msgId ~= msg.id then
         error(string.format("消息ID不匹配,期望值[%s],实际值[%s]", msg.id, msgId), 2)
     end
-
     return msg
+end
+
+function Message.skipField(tag, buffer)
+    local t = tag & 3
+    if t == 0 then
+        buffer:readLong()
+    elseif t == 1 then
+        buffer:readFloat()
+    elseif t == 2 then
+        buffer:readDouble()
+    else
+        buffer:skipField()
+    end
 end
 
 function Message.listToString(list)
@@ -69,19 +79,6 @@ function Message.mapToString(map)
     result = result .. "}";
 
     return result;
-end
-
-function Message.skipField(tag, buffer)
-    local t = tag & 0x3
-    if t == 0 then
-        buffer:readLong()
-    elseif t == 1 then
-        buffer:readFloat()
-    elseif t == 2 then
-        buffer:readDouble()
-    else
-        buffer:skipField()
-    end
 end
 
 return Message

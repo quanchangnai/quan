@@ -391,7 +391,7 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
 
         ${tab}return errors;
     ${tab}}
-    </#macro>
+</#macro>
 
  <#if kind ==6>
 
