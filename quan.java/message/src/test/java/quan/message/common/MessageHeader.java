@@ -1,7 +1,6 @@
 package quan.message.common;
 
 import java.util.*;
-import java.io.IOException;
 import quan.message.*;
 
 /**
@@ -48,7 +47,7 @@ public abstract class MessageHeader extends Message {
     }
 
     @Override
-    public void encode(Buffer buffer) throws IOException {
+    public void encode(Buffer buffer) {
         super.encode(buffer);
 
         buffer.writeLong(this.seq);
@@ -56,7 +55,7 @@ public abstract class MessageHeader extends Message {
     }
 
     @Override
-    public void decode(Buffer buffer) throws IOException {
+    public void decode(Buffer buffer) {
         super.decode(buffer);
 
         this.seq = buffer.readLong();

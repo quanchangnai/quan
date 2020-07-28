@@ -82,7 +82,7 @@ namespace ${getFullPackageName("cs")}
             get => _${field.name};
             set
             {
-                Buffer.CheckScale(value, ${field.scale}, false);
+                Buffer.CheckScale(value, ${field.scale});
                 _${field.name} = value;
             }
         }

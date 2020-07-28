@@ -43,7 +43,7 @@ namespace Test.Message.Role
             get => _f;
             set
             {
-                Buffer.CheckScale(value, 2, false);
+                Buffer.CheckScale(value, 2);
                 _f = value;
             }
         }

@@ -1,7 +1,6 @@
 package quan.message.user;
 
 import java.util.*;
-import java.io.IOException;
 import quan.message.*;
 import quan.message.role.RoleInfo;
 
@@ -27,13 +26,13 @@ public class UserInfo extends Bean {
     private RoleInfo roleInfo2 = new RoleInfo();
 
     //角色信息List
-    private ArrayList<RoleInfo> roleList = new ArrayList<>();
+    private List<RoleInfo> roleList = new ArrayList<>();
 
     //角色信息Set
-    private HashSet<RoleInfo> roleSet = new HashSet<>();
+    private Set<RoleInfo> roleSet = new HashSet<>();
 
     //角色信息Map
-    private HashMap<Long, RoleInfo> roleMap = new HashMap<>();
+    private Map<Long, RoleInfo> roleMap = new HashMap<>();
 
 
     /**
@@ -116,26 +115,26 @@ public class UserInfo extends Bean {
     /**
      * 角色信息List
      */
-    public ArrayList<RoleInfo> getRoleList() {
+    public List<RoleInfo> getRoleList() {
         return roleList;
     }
 
     /**
      * 角色信息Set
      */
-    public HashSet<RoleInfo> getRoleSet() {
+    public Set<RoleInfo> getRoleSet() {
         return roleSet;
     }
 
     /**
      * 角色信息Map
      */
-    public HashMap<Long, RoleInfo> getRoleMap() {
+    public Map<Long, RoleInfo> getRoleMap() {
         return roleMap;
     }
 
     @Override
-    public void encode(Buffer buffer) throws IOException {
+    public void encode(Buffer buffer) {
         super.encode(buffer);
 
         buffer.writeTag(4);
@@ -189,7 +188,7 @@ public class UserInfo extends Bean {
     }
 
     @Override
-    public void decode(Buffer buffer) throws IOException {
+    public void decode(Buffer buffer) {
         super.decode(buffer);
 
         for (int tag = buffer.readTag(); tag != 0; tag = buffer.readTag()) {

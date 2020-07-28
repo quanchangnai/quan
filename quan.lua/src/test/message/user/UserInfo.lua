@@ -176,7 +176,7 @@ function UserInfo.decode(buffer, self)
                 self.roleMap[buffer:readLong()] = RoleInfo.decode(buffer)
             end
         else
-            Message.skipField(tag,buffer)
+            Message.skipField(tag, buffer)
         end
     end
 

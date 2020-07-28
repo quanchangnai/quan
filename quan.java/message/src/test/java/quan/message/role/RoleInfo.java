@@ -1,7 +1,6 @@
 package quan.message.role;
 
 import java.util.*;
-import java.io.IOException;
 import quan.message.*;
 
 /**
@@ -30,11 +29,11 @@ public class RoleInfo extends Bean {
 
     private byte[] data = new byte[0];
 
-    private ArrayList<Integer> list = new ArrayList<>();
+    private List<Integer> list = new ArrayList<>();
 
-    private HashSet<Integer> set = new HashSet<>();
+    private Set<Integer> set = new HashSet<>();
 
-    private HashMap<Integer, Integer> map = new HashMap<>();
+    private Map<Integer, Integer> map = new HashMap<>();
 
 
     /**
@@ -133,20 +132,20 @@ public class RoleInfo extends Bean {
         return this;
     }
 
-    public ArrayList<Integer> getList() {
+    public List<Integer> getList() {
         return list;
     }
 
-    public HashSet<Integer> getSet() {
+    public Set<Integer> getSet() {
         return set;
     }
 
-    public HashMap<Integer, Integer> getMap() {
+    public Map<Integer, Integer> getMap() {
         return map;
     }
 
     @Override
-    public void encode(Buffer buffer) throws IOException {
+    public void encode(Buffer buffer) {
         super.encode(buffer);
 
         buffer.writeLong(this.id);
@@ -171,7 +170,7 @@ public class RoleInfo extends Bean {
     }
 
     @Override
-    public void decode(Buffer buffer) throws IOException {
+    public void decode(Buffer buffer) {
         super.decode(buffer);
 
         this.id = buffer.readLong();

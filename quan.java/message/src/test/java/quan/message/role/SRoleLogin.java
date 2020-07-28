@@ -1,7 +1,6 @@
 package quan.message.role;
 
 import java.util.*;
-import java.io.IOException;
 import quan.message.*;
 import quan.message.user.UserInfo;
 import quan.message.common.MessageHeader;
@@ -27,13 +26,13 @@ public class SRoleLogin extends MessageHeader {
     private RoleInfo roleInfo = new RoleInfo();
 
     //角色信息
-    private ArrayList<RoleInfo> roleInfoList = new ArrayList<>();
+    private List<RoleInfo> roleInfoList = new ArrayList<>();
 
     //角色信息
-    private HashSet<RoleInfo> roleInfoSet = new HashSet<>();
+    private Set<RoleInfo> roleInfoSet = new HashSet<>();
 
     //角色信息
-    private HashMap<Long, RoleInfo> roleInfoMap = new HashMap<>();
+    private Map<Long, RoleInfo> roleInfoMap = new HashMap<>();
 
     //用户信息
     private UserInfo userInfo;
@@ -115,21 +114,21 @@ public class SRoleLogin extends MessageHeader {
     /**
      * 角色信息
      */
-    public ArrayList<RoleInfo> getRoleInfoList() {
+    public List<RoleInfo> getRoleInfoList() {
         return roleInfoList;
     }
 
     /**
      * 角色信息
      */
-    public HashSet<RoleInfo> getRoleInfoSet() {
+    public Set<RoleInfo> getRoleInfoSet() {
         return roleInfoSet;
     }
 
     /**
      * 角色信息
      */
-    public HashMap<Long, RoleInfo> getRoleInfoMap() {
+    public Map<Long, RoleInfo> getRoleInfoMap() {
         return roleInfoMap;
     }
 
@@ -154,7 +153,7 @@ public class SRoleLogin extends MessageHeader {
     }
 
     @Override
-    public void encode(Buffer buffer) throws IOException {
+    public void encode(Buffer buffer) {
         super.encode(buffer);
 
         buffer.writeLong(this.roleId);
@@ -184,7 +183,7 @@ public class SRoleLogin extends MessageHeader {
     }
 
     @Override
-    public void decode(Buffer buffer) throws IOException {
+    public void decode(Buffer buffer) {
         super.decode(buffer);
 
         this.roleId = buffer.readLong();

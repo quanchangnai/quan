@@ -1,6 +1,5 @@
 package quan.message;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
 /**
@@ -93,9 +92,9 @@ public class SimpleBuffer extends Buffer {
     }
 
     @Override
-    protected void onRead() throws IOException {
+    protected void onRead() {
         if (readableCount() < 1) {
-            throw new IOException("读数据出错，剩余字节数不够");
+            throw new RuntimeException("读数据出错，剩余字节数不够");
         }
     }
 

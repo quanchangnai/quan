@@ -1,7 +1,6 @@
 package ${getFullPackageName("java")};
 
 import java.util.*;
-import java.io.IOException;
 import quan.message.*;
 <#list imports as import>
 import ${import};
@@ -32,9 +31,9 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
     //${field.comment}
     </#if>
     <#if field.type == "set" || field.type == "list">
-    ${fieldModifier} ${field.classType}<${field.classValueType}> ${field.name} = new ${field.classType}<>();
+    ${fieldModifier} ${field.basicType}<${field.classValueType}> ${field.name} = new ${field.classType}<>();
     <#elseif field.type == "map">
-    ${fieldModifier} ${field.classType}<${field.classKeyType}, ${field.classValueType}> ${field.name} = new ${field.classType}<>();
+    ${fieldModifier} ${field.basicType}<${field.classKeyType}, ${field.classValueType}> ${field.name} = new ${field.classType}<>();
     <#elseif field.type == "string">
     ${fieldModifier} ${field.basicType} ${field.name} = "";
     <#elseif field.type == "bytes">
@@ -81,12 +80,12 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
      */
     </#if>
     <#if field.type == "list" || field.type == "set">
-    public ${field.classType}<${field.classValueType}> get${field.name?cap_first}() {
+    public ${field.basicType}<${field.classValueType}> get${field.name?cap_first}() {
         return ${field.name};
     }
 
     <#elseif field.type == "map">
-    public ${field.classType}<${field.classKeyType}, ${field.classValueType}> get${field.name?cap_first}() {
+    public ${field.basicType}<${field.classKeyType}, ${field.classValueType}> get${field.name?cap_first}() {
         return ${field.name};
     }
 
@@ -138,7 +137,7 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
 
 </#if>
     @Override
-    public void encode(Buffer buffer) throws IOException {
+    public void encode(Buffer buffer) {
         super.encode(buffer);
 
 <#list selfFields as field>
@@ -251,7 +250,7 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
     }
 
     @Override
-    public void decode(Buffer buffer) throws IOException {
+    public void decode(Buffer buffer) {
         super.decode(buffer);
 
 <#if definedFieldId>

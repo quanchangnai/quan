@@ -101,7 +101,6 @@ namespace Quan.Message
         /// </summary>
         /// <param name="readBits">最多读几个bit位，合法值:16,32,64</param>
         /// <returns></returns>
-        /// <exception cref="ArgumentException"></exception>
         /// <exception cref="IOException"></exception>
         protected long ReadVarInt(int readBits)
         {
@@ -342,7 +341,7 @@ namespace Quan.Message
             }
         }
 
-        public static long CheckScale(double n, int scale, bool encode)
+        public static long CheckScale(double n, int scale)
         {
             var times = (int) Math.Pow(10, scale);
             var threshold = long.MaxValue / times;
@@ -352,11 +351,6 @@ namespace Quan.Message
             }
 
             var error = $"参数[{n}]超出了限定范围[{-threshold},{threshold}],无法转换为指定精度[{scale}]的定点型数据";
-            if (encode)
-            {
-                throw new IOException(error);
-            }
-
             throw new ArgumentException(error);
         }
 
@@ -368,7 +362,7 @@ namespace Quan.Message
             }
             else
             {
-                WriteLong(CheckScale(n, scale, true));
+                WriteLong(CheckScale(n, scale));
             }
         }
 

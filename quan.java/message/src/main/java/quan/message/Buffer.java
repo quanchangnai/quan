@@ -1,6 +1,5 @@
 package quan.message;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -49,7 +48,7 @@ public abstract class Buffer {
      *
      * @param readBits 最多读几个bit位，合法值:16,32,64
      */
-    protected long readVarInt(int readBits) throws IOException {
+    protected long readVarInt(int readBits) {
         onRead();
 
         int shift = 0;
@@ -68,13 +67,13 @@ public abstract class Buffer {
             return (temp >>> 1) ^ -(temp & 1);
         }
 
-        throw new IOException("读数据出错");
+        throw new RuntimeException("读数据出错");
     }
 
     /**
      * 读数据之前的回调
      */
-    protected void onRead() throws IOException {
+    protected void onRead() {
     }
 
     /**
@@ -82,23 +81,23 @@ public abstract class Buffer {
      */
     public abstract byte readByte();
 
-    public boolean readBool() throws IOException {
+    public boolean readBool() {
         return readInt() != 0;
     }
 
-    public short readShort() throws IOException {
+    public short readShort() {
         return (short) readVarInt(16);
     }
 
-    public int readInt() throws IOException {
+    public int readInt() {
         return (int) readVarInt(32);
     }
 
-    public long readLong() throws IOException {
+    public long readLong() {
         return readVarInt(64);
     }
 
-    public float readFloat() throws IOException {
+    public float readFloat() {
         onRead();
 
         int shift = 0;
@@ -113,7 +112,7 @@ public abstract class Buffer {
         return Float.intBitsToFloat(temp);
     }
 
-    public float readFloat(int scale) throws IOException {
+    public float readFloat(int scale) {
         if (scale < 0) {
             return readFloat();
         } else {
@@ -121,7 +120,7 @@ public abstract class Buffer {
         }
     }
 
-    public double readDouble() throws IOException {
+    public double readDouble() {
         onRead();
 
         int shift = 0;
@@ -136,7 +135,7 @@ public abstract class Buffer {
         return Double.longBitsToDouble(temp);
     }
 
-    public double readDouble(int scale) throws IOException {
+    public double readDouble(int scale) {
         if (scale < 0) {
             return readDouble();
         } else {
@@ -144,11 +143,11 @@ public abstract class Buffer {
         }
     }
 
-    public byte[] readBytes() throws IOException {
+    public byte[] readBytes() {
         int length = readInt();
         int readableCount = readableCount();
         if (length > readableCount) {
-            throw new IOException(String.format("读数据出错，希望读取%d字节,实际剩余%d字节", length, readableCount));
+            throw new RuntimeException(String.format("读数据出错，希望读取%d字节,实际剩余%d字节", length, readableCount));
         }
 
         return readBytes(length);
@@ -156,11 +155,11 @@ public abstract class Buffer {
 
     protected abstract byte[] readBytes(int length);
 
-    public void skipBytes() throws IOException {
+    public void skipBytes() {
         int length = readInt();
         int readableCount = readableCount();
         if (length > readableCount) {
-            throw new IOException(String.format("读数据出错，希望跳过%d字节,实际剩余%d字节", length, readableCount));
+            throw new RuntimeException(String.format("读数据出错，希望跳过%d字节,实际剩余%d字节", length, readableCount));
         }
 
         skipBytes(length);
@@ -168,7 +167,7 @@ public abstract class Buffer {
 
     protected abstract void skipBytes(int length);
 
-    public String readString() throws IOException {
+    public String readString() {
         return new String(readBytes(), StandardCharsets.UTF_8);
     }
 
@@ -230,7 +229,7 @@ public abstract class Buffer {
         }
     }
 
-    public void writeFloat(float n, int scale) throws IOException {
+    public void writeFloat(float n, int scale) {
         if (scale < 0) {
             writeFloat(n);
         } else {
@@ -259,20 +258,13 @@ public abstract class Buffer {
         return (long) Math.floor(n * times);
     }
 
-    public void writeDouble(double n, int scale) throws IOException {
+    public void writeDouble(double n, int scale) {
         if (scale < 0) {
             writeDouble(n);
             return;
         }
 
-        long lon;
-        try {
-            lon = checkScale(n, scale);
-        } catch (IllegalArgumentException e) {
-            throw new IOException(e);
-        }
-
-        writeLong(lon);
+        writeLong(checkScale(n, scale));
     }
 
     public abstract void writeBytes(byte[] bytes);

@@ -311,7 +311,7 @@ function ${name}.decode(buffer, self)
     Message.skipField(tag,buffer)
     <#else>
         else
-            Message.skipField(tag,buffer)
+            Message.skipField(tag, buffer)
         end
     </#if>
     end
