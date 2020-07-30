@@ -4,7 +4,6 @@
 --- DateTime: 2019/9/7 11:23
 ---
 
-
 function table.size(t)
     assert(type(t) == "table", "参数[t]类型错误")
     local size = 0
@@ -31,6 +30,50 @@ function table.readOnly(origin)
 end
 
 local empty = table.readOnly({})
+
 function table.empty()
     return empty
 end
+
+function table.listToString(list)
+    if not list then
+        return "nil"
+    end
+
+    local result = "["
+    local start = true
+    for i, v in ipairs(list) do
+        if not start then
+            result = result .. ", ";
+        end
+        result = result .. tostring(v)
+        start = false
+    end
+    result = result .. "]";
+
+    return result;
+end
+
+function table.setToString(set)
+    return table.listToString(set)
+end
+
+function table.mapToString(map)
+    if not map then
+        return "nil"
+    end
+
+    local result = "{"
+    local start = true
+    for k, v in pairs(map) do
+        if not start then
+            result = result .. ", ";
+        end
+        result = result .. tostring(k) .. "=" .. tostring(v)
+        start = false
+    end
+    result = result .. "}";
+
+    return result;
+end
+

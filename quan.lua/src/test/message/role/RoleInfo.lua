@@ -3,15 +3,15 @@
 ---自动生成
 ---
 
-local Buffer = require("quan.message.Buffer")
-local Message = require("quan.message.Message")
+local _Buffer = require("quan.message.Buffer")
+local _Message = require("quan.message.Message")
 
 ---
 ---角色信息
 ---
 local RoleInfo = {
     ---类名
-    class = "RoleInfo",
+    class = "test.message.role.RoleInfo",
 }
 
 local function onSet(self, key, value)
@@ -30,9 +30,9 @@ local function toString(self)
             ",f=" .. tostring(self.f) ..
             ",d=" .. tostring(self.d) ..
             ",data=" .. tostring(self.data) ..
-            ",list=" .. Message.listToString(self.list) ..
-            ",set=" .. Message.setToString(self.set) ..
-            ",map=" .. Message.mapToString(self.map) ..
+            ",list=" .. table.listToString(self.list) ..
+            ",set=" .. table.setToString(self.set) ..
+            ",map=" .. table.mapToString(self.map) ..
             '}';
 end
 
@@ -75,9 +75,9 @@ end
 ---
 function RoleInfo:encode(buffer)
     assert(type(self) == "table" and self.class == RoleInfo.class, "参数[self]类型错误")
-    assert(buffer == nil or type(buffer) == "table" and buffer.class == Buffer.class, "参数[buffer]类型错误")
+    assert(buffer == nil or type(buffer) == "table" and buffer.class == _Buffer.class, "参数[buffer]类型错误")
 
-    buffer = buffer or Buffer.new()
+    buffer = buffer or _Buffer.new()
 
     buffer:writeLong(self.id)
     buffer:writeString(self.name)
@@ -109,7 +109,7 @@ end
 ---@return test.message.role.RoleInfo
 ---
 function RoleInfo.decode(buffer, self)
-    assert(type(buffer) == "table" and buffer.class == Buffer.class, "参数[buffer]类型错误")
+    assert(type(buffer) == "table" and buffer.class == _Buffer.class, "参数[buffer]类型错误")
     assert(self == nil or type(self) == "table" and self.class == RoleInfo.class, "参数[self]类型错误")
 
     self = self or RoleInfo.new()

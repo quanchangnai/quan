@@ -10,7 +10,7 @@ namespace ${getFullPackageName("cs")}
     <#if comment !="">
     /// ${comment}<br/>
     </#if>
-    /// 自动生成
+    /// 自动生成，请勿修改
     /// </summary>
 <#if useEnum && (valueField.type=="short" || valueField.type=="int"||valueField.type=="long")>
     public enum ${name}<#if valueField.type!="int">: ${valueField.type}</#if>

@@ -3,8 +3,9 @@
 ---自动生成
 ---
 
-local Buffer = require("quan.message.Buffer")
-local Message = require("quan.message.Message")
+local _Buffer = require("quan.message.Buffer")
+local _Message = require("quan.message.Message")
+local _MessageHeader = require("test.message.common.MessageHeader")
 local UserInfo = require("test.message.user.UserInfo")
 local RoleInfo = require("test.message.role.RoleInfo")
 
@@ -13,7 +14,7 @@ local RoleInfo = require("test.message.role.RoleInfo")
 ---
 local CRoleLogin = {
     ---类名
-    class = "CRoleLogin",
+    class = "test.message.role.CRoleLogin",
     ---消息ID
     id = 1
 }
@@ -30,9 +31,9 @@ local function toString(self)
             ",roleId=" .. tostring(self.roleId) ..
             ",roleName='" .. tostring(self.roleName) .. '\'' ..
             ",roleInfo=" .. tostring(self.roleInfo) ..
-            ",roleInfoList=" .. Message.listToString(self.roleInfoList) ..
-            ",roleInfoSet=" .. Message.setToString(self.roleInfoSet) ..
-            ",roleInfoMap=" .. Message.mapToString(self.roleInfoMap) ..
+            ",roleInfoList=" .. table.listToString(self.roleInfoList) ..
+            ",roleInfoSet=" .. table.setToString(self.roleInfoSet) ..
+            ",roleInfoMap=" .. table.mapToString(self.roleInfoMap) ..
             ",userInfo=" .. tostring(self.userInfo) ..
             '}';
 end
@@ -80,8 +81,8 @@ end
 function CRoleLogin:encode()
     assert(type(self) == "table" and self.class == CRoleLogin.class, "参数[self]类型错误")
 
-    local buffer = Message.encode(self)
-    require("test.message.common.MessageHeader").encode(self,buffer)
+    local buffer = _Message.encode(self)
+    _MessageHeader.encode(self, buffer)
 
     buffer:writeLong(self.seq)
     buffer:writeInt(self.error)
@@ -119,12 +120,12 @@ end
 ---@return test.message.role.CRoleLogin
 ---
 function CRoleLogin.decode(buffer)
-    assert(type(buffer) == "table" and buffer.class == Buffer.class, "参数[buffer]类型错误")
+    assert(type(buffer) == "table" and buffer.class == _Buffer.class, "参数[buffer]类型错误")
 
     local self = CRoleLogin.new()
 
-    Message.decode(buffer, self)
-    require("test.message.common.MessageHeader").decode(buffer, self)
+    _Message.decode(buffer, self)
+    _MessageHeader.decode(buffer, self)
 
     self.seq = buffer:readLong()
     self.error = buffer:readInt()

@@ -39,46 +39,4 @@ function Message.skipField(tag, buffer)
     end
 end
 
-function Message.listToString(list)
-    if not list then
-        return "nil"
-    end
-
-    local result = "["
-    local start = true
-    for i, v in ipairs(list) do
-        if not start then
-            result = result .. ", ";
-        end
-        result = result .. tostring(v)
-        start = false
-    end
-    result = result .. "]";
-
-    return result;
-end
-
-function Message.setToString(set)
-    return Message.listToString(set)
-end
-
-function Message.mapToString(map)
-    if not map then
-        return "nil"
-    end
-
-    local result = "{"
-    local start = true
-    for k, v in pairs(map) do
-        if not start then
-            result = result .. ", ";
-        end
-        result = result .. tostring(k) .. "=" .. tostring(v)
-        start = false
-    end
-    result = result .. "}";
-
-    return result;
-end
-
 return Message

@@ -3,15 +3,15 @@
 ---自动生成
 ---
 
-local Buffer = require("quan.message.Buffer")
-local Message = require("quan.message.Message")
+local _Buffer = require("quan.message.Buffer")
+local _Message = require("quan.message.Message")
 
 ---
 ---消息头
 ---
 local MessageHeader = {
     ---类名
-    class = "MessageHeader",
+    class = "test.message.common.MessageHeader",
 }
 
 ---
@@ -20,9 +20,9 @@ local MessageHeader = {
 ---@return quan.message.Buffer
 ---
 function MessageHeader:encode(buffer)
-    assert(buffer == nil or type(buffer) == "table" and buffer.class == Buffer.class, "参数[buffer]类型错误")
+    assert(buffer == nil or type(buffer) == "table" and buffer.class == _Buffer.class, "参数[buffer]类型错误")
 
-    buffer = buffer or Buffer.new()
+    buffer = buffer or _Buffer.new()
 
     buffer:writeLong(self.seq)
     buffer:writeInt(self.error)
@@ -37,7 +37,7 @@ end
 ---@return test.message.common.MessageHeader
 ---
 function MessageHeader.decode(buffer, self)
-    assert(type(buffer) == "table" and buffer.class == Buffer.class, "参数[buffer]类型错误")
+    assert(type(buffer) == "table" and buffer.class == _Buffer.class, "参数[buffer]类型错误")
 
     self = self or MessageHeader.new()
 

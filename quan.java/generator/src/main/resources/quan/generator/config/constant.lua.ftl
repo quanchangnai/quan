@@ -4,7 +4,7 @@ local ${configDefinition.name} = require("${configDefinition.getFullName("lua")}
 <#if comment !="">
 ---${comment}
 </#if>
----@author 自动生成
+---@author 自动生成，请勿修改
 local ${name} = {}
 
 <#list rows?keys as key>

@@ -129,9 +129,9 @@ local function testMessage1()
     --file1:write(buffer.bytes)
     --file1:flush()
 
-    local file2 = io.open("D:\\SRoleLogin", "r")
-    local bytes = file2:read("*a")
-    local sRoleLogin3 = SRoleLogin.decode(Buffer.new(bytes))
+    --local file2 = io.open("D:\\SRoleLogin", "r")
+    --local bytes = file2:read("*a")
+    --local sRoleLogin3 = SRoleLogin.decode(Buffer.new(bytes))
 
     print("SRoleLogin1", sRoleLogin1)
     print("SRoleLogin2", sRoleLogin2)

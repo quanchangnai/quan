@@ -5,8 +5,11 @@
 ---自动生成
 ---
 
-local Buffer = require("quan.message.Buffer")
-local Message = require("quan.message.Message")
+local _Buffer = require("quan.message.Buffer")
+local _Message = require("quan.message.Message")
+<#if header??>
+local _MessageHeader = require("${header.getFullName("lua")}")
+</#if>
 <#list imports as import>
 local ${import[import?last_index_of(".")+1..]} = require("${import}")
 </#list>
@@ -18,7 +21,7 @@ local ${import[import?last_index_of(".")+1..]} = require("${import}")
 </#if>
 local ${name} = {
     ---类名
-    class = "${name}",
+    class = "${getFullName('lua')}",
 <#if kind ==3>
     ---消息ID
     id = ${id?c}
@@ -41,7 +44,7 @@ local function toString(self)
         <#if field.type == "string">
              <#lt>${field.name}='" .. tostring(self.${field.name}) .. '\'' ..
         <#elseif field.collectionType>
-             <#lt>${field.name}=" .. Message.${field.type}ToString(self.${field.name}) ..
+             <#lt>${field.name}=" .. table.${field.type}ToString(self.${field.name}) ..
         <#else>
              <#lt>${field.name}=" .. tostring(self.${field.name}) ..
         </#if>
@@ -94,9 +97,9 @@ end
 function ${name}:encode()
     assert(type(self) == "table" and self.class == ${name}.class, "参数[self]类型错误")
 
-    local buffer = Message.encode(self)
+    local buffer = _Message.encode(self)
     <#if header??>
-    require("${header.getFullName("lua")}").encode(self,buffer)
+    _MessageHeader.encode(self, buffer)
 
     </#if>
 <#else>
@@ -109,12 +112,12 @@ function ${name}:encode(buffer)
     <#if kind ==2>
     assert(type(self) == "table" and self.class == ${name}.class, "参数[self]类型错误")
     </#if>
-    assert(buffer == nil or type(buffer) == "table" and buffer.class == Buffer.class, "参数[buffer]类型错误")
+    assert(buffer == nil or type(buffer) == "table" and buffer.class == _Buffer.class, "参数[buffer]类型错误")
 
-    buffer = buffer or Buffer.new()
+    buffer = buffer or _Buffer.new()
 
     <#if header??>
-    require("${header.getFullName("lua")}").encode(self,buffer)
+    _MessageHeader.encode(self,buffer)
 
     </#if>
 </#if>
@@ -127,16 +130,16 @@ function ${name}:encode(buffer)
     </#if>
     <#if field.type=="set" || field.type=="list">
         <#if definedFieldId>
-    local ${field.name}Buffer_ = Buffer.new()
-    ${field.name}Buffer_:writeInt(#self.${field.name})
+    local ${field.name}Buffer = _Buffer.new()
+    ${field.name}Buffer:writeInt(#self.${field.name})
     for i, value in ipairs(self.${field.name}) do
         <#if field.builtinValueType>
-        ${field.name}Buffer_:write${field.valueType?cap_first}(value)
+        ${field.name}Buffer:write${field.valueType?cap_first}(value)
         <#else>
-        ${field.classValueType}.encode(value, ${field.name}Buffer_)
+        ${field.classValueType}.encode(value, ${field.name}Buffer)
         </#if>
     end
-    buffer:writeBuffer(${field.name}Buffer_)
+    buffer:writeBuffer(${field.name}Buffer)
         <#else>
         <#if field?index gt 0>
 
@@ -155,17 +158,17 @@ function ${name}:encode(buffer)
         </#if>
     <#elseif field.type=="map">
         <#if definedFieldId>
-    local ${field.name}Buffer_ = Buffer.new()
-    ${field.name}Buffer_:writeInt(table.size(self.${field.name}))
+    local ${field.name}Buffer = _Buffer.new()
+    ${field.name}Buffer:writeInt(table.size(self.${field.name}))
     for key, value in pairs(self.${field.name}) do
-        ${field.name}Buffer_:write${field.keyType?cap_first}(key)
+        ${field.name}Buffer:write${field.keyType?cap_first}(key)
         <#if field.builtinValueType>
-        ${field.name}Buffer_:write${field.valueType?cap_first}(value)
+        ${field.name}Buffer:write${field.valueType?cap_first}(value)
         <#else>
-        ${field.classValueType}.encode(value, ${field.name}Buffer_)
+        ${field.classValueType}.encode(value, ${field.name}Buffer)
         </#if>
     end
-    buffer:writeBuffer(${field.name}Buffer_)
+    buffer:writeBuffer(${field.name}Buffer)
         <#else>
         <#if field?index gt 0>
 
@@ -191,12 +194,12 @@ function ${name}:encode(buffer)
     buffer:writeInt(self.${field.name} or 0)
     <#elseif field.optional>
         <#if definedFieldId>
-    local ${field.name}Buffer_ = Buffer.new()
-    ${field.name}Buffer_:writeBool(self.${field.name} ~= nil)
+    local ${field.name}Buffer = _Buffer.new()
+    ${field.name}Buffer:writeBool(self.${field.name} ~= nil)
     if self.${field.name} ~= nil then
-        ${field.classType}.encode(self.${field.name}, ${field.name}Buffer_)
+        ${field.classType}.encode(self.${field.name}, ${field.name}Buffer)
     end
-    buffer:writeBuffer(${field.name}Buffer_)
+    buffer:writeBuffer(${field.name}Buffer)
         <#else>
         <#if field?index gt 0>
 
@@ -211,9 +214,9 @@ function ${name}:encode(buffer)
         </#if>
     <#else>
     <#if definedFieldId>
-    local ${field.name}Buffer_ = Buffer.new()
-    ${field.classType}.encode(self.${field.name}, ${field.name}Buffer_)
-    buffer:writeBuffer(${field.name}Buffer_)
+    local ${field.name}Buffer = _Buffer.new()
+    ${field.classType}.encode(self.${field.name}, ${field.name}Buffer)
+    buffer:writeBuffer(${field.name}Buffer)
     <#else>
     ${field.classType}.encode(self.${field.name}, buffer)
     </#if>
@@ -236,13 +239,13 @@ end
 ---@return ${getFullName("lua")}
 ---
 function ${name}.decode(buffer)
-    assert(type(buffer) == "table" and buffer.class == Buffer.class, "参数[buffer]类型错误")
+    assert(type(buffer) == "table" and buffer.class == _Buffer.class, "参数[buffer]类型错误")
 
     local self = ${name}.new()
 
-    Message.decode(buffer, self)
+    _Message.decode(buffer, self)
     <#if header??>
-    require("${header.getFullName("lua")}").decode(buffer, self)
+    _MessageHeader.decode(buffer, self)
 
     </#if>
 <#else>
@@ -253,7 +256,7 @@ function ${name}.decode(buffer)
 ---@return ${getFullName("lua")}
 ---
 function ${name}.decode(buffer, self)
-    assert(type(buffer) == "table" and buffer.class == Buffer.class, "参数[buffer]类型错误")
+    assert(type(buffer) == "table" and buffer.class == _Buffer.class, "参数[buffer]类型错误")
     <#if kind ==2>
     assert(self == nil or type(self) == "table" and self.class == ${name}.class, "参数[self]类型错误")
     </#if>
@@ -261,7 +264,7 @@ function ${name}.decode(buffer, self)
     self = self or ${name}.new()
 
     <#if header??>
-    require("${header.getFullName("lua")}").decode(buffer, self)
+    _MessageHeader.decode(buffer, self)
 
     </#if>
 </#if>
@@ -308,10 +311,10 @@ function ${name}.decode(buffer, self)
         </#if>
     </#list>
     <#if fields?size==0>
-    Message.skipField(tag,buffer)
+    _Message.skipField(tag,buffer)
     <#else>
         else
-            Message.skipField(tag, buffer)
+            _Message.skipField(tag, buffer)
         end
     </#if>
     end

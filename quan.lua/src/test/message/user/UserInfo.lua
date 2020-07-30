@@ -3,8 +3,8 @@
 ---自动生成
 ---
 
-local Buffer = require("quan.message.Buffer")
-local Message = require("quan.message.Message")
+local _Buffer = require("quan.message.Buffer")
+local _Message = require("quan.message.Message")
 local RoleInfo = require("test.message.role.RoleInfo")
 
 ---
@@ -12,7 +12,7 @@ local RoleInfo = require("test.message.role.RoleInfo")
 ---
 local UserInfo = {
     ---类名
-    class = "UserInfo",
+    class = "test.message.user.UserInfo",
 }
 
 local function onSet(self, key, value)
@@ -27,9 +27,9 @@ local function toString(self)
             ",level=" .. tostring(self.level) ..
             ",roleInfo1=" .. tostring(self.roleInfo1) ..
             ",roleInfo2=" .. tostring(self.roleInfo2) ..
-            ",roleList=" .. Message.listToString(self.roleList) ..
-            ",roleSet=" .. Message.setToString(self.roleSet) ..
-            ",roleMap=" .. Message.mapToString(self.roleMap) ..
+            ",roleList=" .. table.listToString(self.roleList) ..
+            ",roleSet=" .. table.setToString(self.roleSet) ..
+            ",roleMap=" .. table.mapToString(self.roleMap) ..
             '}';
 end
 
@@ -74,9 +74,9 @@ end
 ---
 function UserInfo:encode(buffer)
     assert(type(self) == "table" and self.class == UserInfo.class, "参数[self]类型错误")
-    assert(buffer == nil or type(buffer) == "table" and buffer.class == Buffer.class, "参数[buffer]类型错误")
+    assert(buffer == nil or type(buffer) == "table" and buffer.class == _Buffer.class, "参数[buffer]类型错误")
 
-    buffer = buffer or Buffer.new()
+    buffer = buffer or _Buffer.new()
 
     buffer:writeTag(4)
     buffer:writeLong(self.id)
@@ -88,42 +88,42 @@ function UserInfo:encode(buffer)
     buffer:writeInt(self.level)
 
     buffer:writeTag(19)
-    local roleInfo1Buffer_ = Buffer.new()
-    roleInfo1Buffer_:writeBool(self.roleInfo1 ~= nil)
+    local roleInfo1Buffer = _Buffer.new()
+    roleInfo1Buffer:writeBool(self.roleInfo1 ~= nil)
     if self.roleInfo1 ~= nil then
-        RoleInfo.encode(self.roleInfo1, roleInfo1Buffer_)
+        RoleInfo.encode(self.roleInfo1, roleInfo1Buffer)
     end
-    buffer:writeBuffer(roleInfo1Buffer_)
+    buffer:writeBuffer(roleInfo1Buffer)
 
     buffer:writeTag(23)
-    local roleInfo2Buffer_ = Buffer.new()
-    RoleInfo.encode(self.roleInfo2, roleInfo2Buffer_)
-    buffer:writeBuffer(roleInfo2Buffer_)
+    local roleInfo2Buffer = _Buffer.new()
+    RoleInfo.encode(self.roleInfo2, roleInfo2Buffer)
+    buffer:writeBuffer(roleInfo2Buffer)
 
     buffer:writeTag(27)
-    local roleListBuffer_ = Buffer.new()
-    roleListBuffer_:writeInt(#self.roleList)
+    local roleListBuffer = _Buffer.new()
+    roleListBuffer:writeInt(#self.roleList)
     for i, value in ipairs(self.roleList) do
-        RoleInfo.encode(value, roleListBuffer_)
+        RoleInfo.encode(value, roleListBuffer)
     end
-    buffer:writeBuffer(roleListBuffer_)
+    buffer:writeBuffer(roleListBuffer)
 
     buffer:writeTag(31)
-    local roleSetBuffer_ = Buffer.new()
-    roleSetBuffer_:writeInt(#self.roleSet)
+    local roleSetBuffer = _Buffer.new()
+    roleSetBuffer:writeInt(#self.roleSet)
     for i, value in ipairs(self.roleSet) do
-        RoleInfo.encode(value, roleSetBuffer_)
+        RoleInfo.encode(value, roleSetBuffer)
     end
-    buffer:writeBuffer(roleSetBuffer_)
+    buffer:writeBuffer(roleSetBuffer)
 
     buffer:writeTag(35)
-    local roleMapBuffer_ = Buffer.new()
-    roleMapBuffer_:writeInt(table.size(self.roleMap))
+    local roleMapBuffer = _Buffer.new()
+    roleMapBuffer:writeInt(table.size(self.roleMap))
     for key, value in pairs(self.roleMap) do
-        roleMapBuffer_:writeLong(key)
-        RoleInfo.encode(value, roleMapBuffer_)
+        roleMapBuffer:writeLong(key)
+        RoleInfo.encode(value, roleMapBuffer)
     end
-    buffer:writeBuffer(roleMapBuffer_)
+    buffer:writeBuffer(roleMapBuffer)
 
     buffer:writeTag(0);
 
@@ -137,7 +137,7 @@ end
 ---@return test.message.user.UserInfo
 ---
 function UserInfo.decode(buffer, self)
-    assert(type(buffer) == "table" and buffer.class == Buffer.class, "参数[buffer]类型错误")
+    assert(type(buffer) == "table" and buffer.class == _Buffer.class, "参数[buffer]类型错误")
     assert(self == nil or type(self) == "table" and self.class == UserInfo.class, "参数[self]类型错误")
 
     self = self or UserInfo.new()
@@ -176,7 +176,7 @@ function UserInfo.decode(buffer, self)
                 self.roleMap[buffer:readLong()] = RoleInfo.decode(buffer)
             end
         else
-            Message.skipField(tag, buffer)
+            _Message.skipField(tag, buffer)
         end
     end
 

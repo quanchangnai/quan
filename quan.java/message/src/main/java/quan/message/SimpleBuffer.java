@@ -167,4 +167,5 @@ public class SimpleBuffer extends Buffer {
         System.arraycopy(bytes, 0, this.bytes, writeIndex, bytes.length);
         writeIndex += bytes.length;
     }
+
 }

@@ -15,7 +15,7 @@ import ${import};
 <#if comment !="">
  * ${comment}<br/>
 </#if>
- * 自动生成
+ * 自动生成，请勿修改
  */
 public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif kind ==2>Bean<#else>Config</#if> {
 <#if !selfFields??>

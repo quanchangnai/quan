@@ -10,7 +10,7 @@ import ${import};
 <#if comment !="">
  * ${comment}<br/>
 </#if>
- * 自动生成
+ * 自动生成，请勿修改
  */
 <#if useEnum>
 public enum ${name} {

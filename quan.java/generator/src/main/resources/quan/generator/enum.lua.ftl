@@ -4,7 +4,7 @@ require("quan.table")
 <#if comment !="">
 ---${comment}
 </#if>
----自动生成
+---自动生成，请勿修改
 ---
 local ${name} = {
 <#list fields as field>

@@ -3,7 +3,7 @@
 ---${comment}
 </#if>
 ---@module ${name}
----@author 自动生成
+---@author 自动生成，请勿修改
 ---
 
 local Config = require("quan.config.Config")

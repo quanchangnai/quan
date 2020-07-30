@@ -2,7 +2,7 @@ namespace Test.Message.Role
 {
     /// <summary>
     /// 角色类型<br/>
-    /// 自动生成
+    /// 自动生成，请勿修改
     /// </summary>
     public enum RoleType {
 
