@@ -378,7 +378,7 @@ public class ConfigDefinition extends BeanDefinition {
 
     private void validateFieldDelimiter(FieldDefinition field, List<String> delimiters) {
         if (field.isBeanType()) {
-            validateBeanDelimiter(field.getBean(), delimiters);
+            validateBeanDelimiter(field.getTypeBean(), delimiters);
             return;
         }
 
@@ -411,7 +411,7 @@ public class ConfigDefinition extends BeanDefinition {
             addValidatedError(getValidatedName() + "[" + field.getType() + "]类型字段" + field.getValidatedName() + "的分隔符[" + delimiter + "]必须是" + charNumError + "个字符");
         }
 
-        BeanDefinition fieldValueBean = field.getValueBean();
+        BeanDefinition fieldValueBean = field.getValueTypeBean();
         if (fieldValueBean != null) {
             validateBeanDelimiter(fieldValueBean, delimiters);
         }

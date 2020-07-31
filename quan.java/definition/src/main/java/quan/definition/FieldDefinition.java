@@ -182,14 +182,14 @@ public class FieldDefinition extends Definition implements Cloneable {
     }
 
     public boolean isBeanType() {
-        return getBean() != null;
+        return getTypeBean() != null;
     }
 
     public ClassDefinition getClassDefinition() {
         return parser.getClass(getLongClassName(owner, type));
     }
 
-    public BeanDefinition getBean() {
+    public BeanDefinition getTypeBean() {
         ClassDefinition classDefinition = getClassDefinition();
         if (classDefinition != null && classDefinition.getClass() == BeanDefinition.class) {
             return (BeanDefinition) classDefinition;
@@ -302,10 +302,10 @@ public class FieldDefinition extends Definition implements Cloneable {
     }
 
     public boolean isBeanValueType() {
-        return getValueBean() != null;
+        return getValueTypeBean() != null;
     }
 
-    public BeanDefinition getValueBean() {
+    public BeanDefinition getValueTypeBean() {
         if (!isCollectionType()) {
             return null;
         }
@@ -604,7 +604,7 @@ public class FieldDefinition extends Definition implements Cloneable {
         if (columnNums.size() == 1) {
             return true;
         }
-        BeanDefinition beanDefinition = getBean();
+        BeanDefinition beanDefinition = getTypeBean();
         if (beanDefinition != null) {
             if (beanDefinition.hasChild()) {
                 return columnNums.size() == beanDefinition.getDescendantMaxFieldCount() + 1;

@@ -81,7 +81,7 @@ public class ConfigConverter {
         } else if (type.equals("map")) {
             return convertMap(fieldDefinition, value);
         } else if (fieldDefinition.isBeanType()) {
-            return convertBean(fieldDefinition.getOwner(), fieldDefinition.getBean(), value);
+            return convertBean(fieldDefinition.getOwner(), fieldDefinition.getTypeBean(), value);
         } else if (fieldDefinition.isEnumType()) {
             return convertEnumType(fieldDefinition.getEnum(), value);
         }
@@ -89,7 +89,7 @@ public class ConfigConverter {
     }
 
     public Object convertColumnBean(FieldDefinition fieldDefinition, JSONObject object, String columnValue, int columnNum) {
-        BeanDefinition beanDefinition = fieldDefinition.getBean();
+        BeanDefinition beanDefinition = fieldDefinition.getTypeBean();
 
         //字段对应一列
         if (fieldDefinition.getColumnNums().size() == 1) {
@@ -268,7 +268,7 @@ public class ConfigConverter {
             if (fieldDefinition.isPrimitiveValueType()) {
                 o = convertPrimitiveType(fieldDefinition.getValueType(), v);
             } else {
-                o = convertBean(fieldDefinition.getOwner(), fieldDefinition.getValueBean(), v);
+                o = convertBean(fieldDefinition.getOwner(), fieldDefinition.getValueTypeBean(), v);
             }
             if (o != null) {
                 array.add(o);
@@ -362,7 +362,7 @@ public class ConfigConverter {
                 if (fieldDefinition.isPrimitiveValueType()) {
                     objectValue = convertPrimitiveType(fieldDefinition.getValueType(), value);
                 } else {
-                    objectValue = convertBean(fieldDefinition.getOwner(), fieldDefinition.getValueBean(), value);
+                    objectValue = convertBean(fieldDefinition.getOwner(), fieldDefinition.getValueTypeBean(), value);
                 }
             } catch (Exception ignored) {
             }
@@ -405,7 +405,7 @@ public class ConfigConverter {
                 if (fieldDefinition.isPrimitiveValueType()) {
                     v = convertPrimitiveType(fieldDefinition.getValueType(), values[i + 1]);
                 } else {
-                    v = convertBean(fieldDefinition.getOwner(), fieldDefinition.getValueBean(), values[i + 1]);
+                    v = convertBean(fieldDefinition.getOwner(), fieldDefinition.getValueTypeBean(), values[i + 1]);
                 }
             } catch (Exception ignored) {
             }

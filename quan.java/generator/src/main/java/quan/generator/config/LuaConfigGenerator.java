@@ -106,7 +106,7 @@ public class LuaConfigGenerator extends ConfigGenerator {
             } else if (field.getType().equals("list") || field.getType().equals("set")) {
                 arrayLuaString(configDefinition, field, object.getJSONArray(field.getName()), luaBuilder);
             } else if (field.isBeanType()) {
-                beanLuaString(configDefinition, field.getBean(), object.getJSONObject(field.getName()), luaBuilder);
+                beanLuaString(configDefinition, field.getTypeBean(), object.getJSONObject(field.getName()), luaBuilder);
             } else {
                 luaBuilder.append(object.getOrDefault(field.getName(), "nil"));
             }
@@ -142,7 +142,7 @@ public class LuaConfigGenerator extends ConfigGenerator {
             if (field.getValueType().equals("string")) {
                 luaBuilder.append("\"").append(object.getString(key)).append("\"");
             } else if (field.isBeanValueType()) {
-                beanLuaString(configDefinition, field.getValueBean(), object.getJSONObject(key), luaBuilder);
+                beanLuaString(configDefinition, field.getValueTypeBean(), object.getJSONObject(key), luaBuilder);
             } else {
                 luaBuilder.append(object.get(key));
             }
@@ -166,7 +166,7 @@ public class LuaConfigGenerator extends ConfigGenerator {
             if (field.getValueType().equals("string")) {
                 luaBuilder.append("\"").append(array.getString(i)).append("\"");
             } else if (field.isBeanValueType()) {
-                beanLuaString(configDefinition, field.getValueBean(), array.getJSONObject(i), luaBuilder);
+                beanLuaString(configDefinition, field.getValueTypeBean(), array.getJSONObject(i), luaBuilder);
             } else {
                 luaBuilder.append(array.get(i));
             }

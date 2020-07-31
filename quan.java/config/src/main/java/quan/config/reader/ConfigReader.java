@@ -150,7 +150,7 @@ public abstract class ConfigReader {
         }
 
         for (FieldDefinition fieldDefinition : configDefinition.getFields()) {
-            BeanDefinition fieldBean = fieldDefinition.getBean();
+            BeanDefinition fieldBean = fieldDefinition.getTypeBean();
             if (!fieldDefinition.isLegalColumnCount() && fieldBean != null) {
                 validatedErrors.add(String.format("配置[%s]的字段类型[%s]对应列数非法，要么单独对应1列，要么按字段拆开对应%s列", table, fieldDefinition.getType(), fieldBean.getFields().size()));
             }

@@ -333,9 +333,9 @@ public class BeanDefinition extends ClassDefinition {
     protected boolean validateFieldBeanCycle(FieldDefinition rootField, FieldDefinition field, Set<BeanDefinition> fieldBeans) {
         BeanDefinition fieldBean = null;
         if (field.isBeanType()) {
-            fieldBean = field.getBean();
+            fieldBean = field.getTypeBean();
         } else if (field.isCollectionType()) {
-            fieldBean = field.getValueBean();
+            fieldBean = field.getValueTypeBean();
         }
 
         if (fieldBean == null) {
@@ -364,9 +364,9 @@ public class BeanDefinition extends ClassDefinition {
         }
         BeanDefinition fieldBean = null;
         if (field.isBeanType()) {
-            fieldBean = field.getBean();
+            fieldBean = field.getTypeBean();
         } else if (field.isCollectionType()) {
-            fieldBean = field.getValueBean();
+            fieldBean = field.getValueTypeBean();
         }
         if (fieldBean == null) {
             return;
@@ -384,8 +384,8 @@ public class BeanDefinition extends ClassDefinition {
         }
 
         for (FieldDefinition fieldDefinition : getFields()) {
-            addDependent(new DependentSource(fieldDefinition, DependentType.field), fieldDefinition.getBean());
-            addDependent(new DependentSource(fieldDefinition, DependentType.fieldValue), fieldDefinition.getValueBean());
+            addDependent(new DependentSource(fieldDefinition, DependentType.field), fieldDefinition.getTypeBean());
+            addDependent(new DependentSource(fieldDefinition, DependentType.fieldValue), fieldDefinition.getValueTypeBean());
         }
 
         for (BeanDefinition child : getChildren()) {

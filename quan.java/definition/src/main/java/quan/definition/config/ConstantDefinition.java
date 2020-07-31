@@ -161,7 +161,7 @@ public class ConstantDefinition extends ClassDefinition {
     protected void validateDependents() {
         super.validateDependents();
         FieldDefinition valueField = getValueField();
-        addDependent(new DependentSource(valueField, DependentType.field), valueField.getBean());
-        addDependent(new DependentSource(valueField, DependentType.fieldValue), valueField.getValueBean());
+        addDependent(new DependentSource(valueField, DependentType.field), valueField.getTypeBean());
+        addDependent(new DependentSource(valueField, DependentType.fieldValue), valueField.getValueTypeBean());
     }
 }

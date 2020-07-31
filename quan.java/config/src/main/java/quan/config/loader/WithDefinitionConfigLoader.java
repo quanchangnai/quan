@@ -325,7 +325,7 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
         if (field.isPrimitiveType()) {
             validatePrimitiveTypeRef(position, bean, field, value, false, allConfigIndexedJsons);
         } else if (field.isBeanType()) {
-            validateBeanTypeRef(position, field.getBean(), (JSONObject) value, allConfigIndexedJsons);
+            validateBeanTypeRef(position, field.getTypeBean(), (JSONObject) value, allConfigIndexedJsons);
         } else if (field.getType().equals("map")) {
             JSONObject map = (JSONObject) value;
             for (String mapKey : map.keySet()) {
@@ -336,7 +336,7 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
                 if (field.isPrimitiveValueType()) {
                     validatePrimitiveTypeRef(position, bean, field, mapValue, false, allConfigIndexedJsons);
                 } else {
-                    validateBeanTypeRef(position, field.getValueBean(), (JSONObject) mapValue, allConfigIndexedJsons);
+                    validateBeanTypeRef(position, field.getValueTypeBean(), (JSONObject) mapValue, allConfigIndexedJsons);
                 }
             }
 
@@ -346,7 +346,7 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
                 if (field.isPrimitiveValueType()) {
                     validatePrimitiveTypeRef(position, bean, field, arrayValue, false, allConfigIndexedJsons);
                 } else {
-                    validateBeanTypeRef(position, field.getValueBean(), (JSONObject) arrayValue, allConfigIndexedJsons);
+                    validateBeanTypeRef(position, field.getValueTypeBean(), (JSONObject) arrayValue, allConfigIndexedJsons);
                 }
             }
         }
