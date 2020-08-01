@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Quan.Common.Utils;
 using Quan.Message;
 using Buffer = Quan.Message.Buffer;
-<#list imports as import>
+<#list imports?keys as import>
 using ${import};
 </#list>
 

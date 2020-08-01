@@ -31,4 +31,5 @@ function MessageRegistry.create(msgId)
     end
 end
 
+MessageRegistry = table.readOnly(MessageRegistry)
 return MessageRegistry

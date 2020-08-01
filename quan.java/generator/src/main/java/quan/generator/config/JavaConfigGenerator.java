@@ -56,7 +56,7 @@ public class JavaConfigGenerator extends ConfigGenerator {
     protected void prepareConstant(ConstantDefinition constantDefinition) {
         super.prepareConstant(constantDefinition);
         if (constantDefinition.getValueField().isCollectionType()) {
-            constantDefinition.getImports().add("java.util.*");
+            constantDefinition.getImports().put("java.util.*",null);
         }
     }
 }

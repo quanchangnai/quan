@@ -10,8 +10,8 @@ local _Message = require("quan.message.Message")
 <#if header??>
 local _MessageHeader = require("${header.getFullName("lua")}")
 </#if>
-<#list imports as import>
-local ${import[import?last_index_of(".")+1..]} = require("${import}")
+<#list imports?keys as import>
+local ${imports[import]?replace('.','_')} = require("${import}")
 </#list>
 
 <#if comment !="">
@@ -77,7 +77,7 @@ function ${name}.new(args)
     <#elseif field.collectionType>
         ${field.name} = args.${field.name} or {},
     <#elseif !field.optional>
-        ${field.name} = args.${field.name} or ${field.classType}.new(),
+        ${field.name} = args.${field.name} or ${field.classType?replace('.','_')}.new(),
     <#else>
         ${field.name} = args.${field.name},
     </#if>
@@ -136,7 +136,7 @@ function ${name}:encode(buffer)
         <#if field.builtinValueType>
         ${field.name}Buffer:write${field.valueType?cap_first}(value)
         <#else>
-        ${field.classValueType}.encode(value, ${field.name}Buffer)
+        ${field.classValueType?replace('.','_')}.encode(value, ${field.name}Buffer)
         </#if>
     end
     buffer:writeBuffer(${field.name}Buffer)
@@ -147,7 +147,7 @@ function ${name}:encode(buffer)
     buffer:writeInt(#self.${field.name})
     for i, value in ipairs(self.${field.name}) do
         <#if field.builtinValueType>
-        buffer:write${field.classValueType?cap_first}(value)
+        buffer:write${field.classValueType?replace('.','_')?cap_first}(value)
         <#else>
         ${field.valueType}.encode(value, buffer)
         </#if>
@@ -179,7 +179,7 @@ function ${name}:encode(buffer)
         <#if field.builtinValueType>
         buffer:write${field.valueType?cap_first}(value)
         <#else>
-        ${field.classValueType}.encode(value, buffer)
+        ${field.classValueType?replace('.','_')}.encode(value, buffer)
         </#if>
     end
         <#if field?has_next && !fields[field?index+1].collectionType && (fields[field?index+1].primitiveType || fields[field?index+1].enumType || !fields[field?index+1].optional) >
@@ -197,7 +197,7 @@ function ${name}:encode(buffer)
     local ${field.name}Buffer = _Buffer.new()
     ${field.name}Buffer:writeBool(self.${field.name} ~= nil)
     if self.${field.name} ~= nil then
-        ${field.classType}.encode(self.${field.name}, ${field.name}Buffer)
+        ${field.classType?replace('.','_')}.encode(self.${field.name}, ${field.name}Buffer)
     end
     buffer:writeBuffer(${field.name}Buffer)
         <#else>
@@ -206,7 +206,7 @@ function ${name}:encode(buffer)
         </#if>
     buffer:writeBool(self.${field.name} ~= nil)
     if self.${field.name} ~= nil then
-        ${field.classType}.encode(self.${field.name}, buffer)
+        ${field.classType?replace('.','_')}.encode(self.${field.name}, buffer)
     end
         <#if field?has_next && !fields[field?index+1].collectionType && (fields[field?index+1].primitiveType || fields[field?index+1].enumType || !fields[field?index+1].optional) >
 
@@ -215,10 +215,10 @@ function ${name}:encode(buffer)
     <#else>
     <#if definedFieldId>
     local ${field.name}Buffer = _Buffer.new()
-    ${field.classType}.encode(self.${field.name}, ${field.name}Buffer)
+    ${field.classType?replace('.','_')}.encode(self.${field.name}, ${field.name}Buffer)
     buffer:writeBuffer(${field.name}Buffer)
     <#else>
-    ${field.classType}.encode(self.${field.name}, buffer)
+    ${field.classType?replace('.','_')}.encode(self.${field.name}, buffer)
     </#if>
     </#if>
     <#if definedFieldId>
@@ -282,7 +282,7 @@ function ${name}.decode(buffer, self)
             <#if field.builtinValueType>
                 self.${field.name}[i] = buffer:read${field.valueType?cap_first}()
             <#else>
-                self.${field.name}[i] = ${field.classValueType}.decode(buffer)
+                self.${field.name}[i] = ${field.classValueType?replace('.','_')}.decode(buffer)
             </#if>
             end
         <#elseif field.type=="map">
@@ -291,7 +291,7 @@ function ${name}.decode(buffer, self)
             <#if field.builtinValueType>
                 self.${field.name}[buffer:read${field.keyType?cap_first}()] = buffer:read${field.valueType?cap_first}()
             <#else>
-                self.${field.name}[buffer:read${field.keyType?cap_first}()] = ${field.classValueType}.decode(buffer)
+                self.${field.name}[buffer:read${field.keyType?cap_first}()] = ${field.classValueType?replace('.','_')}.decode(buffer)
             </#if>
             end
         <#elseif field.type=="float"||field.type=="double">
@@ -303,11 +303,11 @@ function ${name}.decode(buffer, self)
         <#elseif field.optional>
             buffer:readInt()
             if buffer:readBool() then
-                self.${field.name} = ${field.classType}.decode(buffer)
+                self.${field.name} = ${field.classType?replace('.','_')}.decode(buffer)
             end
         <#else>
             buffer:readInt()
-            self.${field.name} = ${field.classType}.decode(buffer, self.${field.name})
+            self.${field.name} = ${field.classType?replace('.','_')}.decode(buffer, self.${field.name})
         </#if>
     </#list>
     <#if fields?size==0>
@@ -330,7 +330,7 @@ function ${name}.decode(buffer, self)
         <#if field.builtinValueType>
         self.${field.name}[i] = buffer:read${field.valueType?cap_first}()
         <#else>
-        self.${field.name}[i] = ${field.classValueType}.decode(buffer)
+        self.${field.name}[i] = ${field.classValueType?replace('.','_')}.decode(buffer)
         </#if>
     end
         <#if field?has_next && !fields[field?index+1].collectionType && (fields[field?index+1].primitiveType || fields[field?index+1].enumType || !fields[field?index+1].optional) >
@@ -344,7 +344,7 @@ function ${name}.decode(buffer, self)
         <#if field.builtinValueType>
         self.${field.name}[buffer:read${field.keyType?cap_first}()] = buffer:read${field.valueType?cap_first}()
         <#else>
-        self.${field.name}[buffer:read${field.keyType?cap_first}()] = ${field.classValueType}.decode(buffer)
+        self.${field.name}[buffer:read${field.keyType?cap_first}()] = ${field.classValueType?replace('.','_')}.decode(buffer)
         </#if>
     end
         <#if field?has_next && !fields[field?index+1].collectionType && (fields[field?index+1].primitiveType || fields[field?index+1].enumType || !fields[field?index+1].optional) >
@@ -361,13 +361,13 @@ function ${name}.decode(buffer, self)
 
         </#if>
     if buffer:readBool() then
-        self.${field.name} = ${field.classType}.decode(buffer)
+        self.${field.name} = ${field.classType?replace('.','_')}.decode(buffer)
     end
         <#if field?has_next && !fields[field?index+1].collectionType && (fields[field?index+1].primitiveType || fields[field?index+1].enumType || !fields[field?index+1].optional) >
 
         </#if>
     <#else>
-    self.${field.name} = ${field.classType}.decode(buffer, self.${field.name})
+    self.${field.name} = ${field.classType?replace('.','_')}.decode(buffer, self.${field.name})
     </#if>
 </#list>
 </#if>

@@ -2,7 +2,6 @@ package quan.message.user;
 
 import java.util.*;
 import quan.message.*;
-import quan.message.role.RoleInfo;
 
 /**
  * 用户信息<br/>
@@ -20,19 +19,22 @@ public class UserInfo extends Bean {
     private int level;
 
     //角色信息
-    private RoleInfo roleInfo1;
+    private quan.message.role.RoleInfo roleInfo1;
 
     //角色信息2
     private RoleInfo roleInfo2 = new RoleInfo();
 
+    //角色信息2
+    private RoleInfo roleInfo3 = new RoleInfo();
+
     //角色信息List
-    private List<RoleInfo> roleList = new ArrayList<>();
+    private List<quan.message.role.RoleInfo> roleList = new ArrayList<>();
 
     //角色信息Set
-    private Set<RoleInfo> roleSet = new HashSet<>();
+    private Set<quan.message.role.RoleInfo> roleSet = new HashSet<>();
 
     //角色信息Map
-    private Map<Long, RoleInfo> roleMap = new HashMap<>();
+    private Map<Long, quan.message.role.RoleInfo> roleMap = new HashMap<>();
 
 
     /**
@@ -84,14 +86,14 @@ public class UserInfo extends Bean {
     /**
      * 角色信息
      */
-    public RoleInfo getRoleInfo1() {
+    public quan.message.role.RoleInfo getRoleInfo1() {
         return roleInfo1;
     }
 
     /**
      * 角色信息
      */
-    public UserInfo setRoleInfo1(RoleInfo roleInfo1) {
+    public UserInfo setRoleInfo1(quan.message.role.RoleInfo roleInfo1) {
         this.roleInfo1 = roleInfo1;
         return this;
     }
@@ -113,23 +115,39 @@ public class UserInfo extends Bean {
     }
 
     /**
+     * 角色信息2
+     */
+    public RoleInfo getRoleInfo3() {
+        return roleInfo3;
+    }
+
+    /**
+     * 角色信息2
+     */
+    public UserInfo setRoleInfo3(RoleInfo roleInfo3) {
+        Objects.requireNonNull(roleInfo3);
+        this.roleInfo3 = roleInfo3;
+        return this;
+    }
+
+    /**
      * 角色信息List
      */
-    public List<RoleInfo> getRoleList() {
+    public List<quan.message.role.RoleInfo> getRoleList() {
         return roleList;
     }
 
     /**
      * 角色信息Set
      */
-    public Set<RoleInfo> getRoleSet() {
+    public Set<quan.message.role.RoleInfo> getRoleSet() {
         return roleSet;
     }
 
     /**
      * 角色信息Map
      */
-    public Map<Long, RoleInfo> getRoleMap() {
+    public Map<Long, quan.message.role.RoleInfo> getRoleMap() {
         return roleMap;
     }
 
@@ -160,22 +178,27 @@ public class UserInfo extends Bean {
         buffer.writeBuffer(roleInfo2$Buffer);
 
         buffer.writeTag(27);
+        Buffer roleInfo3$Buffer = new SimpleBuffer();
+        this.roleInfo3.encode(roleInfo3$Buffer);
+        buffer.writeBuffer(roleInfo3$Buffer);
+
+        buffer.writeTag(31);
         Buffer roleList$Buffer = new SimpleBuffer();
         roleList$Buffer.writeInt(this.roleList.size());
-        for (RoleInfo roleList$Value : this.roleList) {
+        for (quan.message.role.RoleInfo roleList$Value : this.roleList) {
             roleList$Value.encode(roleList$Buffer);
         }
         buffer.writeBuffer(roleList$Buffer);
 
-        buffer.writeTag(31);
+        buffer.writeTag(35);
         Buffer roleSet$Buffer = new SimpleBuffer();
         roleSet$Buffer.writeInt(this.roleSet.size());
-        for (RoleInfo roleSet$Value : this.roleSet) {
+        for (quan.message.role.RoleInfo roleSet$Value : this.roleSet) {
             roleSet$Value.encode(roleSet$Buffer);
         }
         buffer.writeBuffer(roleSet$Buffer);
 
-        buffer.writeTag(35);
+        buffer.writeTag(39);
         Buffer roleMap$Buffer = new SimpleBuffer();
         roleMap$Buffer.writeInt(this.roleMap.size());
         for (Long roleMap$Key : this.roleMap.keySet()) {
@@ -206,7 +229,7 @@ public class UserInfo extends Bean {
                     buffer.readInt();
                     if (buffer.readBool()) {
                         if (this.roleInfo1 == null) {
-                            this.roleInfo1 = new RoleInfo();
+                            this.roleInfo1 = new quan.message.role.RoleInfo();
                         }
                         this.roleInfo1.decode(buffer);
                     }
@@ -217,28 +240,32 @@ public class UserInfo extends Bean {
                     break;
                 case 27:
                     buffer.readInt();
+                    this.roleInfo3.decode(buffer);
+                    break;
+                case 31:
+                    buffer.readInt();
                     int roleList$Size = buffer.readInt();
                     for (int i = 0; i < roleList$Size; i++) {     
-                        RoleInfo roleList$Value = new RoleInfo();
+                        quan.message.role.RoleInfo roleList$Value = new quan.message.role.RoleInfo();
                         roleList$Value.decode(buffer);
                         this.roleList.add(roleList$Value);
                     }
                     break;
-                case 31:
+                case 35:
                     buffer.readInt();
                     int roleSet$Size = buffer.readInt();
                     for (int i = 0; i < roleSet$Size; i++) {     
-                        RoleInfo roleSet$Value = new RoleInfo();
+                        quan.message.role.RoleInfo roleSet$Value = new quan.message.role.RoleInfo();
                         roleSet$Value.decode(buffer);
                         this.roleSet.add(roleSet$Value);
                     }
                     break;
-                case 35:
+                case 39:
                     buffer.readInt();
                     int roleMap$Size = buffer.readInt();
                     for (int i = 0; i < roleMap$Size; i++) {
                         Long roleMap$Key = buffer.readLong();
-                        RoleInfo roleMap$Value = new RoleInfo();
+                        quan.message.role.RoleInfo roleMap$Value = new quan.message.role.RoleInfo();
                         roleMap$Value.decode(buffer);
                         this.roleMap.put(roleMap$Key, roleMap$Value);
                     }
@@ -257,6 +284,7 @@ public class UserInfo extends Bean {
                 ",level=" + level +
                 ",roleInfo1=" + roleInfo1 +
                 ",roleInfo2=" + roleInfo2 +
+                ",roleInfo3=" + roleInfo3 +
                 ",roleList=" + roleList +
                 ",roleSet=" + roleSet +
                 ",roleMap=" + roleMap +

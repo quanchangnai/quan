@@ -7,7 +7,7 @@ import com.alibaba.fastjson.*;
 <#if !(parentClassName??) || kind == 6>
 import quan.config.*;
 </#if>
-<#list imports as import>
+<#list imports?keys as import>
 import ${import};
 </#list>
 

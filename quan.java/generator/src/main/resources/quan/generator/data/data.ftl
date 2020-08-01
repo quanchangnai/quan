@@ -6,7 +6,7 @@ import org.bson.codecs.*;
 import org.bson.codecs.configuration.CodecRegistry;
 import quan.data.*;
 import quan.data.field.*;
-<#list imports as import>
+<#list imports?keys as import>
 import ${import};
 </#list>
 

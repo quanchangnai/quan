@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Quan.Common.Utils;
 using Quan.Message;
 using Buffer = Quan.Message.Buffer;
-using Test.Message.Role;
 
 namespace Test.Message.User
 {
@@ -37,7 +36,7 @@ namespace Test.Message.User
         /// <summary>
 		/// 角色信息
 		/// </summary>
-		public RoleInfo RoleInfo1 { get; set; }
+		public Test.Message.Role.RoleInfo RoleInfo1 { get; set; }
 
 		private RoleInfo _roleInfo2 = new RoleInfo();
 
@@ -50,20 +49,31 @@ namespace Test.Message.User
 	    	set => _roleInfo2 = value ?? throw new NullReferenceException();
 		}
 
+		private RoleInfo _roleInfo3 = new RoleInfo();
+
+        /// <summary>
+		/// 角色信息2
+		/// </summary>
+		public RoleInfo RoleInfo3
+		{
+	    	get => _roleInfo3;
+	    	set => _roleInfo3 = value ?? throw new NullReferenceException();
+		}
+
         /// <summary>
 		/// 角色信息List
 		/// </summary>
-		public List<RoleInfo> RoleList { get; } = new List<RoleInfo>();
+		public List<Test.Message.Role.RoleInfo> RoleList { get; } = new List<Test.Message.Role.RoleInfo>();
 
         /// <summary>
 		/// 角色信息Set
 		/// </summary>
-		public HashSet<RoleInfo> RoleSet { get; } = new HashSet<RoleInfo>();
+		public HashSet<Test.Message.Role.RoleInfo> RoleSet { get; } = new HashSet<Test.Message.Role.RoleInfo>();
 
         /// <summary>
 		/// 角色信息Map
 		/// </summary>
-		public Dictionary<long, RoleInfo> RoleMap { get; } = new Dictionary<long, RoleInfo>();
+		public Dictionary<long, Test.Message.Role.RoleInfo> RoleMap { get; } = new Dictionary<long, Test.Message.Role.RoleInfo>();
 
 
 		public override void Encode(Buffer buffer)
@@ -91,6 +101,11 @@ namespace Test.Message.User
         	buffer.WriteBuffer(roleInfo2Buffer);
 
         	buffer.WriteTag(27);
+        	var roleInfo3Buffer = new Buffer();
+        	RoleInfo3.Encode(roleInfo3Buffer);
+        	buffer.WriteBuffer(roleInfo3Buffer);
+
+        	buffer.WriteTag(31);
 			var roleListBuffer = new Buffer();
 			roleListBuffer.WriteInt(RoleList.Count);
 		    foreach (var roleListValue in RoleList) {
@@ -98,7 +113,7 @@ namespace Test.Message.User
 		    }
 			buffer.WriteBuffer(roleListBuffer);
 
-        	buffer.WriteTag(31);
+        	buffer.WriteTag(35);
 			var roleSetBuffer = new Buffer();
 			roleSetBuffer.WriteInt(RoleSet.Count);
 		    foreach (var roleSetValue in RoleSet) {
@@ -106,7 +121,7 @@ namespace Test.Message.User
 		    }
 			buffer.WriteBuffer(roleSetBuffer);
 
-        	buffer.WriteTag(35);
+        	buffer.WriteTag(39);
 			var roleMapBuffer = new Buffer();
 			roleMapBuffer.WriteInt(RoleMap.Count);
 		    foreach (var roleMapKey in RoleMap.Keys) {
@@ -141,7 +156,7 @@ namespace Test.Message.User
 						{
 		        			if (RoleInfo1 == null) 
 							{
-		            			RoleInfo1 = new RoleInfo();
+		            			RoleInfo1 = new Test.Message.Role.RoleInfo();
 		        			}
 		        			RoleInfo1.Decode(buffer);
             			}
@@ -152,31 +167,35 @@ namespace Test.Message.User
                     	break;
                 	case 27:
                     	buffer.ReadInt();
+                    	RoleInfo3.Decode(buffer);
+                    	break;
+                	case 31:
+                    	buffer.ReadInt();
                     	var roleListSize = buffer.ReadInt();
 		    			for (var i = 0; i < roleListSize; i++) 
 						{
-			    			var roleListValue = new RoleInfo();
+			    			var roleListValue = new Test.Message.Role.RoleInfo();
 			  				roleListValue.Decode(buffer);
 			    			RoleList.Add(roleListValue);
 		    			}
                     	break;
-                	case 31:
+                	case 35:
                     	buffer.ReadInt();
                     	var roleSetSize = buffer.ReadInt();
 		    			for (var i = 0; i < roleSetSize; i++) 
 						{
-			    			var roleSetValue = new RoleInfo();
+			    			var roleSetValue = new Test.Message.Role.RoleInfo();
 			  				roleSetValue.Decode(buffer);
 			    			RoleSet.Add(roleSetValue);
 		    			}
                     	break;
-                	case 35:
+                	case 39:
                     	buffer.ReadInt();
                     	var roleMapSize = buffer.ReadInt();
 		    			for (var i = 0; i < roleMapSize; i++) 
 						{
 			    			var roleMapKey = buffer.ReadLong();
-			    			var roleMapValue = new RoleInfo();
+			    			var roleMapValue = new Test.Message.Role.RoleInfo();
 							roleMapValue.Decode(buffer);
 			    			RoleMap.Add(roleMapKey, roleMapValue);
 						}
@@ -196,6 +215,7 @@ namespace Test.Message.User
 				   ",level=" + Level.ToString2() +
 				   ",roleInfo1=" + RoleInfo1.ToString2() +
 				   ",roleInfo2=" + RoleInfo2.ToString2() +
+				   ",roleInfo3=" + RoleInfo3.ToString2() +
 				   ",roleList=" + RoleList.ToString2() +
 				   ",roleSet=" + RoleSet.ToString2() +
 				   ",roleMap=" + RoleMap.ToString2() +

@@ -7,7 +7,7 @@ using Quan.Common.Utils;
 <#if !(parentClassName??) || kind == 6>
 using Quan.Config;
 </#if>
-<#list imports as import>
+<#list imports?keys as import>
 using ${import};
 </#list>
 

@@ -77,16 +77,7 @@ public class LuaMessageGenerator extends MessageGenerator {
 
     @Override
     protected void prepareClass(ClassDefinition classDefinition) {
-        if (classDefinition instanceof BeanDefinition) {
-            prepareBean((BeanDefinition) classDefinition);
-        }
-
-        Map<String, TreeMap<DependentSource, ClassDefinition>> dependentsClasses = classDefinition.getDependentsClasses();
-        for (String dependentName : dependentsClasses.keySet()) {
-            ClassDefinition firstDependentClass = dependentsClasses.get(dependentName).firstEntry().getValue();
-            classDefinition.getImports().add(firstDependentClass.getOtherImport(language()));
-        }
-
+        super.prepareClass(classDefinition);
         if (classDefinition instanceof MessageDefinition) {
             HeaderDefinition headerDefinition = ((MessageDefinition) classDefinition).getHeader();
             if (headerDefinition != null) {
@@ -94,4 +85,5 @@ public class LuaMessageGenerator extends MessageGenerator {
             }
         }
     }
+
 }

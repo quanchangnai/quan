@@ -274,66 +274,84 @@ public abstract class Generator {
     }
 
     protected void prepareClass(ClassDefinition classDefinition) {
+        if (classDefinition instanceof BeanDefinition) {
+            prepareBean((BeanDefinition) classDefinition);
+        }
+
         //不同包下的同名类依赖
         Map<String, TreeMap<DependentSource, ClassDefinition>> dependentsClasses = classDefinition.getDependentsClasses();
         for (String dependentName : dependentsClasses.keySet()) {
-            ClassDefinition importedClassDefinition = null;
-            for (DependentSource dependentSource : dependentsClasses.get(dependentName).keySet()) {
-                ClassDefinition dependentClassDefinition = dependentsClasses.get(dependentName).get(dependentSource);
-                if (dependentClassDefinition == importedClassDefinition) {
-                    continue;
-                } else if (importedClassDefinition == null) {
-                    int howImport = howImportDependent(classDefinition, dependentClassDefinition);
-                    if (howImport >= 0) {
-                        if (howImport == 0) {
-                            classDefinition.getImports().add(dependentClassDefinition.getOtherImport(language()));
-                        }
-                        importedClassDefinition = dependentClassDefinition;
-                        continue;
+            ClassDefinition simpleNameClassDefinition = null;
+            TreeMap<DependentSource, ClassDefinition> dependentClasses = dependentsClasses.get(dependentName);
+            for (DependentSource dependentSource : dependentClasses.keySet()) {
+                ClassDefinition dependentClassDefinition = dependentClasses.get(dependentSource);
+                int howUse = howUseDependent(classDefinition, dependentClassDefinition, simpleNameClassDefinition);
+
+                if ((howUse & 0x01) == 0 && simpleNameClassDefinition == null) {
+                    simpleNameClassDefinition = dependentClassDefinition;
+                }
+
+                if ((howUse & 0x10) != 0) {
+                    String importName = dependentClassDefinition.getName();
+                    if ((howUse & 0x01) != 0) {
+                        importName = dependentClassDefinition.getLongName();
                     }
+                    classDefinition.getImports().put(dependentClassDefinition.getOtherImport(language()), importName);
                 }
 
-                String dependentFullName = dependentClassDefinition.getFullName(language());
-                if (dependentSource.getType() == DependentType.field) {
-                    ((FieldDefinition) dependentSource.getDefinition()).setClassType(dependentFullName);
-                } else if (dependentSource.getType() == DependentType.fieldValue) {
-                    ((FieldDefinition) dependentSource.getDefinition()).setClassValueType(dependentFullName);
-                } else if (dependentSource.getType() == DependentType.parent) {
-                    ((BeanDefinition) dependentSource.getDefinition()).setParentClassName(dependentFullName);
-                } else if (dependentSource.getType() == DependentType.child) {
-                    ((BeanDefinition) dependentSource.getDefinition()).getDependentChildren().get(classDefinition.getLongName()).setRight(dependentFullName);
+                if ((howUse & 0x01) != 0) {
+                    String dependentClassName;
+                    if (language() == Language.lua) {
+                        dependentClassName = dependentClassDefinition.getLongName();
+                    } else {
+                        dependentClassName = dependentClassDefinition.getFullName(language());
+                    }
+
+                    if (dependentSource.getType() == DependentType.field) {
+                        ((FieldDefinition) dependentSource.getOwnerDefinition()).setClassType(dependentClassName);
+                    } else if (dependentSource.getType() == DependentType.fieldValue) {
+                        ((FieldDefinition) dependentSource.getOwnerDefinition()).setClassValueType(dependentClassName);
+                    } else if (dependentSource.getType() == DependentType.parent) {
+                        ((BeanDefinition) dependentSource.getOwnerDefinition()).setParentClassName(dependentClassName);
+                    } else if (dependentSource.getType() == DependentType.child) {
+                        ((BeanDefinition) dependentSource.getOwnerDefinition()).getDependentChildren().get(classDefinition.getLongName()).setRight(dependentClassName);
+                    }
+                    //消息头没有同名类
                 }
-                //消息头没有同名类
             }
-        }
-
-        if (classDefinition instanceof BeanDefinition) {
-            prepareBean((BeanDefinition) classDefinition);
         }
     }
 
     /**
-     * 判断怎么依赖类怎么导入
+     * 判断依赖类的使用方式
      *
-     * @return 0:import(using)语句导入,1:直接使用简单类名,-1:需要使用全类名
+     * @return 0x00:使用简单类名,0x01:使用全类名,0x10:使用import(using、require)
      */
-    protected int howImportDependent(ClassDefinition classDefinition, ClassDefinition dependentClassDefinition) {
+    protected int howUseDependent(ClassDefinition ownerClassDefinition, ClassDefinition dependentClassDefinition, ClassDefinition simpleNameClassDefinition) {
         Language language = language();
-        String fullPackageName = classDefinition.getFullPackageName(language);
+        String packageName = ownerClassDefinition.getPackageName(language);
+        String fullPackageName = ownerClassDefinition.getFullPackageName(language);
         String dependentFullPackageName = dependentClassDefinition.getFullPackageName(language);
+        ClassDefinition packagedClassDefinition = packagesClasses.get(packageName).get(dependentClassDefinition.getName());
 
         if (language == Language.java) {
-            return fullPackageName.equals(dependentFullPackageName) ? 1 : 0;
-        } else if (language == Language.cs) {
-            Map<String, ClassDefinition> packageClasses = this.packagesClasses.get(classDefinition.getPackageName(language));
-            ClassDefinition packageClassDefinition = packageClasses.get(dependentClassDefinition.getName());
-            if (packageClassDefinition == null) {
-                return 0;
+            if (simpleNameClassDefinition == null) {
+                return fullPackageName.equals(dependentFullPackageName) ? 0x00 : 0x10;
+            } else {
+                return dependentClassDefinition == simpleNameClassDefinition ? 0x00 : 0x01;
             }
-            return packageClassDefinition == dependentClassDefinition ? 1 : -1;
+        } else if (language == Language.cs) {
+            if (packagedClassDefinition == null) {
+                return 0x10;
+            }
+            return packagedClassDefinition == dependentClassDefinition ? 0x00 : 0x01;
+        } else {
+            //lua
+            if (simpleNameClassDefinition == null || simpleNameClassDefinition == dependentClassDefinition) {
+                return 0x10;
+            }
+            return 0x11;
         }
-
-        return 0;
     }
 
     protected void prepareBean(BeanDefinition beanDefinition) {
@@ -345,6 +363,8 @@ public abstract class Generator {
         if (fieldDefinition.isBuiltinType()) {
             fieldDefinition.setBasicType(basicTypes.get(fieldType));
             fieldDefinition.setClassType(classTypes.get(fieldType));
+        } else {
+            fieldDefinition.setClassType(null);
         }
 
         if (fieldDefinition.isCollectionType()) {
@@ -358,6 +378,8 @@ public abstract class Generator {
             if (fieldDefinition.isBuiltinValueType()) {
                 fieldDefinition.setBasicValueType(basicTypes.get(fieldValueType));
                 fieldDefinition.setClassValueType(classTypes.get(fieldValueType));
+            } else {
+                fieldDefinition.setClassValueType(null);
             }
         }
 

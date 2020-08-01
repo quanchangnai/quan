@@ -5,7 +5,8 @@
 
 local _Buffer = require("quan.message.Buffer")
 local _Message = require("quan.message.Message")
-local RoleInfo = require("test.message.role.RoleInfo")
+local RoleInfo = require("test.message.user.RoleInfo")
+local role_RoleInfo = require("test.message.role.RoleInfo")
 
 ---
 ---用户信息
@@ -27,6 +28,7 @@ local function toString(self)
             ",level=" .. tostring(self.level) ..
             ",roleInfo1=" .. tostring(self.roleInfo1) ..
             ",roleInfo2=" .. tostring(self.roleInfo2) ..
+            ",roleInfo3=" .. tostring(self.roleInfo3) ..
             ",roleList=" .. table.listToString(self.roleList) ..
             ",roleSet=" .. table.setToString(self.roleSet) ..
             ",roleMap=" .. table.mapToString(self.roleMap) ..
@@ -55,6 +57,8 @@ function UserInfo.new(args)
         roleInfo1 = args.roleInfo1,
         ---角色信息2
         roleInfo2 = args.roleInfo2 or RoleInfo.new(),
+        ---角色信息2
+        roleInfo3 = args.roleInfo3 or RoleInfo.new(),
         ---角色信息List
         roleList = args.roleList or {},
         ---角色信息Set
@@ -91,7 +95,7 @@ function UserInfo:encode(buffer)
     local roleInfo1Buffer = _Buffer.new()
     roleInfo1Buffer:writeBool(self.roleInfo1 ~= nil)
     if self.roleInfo1 ~= nil then
-        RoleInfo.encode(self.roleInfo1, roleInfo1Buffer)
+        role_RoleInfo.encode(self.roleInfo1, roleInfo1Buffer)
     end
     buffer:writeBuffer(roleInfo1Buffer)
 
@@ -101,27 +105,32 @@ function UserInfo:encode(buffer)
     buffer:writeBuffer(roleInfo2Buffer)
 
     buffer:writeTag(27)
+    local roleInfo3Buffer = _Buffer.new()
+    RoleInfo.encode(self.roleInfo3, roleInfo3Buffer)
+    buffer:writeBuffer(roleInfo3Buffer)
+
+    buffer:writeTag(31)
     local roleListBuffer = _Buffer.new()
     roleListBuffer:writeInt(#self.roleList)
     for i, value in ipairs(self.roleList) do
-        RoleInfo.encode(value, roleListBuffer)
+        role_RoleInfo.encode(value, roleListBuffer)
     end
     buffer:writeBuffer(roleListBuffer)
 
-    buffer:writeTag(31)
+    buffer:writeTag(35)
     local roleSetBuffer = _Buffer.new()
     roleSetBuffer:writeInt(#self.roleSet)
     for i, value in ipairs(self.roleSet) do
-        RoleInfo.encode(value, roleSetBuffer)
+        role_RoleInfo.encode(value, roleSetBuffer)
     end
     buffer:writeBuffer(roleSetBuffer)
 
-    buffer:writeTag(35)
+    buffer:writeTag(39)
     local roleMapBuffer = _Buffer.new()
     roleMapBuffer:writeInt(table.size(self.roleMap))
     for key, value in pairs(self.roleMap) do
         roleMapBuffer:writeLong(key)
-        RoleInfo.encode(value, roleMapBuffer)
+        role.RoleInfo.encode(value, roleMapBuffer)
     end
     buffer:writeBuffer(roleMapBuffer)
 
@@ -155,25 +164,28 @@ function UserInfo.decode(buffer, self)
         elseif tag == 19 then
             buffer:readInt()
             if buffer:readBool() then
-                self.roleInfo1 = RoleInfo.decode(buffer)
+                self.roleInfo1 = role_RoleInfo.decode(buffer)
             end
         elseif tag == 23 then
             buffer:readInt()
             self.roleInfo2 = RoleInfo.decode(buffer, self.roleInfo2)
         elseif tag == 27 then
             buffer:readInt()
-            for i = 1, buffer:readInt() do
-                self.roleList[i] = RoleInfo.decode(buffer)
-            end
+            self.roleInfo3 = RoleInfo.decode(buffer, self.roleInfo3)
         elseif tag == 31 then
             buffer:readInt()
             for i = 1, buffer:readInt() do
-                self.roleSet[i] = RoleInfo.decode(buffer)
+                self.roleList[i] = role_RoleInfo.decode(buffer)
             end
         elseif tag == 35 then
             buffer:readInt()
             for i = 1, buffer:readInt() do
-                self.roleMap[buffer:readLong()] = RoleInfo.decode(buffer)
+                self.roleSet[i] = role_RoleInfo.decode(buffer)
+            end
+        elseif tag == 39 then
+            buffer:readInt()
+            for i = 1, buffer:readInt() do
+                self.roleMap[buffer:readLong()] = role_RoleInfo.decode(buffer)
             end
         else
             _Message.skipField(tag, buffer)

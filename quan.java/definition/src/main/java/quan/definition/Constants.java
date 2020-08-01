@@ -1,7 +1,11 @@
 package quan.definition;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Set;
 import java.util.regex.Pattern;
+
+import static quan.common.utils.CollectionUtils.unmodifiableSet;
 
 /**
  * Created by quanchangnai on 2019/8/3.
@@ -44,18 +48,6 @@ public final class Constants {
      */
     public static final Pattern FIELD_NAME_PATTERN = Pattern.compile("[a-z][a-zA-Z\\d]*");
 
-
-    private static Set<String> unmodifiableSet(String... strings) {
-        return Collections.unmodifiableSet(new HashSet<>(Arrays.asList(strings)));
-    }
-
-    private static Set<String> unmodifiableSet(Collection<String>... collections) {
-        Set<String> set = new HashSet<>();
-        for (Collection<String> collection : collections) {
-            set.addAll(collection);
-        }
-        return Collections.unmodifiableSet(set);
-    }
 
     /**
      * Java保留字
@@ -124,6 +116,11 @@ public final class Constants {
      * 配置支持的内建类型
      */
     public static final Set<String> CONFIG_BUILTIN_TYPES = unmodifiableSet(PRIMITIVE_TYPES, COLLECTION_TYPES, TIME_TYPES);
+
+    public static final Set<String> DATA_RESERVED_CLASS_NAMES = unmodifiableSet("Boolean", "Short", "Integer",
+            "Long", "Float", "Double", "String", "Set", "List", "Map", "HashSet", "ArrayList", "HashMap");
+
+    public static final Set<String> CS_RESERVED_CLASS_NAMES = unmodifiableSet("HashSet", "List", "Dictionary");
 
     /**
      * 配置支持的合法分隔符

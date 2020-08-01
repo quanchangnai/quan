@@ -99,7 +99,7 @@ public class MessageTest {
         userInfo.setLevel(2);
         userInfo.setName("addadas");
         userInfo.setRoleInfo1(roleInfo1);
-        userInfo.setRoleInfo2(roleInfo2);
+//        userInfo.setRoleInfo2(new quan.message.user.RoleInfo());
         userInfo.getRoleList().add(roleInfo1);
         userInfo.getRoleMap().put(roleInfo2.getId(), roleInfo2);
 

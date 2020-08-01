@@ -39,7 +39,7 @@ public abstract class ClassDefinition extends Definition {
     protected List<FieldDefinition> fields = new ArrayList<>();
 
     //导包，和具体语言相关
-    private Set<String> imports = new HashSet<>();
+    private Map<String, String> imports = new HashMap<>();
 
     //字段名:字段定义
     protected Map<String, FieldDefinition> nameFields = new HashMap<>();
@@ -205,7 +205,7 @@ public abstract class ClassDefinition extends Definition {
         return languages;
     }
 
-    public Set<String> getImports() {
+    public Map<String, String> getImports() {
         return imports;
     }
 
@@ -239,6 +239,7 @@ public abstract class ClassDefinition extends Definition {
         if (classDefinition == null) {
             return;
         }
+        dependentSource.setDependentClass(classDefinition);
         dependentsClasses.computeIfAbsent(classDefinition.getName(), k -> new TreeMap<>()).put(dependentSource, classDefinition);
     }
 
@@ -342,4 +343,10 @@ public abstract class ClassDefinition extends Definition {
         parser.addValidatedError(error);
     }
 
+    @Override
+    public String toString() {
+        return getClass().getName() + "{" +
+                "name='" + getLongName() + '\'' +
+                '}';
+    }
 }

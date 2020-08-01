@@ -52,7 +52,7 @@ public class CSharpMessageGenerator extends MessageGenerator {
     protected void prepareField(FieldDefinition fieldDefinition) {
         super.prepareField(fieldDefinition);
         if (fieldDefinition.isTimeType()) {
-            fieldDefinition.getOwner().getImports().add("System");
+            fieldDefinition.getOwner().getImports().put("System", null);
         }
     }
 

@@ -64,7 +64,7 @@ public class CSharpConfigGenerator extends ConfigGenerator {
             return;
         }
         if (!(owner instanceof BeanDefinition) || ((BeanDefinition) owner).getSelfFields().contains(fieldDefinition)) {
-            owner.getImports().add("System");
+            owner.getImports().put("System",null);
         }
     }
 
@@ -72,7 +72,7 @@ public class CSharpConfigGenerator extends ConfigGenerator {
     protected void prepareConstant(ConstantDefinition constantDefinition) {
         super.prepareConstant(constantDefinition);
         if (constantDefinition.getValueField().isCollectionType()) {
-            constantDefinition.getImports().add("System.Collections.Generic");
+            constantDefinition.getImports().put("System.Collections.Generic", null);
         }
     }
 }

@@ -2,7 +2,7 @@ package ${getFullPackageName("java")};
 
 import java.util.*;
 import quan.message.*;
-<#list imports as import>
+<#list imports?keys as import>
 import ${import};
 </#list>
 

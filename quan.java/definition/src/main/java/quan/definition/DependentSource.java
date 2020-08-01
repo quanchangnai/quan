@@ -6,26 +6,48 @@ public class DependentSource implements Comparable<DependentSource> {
 
     private int id = nextId++;
 
-    private Definition definition;
-
     private DependentType type;
 
-    public DependentSource(Definition definition, DependentType type) {
-        this.definition = definition;
+    private ClassDefinition ownerClass;
+
+    private Definition ownerDefinition;
+
+    private ClassDefinition dependentClass;
+
+    public DependentSource(DependentType type, ClassDefinition ownerClass, Definition ownerDefinition) {
         this.type = type;
+        this.ownerClass = ownerClass;
+        this.ownerDefinition = ownerDefinition;
     }
 
-    public Definition getDefinition() {
-        return definition;
+    public Definition getOwnerDefinition() {
+        return ownerDefinition;
     }
 
     public DependentType getType() {
         return type;
     }
 
+    public ClassDefinition getDependentClass() {
+        return dependentClass;
+    }
+
+    public DependentSource setDependentClass(ClassDefinition dependentClass) {
+        this.dependentClass = dependentClass;
+        return this;
+    }
+
     @Override
-    public int compareTo(DependentSource o) {
-        return id - o.id;
+    public int compareTo(DependentSource other) {
+        if (dependentClass != other.dependentClass) {
+            if (ownerClass.getPackageName().equals(dependentClass.getPackageName())) {
+                return -1;
+            }
+            if (ownerClass.getPackageName().equals(other.dependentClass.getPackageName())) {
+                return 1;
+            }
+        }
+        return id - other.id;
     }
 
     public enum DependentType {

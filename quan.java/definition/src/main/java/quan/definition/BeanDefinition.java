@@ -380,16 +380,16 @@ public class BeanDefinition extends ClassDefinition {
     protected void validateDependents() {
         BeanDefinition parent = getParent();
         if (parent != null) {
-            addDependent(new DependentSource(this, DependentType.parent), parent);
+            addDependent(new DependentSource(DependentType.parent, this,this), parent);
         }
 
         for (FieldDefinition fieldDefinition : getFields()) {
-            addDependent(new DependentSource(fieldDefinition, DependentType.field), fieldDefinition.getTypeBean());
-            addDependent(new DependentSource(fieldDefinition, DependentType.fieldValue), fieldDefinition.getValueTypeBean());
+            addDependent(new DependentSource(DependentType.field, this,fieldDefinition), fieldDefinition.getTypeBean());
+            addDependent(new DependentSource(DependentType.fieldValue, this,fieldDefinition), fieldDefinition.getValueTypeBean());
         }
 
         for (BeanDefinition child : getChildren()) {
-            addDependent(new DependentSource(child, DependentType.child), child);
+            addDependent(new DependentSource(DependentType.child, this,child), child);
         }
     }
 

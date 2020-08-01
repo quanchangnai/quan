@@ -1,4 +1,4 @@
-<#list imports as import>
+<#list imports?keys as import>
 using ${import};
     <#if !import?has_next>
 

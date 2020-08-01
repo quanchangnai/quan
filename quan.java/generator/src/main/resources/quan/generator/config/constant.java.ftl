@@ -1,6 +1,6 @@
 package ${getFullPackageName("java")};
 
-<#list imports as import>
+<#list imports?keys as import>
 import ${import};
     <#if !import?has_next>
 
