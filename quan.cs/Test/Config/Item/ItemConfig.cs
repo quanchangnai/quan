@@ -9,7 +9,7 @@ namespace Test.Config.Item
 {
     /// <summary>
 	/// 道具<br/>
-	/// 自动生成
+	/// 代码自动生成，请勿手动修改
 	/// </summary>
     public class ItemConfig : ConfigBase
     {

@@ -5,7 +5,7 @@ import quan.message.*;
 
 /**
  * 消息头<br/>
- * 自动生成，请勿修改
+ * 代码自动生成，请勿手动修改
  */
 public abstract class MessageHeader extends Message {
 

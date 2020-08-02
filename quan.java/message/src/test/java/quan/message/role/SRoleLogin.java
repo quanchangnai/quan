@@ -7,7 +7,7 @@ import quan.message.common.MessageHeader;
 
 /**
  * 角色登录，哈希生成ID<br/>
- * 自动生成，请勿修改
+ * 代码自动生成，请勿手动修改
  */
 public class SRoleLogin extends MessageHeader {
 

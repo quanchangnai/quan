@@ -2,7 +2,7 @@ package quan.data.role;
 
 /**
  * 角色类型<br/>
- * 自动生成
+ * 代码自动生成，请勿手动修改
  */
 public enum RoleType {
 

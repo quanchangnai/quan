@@ -2,7 +2,7 @@ require("quan.table")
 
 ---
 ---任务类型
----自动生成
+---代码自动生成，请勿手动修改
 ---
 local QuestType = {
     --- 主线

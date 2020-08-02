@@ -8,7 +8,7 @@ namespace Test.Message.User
 {
 	/// <summary>
 	/// 角色信息2<br/>
-	/// 自动生成，请勿修改
+	/// 代码自动生成，请勿手动修改
 	/// </summary>
     public class RoleInfo : Bean
     {

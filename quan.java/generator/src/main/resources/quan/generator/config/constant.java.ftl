@@ -10,7 +10,7 @@ import ${import};
 <#if comment !="">
  * ${comment}<br/>
 </#if>
- * 自动生成，请勿修改
+ * 代码自动生成，请勿手动修改
  */
 <#if useEnum>
 public enum ${name} {
@@ -27,7 +27,7 @@ public enum ${name} {
     </#list>
 <#if valueField.type=="map">
 
-    public ${valueField.basicType}<${valueField.keyType},${valueField.keyType}> value() {
+    public ${valueField.basicType}<${valueField.keyType},${valueField.classValueType}> value() {
         return ${configDefinition.name}.getBy${keyField.name?cap_first}(name()").get${valueField.name?cap_first}();
     }
     <#elseif valueField.type=="list" || valueField.type=="set">
@@ -37,7 +37,7 @@ public enum ${name} {
     }
     <#else>
 
-    public ${valueField.basicType} value() {
+    public ${valueField.classType} value() {
         return ${configDefinition.name}.getBy${keyField.name?cap_first}(name()).get${valueField.name?cap_first}();
     }
     </#if>
@@ -51,7 +51,7 @@ public class ${name} {
      */
     </#if>
     <#if valueField.type=="map">
-    public static ${valueField.basicType}<${valueField.keyType},${valueField.keyType}> ${key}() {
+    public static ${valueField.basicType}<${valueField.keyType},${valueField.classValueType}> ${key}() {
         return ${configDefinition.name}.getBy${keyField.name?cap_first}("${key}").get${valueField.name?cap_first}();
     }
     <#elseif valueField.type=="list" || valueField.type=="set">

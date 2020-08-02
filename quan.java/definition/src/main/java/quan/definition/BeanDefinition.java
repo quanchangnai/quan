@@ -380,16 +380,16 @@ public class BeanDefinition extends ClassDefinition {
     protected void validateDependents() {
         BeanDefinition parent = getParent();
         if (parent != null) {
-            addDependent(new DependentSource(DependentType.parent, this,this), parent);
+            addDependent(DependentType.parent, this, this, parent);
         }
 
         for (FieldDefinition fieldDefinition : getFields()) {
-            addDependent(new DependentSource(DependentType.field, this,fieldDefinition), fieldDefinition.getTypeBean());
-            addDependent(new DependentSource(DependentType.fieldValue, this,fieldDefinition), fieldDefinition.getValueTypeBean());
+            addDependent(DependentType.field, this, fieldDefinition, fieldDefinition.getTypeBean());
+            addDependent(DependentType.fieldValue, this, fieldDefinition, fieldDefinition.getValueTypeBean());
         }
 
         for (BeanDefinition child : getChildren()) {
-            addDependent(new DependentSource(DependentType.child, this,child), child);
+            addDependent(DependentType.child, this, child, child);
         }
     }
 
@@ -401,7 +401,7 @@ public class BeanDefinition extends ClassDefinition {
         int fieldId = -1;
         try {
             fieldId = Integer.parseInt(field.getId());
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException ignored) {
         }
 
         if (fieldId < 1 || fieldId > 63) {

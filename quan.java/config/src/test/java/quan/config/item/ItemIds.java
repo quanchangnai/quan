@@ -2,7 +2,7 @@ package quan.config.item;
 
 /**
  * 道具ID<br/>
- * 自动生成
+ * 代码自动生成，请勿手动修改
  */
 public enum ItemIds {
 
@@ -16,7 +16,7 @@ public enum ItemIds {
      */
     item2;
 
-    public int value() {
+    public Integer value() {
         return ItemConfig.getByKey(name()).getId();
     }
 

@@ -1,7 +1,6 @@
 ---
 ---QuestTargetConfig
----@module QuestTargetConfig
----@author 自动生成
+---代码自动生成，请勿手动修改
 ---
 
 local Config = require("quan.config.Config")

@@ -6,7 +6,7 @@ import quan.config.*;
 
 /**
  * 常量<br/>
- * 自动生成
+ * 代码自动生成，请勿手动修改
  */
 public class ConstantConfig extends Config {
 
@@ -32,22 +32,22 @@ public class ConstantConfig extends Config {
         this.key = json.getOrDefault("key", "").toString();
         this.itemId = json.getIntValue("itemId");
 
-        JSONObject $reward = json.getJSONObject("reward");
-        if ($reward != null) {
-            this.reward = Reward.create($reward);
+        JSONObject reward = json.getJSONObject("reward");
+        if (reward != null) {
+            this.reward = Reward.create(reward);
         } else {
             this.reward = null;
         }
 
-        JSONArray $rewardList$1 = json.getJSONArray("rewardList");
-        List<quan.config.item.Reward> $rewardList$2 = new ArrayList<>();
-        if ($rewardList$1 != null) {
-            for (int i = 0; i < $rewardList$1.size(); i++) {
-                quan.config.item.Reward $rewardList$Value = quan.config.item.Reward.create($rewardList$1.getJSONObject(i));
-                $rewardList$2.add($rewardList$Value);
+        JSONArray rewardList$1 = json.getJSONArray("rewardList");
+        List<quan.config.item.Reward> rewardList$2 = new ArrayList<>();
+        if (rewardList$1 != null) {
+            for (int i = 0; i < rewardList$1.size(); i++) {
+                quan.config.item.Reward rewardList$Value = quan.config.item.Reward.create(rewardList$1.getJSONObject(i));
+                rewardList$2.add(rewardList$Value);
             }
         }
-        this.rewardList = Collections.unmodifiableList($rewardList$2);
+        this.rewardList = Collections.unmodifiableList(rewardList$2);
 
         this.comment = json.getOrDefault("comment", "").toString();
     }

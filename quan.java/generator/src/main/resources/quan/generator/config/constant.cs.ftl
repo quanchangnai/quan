@@ -10,7 +10,7 @@ namespace ${getFullPackageName("cs")}
     <#if comment !="">
     /// ${comment}<br/>
     </#if>
-    /// 自动生成，请勿修改
+    /// 代码自动生成，请勿手动修改
     /// </summary>
 <#if useEnum && (valueField.type=="short" || valueField.type=="int"||valueField.type=="long")>
     public enum ${name}<#if valueField.type!="int">: ${valueField.type}</#if>
@@ -38,7 +38,7 @@ namespace ${getFullPackageName("cs")}
         }
 
     <#if valueField.type=="map">
-        public ${valueField.basicType}<${valueField.keyType},${valueField.keyType}> Value => ${configDefinition.name}.GetBy${keyField.name?cap_first}(_key).${valueField.name?cap_first};
+        public ${valueField.basicType}<${valueField.keyType},${valueField.classValueType}> Value => ${configDefinition.name}.GetBy${keyField.name?cap_first}(_key).${valueField.name?cap_first};
     <#elseif valueField.type=="list" || valueField.type=="set">
         public ${valueField.basicType}<${valueField.classValueType}> Value => ${configDefinition.name}.GetBy${keyField.name?cap_first}(_key).${valueField.name?cap_first};
     <#else>
@@ -68,11 +68,11 @@ namespace ${getFullPackageName("cs")}
         /// </summary>
         </#if>
         <#if valueField.type=="map">
-        public static ${valueField.basicType}<${valueField.keyType},${valueField.keyType}> ${key?cap_first} => ${configDefinition.name}.GetBy${keyField.name?cap_first}("${key}").${valueField.name?cap_first};
+        public static ${valueField.basicType}<${valueField.keyType},${valueField.classValueType}> ${key?cap_first} => ${configDefinition.name}.GetBy${keyField.name?cap_first}("${key}").${valueField.name?cap_first};
         <#elseif valueField.type=="list" || valueField.type=="set">
-        public static ${valueField.basicType}<${valueField.valueType}> ${key?cap_first} => ${configDefinition.name}.GetBy${keyField.name?cap_first}("${key}").${valueField.name?cap_first};
+        public static ${valueField.basicType}<${valueField.classValueType}> ${key?cap_first} => ${configDefinition.name}.GetBy${keyField.name?cap_first}("${key}").${valueField.name?cap_first};
         <#else>
-        public static ${valueField.basicType} ${key?cap_first} => ${configDefinition.name}.GetBy${keyField.name?cap_first}("${key}").${valueField.name?cap_first};
+        public static ${valueField.classType} ${key?cap_first} => ${configDefinition.name}.GetBy${keyField.name?cap_first}("${key}").${valueField.name?cap_first};
         </#if>
         <#if key?has_next>
 

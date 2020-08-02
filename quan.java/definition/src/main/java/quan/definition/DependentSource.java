@@ -14,10 +14,11 @@ public class DependentSource implements Comparable<DependentSource> {
 
     private ClassDefinition dependentClass;
 
-    public DependentSource(DependentType type, ClassDefinition ownerClass, Definition ownerDefinition) {
+    public DependentSource(DependentType type, ClassDefinition ownerClass, Definition ownerDefinition, ClassDefinition dependentClass) {
         this.type = type;
         this.ownerClass = ownerClass;
         this.ownerDefinition = ownerDefinition;
+        this.dependentClass = dependentClass;
     }
 
     public Definition getOwnerDefinition() {

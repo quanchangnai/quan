@@ -1,12 +1,12 @@
 ---
 ---用户信息
----自动生成
+---代码自动生成，请勿手动修改
 ---
 
 local _Buffer = require("quan.message.Buffer")
 local _Message = require("quan.message.Message")
 local RoleInfo = require("test.message.user.RoleInfo")
-local role_RoleInfo = require("test.message.role.RoleInfo")
+local test_message_role_RoleInfo = require("test.message.role.RoleInfo")
 
 ---
 ---用户信息
@@ -95,7 +95,7 @@ function UserInfo:encode(buffer)
     local roleInfo1Buffer = _Buffer.new()
     roleInfo1Buffer:writeBool(self.roleInfo1 ~= nil)
     if self.roleInfo1 ~= nil then
-        role_RoleInfo.encode(self.roleInfo1, roleInfo1Buffer)
+        test_message_role_RoleInfo.encode(self.roleInfo1, roleInfo1Buffer)
     end
     buffer:writeBuffer(roleInfo1Buffer)
 
@@ -113,7 +113,7 @@ function UserInfo:encode(buffer)
     local roleListBuffer = _Buffer.new()
     roleListBuffer:writeInt(#self.roleList)
     for i, value in ipairs(self.roleList) do
-        role_RoleInfo.encode(value, roleListBuffer)
+        test_message_role_RoleInfo.encode(value, roleListBuffer)
     end
     buffer:writeBuffer(roleListBuffer)
 
@@ -121,7 +121,7 @@ function UserInfo:encode(buffer)
     local roleSetBuffer = _Buffer.new()
     roleSetBuffer:writeInt(#self.roleSet)
     for i, value in ipairs(self.roleSet) do
-        role_RoleInfo.encode(value, roleSetBuffer)
+        test_message_role_RoleInfo.encode(value, roleSetBuffer)
     end
     buffer:writeBuffer(roleSetBuffer)
 
@@ -130,7 +130,7 @@ function UserInfo:encode(buffer)
     roleMapBuffer:writeInt(table.size(self.roleMap))
     for key, value in pairs(self.roleMap) do
         roleMapBuffer:writeLong(key)
-        role.RoleInfo.encode(value, roleMapBuffer)
+        test.message.role.RoleInfo.encode(value, roleMapBuffer)
     end
     buffer:writeBuffer(roleMapBuffer)
 
@@ -164,7 +164,7 @@ function UserInfo.decode(buffer, self)
         elseif tag == 19 then
             buffer:readInt()
             if buffer:readBool() then
-                self.roleInfo1 = role_RoleInfo.decode(buffer)
+                self.roleInfo1 = test_message_role_RoleInfo.decode(buffer)
             end
         elseif tag == 23 then
             buffer:readInt()
@@ -175,17 +175,17 @@ function UserInfo.decode(buffer, self)
         elseif tag == 31 then
             buffer:readInt()
             for i = 1, buffer:readInt() do
-                self.roleList[i] = role_RoleInfo.decode(buffer)
+                self.roleList[i] = test_message_role_RoleInfo.decode(buffer)
             end
         elseif tag == 35 then
             buffer:readInt()
             for i = 1, buffer:readInt() do
-                self.roleSet[i] = role_RoleInfo.decode(buffer)
+                self.roleSet[i] = test_message_role_RoleInfo.decode(buffer)
             end
         elseif tag == 39 then
             buffer:readInt()
             for i = 1, buffer:readInt() do
-                self.roleMap[buffer:readLong()] = role_RoleInfo.decode(buffer)
+                self.roleMap[buffer:readLong()] = test_message_role_RoleInfo.decode(buffer)
             end
         else
             _Message.skipField(tag, buffer)

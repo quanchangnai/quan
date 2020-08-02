@@ -15,7 +15,7 @@ import ${import};
 <#if comment !="">
  * ${comment}<br/>
 </#if>
- * 自动生成，请勿修改
+ * 代码自动生成，请勿手动修改
  */
 public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif kind ==2>Bean<#else>Config</#if> {
 <#if !selfFields??>
@@ -69,19 +69,19 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
         <#if field_index gt 0 >
 
         </#if>
-        JSONArray $${field.name}$1 = json.getJSONArray("${field.name}");
-        ${field.basicType}<${field.classValueType}> $${field.name}$2 = new ${field.classType}<>();
-        if ($${field.name}$1 != null) {
-            for (int i = 0; i < $${field.name}$1.size(); i++) {
+        JSONArray ${field.name}$1 = json.getJSONArray("${field.name}");
+        ${field.basicType}<${field.classValueType}> ${field.name}$2 = new ${field.classType}<>();
+        if (${field.name}$1 != null) {
+            for (int i = 0; i < ${field.name}$1.size(); i++) {
                 <#if field.beanValueType>
-                ${field.classValueType} $${field.name}$Value = ${field.classValueType}.create($${field.name}$1.getJSONObject(i));
-                $${field.name}$2.add($${field.name}$Value);
+                ${field.classValueType} ${field.name}$Value = ${field.classValueType}.create(${field.name}$1.getJSONObject(i));
+                ${field.name}$2.add(${field.name}$Value);
                 <#else>
-                $${field.name}$2.add($${field.name}$1.get${field.classValueType}(i));
+                ${field.name}$2.add(${field.name}$1.get${field.classValueType}(i));
                 </#if>
             }
         }
-        this.${field.name} = Collections.unmodifiable${field.basicType}($${field.name}$2);
+        this.${field.name} = Collections.unmodifiable${field.basicType}(${field.name}$2);
         <#if field_has_next && (selfFields[field_index+1].primitiveType ||selfFields[field_index+1].timeType) >
 
         </#if>
@@ -89,19 +89,19 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
         <#if field_index gt 0 >
 
         </#if>
-        JSONObject $${field.name}$1 = json.getJSONObject("${field.name}");
-        Map<${field.classKeyType}, ${field.classValueType}> $${field.name}$2 = new HashMap<>();
-        if ($${field.name}$1 != null) {
-            for (String $${field.name}$Key : $${field.name}$1.keySet()) {
+        JSONObject ${field.name}$1 = json.getJSONObject("${field.name}");
+        Map<${field.classKeyType}, ${field.classValueType}> ${field.name}$2 = new HashMap<>();
+        if (${field.name}$1 != null) {
+            for (String ${field.name}$Key : ${field.name}$1.keySet()) {
                 <#if field.beanValueType>
-                ${field.classValueType} $${field.name}$Value = ${field.classValueType}.create($${field.name}$1.getJSONObject($${field.name}$Key));
-                $${field.name}$2.put(${field.classKeyType}.valueOf($${field.name}$Key), $${field.name}$Value);
+                ${field.classValueType} ${field.name}$Value = ${field.classValueType}.create(${field.name}$1.getJSONObject(${field.name}$Key));
+                ${field.name}$2.put(${field.classKeyType}.valueOf(${field.name}$Key), ${field.name}$Value);
                 <#else>
-                $${field.name}$2.put(${field.classKeyType}.valueOf($${field.name}$Key), $${field.name}$1.get${field.classValueType}($${field.name}$Key));
+                ${field.name}$2.put(${field.classKeyType}.valueOf(${field.name}$Key), ${field.name}$1.get${field.classValueType}(${field.name}$Key));
                 </#if>
             }
         }
-        this.${field.name} = Collections.unmodifiableMap($${field.name}$2);
+        this.${field.name} = Collections.unmodifiableMap(${field.name}$2);
         <#if field_has_next && (selfFields[field_index+1].primitiveType ||selfFields[field_index+1].timeType) >
 
         </#if>
@@ -111,8 +111,8 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
        <#if field_index gt 0 >
 
         </#if>
-        int $${field.name} = json.getIntValue("${field.name}");
-        this.${field.name} = $${field.name} > 0 ? ${field.type}.valueOf($${field.name}) : null;
+        int ${field.name} = json.getIntValue("${field.name}");
+        this.${field.name} = ${field.name} > 0 ? ${field.type}.valueOf(${field.name}) : null;
          <#if field_has_next && (selfFields[field_index+1].primitiveType ||selfFields[field_index+1].timeType) >
 
         </#if>
@@ -120,9 +120,9 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
         <#if field_index gt 0 >
 
         </#if>
-        JSONObject $${field.name} = json.getJSONObject("${field.name}");
-        if ($${field.name} != null) {
-            this.${field.name} = ${field.classType}.create($${field.name});
+        JSONObject ${field.name} = json.getJSONObject("${field.name}");
+        if (${field.name} != null) {
+            this.${field.name} = ${field.classType}.create(${field.name});
         } else {
             this.${field.name} = null;
         }

@@ -91,7 +91,6 @@ public class ConstantDefinition extends ClassDefinition {
         return valueField;
     }
 
-
     public void setConfigs(List<JSONObject> configs) {
         for (JSONObject config : configs) {
             String key = config.getString(keyField);
@@ -152,16 +151,19 @@ public class ConstantDefinition extends ClassDefinition {
             return;
         }
 
-        valueField = valueFieldDefinition.clone();
-        valueField.setOwner(this);
+        valueField = valueFieldDefinition.clone().setOwner(this);
     }
 
+    @Override
+    public void reset() {
+        super.reset();
+        resetField(valueField);
+    }
 
     @Override
     protected void validateDependents() {
         super.validateDependents();
-        FieldDefinition valueField = getValueField();
-        addDependent(new DependentSource(DependentType.field, this,valueField), valueField.getTypeBean());
-        addDependent(new DependentSource(DependentType.fieldValue, this,valueField), valueField.getValueTypeBean());
+        addDependent(DependentType.field, this, valueField, valueField.getTypeBean());
+        addDependent(DependentType.fieldValue, this, valueField, valueField.getValueTypeBean());
     }
 }

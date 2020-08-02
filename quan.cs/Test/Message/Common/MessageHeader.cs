@@ -8,7 +8,7 @@ namespace Test.Message.Common
 {
 	/// <summary>
 	/// 消息头<br/>
-	/// 自动生成，请勿修改
+	/// 代码自动生成，请勿手动修改
 	/// </summary>
     public abstract class MessageHeader : MessageBase
     {

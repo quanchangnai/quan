@@ -2,6 +2,7 @@ package quan.definition;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import quan.definition.DependentSource.DependentType;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -57,6 +58,16 @@ public abstract class ClassDefinition extends Definition {
 
     public void reset() {
         imports.clear();
+        fields.forEach(this::resetField);
+    }
+
+    protected void resetField(FieldDefinition fieldDefinition) {
+        fieldDefinition.setBasicType(null);
+        fieldDefinition.setClassType(null);
+        fieldDefinition.setBasicKeyType(null);
+        fieldDefinition.setClassKeyType(null);
+        fieldDefinition.setBasicValueType(null);
+        fieldDefinition.setClassValueType(null);
     }
 
     public String getPackagePrefix() {
@@ -235,12 +246,12 @@ public abstract class ClassDefinition extends Definition {
         return supportedLanguages;
     }
 
-    public void addDependent(DependentSource dependentSource, ClassDefinition classDefinition) {
-        if (classDefinition == null) {
+    public void addDependent(DependentType dependentType, ClassDefinition ownerClass, Definition ownerDefinition, ClassDefinition dependentClass) {
+        if (dependentClass == null) {
             return;
         }
-        dependentSource.setDependentClass(classDefinition);
-        dependentsClasses.computeIfAbsent(classDefinition.getName(), k -> new TreeMap<>()).put(dependentSource, classDefinition);
+        DependentSource dependentSource = new DependentSource(dependentType, ownerClass, ownerDefinition, dependentClass);
+        dependentsClasses.computeIfAbsent(dependentClass.getName(), k -> new TreeMap<>()).put(dependentSource, dependentClass);
     }
 
     public Map<String, TreeMap<DependentSource, ClassDefinition>> getDependentsClasses() {

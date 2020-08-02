@@ -3,13 +3,12 @@ package quan.generator.config;
 import com.alibaba.fastjson.JSONObject;
 import freemarker.template.Template;
 import org.apache.commons.lang3.StringUtils;
-import quan.config.reader.ConfigConverter;
 import quan.config.TableType;
 import quan.config.loader.WithDefinitionConfigLoader;
+import quan.config.reader.ConfigConverter;
 import quan.definition.BeanDefinition;
 import quan.definition.Category;
 import quan.definition.ClassDefinition;
-import quan.definition.FieldDefinition;
 import quan.definition.config.ConfigDefinition;
 import quan.definition.config.ConstantDefinition;
 import quan.generator.Generator;
@@ -152,10 +151,9 @@ public abstract class ConfigGenerator extends Generator {
     @Override
     protected void prepareClass(ClassDefinition classDefinition) {
         super.prepareClass(classDefinition);
-
         if (classDefinition instanceof ConstantDefinition) {
             ConstantDefinition constantDefinition = (ConstantDefinition) classDefinition;
-            prepareConstant((ConstantDefinition) classDefinition);
+            prepareConstant(constantDefinition);
             if (configLoader != null) {
                 List<JSONObject> configJsons = configLoader.loadJsons(constantDefinition.getConfigDefinition(), false);
                 constantDefinition.setConfigs(configJsons);
@@ -164,8 +162,7 @@ public abstract class ConfigGenerator extends Generator {
     }
 
     protected void prepareConstant(ConstantDefinition constantDefinition) {
-        FieldDefinition valueField = constantDefinition.getValueField();
-        prepareField(valueField);
+        prepareField(constantDefinition.getValueField());
     }
 
 }

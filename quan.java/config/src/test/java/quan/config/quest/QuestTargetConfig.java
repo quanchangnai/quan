@@ -6,7 +6,7 @@ import quan.config.*;
 
 /**
  * QuestTargetConfig<br/>
- * 自动生成
+ * 代码自动生成，请勿手动修改
  */
 public class QuestTargetConfig extends Config {
 

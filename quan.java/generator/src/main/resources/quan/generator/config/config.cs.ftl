@@ -17,7 +17,7 @@ namespace ${getFullPackageName("cs")}
 <#if comment !="">
 	/// ${comment}<br/>
 </#if>
-	/// 自动生成，请勿修改
+	/// 代码自动生成，请勿手动修改
 	/// </summary>
     public class ${name} : <#if parentClassName??>${parentClassName}<#elseif kind ==2>Bean<#else>ConfigBase</#if>
     {

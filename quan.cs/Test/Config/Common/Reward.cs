@@ -6,7 +6,7 @@ namespace Test.Config.Common
 {
     /// <summary>
 	/// 奖励<br/>
-	/// 自动生成
+	/// 代码自动生成，请勿手动修改
 	/// </summary>
     public class Reward : Bean
     {

@@ -3,6 +3,7 @@ package quan.generator;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.common.utils.PathUtils;
@@ -285,36 +286,30 @@ public abstract class Generator {
             TreeMap<DependentSource, ClassDefinition> dependentClasses = dependentsClasses.get(dependentName);
             for (DependentSource dependentSource : dependentClasses.keySet()) {
                 ClassDefinition dependentClassDefinition = dependentClasses.get(dependentSource);
-                int howUse = howUseDependent(classDefinition, dependentClassDefinition, simpleNameClassDefinition);
+                String dependentClassFullName = dependentClassDefinition.getFullName(language());
+                Pair<Boolean, Boolean> useDependent = howUseDependent(classDefinition, dependentClassDefinition, simpleNameClassDefinition);
 
-                if ((howUse & 0x01) == 0 && simpleNameClassDefinition == null) {
+                if (!useDependent.getLeft() && simpleNameClassDefinition == null) {
                     simpleNameClassDefinition = dependentClassDefinition;
                 }
 
-                if ((howUse & 0x10) != 0) {
-                    String importName = dependentClassDefinition.getName();
-                    if ((howUse & 0x01) != 0) {
-                        importName = dependentClassDefinition.getLongName();
+                if (useDependent.getRight()) {
+                    if (useDependent.getLeft()) {
+                        classDefinition.getImports().put(dependentClassDefinition.getOtherImport(language()), dependentClassFullName);
+                    } else {
+                        classDefinition.getImports().put(dependentClassDefinition.getOtherImport(language()), dependentClassDefinition.getName());
                     }
-                    classDefinition.getImports().put(dependentClassDefinition.getOtherImport(language()), importName);
                 }
 
-                if ((howUse & 0x01) != 0) {
-                    String dependentClassName;
-                    if (language() == Language.lua) {
-                        dependentClassName = dependentClassDefinition.getLongName();
-                    } else {
-                        dependentClassName = dependentClassDefinition.getFullName(language());
-                    }
-
+                if (useDependent.getLeft()) {
                     if (dependentSource.getType() == DependentType.field) {
-                        ((FieldDefinition) dependentSource.getOwnerDefinition()).setClassType(dependentClassName);
+                        ((FieldDefinition) dependentSource.getOwnerDefinition()).setClassType(dependentClassFullName);
                     } else if (dependentSource.getType() == DependentType.fieldValue) {
-                        ((FieldDefinition) dependentSource.getOwnerDefinition()).setClassValueType(dependentClassName);
+                        ((FieldDefinition) dependentSource.getOwnerDefinition()).setClassValueType(dependentClassFullName);
                     } else if (dependentSource.getType() == DependentType.parent) {
-                        ((BeanDefinition) dependentSource.getOwnerDefinition()).setParentClassName(dependentClassName);
+                        ((BeanDefinition) dependentSource.getOwnerDefinition()).setParentClassName(dependentClassFullName);
                     } else if (dependentSource.getType() == DependentType.child) {
-                        ((BeanDefinition) dependentSource.getOwnerDefinition()).getDependentChildren().get(classDefinition.getLongName()).setRight(dependentClassName);
+                        ((BeanDefinition) dependentSource.getOwnerDefinition()).getDependentChildren().get(classDefinition.getLongName()).setRight(dependentClassFullName);
                     }
                     //消息头没有同名类
                 }
@@ -325,9 +320,9 @@ public abstract class Generator {
     /**
      * 判断依赖类的使用方式
      *
-     * @return 0x00:使用简单类名,0x01:使用全类名,0x10:使用import(using、require)
+     * @return Pair<使用全类名还是简单类名, 是否使用import或using或require>
      */
-    protected int howUseDependent(ClassDefinition ownerClassDefinition, ClassDefinition dependentClassDefinition, ClassDefinition simpleNameClassDefinition) {
+    protected Pair<Boolean, Boolean> howUseDependent(ClassDefinition ownerClassDefinition, ClassDefinition dependentClassDefinition, ClassDefinition simpleNameClassDefinition) {
         Language language = language();
         String packageName = ownerClassDefinition.getPackageName(language);
         String fullPackageName = ownerClassDefinition.getFullPackageName(language);
@@ -336,21 +331,21 @@ public abstract class Generator {
 
         if (language == Language.java) {
             if (simpleNameClassDefinition == null) {
-                return fullPackageName.equals(dependentFullPackageName) ? 0x00 : 0x10;
+                return fullPackageName.equals(dependentFullPackageName) ? Pair.of(false, false) : Pair.of(false, true);
             } else {
-                return dependentClassDefinition == simpleNameClassDefinition ? 0x00 : 0x01;
+                return dependentClassDefinition == simpleNameClassDefinition ? Pair.of(false, false) : Pair.of(true, false);
             }
         } else if (language == Language.cs) {
             if (packagedClassDefinition == null) {
-                return 0x10;
+                return Pair.of(false, true);
             }
-            return packagedClassDefinition == dependentClassDefinition ? 0x00 : 0x01;
+            return packagedClassDefinition == dependentClassDefinition ? Pair.of(false, false) : Pair.of(true, false);
         } else {
             //lua
             if (simpleNameClassDefinition == null || simpleNameClassDefinition == dependentClassDefinition) {
-                return 0x10;
+                return Pair.of(false, true);
             }
-            return 0x11;
+            return Pair.of(true, true);
         }
     }
 
@@ -363,8 +358,6 @@ public abstract class Generator {
         if (fieldDefinition.isBuiltinType()) {
             fieldDefinition.setBasicType(basicTypes.get(fieldType));
             fieldDefinition.setClassType(classTypes.get(fieldType));
-        } else {
-            fieldDefinition.setClassType(null);
         }
 
         if (fieldDefinition.isCollectionType()) {
@@ -378,8 +371,6 @@ public abstract class Generator {
             if (fieldDefinition.isBuiltinValueType()) {
                 fieldDefinition.setBasicValueType(basicTypes.get(fieldValueType));
                 fieldDefinition.setClassValueType(classTypes.get(fieldValueType));
-            } else {
-                fieldDefinition.setClassValueType(null);
             }
         }
 

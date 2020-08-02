@@ -1,6 +1,6 @@
 ---
 ---角色信息2
----自动生成
+---代码自动生成，请勿手动修改
 ---
 
 local _Buffer = require("quan.message.Buffer")

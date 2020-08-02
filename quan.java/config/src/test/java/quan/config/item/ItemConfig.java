@@ -6,7 +6,7 @@ import quan.config.*;
 
 /**
  * 道具<br/>
- * 自动生成
+ * 代码自动生成，请勿手动修改
  */
 public class ItemConfig extends Config {
 
@@ -51,49 +51,49 @@ public class ItemConfig extends Config {
         this.key = json.getOrDefault("key", "").toString();
         this.name = json.getOrDefault("name", "").toString();
 
-        int $type = json.getIntValue("type");
-        this.type = $type > 0 ? ItemType.valueOf($type) : null;
+        int type = json.getIntValue("type");
+        this.type = type > 0 ? ItemType.valueOf(type) : null;
 
-        JSONObject $useEffect = json.getJSONObject("useEffect");
-        if ($useEffect != null) {
-            this.useEffect = UseEffect.create($useEffect);
+        JSONObject useEffect = json.getJSONObject("useEffect");
+        if (useEffect != null) {
+            this.useEffect = UseEffect.create(useEffect);
         } else {
             this.useEffect = null;
         }
 
-        JSONObject $reward = json.getJSONObject("reward");
-        if ($reward != null) {
-            this.reward = Reward.create($reward);
+        JSONObject reward = json.getJSONObject("reward");
+        if (reward != null) {
+            this.reward = Reward.create(reward);
         } else {
             this.reward = null;
         }
 
-        JSONArray $list$1 = json.getJSONArray("list");
-        List<Integer> $list$2 = new ArrayList<>();
-        if ($list$1 != null) {
-            for (int i = 0; i < $list$1.size(); i++) {
-                $list$2.add($list$1.getInteger(i));
+        JSONArray list$1 = json.getJSONArray("list");
+        List<Integer> list$2 = new ArrayList<>();
+        if (list$1 != null) {
+            for (int i = 0; i < list$1.size(); i++) {
+                list$2.add(list$1.getInteger(i));
             }
         }
-        this.list = Collections.unmodifiableList($list$2);
+        this.list = Collections.unmodifiableList(list$2);
 
-        JSONArray $set$1 = json.getJSONArray("set");
-        Set<Integer> $set$2 = new HashSet<>();
-        if ($set$1 != null) {
-            for (int i = 0; i < $set$1.size(); i++) {
-                $set$2.add($set$1.getInteger(i));
+        JSONArray set$1 = json.getJSONArray("set");
+        Set<Integer> set$2 = new HashSet<>();
+        if (set$1 != null) {
+            for (int i = 0; i < set$1.size(); i++) {
+                set$2.add(set$1.getInteger(i));
             }
         }
-        this.set = Collections.unmodifiableSet($set$2);
+        this.set = Collections.unmodifiableSet(set$2);
 
-        JSONObject $map$1 = json.getJSONObject("map");
-        Map<Integer, Integer> $map$2 = new HashMap<>();
-        if ($map$1 != null) {
-            for (String $map$Key : $map$1.keySet()) {
-                $map$2.put(Integer.valueOf($map$Key), $map$1.getInteger($map$Key));
+        JSONObject map$1 = json.getJSONObject("map");
+        Map<Integer, Integer> map$2 = new HashMap<>();
+        if (map$1 != null) {
+            for (String map$Key : map$1.keySet()) {
+                map$2.put(Integer.valueOf(map$Key), map$1.getInteger(map$Key));
             }
         }
-        this.map = Collections.unmodifiableMap($map$2);
+        this.map = Collections.unmodifiableMap(map$2);
 
         this.effectiveTime = json.getDate("effectiveTime");
         this.effectiveTime_ = json.getOrDefault("effectiveTime_", "").toString();

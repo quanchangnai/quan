@@ -14,7 +14,7 @@ import ${import};
 <#if comment !="">
  * ${comment}<br/>
 </#if>
- * 自动生成，请勿修改
+ * 代码自动生成，请勿手动修改
  */
 public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idField.classType}></#if> {
 <#if kind ==5>

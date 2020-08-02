@@ -10,7 +10,7 @@ namespace Test.Message.Role
 {
 	/// <summary>
 	/// 角色登录，自定义ID<br/>
-	/// 自动生成，请勿修改
+	/// 代码自动生成，请勿手动修改
 	/// </summary>
     public class CRoleLogin : MessageHeader
     {

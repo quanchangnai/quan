@@ -7,7 +7,7 @@ import quan.config.item.Reward;
 
 /**
  * 任务<br/>
- * 自动生成
+ * 代码自动生成，请勿手动修改
  */
 public class QuestConfig extends Config {
 
@@ -72,14 +72,14 @@ public class QuestConfig extends Config {
         this.id = json.getIntValue("id");
         this.name = json.getOrDefault("name", "").toString();
 
-        int $type = json.getIntValue("type");
-        this.type = $type > 0 ? QuestType.valueOf($type) : null;
+        int type = json.getIntValue("type");
+        this.type = type > 0 ? QuestType.valueOf(type) : null;
 
         this.target = json.getIntValue("target");
 
-        JSONObject $reward = json.getJSONObject("reward");
-        if ($reward != null) {
-            this.reward = Reward.create($reward);
+        JSONObject reward = json.getJSONObject("reward");
+        if (reward != null) {
+            this.reward = Reward.create(reward);
         } else {
             this.reward = null;
         }
@@ -95,32 +95,32 @@ public class QuestConfig extends Config {
         this.d2 = json.getIntValue("d2");
         this.d3 = json.getIntValue("d3");
 
-        JSONArray $s1$1 = json.getJSONArray("s1");
-        Set<Integer> $s1$2 = new HashSet<>();
-        if ($s1$1 != null) {
-            for (int i = 0; i < $s1$1.size(); i++) {
-                $s1$2.add($s1$1.getInteger(i));
+        JSONArray s1$1 = json.getJSONArray("s1");
+        Set<Integer> s1$2 = new HashSet<>();
+        if (s1$1 != null) {
+            for (int i = 0; i < s1$1.size(); i++) {
+                s1$2.add(s1$1.getInteger(i));
             }
         }
-        this.s1 = Collections.unmodifiableSet($s1$2);
+        this.s1 = Collections.unmodifiableSet(s1$2);
 
-        JSONArray $l1$1 = json.getJSONArray("l1");
-        List<Integer> $l1$2 = new ArrayList<>();
-        if ($l1$1 != null) {
-            for (int i = 0; i < $l1$1.size(); i++) {
-                $l1$2.add($l1$1.getInteger(i));
+        JSONArray l1$1 = json.getJSONArray("l1");
+        List<Integer> l1$2 = new ArrayList<>();
+        if (l1$1 != null) {
+            for (int i = 0; i < l1$1.size(); i++) {
+                l1$2.add(l1$1.getInteger(i));
             }
         }
-        this.l1 = Collections.unmodifiableList($l1$2);
+        this.l1 = Collections.unmodifiableList(l1$2);
 
-        JSONObject $m1$1 = json.getJSONObject("m1");
-        Map<Integer, Integer> $m1$2 = new HashMap<>();
-        if ($m1$1 != null) {
-            for (String $m1$Key : $m1$1.keySet()) {
-                $m1$2.put(Integer.valueOf($m1$Key), $m1$1.getInteger($m1$Key));
+        JSONObject m1$1 = json.getJSONObject("m1");
+        Map<Integer, Integer> m1$2 = new HashMap<>();
+        if (m1$1 != null) {
+            for (String m1$Key : m1$1.keySet()) {
+                m1$2.put(Integer.valueOf(m1$Key), m1$1.getInteger(m1$Key));
             }
         }
-        this.m1 = Collections.unmodifiableMap($m1$2);
+        this.m1 = Collections.unmodifiableMap(m1$2);
     }
 
     /**

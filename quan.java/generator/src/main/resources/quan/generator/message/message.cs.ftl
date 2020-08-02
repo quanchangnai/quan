@@ -13,7 +13,7 @@ namespace ${getFullPackageName("cs")}
 <#if comment !="">
 	/// ${comment}<br/>
 </#if>
-	/// 自动生成，请勿修改
+	/// 代码自动生成，请勿手动修改
 	/// </summary>
     public<#if kind ==9> abstract</#if> class ${name} : <#if kind ==2>Bean<#elseif kind ==3 && header??>${header.name}<#else>MessageBase</#if>
     {
