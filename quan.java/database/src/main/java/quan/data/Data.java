@@ -37,6 +37,7 @@ public abstract class Data<I> {
     /**
      * 不在事务中需要设置写入器时通过反射引用此方法
      */
+    @SuppressWarnings("unused")
     private static BiConsumer<Data<?>, DataWriter> _setWriter = (data, writer) -> {
         data.writer = writer;
         data.state = State.UPDATE;

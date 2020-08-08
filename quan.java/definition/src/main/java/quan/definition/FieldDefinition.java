@@ -564,9 +564,9 @@ public class FieldDefinition extends Definition implements Cloneable {
         if (StringUtils.isBlank(language) || category != Category.config) {
             return;
         }
-        Pair<Boolean, Set<String>> pair = Language.parse(language);
-        excludeLanguage = pair.getLeft();
-        languages = pair.getRight();
+        Pair<Set<String>, Boolean> pair = Language.parse(language);
+        languages = pair.getLeft();
+        excludeLanguage = pair.getRight();
     }
 
     public boolean isExcludeLanguage() {

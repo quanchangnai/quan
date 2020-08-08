@@ -41,9 +41,7 @@ public class HeaderDefinition extends BeanDefinition {
         if (validated) {
             return;
         }
-        for (FieldDefinition fieldDefinition : getFields()) {
-            validateField(fieldDefinition);
-        }
+        getFields().forEach(this::validateField);
         validated = true;
     }
 }

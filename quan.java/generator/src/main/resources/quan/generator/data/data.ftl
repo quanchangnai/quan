@@ -105,6 +105,33 @@ public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idFiel
         return _INDEXES;
     }
 
+<#elseif selfFields?size<=5>
+    public ${name}() {
+    }
+    
+    public ${name}(<#rt/>
+    <#list selfFields as field>
+        <#if field.type == "set" || field.type == "list">
+        ${field.basicType}<${field.classValueType}> ${field.name}<#if field?has_next>, </#if><#t/>
+        <#elseif field.type == "map">
+        ${field.basicType}<${field.classKeyType}, ${field.classValueType}> ${field.name}<#if field?has_next>, </#if><#t/>
+        <#elseif field.builtinType>
+        ${field.basicType} ${field.name}<#if field?has_next>, </#if><#t/>
+        <#else>
+        ${field.classType} ${field.name}<#if field?has_next>, </#if><#t/>
+        </#if>
+    </#list>
+    ) {<#lt/>
+    <#list selfFields as field>
+        <#if field.type == "set" || field.type == "list">
+        this.${field.name}.addAll(${field.name});
+        <#elseif field.type == "map">
+        this.${field.name}.putAll(${field.name});
+        <#else>
+        this.set${field.name?cap_first}(${field.name});
+        </#if>
+    </#list>
+    }
 </#if>
 
 <#list fields as field>

@@ -15,6 +15,13 @@ public class RoleInfo extends Bean {
     //角色名
     private String name = "";
 
+    public RoleInfo() {
+    }
+    
+    public RoleInfo(long id, String name) {
+        this.setId(id);
+        this.setName(name);
+    }
 
     /**
      * 角色id

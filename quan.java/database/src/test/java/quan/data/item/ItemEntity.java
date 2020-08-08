@@ -26,6 +26,14 @@ public class ItemEntity extends Entity {
 
     private ListField<Integer> list = new ListField<>(_getLogRoot());
 
+    public ItemEntity() {
+    }
+    
+    public ItemEntity(int id, String name, List<Integer> list) {
+        this.setId(id);
+        this.setName(name);
+        this.list.addAll(list);
+    }
 
     public int getId() {
         return id.getLogValue();

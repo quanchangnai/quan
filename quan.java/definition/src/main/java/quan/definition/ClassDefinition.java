@@ -199,9 +199,9 @@ public abstract class ClassDefinition extends Definition {
         if (StringUtils.isBlank(language) || category == Category.data) {
             return;
         }
-        Pair<Boolean, Set<String>> pair = Language.parse(language);
-        excludeLanguage = pair.getLeft();
-        languages = pair.getRight();
+        Pair<Set<String>,Boolean > pair = Language.parse(language);
+        languages = pair.getLeft();
+        excludeLanguage = pair.getRight();
     }
 
     public boolean isExcludeLanguage() {
@@ -360,4 +360,5 @@ public abstract class ClassDefinition extends Definition {
                 "name='" + getLongName() + '\'' +
                 '}';
     }
+
 }

@@ -49,7 +49,7 @@ public enum Language {
         return names;
     }
 
-    public static Pair<Boolean, Set<String>> parse(String language) {
+    public static Pair<Set<String>, Boolean> parse(String language) {
         language = language.trim();
         boolean exclude = false;
         Set<String> languages = new HashSet<>();
@@ -65,7 +65,7 @@ public enum Language {
             }
         }
 
-        return Pair.of(exclude, languages);
+        return Pair.of(languages, exclude);
     }
 
     public abstract Set<String> reservedWords();
