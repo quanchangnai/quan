@@ -1,6 +1,5 @@
 package quan.message.common;
 
-import java.util.*;
 import quan.message.*;
 
 /**

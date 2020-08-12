@@ -14,16 +14,6 @@ import static quan.common.utils.CollectionUtils.unmodifiableSet;
 public final class Constants {
 
     /**
-     * 首字母小写包名格式
-     */
-    public static final Pattern LOWER_PACKAGE_NAME_PATTERN = Pattern.compile("[a-z][a-z\\d]*(\\.[a-z][a-z\\d]*)*");
-
-    /**
-     * 首字母大写包名格式
-     */
-    public static final Pattern UPPER_PACKAGE_NAME_PATTERN = Pattern.compile("[A-Z][a-z\\d]*(\\.[A-Z][a-z\\d]*)*");
-
-    /**
      * 类名格式
      */
     public static final Pattern CLASS_NAME_PATTERN = Pattern.compile("[A-Z][a-zA-Z\\d]*");
@@ -82,11 +72,6 @@ public final class Constants {
      * 配置支持的内建类型
      */
     public static final Set<String> CONFIG_BUILTIN_TYPES = unmodifiableSet(PRIMITIVE_TYPES, COLLECTION_TYPES, TIME_TYPES);
-
-    public static final Set<String> DATA_RESERVED_CLASS_NAMES = unmodifiableSet("Boolean", "Short", "Integer",
-            "Long", "Float", "Double", "String", "Set", "List", "Map", "HashSet", "ArrayList", "HashMap");
-
-    public static final Set<String> CS_RESERVED_CLASS_NAMES = unmodifiableSet("HashSet", "List", "Dictionary");
 
     /**
      * 配置支持的合法分隔符

@@ -6,8 +6,8 @@
 local _Buffer = require("quan.message.Buffer")
 local _Message = require("quan.message.Message")
 local _MessageHeader = require("test.message.common.MessageHeader")
-local UserInfo = require("test.message.user.UserInfo")
 local RoleInfo = require("test.message.role.RoleInfo")
+local UserInfo = require("test.message.user.UserInfo")
 
 ---
 ---角色登录，哈希生成ID

@@ -1,6 +1,5 @@
 package ${getFullPackageName("java")};
 
-import java.util.*;
 import quan.message.*;
 <#list imports?keys as import>
 import ${import};

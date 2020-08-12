@@ -1,5 +1,6 @@
 package quan.generator.message;
 
+import quan.definition.FieldDefinition;
 import quan.definition.Language;
 
 import java.util.Properties;
@@ -45,6 +46,16 @@ public class JavaMessageGenerator extends MessageGenerator {
     @Override
     protected Language language() {
         return Language.java;
+    }
+
+    @Override
+    protected void prepareField(FieldDefinition fieldDefinition) {
+        super.prepareField(fieldDefinition);
+        if (fieldDefinition.getType().equals("bytes") || fieldDefinition.getType().equals("string")
+                || fieldDefinition.isCollectionType() || fieldDefinition.isTimeType()
+                || fieldDefinition.isBeanType() && !fieldDefinition.isOptional()) {
+            fieldDefinition.getOwner().getImports().put("java.util.*", null);
+        }
     }
 
 }

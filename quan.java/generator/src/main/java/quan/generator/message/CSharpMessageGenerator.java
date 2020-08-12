@@ -51,7 +51,11 @@ public class CSharpMessageGenerator extends MessageGenerator {
     @Override
     protected void prepareField(FieldDefinition fieldDefinition) {
         super.prepareField(fieldDefinition);
-        if (fieldDefinition.isTimeType()) {
+        if (fieldDefinition.isCollectionType()) {
+            fieldDefinition.getOwner().getImports().put("System.Collections.Generic", null);
+        }
+        if (fieldDefinition.getType().equals("bytes") || fieldDefinition.getType().equals("string")
+                || fieldDefinition.isTimeType() || fieldDefinition.isBeanType() && !fieldDefinition.isOptional()) {
             fieldDefinition.getOwner().getImports().put("System", null);
         }
     }

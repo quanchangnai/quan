@@ -1,8 +1,7 @@
-using System;
-using System.Collections.Generic;
 using Quan.Common.Utils;
 using Quan.Message;
 using Buffer = Quan.Message.Buffer;
+using System;
 
 namespace Test.Message.User
 {

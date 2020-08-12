@@ -1,7 +1,7 @@
 package quan.message.user;
 
-import java.util.*;
 import quan.message.*;
+import java.util.*;
 
 /**
  * 角色信息2<br/>
@@ -17,7 +17,7 @@ public class RoleInfo extends Bean {
 
     public RoleInfo() {
     }
-    
+
     public RoleInfo(long id, String name) {
         this.setId(id);
         this.setName(name);

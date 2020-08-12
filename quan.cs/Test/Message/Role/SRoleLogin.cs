@@ -1,10 +1,10 @@
-using System;
-using System.Collections.Generic;
 using Quan.Common.Utils;
 using Quan.Message;
 using Buffer = Quan.Message.Buffer;
-using Test.Message.User;
+using System;
+using System.Collections.Generic;
 using Test.Message.Common;
+using Test.Message.User;
 
 namespace Test.Message.Role
 {

@@ -40,7 +40,7 @@ public abstract class ClassDefinition extends Definition {
     protected List<FieldDefinition> fields = new ArrayList<>();
 
     //导包，和具体语言相关
-    private Map<String, String> imports = new HashMap<>();
+    private Map<String, String> imports = new TreeMap<>();
 
     //字段名:字段定义
     protected Map<String, FieldDefinition> nameFields = new HashMap<>();
@@ -199,7 +199,7 @@ public abstract class ClassDefinition extends Definition {
         if (StringUtils.isBlank(language) || category == Category.data) {
             return;
         }
-        Pair<Set<String>,Boolean > pair = Language.parse(language);
+        Pair<Set<String>, Boolean> pair = Language.parse(language);
         languages = pair.getLeft();
         excludeLanguage = pair.getRight();
     }

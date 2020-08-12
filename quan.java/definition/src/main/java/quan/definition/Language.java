@@ -5,6 +5,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import static quan.common.utils.CollectionUtils.unmodifiableSet;
 
@@ -24,6 +25,11 @@ public enum Language {
         @Override
         public Set<String> reservedWords() {
             return CS_RESERVED_WORDS;
+        }
+
+        @Override
+        public Pattern getPackageNamePattern() {
+            return UPPER_PACKAGE_NAME_PATTERN;
         }
     },
 
@@ -70,6 +76,14 @@ public enum Language {
 
     public abstract Set<String> reservedWords();
 
+    public boolean matchPackageName(String packageName) {
+        return getPackageNamePattern().matcher(packageName).matches();
+    }
+
+    public Pattern getPackageNamePattern() {
+        return LOWER_PACKAGE_NAME_PATTERN;
+    }
+
     /**
      * Java保留字
      */
@@ -102,4 +116,13 @@ public enum Language {
             "local", "nil", "not", "or", "repeat", "return", "then", "true", "until", "while"
     );
 
+    /**
+     * 首字母小写包名格式
+     */
+    public static final Pattern LOWER_PACKAGE_NAME_PATTERN = Pattern.compile("[a-z][a-z\\d]*(\\.[a-z][a-z\\d]*)*");
+
+    /**
+     * 首字母大写包名格式
+     */
+    public static final Pattern UPPER_PACKAGE_NAME_PATTERN = Pattern.compile("[A-Z][a-z\\d]*(\\.[A-Z][a-z\\d]*)*");
 }

@@ -1,9 +1,9 @@
 package quan.message.role;
 
-import java.util.*;
 import quan.message.*;
-import quan.message.user.UserInfo;
+import java.util.*;
 import quan.message.common.MessageHeader;
+import quan.message.user.UserInfo;
 
 /**
  * 角色登录，哈希生成ID<br/>

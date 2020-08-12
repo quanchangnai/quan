@@ -1,7 +1,7 @@
 package quan.message.role;
 
-import java.util.*;
 import quan.message.*;
+import java.util.*;
 
 /**
  * 角色信息<br/>

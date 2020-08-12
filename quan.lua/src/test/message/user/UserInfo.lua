@@ -5,8 +5,8 @@
 
 local _Buffer = require("quan.message.Buffer")
 local _Message = require("quan.message.Message")
-local RoleInfo = require("test.message.user.RoleInfo")
 local test_message_role_RoleInfo = require("test.message.role.RoleInfo")
+local RoleInfo = require("test.message.user.RoleInfo")
 
 ---
 ---用户信息
