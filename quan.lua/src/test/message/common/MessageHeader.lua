@@ -15,7 +15,7 @@ local MessageHeader = {
 }
 
 ---
----消息头.编码
+---[消息头].编码
 ---@param buffer quan.message.Buffer 可以为空
 ---@return quan.message.Buffer
 ---
@@ -31,7 +31,7 @@ function MessageHeader:encode(buffer)
 end
 
 ---
----消息头.解码
+---[消息头].解码
 ---@param buffer quan.message.Buffer 不能为空
 ---@param self test.message.common.MessageHeader 可以为空
 ---@return test.message.common.MessageHeader

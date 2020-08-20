@@ -56,7 +56,7 @@ end
 local meta = { __index = ${name}, __newindex = onSet, __tostring = toString }
 
 ---
----<#if comment !="">${comment}<#else>${name}</#if>.构造
+---<#if comment !="">[${comment}]<#else>${name}</#if>.构造
 ---@param args 参数列表可以为空
 ---
 function ${name}.new(args)
@@ -91,7 +91,7 @@ end
 </#if>
 <#if kind ==3>
 ---
----<#if comment !="">${comment}<#else>${name}</#if>.编码
+---<#if comment !="">[${comment}]<#else>${name}</#if>.编码
 ---@return quan.message.Buffer
 ---
 function ${name}:encode()
@@ -104,7 +104,7 @@ function ${name}:encode()
     </#if>
 <#else>
 ---
----<#if comment !="">${comment}<#else>${name}</#if>.编码
+---<#if comment !="">[${comment}]<#else>${name}</#if>.编码
 ---@param buffer quan.message.Buffer 可以为空
 ---@return quan.message.Buffer
 ---
@@ -234,7 +234,7 @@ end
 
 <#if kind ==3>
 ---
----<#if comment !="">${comment}<#else>${name}</#if>.解码
+---<#if comment !="">[${comment}]<#else>${name}</#if>.解码
 ---@param buffer quan.message.Buffer 不能为空
 ---@return ${getFullName("lua")}
 ---
@@ -250,7 +250,7 @@ function ${name}.decode(buffer)
     </#if>
 <#else>
 ---
----<#if comment !="">${comment}<#else>${name}</#if>.解码
+---<#if comment !="">[${comment}]<#else>${name}</#if>.解码
 ---@param buffer quan.message.Buffer 不能为空
 ---@param self ${getFullName("lua")} 可以为空
 ---@return ${getFullName("lua")}

@@ -112,14 +112,15 @@ public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idFiel
     public ${name}(<#rt/>
     <#list selfFields as field>
         <#if field.type == "set" || field.type == "list">
-        ${field.basicType}<${field.classValueType}> ${field.name}<#if field?has_next>, </#if><#t/>
+        ${field.basicType}<${field.classValueType}> ${field.name}<#t/>
         <#elseif field.type == "map">
-        ${field.basicType}<${field.classKeyType}, ${field.classValueType}> ${field.name}<#if field?has_next>, </#if><#t/>
+        ${field.basicType}<${field.classKeyType}, ${field.classValueType}> ${field.name}<#t/>
         <#elseif field.builtinType>
-        ${field.basicType} ${field.name}<#if field?has_next>, </#if><#t/>
+        ${field.basicType} ${field.name}<#t/>
         <#else>
-        ${field.classType} ${field.name}<#if field?has_next>, </#if><#t/>
+        ${field.classType} ${field.name}<#t/>
         </#if>
+        <#if field?has_next>, </#if><#t/>
     </#list>
     ) {<#lt/>
     <#list selfFields as field>

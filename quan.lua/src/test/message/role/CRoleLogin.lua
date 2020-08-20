@@ -42,7 +42,7 @@ end
 local meta = { __index = CRoleLogin, __newindex = onSet, __tostring = toString }
 
 ---
----角色登录，自定义ID.构造
+---[角色登录，自定义ID].构造
 ---@param args 参数列表可以为空
 ---
 function CRoleLogin.new(args)
@@ -75,7 +75,7 @@ function CRoleLogin.new(args)
 end
 
 ---
----角色登录，自定义ID.编码
+---[角色登录，自定义ID].编码
 ---@return quan.message.Buffer
 ---
 function CRoleLogin:encode()
@@ -115,7 +115,7 @@ function CRoleLogin:encode()
 end
 
 ---
----角色登录，自定义ID.解码
+---[角色登录，自定义ID].解码
 ---@param buffer quan.message.Buffer 不能为空
 ---@return test.message.role.CRoleLogin
 ---

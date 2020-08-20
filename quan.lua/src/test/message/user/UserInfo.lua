@@ -39,7 +39,7 @@ end
 local meta = { __index = UserInfo, __newindex = onSet, __tostring = toString }
 
 ---
----用户信息.构造
+---[用户信息].构造
 ---@param args 参数列表可以为空
 ---
 function UserInfo.new(args)
@@ -72,7 +72,7 @@ function UserInfo.new(args)
 end
 
 ---
----用户信息.编码
+---[用户信息].编码
 ---@param buffer quan.message.Buffer 可以为空
 ---@return quan.message.Buffer
 ---
@@ -140,7 +140,7 @@ function UserInfo:encode(buffer)
 end
 
 ---
----用户信息.解码
+---[用户信息].解码
 ---@param buffer quan.message.Buffer 不能为空
 ---@param self test.message.user.UserInfo 可以为空
 ---@return test.message.user.UserInfo

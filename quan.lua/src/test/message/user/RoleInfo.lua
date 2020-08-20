@@ -30,7 +30,7 @@ end
 local meta = { __index = RoleInfo, __newindex = onSet, __tostring = toString }
 
 ---
----角色信息2.构造
+---[角色信息2].构造
 ---@param args 参数列表可以为空
 ---
 function RoleInfo.new(args)
@@ -49,7 +49,7 @@ function RoleInfo.new(args)
 end
 
 ---
----角色信息2.编码
+---[角色信息2].编码
 ---@param buffer quan.message.Buffer 可以为空
 ---@return quan.message.Buffer
 ---
@@ -66,7 +66,7 @@ function RoleInfo:encode(buffer)
 end
 
 ---
----角色信息2.解码
+---[角色信息2].解码
 ---@param buffer quan.message.Buffer 不能为空
 ---@param self test.message.user.RoleInfo 可以为空
 ---@return test.message.user.RoleInfo
