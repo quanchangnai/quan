@@ -9,12 +9,12 @@ import java.util.Objects;
 
 
 /**
- * 非对称加密器，支持RSA、DSA算法，支持数字签名
+ * 非对称加密，支持RSA、DSA算法，支持数字签名
  * Created by quanchangnai on 2020/5/21.
  */
-public class AsymmetricCipher {
+public class KeyPairCipher {
 
-    private final AsymmetricAlgorithm algorithm;
+    private final Algorithm algorithm;
 
     private PublicKey publicKey;
 
@@ -25,7 +25,7 @@ public class AsymmetricCipher {
      *
      * @param algorithm 算法
      */
-    public AsymmetricCipher(AsymmetricAlgorithm algorithm) {
+    public KeyPairCipher(Algorithm algorithm) {
         this(algorithm, 1024);
     }
 
@@ -35,7 +35,7 @@ public class AsymmetricCipher {
      * @param algorithm 算法
      * @param keySize   密钥长度
      */
-    public AsymmetricCipher(AsymmetricAlgorithm algorithm, int keySize) {
+    public KeyPairCipher(Algorithm algorithm, int keySize) {
         this.algorithm = Objects.requireNonNull(algorithm, "加密算法不能为空");
         KeyPairGenerator keyPairGenerator;
 
@@ -59,7 +59,7 @@ public class AsymmetricCipher {
      * @param publicKey  公钥
      * @param privateKey 私钥
      */
-    public AsymmetricCipher(AsymmetricAlgorithm algorithm, byte[] publicKey, byte[] privateKey) {
+    public KeyPairCipher(Algorithm algorithm, byte[] publicKey, byte[] privateKey) {
         this.algorithm = Objects.requireNonNull(algorithm, "加密算法不能为空");
         if (publicKey == null && privateKey != null) {
             throw new IllegalArgumentException("公钥和私钥不能都为空");
@@ -80,13 +80,13 @@ public class AsymmetricCipher {
     }
 
     /**
-     * @see #AsymmetricCipher(AsymmetricAlgorithm, byte[], byte[])
+     * @see #KeyPairCipher(Algorithm, byte[], byte[])
      */
-    public AsymmetricCipher(AsymmetricAlgorithm algorithm, String publicKey, String privateKey) {
+    public KeyPairCipher(Algorithm algorithm, String publicKey, String privateKey) {
         this(algorithm, publicKey != null ? Base64.getDecoder().decode(publicKey) : null, privateKey != null ? Base64.getDecoder().decode(privateKey) : null);
     }
 
-    public AsymmetricAlgorithm getAlgorithm() {
+    public Algorithm getAlgorithm() {
         return algorithm;
     }
 
@@ -217,12 +217,58 @@ public class AsymmetricCipher {
 
     @Override
     public String toString() {
-        return "AsymmetricCipher{" +
+        return "KeyPairCipher{" +
                 "algorithm=" + algorithm +
                 ", publicKey=" + getBase64PublicKey() +
                 ", privateKey=" + getBase64PrivateKey() +
                 '}';
     }
 
+    /**
+     * 非对称加密算法枚举
+     */
+    public enum Algorithm {
+
+        RSA("RSA", "RSA/ECB/PKCS1Padding", "MD5withRSA"),
+
+        //Digital Signature Algorithm
+        DSA("DSA", null, "SHA1withDSA");
+
+        //密钥生成算法
+        public final String generation;
+
+        //加密、解密算法
+        public final String encryption;
+
+        //签名、验签算法
+        public final String signature;
+
+        Algorithm(String generation, String encryption, String signature) {
+            this.generation = generation;
+            this.encryption = encryption;
+            this.signature = signature;
+        }
+
+        public void checkEncryption() {
+            if (encryption == null) {
+                throw new UnsupportedOperationException(name() + "算法不支持加密、解密");
+            }
+        }
+
+        public void checkSignature() {
+            if (signature == null) {
+                throw new UnsupportedOperationException(name() + "算法不支持签名、验签");
+            }
+        }
+
+        @Override
+        public String toString() {
+            return "KeyPairCipher.Algorithm{" +
+                    "generation='" + generation + '\'' +
+                    ", encryption='" + encryption + '\'' +
+                    ", signature='" + signature + '\'' +
+                    '}';
+        }
+    }
 }
 

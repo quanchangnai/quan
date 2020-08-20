@@ -9,12 +9,12 @@ import java.util.Base64;
 import java.util.Objects;
 
 /**
- * 对称加密器，支持DES、AES算法
+ * 对称加密，支持DES、AES算法
  * Created by quanchangnai on 2020/5/21.
  */
-public class SymmetricCipher {
+public class SecretKeyCipher {
 
-    private final SymmetricAlgorithm algorithm;
+    private final Algorithm algorithm;
 
     private final SecretKey secretKey;
 
@@ -25,7 +25,7 @@ public class SymmetricCipher {
      *
      * @param algorithm 算法
      */
-    public SymmetricCipher(SymmetricAlgorithm algorithm) {
+    public SecretKeyCipher(Algorithm algorithm) {
         this.algorithm = Objects.requireNonNull(algorithm, "加密算法不能为空");
         this.iv = algorithm.getIvParameterSpec();
         try {
@@ -43,23 +43,23 @@ public class SymmetricCipher {
      * @param algorithm 算法
      * @param secretKey 密钥
      */
-    public SymmetricCipher(SymmetricAlgorithm algorithm, byte[] secretKey) {
+    public SecretKeyCipher(Algorithm algorithm, byte[] secretKey) {
         this.algorithm = Objects.requireNonNull(algorithm, "加密算法不能为空");
         this.secretKey = new SecretKeySpec(secretKey, algorithm.generation);
         this.iv = algorithm.getIvParameterSpec();
     }
 
     /**
-     * @see #SymmetricCipher(SymmetricAlgorithm, byte[])
+     * @see #SecretKeyCipher(Algorithm, byte[])
      */
-    public SymmetricCipher(SymmetricAlgorithm algorithm, String secretKey) {
+    public SecretKeyCipher(Algorithm algorithm, String secretKey) {
         this(algorithm, Base64.getDecoder().decode(secretKey));
     }
 
     /**
      * 自定义初始向量
      */
-    public SymmetricCipher setIv(byte[] iv) {
+    public SecretKeyCipher setIv(byte[] iv) {
         if (algorithm.getIv() == null) {
             throw new UnsupportedOperationException("算法[" + algorithm.encryption + "]不支持初始向量");
         }
@@ -70,7 +70,7 @@ public class SymmetricCipher {
         return this;
     }
 
-    public SymmetricAlgorithm getAlgorithm() {
+    public Algorithm getAlgorithm() {
         return algorithm;
     }
 
@@ -110,10 +110,70 @@ public class SymmetricCipher {
 
     @Override
     public String toString() {
-        return "SymmetricCipher{" +
+        return "SecretKeyCipher{" +
                 "algorithm=" + algorithm +
                 ", secretKey=" + getBase64SecretKey() +
                 '}';
+    }
+
+    /**
+     * 对称加密算法枚举
+     */
+    public enum Algorithm {
+
+        //Data Encryption Standard
+        DES("DES", "DES/CBC/PKCS5Padding", "12345678", 56),
+
+        //Triple DES
+        DESEde("DESEde", "DESEde/CBC/PKCS5Padding", "12345678", 168),
+
+        //Advanced Encryption Standard
+        AES("AES", "AES/CBC/PKCS5Padding", "1234567812345678", 128);
+
+
+        //密钥生成算法
+        public final String generation;
+
+        //加密、解密算法
+        public final String encryption;
+
+        //默认初始向量
+        private byte[] iv;
+
+        //默认初始向量
+        private IvParameterSpec ivParameterSpec;
+
+        //密钥大小
+        public final int keySize;
+
+        Algorithm(String generation, String encryption, String iv, int keySize) {
+            this.generation = generation;
+            this.encryption = encryption;
+            this.keySize = keySize;
+            if (iv != null) {
+                this.iv = iv.getBytes();
+                this.ivParameterSpec = new IvParameterSpec(this.iv);
+            }
+        }
+
+        public byte[] getIv() {
+            return iv;
+        }
+
+        public IvParameterSpec getIvParameterSpec() {
+            return ivParameterSpec;
+        }
+
+
+        @Override
+        public String toString() {
+            return "SecretKeyCipher.Algorithm{" +
+                    "generation='" + generation + '\'' +
+                    ", encryption='" + encryption + '\'' +
+                    ", iv='" + (iv != null ? new String(iv) : "null") + '\'' +
+                    ", keySize=" + keySize +
+                    '}';
+        }
     }
 }
 
