@@ -142,6 +142,9 @@ namespace Test.Config.Item
         // 索引:常量Key
         private static volatile IDictionary<string, ItemConfig> _keyConfigs = new Dictionary<string, ItemConfig>();
 
+        // 索引:类型
+        private static volatile IDictionary<ItemType, IList<ItemConfig>> _typeConfigs = new Dictionary<ItemType, IList<ItemConfig>>();
+
         public static IList<ItemConfig> GetConfigs()
         {
             return _configs;
@@ -169,25 +172,40 @@ namespace Test.Config.Item
             return result;
         }
 
+        public static IDictionary<ItemType, IList<ItemConfig>> GetTypeConfigs()
+        {
+            return _typeConfigs;
+        }
+
+        public static IList<ItemConfig> GetByType(ItemType type)
+        {
+            _typeConfigs.TryGetValue(type, out var result);
+            return result ?? ImmutableList<ItemConfig>.Empty;
+        }
+
 
         public static void Load(IList<ItemConfig> configs)
         {
             IDictionary<int, ItemConfig> idConfigs = new Dictionary<int, ItemConfig>();
             IDictionary<string, ItemConfig> keyConfigs = new Dictionary<string, ItemConfig>();
+            IDictionary<ItemType, IList<ItemConfig>> typeConfigs = new Dictionary<ItemType, IList<ItemConfig>>();
 
             foreach (var config in configs)
             {
                 Load(idConfigs, config, config.Id);
                 Load(keyConfigs, config, config.Key);
+                Load(typeConfigs, config, config.Type);
             }
 
             configs = configs.ToImmutableList();
             idConfigs = ToImmutableDictionary(idConfigs);
             keyConfigs = ToImmutableDictionary(keyConfigs);
+            typeConfigs = ToImmutableDictionary(typeConfigs);
 
             _configs = configs;
             _idConfigs = idConfigs;
             _keyConfigs = keyConfigs;
+            _typeConfigs = typeConfigs;
         }
     }
 }

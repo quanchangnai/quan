@@ -25,12 +25,12 @@ public class NettyMessageCodec extends ByteToMessageCodec<Message> {
     }
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, Message msg, ByteBuf byteBuf) throws Exception {
+    protected void encode(ChannelHandlerContext ctx, Message msg, ByteBuf byteBuf) {
         msg.encode(new NettyBuffer(byteBuf));
     }
 
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) throws Exception {
+    protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) {
         Buffer buffer = new NettyBuffer(byteBuf);
         int msgId = buffer.readInt();
         buffer.reset();

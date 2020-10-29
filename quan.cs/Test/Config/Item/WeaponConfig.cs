@@ -131,6 +131,9 @@ namespace Test.Config.Item
         // 索引:常量Key
         private static volatile IDictionary<string, WeaponConfig> _keyConfigs = new Dictionary<string, WeaponConfig>();
 
+        // 索引:类型
+        private static volatile IDictionary<ItemType, IList<WeaponConfig>> _typeConfigs = new Dictionary<ItemType, IList<WeaponConfig>>();
+
         // 索引:部位
         private static volatile IDictionary<int, IList<WeaponConfig>> _positionConfigs = new Dictionary<int, IList<WeaponConfig>>();
 
@@ -163,6 +166,17 @@ namespace Test.Config.Item
         {
             _keyConfigs.TryGetValue(key, out var result);
             return result;
+        }
+
+        public new static IDictionary<ItemType, IList<WeaponConfig>> GetTypeConfigs()
+        {
+            return _typeConfigs;
+        }
+
+        public new static IList<WeaponConfig> GetByType(ItemType type)
+        {
+            _typeConfigs.TryGetValue(type, out var result);
+            return result ?? ImmutableList<WeaponConfig>.Empty;
         }
 
         public new static IDictionary<int, IList<WeaponConfig>> GetPositionConfigs()
@@ -215,6 +229,7 @@ namespace Test.Config.Item
         {
             IDictionary<int, WeaponConfig> idConfigs = new Dictionary<int, WeaponConfig>();
             IDictionary<string, WeaponConfig> keyConfigs = new Dictionary<string, WeaponConfig>();
+            IDictionary<ItemType, IList<WeaponConfig>> typeConfigs = new Dictionary<ItemType, IList<WeaponConfig>>();
             IDictionary<int, IList<WeaponConfig>> positionConfigs = new Dictionary<int, IList<WeaponConfig>>();
             IDictionary<int, IDictionary<int, IList<WeaponConfig>>> composite1Configs = new Dictionary<int, IDictionary<int, IList<WeaponConfig>>>();
             IDictionary<int, IDictionary<int, WeaponConfig>> composite2Configs = new Dictionary<int, IDictionary<int, WeaponConfig>>();
@@ -223,6 +238,7 @@ namespace Test.Config.Item
             {
                 ConfigBase.Load(idConfigs, config, config.Id);
                 ConfigBase.Load(keyConfigs, config, config.Key);
+                ConfigBase.Load(typeConfigs, config, config.Type);
                 ConfigBase.Load(positionConfigs, config, config.Position);
                 ConfigBase.Load(composite1Configs, config, config.Color, config.W1);
                 ConfigBase.Load(composite2Configs, config, config.W1, config.W2);
@@ -231,6 +247,7 @@ namespace Test.Config.Item
             configs = configs.ToImmutableList();
             idConfigs = ToImmutableDictionary(idConfigs);
             keyConfigs = ToImmutableDictionary(keyConfigs);
+            typeConfigs = ToImmutableDictionary(typeConfigs);
             positionConfigs = ToImmutableDictionary(positionConfigs);
             composite1Configs = ToImmutableDictionary(composite1Configs);
             composite2Configs = ToImmutableDictionary(composite2Configs);
@@ -238,6 +255,7 @@ namespace Test.Config.Item
             _configs = configs;
             _idConfigs = idConfigs;
             _keyConfigs = keyConfigs;
+            _typeConfigs = typeConfigs;
             _positionConfigs = positionConfigs;
             _composite1Configs = composite1Configs;
             _composite2Configs = composite2Configs;

@@ -18,6 +18,9 @@ local idConfigs = {}
 ---索引:常量Key
 local keyConfigs = {}
 
+---索引:类型
+local typeConfigs = {}
+
 ---索引:部位
 local positionConfigs = {}
 
@@ -30,6 +33,7 @@ local function loadConfigs()
     for i, config in ipairs(configs) do
         Config.load(idConfigs, config, true, { "id" }, { config.id })
         Config.load(keyConfigs, config, true, { "key" }, { config.key })
+        Config.load(typeConfigs, config, false, { "type" }, { config.type })
         Config.load(positionConfigs, config, false, { "position" }, { config.position })
         Config.load(composite1Configs, config, false, { "color", "w1" }, { config.color, config.w1 })
         Config.load(composite2Configs, config, true, { "w1", "w2" }, { config.w1, config.w2 })
@@ -70,6 +74,15 @@ function WeaponConfig.getByKey(key)
         return keyConfigs
     end
     return keyConfigs[key]
+end
+
+---
+---通过索引[type]获取WeaponConfig
+---@overload fun():map<type:ItemType,list<WeaponConfig>> 
+---@param type ItemType 类型
+---@return list<WeaponConfig>
+function WeaponConfig.getByType(type)
+    return typeConfigs[type] or table.empty()
 end
 
 ---

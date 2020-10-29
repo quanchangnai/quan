@@ -61,6 +61,9 @@ namespace Test.Config.Item
         // 索引:常量Key
         private static volatile IDictionary<string, EquipConfig> _keyConfigs = new Dictionary<string, EquipConfig>();
 
+        // 索引:类型
+        private static volatile IDictionary<ItemType, IList<EquipConfig>> _typeConfigs = new Dictionary<ItemType, IList<EquipConfig>>();
+
         // 索引:部位
         private static volatile IDictionary<int, IList<EquipConfig>> _positionConfigs = new Dictionary<int, IList<EquipConfig>>();
 
@@ -91,6 +94,17 @@ namespace Test.Config.Item
             return result;
         }
 
+        public new static IDictionary<ItemType, IList<EquipConfig>> GetTypeConfigs()
+        {
+            return _typeConfigs;
+        }
+
+        public new static IList<EquipConfig> GetByType(ItemType type)
+        {
+            _typeConfigs.TryGetValue(type, out var result);
+            return result ?? ImmutableList<EquipConfig>.Empty;
+        }
+
         public static IDictionary<int, IList<EquipConfig>> GetPositionConfigs()
         {
             return _positionConfigs;
@@ -107,23 +121,27 @@ namespace Test.Config.Item
         {
             IDictionary<int, EquipConfig> idConfigs = new Dictionary<int, EquipConfig>();
             IDictionary<string, EquipConfig> keyConfigs = new Dictionary<string, EquipConfig>();
+            IDictionary<ItemType, IList<EquipConfig>> typeConfigs = new Dictionary<ItemType, IList<EquipConfig>>();
             IDictionary<int, IList<EquipConfig>> positionConfigs = new Dictionary<int, IList<EquipConfig>>();
 
             foreach (var config in configs)
             {
                 ConfigBase.Load(idConfigs, config, config.Id);
                 ConfigBase.Load(keyConfigs, config, config.Key);
+                ConfigBase.Load(typeConfigs, config, config.Type);
                 ConfigBase.Load(positionConfigs, config, config.Position);
             }
 
             configs = configs.ToImmutableList();
             idConfigs = ToImmutableDictionary(idConfigs);
             keyConfigs = ToImmutableDictionary(keyConfigs);
+            typeConfigs = ToImmutableDictionary(typeConfigs);
             positionConfigs = ToImmutableDictionary(positionConfigs);
 
             _configs = configs;
             _idConfigs = idConfigs;
             _keyConfigs = keyConfigs;
+            _typeConfigs = typeConfigs;
             _positionConfigs = positionConfigs;
         }
     }

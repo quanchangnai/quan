@@ -163,6 +163,9 @@ public class WeaponConfig extends EquipConfig {
         //索引:常量Key
         private static volatile Map<String, WeaponConfig> keyConfigs = new HashMap<>();
 
+        //索引:类型
+        private static volatile Map<ItemType, List<WeaponConfig>> typeConfigs = new HashMap<>();
+
         //索引:部位
         private static volatile Map<Integer, List<WeaponConfig>> positionConfigs = new HashMap<>();
 
@@ -188,6 +191,14 @@ public class WeaponConfig extends EquipConfig {
 
         public static WeaponConfig getByKey(String key) {
             return keyConfigs.get(key);
+        }
+
+        public static Map<ItemType, List<WeaponConfig>> getTypeConfigs() {
+            return typeConfigs;
+        }
+
+        public static List<WeaponConfig> getByType(ItemType type) {
+            return typeConfigs.getOrDefault(type, Collections.emptyList());
         }
 
         public static Map<Integer, List<WeaponConfig>> getPositionConfigs() {
@@ -232,6 +243,7 @@ public class WeaponConfig extends EquipConfig {
         public static List<String> load(List<WeaponConfig> configs) {
             Map<Integer, WeaponConfig> idConfigs = new HashMap<>();
             Map<String, WeaponConfig> keyConfigs = new HashMap<>();
+            Map<ItemType, List<WeaponConfig>> typeConfigs = new HashMap<>();
             Map<Integer, List<WeaponConfig>> positionConfigs = new HashMap<>();
             Map<Integer, Map<Integer, List<WeaponConfig>>> composite1Configs = new HashMap<>();
             Map<Integer, Map<Integer, WeaponConfig>> composite2Configs = new HashMap<>();
@@ -243,6 +255,7 @@ public class WeaponConfig extends EquipConfig {
                 if (!config.key.equals("")) {
                     Config.load(keyConfigs, errors, config, true, Collections.singletonList("key"), config.key);
                 }
+                Config.load(typeConfigs, errors, config, false, Collections.singletonList("type"), config.type);
                 Config.load(positionConfigs, errors, config, false, Collections.singletonList("position"), config.position);
                 Config.load(composite1Configs, errors, config, false, Arrays.asList("color", "w1"), config.color, config.w1);
                 Config.load(composite2Configs, errors, config, true, Arrays.asList("w1", "w2"), config.w1, config.w2);
@@ -251,6 +264,7 @@ public class WeaponConfig extends EquipConfig {
             configs = Collections.unmodifiableList(configs);
             idConfigs = unmodifiableMap(idConfigs);
             keyConfigs = unmodifiableMap(keyConfigs);
+            typeConfigs = unmodifiableMap(typeConfigs);
             positionConfigs = unmodifiableMap(positionConfigs);
             composite1Configs = unmodifiableMap(composite1Configs);
             composite2Configs = unmodifiableMap(composite2Configs);
@@ -258,6 +272,7 @@ public class WeaponConfig extends EquipConfig {
             WeaponConfig.self.configs = configs;
             WeaponConfig.self.idConfigs = idConfigs;
             WeaponConfig.self.keyConfigs = keyConfigs;
+            WeaponConfig.self.typeConfigs = typeConfigs;
             WeaponConfig.self.positionConfigs = positionConfigs;
             WeaponConfig.self.composite1Configs = composite1Configs;
             WeaponConfig.self.composite2Configs = composite2Configs;

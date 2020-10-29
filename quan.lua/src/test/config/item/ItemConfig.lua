@@ -18,6 +18,9 @@ local idConfigs = {}
 ---索引:常量Key
 local keyConfigs = {}
 
+---索引:类型
+local typeConfigs = {}
+
 ---加载配置，建立索引
 local function loadConfigs()
     local EquipConfig = require("test.config.item.EquipConfig")
@@ -28,6 +31,7 @@ local function loadConfigs()
     for i, config in ipairs(configs) do
         Config.load(idConfigs, config, true, { "id" }, { config.id })
         Config.load(keyConfigs, config, true, { "key" }, { config.key })
+        Config.load(typeConfigs, config, false, { "type" }, { config.type })
     end
 end
 
@@ -65,6 +69,15 @@ function ItemConfig.getByKey(key)
         return keyConfigs
     end
     return keyConfigs[key]
+end
+
+---
+---通过索引[type]获取ItemConfig
+---@overload fun():map<type:ItemType,list<ItemConfig>> 
+---@param type ItemType 类型
+---@return list<ItemConfig>
+function ItemConfig.getByType(type)
+    return typeConfigs[type] or table.empty()
 end
 
 return ItemConfig

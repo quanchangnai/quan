@@ -209,6 +209,9 @@ public class ItemConfig extends Config {
     //索引:常量Key
     private static volatile Map<String, ItemConfig> keyConfigs = new HashMap<>();
 
+    //索引:类型
+    private static volatile Map<ItemType, List<ItemConfig>> typeConfigs = new HashMap<>();
+
     public static List<ItemConfig> getConfigs() {
         return configs;
     }
@@ -229,6 +232,14 @@ public class ItemConfig extends Config {
         return keyConfigs.get(key);
     }
 
+    public static Map<ItemType, List<ItemConfig>> getTypeConfigs() {
+        return typeConfigs;
+    }
+
+    public static List<ItemConfig> getByType(ItemType type) {
+        return typeConfigs.getOrDefault(type, Collections.emptyList());
+    }
+
 
     /**
      * 加载配置，建立索引
@@ -239,6 +250,7 @@ public class ItemConfig extends Config {
     public static List<String> load(List<ItemConfig> configs) {
         Map<Integer, ItemConfig> idConfigs = new HashMap<>();
         Map<String, ItemConfig> keyConfigs = new HashMap<>();
+        Map<ItemType, List<ItemConfig>> typeConfigs = new HashMap<>();
 
         List<String> errors = new ArrayList<>();
 
@@ -247,15 +259,18 @@ public class ItemConfig extends Config {
             if (!config.key.equals("")) {
                 load(keyConfigs, errors, config, true, Collections.singletonList("key"), config.key);
             }
+            load(typeConfigs, errors, config, false, Collections.singletonList("type"), config.type);
         }
 
         configs = Collections.unmodifiableList(configs);
         idConfigs = unmodifiableMap(idConfigs);
         keyConfigs = unmodifiableMap(keyConfigs);
+        typeConfigs = unmodifiableMap(typeConfigs);
 
         ItemConfig.configs = configs;
         ItemConfig.idConfigs = idConfigs;
         ItemConfig.keyConfigs = keyConfigs;
+        ItemConfig.typeConfigs = typeConfigs;
 
         return errors;
     }

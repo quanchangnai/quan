@@ -23,11 +23,15 @@
         <field name="ccc" type="int"/>
     </bean>
 
+    <bean name="UseEffect4" parent="UseEffect">使用效果4
+        <field name="itemType" type="ItemType" ref="ItemConfig@type"/>
+    </bean>
+
     <config name="ItemConfig" table="道具/道具">
         <field name="id" type="int" column="ID" index="unique"/>
         <field name="key" type="string" column="常量Key" index="u"/>
         <field name="name" type="string" column="名字"/>
-        <field name="type" type="ItemType" column="类型"/>
+        <field name="type" type="ItemType" column="类型" index="n"/>
         <field name="useEffect" type="UseEffect" column="使用效果"/>
         <field name="reward" type="Reward" column="奖励" optional="true"/>
         <field name="list" type="list:int" column="List" ref="ItemConfig@id"/>

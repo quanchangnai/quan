@@ -32,7 +32,7 @@ public class MessageCodec extends Codec {
     }
 
     @Override
-    protected List<Object> decode(Object msg) throws Exception {
+    protected List<Object> decode(Object msg) {
         Buffer buffer;
         if (msg instanceof ByteBuffer) {
             buffer = new SimpleBuffer((ByteBuffer) msg);
@@ -54,7 +54,7 @@ public class MessageCodec extends Codec {
     }
 
     @Override
-    protected Object encode(Object msg) throws Exception {
+    protected Object encode(Object msg) {
         return ((Message) msg).encode();
     }
 
