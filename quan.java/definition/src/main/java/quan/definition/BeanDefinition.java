@@ -464,41 +464,64 @@ public class BeanDefinition extends ClassDefinition {
         }
 
         if (!field.getType().equals("map")) {
-            String[] fieldRefs = field.getRef().split("@", -1);
-            if (fieldRefs.length != 2) {
-                addValidatedError(getValidatedName() + field.getValidatedName() + "的引用格式错误[" + field.getRef() + "]，正确格式:[配置@字段]");
-                return;
+            int lastDotIndex = field.getRef().lastIndexOf(".");
+            boolean refError = lastDotIndex < 0;
+
+            if (lastDotIndex > 0) {
+                String refConfig = field.getRef().substring(0, lastDotIndex);
+                String refField = field.getRef().substring(lastDotIndex + 1);
+                if (StringUtils.isBlank(refConfig) || StringUtils.isBlank(refField)) {
+                    refError = true;
+                } else {
+                    validateFieldRef(field, false, refConfig, refField);
+                }
             }
-            validateFieldRef(field, false, fieldRefs[0], fieldRefs[1]);
+
+            if (refError) {
+                addValidatedError(getValidatedName() + field.getValidatedName() + "的引用格式错误[" + field.getRef() + "]，正确格式:[配置.字段]");
+            }
+
             return;
         }
 
         //map类型字段引用校验
         String[] fieldRefs = field.getRef().split(":", -1);
-        String refPatternError = getValidatedName("的") + field.getValidatedName() + "类型[map]的引用格式错误[" + field.getRef() + "]，正确格式:[键引用的配置@字段]或者[键引用配置@字段:值引用的配置@字段]";
+        String mapRefErrorMsg = getValidatedName("的") + field.getValidatedName() + "类型[map]的引用格式错误[" + field.getRef() + "]，正确格式:[键引用的配置.字段]或者[键引用配置.字段:值引用的配置.字段]";
         if (fieldRefs.length != 1 && fieldRefs.length != 2) {
-            addValidatedError(refPatternError);
+            addValidatedError(mapRefErrorMsg);
             return;
         }
 
-        String[] fieldKeyRefs = fieldRefs[0].split("@", -1);
-        String[] fieldValueRefs = null;
-        if (fieldRefs.length == 2) {
-            fieldValueRefs = fieldRefs[1].split("@", -1);
-        }
+        int lastKeyDotIndex = fieldRefs[0].lastIndexOf(".");
+        boolean refError = lastKeyDotIndex < 0;
 
-        if (fieldKeyRefs.length != 2) {
-            addValidatedError(refPatternError);
-            return;
-        }
-        validateFieldRef(field, true, fieldKeyRefs[0], fieldKeyRefs[1]);
-
-        if (fieldValueRefs != null) {
-            if (fieldValueRefs.length != 2) {
-                addValidatedError(refPatternError);
-                return;
+        if (lastKeyDotIndex > 0) {
+            String refKeyConfig = fieldRefs[0].substring(0, lastKeyDotIndex);
+            String refKeyField = fieldRefs[0].substring(lastKeyDotIndex + 1);
+            if (StringUtils.isBlank(refKeyConfig) || StringUtils.isBlank(refKeyField)) {
+                refError = true;
+            } else {
+                validateFieldRef(field, true, refKeyConfig, refKeyField);
             }
-            validateFieldRef(field, false, fieldValueRefs[0], fieldValueRefs[1]);
+        }
+
+        if (fieldRefs.length == 2) {
+            int lastValueDotIndex = fieldRefs[1].lastIndexOf(".");
+            if (lastValueDotIndex > 0) {
+                String refValueConfig = fieldRefs[1].substring(1, lastValueDotIndex);
+                String refValueField = fieldRefs[1].substring(lastKeyDotIndex + 1);
+                if (StringUtils.isBlank(refValueConfig) || StringUtils.isBlank(refValueField)) {
+                    refError = true;
+                } else {
+                    validateFieldRef(field, false, refValueConfig, refValueField);
+                }
+            } else {
+                refError = true;
+            }
+        }
+
+        if (refError) {
+            addValidatedError(mapRefErrorMsg);
         }
     }
 
@@ -509,8 +532,8 @@ public class BeanDefinition extends ClassDefinition {
         return refConfigName;
     }
 
-    protected void validateFieldRef(FieldDefinition field, boolean keType, String refConfigName, String refFiledName) {
-        String refConfigAndField = refConfigName + "@" + refFiledName;
+    protected void validateFieldRef(FieldDefinition field, boolean keyType, String refConfigName, String refFiledName) {
+        String refConfigAndField = refConfigName + "." + refFiledName;
 
         ConfigDefinition refConfig = parser.getConfig(getRefConfigName(refConfigName));
         if (refConfig == null) {
@@ -534,10 +557,10 @@ public class BeanDefinition extends ClassDefinition {
         }
 
         if (field.isCollectionType()) {
-            if (keType && field.isPrimitiveKeyType() && !field.getKeyType().equals(refField.getType()) && refField.getType() != null) {
+            if (keyType && field.isPrimitiveKeyType() && !field.getKeyType().equals(refField.getType()) && refField.getType() != null) {
                 addValidatedError(getValidatedName("的") + field.getValidatedName() + "类型[" + field.getType() + "]的键类型[" + field.getKeyType() + "]和引用字段[" + refConfigAndField + "]的类型[" + refField.getType() + "]不一致");
             }
-            if (!keType && field.isLegalValueType() && !field.getValueType().equals(refField.getType()) && refField.getType() != null) {
+            if (!keyType && field.isLegalValueType() && !field.getValueType().equals(refField.getType()) && refField.getType() != null) {
                 addValidatedError(getValidatedName("的") + field.getValidatedName() + "类型[" + field.getType() + "]的值类型[" + field.getValueType() + "]和引用字段[" + refConfigAndField + "]的类型[" + refField.getType() + "]不一致");
             }
         } else if (!field.getType().equals(refField.getType()) && refField.getType() != null) {

@@ -204,7 +204,6 @@ public class Transaction {
             if (log.writer == null || log.state == null) {
                 continue;
             }
-
             Triple<List<Data<?>>, List<Data<?>>, List<Data<?>>> writings = writers.computeIfAbsent(log.writer, w -> Triple.of(new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
             switch (log.state) {
                 case INSERTION:
@@ -224,7 +223,7 @@ public class Transaction {
                 Triple<List<Data<?>>, List<Data<?>>, List<Data<?>>> writings = writers.get(writer);
                 writer.write(writings.getLeft(), writings.getMiddle(), writings.getRight());
             } catch (Exception e) {
-                logger.error("事务提交后写数据库出错", e);
+                logger.error("内存事务提交后写数据库出错", e);
             }
         }
 

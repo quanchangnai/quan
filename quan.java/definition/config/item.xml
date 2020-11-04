@@ -2,7 +2,7 @@
 <package cs="Item">
 
     <bean name="Reward" delimiter="_">奖励
-        <field name="itemId" type="int" ref="ItemConfig@id"/>
+        <field name="itemId" type="int" ref="ItemConfig.id"/>
         <field name="itemNum" type="int"/>
     </bean>
 
@@ -24,7 +24,7 @@
     </bean>
 
     <bean name="UseEffect4" parent="UseEffect">使用效果4
-        <field name="itemType" type="ItemType" ref="ItemConfig@type"/>
+        <field name="itemType" type="ItemType" ref="ItemConfig.type"/>
     </bean>
 
     <config name="ItemConfig" table="道具/道具">
@@ -34,9 +34,9 @@
         <field name="type" type="ItemType" column="类型" index="n"/>
         <field name="useEffect" type="UseEffect" column="使用效果"/>
         <field name="reward" type="Reward" column="奖励" optional="true"/>
-        <field name="list" type="list:int" column="List" ref="ItemConfig@id"/>
+        <field name="list" type="list:int" column="List" ref="ItemConfig.id"/>
         <field name="set" type="set:int" column="Set"/>
-        <field name="map" type="map:int:int" column="Map" ref="ItemConfig@id"/>
+        <field name="map" type="map:int:int" column="Map" ref="ItemConfig.id:"/>
         <field name="effectiveTime" type="datetime" column="生效时间"/>
         <constant name="ItemIds" key="key" value="id" comment="name"/>道具ID
     </config>

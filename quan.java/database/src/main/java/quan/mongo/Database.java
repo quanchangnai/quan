@@ -26,7 +26,7 @@ import java.util.concurrent.ThreadFactory;
  * 数据库
  * Created by quanchangnai on 2020/4/13.
  */
-@SuppressWarnings({"unchecked", "rawtypes"})
+@SuppressWarnings({"unchecked", "rawtypes", "NullableProblems"})
 public class Database implements DataWriter, MongoDatabase {
 
     private static final Logger logger = LoggerFactory.getLogger(Database.class);

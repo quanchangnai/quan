@@ -12,7 +12,7 @@
     </config>
 
     <bean name="Reward" delimiter="_">奖励
-        <field name="itemId" type="int" ref="item.ItemConfig@id"/>
+        <field name="itemId" type="int" ref="item.ItemConfig.id"/>
         <field name="itemNum" type="int"/>
     </bean>
 
