@@ -11,7 +11,6 @@ import quan.definition.config.ConfigDefinition;
 import quan.definition.message.HeaderDefinition;
 
 import java.io.File;
-import java.nio.charset.Charset;
 import java.util.*;
 
 /**
@@ -202,15 +201,13 @@ public abstract class DefinitionParser {
 
     public static DefinitionParser createConfigParser(String definitionType) {
         switch (definitionType) {
-            case "xml":
-                return new XmlDefinitionParser();
             case "csv":
                 return new CSVDefinitionParser();
             case "xls":
             case "xlsx":
                 return new ExcelDefinitionParser(definitionType);
-            default:
-                return null;
+            default://xml
+                return new XmlDefinitionParser();
         }
     }
 
