@@ -27,7 +27,7 @@ public abstract class DefinitionParser {
 
     protected String enumPackagePrefix;
 
-    protected String definitionFileEncoding = Charset.defaultCharset().name();
+    protected String definitionFileEncoding;
 
     private LinkedHashSet<String> definitionPaths = new LinkedHashSet<>();
 
@@ -197,6 +197,21 @@ public abstract class DefinitionParser {
         validatedClasses.clear();
         validatedErrors.clear();
         tableConfigs.clear();
+    }
+
+
+    public static DefinitionParser createConfigParser(String definitionType) {
+        switch (definitionType) {
+            case "xml":
+                return new XmlDefinitionParser();
+            case "csv":
+                return new CSVDefinitionParser();
+            case "xls":
+            case "xlsx":
+                return new ExcelDefinitionParser(definitionType);
+            default:
+                return null;
+        }
     }
 
     protected abstract void parseClasses(File definitionFile);

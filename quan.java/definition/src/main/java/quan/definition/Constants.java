@@ -10,7 +10,6 @@ import static quan.common.utils.CollectionUtils.unmodifiableSet;
 /**
  * Created by quanchangnai on 2019/8/3.
  */
-@SuppressWarnings("unchecked")
 public final class Constants {
 
     /**

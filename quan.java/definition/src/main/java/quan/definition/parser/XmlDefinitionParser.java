@@ -14,13 +14,19 @@ import quan.definition.message.MessageDefinition;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * XML定义文件解析器
  * Created by quanchangnai on 2017/7/10.
  */
 public class XmlDefinitionParser extends DefinitionParser {
+
+    {
+        definitionFileEncoding = Charset.defaultCharset().name();
+    }
 
     @Override
     protected String definitionFileType() {

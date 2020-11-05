@@ -9,7 +9,9 @@ import org.slf4j.LoggerFactory;
 import quan.common.utils.PathUtils;
 import quan.definition.*;
 import quan.definition.DependentSource.DependentType;
+import quan.definition.parser.CSVDefinitionParser;
 import quan.definition.parser.DefinitionParser;
+import quan.definition.parser.ExcelDefinitionParser;
 import quan.definition.parser.XmlDefinitionParser;
 import quan.generator.config.CSharpConfigGenerator;
 import quan.generator.config.JavaConfigGenerator;
@@ -22,6 +24,8 @@ import quan.generator.message.LuaMessageGenerator;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+
+import static quan.definition.parser.DefinitionParser.createConfigParser;
 
 /**
  * 代码生成器
@@ -60,7 +64,7 @@ public abstract class Generator {
     }
 
     public Generator(Properties options) {
-        initOptions(options);
+        parseOptions(options);
         if (enable) {
             checkOptions();
         }
@@ -128,7 +132,7 @@ public abstract class Generator {
         return classDefinition instanceof BeanDefinition || classDefinition instanceof EnumDefinition;
     }
 
-    protected void initOptions(Properties options) {
+    protected void parseOptions(Properties options) {
         String enable = options.getProperty(category() + ".enable");
         if (enable == null || !enable.equals("true")) {
             this.enable = false;
@@ -393,9 +397,7 @@ public abstract class Generator {
         }
     }
 
-    public static void main(String[] args) {
-        long startTime = System.currentTimeMillis();
-
+    private static Properties loadOptions(String[] args) {
         boolean test = false;
         String optionsFileName = "generator.properties";
 
@@ -418,9 +420,10 @@ public abstract class Generator {
                 inputStream = new FileInputStream(optionsFileName);
             }
             options.load(inputStream);
+            return options;
         } catch (IOException e) {
             logger.info("加载生成器选项配置文件[{}]出错", optionsFileName, e);
-            return;
+            return null;
         } finally {
             if (inputStream != null) {
                 try {
@@ -429,6 +432,16 @@ public abstract class Generator {
                     logger.error("", e);
                 }
             }
+        }
+
+    }
+
+    public static void main(String[] args) {
+        long startTime = System.currentTimeMillis();
+
+        Properties options = loadOptions(args);
+        if (options == null) {
+            return;
         }
 
         DataGenerator dataGenerator = new DataGenerator(options);
@@ -443,7 +456,7 @@ public abstract class Generator {
         cSharpMessageGenerator.setParser(messageParser);
         luaMessageGenerator.setParser(messageParser);
 
-        DefinitionParser configParser = new XmlDefinitionParser();
+        DefinitionParser configParser = createConfigParser(options.getProperty("config.definitionType", "xml").trim());
         JavaConfigGenerator javaConfigGenerator = new JavaConfigGenerator(options);
         CSharpConfigGenerator cSharpConfigGenerator = new CSharpConfigGenerator(options);
         LuaConfigGenerator luaConfigGenerator = new LuaConfigGenerator(options);

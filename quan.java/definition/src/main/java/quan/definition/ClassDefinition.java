@@ -133,10 +133,15 @@ public abstract class ClassDefinition extends Definition {
 
     public String getFullPackageName(String lang) {
         String packagePrefix = getPackagePrefix();
-        if (packagePrefix != null) {
-            return packagePrefix + "." + getPackageName(lang);
+        String packageName = getPackageName(lang);
+        if (!StringUtils.isBlank(packagePrefix)) {
+            if (!StringUtils.isBlank(packageName)) {
+                return packagePrefix + "." + packageName;
+            } else {
+                return packagePrefix;
+            }
         }
-        return getPackageName(lang);
+        return packageName;
     }
 
     public String getFullPackageName(Language lang) {

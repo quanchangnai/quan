@@ -57,8 +57,8 @@ public abstract class ConfigGenerator extends Generator {
     }
 
     @Override
-    protected void initOptions(Properties options) {
-        super.initOptions(options);
+    protected void parseOptions(Properties options) {
+        super.parseOptions(options);
         if (!enable) {
             return;
         }
@@ -67,7 +67,7 @@ public abstract class ConfigGenerator extends Generator {
         tablePath = options.getProperty(category() + ".tablePath");
         tableBodyStartRow = options.getProperty(category() + ".tableBodyStartRow");
 
-        ConfigConverter.setDateTimePattern(options.getProperty(category() + ".dateTimePattern"));
+        ConfigConverter.setDatetimePattern(options.getProperty(category() + ".datetimePattern"));
         ConfigConverter.setDatePattern(options.getProperty(category() + ".datePattern"));
         ConfigConverter.setTimePattern(options.getProperty(category() + ".timePattern"));
 

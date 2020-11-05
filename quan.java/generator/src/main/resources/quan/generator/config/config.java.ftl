@@ -4,7 +4,7 @@ package ${getFullPackageName("java")};
 import java.util.*;
 </#if>
 import com.alibaba.fastjson.*;
-<#if !(parentClassName??) || kind == 6>
+<#if (!(parentClassName??) || kind == 6) && getFullPackageName("java")!="quan.config">
 import quan.config.*;
 </#if>
 <#list imports?keys as import>

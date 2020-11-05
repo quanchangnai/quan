@@ -23,7 +23,7 @@ import static quan.definition.ClassDefinition.getLongClassName;
  */
 public class ConfigConverter {
 
-    private static SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static SimpleDateFormat datetimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -31,22 +31,20 @@ public class ConfigConverter {
 
     private DefinitionParser parser;
 
-    public static void setDateTimePattern(String pattern) {
-        if (StringUtils.isBlank(pattern)) {
-            return;
+    public static void setDatetimePattern(String pattern) {
+        if (!StringUtils.isBlank(pattern)) {
+            datetimeFormat = new SimpleDateFormat(pattern);
         }
-        dateTimeFormat = new SimpleDateFormat(pattern);
     }
 
     public static String getDateTimePattern() {
-        return dateTimeFormat.toPattern();
+        return datetimeFormat.toPattern();
     }
 
     public static void setDatePattern(String pattern) {
-        if (StringUtils.isBlank(pattern)) {
-            return;
+        if (!StringUtils.isBlank(pattern)) {
+            dateFormat = new SimpleDateFormat(pattern);
         }
-        dateFormat = new SimpleDateFormat(pattern);
     }
 
     public static String getDatePattern() {
@@ -54,10 +52,9 @@ public class ConfigConverter {
     }
 
     public static void setTimePattern(String pattern) {
-        if (StringUtils.isBlank(pattern)) {
-            return;
+        if (!StringUtils.isBlank(pattern)) {
+            timeFormat = new SimpleDateFormat(pattern);
         }
-        timeFormat = new SimpleDateFormat(pattern);
     }
 
     public static String getTimePattern() {
@@ -204,13 +201,14 @@ public class ConfigConverter {
         try {
             if (type.equals("datetime")) {
                 //日期加时间
-                return dateTimeFormat.parse(value);
+                return datetimeFormat.parse(value);
             } else if (type.equals("date")) {
                 //纯日期
                 return dateFormat.parse(value);
+            } else {
+                //纯时间
+                return timeFormat.parse(value);
             }
-            //纯时间
-            return timeFormat.parse(value);
         } catch (ParseException e) {
             throw new ConvertException(ConvertException.ErrorType.common, e);
         }
@@ -221,13 +219,12 @@ public class ConfigConverter {
             return null;
         }
         if (type.equals("datetime")) {
-            return dateTimeFormat.format(value);
-        }
-        if (type.equals("date")) {
+            return datetimeFormat.format(value);
+        } else if (type.equals("date")) {
             return dateFormat.format(value);
+        } else {
+            return timeFormat.format(value);
         }
-        return timeFormat.format(value);
-
     }
 
     private JSONArray convertList(FieldDefinition fieldDefinition, String value) {

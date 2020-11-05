@@ -28,25 +28,24 @@ public class ExcelConfigReader extends ConfigReader {
             //只解析第一个工作表
             Sheet sheet = workbook.getSheetAt(0);
             //总行数
-            int rowNum = sheet.getPhysicalNumberOfRows();
-            if (rowNum < 1) {
+            int totalTowNum = sheet.getPhysicalNumberOfRows();
+            if (totalTowNum < 1) {
                 return;
             }
 
             //第一行是表头
             List<String> columnNames = new ArrayList<>();
-            Row row1 = sheet.getRow(0);
-            for (Cell cell : row1) {
+            for (Cell cell : sheet.getRow(0)) {
                 columnNames.add(dataFormatter.formatCellValue(cell).trim());
             }
             validateColumnNames(columnNames);
 
             //第[tableBodyStartRow]行起是正文
-            if (rowNum < tableBodyStartRow) {
+            if (totalTowNum < tableBodyStartRow) {
                 return;
             }
 
-            for (int r = tableBodyStartRow; r <= rowNum; r++) {
+            for (int r = tableBodyStartRow; r <= totalTowNum; r++) {
                 Row row = sheet.getRow(r - 1);
                 JSONObject rowJson = null;
 

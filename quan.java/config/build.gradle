@@ -7,8 +7,4 @@ apply plugin: 'java-library'
 dependencies {
     api project(':common')
     api project(':definition')
-    api 'com.alibaba:fastjson:1.2.58'
-    api 'org.apache.commons:commons-csv:1.7'
-    api 'org.apache.poi:poi:4.1.0'
-    api 'org.apache.poi:poi-ooxml:4.1.0'
 }

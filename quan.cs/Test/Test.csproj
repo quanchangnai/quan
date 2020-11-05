@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="CipherTest.cs" />
     <Compile Include="ConfigTest.cs" />
+    <Compile Include="Config\CardConfig.cs" />
     <Compile Include="Config\Common\ConstantConfig.cs" />
     <Compile Include="Config\Common\ItemConstant.cs" />
     <Compile Include="Config\Common\Reward.cs" />
@@ -61,6 +62,7 @@
     <Compile Include="Config\Item\UseEffect.cs" />
     <Compile Include="Config\Item\UseEffect2.cs" />
     <Compile Include="Config\Item\UseEffect3.cs" />
+    <Compile Include="Config\Item\UseEffect4.cs" />
     <Compile Include="Config\Item\WeaponConfig.cs" />
     <Compile Include="Config\Quest\QuestConfig.cs" />
     <Compile Include="Config\Quest\QuestTargetConfig.cs" />

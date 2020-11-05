@@ -28,8 +28,8 @@ public abstract class MessageGenerator extends Generator {
     }
 
     @Override
-    protected void initOptions(Properties options) {
-        super.initOptions(options);
+    protected void parseOptions(Properties options) {
+        super.parseOptions(options);
         if (!enable) {
             return;
         }

@@ -75,7 +75,7 @@ public class MessageDefinition extends BeanDefinition {
         }
 
         if (partner != null) {
-            ClassDefinition partnerClassDefinition = parser.getClass(ClassDefinition.getLongClassName(this, partner));
+            ClassDefinition partnerClassDefinition = parser.getClass(getLongClassName(this, partner));
             if (partnerClassDefinition == null) {
                 addValidatedError(getValidatedName("的") + "配对消息[" + partner + "]不存在");
             } else if (!(partnerClassDefinition instanceof MessageDefinition)) {
