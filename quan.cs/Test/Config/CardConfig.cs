@@ -125,6 +125,9 @@ namespace Test.Config
         // 索引:ID
         private static volatile IDictionary<int, CardConfig> _idConfigs = new Dictionary<int, CardConfig>();
 
+        // 索引:类型
+        private static volatile IDictionary<int, IList<CardConfig>> _typeConfigs = new Dictionary<int, IList<CardConfig>>();
+
         public static IList<CardConfig> GetConfigs()
         {
             return _configs;
@@ -141,21 +144,36 @@ namespace Test.Config
             return result;
         }
 
+        public static IDictionary<int, IList<CardConfig>> GetTypeConfigs()
+        {
+            return _typeConfigs;
+        }
+
+        public static IList<CardConfig> GetByType(int type)
+        {
+            _typeConfigs.TryGetValue(type, out var result);
+            return result ?? ImmutableList<CardConfig>.Empty;
+        }
+
 
         public static void Load(IList<CardConfig> configs)
         {
             IDictionary<int, CardConfig> idConfigs = new Dictionary<int, CardConfig>();
+            IDictionary<int, IList<CardConfig>> typeConfigs = new Dictionary<int, IList<CardConfig>>();
 
             foreach (var config in configs)
             {
                 Load(idConfigs, config, config.Id);
+                Load(typeConfigs, config, config.Type);
             }
 
             configs = configs.ToImmutableList();
             idConfigs = ToImmutableDictionary(idConfigs);
+            typeConfigs = ToImmutableDictionary(typeConfigs);
 
             _configs = configs;
             _idConfigs = idConfigs;
+            _typeConfigs = typeConfigs;
         }
     }
 }

@@ -1,7 +1,7 @@
 ID,³£Á¿Key,Ãû×Ö,ÀàĞÍ,List,Set,Map,ÉúĞ§Ê±¼ä
 id,key,name,type,list,set,map,effectiveTime
-int,string,string,int,list:int,set:int,map:int:int,datetime
+int,string,string,int;index=normal,list:int,set:int,map:int:int,datetime
 ×¢ÊÍ,×¢ÊÍ,×¢ÊÍ,×¢ÊÍ,×¢ÊÍ,×¢ÊÍ,×¢ÊÍ,×¢ÊÍ
-1,card1,¿¨Æ¬1,1,11,554;465;655,122*2;322*22;455*33,2019-08-05 12:33:55
+1,card1,¿¨Æ¬1,1,11,554;465;655,122*2;322*22;455*33,2019/8/5 12:33
 2,card2,¿¨Æ¬2,1,56;22,244,32*11;34:19,
 3,,¿¨Æ¬3,2,44;223,22;22;456,43*45,

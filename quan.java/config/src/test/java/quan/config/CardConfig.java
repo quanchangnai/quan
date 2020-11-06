@@ -167,6 +167,9 @@ public class CardConfig extends Config {
     //索引:ID
     private static volatile Map<Integer, CardConfig> idConfigs = new HashMap<>();
 
+    //索引:类型
+    private static volatile Map<Integer, List<CardConfig>> typeConfigs = new HashMap<>();
+
     public static List<CardConfig> getConfigs() {
         return configs;
     }
@@ -179,6 +182,14 @@ public class CardConfig extends Config {
         return idConfigs.get(id);
     }
 
+    public static Map<Integer, List<CardConfig>> getTypeConfigs() {
+        return typeConfigs;
+    }
+
+    public static List<CardConfig> getByType(int type) {
+        return typeConfigs.getOrDefault(type, Collections.emptyList());
+    }
+
 
     /**
      * 加载配置，建立索引
@@ -188,18 +199,22 @@ public class CardConfig extends Config {
     @SuppressWarnings({"unchecked"})
     public static List<String> load(List<CardConfig> configs) {
         Map<Integer, CardConfig> idConfigs = new HashMap<>();
+        Map<Integer, List<CardConfig>> typeConfigs = new HashMap<>();
 
         List<String> errors = new ArrayList<>();
 
         for (CardConfig config : configs) {
             load(idConfigs, errors, config, true, Collections.singletonList("id"), config.id);
+            load(typeConfigs, errors, config, false, Collections.singletonList("type"), config.type);
         }
 
         configs = Collections.unmodifiableList(configs);
         idConfigs = unmodifiableMap(idConfigs);
+        typeConfigs = unmodifiableMap(typeConfigs);
 
         CardConfig.configs = configs;
         CardConfig.idConfigs = idConfigs;
+        CardConfig.typeConfigs = typeConfigs;
 
         return errors;
     }

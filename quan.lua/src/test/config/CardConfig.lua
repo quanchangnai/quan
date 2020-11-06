@@ -12,10 +12,14 @@ local configs = {
 ---索引:ID
 local idConfigs = {}
 
+---索引:类型
+local typeConfigs = {}
+
 ---加载配置，建立索引
 local function loadConfigs()
     for i, config in ipairs(configs) do
         Config.load(idConfigs, config, true, { "id" }, { config.id })
+        Config.load(typeConfigs, config, false, { "type" }, { config.type })
     end
 end
 
@@ -41,6 +45,15 @@ function CardConfig.getById(id)
         return idConfigs
     end
     return idConfigs[id]
+end
+
+---
+---通过索引[type]获取CardConfig
+---@overload fun():map<type:int,list<CardConfig>> 
+---@param type int 类型
+---@return list<CardConfig>
+function CardConfig.getByType(type)
+    return typeConfigs[type] or table.empty()
 end
 
 return CardConfig
