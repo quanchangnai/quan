@@ -32,18 +32,22 @@ public abstract class TableDefinitionParser extends DefinitionParser {
     protected abstract boolean parseTable(ConfigDefinition configDefinition, File definitionFile);
 
     protected void addField(ConfigDefinition configDefinition, String columnName, String fieldName, String constraint) {
+        FieldDefinition fieldDefinition = new FieldDefinition();
+        fieldDefinition.setParser(this);
+        fieldDefinition.setCategory(getCategory());
+        fieldDefinition.setName(fieldName);
+        fieldDefinition.setColumn(columnName);
+
+        configDefinition.addField(fieldDefinition);
+
         if (StringUtils.isBlank(constraint)) {
-            addValidatedError(configDefinition.getValidatedName() + "的列[" + columnName + "]约束不能为空");
+            return;
         }
+
         String[] constraints = constraint.split(";", -1);
 
-        String fieldType = null;
-        String fieldRef = null;
-        String fieldIndex = null;
-        String fieldOptional = null;
-
         if (constraints.length > 0) {
-            fieldType = constraints[0];
+            fieldDefinition.setTypes(constraints[0]);
         }
 
         for (int i = 1; i < constraints.length; i++) {
@@ -54,33 +58,22 @@ public abstract class TableDefinitionParser extends DefinitionParser {
             }
 
             String constraintName = constraintNameAndValue[0];
+            String constraintValue = constraintNameAndValue[1];
             switch (constraintName) {
                 case "ref":
-                    fieldRef = constraintNameAndValue[1];
+                    fieldDefinition.setRef(constraintValue);
                     break;
                 case "index":
-                    fieldIndex = constraintNameAndValue[1];
+                    fieldDefinition.setIndex(constraintValue);
                     break;
                 case "optional":
-                    fieldOptional = constraintNameAndValue[1];
+                    fieldDefinition.setOptional(constraintValue);
                     break;
                 default:
                     addValidatedError(configDefinition.getValidatedName() + "的列[" + columnName + "]不支持该约束类型:" + constraintName);
                     break;
             }
         }
-
-        FieldDefinition fieldDefinition = new FieldDefinition();
-        fieldDefinition.setParser(this);
-        fieldDefinition.setCategory(getCategory());
-        fieldDefinition.setName(fieldName);
-        fieldDefinition.setTypes(fieldType);
-        fieldDefinition.setColumn(columnName);
-        fieldDefinition.setIndex(fieldIndex);
-        fieldDefinition.setRef(fieldRef);
-        fieldDefinition.setOptional(fieldOptional);
-
-        configDefinition.addField(fieldDefinition);
     }
 
 }

@@ -31,12 +31,20 @@ public class ExcelDefinitionParser extends TableDefinitionParser {
     }
 
     @Override
+    protected void parseClasses(File definitionFile) {
+        //忽略Excel临时文件
+        if (!definitionFile.getName().startsWith("~$")) {
+            super.parseClasses(definitionFile);
+        }
+    }
+
+    @Override
     protected boolean parseTable(ConfigDefinition configDefinition, File definitionFile) {
         try (Workbook workbook = WorkbookFactory.create(new FileInputStream(definitionFile))) {
             Sheet sheet = workbook.getSheetAt(0);
             int totalTowNum = sheet.getPhysicalNumberOfRows();
             if (totalTowNum < 3) {
-                addValidatedError(configDefinition.getValidatedName() + "的定义文件不完整");
+                addValidatedError(configDefinition.getValidatedName() + "的定义文件不完整，表头要求第1行列名、第2行字段名、第3行字段约束");
                 return false;
             }
 

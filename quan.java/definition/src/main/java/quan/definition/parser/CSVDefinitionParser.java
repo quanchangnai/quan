@@ -19,7 +19,6 @@ public class CSVDefinitionParser extends TableDefinitionParser {
         definitionFileEncoding = "GBK";
     }
 
-
     @Override
     protected String definitionFileType() {
         return "csv";
@@ -36,7 +35,7 @@ public class CSVDefinitionParser extends TableDefinitionParser {
         }
 
         if (records.size() < 3) {
-            addValidatedError(configDefinition.getValidatedName() + "的定义文件不完整");
+            addValidatedError(configDefinition.getValidatedName() + "的定义文件不完整，表头要求第1行列名、第2行字段名、第3行字段约束");
             return false;
         }
 
@@ -44,7 +43,6 @@ public class CSVDefinitionParser extends TableDefinitionParser {
             String columnName = records.get(0).get(i);
             String fieldName = records.get(1).get(i);
             String constraint = records.get(2).get(i);
-
             addField(configDefinition, columnName, fieldName, constraint);
         }
 
