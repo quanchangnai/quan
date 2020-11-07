@@ -132,7 +132,7 @@ public class XmlDefinitionParser extends DefinitionParser {
                 break;
             case "message":
                 if (category == Category.message) {
-                    classDefinition = new MessageDefinition(classElement.attributeValue("id"), classElement.attributeValue("partner"));
+                    classDefinition = new MessageDefinition(classElement.attributeValue("id"));
                 }
                 break;
             case "message-header":
