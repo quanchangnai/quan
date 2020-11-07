@@ -98,6 +98,7 @@ public class MethodUtils {
         for (Package allowPackage : allowPackages) {
             if (allowPackage.equals(callerClass.getPackage())) {
                 allowCall = true;
+                break;
             }
         }
 

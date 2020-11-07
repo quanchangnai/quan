@@ -16,9 +16,11 @@ public abstract class TableDefinitionParser extends DefinitionParser {
     @Override
     protected void parseClasses(File definitionFile) {
         String tableName = definitionFile.getName().substring(0, definitionFile.getName().lastIndexOf("."));
+
         ConfigDefinition configDefinition = new ConfigDefinition(tableName, null);
         configDefinition.setParser(this);
         configDefinition.setDefinitionFile(definitionFile.getName());
+
         if (tableName.contains(".")) {
             configDefinition.setPackageName(tableName.substring(0, tableName.lastIndexOf(".")));
             configDefinition.setName(tableName.substring(tableName.lastIndexOf(".") + 1));

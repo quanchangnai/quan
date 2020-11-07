@@ -2,7 +2,6 @@ package quan.definition.message;
 
 import quan.definition.BeanDefinition;
 import quan.definition.Category;
-import quan.definition.FieldDefinition;
 
 /**
  * 消息头定义，被所有消息共用，主要用于定义消息的公共字段
