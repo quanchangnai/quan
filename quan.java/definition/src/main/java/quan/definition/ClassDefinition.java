@@ -13,6 +13,8 @@ import java.util.regex.Pattern;
  */
 public abstract class ClassDefinition extends Definition {
 
+    public static final Pattern NAME_PATTERN = Pattern.compile("[A-Z][a-zA-Z\\d]*");
+
     //不含前缀的默认包名，
     private String packageName;
 
@@ -53,7 +55,7 @@ public abstract class ClassDefinition extends Definition {
 
     @Override
     public Pattern getNamePattern() {
-        return Constants.CLASS_NAME_PATTERN;
+        return NAME_PATTERN;
     }
 
     public void reset() {

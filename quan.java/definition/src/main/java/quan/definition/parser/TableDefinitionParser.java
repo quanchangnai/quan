@@ -5,6 +5,8 @@ import quan.definition.FieldDefinition;
 import quan.definition.config.ConfigDefinition;
 
 import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * 基于表格的定义文件解析器，在表格中直接定义配置，不支持定义复杂结构
@@ -50,6 +52,8 @@ public abstract class TableDefinitionParser extends DefinitionParser {
             fieldDefinition.setTypes(constraints[0]);
         }
 
+        Set<String> constraintNames = new HashSet<>();
+
         for (int i = 1; i < constraints.length; i++) {
             String[] constraintNameAndValue = constraints[i].split("=", -1);
             if (constraintNameAndValue.length != 2) {
@@ -57,8 +61,15 @@ public abstract class TableDefinitionParser extends DefinitionParser {
                 break;
             }
 
-            String constraintName = constraintNameAndValue[0];
-            String constraintValue = constraintNameAndValue[1];
+            String constraintName = constraintNameAndValue[0].trim();
+            String constraintValue = constraintNameAndValue[1].trim();
+
+            if (constraintNames.contains(constraintName)) {
+                addValidatedError(configDefinition.getValidatedName() + "的列[" + columnName + "]约束类型[" + constraintName + "]重复");
+            } else {
+                constraintNames.add(constraintName);
+            }
+
             switch (constraintName) {
                 case "ref":
                     fieldDefinition.setRef(constraintValue);

@@ -200,6 +200,9 @@ public class ConfigTest {
         System.err.println("QuestConfig============");
         QuestConfig.getConfigs().forEach(System.err::println);
 
+        System.err.println("CardConfig============");
+        CardConfig.getConfigs().forEach(System.err::println);
+
         System.err.println("printConfigs end============");
     }
 

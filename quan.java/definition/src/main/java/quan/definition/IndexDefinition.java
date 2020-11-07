@@ -50,7 +50,7 @@ public class IndexDefinition extends Definition implements Cloneable {
 
     @Override
     public Pattern getNamePattern() {
-        return Constants.FIELD_NAME_PATTERN;
+        return FieldDefinition.NAME_PATTERN;
     }
 
     public BeanDefinition getOwner() {

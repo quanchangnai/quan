@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.config.Config;
 import quan.definition.BeanDefinition;
-import quan.definition.Constants;
 import quan.definition.FieldDefinition;
 import quan.definition.Language;
 import quan.definition.config.ConfigDefinition;
@@ -225,8 +224,8 @@ public abstract class ConfigReader {
             }
         }
 
-        if (constantKeyField && !Constants.FIELD_NAME_PATTERN.matcher(fieldValue.toString()).matches()) {
-            validatedErrors.add(String.format("配置[%s]的第[%d]行第[%s]列[%s]的常量key[%s]格式错误,正确格式:%s", table, row, column, columnName, fieldValue, Constants.FIELD_NAME_PATTERN));
+        if (constantKeyField && !FieldDefinition.NAME_PATTERN.matcher(fieldValue.toString()).matches()) {
+            validatedErrors.add(String.format("配置[%s]的第[%d]行第[%s]列[%s]的常量key[%s]格式错误,正确格式:%s", table, row, column, columnName, fieldValue, FieldDefinition.NAME_PATTERN));
         }
 
         rowJson.put(fieldName, fieldValue);

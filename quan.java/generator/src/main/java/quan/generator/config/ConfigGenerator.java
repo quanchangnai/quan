@@ -26,6 +26,8 @@ public abstract class ConfigGenerator extends Generator {
     //配置加载器用于生成常量
     protected WithDefinitionConfigLoader configLoader;
 
+    protected String definitionType;
+
     protected String tableType;
 
     protected String tablePath;
@@ -63,6 +65,7 @@ public abstract class ConfigGenerator extends Generator {
             return;
         }
 
+        definitionType = options.getProperty(category() + ".definitionType", "xml");
         tableType = options.getProperty(category() + ".tableType");
         tablePath = options.getProperty(category() + ".tablePath");
         tableBodyStartRow = options.getProperty(category() + ".tableBodyStartRow");
@@ -95,6 +98,12 @@ public abstract class ConfigGenerator extends Generator {
                 }
             } catch (Exception e) {
                 throw new IllegalArgumentException(category().alias() + "的表格正文开始行号[tableBodyStartRow]不合法，合法值为空值或者大于1的整数");
+            }
+        } else {
+            if (definitionType.equals("xml")) {
+                tableBodyStartRow = "3";
+            } else {
+                tableBodyStartRow = "5";
             }
         }
     }

@@ -6,7 +6,6 @@ import quan.definition.*;
 
 import java.io.File;
 import java.util.*;
-import java.util.regex.Pattern;
 
 /**
  * 配置定义
@@ -65,11 +64,6 @@ public class ConfigDefinition extends BeanDefinition {
     @Override
     public String getKindName() {
         return "配置";
-    }
-
-    @Override
-    public Pattern getNamePattern() {
-        return Constants.CONFIG_NAME_PATTERN;
     }
 
     @Override

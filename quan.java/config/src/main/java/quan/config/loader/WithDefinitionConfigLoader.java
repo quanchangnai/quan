@@ -15,6 +15,7 @@ import quan.config.reader.JsonConfigReader;
 import quan.definition.*;
 import quan.definition.config.ConfigDefinition;
 import quan.definition.parser.DefinitionParser;
+import quan.definition.parser.TableDefinitionParser;
 import quan.definition.parser.XmlDefinitionParser;
 
 import java.io.File;
@@ -43,7 +44,7 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
     }
 
     /**
-     * 设置表格正文起始行号，默认是第3行,第1行固定是表头，中间是注释等，行号从1开始
+     * 设置表格正文起始行号
      */
     public void setTableBodyStartRow(int tableBodyStartRow) {
         if (tableBodyStartRow > 1 && this.tableBodyStartRow == 0) {
@@ -81,6 +82,9 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
         Objects.requireNonNull(parser, "配置解析器不能为空");
         parser.setCategory(Category.config);
         this.parser = parser;
+        if (parser instanceof TableDefinitionParser && tableBodyStartRow == 0) {
+            tableBodyStartRow = 5;
+        }
     }
 
     /**

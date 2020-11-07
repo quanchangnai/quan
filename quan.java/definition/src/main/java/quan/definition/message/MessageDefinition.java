@@ -1,8 +1,11 @@
 package quan.definition.message;
 
 import org.apache.commons.lang3.StringUtils;
-import quan.definition.*;
+import quan.definition.BeanDefinition;
+import quan.definition.Category;
+import quan.definition.ClassDefinition;
 import quan.definition.DependentSource.DependentType;
+import quan.definition.FieldDefinition;
 
 /**
  * 消息定义

@@ -2,11 +2,13 @@ package quan.definition.data;
 
 import com.google.common.base.CaseFormat;
 import org.apache.commons.lang3.StringUtils;
-import quan.definition.*;
+import quan.definition.BeanDefinition;
+import quan.definition.Category;
+import quan.definition.FieldDefinition;
+import quan.definition.IndexDefinition;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * 数据定义
@@ -54,11 +56,6 @@ public class DataDefinition extends BeanDefinition {
     public void setName(String name) {
         super.setName(name);
         underscoreName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, getName());
-    }
-
-    @Override
-    public Pattern getNamePattern() {
-        return Constants.DATA_NAME_PATTERN;
     }
 
     public String getIdName() {

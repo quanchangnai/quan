@@ -20,6 +20,8 @@ import static quan.definition.ClassDefinition.getShortClassName;
  */
 public class FieldDefinition extends Definition implements Cloneable {
 
+    public static final Pattern NAME_PATTERN = Pattern.compile("[a-z][a-zA-Z\\d]*");
+
     private ClassDefinition owner;
 
     //原始定义的字段类型,集合类型包含其元素类型
@@ -112,7 +114,7 @@ public class FieldDefinition extends Definition implements Cloneable {
 
     @Override
     public Pattern getNamePattern() {
-        return Constants.FIELD_NAME_PATTERN;
+        return NAME_PATTERN;
     }
 
 

@@ -94,7 +94,7 @@ public class ConstantDefinition extends ClassDefinition {
     public void setConfigs(List<JSONObject> configs) {
         for (JSONObject config : configs) {
             String key = config.getString(keyField);
-            if (key == null || !Constants.FIELD_NAME_PATTERN.matcher(key).matches()) {
+            if (key == null || !FieldDefinition.NAME_PATTERN.matcher(key).matches()) {
                 continue;
             }
             String value = config.getString(valueFieldName);
