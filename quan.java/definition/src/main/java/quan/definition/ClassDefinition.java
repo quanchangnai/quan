@@ -1,11 +1,12 @@
 package quan.definition;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import quan.definition.DependentSource.DependentType;
 
 import java.util.*;
 import java.util.regex.Pattern;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
  * 类定义
@@ -74,7 +75,7 @@ public abstract class ClassDefinition extends Definition {
 
     public String getPackagePrefix() {
         if (this instanceof EnumDefinition) {
-            return StringUtils.isBlank(parser.getEnumPackagePrefix()) ? parser.getPackagePrefix() : parser.getEnumPackagePrefix();
+            return isBlank(parser.getEnumPackagePrefix()) ? parser.getPackagePrefix() : parser.getEnumPackagePrefix();
         } else {
             return parser.getPackagePrefix();
         }
@@ -127,7 +128,7 @@ public abstract class ClassDefinition extends Definition {
      * 和具体语言环境无关的[不含前缀的包名.类名]
      */
     public static String getLongClassName(ClassDefinition owner, String className) {
-        if (!StringUtils.isBlank(className) && !className.contains(".")) {
+        if (!isBlank(className) && !className.contains(".")) {
             className = owner.getPackageName() + "." + className;
         }
         return className;
@@ -136,8 +137,8 @@ public abstract class ClassDefinition extends Definition {
     public String getFullPackageName(String lang) {
         String packagePrefix = getPackagePrefix();
         String packageName = getPackageName(lang);
-        if (!StringUtils.isBlank(packagePrefix)) {
-            if (!StringUtils.isBlank(packageName)) {
+        if (!isBlank(packagePrefix)) {
+            if (!isBlank(packageName)) {
                 return packagePrefix + "." + packageName;
             } else {
                 return packagePrefix;
@@ -203,7 +204,7 @@ public abstract class ClassDefinition extends Definition {
     }
 
     public void setLang(String language) {
-        if (StringUtils.isBlank(language) || category == Category.data) {
+        if (isBlank(language) || category == Category.data) {
             return;
         }
         Pair<Set<String>, Boolean> pair = Language.parse(language);

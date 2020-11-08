@@ -1,9 +1,6 @@
 package quan.common.utils;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class CollectionUtils {
 
@@ -15,12 +12,27 @@ public class CollectionUtils {
     }
 
     @SafeVarargs
+    public static <E> Set<E> unmodifiableSet(Collection<E> collection, E... elements) {
+        Set<E> set = new HashSet<>(collection);
+        Collections.addAll(set, elements);
+        return Collections.unmodifiableSet(set);
+    }
+
+    @SafeVarargs
     public static <E> Set<E> unmodifiableSet(Collection<E>... collections) {
         Set<E> set = new HashSet<>();
         for (Collection<E> collection : collections) {
             set.addAll(collection);
         }
         return Collections.unmodifiableSet(set);
+    }
+
+    public boolean isEmpty(Collection<?> collection) {
+        return collection == null || collection.isEmpty();
+    }
+
+    public boolean isEmpty(Map<?, ?> map) {
+        return map == null || map.isEmpty();
     }
 
 }

@@ -31,10 +31,10 @@ public class ExcelDefinitionParser extends TableDefinitionParser {
     }
 
     @Override
-    protected void parseClasses(File definitionFile) {
+    protected void parseFile(File definitionFile) {
         //忽略Excel临时文件
         if (!definitionFile.getName().startsWith("~$")) {
-            super.parseClasses(definitionFile);
+            super.parseFile(definitionFile);
         }
     }
 

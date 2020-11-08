@@ -14,7 +14,7 @@ import java.util.Set;
 public abstract class TableDefinitionParser extends DefinitionParser {
 
     @Override
-    protected void parseClasses(File definitionFile) {
+    protected void parseFile(File definitionFile) {
         String tableName = definitionFile.getName().substring(0, definitionFile.getName().lastIndexOf("."));
 
         ConfigDefinition configDefinition = new ConfigDefinition(tableName, null);
@@ -67,7 +67,7 @@ public abstract class TableDefinitionParser extends DefinitionParser {
             String constraintValue = constraintNameAndValue[1].trim();
 
             if (constraintNames.contains(constraintName)) {
-                addValidatedError(configDefinition.getValidatedName() + "的列[" + columnName + "]约束类型[" + constraintName + "]重复");
+                addValidatedError(configDefinition.getValidatedName() + "的列[" + columnName + "]有重复约束类型:" + constraintName);
             } else {
                 constraintNames.add(constraintName);
             }

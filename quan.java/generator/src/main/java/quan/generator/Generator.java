@@ -23,7 +23,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-import static quan.definition.parser.DefinitionParser.createConfigParser;
+import static quan.definition.parser.DefinitionParser.createParser;
 
 /**
  * 代码生成器
@@ -454,7 +454,7 @@ public abstract class Generator {
         cSharpMessageGenerator.setParser(messageParser);
         luaMessageGenerator.setParser(messageParser);
 
-        DefinitionParser configParser = createConfigParser(options.getProperty("config.definitionType", "xml").trim());
+        DefinitionParser configParser = createParser(options.getProperty("config.definitionType").trim());
         JavaConfigGenerator javaConfigGenerator = new JavaConfigGenerator(options);
         CSharpConfigGenerator cSharpConfigGenerator = new CSharpConfigGenerator(options);
         LuaConfigGenerator luaConfigGenerator = new LuaConfigGenerator(options);

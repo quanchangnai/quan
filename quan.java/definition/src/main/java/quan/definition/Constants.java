@@ -1,6 +1,5 @@
 package quan.definition;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
 
@@ -12,14 +11,19 @@ import static quan.common.utils.CollectionUtils.unmodifiableSet;
 public final class Constants {
 
     /**
+     * 整数类型
+     */
+    public static final Set<String> INTEGER_TYPES = unmodifiableSet("short", "int", "long");
+
+    /**
      * 数字类型
      */
-    public static final Set<String> NUMBER_TYPES = unmodifiableSet("short", "int", "long", "float", "double");
+    public static final Set<String> NUMBER_TYPES = unmodifiableSet(INTEGER_TYPES, "float", "double");
 
     /**
      * 原生类型
      */
-    public static final Set<String> PRIMITIVE_TYPES = unmodifiableSet(NUMBER_TYPES, Arrays.asList("bool", "string"));
+    public static final Set<String> PRIMITIVE_TYPES = unmodifiableSet(NUMBER_TYPES, "bool", "string");
 
     /**
      * 集合类型

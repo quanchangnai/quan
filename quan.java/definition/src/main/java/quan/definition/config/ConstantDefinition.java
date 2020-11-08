@@ -166,4 +166,5 @@ public class ConstantDefinition extends ClassDefinition {
         addDependent(DependentType.field, this, valueField, valueField.getTypeBean());
         addDependent(DependentType.fieldValue, this, valueField, valueField.getValueTypeBean());
     }
+
 }

@@ -159,6 +159,10 @@ public class FieldDefinition extends Definition implements Cloneable {
         return false;
     }
 
+    public boolean isIntegerType() {
+        return Constants.INTEGER_TYPES.contains(type);
+    }
+
     public boolean isNumberType() {
         return Constants.NUMBER_TYPES.contains(type);
     }
@@ -240,7 +244,7 @@ public class FieldDefinition extends Definition implements Cloneable {
     //消息tag
     public int getTag() {
         int t;
-        if (type.equals("bool") || type.equals("short") || type.equals("int") || type.equals("long") || isEnumType() || scale >= 0) {
+        if (type.equals("bool") || isIntegerType() || isEnumType() || scale >= 0) {
             t = 0;
         } else if (type.equals("float")) {
             t = 1;

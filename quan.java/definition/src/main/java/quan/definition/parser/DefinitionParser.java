@@ -148,7 +148,7 @@ public abstract class DefinitionParser {
             return;
         }
 
-        definitionFiles.forEach(this::parseClasses);
+        definitionFiles.forEach(this::parseFile);
 
         validate();
     }
@@ -198,8 +198,7 @@ public abstract class DefinitionParser {
         tableConfigs.clear();
     }
 
-
-    public static DefinitionParser createConfigParser(String definitionType) {
+    public static DefinitionParser createParser(String definitionType) {
         switch (definitionType) {
             case "csv":
                 return new CSVDefinitionParser();
@@ -211,6 +210,6 @@ public abstract class DefinitionParser {
         }
     }
 
-    protected abstract void parseClasses(File definitionFile);
+    protected abstract void parseFile(File definitionFile);
 
 }
