@@ -11,6 +11,8 @@ import java.util.regex.Pattern;
  */
 public class IndexDefinition extends Definition implements Cloneable {
 
+    public static List<String> LEGAL_TYPES = Arrays.asList("normal", "n", "unique", "u");
+
     private BeanDefinition owner;
 
     //索引类型
@@ -88,7 +90,7 @@ public class IndexDefinition extends Definition implements Cloneable {
     }
 
     public IndexDefinition setType(String type) {
-        if (isNormal(type) || isUnique(type)) {
+        if (!StringUtils.isBlank(type)) {
             this.type = type.trim();
         }
         return this;
@@ -128,10 +130,13 @@ public class IndexDefinition extends Definition implements Cloneable {
 
     public static void validate(List<IndexDefinition> indexes, List<IndexDefinition> selfIndexes, List<FieldDefinition> fields) {
         for (FieldDefinition field : fields) {
-            if (!IndexDefinition.isIndex(field.getIndex())) {
+            if (StringUtils.isBlank(field.getIndex())) {
                 continue;
             }
-
+            if (!isIndex(field.getIndex())) {
+                field.getOwner().addValidatedError(field.getOwner().getValidatedName("的") + field.getValidatedName() + "索引类型[" + field.getIndex() + "]不合法,允许类型" + LEGAL_TYPES);
+                continue;
+            }
             if (!field.isPrimitiveType() && !field.isEnumType() && field.getType() != null) {
                 field.getOwner().addValidatedError(field.getOwner().getValidatedName("的") + field.getValidatedName() + "类型[" + field.getType() + "]不支持索引，允许的类型为" + Constants.PRIMITIVE_TYPES + "或枚举");
                 continue;
@@ -173,9 +178,8 @@ public class IndexDefinition extends Definition implements Cloneable {
         if (indexType == null) {
             owner.addValidatedError(owner.getValidatedName("的") + getValidatedName() + "类型不能为空");
         } else {
-            List<String> allowIndexTypes = Arrays.asList("normal", "n", "unique", "u");
-            if (!allowIndexTypes.contains(indexType)) {
-                owner.addValidatedError(owner.getValidatedName("的") + getValidatedName() + "类型[" + indexType + "]非法,允许类型" + allowIndexTypes);
+            if (!LEGAL_TYPES.contains(indexType)) {
+                owner.addValidatedError(owner.getValidatedName("的") + getValidatedName() + "类型[" + indexType + "]非法,允许类型" + LEGAL_TYPES);
             }
         }
 

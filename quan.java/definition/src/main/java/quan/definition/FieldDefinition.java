@@ -445,7 +445,7 @@ public class FieldDefinition extends Definition implements Cloneable {
     }
 
     public FieldDefinition setIndex(String index) {
-        if (IndexDefinition.isUnique(index) || IndexDefinition.isNormal(index) || index != null && index.trim().equals("-")) {
+        if (!StringUtils.isBlank(index)) {
             this.index = index.trim();
         }
         return this;

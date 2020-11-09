@@ -65,7 +65,10 @@ public abstract class ConfigGenerator extends Generator {
             return;
         }
 
-        definitionType = options.getProperty(category() + ".definitionType", "xml");
+        definitionType = options.getProperty(category() + ".definitionType");
+        if (StringUtils.isBlank(definitionType)) {
+            definitionType = "xml";
+        }
         tableType = options.getProperty(category() + ".tableType");
         tablePath = options.getProperty(category() + ".tablePath");
         tableBodyStartRow = options.getProperty(category() + ".tableBodyStartRow");
