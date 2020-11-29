@@ -11,6 +11,8 @@ namespace Test.Config.Item
     {
         public readonly ItemType ItemType;
 
+        public IList<ItemConfig> ItemType_Ref => ItemConfig.GetByType(ItemType);
+
 
         public UseEffect4(JObject json) : base(json)
         {

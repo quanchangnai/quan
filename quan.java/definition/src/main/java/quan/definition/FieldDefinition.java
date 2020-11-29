@@ -74,6 +74,7 @@ public class FieldDefinition extends Definition implements Cloneable {
 
     //配置:引用[配置.字段]
     private String ref;
+    private String refType;//语言相关
 
     //配置:是支持还是排除设置的语言
     private boolean excludeLanguage;
@@ -490,6 +491,46 @@ public class FieldDefinition extends Definition implements Cloneable {
         return this;
     }
 
+    public String getRefType() {
+        if (refType == null) {
+            ConfigDefinition refConfig = getRefConfig();
+            if (refConfig != null) {
+                return refConfig.getName();
+            }
+        }
+        return refType;
+    }
+
+    public FieldDefinition setRefType(String refType) {
+        this.refType = refType;
+        return this;
+    }
+
+    public boolean isSimpleRef() {
+        if (isCollectionType()) {
+            return false;
+        }
+        IndexDefinition refIndex = getRefIndex(false);
+        return refIndex != null && refIndex.getFields().size() == 1;
+    }
+
+    public IndexDefinition getRefIndex() {
+        return getRefIndex(false);
+    }
+
+    public IndexDefinition getRefIndex(boolean keyRef) {
+        ConfigDefinition refConfig = getRefConfig(keyRef);
+        FieldDefinition refField = getRefField(keyRef);
+        if (refConfig == null || refField == null) {
+            return null;
+        }
+        return refConfig.getIndexByField1(refField);
+    }
+
+    public ConfigDefinition getRefConfig() {
+        return getRefConfig(false);
+    }
+
     /**
      * 返回字段的引用配置类
      *
@@ -505,20 +546,23 @@ public class FieldDefinition extends Definition implements Cloneable {
             ConfigDefinition refConfig = null;
 
             if (keyRef && fieldRefs.length >= 1) {
-                refConfig = parser.getConfig(getLongClassName(owner, fieldRefs[0].split("@", -1)[0]));
+                String refConfigName = fieldRefs[0].substring(0, fieldRefs[0].lastIndexOf("."));
+                refConfig = parser.getConfig(getLongClassName(owner, refConfigName));
             }
             if (!keyRef && fieldRefs.length == 2) {
-                refConfig = parser.getConfig(getLongClassName(owner, fieldRefs[1].split("@", -1)[0]));
+                String refConfigName = fieldRefs[1].substring(0, fieldRefs[1].lastIndexOf("."));
+                refConfig = parser.getConfig(getLongClassName(owner, refConfigName));
             }
             return refConfig;
         }
 
         //list set 原生类型
-        String[] fieldRefs = ref.split("@", -1);
-        if (fieldRefs.length != 2) {
-            return null;
-        }
-        return parser.getConfig(getLongClassName(owner, fieldRefs[0]));
+        String refConfigName = ref.substring(0, ref.lastIndexOf("."));
+        return parser.getConfig(getLongClassName(owner, refConfigName));
+    }
+
+    public FieldDefinition getRefField() {
+        return getRefField(false);
     }
 
     /**
@@ -537,31 +581,31 @@ public class FieldDefinition extends Definition implements Cloneable {
             ConfigDefinition refConfig;
 
             if (keyRef && fieldRefs.length >= 1) {
-                String[] fieldKeyRefs = fieldRefs[0].split("@", -1);
-                refConfig = parser.getConfig(getLongClassName(owner, fieldKeyRefs[0]));
+                String refConfigName = fieldRefs[0].substring(0, fieldRefs[0].lastIndexOf("."));
+                refConfig = parser.getConfig(getLongClassName(owner, refConfigName));
                 if (refConfig != null) {
-                    return refConfig.getField(fieldKeyRefs[1]);
+                    String refFieldName = fieldRefs[0].substring(fieldRefs[0].lastIndexOf(".") + 1);
+                    return refConfig.getField(refFieldName);
                 }
             }
             if (!keyRef && fieldRefs.length == 2) {
-                String[] fieldValueRefs = fieldRefs[1].split("@", -1);
-                refConfig = parser.getConfig(getLongClassName(owner, fieldValueRefs[0]));
+                String refConfigName = fieldRefs[1].substring(0, fieldRefs[1].lastIndexOf("."));
+                refConfig = parser.getConfig(getLongClassName(owner, refConfigName));
                 if (refConfig != null) {
-                    return refConfig.getField(fieldValueRefs[1]);
+                    String refFieldName = fieldRefs[1].substring(fieldRefs[1].lastIndexOf(".") + 1);
+                    return refConfig.getField(refFieldName);
                 }
             }
             return null;
         }
 
         //list set 原生类型
-        String[] fieldRefs = ref.split("@", -1);
-        if (fieldRefs.length != 2) {
-            return null;
-        }
+        String refConfigName = ref.substring(0, ref.lastIndexOf("."));
+        ConfigDefinition refConfig = parser.getConfig(getLongClassName(owner, refConfigName));
 
-        ConfigDefinition refConfig = parser.getConfig(getLongClassName(owner, fieldRefs[0]));
         if (refConfig != null) {
-            return refConfig.getField(fieldRefs[1]);
+            String refFieldName = ref.substring(ref.lastIndexOf(".") + 1);
+            return refConfig.getField(refFieldName);
         }
         return null;
     }

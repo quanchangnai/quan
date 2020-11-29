@@ -54,6 +54,7 @@ public class DependentSource implements Comparable<DependentSource> {
     public enum DependentType {
         field,//字段依赖
         fieldValue,//集合字段值依赖
+        fieldRef,//集合引用依赖
         parent,//父类依赖
         child,//子类依赖
         messageHeader//消息头依赖

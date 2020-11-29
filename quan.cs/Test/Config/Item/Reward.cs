@@ -12,6 +12,8 @@ namespace Test.Config.Item
     {
         public readonly int ItemId;
 
+        public ItemConfig ItemId_Ref => ItemConfig.GetById(ItemId);
+
         public readonly int ItemNum;
 
 

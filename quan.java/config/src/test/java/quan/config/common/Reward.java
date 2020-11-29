@@ -2,6 +2,8 @@ package quan.config.common;
 
 import com.alibaba.fastjson.*;
 import quan.config.*;
+import java.util.*;
+import quan.config.item.ItemConfig;
 
 /**
  * 奖励<br/>
@@ -23,6 +25,10 @@ public class Reward extends Bean {
 
     public final int getItemId() {
         return itemId;
+    }
+
+    public final ItemConfig getItemId$Ref() {
+        return ItemConfig.getById(itemId);
     }
 
     public final int getItemNum() {

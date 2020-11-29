@@ -1,6 +1,7 @@
 package quan.config.item;
 
 import com.alibaba.fastjson.*;
+import java.util.*;
 
 /**
  * 使用效果4<br/>
@@ -20,6 +21,10 @@ public class UseEffect4 extends UseEffect {
 
     public final ItemType getItemType() {
         return itemType;
+    }
+
+    public final List<ItemConfig> getItemType$Ref() {
+        return ItemConfig.getByType(itemType);
     }
 
 

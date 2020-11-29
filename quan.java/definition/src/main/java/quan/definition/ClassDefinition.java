@@ -71,6 +71,7 @@ public abstract class ClassDefinition extends Definition {
         fieldDefinition.setClassKeyType(null);
         fieldDefinition.setBasicValueType(null);
         fieldDefinition.setClassValueType(null);
+        fieldDefinition.setRefType(null);
     }
 
     public String getPackagePrefix() {

@@ -1,6 +1,7 @@
 using Newtonsoft.Json.Linq;
 using Quan.Common.Utils;
 using Quan.Config;
+using Test.Config.Item;
 
 namespace Test.Config.Common
 {
@@ -11,6 +12,8 @@ namespace Test.Config.Common
     public class Reward : Bean
     {
         public readonly int ItemId;
+
+        public ItemConfig ItemId_Ref => ItemConfig.GetById(ItemId);
 
         public readonly int ItemNum;
 

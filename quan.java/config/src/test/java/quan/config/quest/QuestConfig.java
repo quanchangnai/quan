@@ -1,8 +1,8 @@
 package quan.config.quest;
 
-import java.util.*;
 import com.alibaba.fastjson.*;
 import quan.config.*;
+import java.util.*;
 import quan.config.item.Reward;
 
 /**
@@ -149,6 +149,10 @@ public class QuestConfig extends Config {
      */
     public final int getTarget() {
         return target;
+    }
+
+    public final QuestTargetConfig getTarget$Ref() {
+        return QuestTargetConfig.getById(target);
     }
 
     /**

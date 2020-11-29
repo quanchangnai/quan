@@ -1,8 +1,9 @@
 package quan.config.common;
 
-import java.util.*;
 import com.alibaba.fastjson.*;
 import quan.config.*;
+import java.util.*;
+import quan.config.item.ItemConfig;
 
 /**
  * 常量<br/>
@@ -64,6 +65,10 @@ public class ConstantConfig extends Config {
      */
     public final int getItemId() {
         return itemId;
+    }
+
+    public final ItemConfig getItemId$Ref() {
+        return ItemConfig.getById(itemId);
     }
 
     /**

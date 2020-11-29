@@ -1,8 +1,8 @@
 package quan.config.quest;
 
-import java.util.*;
 import com.alibaba.fastjson.*;
 import quan.config.*;
+import java.util.*;
 
 /**
  * QuestTargetConfig<br/>

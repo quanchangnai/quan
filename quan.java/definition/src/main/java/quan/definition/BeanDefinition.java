@@ -377,6 +377,9 @@ public class BeanDefinition extends ClassDefinition {
         for (FieldDefinition fieldDefinition : getFields()) {
             addDependent(DependentType.field, this, fieldDefinition, fieldDefinition.getTypeBean());
             addDependent(DependentType.fieldValue, this, fieldDefinition, fieldDefinition.getValueTypeBean());
+            if (fieldDefinition.isSimpleRef()) {
+                addDependent(DependentType.fieldRef, this, fieldDefinition, fieldDefinition.getRefConfig());
+            }
         }
 
         for (BeanDefinition child : getChildren()) {

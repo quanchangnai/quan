@@ -1,8 +1,5 @@
 package ${getFullPackageName("java")};
 
-<#if kind == 6>
-import java.util.*;
-</#if>
 import com.alibaba.fastjson.*;
 <#if (!(parentClassName??) || kind == 6) && getFullPackageName("java")!="quan.config">
 import quan.config.*;
@@ -170,6 +167,16 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
     <#else >
     public final ${field.classType} get${field.name?cap_first}() {
         return ${field.name};
+    }
+    </#if>
+    <#if field.simpleRef>
+
+        <#if field.refIndex.unique>
+    public final ${field.refType} get${field.name?cap_first}$Ref() {
+        <#else >
+    public final List<${field.refType}> get${field.name?cap_first}$Ref() {
+        </#if>
+        return ${field.refType}.getBy${field.refIndex.name?cap_first}(${field.name});
     }
     </#if>
 

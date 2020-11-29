@@ -33,6 +33,8 @@ namespace Test.Config.Quest
         /// </summary>
         public readonly int Target;
 
+        public QuestTargetConfig Target_Ref => QuestTargetConfig.GetById(Target);
+
         /// <summary>
         /// 奖励
         /// </summary>

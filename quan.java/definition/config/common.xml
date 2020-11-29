@@ -3,7 +3,7 @@
 
     <config name="ConstantConfig" table="常量">
         <field name="key" type="string" column="常量Key" index="u"/>
-        <field name="itemId" type="int" column="道具ID"/>
+        <field name="itemId" type="int" column="道具ID" ref="item.ItemConfig.id"/>
         <field name="reward" type="Reward" column="奖励"/>
         <field name="rewardList" type="list:item.Reward" column="奖励List"/>
         <field name="comment" type="string" column="备注"/>

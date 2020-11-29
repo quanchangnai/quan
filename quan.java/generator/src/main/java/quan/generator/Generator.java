@@ -308,7 +308,9 @@ public abstract class Generator {
                         ((FieldDefinition) dependentSource.getOwnerDefinition()).setClassType(dependentClassFullName);
                     } else if (dependentSource.getType() == DependentType.fieldValue) {
                         ((FieldDefinition) dependentSource.getOwnerDefinition()).setClassValueType(dependentClassFullName);
-                    } else if (dependentSource.getType() == DependentType.parent) {
+                    } else if (dependentSource.getType() == DependentType.fieldRef) {
+                        ((FieldDefinition) dependentSource.getOwnerDefinition()).setRefType(dependentClassFullName);
+                    }else if (dependentSource.getType() == DependentType.parent) {
                         ((BeanDefinition) dependentSource.getOwnerDefinition()).setParentClassName(dependentClassFullName);
                     } else if (dependentSource.getType() == DependentType.child) {
                         ((BeanDefinition) dependentSource.getOwnerDefinition()).getDependentChildren().get(classDefinition.getLongName()).setRight(dependentClassFullName);

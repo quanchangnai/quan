@@ -49,6 +49,15 @@ namespace ${getFullPackageName("cs")}
     <#else >
         public readonly ${field.classType} ${field.name?cap_first};
     </#if>
+    <#if field.simpleRef>
+
+        <#if field.refIndex.unique>
+        public ${field.refType} ${field.name?cap_first}_Ref => <#rt/>
+        <#else >
+        public IList<${field.refType}> ${field.name?cap_first}_Ref => <#rt/>
+        </#if>
+        <#lt/>${field.refType}.GetBy${field.refIndex.name?cap_first}(${field.name?cap_first});
+    </#if>
 
 </#list>
 

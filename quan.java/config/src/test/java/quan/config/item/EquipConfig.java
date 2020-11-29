@@ -1,8 +1,8 @@
 package quan.config.item;
 
-import java.util.*;
 import com.alibaba.fastjson.*;
 import quan.config.*;
+import java.util.*;
 
 /**
  * 装备1,装备2<br/>
