@@ -1,8 +1,8 @@
-using System.Collections.Generic;
-using System.Collections.Immutable;
 using Newtonsoft.Json.Linq;
 using Quan.Common.Utils;
 using Quan.Config;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using Test.Config.Item;
 
 namespace Test.Config.Common
@@ -16,36 +16,36 @@ namespace Test.Config.Common
         /// <summary>
         /// 常量Key
         /// </summary>
-        public readonly string Key;
+        public readonly string key;
 
         /// <summary>
         /// 道具ID
         /// </summary>
-        public readonly int ItemId;
+        public readonly int itemId;
 
-        public ItemConfig ItemId_Ref => ItemConfig.GetById(ItemId);
+        public ItemConfig itemId_Ref => ItemConfig.GetById(itemId);
 
         /// <summary>
         /// 奖励
         /// </summary>
-        public readonly Reward Reward;
+        public readonly Reward reward;
 
         /// <summary>
         /// 奖励List
         /// </summary>
-        public readonly IList<Test.Config.Item.Reward> RewardList;
+        public readonly IList<Test.Config.Item.Reward> rewardList;
 
         /// <summary>
         /// 备注
         /// </summary>
-        public readonly string Comment;
+        public readonly string comment;
 
 
         public ConstantConfig(JObject json) : base(json)
         {
-            Key = json["key"]?.Value<string>() ?? "";
-            ItemId = json["itemId"]?.Value<int>() ?? default;
-            Reward = json.ContainsKey("reward") ? Reward.Create(json["reward"].Value<JObject>()) : null;
+            key = json["key"]?.Value<string>() ?? "";
+            itemId = json["itemId"]?.Value<int>() ?? default;
+            reward = json.ContainsKey("reward") ? Reward.Create(json["reward"].Value<JObject>()) : null;
 
             var rewardList1 = json["rewardList"]?.Value<JArray>();
             var rewardList2 = ImmutableList<Test.Config.Item.Reward>.Empty;
@@ -56,9 +56,9 @@ namespace Test.Config.Common
                     rewardList2 =rewardList2.Add(Test.Config.Item.Reward.Create(rewardListValue.Value<JObject>()));
                 }
             }
-            RewardList = rewardList2;
+            rewardList = rewardList2;
 
-            Comment = json["comment"]?.Value<string>() ?? "";
+            comment = json["comment"]?.Value<string>() ?? "";
         }
 
         protected override ConfigBase Create(JObject json)
@@ -69,11 +69,11 @@ namespace Test.Config.Common
         public override string ToString()
         {
             return "ConstantConfig{" +
-                   "Key='" + Key + '\'' +
-                   ",ItemId=" + ItemId.ToString2() +
-                   ",Reward=" + Reward.ToString2() +
-                   ",RewardList=" + RewardList.ToString2() +
-                   ",Comment='" + Comment + '\'' +
+                   "key='" + key + '\'' +
+                   ",itemId=" + itemId.ToString2() +
+                   ",reward=" + reward.ToString2() +
+                   ",rewardList=" + rewardList.ToString2() +
+                   ",comment='" + comment + '\'' +
                    '}';
         }
 
@@ -106,7 +106,7 @@ namespace Test.Config.Common
 
             foreach (var config in configs)
             {
-                Load(keyConfigs, config, config.Key);
+                Load(keyConfigs, config, config.key);
             }
 
             configs = configs.ToImmutableList();

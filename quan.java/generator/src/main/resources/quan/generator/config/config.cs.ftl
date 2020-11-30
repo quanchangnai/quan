@@ -1,7 +1,3 @@
-<#if kind == 6>
-using System.Collections.Generic;
-using System.Collections.Immutable;
-</#if>
 using Newtonsoft.Json.Linq;
 using Quan.Common.Utils;
 <#if !(parentClassName??) || kind == 6>
@@ -35,28 +31,28 @@ namespace ${getFullPackageName("cs")}
         /// </summary>
     </#if>
     <#if field.type=="list">
-        public readonly ${field.basicType}<${field.classValueType}> ${field.name?cap_first};
+        public readonly ${field.basicType}<${field.classValueType}> ${field.name};
     <#elseif field.type=="set">
-        public readonly ${field.basicType}<${field.classValueType}> ${field.name?cap_first};
+        public readonly ${field.basicType}<${field.classValueType}> ${field.name};
     <#elseif field.type=="map">
-        public readonly ${field.basicType}<${field.classKeyType}, ${field.classValueType}> ${field.name?cap_first};
+        public readonly ${field.basicType}<${field.classKeyType}, ${field.classValueType}> ${field.name};
     <#elseif  field.timeType>
-        public readonly ${field.basicType} ${field.name?cap_first};
+        public readonly ${field.basicType} ${field.name};
 
-        public readonly string ${field.name?cap_first}_;
+        public readonly string ${field.name}_;
     <#elseif field.builtinType>
-        public readonly ${field.basicType} ${field.name?cap_first};
+        public readonly ${field.basicType} ${field.name};
     <#else >
-        public readonly ${field.classType} ${field.name?cap_first};
+        public readonly ${field.classType} ${field.name};
     </#if>
     <#if field.simpleRef>
 
         <#if field.refIndex.unique>
-        public ${field.refType} ${field.name?cap_first}_Ref => <#rt/>
+        public ${field.refType} ${field.name}_Ref => <#rt/>
         <#else >
-        public IList<${field.refType}> ${field.name?cap_first}_Ref => <#rt/>
+        public IList<${field.refType}> ${field.name}_Ref => <#rt/>
         </#if>
-        <#lt/>${field.refType}.GetBy${field.refIndex.name?cap_first}(${field.name?cap_first});
+        <#lt/>${field.refType}.GetBy${field.refIndex.name?cap_first}(${field.name});
     </#if>
 
 </#list>
@@ -84,7 +80,7 @@ namespace ${getFullPackageName("cs")}
                 </#if>
                 }
             }
-            ${field.name?cap_first} = ${field.name}2;
+            ${field.name} = ${field.name}2;
         <#if field_has_next && !selfFields[field_index+1].collectionType>
 
         </#if>
@@ -105,21 +101,21 @@ namespace ${getFullPackageName("cs")}
                 </#if>
                 }
             }
-            ${field.name?cap_first} = ${field.name}2;
+            ${field.name} = ${field.name}2;
         <#if field_has_next && !selfFields[field_index+1].collectionType>
 
         </#if>
     <#elseif field.timeType>
-            ${field.name?cap_first} = ToDateTime(json["${field.name}"]?.Value<long>() ?? default);
-            ${field.name?cap_first}_ = json["${field.name}_"]?.Value<string>() ?? "";
+            ${field.name} = ToDateTime(json["${field.name}"]?.Value<long>() ?? default);
+            ${field.name}_ = json["${field.name}_"]?.Value<string>() ?? "";
     <#elseif field.type=="string">
-            ${field.name?cap_first} = json["${field.name}"]?.Value<${field.type}>() ?? "";
+            ${field.name} = json["${field.name}"]?.Value<${field.type}>() ?? "";
     <#elseif field.builtinType>
-            ${field.name?cap_first} = json["${field.name}"]?.Value<${field.type}>() ?? default;
+            ${field.name} = json["${field.name}"]?.Value<${field.type}>() ?? default;
     <#elseif field.enumType>
-            ${field.name?cap_first} = (${field.type}) (json["${field.name}"]?.Value<int>() ?? default);
+            ${field.name} = (${field.type}) (json["${field.name}"]?.Value<int>() ?? default);
     <#else>
-            ${field.name?cap_first} = json.ContainsKey("${field.name}") ? ${field.classType}.Create(json["${field.name}"].Value<JObject>()) : null;
+            ${field.name} = json.ContainsKey("${field.name}") ? ${field.classType}.Create(json["${field.name}"].Value<JObject>()) : null;
     </#if>
 </#list>
         }
@@ -163,11 +159,11 @@ namespace ${getFullPackageName("cs")}
                    <#lt>,<#rt>
                 </#if>
                 <#if field.type == "string">
-                   <#lt>${field.name?cap_first}='" + ${field.name?cap_first} + '\'' +
+                   <#lt>${field.name}='" + ${field.name} + '\'' +
                 <#elseif field.timeType>
-                    <#lt>${field.name?cap_first}='" + ${field.name?cap_first}_ + '\'' +
+                    <#lt>${field.name}='" + ${field.name}_ + '\'' +
                 <#else>
-                   <#lt>${field.name?cap_first}=" + ${field.name?cap_first}.ToString2() +
+                   <#lt>${field.name}=" + ${field.name}.ToString2() +
                 </#if>
             </#list>
                    '}';
@@ -341,11 +337,11 @@ namespace ${getFullPackageName("cs")}
             {
     <#list indexes as index>
         <#if index.fields?size==1>
-                <#if parentClassName??>ConfigBase.</#if>Load(${index.name}Configs, config, config.${index.fields[0].name?cap_first});
+                <#if parentClassName??>ConfigBase.</#if>Load(${index.name}Configs, config, config.${index.fields[0].name});
         <#elseif index.fields?size==2>
-                <#if parentClassName??>ConfigBase.</#if>Load(${index.name}Configs, config, config.${index.fields[0].name?cap_first}, config.${index.fields[1].name?cap_first});
+                <#if parentClassName??>ConfigBase.</#if>Load(${index.name}Configs, config, config.${index.fields[0].name}, config.${index.fields[1].name});
         <#elseif index.fields?size==3>
-                <#if parentClassName??>ConfigBase.</#if>Load(${index.name}Configs, config, config.${index.fields[0].name?cap_first}, config.${index.fields[1].name?cap_first}, config.${index.fields[2].name?cap_first});
+                <#if parentClassName??>ConfigBase.</#if>Load(${index.name}Configs, config, config.${index.fields[0].name}, config.${index.fields[1].name}, config.${index.fields[2].name});
         </#if>
     </#list>
             }

@@ -1,8 +1,8 @@
-using System.Collections.Generic;
-using System.Collections.Immutable;
 using Newtonsoft.Json.Linq;
 using Quan.Common.Utils;
 using Quan.Config;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace Test.Config.Item
 {
@@ -15,18 +15,18 @@ namespace Test.Config.Item
         /// <summary>
         /// 部位
         /// </summary>
-        public readonly int Position;
+        public readonly int position;
 
         /// <summary>
         /// 颜色
         /// </summary>
-        public readonly int Color;
+        public readonly int color;
 
 
         public EquipConfig(JObject json) : base(json)
         {
-            Position = json["position"]?.Value<int>() ?? default;
-            Color = json["color"]?.Value<int>() ?? default;
+            position = json["position"]?.Value<int>() ?? default;
+            color = json["color"]?.Value<int>() ?? default;
         }
 
         protected override ConfigBase Create(JObject json)
@@ -37,18 +37,18 @@ namespace Test.Config.Item
         public override string ToString()
         {
             return "EquipConfig{" +
-                   "Id=" + Id.ToString2() +
-                   ",Key='" + Key + '\'' +
-                   ",Name='" + Name + '\'' +
-                   ",Type=" + Type.ToString2() +
-                   ",UseEffect=" + UseEffect.ToString2() +
-                   ",Reward=" + Reward.ToString2() +
-                   ",List=" + List.ToString2() +
-                   ",Set=" + Set.ToString2() +
-                   ",Map=" + Map.ToString2() +
-                   ",EffectiveTime='" + EffectiveTime_ + '\'' +
-                   ",Position=" + Position.ToString2() +
-                   ",Color=" + Color.ToString2() +
+                   "id=" + id.ToString2() +
+                   ",key='" + key + '\'' +
+                   ",name='" + name + '\'' +
+                   ",type=" + type.ToString2() +
+                   ",useEffect=" + useEffect.ToString2() +
+                   ",reward=" + reward.ToString2() +
+                   ",list=" + list.ToString2() +
+                   ",set=" + set.ToString2() +
+                   ",map=" + map.ToString2() +
+                   ",effectiveTime='" + effectiveTime_ + '\'' +
+                   ",position=" + position.ToString2() +
+                   ",color=" + color.ToString2() +
                    '}';
         }
 
@@ -126,10 +126,10 @@ namespace Test.Config.Item
 
             foreach (var config in configs)
             {
-                ConfigBase.Load(idConfigs, config, config.Id);
-                ConfigBase.Load(keyConfigs, config, config.Key);
-                ConfigBase.Load(typeConfigs, config, config.Type);
-                ConfigBase.Load(positionConfigs, config, config.Position);
+                ConfigBase.Load(idConfigs, config, config.id);
+                ConfigBase.Load(keyConfigs, config, config.key);
+                ConfigBase.Load(typeConfigs, config, config.type);
+                ConfigBase.Load(positionConfigs, config, config.position);
             }
 
             configs = configs.ToImmutableList();

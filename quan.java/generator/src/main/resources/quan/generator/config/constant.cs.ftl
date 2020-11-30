@@ -21,7 +21,7 @@ namespace ${getFullPackageName("cs")}
         /// ${rows[key].right}
         /// </summary>
         </#if>
-        ${key?cap_first} = ${rows[key].left}<#if key?has_next>,</#if>
+        ${key} = ${rows[key].left}<#if key?has_next>,</#if>
         <#if key?has_next>
 
         </#if>
@@ -38,11 +38,11 @@ namespace ${getFullPackageName("cs")}
         }
 
     <#if valueField.type=="map">
-        public ${valueField.basicType}<${valueField.keyType},${valueField.classValueType}> Value => ${configDefinition.name}.GetBy${keyField.name?cap_first}(_key).${valueField.name?cap_first};
+        public ${valueField.basicType}<${valueField.keyType},${valueField.classValueType}> Value => ${configDefinition.name}.GetBy${keyField.name?cap_first}(_key).${valueField.name};
     <#elseif valueField.type=="list" || valueField.type=="set">
-        public ${valueField.basicType}<${valueField.classValueType}> Value => ${configDefinition.name}.GetBy${keyField.name?cap_first}(_key).${valueField.name?cap_first};
+        public ${valueField.basicType}<${valueField.classValueType}> Value => ${configDefinition.name}.GetBy${keyField.name?cap_first}(_key).${valueField.name};
     <#else>
-        public ${valueField.classType} Value => ${configDefinition.name}.GetBy${keyField.name?cap_first}(_key).${valueField.name?cap_first};
+        public ${valueField.classType} Value => ${configDefinition.name}.GetBy${keyField.name?cap_first}(_key).${valueField.name};
     </#if>
 
 
@@ -52,7 +52,7 @@ namespace ${getFullPackageName("cs")}
         /// ${rows[key].right}
         /// </summary>
         </#if>
-        public static readonly ${name} ${key?cap_first} = new ${name}("${key}");
+        public static readonly ${name} ${key} = new ${name}("${key}");
         <#if key?has_next>
 
         </#if>
@@ -68,11 +68,11 @@ namespace ${getFullPackageName("cs")}
         /// </summary>
         </#if>
         <#if valueField.type=="map">
-        public static ${valueField.basicType}<${valueField.keyType},${valueField.classValueType}> ${key?cap_first} => ${configDefinition.name}.GetBy${keyField.name?cap_first}("${key}").${valueField.name?cap_first};
+        public static ${valueField.basicType}<${valueField.keyType},${valueField.classValueType}> ${key} => ${configDefinition.name}.GetBy${keyField.name?cap_first}("${key}").${valueField.name};
         <#elseif valueField.type=="list" || valueField.type=="set">
-        public static ${valueField.basicType}<${valueField.classValueType}> ${key?cap_first} => ${configDefinition.name}.GetBy${keyField.name?cap_first}("${key}").${valueField.name?cap_first};
+        public static ${valueField.basicType}<${valueField.classValueType}> ${key} => ${configDefinition.name}.GetBy${keyField.name?cap_first}("${key}").${valueField.name};
         <#else>
-        public static ${valueField.classType} ${key?cap_first} => ${configDefinition.name}.GetBy${keyField.name?cap_first}("${key}").${valueField.name?cap_first};
+        public static ${valueField.classType} ${key} => ${configDefinition.name}.GetBy${keyField.name?cap_first}("${key}").${valueField.name};
         </#if>
         <#if key?has_next>
 

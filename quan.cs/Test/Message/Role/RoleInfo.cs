@@ -15,30 +15,30 @@ namespace Test.Message.Role
         /// <summary>
 		/// 角色id
 		/// </summary>
-		public long Id { get; set; }
+		public long id { get; set; }
 
 		private string _name = "";
 
         /// <summary>
 		/// 角色名
 		/// </summary>
-		public string Name
+		public string name
 		{
 	    	get => _name;
 	    	set => _name = value ?? throw new NullReferenceException();
 		}
 
-		public RoleType Type { get; set; }
+		public RoleType type { get; set; }
 
-		public bool B { get; set; }
+		public bool b { get; set; }
 
-		public short S { get; set; }
+		public short s { get; set; }
 
-		public int I { get; set; }
+		public int i { get; set; }
 
         private float _f;
 
-        public float F
+        public float f
         {
             get => _f;
             set
@@ -48,44 +48,44 @@ namespace Test.Message.Role
             }
         }
 
-		public double D { get; set; }
+		public double d { get; set; }
 
 		private byte[] _data = new byte[0];
 
-		public byte[] Data
+		public byte[] data
 		{
             get => _data;
             set => _data = value ?? throw new NullReferenceException();
 		}
 
-		public List<int> List { get; } = new List<int>();
+		public List<int> list { get; } = new List<int>();
 
-		public HashSet<int> Set { get; } = new HashSet<int>();
+		public HashSet<int> set { get; } = new HashSet<int>();
 
-		public Dictionary<int, int> Map { get; } = new Dictionary<int, int>();
+		public Dictionary<int, int> map { get; } = new Dictionary<int, int>();
 
 
 		public override void Encode(Buffer buffer)
 		{
 	    	base.Encode(buffer);
 
-		    buffer.WriteLong(Id);
-		    buffer.WriteString(Name);
-			buffer.WriteInt((int)Type);
-		    buffer.WriteBool(B);
-		    buffer.WriteShort(S);
-		    buffer.WriteInt(I);
-			buffer.WriteFloat(F, 2);
-			buffer.WriteDouble(D);
-		    buffer.WriteBytes(Data);
+		    buffer.WriteLong(id);
+		    buffer.WriteString(name);
+			buffer.WriteInt((int)type);
+		    buffer.WriteBool(b);
+		    buffer.WriteShort(s);
+		    buffer.WriteInt(i);
+			buffer.WriteFloat(f, 2);
+			buffer.WriteDouble(d);
+		    buffer.WriteBytes(data);
 
-		    buffer.WriteInt(List.Count);
-		    foreach (var listValue in List) {
+		    buffer.WriteInt(list.Count);
+		    foreach (var listValue in list) {
 			    buffer.WriteInt(listValue);
 		    }
 
-		    buffer.WriteInt(Set.Count);
-		    foreach (var setValue in Set) {
+		    buffer.WriteInt(set.Count);
+		    foreach (var setValue in set) {
 			    buffer.WriteInt(setValue);
 		    }
 		}
@@ -94,44 +94,44 @@ namespace Test.Message.Role
 		{
 	    	base.Decode(buffer);
 
-		    Id = buffer.ReadLong();
-		    Name = buffer.ReadString();
-		    Type = (RoleType)buffer.ReadInt();
-		    B = buffer.ReadBool();
-		    S = buffer.ReadShort();
-		    I = buffer.ReadInt();
-			F = buffer.ReadFloat(2);
-			D = buffer.ReadDouble();
-		    Data = buffer.ReadBytes();
+		    id = buffer.ReadLong();
+		    name = buffer.ReadString();
+		    type = (RoleType)buffer.ReadInt();
+		    b = buffer.ReadBool();
+		    s = buffer.ReadShort();
+		    i = buffer.ReadInt();
+			f = buffer.ReadFloat(2);
+			d = buffer.ReadDouble();
+		    data = buffer.ReadBytes();
 
 		    var listSize = buffer.ReadInt();
 		    for (var i = 0; i < listSize; i++) 
 			{
-			    List.Add(buffer.ReadInt());
+			    list.Add(buffer.ReadInt());
 		    }
 
 		    var setSize = buffer.ReadInt();
 		    for (var i = 0; i < setSize; i++) 
 			{
-			    Set.Add(buffer.ReadInt());
+			    set.Add(buffer.ReadInt());
 		    }
 		}
 
 		public override string ToString()
 		{
 			return "RoleInfo{" +
-				   "id=" + Id.ToString2() +
-				   ",name='" + Name + '\'' +
-				   ",type=" + Type.ToString2() +
-				   ",b=" + B.ToString2() +
-				   ",s=" + S.ToString2() +
-				   ",i=" + I.ToString2() +
-				   ",f=" + F.ToString2() +
-				   ",d=" + D.ToString2() +
-				   ",data=" + Data.ToString2() +
-				   ",list=" + List.ToString2() +
-				   ",set=" + Set.ToString2() +
-				   ",map=" + Map.ToString2() +
+				   "id=" + id.ToString2() +
+				   ",name='" + name + '\'' +
+				   ",type=" + type.ToString2() +
+				   ",b=" + b.ToString2() +
+				   ",s=" + s.ToString2() +
+				   ",i=" + i.ToString2() +
+				   ",f=" + f.ToString2() +
+				   ",d=" + d.ToString2() +
+				   ",data=" + data.ToString2() +
+				   ",list=" + list.ToString2() +
+				   ",set=" + set.ToString2() +
+				   ",map=" + map.ToString2() +
 				   '}';
 		}
     }

@@ -29,7 +29,7 @@ namespace ${getFullPackageName("cs")}
 		/// ${field.comment}
 		/// </summary>
         </#if>
-		public ${field.classType}<${field.classValueType}> ${field.name?cap_first} { get; } = new ${field.classType}<${field.classValueType}>();
+		public ${field.classType}<${field.classValueType}> ${field.name} { get; } = new ${field.classType}<${field.classValueType}>();
 
     <#elseif field.type == "map">
         <#if field.comment !="">
@@ -37,7 +37,7 @@ namespace ${getFullPackageName("cs")}
 		/// ${field.comment}
 		/// </summary>
         </#if>
-		public Dictionary<${field.classKeyType}, ${field.classValueType}> ${field.name?cap_first} { get; } = new Dictionary<${field.classKeyType}, ${field.classValueType}>();
+		public Dictionary<${field.classKeyType}, ${field.classValueType}> ${field.name} { get; } = new Dictionary<${field.classKeyType}, ${field.classValueType}>();
 
     <#elseif field.type == "string">
 		private string _${field.name} = "";
@@ -47,7 +47,7 @@ namespace ${getFullPackageName("cs")}
 		/// ${field.comment}
 		/// </summary>
         </#if>
-		public string ${field.name?cap_first}
+		public string ${field.name}
 		{
 	    	get => _${field.name};
 	    	set => _${field.name} = value ?? throw new NullReferenceException();
@@ -61,7 +61,7 @@ namespace ${getFullPackageName("cs")}
 		/// ${field.comment}
 		/// </summary>
         </#if>
-		public byte[] ${field.name?cap_first}
+		public byte[] ${field.name}
 		{
             get => _${field.name};
             set => _${field.name} = value ?? throw new NullReferenceException();
@@ -75,7 +75,7 @@ namespace ${getFullPackageName("cs")}
 		/// ${field.comment}
 		/// </summary>
         </#if>
-        public ${field.basicType} ${field.name?cap_first}
+        public ${field.basicType} ${field.name}
         {
             get => _${field.name};
             set
@@ -91,7 +91,7 @@ namespace ${getFullPackageName("cs")}
 		/// ${field.comment}
 		/// </summary>
         </#if>
-		public ${field.basicType} ${field.name?cap_first} { get; set; }
+		public ${field.basicType} ${field.name} { get; set; }
 
     <#elseif !field.optional && !field.enumType>
 		private ${field.classType} _${field.name} = new ${field.classType}();
@@ -101,7 +101,7 @@ namespace ${getFullPackageName("cs")}
 		/// ${field.comment}
 		/// </summary>
         </#if>
-		public ${field.classType} ${field.name?cap_first}
+		public ${field.classType} ${field.name}
 		{
 	    	get => _${field.name};
 	    	set => _${field.name} = value ?? throw new NullReferenceException();
@@ -113,7 +113,7 @@ namespace ${getFullPackageName("cs")}
 		/// ${field.comment}
 		/// </summary>
         </#if>
-		public ${field.classType} ${field.name?cap_first} { get; set; }
+		public ${field.classType} ${field.name} { get; set; }
 
     </#if>
 </#list>
@@ -139,8 +139,8 @@ namespace ${getFullPackageName("cs")}
 	<#if field.type=="set" || field.type=="list">
 		<#if definedFieldId>
 			var ${field.name}Buffer = new Buffer();
-			${field.name}Buffer.WriteInt(${field.name?cap_first}.Count);
-		    foreach (var ${field.name}Value in ${field.name?cap_first}) {
+			${field.name}Buffer.WriteInt(${field.name}.Count);
+		    foreach (var ${field.name}Value in ${field.name}) {
 			<#if field.builtinValueType>
 			    ${field.name}Buffer.Write${field.valueType?cap_first}(${field.name}Value);
 			<#else>
@@ -152,8 +152,8 @@ namespace ${getFullPackageName("cs")}
 			<#if field?index gt 0>
 
         	</#if>
-		    buffer.WriteInt(${field.name?cap_first}.Count);
-		    foreach (var ${field.name}Value in ${field.name?cap_first}) {
+		    buffer.WriteInt(${field.name}.Count);
+		    foreach (var ${field.name}Value in ${field.name}) {
 			<#if field.builtinValueType>
 			    buffer.Write${field.valueType?cap_first}(${field.name}Value);
 			<#else>
@@ -167,13 +167,13 @@ namespace ${getFullPackageName("cs")}
 	<#elseif field.type=="map">
 		<#if definedFieldId>
 			var ${field.name}Buffer = new Buffer();
-			${field.name}Buffer.WriteInt(${field.name?cap_first}.Count);
-		    foreach (var ${field.name}Key in ${field.name?cap_first}.Keys) {
+			${field.name}Buffer.WriteInt(${field.name}.Count);
+		    foreach (var ${field.name}Key in ${field.name}.Keys) {
 		        ${field.name}Buffer.Write${field.keyType?cap_first}(${field.name}Key);
 			<#if field.builtinValueType>
-			    ${field.name}Buffer.Write${field.valueType?cap_first}(${field.name?cap_first}[${field.name}Key]);
+			    ${field.name}Buffer.Write${field.valueType?cap_first}(${field.name}[${field.name}Key]);
 			<#else>
-			    ${field.name?cap_first}[${field.name}Key].Encode(${field.name}Buffer);
+			    ${field.name}[${field.name}Key].Encode(${field.name}Buffer);
 			</#if>
 		    }
 			buffer.WriteBuffer(${field.name}Buffer);
@@ -181,13 +181,13 @@ namespace ${getFullPackageName("cs")}
 			<#if field?index gt 0>
 
         	</#if>
-		    buffer.WriteInt(${field.name?cap_first}.Count);
-		    foreach (var ${field.name}Key in ${field.name?cap_first}.Keys) {
+		    buffer.WriteInt(${field.name}.Count);
+		    foreach (var ${field.name}Key in ${field.name}.Keys) {
 		        buffer.Write${field.keyType?cap_first}(${field.name}Key);
 			<#if field.builtinValueType>
-			    buffer.Write${field.valueType?cap_first}(${field.name?cap_first}[${field.name}Key]);
+			    buffer.Write${field.valueType?cap_first}(${field.name}[${field.name}Key]);
 			<#else>
-			    ${field.name?cap_first}[${field.name}Key].Encode(buffer);
+			    ${field.name}[${field.name}Key].Encode(buffer);
 			</#if>
 		    }
         	<#if field?has_next && !selfFields[field?index+1].collectionType && (selfFields[field?index+1].primitiveType || !selfFields[field?index+1].optional) >
@@ -195,23 +195,23 @@ namespace ${getFullPackageName("cs")}
         	</#if>
 		</#if>
 	<#elseif field.type=="float"||field.type=="double">
-			buffer.Write${field.type?cap_first}(${field.name?cap_first}<#if field.scale gt 0>, ${field.scale}</#if>);
+			buffer.Write${field.type?cap_first}(${field.name}<#if field.scale gt 0>, ${field.scale}</#if>);
 	<#elseif field.builtinType>
-		    buffer.Write${field.type?cap_first}(${field.name?cap_first});
+		    buffer.Write${field.type?cap_first}(${field.name});
 	<#elseif field.enumType>
-			buffer.WriteInt((int)${field.name?cap_first});
+			buffer.WriteInt((int)${field.name});
 	<#elseif field.optional>
 		<#if definedFieldId>
 			var ${field.name}Buffer = new Buffer();
-			${field.name}Buffer.WriteBool(${field.name?cap_first} != null);
-		    ${field.name?cap_first}?.Encode(${field.name}Buffer);
+			${field.name}Buffer.WriteBool(${field.name} != null);
+		    ${field.name}?.Encode(${field.name}Buffer);
 			buffer.WriteBuffer(${field.name}Buffer);
 		<#else>
 			<#if field?index gt 0>
 
         	</#if>
-		    buffer.WriteBool(${field.name?cap_first} != null);
-		    ${field.name?cap_first}?.Encode(buffer);
+		    buffer.WriteBool(${field.name} != null);
+		    ${field.name}?.Encode(buffer);
         	<#if field?has_next && !selfFields[field?index+1].collectionType && (selfFields[field?index+1].primitiveType || !selfFields[field?index+1].optional) >
 
         	</#if>
@@ -219,10 +219,10 @@ namespace ${getFullPackageName("cs")}
 	<#else>
 		<#if definedFieldId>
         	var ${field.name}Buffer = new Buffer();
-        	${field.name?cap_first}.Encode(${field.name}Buffer);
+        	${field.name}.Encode(${field.name}Buffer);
         	buffer.WriteBuffer(${field.name}Buffer);
         <#else>
-		    ${field.name?cap_first}.Encode(buffer);
+		    ${field.name}.Encode(buffer);
 		</#if>
 	</#if>
 	<#if definedFieldId>
@@ -254,11 +254,11 @@ namespace ${getFullPackageName("cs")}
 		    			for (var i = 0; i < ${field.name}Size; i++) 
 						{
 						<#if field.builtinValueType>
-			    			${field.name?cap_first}.Add(buffer.Read${field.valueType?cap_first}());
+			    			${field.name}.Add(buffer.Read${field.valueType?cap_first}());
 						<#else>
 			    			var ${field.name}Value = new ${field.classValueType}();
 			  				${field.name}Value.Decode(buffer);
-			    			${field.name?cap_first}.Add(${field.name}Value);
+			    			${field.name}.Add(${field.name}Value);
 						</#if>
 		    			}
                	 	<#elseif field.type=="map">
@@ -267,33 +267,33 @@ namespace ${getFullPackageName("cs")}
 		    			for (var i = 0; i < ${field.name}Size; i++) 
 						{
 						<#if field.builtinValueType>
-			    			${field.name?cap_first}.Add(buffer.Read${field.keyType?cap_first}(), buffer.Read${field.valueType?cap_first}());
+			    			${field.name}.Add(buffer.Read${field.keyType?cap_first}(), buffer.Read${field.valueType?cap_first}());
 						<#else>
 			    			var ${field.name}Key = buffer.Read${field.keyType?cap_first}();
 			    			var ${field.name}Value = new ${field.classValueType}();
 							${field.name}Value.Decode(buffer);
-			    			${field.name?cap_first}.Add(${field.name}Key, ${field.name}Value);
+			    			${field.name}.Add(${field.name}Key, ${field.name}Value);
 						</#if>
 						}
                 	<#elseif field.type=="float"||field.type=="double">
-                    	${field.name?cap_first} = buffer.Read${field.type?cap_first}(<#if field.scale gt 0>${field.scale}</#if>);
+                    	${field.name} = buffer.Read${field.type?cap_first}(<#if field.scale gt 0>${field.scale}</#if>);
                 	<#elseif field.builtinType>
-                    	${field.name?cap_first} = buffer.Read${field.type?cap_first}();
+                    	${field.name} = buffer.Read${field.type?cap_first}();
                 	<#elseif field.enumType>
-                    	${field.name?cap_first} = (${field.type})buffer.ReadInt();
+                    	${field.name} = (${field.type})buffer.ReadInt();
                 	<#elseif field.optional>
                     	buffer.ReadInt();
                     	if (buffer.ReadBool()) 
 						{
-		        			if (${field.name?cap_first} == null) 
+		        			if (${field.name} == null)
 							{
-		            			${field.name?cap_first} = new ${field.classType}();
+		            			${field.name} = new ${field.classType}();
 		        			}
-		        			${field.name?cap_first}.Decode(buffer);
+		        			${field.name}.Decode(buffer);
             			}
            	 		<#else>
                     	buffer.ReadInt();
-                    	${field.name?cap_first}.Decode(buffer);
+                    	${field.name}.Decode(buffer);
             		</#if>
                     	break;
         </#list>
@@ -314,11 +314,11 @@ namespace ${getFullPackageName("cs")}
 		    for (var i = 0; i < ${field.name}Size; i++) 
 			{
 		<#if field.builtinValueType>
-			    ${field.name?cap_first}.Add(buffer.Read${field.valueType?cap_first}());
+			    ${field.name}.Add(buffer.Read${field.valueType?cap_first}());
 		<#else>
 			    var ${field.name}Value = new ${field.classValueType}();
 			  	${field.name}Value.Decode(buffer);
-			    ${field.name?cap_first}.Add(${field.name}Value);
+			    ${field.name}.Add(${field.name}Value);
 		</#if>
 		    }
         <#if field?has_next && !selfFields[field?index+1].collectionType && (selfFields[field?index+1].primitiveType || !selfFields[field?index+1].optional) >
@@ -332,39 +332,39 @@ namespace ${getFullPackageName("cs")}
 		    for (var i = 0; i < ${field.name}Size; i++) 
 			{
 		<#if field.builtinValueType>
-			    ${field.name?cap_first}.Add(buffer.Read${field.keyType?cap_first}(), buffer.Read${field.valueType?cap_first}());
+			    ${field.name}.Add(buffer.Read${field.keyType?cap_first}(), buffer.Read${field.valueType?cap_first}());
 		<#else>
 			    var ${field.name}Key = buffer.Read${field.keyType?cap_first}();
 			    var ${field.name}Value = new ${field.classValueType}();
 				${field.name}Value.Decode(buffer);
-			    ${field.name?cap_first}.Add(${field.name}Key, ${field.name}Value);
+			    ${field.name}.Add(${field.name}Key, ${field.name}Value);
 		</#if>
 		    }
         <#if field?has_next && !selfFields[field?index+1].collectionType && (selfFields[field?index+1].primitiveType || !selfFields[field?index+1].optional) >
 
         </#if>
 	<#elseif field.type=="float"||field.type=="double">
-			${field.name?cap_first} = buffer.Read${field.type?cap_first}(<#if field.scale gt 0>${field.scale}</#if>);
+			${field.name} = buffer.Read${field.type?cap_first}(<#if field.scale gt 0>${field.scale}</#if>);
 	<#elseif field.builtinType>
-		    ${field.name?cap_first} = buffer.Read${field.type?cap_first}();
+		    ${field.name} = buffer.Read${field.type?cap_first}();
 	<#elseif field.enumType>
-		    ${field.name?cap_first} = (${field.type})buffer.ReadInt();
+		    ${field.name} = (${field.type})buffer.ReadInt();
 	<#elseif field.optional>
 		<#if field?index gt 0>
 
         </#if>
 		    if (buffer.ReadBool()) {
-		        if (${field.name?cap_first} == null) 
+		        if (${field.name} == null)
 				{
-		            ${field.name?cap_first} = new ${field.classType}();
+		            ${field.name} = new ${field.classType}();
 		        }
-		        ${field.name?cap_first}.Decode(buffer);
+		        ${field.name}.Decode(buffer);
             }
         <#if field?has_next && !selfFields[field?index+1].collectionType && (selfFields[field?index+1].primitiveType || !selfFields[field?index+1].optional) >
 
         </#if>
 	<#else>
-		    ${field.name?cap_first}.Decode(buffer);
+		    ${field.name}.Decode(buffer);
 	</#if>
 </#list>
 </#if>
@@ -379,13 +379,13 @@ namespace ${getFullPackageName("cs")}
 				   	<#lt>,<#rt>
 				</#if>
 				<#if field.type == "string">
-				   	<#lt>${field.name}='" + ${field.name?cap_first} + '\'' +
+				   	<#lt>${field.name}='" + ${field.name} + '\'' +
 				<#elseif field.type == "bytes">
-				   	<#lt>${field.name}=" + ${field.name?cap_first}.ToString2() +
+				   	<#lt>${field.name}=" + ${field.name}.ToString2() +
 				<#elseif field.collectionType>
-				   	<#lt>${field.name}=" + ${field.name?cap_first}.ToString2() +
+				   	<#lt>${field.name}=" + ${field.name}.ToString2() +
 				<#else>
-				   	<#lt>${field.name}=" + ${field.name?cap_first}.ToString2() +
+				   	<#lt>${field.name}=" + ${field.name}.ToString2() +
 				</#if>
 			</#list>
 				   '}';

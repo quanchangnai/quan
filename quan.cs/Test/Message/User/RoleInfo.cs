@@ -14,14 +14,14 @@ namespace Test.Message.User
         /// <summary>
 		/// 角色id
 		/// </summary>
-		public long Id { get; set; }
+		public long id { get; set; }
 
 		private string _name = "";
 
         /// <summary>
 		/// 角色名
 		/// </summary>
-		public string Name
+		public string name
 		{
 	    	get => _name;
 	    	set => _name = value ?? throw new NullReferenceException();
@@ -32,23 +32,23 @@ namespace Test.Message.User
 		{
 	    	base.Encode(buffer);
 
-		    buffer.WriteLong(Id);
-		    buffer.WriteString(Name);
+		    buffer.WriteLong(id);
+		    buffer.WriteString(name);
 		}
 
 		public override void Decode(Buffer buffer)
 		{
 	    	base.Decode(buffer);
 
-		    Id = buffer.ReadLong();
-		    Name = buffer.ReadString();
+		    id = buffer.ReadLong();
+		    name = buffer.ReadString();
 		}
 
 		public override string ToString()
 		{
 			return "RoleInfo{" +
-				   "id=" + Id.ToString2() +
-				   ",name='" + Name + '\'' +
+				   "id=" + id.ToString2() +
+				   ",name='" + name + '\'' +
 				   '}';
 		}
     }

@@ -10,12 +10,12 @@ namespace Test.Config.Item
 	/// </summary>
     public class UseEffect : Bean
     {
-        public readonly int Aaa;
+        public readonly int aaa;
 
 
         public UseEffect(JObject json) : base(json)
         {
-            Aaa = json["aaa"]?.Value<int>() ?? default;
+            aaa = json["aaa"]?.Value<int>() ?? default;
         }
 
         public static UseEffect Create(JObject json)
@@ -39,7 +39,7 @@ namespace Test.Config.Item
         public override string ToString()
         {
             return "UseEffect{" +
-                   "Aaa=" + Aaa.ToString2() +
+                   "aaa=" + aaa.ToString2() +
                    '}';
         }
     }

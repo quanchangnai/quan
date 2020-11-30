@@ -1,9 +1,9 @@
-using System.Collections.Generic;
-using System.Collections.Immutable;
 using Newtonsoft.Json.Linq;
 using Quan.Common.Utils;
 using Quan.Config;
 using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace Test.Config.Quest
 {
@@ -16,27 +16,27 @@ namespace Test.Config.Quest
         /// <summary>
         /// ID
         /// </summary>
-        public readonly int Id;
+        public readonly int id;
 
         /// <summary>
         /// 名字
         /// </summary>
-        public readonly string Name;
+        public readonly string name;
 
         /// <summary>
         /// 中午
         /// </summary>
-        public readonly DateTime Noon;
+        public readonly DateTime noon;
 
-        public readonly string Noon_;
+        public readonly string noon_;
 
 
         public QuestTargetConfig(JObject json) : base(json)
         {
-            Id = json["id"]?.Value<int>() ?? default;
-            Name = json["name"]?.Value<string>() ?? "";
-            Noon = ToDateTime(json["noon"]?.Value<long>() ?? default);
-            Noon_ = json["noon_"]?.Value<string>() ?? "";
+            id = json["id"]?.Value<int>() ?? default;
+            name = json["name"]?.Value<string>() ?? "";
+            noon = ToDateTime(json["noon"]?.Value<long>() ?? default);
+            noon_ = json["noon_"]?.Value<string>() ?? "";
         }
 
         protected override ConfigBase Create(JObject json)
@@ -47,9 +47,9 @@ namespace Test.Config.Quest
         public override string ToString()
         {
             return "QuestTargetConfig{" +
-                   "Id=" + Id.ToString2() +
-                   ",Name='" + Name + '\'' +
-                   ",Noon='" + Noon_ + '\'' +
+                   "id=" + id.ToString2() +
+                   ",name='" + name + '\'' +
+                   ",noon='" + noon_ + '\'' +
                    '}';
         }
 
@@ -82,7 +82,7 @@ namespace Test.Config.Quest
 
             foreach (var config in configs)
             {
-                Load(idConfigs, config, config.Id);
+                Load(idConfigs, config, config.id);
             }
 
             configs = configs.ToImmutableList();

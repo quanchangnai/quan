@@ -1,6 +1,7 @@
 using Newtonsoft.Json.Linq;
 using Quan.Common.Utils;
 using Quan.Config;
+using System.Collections.Generic;
 using Test.Config.Item;
 
 namespace Test.Config.Common
@@ -11,17 +12,17 @@ namespace Test.Config.Common
 	/// </summary>
     public class Reward : Bean
     {
-        public readonly int ItemId;
+        public readonly int itemId;
 
-        public ItemConfig ItemId_Ref => ItemConfig.GetById(ItemId);
+        public ItemConfig itemId_Ref => ItemConfig.GetById(itemId);
 
-        public readonly int ItemNum;
+        public readonly int itemNum;
 
 
         public Reward(JObject json) : base(json)
         {
-            ItemId = json["itemId"]?.Value<int>() ?? default;
-            ItemNum = json["itemNum"]?.Value<int>() ?? default;
+            itemId = json["itemId"]?.Value<int>() ?? default;
+            itemNum = json["itemNum"]?.Value<int>() ?? default;
         }
 
         public static Reward Create(JObject json)
@@ -32,8 +33,8 @@ namespace Test.Config.Common
         public override string ToString()
         {
             return "Reward{" +
-                   "ItemId=" + ItemId.ToString2() +
-                   ",ItemNum=" + ItemNum.ToString2() +
+                   "itemId=" + itemId.ToString2() +
+                   ",itemNum=" + itemNum.ToString2() +
                    '}';
         }
     }

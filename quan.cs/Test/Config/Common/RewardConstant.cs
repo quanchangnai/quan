@@ -14,11 +14,11 @@ namespace Test.Config.Common
             _key = key;
         }
 
-        public IList<Test.Config.Item.Reward> Value => ConstantConfig.GetByKey(_key).RewardList;
+        public IList<Test.Config.Item.Reward> Value => ConstantConfig.GetByKey(_key).rewardList;
 
 
-        public static readonly RewardConstant Constant1 = new RewardConstant("constant1");
+        public static readonly RewardConstant constant1 = new RewardConstant("constant1");
 
-        public static readonly RewardConstant Constant2 = new RewardConstant("constant2");
+        public static readonly RewardConstant constant2 = new RewardConstant("constant2");
     }
 }

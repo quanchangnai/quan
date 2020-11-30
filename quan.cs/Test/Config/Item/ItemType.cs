@@ -9,12 +9,12 @@ namespace Test.Config.Item
         /// <summary>
         /// 道具类型1
         /// </summary>
-        Type1 = 1,
+        type1 = 1,
 
         /// <summary>
         /// 道具类型2
         /// </summary>
-        Type2 = 2
+        type2 = 2
 
     }
 }

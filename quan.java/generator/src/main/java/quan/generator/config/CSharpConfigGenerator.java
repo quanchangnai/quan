@@ -4,7 +4,7 @@ import quan.definition.BeanDefinition;
 import quan.definition.ClassDefinition;
 import quan.definition.FieldDefinition;
 import quan.definition.Language;
-import quan.definition.config.ConstantDefinition;
+import quan.definition.config.ConfigDefinition;
 
 import java.util.Properties;
 
@@ -57,22 +57,30 @@ public class CSharpConfigGenerator extends ConfigGenerator {
     }
 
     @Override
-    protected void prepareField(FieldDefinition fieldDefinition) {
-        super.prepareField(fieldDefinition);
-        ClassDefinition owner = fieldDefinition.getOwner();
-        if (!fieldDefinition.isTimeType()) {
-            return;
-        }
-        if (!(owner instanceof BeanDefinition) || ((BeanDefinition) owner).getSelfFields().contains(fieldDefinition)) {
-            owner.getImports().put("System",null);
+    protected void prepareClass(ClassDefinition classDefinition) {
+        super.prepareClass(classDefinition);
+        if (classDefinition instanceof ConfigDefinition) {
+            classDefinition.getImports().put("System.Collections.Generic", null);
+            classDefinition.getImports().put("System.Collections.Immutable", null);
         }
     }
 
     @Override
-    protected void prepareConstant(ConstantDefinition constantDefinition) {
-        super.prepareConstant(constantDefinition);
-        if (constantDefinition.getValueField().isCollectionType()) {
-            constantDefinition.getImports().put("System.Collections.Generic", null);
+    protected void prepareField(FieldDefinition fieldDefinition) {
+        super.prepareField(fieldDefinition);
+        ClassDefinition classDefinition = fieldDefinition.getOwner();
+
+        if (fieldDefinition.isCollectionType() || fieldDefinition.isSimpleRef() && classDefinition instanceof BeanDefinition) {
+            classDefinition.getImports().put("System.Collections.Generic", null);
         }
+
+        if (fieldDefinition.isTimeType()) {
+            if (!(classDefinition instanceof BeanDefinition) || ((BeanDefinition) classDefinition).getSelfFields().contains(fieldDefinition)) {
+                classDefinition.getImports().put("System", null);
+            }
+        }
+
+
     }
+
 }

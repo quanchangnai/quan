@@ -1,5 +1,6 @@
 using Newtonsoft.Json.Linq;
 using Quan.Common.Utils;
+using System.Collections.Generic;
 
 namespace Test.Config.Item
 {
@@ -9,14 +10,14 @@ namespace Test.Config.Item
 	/// </summary>
     public class UseEffect4 : UseEffect
     {
-        public readonly ItemType ItemType;
+        public readonly ItemType itemType;
 
-        public IList<ItemConfig> ItemType_Ref => ItemConfig.GetByType(ItemType);
+        public IList<ItemConfig> itemType_Ref => ItemConfig.GetByType(itemType);
 
 
         public UseEffect4(JObject json) : base(json)
         {
-            ItemType = (ItemType) (json["itemType"]?.Value<int>() ?? default);
+            itemType = (ItemType) (json["itemType"]?.Value<int>() ?? default);
         }
 
         public new static UseEffect4 Create(JObject json)
@@ -27,8 +28,8 @@ namespace Test.Config.Item
         public override string ToString()
         {
             return "UseEffect4{" +
-                   "Aaa=" + Aaa.ToString2() +
-                   ",ItemType=" + ItemType.ToString2() +
+                   "aaa=" + aaa.ToString2() +
+                   ",itemType=" + itemType.ToString2() +
                    '}';
         }
     }

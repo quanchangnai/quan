@@ -1,8 +1,8 @@
-using System.Collections.Generic;
-using System.Collections.Immutable;
 using Newtonsoft.Json.Linq;
 using Quan.Common.Utils;
 using Quan.Config;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using Test.Config.Item;
 
 namespace Test.Config.Quest
@@ -16,113 +16,113 @@ namespace Test.Config.Quest
         /// <summary>
         /// ID
         /// </summary>
-        public readonly int Id;
+        public readonly int id;
 
         /// <summary>
         /// 名字
         /// </summary>
-        public readonly string Name;
+        public readonly string name;
 
         /// <summary>
         /// 类型
         /// </summary>
-        public readonly QuestType Type;
+        public readonly QuestType type;
 
         /// <summary>
         /// 任务目标
         /// </summary>
-        public readonly int Target;
+        public readonly int target;
 
-        public QuestTargetConfig Target_Ref => QuestTargetConfig.GetById(Target);
+        public QuestTargetConfig target_Ref => QuestTargetConfig.GetById(target);
 
         /// <summary>
         /// 奖励
         /// </summary>
-        public readonly Reward Reward;
+        public readonly Reward reward;
 
         /// <summary>
         /// A1
         /// </summary>
-        public readonly int A1;
+        public readonly int a1;
 
         /// <summary>
         /// A2
         /// </summary>
-        public readonly int A2;
+        public readonly int a2;
 
         /// <summary>
         /// B1
         /// </summary>
-        public readonly int B1;
+        public readonly int b1;
 
         /// <summary>
         /// B2
         /// </summary>
-        public readonly bool B2;
+        public readonly bool b2;
 
         /// <summary>
         /// C1
         /// </summary>
-        public readonly string C1;
+        public readonly string c1;
 
         /// <summary>
         /// C2
         /// </summary>
-        public readonly int C2;
+        public readonly int c2;
 
         /// <summary>
         /// C3
         /// </summary>
-        public readonly int C3;
+        public readonly int c3;
 
         /// <summary>
         /// D1
         /// </summary>
-        public readonly string D1;
+        public readonly string d1;
 
         /// <summary>
         /// D2
         /// </summary>
-        public readonly int D2;
+        public readonly int d2;
 
         /// <summary>
         /// D3
         /// </summary>
-        public readonly int D3;
+        public readonly int d3;
 
         /// <summary>
         /// S1
         /// </summary>
-        public readonly ISet<int> S1;
+        public readonly ISet<int> s1;
 
         /// <summary>
         /// L1
         /// </summary>
-        public readonly IList<int> L1;
+        public readonly IList<int> l1;
 
         /// <summary>
         /// M1
         /// </summary>
-        public readonly IDictionary<int, int> M1;
+        public readonly IDictionary<int, int> m1;
 
 
         public QuestConfig(JObject json) : base(json)
         {
-            Id = json["id"]?.Value<int>() ?? default;
-            Name = json["name"]?.Value<string>() ?? "";
-            Type = (QuestType) (json["type"]?.Value<int>() ?? default);
-            Target = json["target"]?.Value<int>() ?? default;
-            Reward = json.ContainsKey("reward") ? Reward.Create(json["reward"].Value<JObject>()) : null;
-            A1 = json["a1"]?.Value<int>() ?? default;
-            A2 = json["a2"]?.Value<int>() ?? default;
-            B1 = json["b1"]?.Value<int>() ?? default;
-            B2 = json["b2"]?.Value<bool>() ?? default;
-            C1 = json["c1"]?.Value<string>() ?? "";
-            C2 = json["c2"]?.Value<int>() ?? default;
-            C3 = json["c3"]?.Value<int>() ?? default;
-            D1 = json["d1"]?.Value<string>() ?? "";
-            D2 = json["d2"]?.Value<int>() ?? default;
-            D3 = json["d3"]?.Value<int>() ?? default;
+            id = json["id"]?.Value<int>() ?? default;
+            name = json["name"]?.Value<string>() ?? "";
+            type = (QuestType) (json["type"]?.Value<int>() ?? default);
+            target = json["target"]?.Value<int>() ?? default;
+            reward = json.ContainsKey("reward") ? Reward.Create(json["reward"].Value<JObject>()) : null;
+            a1 = json["a1"]?.Value<int>() ?? default;
+            a2 = json["a2"]?.Value<int>() ?? default;
+            b1 = json["b1"]?.Value<int>() ?? default;
+            b2 = json["b2"]?.Value<bool>() ?? default;
+            c1 = json["c1"]?.Value<string>() ?? "";
+            c2 = json["c2"]?.Value<int>() ?? default;
+            c3 = json["c3"]?.Value<int>() ?? default;
+            d1 = json["d1"]?.Value<string>() ?? "";
+            d2 = json["d2"]?.Value<int>() ?? default;
+            d3 = json["d3"]?.Value<int>() ?? default;
 
             var s11 = json["s1"]?.Value<JArray>();
             var s12 = ImmutableHashSet<int>.Empty;
@@ -133,7 +133,7 @@ namespace Test.Config.Quest
                     s12 =s12.Add(s1Value.Value<int>());
                 }
             }
-            S1 = s12;
+            s1 = s12;
 
             var l11 = json["l1"]?.Value<JArray>();
             var l12 = ImmutableList<int>.Empty;
@@ -144,7 +144,7 @@ namespace Test.Config.Quest
                     l12 =l12.Add(l1Value.Value<int>());
                 }
             }
-            L1 = l12;
+            l1 = l12;
 
             var m11 = json["m1"]?.Value<JObject>();
             var m12 = ImmutableDictionary<int, int>.Empty;
@@ -155,7 +155,7 @@ namespace Test.Config.Quest
                     m12 = m12.Add(int.Parse(m1KeyValue.Key), m1KeyValue.Value.Value<int>());
                 }
             }
-            M1 = m12;
+            m1 = m12;
         }
 
         protected override ConfigBase Create(JObject json)
@@ -166,24 +166,24 @@ namespace Test.Config.Quest
         public override string ToString()
         {
             return "QuestConfig{" +
-                   "Id=" + Id.ToString2() +
-                   ",Name='" + Name + '\'' +
-                   ",Type=" + Type.ToString2() +
-                   ",Target=" + Target.ToString2() +
-                   ",Reward=" + Reward.ToString2() +
-                   ",A1=" + A1.ToString2() +
-                   ",A2=" + A2.ToString2() +
-                   ",B1=" + B1.ToString2() +
-                   ",B2=" + B2.ToString2() +
-                   ",C1='" + C1 + '\'' +
-                   ",C2=" + C2.ToString2() +
-                   ",C3=" + C3.ToString2() +
-                   ",D1='" + D1 + '\'' +
-                   ",D2=" + D2.ToString2() +
-                   ",D3=" + D3.ToString2() +
-                   ",S1=" + S1.ToString2() +
-                   ",L1=" + L1.ToString2() +
-                   ",M1=" + M1.ToString2() +
+                   "id=" + id.ToString2() +
+                   ",name='" + name + '\'' +
+                   ",type=" + type.ToString2() +
+                   ",target=" + target.ToString2() +
+                   ",reward=" + reward.ToString2() +
+                   ",a1=" + a1.ToString2() +
+                   ",a2=" + a2.ToString2() +
+                   ",b1=" + b1.ToString2() +
+                   ",b2=" + b2.ToString2() +
+                   ",c1='" + c1 + '\'' +
+                   ",c2=" + c2.ToString2() +
+                   ",c3=" + c3.ToString2() +
+                   ",d1='" + d1 + '\'' +
+                   ",d2=" + d2.ToString2() +
+                   ",d3=" + d3.ToString2() +
+                   ",s1=" + s1.ToString2() +
+                   ",l1=" + l1.ToString2() +
+                   ",m1=" + m1.ToString2() +
                    '}';
         }
 
@@ -327,12 +327,12 @@ namespace Test.Config.Quest
 
             foreach (var config in configs)
             {
-                Load(composite1Configs, config, config.A1, config.A2);
-                Load(composite2Configs, config, config.B1, config.B2);
-                Load(composite3Configs, config, config.C1, config.C2, config.C3);
-                Load(composite4Configs, config, config.D1, config.D2, config.D3);
-                Load(idConfigs, config, config.Id);
-                Load(typeConfigs, config, config.Type);
+                Load(composite1Configs, config, config.a1, config.a2);
+                Load(composite2Configs, config, config.b1, config.b2);
+                Load(composite3Configs, config, config.c1, config.c2, config.c3);
+                Load(composite4Configs, config, config.d1, config.d2, config.d3);
+                Load(idConfigs, config, config.id);
+                Load(typeConfigs, config, config.type);
             }
 
             configs = configs.ToImmutableList();

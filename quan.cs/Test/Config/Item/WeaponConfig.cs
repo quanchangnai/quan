@@ -1,8 +1,8 @@
-using System.Collections.Generic;
-using System.Collections.Immutable;
 using Newtonsoft.Json.Linq;
 using Quan.Common.Utils;
 using Quan.Config;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace Test.Config.Item
 {
@@ -15,38 +15,38 @@ namespace Test.Config.Item
         /// <summary>
         /// 字段1
         /// </summary>
-        public readonly int W1;
+        public readonly int w1;
 
         /// <summary>
         /// 字段2
         /// </summary>
-        public readonly int W2;
+        public readonly int w2;
 
         /// <summary>
         /// 奖励List
         /// </summary>
-        public readonly IList<Reward> RewardList;
+        public readonly IList<Reward> rewardList;
 
         /// <summary>
         /// 奖励Set
         /// </summary>
-        public readonly ISet<Reward> RewardSet;
+        public readonly ISet<Reward> rewardSet;
 
         /// <summary>
         /// 奖励Map
         /// </summary>
-        public readonly IDictionary<int, Reward> RewardMap;
+        public readonly IDictionary<int, Reward> rewardMap;
 
         /// <summary>
         /// List2
         /// </summary>
-        public readonly IList<int> List2;
+        public readonly IList<int> list2;
 
 
         public WeaponConfig(JObject json) : base(json)
         {
-            W1 = json["w1"]?.Value<int>() ?? default;
-            W2 = json["w2"]?.Value<int>() ?? default;
+            w1 = json["w1"]?.Value<int>() ?? default;
+            w2 = json["w2"]?.Value<int>() ?? default;
 
             var rewardList1 = json["rewardList"]?.Value<JArray>();
             var rewardList2 = ImmutableList<Reward>.Empty;
@@ -57,7 +57,7 @@ namespace Test.Config.Item
                     rewardList2 =rewardList2.Add(Reward.Create(rewardListValue.Value<JObject>()));
                 }
             }
-            RewardList = rewardList2;
+            rewardList = rewardList2;
 
             var rewardSet1 = json["rewardSet"]?.Value<JArray>();
             var rewardSet2 = ImmutableHashSet<Reward>.Empty;
@@ -68,7 +68,7 @@ namespace Test.Config.Item
                     rewardSet2 =rewardSet2.Add(Reward.Create(rewardSetValue.Value<JObject>()));
                 }
             }
-            RewardSet = rewardSet2;
+            rewardSet = rewardSet2;
 
             var rewardMap1 = json["rewardMap"]?.Value<JObject>();
             var rewardMap2 = ImmutableDictionary<int, Reward>.Empty;
@@ -79,7 +79,7 @@ namespace Test.Config.Item
                     rewardMap2 = rewardMap2.Add(int.Parse(rewardMapKeyValue.Key), Reward.Create(rewardMapKeyValue.Value.Value<JObject>()));
                 }
             }
-            RewardMap = rewardMap2;
+            rewardMap = rewardMap2;
 
             var list21 = json["list2"]?.Value<JArray>();
             var list22 = ImmutableList<int>.Empty;
@@ -90,7 +90,7 @@ namespace Test.Config.Item
                     list22 =list22.Add(list2Value.Value<int>());
                 }
             }
-            List2 = list22;
+            list2 = list22;
         }
 
         protected override ConfigBase Create(JObject json)
@@ -101,24 +101,24 @@ namespace Test.Config.Item
         public override string ToString()
         {
             return "WeaponConfig{" +
-                   "Id=" + Id.ToString2() +
-                   ",Key='" + Key + '\'' +
-                   ",Name='" + Name + '\'' +
-                   ",Type=" + Type.ToString2() +
-                   ",UseEffect=" + UseEffect.ToString2() +
-                   ",Reward=" + Reward.ToString2() +
-                   ",List=" + List.ToString2() +
-                   ",Set=" + Set.ToString2() +
-                   ",Map=" + Map.ToString2() +
-                   ",EffectiveTime='" + EffectiveTime_ + '\'' +
-                   ",Position=" + Position.ToString2() +
-                   ",Color=" + Color.ToString2() +
-                   ",W1=" + W1.ToString2() +
-                   ",W2=" + W2.ToString2() +
-                   ",RewardList=" + RewardList.ToString2() +
-                   ",RewardSet=" + RewardSet.ToString2() +
-                   ",RewardMap=" + RewardMap.ToString2() +
-                   ",List2=" + List2.ToString2() +
+                   "id=" + id.ToString2() +
+                   ",key='" + key + '\'' +
+                   ",name='" + name + '\'' +
+                   ",type=" + type.ToString2() +
+                   ",useEffect=" + useEffect.ToString2() +
+                   ",reward=" + reward.ToString2() +
+                   ",list=" + list.ToString2() +
+                   ",set=" + set.ToString2() +
+                   ",map=" + map.ToString2() +
+                   ",effectiveTime='" + effectiveTime_ + '\'' +
+                   ",position=" + position.ToString2() +
+                   ",color=" + color.ToString2() +
+                   ",w1=" + w1.ToString2() +
+                   ",w2=" + w2.ToString2() +
+                   ",rewardList=" + rewardList.ToString2() +
+                   ",rewardSet=" + rewardSet.ToString2() +
+                   ",rewardMap=" + rewardMap.ToString2() +
+                   ",list2=" + list2.ToString2() +
                    '}';
         }
 
@@ -236,12 +236,12 @@ namespace Test.Config.Item
 
             foreach (var config in configs)
             {
-                ConfigBase.Load(idConfigs, config, config.Id);
-                ConfigBase.Load(keyConfigs, config, config.Key);
-                ConfigBase.Load(typeConfigs, config, config.Type);
-                ConfigBase.Load(positionConfigs, config, config.Position);
-                ConfigBase.Load(composite1Configs, config, config.Color, config.W1);
-                ConfigBase.Load(composite2Configs, config, config.W1, config.W2);
+                ConfigBase.Load(idConfigs, config, config.id);
+                ConfigBase.Load(keyConfigs, config, config.key);
+                ConfigBase.Load(typeConfigs, config, config.type);
+                ConfigBase.Load(positionConfigs, config, config.position);
+                ConfigBase.Load(composite1Configs, config, config.color, config.w1);
+                ConfigBase.Load(composite2Configs, config, config.w1, config.w2);
             }
 
             configs = configs.ToImmutableList();

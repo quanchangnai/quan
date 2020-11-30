@@ -60,20 +60,20 @@ namespace Test
         {
             Console.WriteLine("Test2====================");
 
-            var sRoleLogin1 = new SRoleLogin {RoleId = 1111, RoleName = "张三1111"};
+            var sRoleLogin1 = new SRoleLogin {roleId = 1111, roleName = "张三1111"};
 
-            var roleInfo1 = new RoleInfo {Id = 111, Name = "aaa", Type = RoleType.Type1};
+            var roleInfo1 = new RoleInfo {id = 111, name = "aaa", type = RoleType.type1};
 
-            sRoleLogin1.RoleInfo = roleInfo1;
+            sRoleLogin1.roleInfo = roleInfo1;
 
-            var roleInfo2 = new RoleInfo {Id = 222, Name = "bbb", Type = RoleType.Type2};
-            roleInfo2.Set.Add(2213);
+            var roleInfo2 = new RoleInfo {id = 222, name = "bbb", type = RoleType.type2};
+            roleInfo2.set.Add(2213);
 
-            sRoleLogin1.RoleInfoList.Add(roleInfo2);
-            sRoleLogin1.RoleInfoList.Add(roleInfo2);
-            sRoleLogin1.RoleInfoSet.Add(roleInfo2);
-            sRoleLogin1.RoleInfoSet.Add(roleInfo2);
-            sRoleLogin1.RoleInfoMap.Add(roleInfo2.Id, roleInfo2);
+            sRoleLogin1.roleInfoList.Add(roleInfo2);
+            sRoleLogin1.roleInfoList.Add(roleInfo2);
+            sRoleLogin1.roleInfoSet.Add(roleInfo2);
+            sRoleLogin1.roleInfoSet.Add(roleInfo2);
+            sRoleLogin1.roleInfoMap.Add(roleInfo2.id, roleInfo2);
 
             Console.WriteLine("sRoleLogin1:" + sRoleLogin1);
 
@@ -117,11 +117,11 @@ namespace Test
         {
             Console.WriteLine("Test4====================");
 
-            var sRoleLogin1 = new SRoleLogin {RoleId = 1111, RoleName = "张三1111"};
+            var sRoleLogin1 = new SRoleLogin {roleId = 1111, roleName = "张三1111"};
 
-            var roleInfo = new RoleInfo {Id = 1312, Name = "李四1123123", F = 343.435F, D = 4242.54453D};
+            var roleInfo = new RoleInfo {id = 1312, name = "李四1123123", f = 343.435F, d = 4242.54453D};
 
-            sRoleLogin1.RoleInfo = roleInfo;
+            sRoleLogin1.roleInfo = roleInfo;
 
 
             var encodedBytes = sRoleLogin1.Encode();

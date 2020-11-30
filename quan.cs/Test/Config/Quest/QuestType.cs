@@ -9,12 +9,12 @@ namespace Test.Config.Quest
         /// <summary>
         /// 主线
         /// </summary>
-        Main = 1,
+        main = 1,
 
         /// <summary>
         /// 支线
         /// </summary>
-        Branch = 2
+        branch = 2
 
     }
 }

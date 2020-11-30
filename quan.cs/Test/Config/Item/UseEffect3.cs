@@ -9,12 +9,12 @@ namespace Test.Config.Item
 	/// </summary>
     public class UseEffect3 : UseEffect
     {
-        public readonly int Ccc;
+        public readonly int ccc;
 
 
         public UseEffect3(JObject json) : base(json)
         {
-            Ccc = json["ccc"]?.Value<int>() ?? default;
+            ccc = json["ccc"]?.Value<int>() ?? default;
         }
 
         public new static UseEffect3 Create(JObject json)
@@ -25,8 +25,8 @@ namespace Test.Config.Item
         public override string ToString()
         {
             return "UseEffect3{" +
-                   "Aaa=" + Aaa.ToString2() +
-                   ",Ccc=" + Ccc.ToString2() +
+                   "aaa=" + aaa.ToString2() +
+                   ",ccc=" + ccc.ToString2() +
                    '}';
         }
     }

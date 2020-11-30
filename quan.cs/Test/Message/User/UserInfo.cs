@@ -15,14 +15,14 @@ namespace Test.Message.User
         /// <summary>
 		/// ID
 		/// </summary>
-		public long Id { get; set; }
+		public long id { get; set; }
 
 		private string _name = "";
 
         /// <summary>
 		/// 名字
 		/// </summary>
-		public string Name
+		public string name
 		{
 	    	get => _name;
 	    	set => _name = value ?? throw new NullReferenceException();
@@ -31,19 +31,19 @@ namespace Test.Message.User
         /// <summary>
 		/// 等级
 		/// </summary>
-		public int Level { get; set; }
+		public int level { get; set; }
 
         /// <summary>
 		/// 角色信息
 		/// </summary>
-		public Test.Message.Role.RoleInfo RoleInfo1 { get; set; }
+		public Test.Message.Role.RoleInfo roleInfo1 { get; set; }
 
 		private RoleInfo _roleInfo2 = new RoleInfo();
 
         /// <summary>
 		/// 角色信息2
 		/// </summary>
-		public RoleInfo RoleInfo2
+		public RoleInfo roleInfo2
 		{
 	    	get => _roleInfo2;
 	    	set => _roleInfo2 = value ?? throw new NullReferenceException();
@@ -54,7 +54,7 @@ namespace Test.Message.User
         /// <summary>
 		/// 角色信息2
 		/// </summary>
-		public RoleInfo RoleInfo3
+		public RoleInfo roleInfo3
 		{
 	    	get => _roleInfo3;
 	    	set => _roleInfo3 = value ?? throw new NullReferenceException();
@@ -63,17 +63,17 @@ namespace Test.Message.User
         /// <summary>
 		/// 角色信息List
 		/// </summary>
-		public List<Test.Message.Role.RoleInfo> RoleList { get; } = new List<Test.Message.Role.RoleInfo>();
+		public List<Test.Message.Role.RoleInfo> roleList { get; } = new List<Test.Message.Role.RoleInfo>();
 
         /// <summary>
 		/// 角色信息Set
 		/// </summary>
-		public HashSet<Test.Message.Role.RoleInfo> RoleSet { get; } = new HashSet<Test.Message.Role.RoleInfo>();
+		public HashSet<Test.Message.Role.RoleInfo> roleSet { get; } = new HashSet<Test.Message.Role.RoleInfo>();
 
         /// <summary>
 		/// 角色信息Map
 		/// </summary>
-		public Dictionary<long, Test.Message.Role.RoleInfo> RoleMap { get; } = new Dictionary<long, Test.Message.Role.RoleInfo>();
+		public Dictionary<long, Test.Message.Role.RoleInfo> roleMap { get; } = new Dictionary<long, Test.Message.Role.RoleInfo>();
 
 
 		public override void Encode(Buffer buffer)
@@ -81,52 +81,52 @@ namespace Test.Message.User
 	    	base.Encode(buffer);
 
         	buffer.WriteTag(4);
-		    buffer.WriteLong(Id);
+		    buffer.WriteLong(id);
 
         	buffer.WriteTag(11);
-		    buffer.WriteString(Name);
+		    buffer.WriteString(name);
 
         	buffer.WriteTag(12);
-		    buffer.WriteInt(Level);
+		    buffer.WriteInt(level);
 
         	buffer.WriteTag(19);
 			var roleInfo1Buffer = new Buffer();
-			roleInfo1Buffer.WriteBool(RoleInfo1 != null);
-		    RoleInfo1?.Encode(roleInfo1Buffer);
+			roleInfo1Buffer.WriteBool(roleInfo1 != null);
+		    roleInfo1?.Encode(roleInfo1Buffer);
 			buffer.WriteBuffer(roleInfo1Buffer);
 
         	buffer.WriteTag(23);
         	var roleInfo2Buffer = new Buffer();
-        	RoleInfo2.Encode(roleInfo2Buffer);
+        	roleInfo2.Encode(roleInfo2Buffer);
         	buffer.WriteBuffer(roleInfo2Buffer);
 
         	buffer.WriteTag(27);
         	var roleInfo3Buffer = new Buffer();
-        	RoleInfo3.Encode(roleInfo3Buffer);
+        	roleInfo3.Encode(roleInfo3Buffer);
         	buffer.WriteBuffer(roleInfo3Buffer);
 
         	buffer.WriteTag(31);
 			var roleListBuffer = new Buffer();
-			roleListBuffer.WriteInt(RoleList.Count);
-		    foreach (var roleListValue in RoleList) {
+			roleListBuffer.WriteInt(roleList.Count);
+		    foreach (var roleListValue in roleList) {
 				roleListValue.Encode(roleListBuffer);
 		    }
 			buffer.WriteBuffer(roleListBuffer);
 
         	buffer.WriteTag(35);
 			var roleSetBuffer = new Buffer();
-			roleSetBuffer.WriteInt(RoleSet.Count);
-		    foreach (var roleSetValue in RoleSet) {
+			roleSetBuffer.WriteInt(roleSet.Count);
+		    foreach (var roleSetValue in roleSet) {
 				roleSetValue.Encode(roleSetBuffer);
 		    }
 			buffer.WriteBuffer(roleSetBuffer);
 
         	buffer.WriteTag(39);
 			var roleMapBuffer = new Buffer();
-			roleMapBuffer.WriteInt(RoleMap.Count);
-		    foreach (var roleMapKey in RoleMap.Keys) {
+			roleMapBuffer.WriteInt(roleMap.Count);
+		    foreach (var roleMapKey in roleMap.Keys) {
 		        roleMapBuffer.WriteLong(roleMapKey);
-			    RoleMap[roleMapKey].Encode(roleMapBuffer);
+			    roleMap[roleMapKey].Encode(roleMapBuffer);
 		    }
 			buffer.WriteBuffer(roleMapBuffer);
 
@@ -142,32 +142,32 @@ namespace Test.Message.User
             	switch (tag) 
 				{
                 	case 4:
-                    	Id = buffer.ReadLong();
+                    	id = buffer.ReadLong();
                     	break;
                 	case 11:
-                    	Name = buffer.ReadString();
+                    	name = buffer.ReadString();
                     	break;
                 	case 12:
-                    	Level = buffer.ReadInt();
+                    	level = buffer.ReadInt();
                     	break;
                 	case 19:
                     	buffer.ReadInt();
                     	if (buffer.ReadBool()) 
 						{
-		        			if (RoleInfo1 == null) 
+		        			if (roleInfo1 == null)
 							{
-		            			RoleInfo1 = new Test.Message.Role.RoleInfo();
+		            			roleInfo1 = new Test.Message.Role.RoleInfo();
 		        			}
-		        			RoleInfo1.Decode(buffer);
+		        			roleInfo1.Decode(buffer);
             			}
                     	break;
                 	case 23:
                     	buffer.ReadInt();
-                    	RoleInfo2.Decode(buffer);
+                    	roleInfo2.Decode(buffer);
                     	break;
                 	case 27:
                     	buffer.ReadInt();
-                    	RoleInfo3.Decode(buffer);
+                    	roleInfo3.Decode(buffer);
                     	break;
                 	case 31:
                     	buffer.ReadInt();
@@ -176,7 +176,7 @@ namespace Test.Message.User
 						{
 			    			var roleListValue = new Test.Message.Role.RoleInfo();
 			  				roleListValue.Decode(buffer);
-			    			RoleList.Add(roleListValue);
+			    			roleList.Add(roleListValue);
 		    			}
                     	break;
                 	case 35:
@@ -186,7 +186,7 @@ namespace Test.Message.User
 						{
 			    			var roleSetValue = new Test.Message.Role.RoleInfo();
 			  				roleSetValue.Decode(buffer);
-			    			RoleSet.Add(roleSetValue);
+			    			roleSet.Add(roleSetValue);
 		    			}
                     	break;
                 	case 39:
@@ -197,7 +197,7 @@ namespace Test.Message.User
 			    			var roleMapKey = buffer.ReadLong();
 			    			var roleMapValue = new Test.Message.Role.RoleInfo();
 							roleMapValue.Decode(buffer);
-			    			RoleMap.Add(roleMapKey, roleMapValue);
+			    			roleMap.Add(roleMapKey, roleMapValue);
 						}
                     	break;
                 	default:
@@ -210,15 +210,15 @@ namespace Test.Message.User
 		public override string ToString()
 		{
 			return "UserInfo{" +
-				   "id=" + Id.ToString2() +
-				   ",name='" + Name + '\'' +
-				   ",level=" + Level.ToString2() +
-				   ",roleInfo1=" + RoleInfo1.ToString2() +
-				   ",roleInfo2=" + RoleInfo2.ToString2() +
-				   ",roleInfo3=" + RoleInfo3.ToString2() +
-				   ",roleList=" + RoleList.ToString2() +
-				   ",roleSet=" + RoleSet.ToString2() +
-				   ",roleMap=" + RoleMap.ToString2() +
+				   "id=" + id.ToString2() +
+				   ",name='" + name + '\'' +
+				   ",level=" + level.ToString2() +
+				   ",roleInfo1=" + roleInfo1.ToString2() +
+				   ",roleInfo2=" + roleInfo2.ToString2() +
+				   ",roleInfo3=" + roleInfo3.ToString2() +
+				   ",roleList=" + roleList.ToString2() +
+				   ",roleSet=" + roleSet.ToString2() +
+				   ",roleMap=" + roleMap.ToString2() +
 				   '}';
 		}
     }

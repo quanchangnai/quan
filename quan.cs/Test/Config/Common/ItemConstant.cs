@@ -8,11 +8,11 @@ namespace Test.Config.Common
         /// <summary>
         /// 常量1
         /// </summary>
-        public static int Constant1 => ConstantConfig.GetByKey("constant1").ItemId;
+        public static int constant1 => ConstantConfig.GetByKey("constant1").itemId;
 
         /// <summary>
         /// 常量3
         /// </summary>
-        public static int Constant2 => ConstantConfig.GetByKey("constant2").ItemId;
+        public static int constant2 => ConstantConfig.GetByKey("constant2").itemId;
     }
 }

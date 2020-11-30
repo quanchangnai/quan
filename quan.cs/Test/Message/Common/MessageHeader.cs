@@ -13,35 +13,35 @@ namespace Test.Message.Common
         /// <summary>
 		/// 消息序号
 		/// </summary>
-		public long Seq { get; set; }
+		public long seq { get; set; }
 
         /// <summary>
 		/// 错误码
 		/// </summary>
-		public int Error { get; set; }
+		public int error { get; set; }
 
 
 		public override void Encode(Buffer buffer)
 		{
 	    	base.Encode(buffer);
 
-		    buffer.WriteLong(Seq);
-		    buffer.WriteInt(Error);
+		    buffer.WriteLong(seq);
+		    buffer.WriteInt(error);
 		}
 
 		public override void Decode(Buffer buffer)
 		{
 	    	base.Decode(buffer);
 
-		    Seq = buffer.ReadLong();
-		    Error = buffer.ReadInt();
+		    seq = buffer.ReadLong();
+		    error = buffer.ReadInt();
 		}
 
 		public override string ToString()
 		{
 			return "MessageHeader{" +
-				   "seq=" + Seq.ToString2() +
-				   ",error=" + Error.ToString2() +
+				   "seq=" + seq.ToString2() +
+				   ",error=" + error.ToString2() +
 				   '}';
 		}
     }
