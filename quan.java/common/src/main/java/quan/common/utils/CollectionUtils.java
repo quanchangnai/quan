@@ -5,21 +5,21 @@ import java.util.*;
 public class CollectionUtils {
 
     @SafeVarargs
-    public static <E> Set<E> unmodifiableSet(E... elements) {
+    public static <E> Set<E> asSet(E... elements) {
         Set<E> set = new HashSet<>();
         Collections.addAll(set, elements);
         return Collections.unmodifiableSet(set);
     }
 
     @SafeVarargs
-    public static <E> Set<E> unmodifiableSet(Collection<E> collection, E... elements) {
+    public static <E> Set<E> asSet(Collection<E> collection, E... elements) {
         Set<E> set = new HashSet<>(collection);
         Collections.addAll(set, elements);
         return Collections.unmodifiableSet(set);
     }
 
     @SafeVarargs
-    public static <E> Set<E> unmodifiableSet(Collection<E>... collections) {
+    public static <E> Set<E> asSet(Collection<E>... collections) {
         Set<E> set = new HashSet<>();
         for (Collection<E> collection : collections) {
             set.addAll(collection);

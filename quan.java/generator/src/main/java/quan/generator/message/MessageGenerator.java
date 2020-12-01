@@ -67,7 +67,7 @@ public abstract class MessageGenerator extends Generator {
     @Override
     protected void parseDefinitions() {
         super.parseDefinitions();
-        hashId();
+        hashIds();
     }
 
     public MessageGenerator setRehashId(boolean rehashId) {
@@ -76,7 +76,7 @@ public abstract class MessageGenerator extends Generator {
     }
 
     //使用类名哈希计算消息ID
-    protected void hashId() {
+    protected void hashIds() {
         Map<Integer, MessageDefinition> definedIdMessageDefinitions = new HashMap<>();
         Set<MessageDefinition> hashIdMessageDefinitions = new HashSet<>();
 
@@ -95,10 +95,10 @@ public abstract class MessageGenerator extends Generator {
             }
         }
         //0xFFFFF正好占用3个字节,当设置了[rehashId]时，100000个坑位用于解决冲突，每次用10000个
-        hashId(definedIdMessageDefinitions, hashIdMessageDefinitions, 1, 0xFFFFF - 100000);
+        hashIds(definedIdMessageDefinitions, hashIdMessageDefinitions, 1, 0xFFFFF - 100000);
     }
 
-    protected void hashId(Map<Integer, MessageDefinition> definedIdMessageDefinitions, Set<MessageDefinition> hashIdMessageDefinitions, int begin, int end) {
+    protected void hashIds(Map<Integer, MessageDefinition> definedIdMessageDefinitions, Set<MessageDefinition> hashIdMessageDefinitions, int begin, int end) {
         Map<Integer, List<MessageDefinition>> conflictedMessagesMap = new HashMap<>();
         for (MessageDefinition messageDefinition : hashIdMessageDefinitions) {
             int messageId = begin + (messageDefinition.getLongName().hashCode() & 0x7FFFFFFF) % (end - begin);
@@ -125,7 +125,8 @@ public abstract class MessageGenerator extends Generator {
 
         //ID冲突的消息调整区间参数重新计算
         if (!allConflictedMessages.isEmpty()) {
-            hashId(definedIdMessageDefinitions, allConflictedMessages, end, end + 10000);
+            hashIds(definedIdMessageDefinitions, allConflictedMessages, end, end + 10000);
         }
     }
+
 }

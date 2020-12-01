@@ -1,8 +1,12 @@
 package quan.definition;
 
 import org.apache.commons.lang3.StringUtils;
+import quan.common.utils.CollectionUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -11,7 +15,7 @@ import java.util.regex.Pattern;
  */
 public class IndexDefinition extends Definition implements Cloneable {
 
-    public static List<String> LEGAL_TYPES = Arrays.asList("normal", "n", "unique", "u");
+    public static Set<String> LEGAL_TYPES = CollectionUtils.asSet("normal", "n", "unique", "u");
 
     private BeanDefinition owner;
 

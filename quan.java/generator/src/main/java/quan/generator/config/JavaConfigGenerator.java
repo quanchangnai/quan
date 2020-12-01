@@ -71,4 +71,5 @@ public class JavaConfigGenerator extends ConfigGenerator {
             classDefinition.getImports().put("java.util.*", null);
         }
     }
+
 }
