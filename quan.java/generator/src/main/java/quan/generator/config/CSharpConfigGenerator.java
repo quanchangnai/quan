@@ -70,7 +70,7 @@ public class CSharpConfigGenerator extends ConfigGenerator {
         super.prepareField(fieldDefinition);
         ClassDefinition classDefinition = fieldDefinition.getOwner();
 
-        if (fieldDefinition.isCollectionType() || fieldDefinition.isSimpleRef() && classDefinition instanceof BeanDefinition) {
+        if (fieldDefinition.isCollectionType() || fieldDefinition.isSimpleRef() && fieldDefinition.getRefIndex().isNormal()) {
             classDefinition.getImports().put("System.Collections.Generic", null);
         }
 
@@ -79,8 +79,6 @@ public class CSharpConfigGenerator extends ConfigGenerator {
                 classDefinition.getImports().put("System", null);
             }
         }
-
-
     }
 
 }

@@ -1,7 +1,6 @@
 using Newtonsoft.Json.Linq;
 using Quan.Common.Utils;
 using Quan.Config;
-using System.Collections.Generic;
 
 namespace Test.Config.Item
 {

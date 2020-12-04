@@ -79,7 +79,7 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
             }
         }
         this.${field.name} = Collections.unmodifiable${field.basicType}(${field.name}$2);
-        <#if field_has_next && (selfFields[field_index+1].primitiveType ||selfFields[field_index+1].timeType) >
+        <#if field_has_next && (selfFields[field_index+1].primitiveType ||selfFields[field_index+1].timeType || selfFields[field_index+1].enumType) >
 
         </#if>
     <#elseif field.type=="map">
@@ -99,20 +99,13 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
             }
         }
         this.${field.name} = Collections.unmodifiableMap(${field.name}$2);
-        <#if field_has_next && (selfFields[field_index+1].primitiveType ||selfFields[field_index+1].timeType) >
+        <#if field_has_next && (selfFields[field_index+1].primitiveType ||selfFields[field_index+1].timeType || selfFields[field_index+1].enumType) >
 
         </#if>
     <#elseif field.builtinType>
         this.${field.name} = json.get${field.type?cap_first}Value("${field.name}");
     <#elseif field.enumType>
-       <#if field_index gt 0 >
-
-        </#if>
-        int ${field.name} = json.getIntValue("${field.name}");
-        this.${field.name} = ${field.name} > 0 ? ${field.type}.valueOf(${field.name}) : null;
-         <#if field_has_next && (selfFields[field_index+1].primitiveType ||selfFields[field_index+1].timeType) >
-
-        </#if>
+        this.${field.name} = ${field.type}.valueOf(json.getIntValue("${field.name}"));
     <#else>
         <#if field_index gt 0 >
 
@@ -123,7 +116,7 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
         } else {
             this.${field.name} = null;
         }
-        <#if field_has_next && selfFields[field_index+1].primitiveType >
+        <#if field_has_next && (selfFields[field_index+1].primitiveType ||selfFields[field_index+1].timeType || selfFields[field_index+1].enumType) >
 
         </#if>
     </#if>

@@ -1,6 +1,5 @@
 package quan.generator.config;
 
-import quan.definition.BeanDefinition;
 import quan.definition.ClassDefinition;
 import quan.definition.FieldDefinition;
 import quan.definition.Language;
@@ -66,9 +65,8 @@ public class JavaConfigGenerator extends ConfigGenerator {
     @Override
     protected void prepareField(FieldDefinition fieldDefinition) {
         super.prepareField(fieldDefinition);
-        ClassDefinition classDefinition = fieldDefinition.getOwner();
-        if (fieldDefinition.isCollectionType() || fieldDefinition.isSimpleRef() && classDefinition instanceof BeanDefinition) {
-            classDefinition.getImports().put("java.util.*", null);
+        if (fieldDefinition.isCollectionType() || fieldDefinition.isSimpleRef() && fieldDefinition.getRefIndex().isNormal()) {
+            fieldDefinition.getOwner().getImports().put("java.util.*", null);
         }
     }
 

@@ -15,8 +15,7 @@ public class UseEffect4 extends UseEffect {
     public UseEffect4(JSONObject json) {
         super(json);
 
-        int itemType = json.getIntValue("itemType");
-        this.itemType = itemType > 0 ? ItemType.valueOf(itemType) : null;
+        this.itemType = ItemType.valueOf(json.getIntValue("itemType"));
     }
 
     public final ItemType getItemType() {

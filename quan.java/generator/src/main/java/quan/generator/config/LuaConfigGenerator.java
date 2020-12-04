@@ -9,10 +9,10 @@ import quan.definition.FieldDefinition;
 import quan.definition.Language;
 import quan.definition.config.ConfigDefinition;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 import static quan.definition.ClassDefinition.getLongClassName;
 
@@ -47,7 +47,10 @@ public class LuaConfigGenerator extends ConfigGenerator {
         if (configLoader != null && beanDefinition instanceof ConfigDefinition) {
             ConfigDefinition configDefinition = (ConfigDefinition) beanDefinition;
             List<JSONObject> configJsons = configLoader.loadJsons(configDefinition, true);
-            List<String> rows = configJsons.stream().map(o -> configLuaString(configDefinition, o)).collect(Collectors.toList());
+            List<String> rows = new ArrayList<>();
+            for (JSONObject json : configJsons) {
+                rows.add(configLuaString(configDefinition, json));
+            }
             configDefinition.setRows(rows);
         }
     }

@@ -50,9 +50,7 @@ public class ItemConfig extends Config {
         this.id = json.getIntValue("id");
         this.key = json.getOrDefault("key", "").toString();
         this.name = json.getOrDefault("name", "").toString();
-
-        int type = json.getIntValue("type");
-        this.type = type > 0 ? ItemType.valueOf(type) : null;
+        this.type = ItemType.valueOf(json.getIntValue("type"));
 
         JSONObject useEffect = json.getJSONObject("useEffect");
         if (useEffect != null) {

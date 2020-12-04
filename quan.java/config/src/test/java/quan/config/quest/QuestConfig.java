@@ -71,10 +71,7 @@ public class QuestConfig extends Config {
 
         this.id = json.getIntValue("id");
         this.name = json.getOrDefault("name", "").toString();
-
-        int type = json.getIntValue("type");
-        this.type = type > 0 ? QuestType.valueOf(type) : null;
-
+        this.type = QuestType.valueOf(json.getIntValue("type"));
         this.target = json.getIntValue("target");
 
         JSONObject reward = json.getJSONObject("reward");

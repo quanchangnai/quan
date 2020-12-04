@@ -1,9 +1,7 @@
 package quan.generator.message;
 
 import freemarker.template.Template;
-import quan.definition.BeanDefinition;
 import quan.definition.ClassDefinition;
-import quan.definition.DependentSource;
 import quan.definition.Language;
 import quan.definition.message.HeaderDefinition;
 import quan.definition.message.MessageDefinition;
