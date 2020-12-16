@@ -77,7 +77,6 @@ public class NettyBuffer extends Buffer {
         buf.writeByte(b);
     }
 
-
     @Override
     public void writeBytes(byte[] bytes) {
         writeInt(bytes.length);

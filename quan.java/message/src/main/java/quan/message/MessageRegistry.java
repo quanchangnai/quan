@@ -18,7 +18,9 @@ public class MessageRegistry {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    protected Map<Integer, Message> messages = new HashMap<>();
+    protected Map<Integer, Message> idMessages = new HashMap<>();
+
+    protected Map<Class<? extends Message>, Message> classMessages = new HashMap<>();
 
     public MessageRegistry() {
     }
@@ -29,9 +31,10 @@ public class MessageRegistry {
 
     public void register(Message message) {
         Objects.requireNonNull(message, "参数[message]不能为空");
-        if (messages.put(message.getId(), message) != null) {
+        if (idMessages.put(message.getId(), message) != null) {
             throw new IllegalArgumentException("消息ID[" + message.getId() + "]不能重复");
         }
+        classMessages.put(message.getClass(), message);
     }
 
     public void register(String messagePackage) {
@@ -50,7 +53,15 @@ public class MessageRegistry {
     }
 
     public Message create(int msgId) {
-        Message message = messages.get(msgId);
+        Message message = idMessages.get(msgId);
+        if (message == null) {
+            return null;
+        }
+        return message.create();
+    }
+
+    public Message create(Class<? extends Message> msgClass) {
+        Message message = classMessages.get(msgClass);
         if (message == null) {
             return null;
         }

@@ -8,6 +8,8 @@ import java.nio.charset.StandardCharsets;
  */
 public abstract class Buffer {
 
+    private Buffer temp;
+
     /**
      * 容量
      */
@@ -284,4 +286,17 @@ public abstract class Buffer {
     public int readTag() {
         return readByte() & 0b11111111;
     }
+
+    public Buffer getTemp() {
+        if (temp == null) {
+            temp = new SimpleBuffer();
+        }
+        return temp;
+    }
+
+    public void writeTemp() {
+        writeBuffer(temp);
+        temp.clear();
+    }
+
 }

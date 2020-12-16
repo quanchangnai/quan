@@ -165,47 +165,41 @@ public class UserInfo extends Bean {
         buffer.writeInt(this.level);
 
         buffer.writeTag(19);
-        Buffer roleInfo1$Buffer = new SimpleBuffer();
-        roleInfo1$Buffer.writeBool(this.roleInfo1 != null);
+        buffer.getTemp().writeBool(this.roleInfo1 != null);
         if (this.roleInfo1 != null) {
-            this.roleInfo1.encode(roleInfo1$Buffer);
+            this.roleInfo1.encode(buffer.getTemp());
         }
-        buffer.writeBuffer(roleInfo1$Buffer);
+        buffer.writeTemp();
 
         buffer.writeTag(23);
-        Buffer roleInfo2$Buffer = new SimpleBuffer();
-        this.roleInfo2.encode(roleInfo2$Buffer);
-        buffer.writeBuffer(roleInfo2$Buffer);
+        this.roleInfo2.encode(buffer.getTemp());
+        buffer.writeTemp();
 
         buffer.writeTag(27);
-        Buffer roleInfo3$Buffer = new SimpleBuffer();
-        this.roleInfo3.encode(roleInfo3$Buffer);
-        buffer.writeBuffer(roleInfo3$Buffer);
+        this.roleInfo3.encode(buffer.getTemp());
+        buffer.writeTemp();
 
         buffer.writeTag(31);
-        Buffer roleList$Buffer = new SimpleBuffer();
-        roleList$Buffer.writeInt(this.roleList.size());
+        buffer.getTemp().writeInt(this.roleList.size());
         for (quan.message.role.RoleInfo roleList$Value : this.roleList) {
-            roleList$Value.encode(roleList$Buffer);
+            roleList$Value.encode(buffer.getTemp());
         }
-        buffer.writeBuffer(roleList$Buffer);
+        buffer.writeTemp();
 
         buffer.writeTag(35);
-        Buffer roleSet$Buffer = new SimpleBuffer();
-        roleSet$Buffer.writeInt(this.roleSet.size());
+        buffer.getTemp().writeInt(this.roleSet.size());
         for (quan.message.role.RoleInfo roleSet$Value : this.roleSet) {
-            roleSet$Value.encode(roleSet$Buffer);
+            roleSet$Value.encode(buffer.getTemp());
         }
-        buffer.writeBuffer(roleSet$Buffer);
+        buffer.writeTemp();
 
         buffer.writeTag(39);
-        Buffer roleMap$Buffer = new SimpleBuffer();
-        roleMap$Buffer.writeInt(this.roleMap.size());
+        buffer.getTemp().writeInt(this.roleMap.size());
         for (Long roleMap$Key : this.roleMap.keySet()) {
-            roleMap$Buffer.writeLong(roleMap$Key);
-            this.roleMap.get(roleMap$Key).encode(roleMap$Buffer);
+            buffer.getTemp().writeLong(roleMap$Key);
+            this.roleMap.get(roleMap$Key).encode(buffer.getTemp());
         }
-        buffer.writeBuffer(roleMap$Buffer);
+        buffer.writeTemp();
 
         buffer.writeTag(0);
     }

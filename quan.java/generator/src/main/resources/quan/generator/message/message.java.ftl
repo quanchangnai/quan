@@ -177,16 +177,15 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
     </#if>
     <#if field.type=="set" || field.type=="list">
         <#if definedFieldId>
-        Buffer ${field.name}$Buffer = new SimpleBuffer();
-        ${field.name}$Buffer.writeInt(this.${field.name}.size());
+        buffer.getTemp().writeInt(this.${field.name}.size());
         for (${field.classValueType} ${field.name}$Value : this.${field.name}) {
             <#if field.builtinValueType>
-            ${field.name}$Buffer.write${field.valueType?cap_first}(${field.name}$Value);
+            buffer.getTemp().write${field.valueType?cap_first}(${field.name}$Value);
             <#else>
-            ${field.name}$Value.encode(${field.name}$Buffer);
+            ${field.name}$Value.encode(buffer.getTemp());
             </#if>
         }
-        buffer.writeBuffer(${field.name}$Buffer);
+        buffer.writeTemp();
         <#else>
             <#if field?index gt 0>
 
@@ -205,17 +204,16 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
         </#if>
     <#elseif field.type=="map">
         <#if definedFieldId>
-        Buffer ${field.name}$Buffer = new SimpleBuffer();
-        ${field.name}$Buffer.writeInt(this.${field.name}.size());
+        buffer.getTemp().writeInt(this.${field.name}.size());
         for (${field.classKeyType} ${field.name}$Key : this.${field.name}.keySet()) {
-            ${field.name}$Buffer.write${field.keyType?cap_first}(${field.name}$Key);
+            buffer.getTemp().write${field.keyType?cap_first}(${field.name}$Key);
             <#if field.builtinValueType>
-            ${field.name}$Buffer.write${field.valueType?cap_first}(this.${field.name}.get(${field.name}$Key));
+            buffer.getTemp().write${field.valueType?cap_first}(this.${field.name}.get(${field.name}$Key));
             <#else>
-            this.${field.name}.get(${field.name}$Key).encode(${field.name}$Buffer);
+            this.${field.name}.get(${field.name}$Key).encode(buffer.getTemp());
             </#if>
         }
-        buffer.writeBuffer(${field.name}$Buffer);
+        buffer.writeTemp();
         <#else>
             <#if field?index gt 0>
 
@@ -241,12 +239,11 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
         buffer.writeInt(this.${field.name} == null ? 0 : this.${field.name}.value());
     <#elseif field.optional>
         <#if definedFieldId>
-        Buffer ${field.name}$Buffer = new SimpleBuffer();
-        ${field.name}$Buffer.writeBool(this.${field.name} != null);
+        buffer.getTemp().writeBool(this.${field.name} != null);
         if (this.${field.name} != null) {
-            this.${field.name}.encode(${field.name}$Buffer);
+            this.${field.name}.encode(buffer.getTemp());
         }
-        buffer.writeBuffer(${field.name}$Buffer);
+        buffer.writeTemp();
         <#else>
             <#if field?index gt 0>
 
@@ -261,9 +258,8 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
         </#if>
     <#else>
         <#if definedFieldId>
-        Buffer ${field.name}$Buffer = new SimpleBuffer();
-        this.${field.name}.encode(${field.name}$Buffer);
-        buffer.writeBuffer(${field.name}$Buffer);
+        this.${field.name}.encode(buffer.getTemp());
+        buffer.writeTemp();
         <#else>
         this.${field.name}.encode(buffer);
         </#if>
