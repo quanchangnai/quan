@@ -13,7 +13,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  *
  * @author quanchangnai
  */
-public class TaskExecutor implements Executor, Runnable {
+public class SingleThreadExecutor implements Executor {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -41,8 +41,7 @@ public class TaskExecutor implements Executor, Runnable {
         }
     }
 
-    @Override
-    public void run() {
+    protected void run() {
         while (isRunning()) {
             for (Runnable task = taskQueue.poll(); task != null; task = taskQueue.poll()) {
                 try {
@@ -57,14 +56,20 @@ public class TaskExecutor implements Executor, Runnable {
                 logger.error("", e);
             }
         }
+
+        try {
+            end();
+        } catch (Throwable e) {
+            logger.error("", e);
+        }
+
         taskQueue.clear();
-        end();
         thread = null;
     }
 
     public void start() {
         running = true;
-        thread = new Thread(this);
+        thread = new Thread(this::run);
         thread.start();
     }
 

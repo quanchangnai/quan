@@ -192,7 +192,7 @@ public class NioServer {
         return readWriteExecutors[readWriteExecutorIndex++];
     }
 
-    private static class AcceptExecutor extends TaskExecutor {
+    private static class AcceptExecutor extends SingleThreadExecutor {
 
         private NioServer server;
 
@@ -277,7 +277,7 @@ public class NioServer {
         }
     }
 
-    private static class ReadWriteExecutor extends TaskExecutor {
+    private static class ReadWriteExecutor extends SingleThreadExecutor {
 
         private NioServer server;
 

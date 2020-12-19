@@ -188,7 +188,7 @@ public class NioClient {
         connect();
     }
 
-    private static class ReadWriteExecutor extends TaskExecutor {
+    private static class ReadWriteExecutor extends SingleThreadExecutor {
 
         private NioClient client;
 

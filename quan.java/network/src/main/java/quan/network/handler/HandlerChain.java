@@ -3,7 +3,7 @@ package quan.network.handler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.network.Connection;
-import quan.network.TaskExecutor;
+import quan.network.SingleThreadExecutor;
 
 import java.nio.ByteBuffer;
 import java.util.Objects;
@@ -31,7 +31,7 @@ public class HandlerChain {
         this.tail.prev = head;
     }
 
-    public TaskExecutor getExecutor() {
+    public SingleThreadExecutor getExecutor() {
         return connection.getExecutor();
     }
 
