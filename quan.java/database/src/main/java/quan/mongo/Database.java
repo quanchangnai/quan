@@ -61,7 +61,7 @@ public class Database implements DataWriter, MongoDatabase {
     }
 
     public Database(String connectionString, String name, String dataPackage) {
-        this(connectionString, name, dataPackage, false);
+        this(connectionString, name, dataPackage, true);
     }
 
     /**
