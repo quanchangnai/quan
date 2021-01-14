@@ -1,6 +1,7 @@
 package quan.data.role;
 
 import java.util.*;
+
 import org.bson.*;
 import org.bson.codecs.*;
 import org.bson.codecs.configuration.CodecRegistry;
@@ -12,25 +13,15 @@ import quan.data.item.ItemEntity;
  * 角色<br/>
  * 代码自动生成，请勿手动修改
  */
+@Index(name = "aa", fields = {RoleData.A, RoleData.A2}, unique = false)
+@Index(name = "bb", fields = {RoleData.B, RoleData.B2}, unique = false)
+@Index(name = "name", fields = {RoleData.NAME}, unique = true)
 public class RoleData extends Data<Long> {
 
     /**
      * 对应的表名
      */
     public static final String _NAME = "role_data";
-
-    /**
-     * 索引
-     */
-    public static final List<Index> _INDEXES;
-
-    static {
-        List<Index> indexes = new ArrayList<>();
-        indexes.add(new Index("aa", Arrays.asList(RoleData.A, RoleData.A2), false));
-        indexes.add(new Index("bb", Arrays.asList(RoleData.B, RoleData.B2), false));
-        indexes.add(new Index("name", Collections.singletonList(RoleData.NAME), true));
-        _INDEXES = Collections.unmodifiableList(indexes);
-    }
 
 
     /**
@@ -147,14 +138,6 @@ public class RoleData extends Data<Long> {
     @Override
     public Long _id() {
         return id.getValue();
-    }
-
-    /**
-     * 索引
-     */
-    @Override
-    public List<Index> _indexes() {
-        return _INDEXES;
     }
 
 

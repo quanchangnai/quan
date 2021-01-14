@@ -16,6 +16,15 @@ import ${import};
 </#if>
  * 代码自动生成，请勿手动修改
  */
+<#if kind ==5>
+<#list indexes as index>
+@Index(name = "${index.name}", fields = {<#rt/>
+    <#list index.fields as field>
+     <#lt/>${name}.${field.underscoreName}<#if field_has_next>, </#if><#rt/>
+    </#list>
+    <#lt/>}, unique = ${index.unique?c})
+</#list>
+</#if>
 public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idField.classType}></#if> {
 <#if kind ==5>
 
@@ -23,25 +32,6 @@ public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idFiel
      * 对应的表名
      */
     public static final String _NAME = "${underscoreName}";
-
-    /**
-     * 索引
-     */
-    public static final List<Index> _INDEXES;
-
-    static {
-        List<Index> indexes = new ArrayList<>();
-    <#list indexes as index>
-        <#if index.fields?size==1>
-        indexes.add(new Index("${index.name}", Collections.singletonList(${name}.${index.fields[0].underscoreName}), ${index.unique?c}));
-        <#elseif index.fields?size==2>
-        indexes.add(new Index("${index.name}", Arrays.asList(${name}.${index.fields[0].underscoreName}, ${name}.${index.fields[1].underscoreName}), ${index.unique?c}));
-        <#elseif index.fields?size==3>
-        indexes.add(new Index("${index.name}", Arrays.asList(${name}.${index.fields[0].underscoreName}, ${name}.${index.fields[1].underscoreName}, ${name}.${index.fields[2].underscoreName}), ${index.unique?c}));
-        </#if>
-    </#list>
-        _INDEXES = Collections.unmodifiableList(indexes);
-    }
 
 </#if>
 <#list fields as field>
@@ -95,14 +85,6 @@ public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idFiel
     @Override
     public ${idField.classType} _id() {
         return ${idName}.getValue();
-    }
-
-    /**
-     * 索引
-     */
-    @Override
-    public List<Index> _indexes() {
-        return _INDEXES;
     }
 
 <#elseif selfFields?size<=5>

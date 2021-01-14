@@ -2,6 +2,7 @@ package quan.data.test;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.Sorts;
 import org.bson.BsonReader;
@@ -11,6 +12,7 @@ import org.bson.json.JsonWriter;
 import org.junit.Ignore;
 import org.junit.Test;
 import quan.common.utils.ClassUtils;
+import quan.data.Index;
 import quan.data.Transaction;
 import quan.data.item.ItemEntity;
 import quan.data.item.ItemEntity2;
@@ -22,6 +24,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -31,6 +34,12 @@ public class DatabaseTest {
 
     static {
         ClassUtils.enableAop();
+    }
+
+    @Test
+    public void testRoleData() {
+        Index.List indexes = RoleData.class.getAnnotation(Index.List.class);
+        System.err.println("RoleData indexes:" + Arrays.toString(indexes.value()));
     }
 
     @Test

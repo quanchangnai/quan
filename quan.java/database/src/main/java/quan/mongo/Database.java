@@ -16,6 +16,7 @@ import quan.common.utils.ClassUtils;
 import quan.data.Data;
 import quan.data.DataCodecRegistry;
 import quan.data.DataWriter;
+import quan.data.Index;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -54,12 +55,6 @@ public class Database implements DataWriter, MongoDatabase {
         ClassUtils.enableAop();
     }
 
-    private Database(MongoClient client, String dataPackage, boolean asyncWrite) {
-        this.client = client;
-        this.dataPackage = dataPackage;
-        this.asyncWrite = asyncWrite;
-    }
-
     public Database(String connectionString, String name, String dataPackage) {
         this(connectionString, name, dataPackage, true);
     }
@@ -67,7 +62,7 @@ public class Database implements DataWriter, MongoDatabase {
     /**
      * 简单的数据库对象构造方法
      *
-     * @param connectionString MongoDB连接字符串
+     * @param connectionString 连接字符串
      * @param name             数据库名
      * @param dataPackage      数据类所在的包名
      * @param asyncWrite       是否异步写数据库
@@ -83,14 +78,22 @@ public class Database implements DataWriter, MongoDatabase {
         initClient(builder, name);
     }
 
-    public Database(MongoClientSettings.Builder builder, String databaseName, String dataPackage) {
-        this(builder, databaseName, dataPackage, false);
+    public Database(MongoClientSettings.Builder builder, String name, String dataPackage) {
+        this(builder, name, dataPackage, false);
     }
 
-    public Database(MongoClientSettings.Builder builder, String databaseName, String dataPackage, boolean asyncWrite) {
+    public Database(MongoClientSettings.Builder builder, String name, String dataPackage, boolean asyncWrite) {
         this.asyncWrite = asyncWrite;
         this.dataPackage = Assertions.notNull("dataPackage", dataPackage);
-        initClient(builder, databaseName);
+        initClient(builder, name);
+    }
+
+    public Database(MongoClient client, String name, String dataPackage, boolean asyncWrite) {
+        this.client = Assertions.notNull("client", client);
+        this.dataPackage = Assertions.notNull("dataPackage", dataPackage);
+        this.asyncWrite = asyncWrite;
+        Assertions.notNull("name", name);
+        initDatabase(name);
     }
 
     private void initClient(MongoClientSettings.Builder builder, String databaseName) {
@@ -120,15 +123,19 @@ public class Database implements DataWriter, MongoDatabase {
 
     private void initCollection(Class<?> clazz) {
         String collectionName;
-        Map<String, Data.Index> collectionIndexes = new HashMap<>();
-
         try {
             collectionName = (String) clazz.getField("_NAME").get(clazz);
-            List<Data.Index> indexes = (List<Data.Index>) clazz.getField("_INDEXES").get(clazz);
-            indexes.forEach(index -> collectionIndexes.put(index.getName(), index));
         } catch (Exception e) {
             logger.error("", e);
             return;
+        }
+
+        Map<String, Index> collectionIndexes = new HashMap<>();
+        Index.List indexes = clazz.getAnnotation(Index.List.class);
+        if (indexes != null) {
+            for (Index index : indexes.value()) {
+                collectionIndexes.put(index.name(), index);
+            }
         }
 
         MongoCollection<?> collection = database.getCollection(collectionName, clazz);
@@ -150,50 +157,14 @@ public class Database implements DataWriter, MongoDatabase {
         dropIndexes.forEach(collection::dropIndex);
 
         List<IndexModel> createIndexModels = new ArrayList<>();
-        for (Data.Index index : collectionIndexes.values()) {
-            IndexOptions indexOptions = new IndexOptions().name(index.getName()).unique(index.isUnique());
-            createIndexModels.add(new IndexModel(Indexes.ascending(index.getFields()), indexOptions));
+        for (Index index : collectionIndexes.values()) {
+            IndexOptions indexOptions = new IndexOptions().name(index.name()).unique(index.unique());
+            createIndexModels.add(new IndexModel(Indexes.ascending(index.fields()), indexOptions));
         }
         if (!createIndexModels.isEmpty()) {
             collection.createIndexes(createIndexModels);
         }
 
-    }
-
-    /**
-     * 使用当前数据库实例在同一个MongoClient上获取一个新的数据库实例，它使用的数据类和当前数据库实例的完全一样
-     *
-     * @param name 新的数据库名
-     * @return 如果给定的数据库名和当前数据库名相同，将直接返回当前数据库实例
-     * @see #getInstance(String, String)
-     */
-    public Database getInstance(String name) {
-        if (name.equals(database.getName())) {
-            return this;
-        }
-        Database database = new Database(client, dataPackage, asyncWrite);
-        database.initDatabase(name);
-        return database;
-    }
-
-    /**
-     * 使用当前数据库实例在同一个MongoClient上获取一个新的数据库实例
-     *
-     * @param name        新的数据库名
-     * @param dataPackage 数据类包名
-     * @return 如果给定的数据库名、数据类包名和当前数据库名、数据类包名都一样，将直接返回当前数据库实例
-     */
-    public Database getInstance(String name, String dataPackage) {
-        if (name.equals(database.getName())) {
-            if (this.dataPackage.equals(dataPackage)) {
-                return this;
-            } else {
-                throw new IllegalArgumentException(String.format("新数据库名[%s]和当前数据库名[%s]相同，但是新数据包名[%s]和当前数据包名[%s]却不相同", name, this.database.getName(), dataPackage, this.dataPackage));
-            }
-        }
-        Database database = new Database(client, dataPackage, asyncWrite);
-        database.initDatabase(name);
-        return database;
     }
 
     public MongoClient getClient() {
@@ -254,7 +225,7 @@ public class Database implements DataWriter, MongoDatabase {
 
         if (asyncWrite) {
             if (!executors.containsKey(client)) {
-                logger.info("MongoClient已经关闭了，数据无法写入数据库");
+                logger.error("MongoClient已经关闭了，数据无法入库");
                 return;
             }
             for (MongoCollection<Data<?>> collection : writeModels.keySet()) {
