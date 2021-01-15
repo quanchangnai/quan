@@ -79,7 +79,7 @@ public class Database implements DataWriter, MongoDatabase {
     }
 
     public Database(MongoClientSettings.Builder builder, String name, String dataPackage) {
-        this(builder, name, dataPackage, false);
+        this(builder, name, dataPackage, true);
     }
 
     public Database(MongoClientSettings.Builder builder, String name, String dataPackage, boolean asyncWrite) {
@@ -88,11 +88,20 @@ public class Database implements DataWriter, MongoDatabase {
         initClient(builder, name);
     }
 
+    public Database(MongoClient client, String name, String dataPackage) {
+        this(client, name, dataPackage, true);
+    }
+
     public Database(MongoClient client, String name, String dataPackage, boolean asyncWrite) {
         this.client = Assertions.notNull("client", client);
         this.dataPackage = Assertions.notNull("dataPackage", dataPackage);
         this.asyncWrite = asyncWrite;
         Assertions.notNull("name", name);
+
+        if (asyncWrite && !executors.containsKey(client)) {
+            initExecutors();
+        }
+
         initDatabase(name);
     }
 
@@ -104,15 +113,19 @@ public class Database implements DataWriter, MongoDatabase {
         databases.put(client, new HashMap<>());
 
         if (asyncWrite) {
-            List<ExecutorService> clientExecutors = new ArrayList<>();
-            ThreadFactory threadFactory = new BasicThreadFactory.Builder().namingPattern("database-thread-%d").daemon(true).build();
-            for (int i = 1; i <= Runtime.getRuntime().availableProcessors(); i++) {
-                clientExecutors.add(Executors.newSingleThreadExecutor(threadFactory));
-            }
-            executors.put(client, clientExecutors);
+            initExecutors();
         }
 
         initDatabase(databaseName);
+    }
+
+    private void initExecutors() {
+        List<ExecutorService> clientExecutors = new ArrayList<>();
+        ThreadFactory threadFactory = new BasicThreadFactory.Builder().namingPattern("database-thread-%d").daemon(true).build();
+        for (int i = 1; i <= Runtime.getRuntime().availableProcessors(); i++) {
+            clientExecutors.add(Executors.newSingleThreadExecutor(threadFactory));
+        }
+        executors.put(client, clientExecutors);
     }
 
     private void initDatabase(String name) {
