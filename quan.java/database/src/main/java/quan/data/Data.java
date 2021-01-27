@@ -1,10 +1,17 @@
 package quan.data;
 
+import org.bson.codecs.Codec;
+import org.bson.codecs.EncoderContext;
+import org.bson.json.JsonWriter;
+import quan.data.mongo.CodecsRegistry;
+import quan.data.mongo.JsonStringWriter;
+
+import java.io.StringWriter;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 
 /**
- * 数据对应一张表，每个实例对应表中的一行
+ * 数据类对应一张表，每个数据实例对应表中的一行
  * Created by quanchangnai on 2019/5/16.
  */
 public abstract class Data<I> {
@@ -83,6 +90,15 @@ public abstract class Data<I> {
             this.writer = null;
             this.state = null;
         }
+    }
+
+    @SuppressWarnings({"unchecked"})
+    public String toJson() {
+        StringWriter stringWriter = new StringWriter();
+        JsonWriter jsonWriter = new JsonStringWriter(stringWriter);
+        Codec codec = CodecsRegistry.getDefault().get(getClass());
+        codec.encode(jsonWriter, this, EncoderContext.builder().build());
+        return stringWriter.toString();
     }
 
     /**

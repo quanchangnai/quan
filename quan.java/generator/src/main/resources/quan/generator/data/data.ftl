@@ -6,6 +6,9 @@ import org.bson.codecs.*;
 import org.bson.codecs.configuration.CodecRegistry;
 import quan.data.*;
 import quan.data.field.*;
+<#if kind ==5>
+import quan.data.mongo.JsonStringWriter;
+</#if>
 <#list imports?keys as import>
 import ${import};
 </#list>
@@ -61,14 +64,14 @@ public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idFiel
 </#list>
 
 <#if kind ==5>
+    public ${name}() {
+    }
 
-    <#if idField.type=="string">    
-    public ${name}(String ${idName}) {
-        Objects.requireNonNull(${idName}, "参数[${idName}]不能为空");
-    <#else>
     public ${name}(${idField.type} ${idName}) {
+    <#if idField.type=="string">    
+        Objects.requireNonNull(${idName}, "参数[${idName}]不能为空");
     </#if>
-        this.${idName}.setValue(${idName});
+        this.${idName}.setLogValue(${idName},this);
     }
 
     /**
@@ -84,7 +87,7 @@ public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idFiel
      */
     @Override
     public ${idField.classType} _id() {
-        return ${idName}.getValue();
+        return ${idName}.getLogValue();
     }
 
 <#elseif selfFields?size<=5>
@@ -131,11 +134,6 @@ public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idFiel
     <#elseif field.type == "map">
     public ${field.basicType}<${field.classKeyType}, ${field.classValueType}> get${field.name?cap_first}() {
         return ${field.name}.getDelegate();
-    }
-
-    <#elseif kind ==5 && field.name == idName>
-    public ${field.type} get${field.name?cap_first}() {
-        return ${field.name}.getValue();
     }
 
     <#elseif field.enumType>
@@ -248,17 +246,16 @@ public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idFiel
         @Override
         public ${name} decode(BsonReader reader, DecoderContext decoderContext) {
             reader.readStartDocument();
-            <#if kind ==5>
-            ${name} value = new ${name}(reader.read${bsonTypes[idField.type]}(${name}._ID));
-            <#else>
             ${name} value = new ${name}(); 
-            </#if>
-
+        
             while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
                 switch (reader.readName()) {
                     <#list fields as field>
-                        <#if field.ignore || kind == 5 && field.name == idName >
+                        <#if field.ignore>
                             <#continue/>
+                        </#if>
+                        <#if kind == 5 && field.name == idName >
+                    case ${name}._ID:
                         </#if>
                     case ${name}.${field.underscoreName}:
                         <#if field.enumType>
@@ -283,9 +280,9 @@ public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idFiel
                         reader.readStartDocument();
                         while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
                             <#if field.primitiveValueType>
-                            value.${field.name}.plus(<#if convertTypes[field.keyType]??>(${field.basicValueType}) </#if>reader.read${bsonTypes[field.keyType]}(), <#if convertTypes[field.valueType]??>(${field.basicValueType})</#if>reader.read${bsonTypes[field.valueType]}());
+                            value.${field.name}.plus(<#if convertTypes[field.keyType]??>(${field.basicValueType}) </#if>${field.classKeyType}.valueOf(reader.readName()), <#if convertTypes[field.valueType]??>(${field.basicValueType})</#if>reader.read${bsonTypes[field.valueType]}());
                             <#else>
-                            value.${field.name}.plus(<#if convertTypes[field.keyType]??>(${field.basicValueType}) </#if>reader.read${bsonTypes[field.keyType]}(), decoderContext.decodeWithChildContext(registry.get(${field.classValueType}.class), reader));
+                            value.${field.name}.plus(<#if convertTypes[field.keyType]??>(${field.basicValueType}) </#if>${field.classKeyType}.valueOf(reader.readName()), decoderContext.decodeWithChildContext(registry.get(${field.classValueType}.class), reader));
                             </#if>
                         }
                         reader.readEndDocument();
@@ -307,23 +304,28 @@ public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idFiel
         public void encode(BsonWriter writer, ${name} value, EncoderContext encoderContext) {
             writer.writeStartDocument();
             <#if kind ==5>
-            writer.write${bsonTypes[idField.type]}(${name}._ID, value._id());
+
+            if (writer instanceof JsonStringWriter) {
+                writer.write${bsonTypes[idField.type]}(${name}.${idField.underscoreName}, value.${idField.name}.getLogValue());
+            } else {
+                writer.write${bsonTypes[idField.type]}(${name}._ID, value.${idField.name}.getLogValue());
+            }
             </#if>
 
             <#list fields as field>
                 <#if field.ignore || kind == 5 && field.name == idName >
                     <#continue/>
                 <#elseif field.enumType>
-            writer.writeInt32(${name}.${field.underscoreName}, value.${field.name}.getValue());
+            writer.writeInt32(${name}.${field.underscoreName}, value.${field.name}.getLogValue());
                 <#elseif field.primitiveType>
-            writer.write${bsonTypes[field.type]}(${name}.${field.underscoreName}, value.${field.name}.getValue());
+            writer.write${bsonTypes[field.type]}(${name}.${field.underscoreName}, value.${field.name}.getLogValue());
                 <#elseif field.beanType>
                     <#if field_index gt 0 >
 
                     </#if>
-            if (value.${field.name}.getValue() != null) {
+            if (value.${field.name}.getLogValue() != null) {
                 writer.writeName(${name}.${field.underscoreName});
-                encoderContext.encodeWithChildContext(registry.get(${field.classType}.class), writer, value.${field.name}.getValue());
+                encoderContext.encodeWithChildContext(registry.get(${field.classType}.class), writer, value.${field.name}.getLogValue());
             }
                     <#if field_has_next && fields[field_index+1].primitiveType >
 
@@ -332,9 +334,9 @@ public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idFiel
                     <#if field_index gt 0 >
 
                     </#if>
-            if (!value.${field.name}.get${field.type?cap_first}().isEmpty()) {
+            if (!value.${field.name}.isEmpty()) {
                 writer.writeStartArray(${name}.${field.underscoreName});
-                for (${field.classValueType} ${field.name}Value : value.${field.name}.get${field.type?cap_first}()) {
+                for (${field.classValueType} ${field.name}Value : value.${field.name}) {
                     <#if field.primitiveValueType>
                     writer.write${bsonTypes[field.valueType]}(${field.name}Value);
                     <#elseif field.beanValueType>
@@ -352,14 +354,14 @@ public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idFiel
                     <#if field_index gt 0 >
 
                     </#if>
-            if (!value.${field.name}.getMap().isEmpty()) {
+            if (!value.${field.name}.isEmpty()) {
                 writer.writeStartDocument(${name}.${field.underscoreName});
-                for (${field.classKeyType} ${field.name}Key : value.${field.name}.getMap().keySet()) {
-                    writer.write${bsonTypes[field.keyType]}(${field.name}Key);
+                for (${field.classKeyType} ${field.name}Key : value.${field.name}.keySet()) {
+                    writer.writeName(String.valueOf(${field.name}Key));
                     <#if field.primitiveValueType>
-                    writer.write${bsonTypes[field.valueType]}(value.${field.name}.getMap().get(${field.name}Key));
+                    writer.write${bsonTypes[field.valueType]}(value.${field.name}.get(${field.name}Key));
                     <#elseif field.beanValueType>
-                    encoderContext.encodeWithChildContext(registry.get(${field.classValueType}.class), writer, value.${field.name}.getMap().get(${field.name}Key));
+                    encoderContext.encodeWithChildContext(registry.get(${field.classValueType}.class), writer, value.${field.name}.get(${field.name}Key));
                     <#else>
                     writer.write${field.valueType?cap_first}(${field.name}Value);
                     </#if>

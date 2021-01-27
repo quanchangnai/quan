@@ -1,10 +1,12 @@
-package quan.data;
+package quan.data.mongo;
 
 import org.bson.codecs.Codec;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.common.utils.ClassUtils;
+import quan.data.Data;
+import quan.data.Entity;
 
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
@@ -13,20 +15,22 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * 数据编解码器注册表，支持注册指定包名下面所有的编解码器
+ * 编解码器注册表，支持注册指定包名下面所有的编解码器
  * Created by quanchangnai on 2020/4/1.
  */
 @SuppressWarnings("unchecked")
-public class DataCodecRegistry implements CodecRegistry {
+public class CodecsRegistry implements CodecRegistry {
 
-    protected final static Logger logger = LoggerFactory.getLogger(DataCodecRegistry.class);
+    protected final static Logger logger = LoggerFactory.getLogger(CodecsRegistry.class);
+
+    private static CodecRegistry registry = new CodecsRegistry();
 
     private Map<Class<?>, Codec<?>> codecs = new HashMap<>();
 
-    public DataCodecRegistry() {
+    public CodecsRegistry() {
     }
 
-    public DataCodecRegistry(String codecPackage) {
+    public CodecsRegistry(String codecPackage) {
         register(codecPackage);
     }
 
@@ -42,7 +46,6 @@ public class DataCodecRegistry implements CodecRegistry {
             if (Modifier.isAbstract(codecClass.getModifiers())) {
                 continue;
             }
-
             try {
                 Codec<?> codec = (Codec<?>) codecClass.getDeclaredConstructor(CodecRegistry.class).newInstance(this);
                 codecs.put(codec.getEncoderClass(), codec);
@@ -56,7 +59,16 @@ public class DataCodecRegistry implements CodecRegistry {
 
     @Override
     public <T> Codec<T> get(Class<T> clazz) {
-        return (Codec<T>) codecs.get(clazz);
+        Codec<T> codec = (Codec<T>) codecs.get(clazz);
+        if (codec == null && (Data.class.isAssignableFrom(clazz) || Entity.class.isAssignableFrom(clazz))) {
+            register(clazz.getPackage().getName());
+            codec = (Codec<T>) codecs.get(clazz);
+        }
+        return codec;
+    }
+
+    public static CodecRegistry getDefault() {
+        return registry;
     }
 
 }

@@ -5,6 +5,8 @@ import quan.data.Transactional;
 import quan.data.item.ItemEntity;
 import quan.data.role.RoleData;
 
+import java.util.ArrayList;
+
 /**
  * Created by quanchangnai on 2020/4/20.
  */
@@ -13,9 +15,9 @@ public class Role {
 
     private long roleId;
 
-    private RoleData roleData1 = new RoleData(1L);
+    private RoleData roleData1 = new RoleData();
 
-    private RoleData roleData2 = new RoleData(2L);
+    private RoleData roleData2 = new RoleData();
 
     public Role() {
     }
@@ -34,6 +36,7 @@ public class Role {
     public int test1(int v) {
         System.err.println("RoleTest.test1()===============" + roleId + "=" + v);
 
+        roleData1.setId(1L);
         roleData1.setName("aaa");
         roleData1.setI(1);
 //        roleData1.getSet().add(true);
@@ -41,6 +44,7 @@ public class Role {
         for (int i = 0; i < 10; i++) {
             roleData1.getList().add("aaa" + i);
             roleData1.getMap().put(i, i);
+            roleData1.getItems().put(i, new ItemEntity(i, "item" + i, new ArrayList<>()));
         }
 
         for (String s : roleData1.getList()) {
@@ -61,13 +65,20 @@ public class Role {
         itemEntity1.setId(111);
         itemEntity1.setName("item111");
 
-        roleData1.setItem(itemEntity1);
+//        roleData1.setItem(itemEntity1);
 //        roleData1.setItem(null);
 
-//        roleData2.setItem(itemEntity1);
+        roleData2.setId(2);
+        roleData2.setName("bbb");
+        roleData2.setItem(itemEntity1);
 
-        System.err.println("roleData1:" + roleData1);
-        System.err.println("roleData2:" + roleData2);
+        for (int i = 0; i < 10; i++) {
+            roleData2.getList().add("bbb" + i);
+            roleData2.getMap().put(i, i);
+        }
+
+        System.err.println("roleData1:" + roleData1.toJson());
+        System.err.println("roleData2:" + roleData2.toJson());
 
 //        throw new RuntimeException("aaa");
 

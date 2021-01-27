@@ -1,4 +1,4 @@
-package quan.mongo;
+package quan.data.mongo;
 
 import com.mongodb.ServerAddress;
 import com.mongodb.ServerCursor;

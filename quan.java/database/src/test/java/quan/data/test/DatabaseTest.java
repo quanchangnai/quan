@@ -2,11 +2,11 @@ package quan.data.test;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.Sorts;
 import org.bson.BsonReader;
 import org.bson.BsonWriter;
+import org.bson.codecs.Codec;
 import org.bson.json.JsonReader;
 import org.bson.json.JsonWriter;
 import org.junit.Ignore;
@@ -16,9 +16,10 @@ import quan.data.Index;
 import quan.data.Transaction;
 import quan.data.item.ItemEntity;
 import quan.data.item.ItemEntity2;
+import quan.data.mongo.CodecsRegistry;
 import quan.data.role.RoleData;
 import quan.data.role.RoleData2;
-import quan.mongo.Database;
+import quan.data.mongo.Database;
 
 import java.io.File;
 import java.io.FileReader;
@@ -40,6 +41,10 @@ public class DatabaseTest {
     public void testRoleData() {
         Index.List indexes = RoleData.class.getAnnotation(Index.List.class);
         System.err.println("RoleData indexes:" + Arrays.toString(indexes.value()));
+
+        CodecsRegistry codecsRegistry = new CodecsRegistry();
+        Codec<RoleData> roleDataCodec = codecsRegistry.get(RoleData.class);
+        System.err.println("roleDataCodec:" + roleDataCodec);
     }
 
     @Test
@@ -112,6 +117,8 @@ public class DatabaseTest {
             roleDataMax.insert(database);
         } else {
             roleDataMax.setName("max:" + System.nanoTime());
+            System.err.println("roleDataMax:" + roleDataMax.toJson());
+
 //            roleDataCollection.insertOne(roleDataMax);
 //            roleDataCollection.deleteOne(Filters.eq(roleDataMax.getId()));
         }

@@ -13,7 +13,7 @@ public class Validations {
     }
 
     public static void validateCollectionValue(Object value) {
-        Objects.requireNonNull(value, "list或者set的元素不能为null");
+        Objects.requireNonNull(value, "集合元素不能为null");
         if (value instanceof Entity) {
             validateEntityRoot((Entity) value);
         }

@@ -1,4 +1,4 @@
-package quan.mongo;
+package quan.data.mongo;
 
 import com.mongodb.*;
 import com.mongodb.assertions.Assertions;
@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.common.utils.ClassUtils;
 import quan.data.Data;
-import quan.data.DataCodecRegistry;
 import quan.data.DataWriter;
 import quan.data.Index;
 
@@ -55,19 +54,19 @@ public class Database implements DataWriter, MongoDatabase {
         ClassUtils.enableAop();
     }
 
-    public Database(String connectionString, String name, String dataPackage) {
-        this(connectionString, name, dataPackage, true);
+    public Database(String connectionString, String databaseName, String dataPackage) {
+        this(connectionString, databaseName, dataPackage, true);
     }
 
     /**
      * 简单的数据库对象构造方法
      *
      * @param connectionString 连接字符串
-     * @param name             数据库名
+     * @param databaseName     数据库名
      * @param dataPackage      数据类所在的包名
      * @param asyncWrite       是否异步写数据库
      */
-    public Database(String connectionString, String name, String dataPackage, boolean asyncWrite) {
+    public Database(String connectionString, String databaseName, String dataPackage, boolean asyncWrite) {
         this.asyncWrite = asyncWrite;
         this.dataPackage = Assertions.notNull("dataPackage", dataPackage);
         Assertions.notNull("connectionString", connectionString);
@@ -75,41 +74,41 @@ public class Database implements DataWriter, MongoDatabase {
         MongoClientSettings.Builder builder = MongoClientSettings.builder();
         builder.applyConnectionString(new ConnectionString(connectionString));
 
-        initClient(builder, name);
+        initClient(builder, databaseName);
     }
 
-    public Database(MongoClientSettings.Builder builder, String name, String dataPackage) {
-        this(builder, name, dataPackage, true);
+    public Database(MongoClientSettings.Builder clientSettings, String databaseName, String dataPackage) {
+        this(clientSettings, databaseName, dataPackage, true);
     }
 
-    public Database(MongoClientSettings.Builder builder, String name, String dataPackage, boolean asyncWrite) {
+    public Database(MongoClientSettings.Builder clientSettings, String databaseName, String dataPackage, boolean asyncWrite) {
         this.asyncWrite = asyncWrite;
         this.dataPackage = Assertions.notNull("dataPackage", dataPackage);
-        initClient(builder, name);
+        initClient(clientSettings, databaseName);
     }
 
-    public Database(MongoClient client, String name, String dataPackage) {
-        this(client, name, dataPackage, true);
+    public Database(MongoClient client, String databaseName, String dataPackage) {
+        this(client, databaseName, dataPackage, true);
     }
 
-    public Database(MongoClient client, String name, String dataPackage, boolean asyncWrite) {
+    public Database(MongoClient client, String databaseName, String dataPackage, boolean asyncWrite) {
         this.client = Assertions.notNull("client", client);
         this.dataPackage = Assertions.notNull("dataPackage", dataPackage);
         this.asyncWrite = asyncWrite;
-        Assertions.notNull("name", name);
+        Assertions.notNull("name", databaseName);
 
         if (asyncWrite && !executors.containsKey(client)) {
             initExecutors();
         }
 
-        initDatabase(name);
+        initDatabase(databaseName);
     }
 
-    private void initClient(MongoClientSettings.Builder builder, String databaseName) {
+    private void initClient(MongoClientSettings.Builder clientSettings, String databaseName) {
         Assertions.notNull("databaseName", databaseName);
-        DataCodecRegistry dataCodecRegistry = new DataCodecRegistry(dataPackage);
-        builder.codecRegistry(CodecRegistries.fromRegistries(dataCodecRegistry, MongoClientSettings.getDefaultCodecRegistry()));
-        client = MongoClients.create(builder.build());
+        CodecRegistry codecRegistry = new CodecsRegistry(dataPackage);
+        clientSettings.codecRegistry(CodecRegistries.fromRegistries(codecRegistry, MongoClientSettings.getDefaultCodecRegistry()));
+        client = MongoClients.create(clientSettings.build());
         databases.put(client, new HashMap<>());
 
         if (asyncWrite) {
@@ -128,9 +127,9 @@ public class Database implements DataWriter, MongoDatabase {
         executors.put(client, clientExecutors);
     }
 
-    private void initDatabase(String name) {
-        database = client.getDatabase(name);
-        databases.get(client).put(name, this);
+    private void initDatabase(String databaseName) {
+        database = client.getDatabase(databaseName);
+        databases.get(client).put(databaseName, this);
         ClassUtils.loadClasses(dataPackage, Data.class).forEach(this::initCollection);
     }
 

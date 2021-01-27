@@ -94,7 +94,7 @@ public class ItemEntity extends Entity {
         public ItemEntity decode(BsonReader reader, DecoderContext decoderContext) {
             reader.readStartDocument();
             ItemEntity value = new ItemEntity(); 
-
+        
             while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
                 switch (reader.readName()) {
                     case ItemEntity.ID:
@@ -123,12 +123,12 @@ public class ItemEntity extends Entity {
         public void encode(BsonWriter writer, ItemEntity value, EncoderContext encoderContext) {
             writer.writeStartDocument();
 
-            writer.writeInt32(ItemEntity.ID, value.id.getValue());
-            writer.writeString(ItemEntity.NAME, value.name.getValue());
+            writer.writeInt32(ItemEntity.ID, value.id.getLogValue());
+            writer.writeString(ItemEntity.NAME, value.name.getLogValue());
 
-            if (!value.list.getList().isEmpty()) {
+            if (!value.list.isEmpty()) {
                 writer.writeStartArray(ItemEntity.LIST);
-                for (Integer listValue : value.list.getList()) {
+                for (Integer listValue : value.list) {
                     writer.writeInt32(listValue);
                 }
                 writer.writeEndArray();

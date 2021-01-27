@@ -23,21 +23,25 @@ public class ClassUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(ClassUtils.class);
 
+    private static Instrumentation instrumentation;
+
     private static boolean aop;
 
     /**
      * 启用AOP
      */
     public synchronized static void enableAop() {
-        if (aop) {
-            return;
+        if (!aop) {
+            aop = true;
+            getInstrumentation().addTransformer(new ClassPreProcessorAgentAdapter());
         }
-        aop = true;
-        getInstrumentation().addTransformer(new ClassPreProcessorAgentAdapter());
     }
 
     public static Instrumentation getInstrumentation() {
-        return ByteBuddyAgent.install();
+        if (instrumentation == null) {
+            instrumentation = ByteBuddyAgent.install();
+        }
+        return instrumentation;
     }
 
     /**
@@ -65,7 +69,6 @@ public class ClassUtils {
         } catch (Exception e) {
             logger.error("重定义类失败", e);
         }
-
     }
 
     /**

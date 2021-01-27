@@ -7,6 +7,7 @@ import org.bson.codecs.*;
 import org.bson.codecs.configuration.CodecRegistry;
 import quan.data.*;
 import quan.data.field.*;
+import quan.data.mongo.JsonStringWriter;
 import quan.data.item.ItemEntity;
 
 /**
@@ -119,9 +120,11 @@ public class RoleData extends Data<Long> {
 
     private MapField<Integer, ItemEntity> map2 = new MapField<>(this);
 
+    public RoleData() {
+    }
 
     public RoleData(long id) {
-        this.id.setValue(id);
+        this.id.setLogValue(id, this);
     }
 
     /**
@@ -137,7 +140,7 @@ public class RoleData extends Data<Long> {
      */
     @Override
     public Long _id() {
-        return id.getValue();
+        return id.getLogValue();
     }
 
 
@@ -145,7 +148,23 @@ public class RoleData extends Data<Long> {
      * 角色ID
      */
     public long getId() {
-        return id.getValue();
+        return id.getLogValue();
+    }
+
+    /**
+     * 角色ID
+     */
+    public RoleData setId(long id) {
+        this.id.setLogValue(id, this);
+        return this;
+    }
+
+    /**
+     * 角色ID
+     */
+    public RoleData addId(long id) {
+        setId(getId() + id);
+        return this;
     }
 
     public String getName() {
@@ -391,10 +410,14 @@ public class RoleData extends Data<Long> {
         @Override
         public RoleData decode(BsonReader reader, DecoderContext decoderContext) {
             reader.readStartDocument();
-            RoleData value = new RoleData(reader.readInt64(RoleData._ID));
+            RoleData value = new RoleData();
 
             while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
                 switch (reader.readName()) {
+                    case RoleData._ID:
+                    case RoleData.ID:
+                        value.id.setValue(reader.readInt64());
+                        break;
                     case RoleData.NAME:
                         value.name.setValue(reader.readString());
                         break;
@@ -431,7 +454,7 @@ public class RoleData extends Data<Long> {
                     case RoleData.ITEMS:
                         reader.readStartDocument();
                         while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
-                            value.items.plus(reader.readInt32(), decoderContext.decodeWithChildContext(registry.get(ItemEntity.class), reader));
+                            value.items.plus(Integer.valueOf(reader.readName()), decoderContext.decodeWithChildContext(registry.get(ItemEntity.class), reader));
                         }
                         reader.readEndDocument();
                         break;
@@ -452,7 +475,7 @@ public class RoleData extends Data<Long> {
                     case RoleData.MAP:
                         reader.readStartDocument();
                         while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
-                            value.map.plus(reader.readInt32(), reader.readInt32());
+                            value.map.plus(Integer.valueOf(reader.readName()), reader.readInt32());
                         }
                         reader.readEndDocument();
                         break;
@@ -482,69 +505,74 @@ public class RoleData extends Data<Long> {
         @Override
         public void encode(BsonWriter writer, RoleData value, EncoderContext encoderContext) {
             writer.writeStartDocument();
-            writer.writeInt64(RoleData._ID, value._id());
 
-            writer.writeString(RoleData.NAME, value.name.getValue());
-            writer.writeInt32(RoleData.ROLE_TYPE, value.roleType.getValue());
-            writer.writeInt32(RoleData.A, value.a.getValue());
-            writer.writeInt32(RoleData.A2, value.a2.getValue());
-            writer.writeBoolean(RoleData.B, value.b.getValue());
-            writer.writeInt32(RoleData.B2, value.b2.getValue());
-            writer.writeInt32(RoleData.S, value.s.getValue());
-            writer.writeInt32(RoleData.I, value.i.getValue());
-            writer.writeDouble(RoleData.F, value.f.getValue());
-            writer.writeDouble(RoleData.D, value.d.getValue());
-
-            if (value.item.getValue() != null) {
-                writer.writeName(RoleData.ITEM);
-                encoderContext.encodeWithChildContext(registry.get(ItemEntity.class), writer, value.item.getValue());
+            if (writer instanceof JsonStringWriter) {
+                writer.writeInt64(RoleData.ID, value.id.getLogValue());
+            } else {
+                writer.writeInt64(RoleData._ID, value.id.getLogValue());
             }
 
-            if (!value.items.getMap().isEmpty()) {
+            writer.writeString(RoleData.NAME, value.name.getLogValue());
+            writer.writeInt32(RoleData.ROLE_TYPE, value.roleType.getLogValue());
+            writer.writeInt32(RoleData.A, value.a.getLogValue());
+            writer.writeInt32(RoleData.A2, value.a2.getLogValue());
+            writer.writeBoolean(RoleData.B, value.b.getLogValue());
+            writer.writeInt32(RoleData.B2, value.b2.getLogValue());
+            writer.writeInt32(RoleData.S, value.s.getLogValue());
+            writer.writeInt32(RoleData.I, value.i.getLogValue());
+            writer.writeDouble(RoleData.F, value.f.getLogValue());
+            writer.writeDouble(RoleData.D, value.d.getLogValue());
+
+            if (value.item.getLogValue() != null) {
+                writer.writeName(RoleData.ITEM);
+                encoderContext.encodeWithChildContext(registry.get(ItemEntity.class), writer, value.item.getLogValue());
+            }
+
+            if (!value.items.isEmpty()) {
                 writer.writeStartDocument(RoleData.ITEMS);
-                for (Integer itemsKey : value.items.getMap().keySet()) {
-                    writer.writeInt32(itemsKey);
-                    encoderContext.encodeWithChildContext(registry.get(ItemEntity.class), writer, value.items.getMap().get(itemsKey));
+                for (Integer itemsKey : value.items.keySet()) {
+                    writer.writeName(String.valueOf(itemsKey));
+                    encoderContext.encodeWithChildContext(registry.get(ItemEntity.class), writer, value.items.get(itemsKey));
                 }
                 writer.writeEndDocument();
             }
 
-            if (!value.set.getSet().isEmpty()) {
+            if (!value.set.isEmpty()) {
                 writer.writeStartArray(RoleData.SET);
-                for (Boolean setValue : value.set.getSet()) {
+                for (Boolean setValue : value.set) {
                     writer.writeBoolean(setValue);
                 }
                 writer.writeEndArray();
             }
 
-            if (!value.list.getList().isEmpty()) {
+            if (!value.list.isEmpty()) {
                 writer.writeStartArray(RoleData.LIST);
-                for (String listValue : value.list.getList()) {
+                for (String listValue : value.list) {
                     writer.writeString(listValue);
                 }
                 writer.writeEndArray();
             }
 
-            if (!value.map.getMap().isEmpty()) {
+            if (!value.map.isEmpty()) {
                 writer.writeStartDocument(RoleData.MAP);
-                for (Integer mapKey : value.map.getMap().keySet()) {
-                    writer.writeInt32(mapKey);
-                    writer.writeInt32(value.map.getMap().get(mapKey));
+                for (Integer mapKey : value.map.keySet()) {
+                    writer.writeName(String.valueOf(mapKey));
+                    writer.writeInt32(value.map.get(mapKey));
                 }
                 writer.writeEndDocument();
             }
 
-            if (!value.set2.getSet().isEmpty()) {
+            if (!value.set2.isEmpty()) {
                 writer.writeStartArray(RoleData.SET2);
-                for (ItemEntity set2Value : value.set2.getSet()) {
+                for (ItemEntity set2Value : value.set2) {
                     encoderContext.encodeWithChildContext(registry.get(ItemEntity.class), writer, set2Value);
                 }
                 writer.writeEndArray();
             }
 
-            if (!value.list2.getList().isEmpty()) {
+            if (!value.list2.isEmpty()) {
                 writer.writeStartArray(RoleData.LIST2);
-                for (ItemEntity list2Value : value.list2.getList()) {
+                for (ItemEntity list2Value : value.list2) {
                     encoderContext.encodeWithChildContext(registry.get(ItemEntity.class), writer, list2Value);
                 }
                 writer.writeEndArray();

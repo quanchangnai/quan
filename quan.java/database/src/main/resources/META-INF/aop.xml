@@ -8,6 +8,6 @@
     </weaver>
     <aspects>
         <aspect name="quan.data.TransactionAspect"/>
-        <aspect name="quan.mongo.DatabaseAspect"/>
+        <aspect name="quan.data.mongo.OperationAspect"/>
     </aspects>
 </aspectj>

@@ -1,4 +1,4 @@
-package quan.mongo;
+package quan.data.mongo;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.internal.MongoClientDelegate;
@@ -25,7 +25,7 @@ import java.util.concurrent.ExecutorService;
  */
 @Aspect
 @SuppressWarnings("deprecation")
-public class DatabaseAspect {
+public class OperationAspect {
 
     //一般情况只会创建一个MongoClient，这里兼容一下可能有多个数据源的情况
     private static Map<OperationExecutor, MongoClient> clients = new HashMap<>();
