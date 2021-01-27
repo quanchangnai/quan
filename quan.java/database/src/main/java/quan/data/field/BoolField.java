@@ -11,10 +11,6 @@ public class BoolField extends Loggable implements Field {
 
     private boolean value;
 
-    public boolean getValue() {
-        return value;
-    }
-
     public void setValue(boolean value) {
         this.value = value;
     }
@@ -24,7 +20,7 @@ public class BoolField extends Loggable implements Field {
         this.value = (Boolean) logValue;
     }
 
-    public boolean getLogValue() {
+    public boolean getValue() {
         Transaction transaction = Transaction.get();
         if (transaction != null) {
             Boolean logValue = (Boolean) _getFieldLog(transaction, this);
@@ -35,13 +31,13 @@ public class BoolField extends Loggable implements Field {
         return value;
     }
 
-    public void setLogValue(boolean value, Data<?> root) {
+    public void setValue(boolean value, Data<?> root) {
         _setFieldLog(Transaction.check(), this, value, root);
     }
 
     @Override
     public String toString() {
-        return String.valueOf(getLogValue());
+        return String.valueOf(getValue());
     }
 
 }

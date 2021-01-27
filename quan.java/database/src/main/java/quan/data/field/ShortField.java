@@ -11,10 +11,6 @@ public class ShortField extends Loggable implements Field {
 
     private short value;
 
-    public short getValue() {
-        return value;
-    }
-
     public void setValue(short value) {
         this.value = value;
     }
@@ -24,7 +20,7 @@ public class ShortField extends Loggable implements Field {
         this.value = (short) logValue;
     }
 
-    public short getLogValue() {
+    public short getValue() {
         Transaction transaction = Transaction.get();
         if (transaction != null) {
             Short logValue = (Short) _getFieldLog(transaction, this);
@@ -35,13 +31,13 @@ public class ShortField extends Loggable implements Field {
         return value;
     }
 
-    public void setLogValue(short value, Data<?> root) {
+    public void setValue(short value, Data<?> root) {
         _setFieldLog(Transaction.check(), this, value, root);
     }
 
     @Override
     public String toString() {
-        return String.valueOf(getLogValue());
+        return String.valueOf(getValue());
     }
 
 }

@@ -11,10 +11,6 @@ public class IntField extends Loggable implements Field {
 
     private int value;
 
-    public int getValue() {
-        return value;
-    }
-
     public void setValue(int value) {
         this.value = value;
     }
@@ -24,7 +20,7 @@ public class IntField extends Loggable implements Field {
         this.value = (int) logValue;
     }
 
-    public int getLogValue() {
+    public int getValue() {
         Transaction transaction = Transaction.get();
         if (transaction != null) {
             Integer logValue = (Integer) _getFieldLog(transaction, this);
@@ -35,13 +31,13 @@ public class IntField extends Loggable implements Field {
         return value;
     }
 
-    public void setLogValue(int value, Data<?> root) {
+    public void setValue(int value, Data<?> root) {
         _setFieldLog(Transaction.check(), this, value, root);
     }
 
     @Override
     public String toString() {
-        return String.valueOf(getLogValue());
+        return String.valueOf(getValue());
     }
 
 }

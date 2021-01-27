@@ -1,7 +1,6 @@
 package quan.data.role;
 
 import java.util.*;
-
 import org.bson.*;
 import org.bson.codecs.*;
 import org.bson.codecs.configuration.CodecRegistry;
@@ -124,7 +123,7 @@ public class RoleData extends Data<Long> {
     }
 
     public RoleData(long id) {
-        this.id.setLogValue(id, this);
+        this.id.setValue(id,this);
     }
 
     /**
@@ -140,7 +139,7 @@ public class RoleData extends Data<Long> {
      */
     @Override
     public Long _id() {
-        return id.getLogValue();
+        return id.getValue();
     }
 
 
@@ -148,14 +147,14 @@ public class RoleData extends Data<Long> {
      * 角色ID
      */
     public long getId() {
-        return id.getLogValue();
+        return id.getValue();
     }
 
     /**
      * 角色ID
      */
     public RoleData setId(long id) {
-        this.id.setLogValue(id, this);
+        this.id.setValue(id, this);
         return this;
     }
 
@@ -168,11 +167,11 @@ public class RoleData extends Data<Long> {
     }
 
     public String getName() {
-        return name.getLogValue();
+        return name.getValue();
     }
 
     public RoleData setName(String name) {
-        this.name.setLogValue(name, this);
+        this.name.setValue(name, this);
         return this;
     }
 
@@ -180,23 +179,23 @@ public class RoleData extends Data<Long> {
      * 角色类型
      */
     public RoleType getRoleType() {
-        return RoleType.valueOf(roleType.getLogValue());
+        return RoleType.valueOf(roleType.getValue());
     }
 
     /**
      * 角色类型
      */
     public RoleData setRoleType(RoleType roleType) {
-        this.roleType.setLogValue(roleType.value(), this);
+        this.roleType.setValue(roleType.value(), this);
         return this;
     }
 
     public int getA() {
-        return a.getLogValue();
+        return a.getValue();
     }
 
     public RoleData setA(int a) {
-        this.a.setLogValue(a, this);
+        this.a.setValue(a, this);
         return this;
     }
 
@@ -206,11 +205,11 @@ public class RoleData extends Data<Long> {
     }
 
     public int getA2() {
-        return a2.getLogValue();
+        return a2.getValue();
     }
 
     public RoleData setA2(int a2) {
-        this.a2.setLogValue(a2, this);
+        this.a2.setValue(a2, this);
         return this;
     }
 
@@ -220,20 +219,20 @@ public class RoleData extends Data<Long> {
     }
 
     public boolean getB() {
-        return b.getLogValue();
+        return b.getValue();
     }
 
     public RoleData setB(boolean b) {
-        this.b.setLogValue(b, this);
+        this.b.setValue(b, this);
         return this;
     }
 
     public int getB2() {
-        return b2.getLogValue();
+        return b2.getValue();
     }
 
     public RoleData setB2(int b2) {
-        this.b2.setLogValue(b2, this);
+        this.b2.setValue(b2, this);
         return this;
     }
 
@@ -246,14 +245,14 @@ public class RoleData extends Data<Long> {
      * sssss
      */
     public short getS() {
-        return s.getLogValue();
+        return s.getValue();
     }
 
     /**
      * sssss
      */
     public RoleData setS(short s) {
-        this.s.setLogValue(s, this);
+        this.s.setValue(s, this);
         return this;
     }
 
@@ -269,14 +268,14 @@ public class RoleData extends Data<Long> {
      * iiii
      */
     public int getI() {
-        return i.getLogValue();
+        return i.getValue();
     }
 
     /**
      * iiii
      */
     public RoleData setI(int i) {
-        this.i.setLogValue(i, this);
+        this.i.setValue(i, this);
         return this;
     }
 
@@ -292,14 +291,14 @@ public class RoleData extends Data<Long> {
      * ffff
      */
     public float getF() {
-        return f.getLogValue();
+        return f.getValue();
     }
 
     /**
      * ffff
      */
     public RoleData setF(float f) {
-        this.f.setLogValue(f, this);
+        this.f.setValue(f, this);
         return this;
     }
 
@@ -312,11 +311,11 @@ public class RoleData extends Data<Long> {
     }
 
     public double getD() {
-        return d.getLogValue();
+        return d.getValue();
     }
 
     public RoleData setD(double d) {
-        this.d.setLogValue(d, this);
+        this.d.setValue(d, this);
         return this;
     }
 
@@ -329,14 +328,14 @@ public class RoleData extends Data<Long> {
      * 道具
      */
     public ItemEntity getItem() {
-        return item.getLogValue();
+        return item.getValue();
     }
 
     /**
      * 道具
      */
     public RoleData setItem(ItemEntity item) {
-        this.item.setLogValue(item, this);
+        this.item.setValue(item, this);
         return this;
     }
 
@@ -395,11 +394,11 @@ public class RoleData extends Data<Long> {
 
     }
 
-    public static class Codec implements org.bson.codecs.Codec<RoleData> {
+    public static class CodecImpl implements Codec<RoleData> {
 
         private CodecRegistry registry;
 
-        public Codec(CodecRegistry registry) {
+        public CodecImpl(CodecRegistry registry) {
             this.registry = registry;
         }
 
@@ -410,8 +409,8 @@ public class RoleData extends Data<Long> {
         @Override
         public RoleData decode(BsonReader reader, DecoderContext decoderContext) {
             reader.readStartDocument();
-            RoleData value = new RoleData();
-
+            RoleData value = new RoleData(); 
+        
             while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
                 switch (reader.readName()) {
                     case RoleData._ID:
@@ -507,25 +506,25 @@ public class RoleData extends Data<Long> {
             writer.writeStartDocument();
 
             if (writer instanceof JsonStringWriter) {
-                writer.writeInt64(RoleData.ID, value.id.getLogValue());
+                writer.writeInt64(RoleData.ID, value.id.getValue());
             } else {
-                writer.writeInt64(RoleData._ID, value.id.getLogValue());
+                writer.writeInt64(RoleData._ID, value.id.getValue());
             }
 
-            writer.writeString(RoleData.NAME, value.name.getLogValue());
-            writer.writeInt32(RoleData.ROLE_TYPE, value.roleType.getLogValue());
-            writer.writeInt32(RoleData.A, value.a.getLogValue());
-            writer.writeInt32(RoleData.A2, value.a2.getLogValue());
-            writer.writeBoolean(RoleData.B, value.b.getLogValue());
-            writer.writeInt32(RoleData.B2, value.b2.getLogValue());
-            writer.writeInt32(RoleData.S, value.s.getLogValue());
-            writer.writeInt32(RoleData.I, value.i.getLogValue());
-            writer.writeDouble(RoleData.F, value.f.getLogValue());
-            writer.writeDouble(RoleData.D, value.d.getLogValue());
+            writer.writeString(RoleData.NAME, value.name.getValue());
+            writer.writeInt32(RoleData.ROLE_TYPE, value.roleType.getValue());
+            writer.writeInt32(RoleData.A, value.a.getValue());
+            writer.writeInt32(RoleData.A2, value.a2.getValue());
+            writer.writeBoolean(RoleData.B, value.b.getValue());
+            writer.writeInt32(RoleData.B2, value.b2.getValue());
+            writer.writeInt32(RoleData.S, value.s.getValue());
+            writer.writeInt32(RoleData.I, value.i.getValue());
+            writer.writeDouble(RoleData.F, value.f.getValue());
+            writer.writeDouble(RoleData.D, value.d.getValue());
 
-            if (value.item.getLogValue() != null) {
+            if (value.item.getValue() != null) {
                 writer.writeName(RoleData.ITEM);
-                encoderContext.encodeWithChildContext(registry.get(ItemEntity.class), writer, value.item.getLogValue());
+                encoderContext.encodeWithChildContext(registry.get(ItemEntity.class), writer, value.item.getValue());
             }
 
             if (!value.items.isEmpty()) {

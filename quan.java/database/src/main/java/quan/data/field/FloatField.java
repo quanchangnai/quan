@@ -11,10 +11,6 @@ public class FloatField extends Loggable implements Field {
 
     private float value;
 
-    public float getValue() {
-        return value;
-    }
-
     public void setValue(float value) {
         this.value = value;
     }
@@ -24,7 +20,7 @@ public class FloatField extends Loggable implements Field {
         this.value = (float) logValue;
     }
 
-    public float getLogValue() {
+    public float getValue() {
         Transaction transaction = Transaction.get();
         if (transaction != null) {
             Float logValue = (Float) _getFieldLog(transaction, this);
@@ -35,13 +31,13 @@ public class FloatField extends Loggable implements Field {
         return value;
     }
 
-    public void setLogValue(float value, Data<?> root) {
+    public void setValue(float value, Data<?> root) {
         _setFieldLog(Transaction.check(), this, value, root);
     }
 
     @Override
     public String toString() {
-        return String.valueOf(getLogValue());
+        return String.valueOf(getValue());
     }
 
 }

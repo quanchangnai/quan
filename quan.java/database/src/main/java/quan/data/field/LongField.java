@@ -11,10 +11,6 @@ public class LongField extends Loggable implements Field {
 
     private long value;
 
-    public long getValue() {
-        return value;
-    }
-
     public void setValue(long value) {
         this.value = value;
     }
@@ -24,7 +20,7 @@ public class LongField extends Loggable implements Field {
         this.value = (long) logValue;
     }
 
-    public long getLogValue() {
+    public long getValue() {
         Transaction transaction = Transaction.get();
         if (transaction != null) {
             Long logValue = (Long) _getFieldLog(transaction, this);
@@ -35,13 +31,13 @@ public class LongField extends Loggable implements Field {
         return value;
     }
 
-    public void setLogValue(long value, Data<?> root) {
+    public void setValue(long value, Data<?> root) {
         _setFieldLog(Transaction.check(), this, value, root);
     }
 
     @Override
     public String toString() {
-        return String.valueOf(getLogValue());
+        return String.valueOf(getValue());
     }
 
 }

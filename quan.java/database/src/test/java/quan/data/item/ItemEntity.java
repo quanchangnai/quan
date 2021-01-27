@@ -36,11 +36,11 @@ public class ItemEntity extends Entity {
     }
 
     public int getId() {
-        return id.getLogValue();
+        return id.getValue();
     }
 
     public ItemEntity setId(int id) {
-        this.id.setLogValue(id, _getLogRoot());
+        this.id.setValue(id, _getLogRoot());
         return this;
     }
 
@@ -50,11 +50,11 @@ public class ItemEntity extends Entity {
     }
 
     public String getName() {
-        return name.getLogValue();
+        return name.getValue();
     }
 
     public ItemEntity setName(String name) {
-        this.name.setLogValue(name, _getLogRoot());
+        this.name.setValue(name, _getLogRoot());
         return this;
     }
 
@@ -78,11 +78,11 @@ public class ItemEntity extends Entity {
 
     }
 
-    public static class Codec implements org.bson.codecs.Codec<ItemEntity> {
+    public static class CodecImpl implements Codec<ItemEntity> {
 
         private CodecRegistry registry;
 
-        public Codec(CodecRegistry registry) {
+        public CodecImpl(CodecRegistry registry) {
             this.registry = registry;
         }
 
@@ -123,8 +123,8 @@ public class ItemEntity extends Entity {
         public void encode(BsonWriter writer, ItemEntity value, EncoderContext encoderContext) {
             writer.writeStartDocument();
 
-            writer.writeInt32(ItemEntity.ID, value.id.getLogValue());
-            writer.writeString(ItemEntity.NAME, value.name.getLogValue());
+            writer.writeInt32(ItemEntity.ID, value.id.getValue());
+            writer.writeString(ItemEntity.NAME, value.name.getValue());
 
             if (!value.list.isEmpty()) {
                 writer.writeStartArray(ItemEntity.LIST);

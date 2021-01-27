@@ -71,7 +71,7 @@ public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idFiel
     <#if idField.type=="string">    
         Objects.requireNonNull(${idName}, "参数[${idName}]不能为空");
     </#if>
-        this.${idName}.setLogValue(${idName},this);
+        this.${idName}.setValue(${idName},this);
     }
 
     /**
@@ -87,7 +87,7 @@ public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idFiel
      */
     @Override
     public ${idField.classType} _id() {
-        return ${idName}.getLogValue();
+        return ${idName}.getValue();
     }
 
 <#elseif selfFields?size<=5>
@@ -138,7 +138,7 @@ public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idFiel
 
     <#elseif field.enumType>
     public ${field.classType} get${field.name?cap_first}() {
-        return ${field.classType}.valueOf(${field.name}.getLogValue());
+        return ${field.classType}.valueOf(${field.name}.getValue());
     }
 
     <#if field.comment !="">
@@ -147,13 +147,13 @@ public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idFiel
      */
     </#if>
     public ${name} set${field.name?cap_first}(${field.classType} ${field.name}) {
-        this.${field.name}.setLogValue(${field.name}.value(), ${root});
+        this.${field.name}.setValue(${field.name}.value(), ${root});
         return this;
     }
 
     <#elseif field.builtinType>
     public ${field.basicType} get${field.name?cap_first}() {
-        return ${field.name}.getLogValue();
+        return ${field.name}.getValue();
     }
 
     <#if field.comment !="">
@@ -162,7 +162,7 @@ public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idFiel
      */
     </#if>
     public ${name} set${field.name?cap_first}(${field.basicType} ${field.name}) {
-        this.${field.name}.setLogValue(${field.name}, ${root});
+        this.${field.name}.setValue(${field.name}, ${root});
         return this;
     }
         <#if field.numberType>
@@ -180,7 +180,7 @@ public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idFiel
 
     <#else>
     public ${field.classType} get${field.name?cap_first}() {
-        return ${field.name}.getLogValue();
+        return ${field.name}.getValue();
     }
 
     <#if field.comment !="">
@@ -189,7 +189,7 @@ public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idFiel
      */
     </#if>
     public ${name} set${field.name?cap_first}(${field.classType} ${field.name}) {
-        this.${field.name}.setLogValue(${field.name}, ${root});
+        this.${field.name}.setValue(${field.name}, ${root});
         return this;
     }
 
@@ -203,7 +203,7 @@ public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idFiel
         <#if field.collectionType>
         _setLogRoot(${field.name}, root);
         <#elseif field.beanType>
-        _setLogRoot(${field.name}.getLogValue(), root);
+        _setLogRoot(${field.name}.getValue(), root);
         </#if>
     </#list>
     }
@@ -231,11 +231,11 @@ public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idFiel
     <#assign bsonTypes={"byte":"Int32","bool":"Boolean","short":"Int32","int":"Int32","long":"Int64","float":"Double","double":"Double","string":"String"}/>
     <#assign convertTypes={"byte":"byte","short":"short","float":"float"}/>
 
-    public static class Codec implements org.bson.codecs.Codec<${name}> {
+    public static class CodecImpl implements Codec<${name}> {
 
         private CodecRegistry registry;
 
-        public Codec(CodecRegistry registry) {
+        public CodecImpl(CodecRegistry registry) {
             this.registry = registry;
         }
 
@@ -306,9 +306,9 @@ public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idFiel
             <#if kind ==5>
 
             if (writer instanceof JsonStringWriter) {
-                writer.write${bsonTypes[idField.type]}(${name}.${idField.underscoreName}, value.${idField.name}.getLogValue());
+                writer.write${bsonTypes[idField.type]}(${name}.${idField.underscoreName}, value.${idField.name}.getValue());
             } else {
-                writer.write${bsonTypes[idField.type]}(${name}._ID, value.${idField.name}.getLogValue());
+                writer.write${bsonTypes[idField.type]}(${name}._ID, value.${idField.name}.getValue());
             }
             </#if>
 
@@ -316,16 +316,16 @@ public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idFiel
                 <#if field.ignore || kind == 5 && field.name == idName >
                     <#continue/>
                 <#elseif field.enumType>
-            writer.writeInt32(${name}.${field.underscoreName}, value.${field.name}.getLogValue());
+            writer.writeInt32(${name}.${field.underscoreName}, value.${field.name}.getValue());
                 <#elseif field.primitiveType>
-            writer.write${bsonTypes[field.type]}(${name}.${field.underscoreName}, value.${field.name}.getLogValue());
+            writer.write${bsonTypes[field.type]}(${name}.${field.underscoreName}, value.${field.name}.getValue());
                 <#elseif field.beanType>
                     <#if field_index gt 0 >
 
                     </#if>
-            if (value.${field.name}.getLogValue() != null) {
+            if (value.${field.name}.getValue() != null) {
                 writer.writeName(${name}.${field.underscoreName});
-                encoderContext.encodeWithChildContext(registry.get(${field.classType}.class), writer, value.${field.name}.getLogValue());
+                encoderContext.encodeWithChildContext(registry.get(${field.classType}.class), writer, value.${field.name}.getValue());
             }
                     <#if field_has_next && fields[field_index+1].primitiveType >
 

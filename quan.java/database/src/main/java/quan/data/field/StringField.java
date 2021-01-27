@@ -12,10 +12,6 @@ public class StringField extends Loggable implements Field {
 
     private String value = "";
 
-    public String getValue() {
-        return value;
-    }
-
     public void setValue(String value) {
         this.value = value;
     }
@@ -25,7 +21,7 @@ public class StringField extends Loggable implements Field {
         this.value = (String) logValue;
     }
 
-    public String getLogValue() {
+    public String getValue() {
         Transaction transaction = Transaction.get();
         if (transaction != null) {
             String logValue = (String) _getFieldLog(transaction, this);
@@ -36,14 +32,14 @@ public class StringField extends Loggable implements Field {
         return value;
     }
 
-    public void setLogValue(String value, Data<?> root) {
+    public void setValue(String value, Data<?> root) {
         Validations.validateFieldValue(value);
         _setFieldLog(Transaction.check(), this, value, root);
     }
 
     @Override
     public String toString() {
-        return getLogValue();
+        return getValue();
     }
 
 }
