@@ -16,16 +16,16 @@ public class DoubleField extends Loggable implements Field {
     }
 
     @Override
-    public void commit(Object logValue) {
-        this.value = (double) logValue;
+    public void commit(Object log) {
+        this.value = (double) log;
     }
 
     public double getValue() {
         Transaction transaction = Transaction.get();
         if (transaction != null) {
-            Double logValue = (Double) _getFieldLog(transaction, this);
-            if (logValue != null) {
-                return logValue;
+            Double log = (Double) _getFieldLog(transaction, this);
+            if (log != null) {
+                return log;
             }
         }
         return value;

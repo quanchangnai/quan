@@ -24,29 +24,25 @@ public final class SetField<E> extends Node implements Set<E>, Field {
         _setRoot(root);
     }
 
-    public PSet<E> getSet() {
-        return set;
-    }
-
     public Set<E> getDelegate() {
         return delegate;
     }
 
     @Override
-    public void commit(Object logSet) {
-        this.set = (PSet<E>) logSet;
+    public void commit(Object log) {
+        this.set = (PSet<E>) log;
     }
 
     @Override
     public void _setChildrenLogRoot(Data<?> root) {
-        for (E e : getLogSet()) {
+        for (E e : getSet()) {
             if (e instanceof Entity) {
                 _setLogRoot((Entity) e, root);
             }
         }
     }
 
-    private PSet<E> getLogSet(Transaction transaction) {
+    private PSet<E> getSet(Transaction transaction) {
         if (transaction != null) {
             PSet<E> log = (PSet<E>) _getFieldLog(transaction, this);
             if (log != null) {
@@ -56,29 +52,29 @@ public final class SetField<E> extends Node implements Set<E>, Field {
         return set;
     }
 
-    private PSet<E> getLogSet() {
-        return getLogSet(Transaction.get());
+    private PSet<E> getSet() {
+        return getSet(Transaction.get());
     }
 
     @Override
     public int size() {
-        return getLogSet().size();
+        return getSet().size();
     }
 
     @Override
     public boolean isEmpty() {
-        return getLogSet().isEmpty();
+        return getSet().isEmpty();
     }
 
     @Override
     public boolean contains(Object o) {
-        return getLogSet().contains(o);
+        return getSet().contains(o);
     }
 
 
     private class It implements Iterator<E> {
 
-        private Iterator<E> it = getLogSet().iterator();
+        private Iterator<E> it = getSet().iterator();
 
         private E current;
 
@@ -108,13 +104,13 @@ public final class SetField<E> extends Node implements Set<E>, Field {
 
     @Override
     public Object[] toArray() {
-        return getLogSet().toArray();
+        return getSet().toArray();
     }
 
     @SuppressWarnings("SuspiciousToArrayCall")
     @Override
     public <T> T[] toArray(T[] a) {
-        return getLogSet().toArray(a);
+        return getSet().toArray(a);
     }
 
 
@@ -123,7 +119,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
         Validations.validateCollectionValue(e);
 
         Transaction transaction = Transaction.check();
-        PSet<E> oldSet = getLogSet(transaction);
+        PSet<E> oldSet = getSet(transaction);
         PSet<E> newSet = oldSet.plus(e);
 
         if (oldSet == newSet) {
@@ -161,7 +157,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
     @Override
     public boolean remove(Object o) {
         Transaction transaction = Transaction.check();
-        PSet<E> oldSet = getLogSet(transaction);
+        PSet<E> oldSet = getSet(transaction);
         PSet<E> newSet = oldSet.minus(o);
 
         if (oldSet == newSet) {
@@ -179,7 +175,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        return getLogSet().containsAll(c);
+        return getSet().containsAll(c);
     }
 
     @Override
@@ -188,7 +184,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
         c.forEach(Validations::validateCollectionValue);
 
         Transaction transaction = Transaction.check();
-        PSet<E> oldSet = getLogSet(transaction);
+        PSet<E> oldSet = getSet(transaction);
         PSet<E> newSet = oldSet.plusAll(c);
 
         if (oldSet == newSet) {
@@ -241,7 +237,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
     @Override
     public void clear() {
         Transaction transaction = Transaction.check();
-        if (getLogSet(transaction).isEmpty()) {
+        if (getSet(transaction).isEmpty()) {
             return;
         }
 
@@ -251,7 +247,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
 
     @Override
     public String toString() {
-        return String.valueOf(getLogSet());
+        return String.valueOf(getSet());
     }
 
     @SuppressWarnings("NullableProblems")

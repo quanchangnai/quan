@@ -16,16 +16,16 @@ public class IntField extends Loggable implements Field {
     }
 
     @Override
-    public void commit(Object logValue) {
-        this.value = (int) logValue;
+    public void commit(Object log) {
+        this.value = (int) log;
     }
 
     public int getValue() {
         Transaction transaction = Transaction.get();
         if (transaction != null) {
-            Integer logValue = (Integer) _getFieldLog(transaction, this);
-            if (logValue != null) {
-                return logValue;
+            Integer log = (Integer) _getFieldLog(transaction, this);
+            if (log != null) {
+                return log;
             }
         }
         return value;

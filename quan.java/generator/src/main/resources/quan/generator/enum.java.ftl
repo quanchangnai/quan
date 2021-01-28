@@ -22,7 +22,7 @@ public enum ${name} {
 
 </#list>
 
-    private int value;
+    private final int value;
 
     ${name}(int value) {
         this.value = value;

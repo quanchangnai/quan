@@ -20,10 +20,6 @@ public final class ListField<E> extends Node implements List<E>, Field {
         _setRoot(root);
     }
 
-    public PVector<E> getList() {
-        return list;
-    }
-
     public List<E> getDelegate() {
         return delegate;
     }
@@ -35,7 +31,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
 
     @Override
     public void _setChildrenLogRoot(Data<?> root) {
-        for (E e : getLogList()) {
+        for (E e : getList()) {
             if (e instanceof Entity) {
                 _setLogRoot((Entity) e, root);
             }
@@ -56,10 +52,11 @@ public final class ListField<E> extends Node implements List<E>, Field {
             log = new Log<>(this.list);
             _setFieldLog(transaction, this, log, _getLogRoot(transaction));
         }
+
         return log;
     }
 
-    private PVector<E> getLogList() {
+    private PVector<E> getList() {
         Log<E> log = getLog(false);
         if (log != null) {
             return log.list;
@@ -77,17 +74,17 @@ public final class ListField<E> extends Node implements List<E>, Field {
 
     @Override
     public int size() {
-        return getLogList().size();
+        return getList().size();
     }
 
     @Override
     public boolean isEmpty() {
-        return getLogList().isEmpty();
+        return getList().isEmpty();
     }
 
     @Override
     public boolean contains(Object o) {
-        return getLogList().contains(o);
+        return getList().contains(o);
     }
 
     private class It implements Iterator<E> {
@@ -151,13 +148,13 @@ public final class ListField<E> extends Node implements List<E>, Field {
 
     @Override
     public Object[] toArray() {
-        return getLogList().toArray();
+        return getList().toArray();
     }
 
     @SuppressWarnings("SuspiciousToArrayCall")
     @Override
     public <T> T[] toArray(T[] a) {
-        return getLogList().toArray(a);
+        return getList().toArray(a);
     }
 
     @Override
@@ -209,7 +206,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        return getLogList().containsAll(c);
+        return getList().containsAll(c);
     }
 
     @Override
@@ -270,7 +267,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
 
     @Override
     public E get(int index) {
-        return getLogList().get(index);
+        return getList().get(index);
     }
 
     @Override
@@ -346,12 +343,12 @@ public final class ListField<E> extends Node implements List<E>, Field {
 
     @Override
     public int indexOf(Object o) {
-        return getLogList().indexOf(o);
+        return getList().indexOf(o);
     }
 
     @Override
     public int lastIndexOf(Object o) {
-        return getLogList().lastIndexOf(o);
+        return getList().lastIndexOf(o);
     }
 
     private class ListIt extends It implements ListIterator<E> {
@@ -433,12 +430,12 @@ public final class ListField<E> extends Node implements List<E>, Field {
 
     @Override
     public List<E> subList(int fromIndex, int toIndex) {
-        return getLogList().subList(fromIndex, toIndex);
+        return getList().subList(fromIndex, toIndex);
     }
 
     @Override
     public String toString() {
-        return String.valueOf(getLogList());
+        return String.valueOf(getList());
     }
 
     private static class Log<E> {

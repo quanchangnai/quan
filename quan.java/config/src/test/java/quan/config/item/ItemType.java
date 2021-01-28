@@ -17,7 +17,7 @@ public enum ItemType {
     type2(2);
 
 
-    private int value;
+    private final int value;
 
     ItemType(int value) {
         this.value = value;

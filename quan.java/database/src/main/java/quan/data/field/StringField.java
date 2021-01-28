@@ -17,16 +17,16 @@ public class StringField extends Loggable implements Field {
     }
 
     @Override
-    public void commit(Object logValue) {
-        this.value = (String) logValue;
+    public void commit(Object log) {
+        this.value = (String) log;
     }
 
     public String getValue() {
         Transaction transaction = Transaction.get();
         if (transaction != null) {
-            String logValue = (String) _getFieldLog(transaction, this);
-            if (logValue != null) {
-                return logValue;
+            String log = (String) _getFieldLog(transaction, this);
+            if (log != null) {
+                return log;
             }
         }
         return value;

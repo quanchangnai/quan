@@ -17,7 +17,7 @@ public enum QuestType {
     branch(2);
 
 
-    private int value;
+    private final int value;
 
     QuestType(int value) {
         this.value = value;

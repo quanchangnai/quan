@@ -16,16 +16,16 @@ public class FloatField extends Loggable implements Field {
     }
 
     @Override
-    public void commit(Object logValue) {
-        this.value = (float) logValue;
+    public void commit(Object log) {
+        this.value = (float) log;
     }
 
     public float getValue() {
         Transaction transaction = Transaction.get();
         if (transaction != null) {
-            Float logValue = (Float) _getFieldLog(transaction, this);
-            if (logValue != null) {
-                return logValue;
+            Float log = (Float) _getFieldLog(transaction, this);
+            if (log != null) {
+                return log;
             }
         }
         return value;

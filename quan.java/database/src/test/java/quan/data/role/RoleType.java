@@ -17,7 +17,7 @@ public enum RoleType {
     type2(2);
 
 
-    private int value;
+    private final int value;
 
     RoleType(int value) {
         this.value = value;

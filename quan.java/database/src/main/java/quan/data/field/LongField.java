@@ -16,16 +16,16 @@ public class LongField extends Loggable implements Field {
     }
 
     @Override
-    public void commit(Object logValue) {
-        this.value = (long) logValue;
+    public void commit(Object log) {
+        this.value = (long) log;
     }
 
     public long getValue() {
         Transaction transaction = Transaction.get();
         if (transaction != null) {
-            Long logValue = (Long) _getFieldLog(transaction, this);
-            if (logValue != null) {
-                return logValue;
+            Long log = (Long) _getFieldLog(transaction, this);
+            if (log != null) {
+                return log;
             }
         }
         return value;

@@ -20,65 +20,61 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
         _setRoot(root);
     }
 
-    public PMap<K, V> getMap() {
-        return map;
-    }
-
     public Map<K, V> getDelegate() {
         return delegate;
     }
 
     @Override
-    public void commit(Object logMap) {
-        this.map = (PMap<K, V>) logMap;
+    public void commit(Object log) {
+        this.map = (PMap<K, V>) log;
     }
 
     @Override
     public void _setChildrenLogRoot(Data<?> root) {
-        for (V value : getLogMap().values()) {
+        for (V value : getMap().values()) {
             if (value instanceof Entity) {
                 _setLogRoot((Entity) value, root);
             }
         }
     }
 
-    private PMap<K, V> getLogMap(Transaction transaction) {
+    private PMap<K, V> getMap(Transaction transaction) {
         if (transaction != null) {
-            PMap<K, V> logMap = (PMap<K, V>) _getFieldLog(transaction, this);
-            if (logMap != null) {
-                return logMap;
+            PMap<K, V> log = (PMap<K, V>) _getFieldLog(transaction, this);
+            if (log != null) {
+                return log;
             }
         }
         return map;
     }
 
-    private PMap<K, V> getLogMap() {
-        return getLogMap(Transaction.get());
+    private PMap<K, V> getMap() {
+        return getMap(Transaction.get());
     }
 
     @Override
     public int size() {
-        return getLogMap().size();
+        return getMap().size();
     }
 
     @Override
     public boolean isEmpty() {
-        return getLogMap().isEmpty();
+        return getMap().isEmpty();
     }
 
     @Override
     public boolean containsKey(Object key) {
-        return getLogMap().containsKey(key);
+        return getMap().containsKey(key);
     }
 
     @Override
     public boolean containsValue(Object value) {
-        return getLogMap().containsValue(value);
+        return getMap().containsValue(value);
     }
 
     @Override
     public V get(Object key) {
-        return getLogMap().get(key);
+        return getMap().get(key);
     }
 
     @Override
@@ -87,7 +83,7 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
         Validations.validateCollectionValue(value);
 
         Transaction transaction = Transaction.check();
-        PMap<K, V> oldMap = getLogMap(transaction);
+        PMap<K, V> oldMap = getMap(transaction);
         V oldValue = oldMap.get(key);
         PMap<K, V> newMap = oldMap.plus(key, value);
 
@@ -126,7 +122,7 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
     @Override
     public V remove(Object key) {
         Transaction transaction = Transaction.check();
-        PMap<K, V> oldMap = getLogMap(transaction);
+        PMap<K, V> oldMap = getMap(transaction);
 
         @SuppressWarnings("SuspiciousMethodCalls")
         V value = oldMap.get(key);
@@ -145,7 +141,7 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
         m.values().forEach(Validations::validateCollectionValue);
 
         Transaction transaction = Transaction.check();
-        PMap<K, V> oldMap = getLogMap(transaction);
+        PMap<K, V> oldMap = getMap(transaction);
         Data<?> root = _getLogRoot(transaction);
 
         _setFieldLog(transaction, this, oldMap.plusAll(m), root);
@@ -165,7 +161,7 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
     @Override
     public void clear() {
         Transaction transaction = Transaction.check();
-        if (getLogMap(transaction).isEmpty()) {
+        if (getMap(transaction).isEmpty()) {
             return;
         }
 
@@ -314,7 +310,7 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
                 public Iterator<Entry<K, V>> iterator() {
                     return new Iterator<Entry<K, V>>() {
                         //entrySet iterator
-                        private Iterator<Entry<K, V>> it = getLogMap().entrySet().iterator();
+                        private Iterator<Entry<K, V>> it = getMap().entrySet().iterator();
 
                         private Entry<K, V> current;
 
@@ -345,7 +341,7 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
 
     @Override
     public String toString() {
-        return String.valueOf(getLogMap());
+        return String.valueOf(getMap());
     }
 
     private static class Delegate<K, V> implements Map<K, V> {
