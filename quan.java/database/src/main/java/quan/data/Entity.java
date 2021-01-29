@@ -9,7 +9,7 @@ import quan.data.mongo.JsonStringWriter;
 import java.io.StringWriter;
 
 /**
- * 数据实体
+ * 数据实体<br/>
  * Created by quanchangnai on 2019/5/16.
  */
 public abstract class Entity extends Node {

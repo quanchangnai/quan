@@ -11,7 +11,7 @@ import java.util.function.Supplier;
 import static java.lang.Boolean.FALSE;
 
 /**
- * 事务实现，多线程并发时需要自己加锁，否则隔离级别就是读已提交
+ * 事务实现，多线程并发时需要自己加锁，否则隔离级别就是读已提交<br/>
  * Created by quanchangnai on 2019/5/16.
  */
 public class Transaction {

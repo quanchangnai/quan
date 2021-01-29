@@ -9,7 +9,7 @@ import java.util.Base64;
 import java.util.Objects;
 
 /**
- * 对称加密，支持DES、AES算法
+ * 对称加密，支持DES、AES算法<br/>
  * Created by quanchangnai on 2020/5/21.
  */
 public class SecretKeyCipher {
