@@ -16,6 +16,8 @@ public final class ListField<E> extends Node implements List<E>, Field {
 
     private Delegate<E> delegate = new Delegate<>(this);
 
+    private int modCount;
+
     public ListField(Data<?> root) {
         _setRoot(root);
     }
@@ -26,7 +28,9 @@ public final class ListField<E> extends Node implements List<E>, Field {
 
     @Override
     public void commit(Object log) {
-        this.list = ((Log<E>) log).list;
+        Log<E> log1 = (Log<E>) log;
+        list = log1.list;
+        modCount = log1.modCount;
     }
 
     @Override
@@ -49,7 +53,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
 
         Log<E> log = (Log<E>) _getFieldLog(transaction, this);
         if (write && log == null) {
-            log = new Log<>(this.list);
+            log = new Log<>(list, modCount);
             _setFieldLog(transaction, this, log, _getLogRoot(transaction));
         }
 
@@ -67,7 +71,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
     private int getModCount() {
         Log<E> log = getLog(false);
         if (log == null) {
-            return 0;
+            return modCount;
         }
         return log.modCount;
     }
@@ -160,15 +164,19 @@ public final class ListField<E> extends Node implements List<E>, Field {
     @Override
     public boolean add(E e) {
         Validations.validateCollectionValue(e);
+        Transaction transaction = Transaction.get();
 
-        Transaction transaction = Transaction.check();
-        Log<E> log = getLog(transaction, true);
-
-        log.modCount++;
-        log.list = log.list.plus(e);
-
-        if (e instanceof Entity) {
-            _setLogRoot((Entity) e, _getLogRoot(transaction));
+        if (transaction != null) {
+            Log<E> log = getLog(transaction, true);
+            log.modCount++;
+            log.list = log.list.plus(e);
+            if (e instanceof Entity) {
+                _setLogRoot((Entity) e, _getLogRoot(transaction));
+            }
+        } else if (Transaction.isOptional()) {
+            return plus(e);
+        } else {
+            Transaction.error();
         }
 
         return true;
@@ -177,6 +185,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
     public boolean plus(E e) {
         Validations.validateCollectionValue(e);
 
+        modCount++;
         list = list.plus(e);
         if (e instanceof Entity) {
             _setRoot((Entity) e, _getRoot());
@@ -187,21 +196,34 @@ public final class ListField<E> extends Node implements List<E>, Field {
 
     @Override
     public boolean remove(Object o) {
-        Log<E> log = getLog(true);
-        PVector<E> oldList = log.list;
+        if (Transaction.isInside()) {
+            Log<E> log = getLog(true);
+            PVector<E> oldList = log.list;
+            log.modCount++;
+            log.list = oldList.minus(o);
 
-        log.modCount++;
-        log.list = oldList.minus(o);
+            if (oldList != log.list) {
+                if (o instanceof Entity) {
+                    _setLogRoot((Entity) o, null);
+                }
+                return true;
+            }
+        } else if (Transaction.isOptional()) {
+            PVector<E> oldList = list;
+            modCount++;
+            list = oldList.minus(o);
 
-        if (oldList == log.list) {
-            return false;
+            if (oldList != list) {
+                if (o instanceof Entity) {
+                    _setRoot((Entity) o, null);
+                }
+                return true;
+            }
+        } else {
+            Transaction.error();
         }
 
-        if (o instanceof Entity) {
-            _setLogRoot((Entity) o, null);
-        }
-
-        return true;
+        return false;
     }
 
     @Override
@@ -219,50 +241,75 @@ public final class ListField<E> extends Node implements List<E>, Field {
         Objects.requireNonNull(c);
         c.forEach(Validations::validateCollectionValue);
 
-        Transaction transaction = Transaction.check();
-        Log<E> log = getLog(transaction, true);
+        Transaction transaction = Transaction.get();
+        if (transaction != null) {
+            Log<E> log = getLog(transaction, true);
+            PVector<E> oldList = log.list;
+            log.list = oldList.plusAll(index, c);
+            log.modCount++;
 
-        PVector<E> oldList = log.list;
-        log.list = oldList.plusAll(index, c);
-
-        if (oldList == log.list) {
-            return false;
-        }
-
-        Data<?> root = _getLogRoot(transaction);
-
-        for (E e : c) {
-            if (e instanceof Entity) {
-                _setLogRoot((Entity) e, root);
+            if (oldList != log.list) {
+                Data<?> root = _getLogRoot(transaction);
+                for (E e : c) {
+                    if (e instanceof Entity) {
+                        _setLogRoot((Entity) e, root);
+                    }
+                }
+                return true;
             }
+        } else if (Transaction.isOptional()) {
+            PVector<E> oldList = list;
+            modCount++;
+            list = oldList.plusAll(index, c);
+
+            if (oldList != list) {
+                Data<?> root = _getRoot();
+                for (E e : c) {
+                    if (e instanceof Entity) {
+                        _setRoot((Entity) e, root);
+                    }
+                }
+                return true;
+            }
+        } else {
+            Transaction.error();
         }
 
-        return true;
+        return false;
     }
 
     @Override
     public boolean removeAll(Collection<?> c) {
         boolean modified = false;
-
         for (Object o : c) {
             if (remove(o)) {
                 modified = true;
             }
         }
-
         return modified;
     }
 
     @Override
     public void clear() {
-        Log<E> log = getLog(true);
-        if (log.list.isEmpty()) {
-            return;
+        Transaction transaction = Transaction.get();
+        if (transaction != null) {
+            Log<E> log = getLog(transaction, true);
+            if (!log.list.isEmpty()) {
+                log.modCount++;
+                _setChildrenLogRoot(null);
+                log.list = Empty.vector();
+            }
+        } else if (!Transaction.isOptional()) {
+            Transaction.error();
+        } else if (!list.isEmpty()) {
+            modCount++;
+            for (E e : list) {
+                if (e instanceof Entity) {
+                    _setRoot((Entity) e, null);
+                }
+            }
+            list = Empty.vector();
         }
-
-        log.modCount++;
-        _setChildrenLogRoot(null);
-        log.list = Empty.vector();
     }
 
     @Override
@@ -292,53 +339,91 @@ public final class ListField<E> extends Node implements List<E>, Field {
     public E set(int index, E e) {
         Validations.validateCollectionValue(e);
 
-        Transaction transaction = Transaction.check();
-        Log<E> log = getLog(transaction, true);
+        Transaction transaction = Transaction.get();
+        if (transaction != null) {
+            Log<E> log = getLog(transaction, true);
+            PVector<E> oldList = log.list;
+            log.modCount++;
+            log.list = oldList.with(index, e);
 
-        PVector<E> oldList = log.list;
-        log.modCount++;
-        log.list = oldList.with(index, e);
+            if (e instanceof Entity) {
+                _setLogRoot((Entity) e, _getLogRoot(transaction));
+            }
+            E old = oldList.get(index);
+            if (old instanceof Entity) {
+                _setLogRoot((Entity) old, null);
+            }
+            return old;
+        } else if (Transaction.isOptional()) {
+            PVector<E> oldList = list;
+            modCount++;
+            list = oldList.with(index, e);
 
-        if (e instanceof Entity) {
-            _setLogRoot((Entity) e, _getLogRoot(transaction));
+            if (e instanceof Entity) {
+                _setRoot((Entity) e, _getRoot());
+            }
+            E old = oldList.get(index);
+            if (old instanceof Entity) {
+                _setRoot((Entity) old, null);
+            }
+            return old;
+        } else {
+            Transaction.error();
+            return null;
         }
-
-        E old = oldList.get(index);
-        if (old instanceof Entity) {
-            _setLogRoot((Entity) old, null);
-        }
-
-        return old;
     }
 
     @Override
     public void add(int index, E e) {
         Validations.validateCollectionValue(e);
+        Transaction transaction = Transaction.get();
 
-        Transaction transaction = Transaction.check();
-        Log<E> log = getLog(transaction, true);
-
-        log.modCount++;
-        log.list = log.list.plus(index, e);
-
-        if (e instanceof Entity) {
-            _setLogRoot((Entity) e, _getLogRoot(transaction));
+        if (transaction != null) {
+            Log<E> log = getLog(transaction, true);
+            log.modCount++;
+            log.list = log.list.plus(index, e);
+            if (e instanceof Entity) {
+                _setLogRoot((Entity) e, _getLogRoot(transaction));
+            }
+        } else if (Transaction.isOptional()) {
+            modCount++;
+            list = list.plus(index, e);
+            if (e instanceof Entity) {
+                _setRoot((Entity) e, _getRoot());
+            }
+        } else {
+            Transaction.error();
         }
     }
 
     @Override
     public E remove(int index) {
-        Log<E> log = getLog(true);
-        E old = log.list.get(index);
+        Transaction transaction = Transaction.get();
+        if (transaction != null) {
+            Log<E> log = getLog(transaction, true);
+            E old = log.list.get(index);
+            log.modCount++;
+            log.list = log.list.minus(index);
 
-        log.modCount++;
-        log.list = log.list.minus(index);
+            if (old instanceof Entity) {
+                _setLogRoot((Entity) old, null);
+            }
 
-        if (old instanceof Entity) {
-            _setLogRoot((Entity) old, null);
+            return old;
+        } else if (Transaction.isOptional()) {
+            E old = list.get(index);
+            modCount++;
+            list = list.minus(index);
+
+            if (old instanceof Entity) {
+                _setRoot((Entity) old, null);
+            }
+
+            return old;
+        } else {
+            Transaction.error();
+            return null;
         }
-
-        return old;
     }
 
     @Override
@@ -444,8 +529,9 @@ public final class ListField<E> extends Node implements List<E>, Field {
 
         private int modCount;
 
-        public Log(PVector<E> list) {
+        public Log(PVector<E> list, int modCount) {
             this.list = list;
+            this.modCount = modCount;
         }
 
     }

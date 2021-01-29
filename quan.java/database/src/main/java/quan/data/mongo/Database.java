@@ -205,15 +205,26 @@ public class Database implements DataWriter, MongoDatabase {
 
     /**
      * 通过主键_id查询数据
+     *
+     * @param <D> @see {@link Data}
      */
     public <D extends Data, I> D find(Class<D> clazz, I _id) {
+        return find(clazz, Filters.eq(Data._ID, _id)).first();
+    }
+
+    /**
+     * 通用查询数据
+     *
+     * @param <D>    @see {@link Data}
+     * @param filter @see {@link Filters}
+     */
+    public <D extends Data> FindIterable<D> find(Class<D> clazz, Bson filter) {
         MongoCollection<D> collection = getCollection(clazz);
         if (collection == null) {
             throw new IllegalArgumentException("数据类[" + clazz + "]未注册");
         }
-        return collection.find(Filters.eq(_id)).first();
+        return collection.find(filter);
     }
-
 
     /**
      * @see DataWriter#write(List, List, List)
@@ -222,17 +233,23 @@ public class Database implements DataWriter, MongoDatabase {
     public void write(List<Data<?>> insertions, List<Data<?>> updates, List<Data<?>> deletions) {
         Map<MongoCollection<Data<?>>, List<WriteModel<Data<?>>>> writeModels = new HashMap<>();
 
-        for (Data<?> data : insertions) {
-            writeModels.computeIfAbsent(collections.get(data.getClass()), c -> new ArrayList<>()).add(new InsertOneModel(data));
+        if (insertions != null) {
+            for (Data<?> data : insertions) {
+                writeModels.computeIfAbsent(collections.get(data.getClass()), this::list).add(new InsertOneModel(data));
+            }
         }
 
-        for (Data<?> data : updates) {
-            ReplaceOneModel<Data<?>> replaceOneModel = new ReplaceOneModel<>(Filters.eq(data._id()), data, replaceOptions);
-            writeModels.computeIfAbsent(collections.get(data.getClass()), c -> new ArrayList<>()).add(replaceOneModel);
+        if (updates != null) {
+            for (Data<?> data : updates) {
+                ReplaceOneModel<Data<?>> replaceOneModel = new ReplaceOneModel<>(Filters.eq(data._id()), data, replaceOptions);
+                writeModels.computeIfAbsent(collections.get(data.getClass()), this::list).add(replaceOneModel);
+            }
         }
 
-        for (Data<?> data : deletions) {
-            writeModels.computeIfAbsent(collections.get(data.getClass()), c -> new ArrayList<>()).add(new DeleteOneModel<>(Filters.eq(data._id())));
+        if (deletions != null) {
+            for (Data<?> data : deletions) {
+                writeModels.computeIfAbsent(collections.get(data.getClass()), this::list).add(new DeleteOneModel<>(Filters.eq(data._id())));
+            }
         }
 
         if (asyncWrite) {
@@ -246,6 +263,10 @@ public class Database implements DataWriter, MongoDatabase {
         } else {
             writeModels.forEach(MongoCollection::bulkWrite);
         }
+    }
+
+    private <K, V> ArrayList<V> list(K k) {
+        return new ArrayList<>();
     }
 
 

@@ -58,14 +58,17 @@ public class ClassUtils {
     /**
      * 重定义类
      *
-     * @param classBytes 类的字节码
+     * @param classBytes 一个或多个类的字节码
      */
-    public static synchronized void redefineClass(byte[] classBytes) {
+    public static synchronized void redefineClass(byte[]... classBytes) {
         try {
-            String className = readClassName(classBytes);
-            Class<?> clazz = Class.forName(className);
-            ClassDefinition classDefinition = new ClassDefinition(clazz, classBytes);
-            getInstrumentation().redefineClasses(classDefinition);
+            ClassDefinition[] classDefinitions = new ClassDefinition[classBytes.length];
+            for (int i = 0; i < classBytes.length; i++) {
+                String className = readClassName(classBytes[i]);
+                Class<?> clazz = Class.forName(className);
+                classDefinitions[i] = new ClassDefinition(clazz, classBytes[i]);
+            }
+            getInstrumentation().redefineClasses(classDefinitions);
         } catch (Exception e) {
             logger.error("重定义类失败", e);
         }

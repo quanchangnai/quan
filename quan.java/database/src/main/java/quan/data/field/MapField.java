@@ -82,23 +82,28 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
         Validations.validateMapKey(key);
         Validations.validateCollectionValue(value);
 
-        Transaction transaction = Transaction.check();
-        PMap<K, V> oldMap = getMap(transaction);
-        V oldValue = oldMap.get(key);
-        PMap<K, V> newMap = oldMap.plus(key, value);
+        Transaction transaction = Transaction.get();
+        if (transaction != null) {
+            PMap<K, V> oldMap = getMap(transaction);
+            V oldValue = oldMap.get(key);
+            PMap<K, V> newMap = oldMap.plus(key, value);
 
-        Data<?> root = _getLogRoot(transaction);
+            Data<?> root = _getLogRoot(transaction);
+            if (value instanceof Entity) {
+                _setLogRoot((Entity) value, root);
+            }
+            if (oldValue instanceof Entity) {
+                _setLogRoot((Entity) oldValue, null);
+            }
+            _setFieldLog(transaction, this, newMap, root);
 
-        if (value instanceof Entity) {
-            _setLogRoot((Entity) value, root);
+            return oldValue;
+        } else if (Transaction.isOptional()) {
+            return plus(key, value);
+        } else {
+            Transaction.error();
+            return null;
         }
-        if (oldValue instanceof Entity) {
-            _setLogRoot((Entity) oldValue, null);
-        }
-
-        _setFieldLog(transaction, this, newMap, root);
-
-        return oldValue;
     }
 
     public V plus(K key, V value) {
@@ -120,19 +125,29 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
     }
 
     @Override
+    @SuppressWarnings("SuspiciousMethodCalls")
     public V remove(Object key) {
-        Transaction transaction = Transaction.check();
-        PMap<K, V> oldMap = getMap(transaction);
-
-        @SuppressWarnings("SuspiciousMethodCalls")
-        V value = oldMap.get(key);
-        _setFieldLog(transaction, this, oldMap.minus(key), _getLogRoot(transaction));
-
-        if (value instanceof Entity) {
-            _setLogRoot((Entity) value, null);
+        Transaction transaction = Transaction.get();
+        if (transaction != null) {
+            PMap<K, V> oldMap = getMap(transaction);
+            V value = oldMap.get(key);
+            if (value != null) {
+                _setFieldLog(transaction, this, oldMap.minus(key), _getLogRoot(transaction));
+                if (value instanceof Entity) {
+                    _setLogRoot((Entity) value, null);
+                }
+            }
+            return value;
+        } else if (Transaction.isOptional()) {
+            V value = map.get(key);
+            if (value instanceof Entity) {
+                _setRoot((Entity) value, null);
+            }
+            return value;
+        } else {
+            Transaction.error();
+            return null;
         }
-
-        return value;
     }
 
     @Override
@@ -140,33 +155,65 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
         m.keySet().forEach(Validations::validateMapKey);
         m.values().forEach(Validations::validateCollectionValue);
 
-        Transaction transaction = Transaction.check();
-        PMap<K, V> oldMap = getMap(transaction);
-        Data<?> root = _getLogRoot(transaction);
+        Transaction transaction = Transaction.get();
+        if (transaction != null) {
+            PMap<K, V> oldMap = getMap(transaction);
+            Data<?> root = _getLogRoot(transaction);
+            _setFieldLog(transaction, this, oldMap.plusAll(m), root);
 
-        _setFieldLog(transaction, this, oldMap.plusAll(m), root);
+            for (K key : m.keySet()) {
+                V newValue = m.get(key);
+                if (newValue instanceof Entity) {
+                    _setLogRoot((Entity) newValue, root);
+                }
+                V oldValue = oldMap.get(key);
+                if (oldValue != newValue && oldValue instanceof Entity) {
+                    _setLogRoot((Entity) oldValue, null);
+                }
+            }
+        } else if (Transaction.isOptional()) {
+            PMap<K, V> oldMap = map;
+            map = oldMap.plusAll(m);
+            Data<?> root = _getRoot();
 
-        for (K key : m.keySet()) {
-            V newValue = m.get(key);
-            if (newValue instanceof Entity) {
-                _setLogRoot((Entity) newValue, root);
+            for (K key : m.keySet()) {
+                V newValue = m.get(key);
+                if (newValue instanceof Entity) {
+                    _setRoot((Entity) newValue, root);
+                }
+                V oldValue = oldMap.get(key);
+                if (oldValue != newValue && oldValue instanceof Entity) {
+                    _setRoot((Entity) oldValue, null);
+                }
             }
-            V oldValue = oldMap.get(key);
-            if (oldValue != newValue && oldValue instanceof Entity) {
-                _setLogRoot((Entity) oldValue, null);
-            }
+        } else {
+            Transaction.error();
         }
     }
 
     @Override
     public void clear() {
-        Transaction transaction = Transaction.check();
-        if (getMap(transaction).isEmpty()) {
+        Transaction transaction = Transaction.get();
+        PMap<K, V> oldMap = getMap(transaction);
+        if (oldMap.isEmpty()) {
             return;
         }
 
-        _setChildrenLogRoot(null);
-        _setFieldLog(transaction, this, Empty.map(), _getLogRoot(transaction));
+        if (transaction != null) {
+            _setChildrenLogRoot(null);
+            _setFieldLog(transaction, this, Empty.map(), _getLogRoot(transaction));
+        } else if (Transaction.isOptional()) {
+            for (V value : this.map.values()) {
+                if (value instanceof Entity) {
+                    _setRoot((Entity) value, null);
+                }
+            }
+            if (!this.map.isEmpty()) {
+                this.map = Empty.map();
+            }
+        } else {
+            Transaction.error();
+        }
     }
 
     private Set<K> keySet;

@@ -32,7 +32,14 @@ public class IntField extends Loggable implements Field {
     }
 
     public void setValue(int value, Data<?> root) {
-        _setFieldLog(Transaction.check(), this, value, root);
+        Transaction transaction = Transaction.get();
+        if (transaction != null) {
+            _setFieldLog(transaction, this, value, root);
+        } else if (Transaction.isOptional()) {
+            this.value = value;
+        } else {
+            Transaction.error();
+        }
     }
 
     @Override

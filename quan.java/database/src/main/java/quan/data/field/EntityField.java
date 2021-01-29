@@ -35,18 +35,25 @@ public final class EntityField<V extends Entity> extends Loggable implements Fie
 
     public void setValue(V value, Data<?> root) {
         Validations.validateEntityRoot(value);
+        Transaction transaction = Transaction.get();
 
-        Transaction transaction = Transaction.check();
-        Log<V> log = (Log<V>) _getFieldLog(transaction, this);
-
-        if (log == null) {
-            log = new Log<>(this.value);
-            _setFieldLog(transaction, this, log, root);
+        if (transaction != null) {
+            Log<V> log = (Log<V>) _getFieldLog(transaction, this);
+            if (log == null) {
+                log = new Log<>(this.value);
+                _setFieldLog(transaction, this, log, root);
+            }
+            //root log
+            _setRootLog(transaction, log.value, null);
+            log.value = value;
+            _setRootLog(transaction, value, root);
+        } else if (Transaction.isOptional()) {
+            _setRoot(this.value, null);
+            this.value = value;
+            _setRoot(value, root);
+        } else {
+            Transaction.error();
         }
-
-        _setRootLog(transaction, log.value, null);
-        log.value = value;
-        _setRootLog(transaction, value, root);
     }
 
     @Override

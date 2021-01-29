@@ -8,6 +8,8 @@ import quan.data.field.Field;
 import java.util.*;
 import java.util.function.Supplier;
 
+import static java.lang.Boolean.FALSE;
+
 /**
  * 事务实现，多线程并发时需要自己加锁，否则隔离级别就是读已提交
  * Created by quanchangnai on 2019/5/16.
@@ -17,9 +19,19 @@ public class Transaction {
     private static final Logger logger = LoggerFactory.getLogger(Transaction.class);
 
     /**
+     * 在事务外是否能修改数据，全局范围生效
+     */
+    private static boolean globalOptional = false;
+
+    /**
+     * 在事务外是否能修改数据，仅对线程范围生效
+     */
+    private static ThreadLocal<Boolean> localOptional = ThreadLocal.withInitial(FALSE::booleanValue);
+
+    /**
      * 保存事务为线程本地变量
      */
-    private static ThreadLocal<Transaction> threadLocal = new ThreadLocal<>();
+    private static ThreadLocal<Transaction> localTxn = new ThreadLocal<>();
 
     /**
      * 事务是否已失败
@@ -45,6 +57,24 @@ public class Transaction {
      * 在事务执行结束之后再执行的特殊任务
      */
     private LinkedHashMap<Runnable, Boolean> afterTasks = new LinkedHashMap<>();
+
+    /**
+     * @see Transaction#globalOptional
+     */
+    public static void setGlobalOptional(boolean globalOptional) {
+        Transaction.globalOptional = globalOptional;
+    }
+
+    /**
+     * @see Transaction#localOptional
+     */
+    public static void setLocalOptional(boolean localOptional) {
+        Transaction.localOptional.set(localOptional);
+    }
+
+    public static boolean isOptional() {
+        return globalOptional || localOptional.get();
+    }
 
     void setDataLog(Data<?> data, Data.Log log) {
         dataLogs.put(data, log);
@@ -77,35 +107,39 @@ public class Transaction {
      * 判断当前是否处于事务之中
      */
     public static boolean isInside() {
-        return threadLocal.get() != null;
+        return localTxn.get() != null;
     }
 
     /**
      * 检测当前是否处于事务之中，如果当前在事务之中则返回当前事务，否则报错
      */
     public static Transaction check() {
-        Transaction transaction = threadLocal.get();
+        Transaction transaction = localTxn.get();
         if (transaction == null) {
-            throw new IllegalStateException("当前不在事务中");
+            error();
         }
         return transaction;
+    }
+
+    public static void error() {
+        throw new IllegalStateException("当前不在事务中");
     }
 
     /**
      * 获取当前事务
      */
     public static Transaction get() {
-        return threadLocal.get();
+        return localTxn.get();
     }
 
     /**
      * 开始事务
      */
     private static Transaction begin() {
-        Transaction transaction = threadLocal.get();
+        Transaction transaction = localTxn.get();
         if (transaction == null) {
             transaction = new Transaction();
-            threadLocal.set(transaction);
+            localTxn.set(transaction);
         } else {
             throw new IllegalStateException("当前已经在事务中了");
         }
@@ -116,7 +150,7 @@ public class Transaction {
      * 在事务中执行任务
      */
     public static void execute(Runnable task) {
-        if (threadLocal.get() != null) {
+        if (localTxn.get() != null) {
             task.run();
             return;
         }
@@ -136,7 +170,7 @@ public class Transaction {
      * 在事务中执行任务
      */
     public static <R> R execute(Supplier<R> task) {
-        if (threadLocal.get() != null) {
+        if (localTxn.get() != null) {
             return task.get();
         }
 
@@ -156,7 +190,7 @@ public class Transaction {
      */
     private static void end(Transaction transaction) {
         //清空当前线程持有的事务对象
-        threadLocal.set(null);
+        localTxn.set(null);
 
         //事务执行成功，提交事务
         if (!transaction.failed) {
@@ -181,7 +215,7 @@ public class Transaction {
      */
     public static void rollback() {
         //标记事务为失败状态
-        Transaction.check().failed = true;
+        check().failed = true;
     }
 
     /**
@@ -233,14 +267,14 @@ public class Transaction {
      * 在当前事务执行成功之后再执行特殊任务
      */
     public static void onSucceeded(Runnable task) {
-        Transaction.check().afterTasks.put(task, true);
+        check().afterTasks.put(task, true);
     }
 
     /**
      * 在当前事务执行失败之后再执行特殊任务
      */
     public static void onFailed(Runnable task) {
-        Transaction.check().afterTasks.put(task, false);
+        check().afterTasks.put(task, false);
     }
 
 }

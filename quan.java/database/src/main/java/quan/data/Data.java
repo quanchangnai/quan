@@ -7,6 +7,7 @@ import quan.data.mongo.CodecsRegistry;
 import quan.data.mongo.JsonStringWriter;
 
 import java.io.StringWriter;
+import java.util.Collections;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 
@@ -44,8 +45,7 @@ public abstract class Data<I> {
         data.state = State.UPDATE;
     };
 
-    private void _setWriter(DataWriter writer, State state) {
-        Transaction transaction = Transaction.check();
+    private void _setWriter(Transaction transaction, DataWriter writer, State state) {
         Log log = transaction.getDataLog(this);
         if (log == null) {
             log = new Log(writer, state);
@@ -57,35 +57,60 @@ public abstract class Data<I> {
     }
 
     /**
-     * 使用指定的写入器在提交事务后插入数据
+     * 使用指定的写入器插入数据，在内存事务中操作将会在提交时真正执行
      */
     public final void insert(DataWriter writer) {
         Objects.requireNonNull(writer, "参数[writer]不能为空");
-        _setWriter(writer, State.INSERTION);
+
+        Transaction transaction = Transaction.get();
+        if (transaction != null) {
+            _setWriter(transaction, writer, State.INSERTION);
+        } else if (Transaction.isOptional()) {
+            writer.write(Collections.singletonList(this), null, null);
+        } else {
+            Transaction.error();
+        }
     }
 
     /**
-     * 使用指定的写入器在提交事务后更新数据
+     * 使用指定的写入器更新数据，在内存事务中操作将会在提交时真正执行
      */
     public final void update(DataWriter writer) {
         Objects.requireNonNull(writer, "参数[writer]不能为空");
-        _setWriter(writer, State.UPDATE);
+
+        Transaction transaction = Transaction.get();
+        if (transaction != null) {
+            _setWriter(transaction, writer, State.UPDATE);
+        } else if (Transaction.isOptional()) {
+            writer.write(null, Collections.singletonList(this), null);
+        } else {
+            Transaction.error();
+        }
     }
 
     /**
-     * 使用指定的写入器在提交事务后删除数据
+     * 使用指定的写入器删除数据，在内存事务中操作将会在提交时真正执行
      */
     public final void delete(DataWriter writer) {
         Objects.requireNonNull(writer, "参数[writer]不能为空");
-        _setWriter(writer, State.DELETION);
+
+        Transaction transaction = Transaction.get();
+        if (transaction != null) {
+            _setWriter(transaction, writer, State.DELETION);
+        } else if (Transaction.isOptional()) {
+            writer.write(null, null, Collections.singletonList(this));
+        } else {
+            Transaction.error();
+        }
     }
 
     /**
-     * 设置数据为纯内纯对象，数据的修改将不会同步到数据库
+     * 数据从数据查询出来时，会设置默认写入器和状态(更新)，本操作会清除以上设置
      */
     public final void free() {
-        if (Transaction.isInside()) {
-            _setWriter(null, null);
+        Transaction transaction = Transaction.get();
+        if (transaction != null) {
+            _setWriter(transaction, null, null);
         } else {
             this.writer = null;
             this.state = null;

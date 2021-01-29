@@ -58,8 +58,9 @@ public class OperationAspect {
     //禁止在内存事务中写数据库
     @Before("execute() && args(com.mongodb.operation.WriteOperation,..,com.mongodb.client.ClientSession)")
     public void beforeWrite() {
-        if (Transaction.isInside())
+        if (!Transaction.isOptional() && Transaction.isInside()) {
             throw new IllegalStateException("不能在内存事务中写数据库");
+        }
     }
 
     //关闭线程池

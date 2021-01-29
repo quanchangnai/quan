@@ -3,7 +3,6 @@ package quan.data.field;
 import quan.data.Data;
 import quan.data.Loggable;
 import quan.data.Transaction;
-import quan.data.Validations;
 
 /**
  * Created by quanchangnai on 2020/4/17.
@@ -33,8 +32,14 @@ public class StringField extends Loggable implements Field {
     }
 
     public void setValue(String value, Data<?> root) {
-        Validations.validateFieldValue(value);
-        _setFieldLog(Transaction.check(), this, value, root);
+        Transaction transaction = Transaction.get();
+        if (transaction != null) {
+            _setFieldLog(transaction, this, value, root);
+        } else if (Transaction.isOptional()) {
+            this.value = value;
+        } else {
+            Transaction.error();
+        }
     }
 
     @Override

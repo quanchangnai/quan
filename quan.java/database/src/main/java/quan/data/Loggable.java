@@ -25,4 +25,10 @@ public abstract class Loggable {
         return transaction.getRootLog(node);
     }
 
+    protected static void _setRoot(Node node, Data<?> root) {
+        if (node != null) {
+            node._setRoot(root);
+        }
+    }
+
 }

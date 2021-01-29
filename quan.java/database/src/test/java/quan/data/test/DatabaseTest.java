@@ -50,6 +50,8 @@ public class DatabaseTest {
     @Test
     public void testRole() {
         System.err.println("testRole=============");
+        Transaction.setLocalOptional(true);
+
         Role roleTest1 = new Role(123L);
         System.err.println("roleTest1.test1():" + roleTest1.test1(111));
         roleTest1.test2();

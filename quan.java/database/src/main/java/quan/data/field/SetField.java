@@ -113,28 +113,30 @@ public final class SetField<E> extends Node implements Set<E>, Field {
         return getSet().toArray(a);
     }
 
-
     @Override
     public boolean add(E e) {
         Validations.validateCollectionValue(e);
+        Transaction transaction = Transaction.get();
 
-        Transaction transaction = Transaction.check();
-        PSet<E> oldSet = getSet(transaction);
-        PSet<E> newSet = oldSet.plus(e);
+        if (transaction != null) {
+            PSet<E> oldSet = getSet(transaction);
+            PSet<E> newSet = oldSet.plus(e);
 
-        if (oldSet == newSet) {
-            return false;
+            if (oldSet != newSet) {
+                Data<?> root = _getLogRoot(transaction);
+                _setFieldLog(transaction, this, newSet, root);
+                if (e instanceof Entity) {
+                    _setLogRoot((Entity) e, root);
+                }
+                return true;
+            }
+        } else if (Transaction.isOptional()) {
+            return plus(e);
+        } else {
+            Transaction.error();
         }
 
-        Data<?> root = _getLogRoot(transaction);
-
-        if (e instanceof Entity) {
-            _setLogRoot((Entity) e, root);
-        }
-
-        _setFieldLog(transaction, this, newSet, root);
-
-        return true;
+        return false;
     }
 
     public boolean plus(E e) {
@@ -143,34 +145,43 @@ public final class SetField<E> extends Node implements Set<E>, Field {
         PSet<E> oldSet = set;
         set = oldSet.plus(e);
 
-        if (oldSet == set) {
-            return false;
+        if (oldSet != set) {
+            if (e instanceof Entity) {
+                _setRoot((Entity) e, _getRoot());
+            }
+            return true;
         }
 
-        if (e instanceof Entity) {
-            _setRoot((Entity) e, _getRoot());
-        }
-
-        return true;
+        return false;
     }
 
     @Override
     public boolean remove(Object o) {
-        Transaction transaction = Transaction.check();
-        PSet<E> oldSet = getSet(transaction);
-        PSet<E> newSet = oldSet.minus(o);
-
-        if (oldSet == newSet) {
-            return false;
+        Transaction transaction = Transaction.get();
+        if (transaction != null) {
+            PSet<E> oldSet = getSet(transaction);
+            PSet<E> newSet = oldSet.minus(o);
+            if (oldSet != newSet) {
+                _setFieldLog(transaction, this, newSet, _getLogRoot(transaction));
+                if (o instanceof Entity) {
+                    _setLogRoot((Entity) o, null);
+                }
+                return true;
+            }
+        } else if (Transaction.isOptional()) {
+            PSet<E> oldSet = set;
+            set = set.minus(o);
+            if (oldSet != set) {
+                if (o instanceof Entity) {
+                    _setRoot((Entity) o, null);
+                }
+                return true;
+            }
+        } else {
+            Transaction.error();
         }
 
-        _setFieldLog(transaction, this, newSet, _getLogRoot(transaction));
-
-        if (o instanceof Entity) {
-            _setLogRoot((Entity) o, null);
-        }
-
-        return true;
+        return false;
     }
 
     @Override
@@ -182,26 +193,38 @@ public final class SetField<E> extends Node implements Set<E>, Field {
     public boolean addAll(Collection<? extends E> c) {
         Objects.requireNonNull(c);
         c.forEach(Validations::validateCollectionValue);
+        Transaction transaction = Transaction.get();
 
-        Transaction transaction = Transaction.check();
-        PSet<E> oldSet = getSet(transaction);
-        PSet<E> newSet = oldSet.plusAll(c);
-
-        if (oldSet == newSet) {
-            return false;
-        }
-
-        Data<?> root = _getLogRoot(transaction);
-
-        _setFieldLog(transaction, this, newSet, root);
-
-        for (E e : c) {
-            if (e instanceof Entity) {
-                _setLogRoot((Entity) e, root);
+        if (transaction != null) {
+            PSet<E> oldSet = getSet(transaction);
+            PSet<E> newSet = oldSet.plusAll(c);
+            if (oldSet != newSet) {
+                Data<?> root = _getLogRoot(transaction);
+                _setFieldLog(transaction, this, newSet, root);
+                for (E e : c) {
+                    if (e instanceof Entity) {
+                        _setLogRoot((Entity) e, root);
+                    }
+                }
+                return true;
             }
+        } else if (Transaction.isOptional()) {
+            PSet<E> oldSet = set;
+            set = oldSet.plusAll(c);
+            if (oldSet != set) {
+                Data<?> root = _getRoot();
+                for (E e : c) {
+                    if (e instanceof Entity) {
+                        _setLogRoot((Entity) e, root);
+                    }
+                }
+                return true;
+            }
+        } else {
+            Transaction.error();
         }
 
-        return true;
+        return false;
     }
 
     @Override
@@ -236,13 +259,26 @@ public final class SetField<E> extends Node implements Set<E>, Field {
 
     @Override
     public void clear() {
-        Transaction transaction = Transaction.check();
-        if (getSet(transaction).isEmpty()) {
+        Transaction transaction = Transaction.get();
+        PSet<E> oldSet = getSet(transaction);
+        if (oldSet.isEmpty()) {
             return;
         }
 
-        _setChildrenLogRoot(null);
-        _setFieldLog(transaction, this, Empty.set(), _getLogRoot(transaction));
+        if (transaction != null) {
+            _setChildrenLogRoot(null);
+            _setFieldLog(transaction, this, Empty.set(), _getLogRoot(transaction));
+        } else if (Transaction.isOptional()) {
+            for (E e : oldSet) {
+                if (e instanceof Entity) {
+                    _setRoot((Entity) e, null);
+                }
+            }
+            this.set = Empty.set();
+        } else {
+            Transaction.error();
+        }
+
     }
 
     @Override

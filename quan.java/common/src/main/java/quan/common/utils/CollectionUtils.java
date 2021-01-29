@@ -27,11 +27,11 @@ public class CollectionUtils {
         return Collections.unmodifiableSet(set);
     }
 
-    public boolean isEmpty(Collection<?> collection) {
+    public static boolean isEmpty(Collection<?> collection) {
         return collection == null || collection.isEmpty();
     }
 
-    public boolean isEmpty(Map<?, ?> map) {
+    public static boolean isEmpty(Map<?, ?> map) {
         return map == null || map.isEmpty();
     }
 
