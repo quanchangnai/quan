@@ -68,14 +68,6 @@ public final class ListField<E> extends Node implements List<E>, Field {
         return list;
     }
 
-    private int getModCount() {
-        Log<E> log = getLog(false);
-        if (log == null) {
-            return modCount;
-        }
-        return log.modCount;
-    }
-
     @Override
     public int size() {
         return getList().size();
@@ -93,22 +85,37 @@ public final class ListField<E> extends Node implements List<E>, Field {
 
     private class It implements Iterator<E> {
 
+        //提前取出，避免遍历过程中频繁调用
+        Transaction transaction = Transaction.get();
+
         int cursor;
 
         int last = -1;
 
         int expectedModCount = getModCount();
 
+        Log<E> log;
+
+        PVector<E> list = log != null ? log.list : ListField.this.list;
+
+        //如果迭代过程中没有修改，用这个比较快
+        Iterator<E> iterator = list.iterator();
+
         @Override
         public boolean hasNext() {
-            return cursor != size();
+            return cursor != this.list.size();
         }
 
         @Override
         public E next() {
             checkConcurrentModification();
             try {
-                E next = get(cursor);
+                E next;
+                if (iterator != null) {
+                    next = iterator.next();
+                } else {
+                    next = this.list.get(cursor);
+                }
                 last = cursor;
                 cursor++;
                 return next;
@@ -132,16 +139,32 @@ public final class ListField<E> extends Node implements List<E>, Field {
                 }
                 last--;
                 expectedModCount = getModCount();
+                this.list = log.list;
+                clearIterator();
             } catch (IndexOutOfBoundsException ex) {
                 throw new ConcurrentModificationException();
             }
 
         }
 
+        int getModCount() {
+            if (transaction != null && log == null) {
+                log = getLog(transaction, false);
+            }
+            if (log != null) {
+                return log.modCount;
+            }
+            return ListField.this.modCount;
+        }
+
         void checkConcurrentModification() {
             if (getModCount() != expectedModCount) {
                 throw new ConcurrentModificationException();
             }
+        }
+
+        void clearIterator() {
+            iterator = null;
         }
     }
 
@@ -438,8 +461,12 @@ public final class ListField<E> extends Node implements List<E>, Field {
 
     private class ListIt extends It implements ListIterator<E> {
 
+        private ListIterator<E> listIterator;
+
         public ListIt(int index) {
             cursor = index;
+            iterator = list.listIterator(index);
+            listIterator = (ListIterator<E>) iterator;
         }
 
         @Override
@@ -451,7 +478,12 @@ public final class ListField<E> extends Node implements List<E>, Field {
         public E previous() {
             checkConcurrentModification();
             try {
-                E previous = get(cursor - 1);
+                E previous;
+                if (listIterator != null) {
+                    previous = listIterator.previous();
+                } else {
+                    previous = this.list.get(cursor - 1);
+                }
                 last = --cursor;
                 return previous;
             } catch (IndexOutOfBoundsException e) {
@@ -480,6 +512,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
             try {
                 ListField.this.set(last, e);
                 expectedModCount = getModCount();
+                clearIterator();
             } catch (IndexOutOfBoundsException ex) {
                 throw new ConcurrentModificationException();
             }
@@ -494,9 +527,16 @@ public final class ListField<E> extends Node implements List<E>, Field {
                 last = -1;
                 cursor++;
                 expectedModCount = getModCount();
+                clearIterator();
             } catch (IndexOutOfBoundsException ex) {
                 throw new ConcurrentModificationException();
             }
+        }
+
+        @Override
+        void clearIterator() {
+            super.clearIterator();
+            listIterator = null;
         }
     }
 

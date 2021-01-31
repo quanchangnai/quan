@@ -11,6 +11,9 @@ import org.bson.json.JsonReader;
 import org.bson.json.JsonWriter;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.pcollections.Empty;
+import org.pcollections.PMap;
+import org.pcollections.PVector;
 import quan.common.utils.ClassUtils;
 import quan.data.Index;
 import quan.data.Transaction;
@@ -24,9 +27,7 @@ import quan.data.mongo.Database;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by quanchangnai on 2020/4/1.
@@ -52,13 +53,104 @@ public class DatabaseTest {
         System.err.println("testRole=============");
         Transaction.setLocalOptional(true);
 
-        Role roleTest1 = new Role(123L);
-        System.err.println("roleTest1.test1():" + roleTest1.test1(111));
-        roleTest1.test2();
+        Role role = new Role(1L);
+        role.test1();
+        role.test2();
+        role.test3();
+        role.reset();
+        System.err.println();
 
-        Role roleTest2 = new Role(Long.valueOf(234L));
-        System.err.println("roleTest2.test1():" + roleTest2.test1(222));
-        roleTest1.test2();
+        int n = 10000;
+
+        long startTime = System.currentTimeMillis();
+        for (int i = 0; i < n; i++) {
+//            role.reset();
+            role.test1();
+        }
+        long endTime = System.currentTimeMillis();
+        System.err.println("role.test1 costTime:" + (endTime - startTime));
+
+
+        startTime = System.currentTimeMillis();
+        for (int i = 0; i < n; i++) {
+//            role.reset();
+            role.test2();
+        }
+        endTime = System.currentTimeMillis();
+        System.err.println("role.test2 costTime:" + (endTime - startTime));
+
+        startTime = System.currentTimeMillis();
+        for (int i = 0; i < n; i++) {
+//            role.reset();
+            role.test3();
+        }
+        endTime = System.currentTimeMillis();
+        System.err.println("role.test3 costTime:" + (endTime - startTime));
+
+        System.err.println();
+
+        role.print();
+    }
+
+    @Test
+    public void testCollection() {
+        Random random = new Random();
+
+        PVector<String> list1 = Empty.vector();
+        PMap<Integer, Integer> map1 = Empty.map();
+        PMap<Integer, ItemEntity2> items1 = Empty.map();
+
+        List<String> list2 = new ArrayList<>();
+        Map<Integer, Integer> map2 = new HashMap<>();
+        Map<Integer, ItemEntity2> items2 = new HashMap<>();
+
+        int n = 10000;
+
+        long startTime = System.currentTimeMillis();
+        for (int i = 0; i <  n; i++) {
+            for (int j = 0; j < 10; j++) {
+                list1 = list1.plus("aaa" + j);
+                map1 = map1.plus(j, j + random.nextInt());
+                items1 = items1.plus(j, new ItemEntity2(i, "item" + j, new ArrayList<>()));
+            }
+
+            for (String s : list1) {
+                if (s.equals("aaa5")) {
+                }
+            }
+            for (Integer k : map1.keySet()) {
+                if (k == 5) {
+                }
+            }
+        }
+
+        long endTime = System.currentTimeMillis();
+        System.err.println("testCollection1 costTime:" + (endTime - startTime));
+
+        startTime = System.currentTimeMillis();
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < 10; j++) {
+                list2.add("aaa" + j);
+                map2.put(j, j + random.nextInt());
+                items2.put(j, new ItemEntity2(j, "item" + j, new ArrayList<>()));
+            }
+
+            for (String s : list2) {
+                if (s.equals("aaa5")) {
+                }
+            }
+            for (Integer k : map2.keySet()) {
+                if (k == 5) {
+                }
+            }
+        }
+
+        endTime = System.currentTimeMillis();
+        System.err.println("testCollection2 costTime:" + (endTime - startTime));
+
+        System.err.println("list.size:");
+        System.err.println(list1.size());
+        System.err.println(list2.size());
     }
 
     @Ignore

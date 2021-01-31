@@ -7,6 +7,9 @@ import org.bson.codecs.DecoderContext;
 import org.bson.codecs.EncoderContext;
 import org.bson.codecs.configuration.CodecRegistry;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 道具<br/>
  * 自动生成
@@ -21,6 +24,16 @@ public class ItemEntity2 {
 
     private String name = "";
 
+    private List<Integer> list = new ArrayList<>();
+
+    public ItemEntity2() {
+    }
+
+    public ItemEntity2(int id, String name, List<Integer> list) {
+        this.id = id;
+        this.name = name;
+        this.list.addAll(list);
+    }
 
     public int getId() {
         return id;
@@ -43,6 +56,10 @@ public class ItemEntity2 {
     public ItemEntity2 setName(String name) {
         this.name = name;
         return this;
+    }
+
+    public List<Integer> getList() {
+        return list;
     }
 
     @Override
