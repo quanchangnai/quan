@@ -132,6 +132,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
                 throw new IllegalStateException();
             }
             checkConcurrentModification();
+
             try {
                 ListField.this.remove(last);
                 if (last < cursor) {
@@ -140,7 +141,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
                 last--;
                 expectedModCount = getModCount();
                 this.list = log.list;
-                clearIterator();
+                iterator = null;
             } catch (IndexOutOfBoundsException ex) {
                 throw new ConcurrentModificationException();
             }
@@ -161,10 +162,6 @@ public final class ListField<E> extends Node implements List<E>, Field {
             if (getModCount() != expectedModCount) {
                 throw new ConcurrentModificationException();
             }
-        }
-
-        void clearIterator() {
-            iterator = null;
         }
     }
 
@@ -461,12 +458,9 @@ public final class ListField<E> extends Node implements List<E>, Field {
 
     private class ListIt extends It implements ListIterator<E> {
 
-        private ListIterator<E> listIterator;
-
         public ListIt(int index) {
             cursor = index;
-            iterator = list.listIterator(index);
-            listIterator = (ListIterator<E>) iterator;
+            iterator = null;
         }
 
         @Override
@@ -478,12 +472,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
         public E previous() {
             checkConcurrentModification();
             try {
-                E previous;
-                if (listIterator != null) {
-                    previous = listIterator.previous();
-                } else {
-                    previous = this.list.get(cursor - 1);
-                }
+                E previous = this.list.get(cursor - 1);
                 last = --cursor;
                 return previous;
             } catch (IndexOutOfBoundsException e) {
@@ -512,7 +501,6 @@ public final class ListField<E> extends Node implements List<E>, Field {
             try {
                 ListField.this.set(last, e);
                 expectedModCount = getModCount();
-                clearIterator();
             } catch (IndexOutOfBoundsException ex) {
                 throw new ConcurrentModificationException();
             }
@@ -527,17 +515,11 @@ public final class ListField<E> extends Node implements List<E>, Field {
                 last = -1;
                 cursor++;
                 expectedModCount = getModCount();
-                clearIterator();
             } catch (IndexOutOfBoundsException ex) {
                 throw new ConcurrentModificationException();
             }
         }
 
-        @Override
-        void clearIterator() {
-            super.clearIterator();
-            listIterator = null;
-        }
     }
 
     @Override
