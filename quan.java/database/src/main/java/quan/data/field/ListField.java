@@ -98,8 +98,12 @@ public final class ListField<E> extends Node implements List<E>, Field {
 
         PVector<E> list = log != null ? log.list : ListField.this.list;
 
-        //如果迭代过程中没有修改，用这个比较快
-        Iterator<E> iterator = list.iterator();
+        Iterator<E> iterator;
+
+        public It() {
+            //如果迭代过程中没有修改，用这个比较快
+            this.iterator = list.iterator();
+        }
 
         @Override
         public boolean hasNext() {
