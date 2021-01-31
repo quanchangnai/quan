@@ -60,7 +60,7 @@ public class DatabaseTest {
         role.reset();
         System.err.println();
 
-        int n = 10000;
+        int n = 1000;
 
         long startTime = System.currentTimeMillis();
         for (int i = 0; i < n; i++) {
