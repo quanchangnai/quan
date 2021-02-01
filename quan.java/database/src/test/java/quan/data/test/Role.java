@@ -33,6 +33,10 @@ public class Role {
         this.roleId = roleId;
     }
 
+    public RoleData getRoleData1() {
+        return roleData1;
+    }
+
     public void reset() {
         roleId = 0;
         roleData1 = new RoleData();

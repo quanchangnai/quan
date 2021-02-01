@@ -17,11 +17,14 @@ public class BoolField extends Loggable implements Field {
 
     @Override
     public void commit(Object log) {
-        this.value = (Boolean) log;
+        this.value = (boolean) log;
     }
 
     public boolean getValue() {
-        Transaction transaction = Transaction.get();
+        return getValue(Transaction.get());
+    }
+
+    public boolean getValue(Transaction transaction) {
         if (transaction != null) {
             Boolean log = (Boolean) _getFieldLog(transaction, this);
             if (log != null) {

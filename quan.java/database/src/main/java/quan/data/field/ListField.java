@@ -12,7 +12,7 @@ import java.util.*;
 @SuppressWarnings({"unchecked", "NullableProblems"})
 public final class ListField<E> extends Node implements List<E>, Field {
 
-    private PVector<E> list = Empty.vector();
+    private PVector<E> origin = Empty.vector();
 
     private Delegate<E> delegate = new Delegate<>(this);
 
@@ -29,21 +29,17 @@ public final class ListField<E> extends Node implements List<E>, Field {
     @Override
     public void commit(Object log) {
         Log<E> log1 = (Log<E>) log;
-        list = log1.list;
+        origin = log1.list;
         modCount = log1.modCount;
     }
 
     @Override
     public void _setChildrenLogRoot(Data<?> root) {
-        for (E e : getList()) {
+        for (E e : getOrigin()) {
             if (e instanceof Entity) {
                 _setLogRoot((Entity) e, root);
             }
         }
-    }
-
-    private Log<E> getLog(boolean write) {
-        return getLog(Transaction.get(), write);
     }
 
     private Log<E> getLog(Transaction transaction, boolean write) {
@@ -53,34 +49,38 @@ public final class ListField<E> extends Node implements List<E>, Field {
 
         Log<E> log = (Log<E>) _getFieldLog(transaction, this);
         if (write && log == null) {
-            log = new Log<>(list, modCount);
+            log = new Log<>(origin, modCount);
             _setFieldLog(transaction, this, log, _getLogRoot(transaction));
         }
 
         return log;
     }
 
-    private PVector<E> getList() {
-        Log<E> log = getLog(false);
+    public PVector<E> getOrigin() {
+        return getOrigin(Transaction.get());
+    }
+
+    public PVector<E> getOrigin(Transaction transaction) {
+        Log<E> log = getLog(transaction, false);
         if (log != null) {
             return log.list;
         }
-        return list;
+        return origin;
     }
 
     @Override
     public int size() {
-        return getList().size();
+        return getOrigin().size();
     }
 
     @Override
     public boolean isEmpty() {
-        return getList().isEmpty();
+        return getOrigin().isEmpty();
     }
 
     @Override
     public boolean contains(Object o) {
-        return getList().contains(o);
+        return getOrigin().contains(o);
     }
 
     private class It implements Iterator<E> {
@@ -96,7 +96,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
 
         Log<E> log;
 
-        PVector<E> list = log != null ? log.list : ListField.this.list;
+        PVector<E> list = log != null ? log.list : ListField.this.origin;
 
         Iterator<E> iterator;
 
@@ -176,13 +176,13 @@ public final class ListField<E> extends Node implements List<E>, Field {
 
     @Override
     public Object[] toArray() {
-        return getList().toArray();
+        return getOrigin().toArray();
     }
 
     @SuppressWarnings("SuspiciousToArrayCall")
     @Override
     public <T> T[] toArray(T[] a) {
-        return getList().toArray(a);
+        return getOrigin().toArray(a);
     }
 
     @Override
@@ -210,7 +210,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
         Validations.validateCollectionValue(e);
 
         modCount++;
-        list = list.plus(e);
+        origin = origin.plus(e);
         if (e instanceof Entity) {
             _setRoot((Entity) e, _getRoot());
         }
@@ -220,8 +220,9 @@ public final class ListField<E> extends Node implements List<E>, Field {
 
     @Override
     public boolean remove(Object o) {
-        if (Transaction.isInside()) {
-            Log<E> log = getLog(true);
+        Transaction transaction = Transaction.get();
+        if (transaction != null) {
+            Log<E> log = getLog(transaction, true);
             PVector<E> oldList = log.list;
             log.modCount++;
             log.list = oldList.minus(o);
@@ -233,11 +234,11 @@ public final class ListField<E> extends Node implements List<E>, Field {
                 return true;
             }
         } else if (Transaction.isOptional()) {
-            PVector<E> oldList = list;
+            PVector<E> oldList = origin;
             modCount++;
-            list = oldList.minus(o);
+            origin = oldList.minus(o);
 
-            if (oldList != list) {
+            if (oldList != origin) {
                 if (o instanceof Entity) {
                     _setRoot((Entity) o, null);
                 }
@@ -252,7 +253,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        return getList().containsAll(c);
+        return getOrigin().containsAll(c);
     }
 
     @Override
@@ -282,11 +283,11 @@ public final class ListField<E> extends Node implements List<E>, Field {
                 return true;
             }
         } else if (Transaction.isOptional()) {
-            PVector<E> oldList = list;
+            PVector<E> oldList = origin;
             modCount++;
-            list = oldList.plusAll(index, c);
+            origin = oldList.plusAll(index, c);
 
-            if (oldList != list) {
+            if (oldList != origin) {
                 Data<?> root = _getRoot();
                 for (E e : c) {
                     if (e instanceof Entity) {
@@ -325,20 +326,20 @@ public final class ListField<E> extends Node implements List<E>, Field {
             }
         } else if (!Transaction.isOptional()) {
             Transaction.error();
-        } else if (!list.isEmpty()) {
+        } else if (!origin.isEmpty()) {
             modCount++;
-            for (E e : list) {
+            for (E e : origin) {
                 if (e instanceof Entity) {
                     _setRoot((Entity) e, null);
                 }
             }
-            list = Empty.vector();
+            origin = Empty.vector();
         }
     }
 
     @Override
     public E get(int index) {
-        return getList().get(index);
+        return getOrigin().get(index);
     }
 
     @Override
@@ -379,9 +380,9 @@ public final class ListField<E> extends Node implements List<E>, Field {
             }
             return old;
         } else if (Transaction.isOptional()) {
-            PVector<E> oldList = list;
+            PVector<E> oldList = origin;
             modCount++;
-            list = oldList.with(index, e);
+            origin = oldList.with(index, e);
 
             if (e instanceof Entity) {
                 _setRoot((Entity) e, _getRoot());
@@ -411,7 +412,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
             }
         } else if (Transaction.isOptional()) {
             modCount++;
-            list = list.plus(index, e);
+            origin = origin.plus(index, e);
             if (e instanceof Entity) {
                 _setRoot((Entity) e, _getRoot());
             }
@@ -435,9 +436,9 @@ public final class ListField<E> extends Node implements List<E>, Field {
 
             return old;
         } else if (Transaction.isOptional()) {
-            E old = list.get(index);
+            E old = origin.get(index);
             modCount++;
-            list = list.minus(index);
+            origin = origin.minus(index);
 
             if (old instanceof Entity) {
                 _setRoot((Entity) old, null);
@@ -452,12 +453,12 @@ public final class ListField<E> extends Node implements List<E>, Field {
 
     @Override
     public int indexOf(Object o) {
-        return getList().indexOf(o);
+        return getOrigin().indexOf(o);
     }
 
     @Override
     public int lastIndexOf(Object o) {
-        return getList().lastIndexOf(o);
+        return getOrigin().lastIndexOf(o);
     }
 
     private class ListIt extends It implements ListIterator<E> {
@@ -541,12 +542,12 @@ public final class ListField<E> extends Node implements List<E>, Field {
 
     @Override
     public List<E> subList(int fromIndex, int toIndex) {
-        return getList().subList(fromIndex, toIndex);
+        return getOrigin().subList(fromIndex, toIndex);
     }
 
     @Override
     public String toString() {
-        return String.valueOf(getList());
+        return String.valueOf(getOrigin());
     }
 
     private static class Log<E> {

@@ -21,7 +21,10 @@ public class DoubleField extends Loggable implements Field {
     }
 
     public double getValue() {
-        Transaction transaction = Transaction.get();
+        return getValue(Transaction.get());
+    }
+
+    public double getValue(Transaction transaction) {
         if (transaction != null) {
             Double log = (Double) _getFieldLog(transaction, this);
             if (log != null) {

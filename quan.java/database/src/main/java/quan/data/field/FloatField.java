@@ -21,7 +21,10 @@ public class FloatField extends Loggable implements Field {
     }
 
     public float getValue() {
-        Transaction transaction = Transaction.get();
+        return getValue(Transaction.get());
+    }
+
+    public float getValue(Transaction transaction) {
         if (transaction != null) {
             Float log = (Float) _getFieldLog(transaction, this);
             if (log != null) {

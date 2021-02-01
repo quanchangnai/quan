@@ -21,7 +21,10 @@ public class StringField extends Loggable implements Field {
     }
 
     public String getValue() {
-        Transaction transaction = Transaction.get();
+        return getValue(Transaction.get());
+    }
+
+    public String getValue(Transaction transaction) {
         if (transaction != null) {
             String log = (String) _getFieldLog(transaction, this);
             if (log != null) {

@@ -121,14 +121,16 @@ public class ItemEntity extends Entity {
 
         @Override
         public void encode(BsonWriter writer, ItemEntity value, EncoderContext encoderContext) {
+            Transaction transaction = Transaction.get();
             writer.writeStartDocument();
 
-            writer.writeInt32(ItemEntity.ID, value.id.getValue());
-            writer.writeString(ItemEntity.NAME, value.name.getValue());
+            writer.writeInt32(ItemEntity.ID, value.id.getValue(transaction));
+            writer.writeString(ItemEntity.NAME, value.name.getValue(transaction));
 
-            if (!value.list.isEmpty()) {
+            Collection<Integer> $list = value.list.getOrigin(transaction);
+            if (!$list.isEmpty()) {
                 writer.writeStartArray(ItemEntity.LIST);
-                for (Integer listValue : value.list) {
+                for (Integer listValue : $list) {
                     writer.writeInt32(listValue);
                 }
                 writer.writeEndArray();

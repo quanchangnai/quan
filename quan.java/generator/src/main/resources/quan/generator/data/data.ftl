@@ -302,13 +302,14 @@ public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idFiel
 
         @Override
         public void encode(BsonWriter writer, ${name} value, EncoderContext encoderContext) {
+            Transaction transaction = Transaction.get();
             writer.writeStartDocument();
             <#if kind ==5>
 
             if (writer instanceof JsonStringWriter) {
-                writer.write${bsonTypes[idField.type]}(${name}.${idField.underscoreName}, value.${idField.name}.getValue());
+                writer.write${bsonTypes[idField.type]}(${name}.${idField.underscoreName}, value.${idField.name}.getValue(transaction));
             } else {
-                writer.write${bsonTypes[idField.type]}(${name}._ID, value.${idField.name}.getValue());
+                writer.write${bsonTypes[idField.type]}(${name}._ID, value.${idField.name}.getValue(transaction));
             }
             </#if>
 
@@ -316,16 +317,17 @@ public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idFiel
                 <#if field.ignore || kind == 5 && field.name == idName >
                     <#continue/>
                 <#elseif field.enumType>
-            writer.writeInt32(${name}.${field.underscoreName}, value.${field.name}.getValue());
+            writer.writeInt32(${name}.${field.underscoreName}, value.${field.name}.getValue(transaction));
                 <#elseif field.primitiveType>
-            writer.write${bsonTypes[field.type]}(${name}.${field.underscoreName}, value.${field.name}.getValue());
+            writer.write${bsonTypes[field.type]}(${name}.${field.underscoreName}, value.${field.name}.getValue(transaction));
                 <#elseif field.beanType>
                     <#if field_index gt 0 >
 
                     </#if>
-            if (value.${field.name}.getValue() != null) {
+            ${field.classType} $${field.name} = value.${field.name}.getValue(transaction);
+            if ($${field.name} != null) {
                 writer.writeName(${name}.${field.underscoreName});
-                encoderContext.encodeWithChildContext(registry.get(${field.classType}.class), writer, value.${field.name}.getValue());
+                encoderContext.encodeWithChildContext(registry.get(${field.classType}.class), writer, $${field.name});
             }
                     <#if field_has_next && fields[field_index+1].primitiveType >
 
@@ -334,9 +336,10 @@ public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idFiel
                     <#if field_index gt 0 >
 
                     </#if>
-            if (!value.${field.name}.isEmpty()) {
+            Collection<${field.classValueType}> $${field.name} = value.${field.name}.getOrigin(transaction);
+            if (!$${field.name}.isEmpty()) {
                 writer.writeStartArray(${name}.${field.underscoreName});
-                for (${field.classValueType} ${field.name}Value : value.${field.name}) {
+                for (${field.classValueType} ${field.name}Value : $${field.name}) {
                     <#if field.primitiveValueType>
                     writer.write${bsonTypes[field.valueType]}(${field.name}Value);
                     <#elseif field.beanValueType>
@@ -354,14 +357,15 @@ public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idFiel
                     <#if field_index gt 0 >
 
                     </#if>
-            if (!value.${field.name}.isEmpty()) {
+            Map<${field.classKeyType}, ${field.classValueType}> $${field.name} = value.${field.name}.getOrigin(transaction);
+            if (!$${field.name}.isEmpty()) {
                 writer.writeStartDocument(${name}.${field.underscoreName});
-                for (${field.classKeyType} ${field.name}Key : value.${field.name}.keySet()) {
-                    writer.writeName(String.valueOf(${field.name}Key));
+                for (Map.Entry<${field.classKeyType}, ${field.classValueType}> ${field.name}Entry : $${field.name}.entrySet()) {
+                    writer.writeName(String.valueOf(${field.name}Entry.getKey()));
                     <#if field.primitiveValueType>
-                    writer.write${bsonTypes[field.valueType]}(value.${field.name}.get(${field.name}Key));
+                    writer.write${bsonTypes[field.valueType]}(${field.name}Entry.getValue());
                     <#elseif field.beanValueType>
-                    encoderContext.encodeWithChildContext(registry.get(${field.classValueType}.class), writer, value.${field.name}.get(${field.name}Key));
+                    encoderContext.encodeWithChildContext(registry.get(${field.classValueType}.class), writer, ${field.name}Entry.getValue());
                     <#else>
                     writer.write${field.valueType?cap_first}(${field.name}Value);
                     </#if>

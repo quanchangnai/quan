@@ -21,7 +21,10 @@ public class ShortField extends Loggable implements Field {
     }
 
     public short getValue() {
-        Transaction transaction = Transaction.get();
+        return getValue(Transaction.get());
+    }
+
+    public short getValue(Transaction transaction) {
         if (transaction != null) {
             Short log = (Short) _getFieldLog(transaction, this);
             if (log != null) {

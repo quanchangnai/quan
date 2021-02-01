@@ -49,6 +49,22 @@ public class DatabaseTest {
     }
 
     @Test
+    public void testEncode() {
+        Role role = new Role(1L);
+        role.test1();
+        String json = role.getRoleData1().toJson();
+
+        long startTime = System.currentTimeMillis();
+        for (int i = 0; i < 10; i++) {
+            json = role.getRoleData1().toJson();
+        }
+        long endTime = System.currentTimeMillis();
+        System.err.println("testEncode costTime:" + (endTime - startTime));
+        System.err.println("testEncode json:" + json);
+    }
+
+
+    @Test
     public void testRole() {
         System.err.println("testRole=============");
         Transaction.setLocalOptional(true);
@@ -107,7 +123,7 @@ public class DatabaseTest {
         int n = 10000;
 
         long startTime = System.currentTimeMillis();
-        for (int i = 0; i <  n; i++) {
+        for (int i = 0; i < n; i++) {
             for (int j = 0; j < 10; j++) {
                 list1 = list1.plus("aaa" + j);
                 map1 = map1.plus(j, j + random.nextInt());

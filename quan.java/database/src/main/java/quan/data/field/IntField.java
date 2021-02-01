@@ -21,7 +21,10 @@ public class IntField extends Loggable implements Field {
     }
 
     public int getValue() {
-        Transaction transaction = Transaction.get();
+        return getValue(Transaction.get());
+    }
+
+    public int getValue(Transaction transaction) {
         if (transaction != null) {
             Integer log = (Integer) _getFieldLog(transaction, this);
             if (log != null) {

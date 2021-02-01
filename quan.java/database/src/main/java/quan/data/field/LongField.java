@@ -21,7 +21,10 @@ public class LongField extends Loggable implements Field {
     }
 
     public long getValue() {
-        Transaction transaction = Transaction.get();
+        return getValue(Transaction.get());
+    }
+
+    public long getValue(Transaction transaction) {
         if (transaction != null) {
             Long log = (Long) _getFieldLog(transaction, this);
             if (log != null) {

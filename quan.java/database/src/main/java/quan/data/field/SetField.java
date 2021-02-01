@@ -15,7 +15,7 @@ import java.util.Set;
 @SuppressWarnings({"unchecked", "NullableProblems"})
 public final class SetField<E> extends Node implements Set<E>, Field {
 
-    private PSet<E> set = Empty.set();
+    private PSet<E> origin = Empty.set();
 
     private Delegate<E> delegate = new Delegate<>(this);
 
@@ -30,51 +30,52 @@ public final class SetField<E> extends Node implements Set<E>, Field {
 
     @Override
     public void commit(Object log) {
-        this.set = (PSet<E>) log;
+        this.origin = (PSet<E>) log;
     }
 
     @Override
     public void _setChildrenLogRoot(Data<?> root) {
-        for (E e : getSet()) {
+        for (E e : getOrigin()) {
             if (e instanceof Entity) {
                 _setLogRoot((Entity) e, root);
             }
         }
     }
 
-    private PSet<E> getSet(Transaction transaction) {
+    public PSet<E> getOrigin() {
+        return getOrigin(Transaction.get());
+    }
+
+    public PSet<E> getOrigin(Transaction transaction) {
         if (transaction != null) {
             PSet<E> log = (PSet<E>) _getFieldLog(transaction, this);
             if (log != null) {
                 return log;
             }
         }
-        return set;
+        return origin;
     }
 
-    private PSet<E> getSet() {
-        return getSet(Transaction.get());
-    }
 
     @Override
     public int size() {
-        return getSet().size();
+        return getOrigin().size();
     }
 
     @Override
     public boolean isEmpty() {
-        return getSet().isEmpty();
+        return getOrigin().isEmpty();
     }
 
     @Override
     public boolean contains(Object o) {
-        return getSet().contains(o);
+        return getOrigin().contains(o);
     }
 
 
     private class It implements Iterator<E> {
 
-        private Iterator<E> it = getSet().iterator();
+        private Iterator<E> it = getOrigin().iterator();
 
         private E current;
 
@@ -104,13 +105,13 @@ public final class SetField<E> extends Node implements Set<E>, Field {
 
     @Override
     public Object[] toArray() {
-        return getSet().toArray();
+        return getOrigin().toArray();
     }
 
     @SuppressWarnings("SuspiciousToArrayCall")
     @Override
     public <T> T[] toArray(T[] a) {
-        return getSet().toArray(a);
+        return getOrigin().toArray(a);
     }
 
     @Override
@@ -119,7 +120,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
         Transaction transaction = Transaction.get();
 
         if (transaction != null) {
-            PSet<E> oldSet = getSet(transaction);
+            PSet<E> oldSet = getOrigin(transaction);
             PSet<E> newSet = oldSet.plus(e);
 
             if (oldSet != newSet) {
@@ -142,10 +143,10 @@ public final class SetField<E> extends Node implements Set<E>, Field {
     public boolean plus(E e) {
         Validations.validateCollectionValue(e);
 
-        PSet<E> oldSet = set;
-        set = oldSet.plus(e);
+        PSet<E> oldSet = origin;
+        origin = oldSet.plus(e);
 
-        if (oldSet != set) {
+        if (oldSet != origin) {
             if (e instanceof Entity) {
                 _setRoot((Entity) e, _getRoot());
             }
@@ -159,7 +160,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
     public boolean remove(Object o) {
         Transaction transaction = Transaction.get();
         if (transaction != null) {
-            PSet<E> oldSet = getSet(transaction);
+            PSet<E> oldSet = getOrigin(transaction);
             PSet<E> newSet = oldSet.minus(o);
             if (oldSet != newSet) {
                 _setFieldLog(transaction, this, newSet, _getLogRoot(transaction));
@@ -169,9 +170,9 @@ public final class SetField<E> extends Node implements Set<E>, Field {
                 return true;
             }
         } else if (Transaction.isOptional()) {
-            PSet<E> oldSet = set;
-            set = set.minus(o);
-            if (oldSet != set) {
+            PSet<E> oldSet = origin;
+            origin = origin.minus(o);
+            if (oldSet != origin) {
                 if (o instanceof Entity) {
                     _setRoot((Entity) o, null);
                 }
@@ -186,7 +187,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        return getSet().containsAll(c);
+        return getOrigin().containsAll(c);
     }
 
     @Override
@@ -196,7 +197,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
         Transaction transaction = Transaction.get();
 
         if (transaction != null) {
-            PSet<E> oldSet = getSet(transaction);
+            PSet<E> oldSet = getOrigin(transaction);
             PSet<E> newSet = oldSet.plusAll(c);
             if (oldSet != newSet) {
                 Data<?> root = _getLogRoot(transaction);
@@ -209,9 +210,9 @@ public final class SetField<E> extends Node implements Set<E>, Field {
                 return true;
             }
         } else if (Transaction.isOptional()) {
-            PSet<E> oldSet = set;
-            set = oldSet.plusAll(c);
-            if (oldSet != set) {
+            PSet<E> oldSet = origin;
+            origin = oldSet.plusAll(c);
+            if (oldSet != origin) {
                 Data<?> root = _getRoot();
                 for (E e : c) {
                     if (e instanceof Entity) {
@@ -260,7 +261,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
     @Override
     public void clear() {
         Transaction transaction = Transaction.get();
-        PSet<E> oldSet = getSet(transaction);
+        PSet<E> oldSet = getOrigin(transaction);
         if (oldSet.isEmpty()) {
             return;
         }
@@ -274,7 +275,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
                     _setRoot((Entity) e, null);
                 }
             }
-            this.set = Empty.set();
+            this.origin = Empty.set();
         } else {
             Transaction.error();
         }
@@ -283,7 +284,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
 
     @Override
     public String toString() {
-        return String.valueOf(getSet());
+        return String.valueOf(getOrigin());
     }
 
     @SuppressWarnings("NullableProblems")
