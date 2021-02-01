@@ -503,75 +503,83 @@ public class RoleData extends Data<Long> {
 
         @Override
         public void encode(BsonWriter writer, RoleData value, EncoderContext encoderContext) {
+            Transaction transaction = Transaction.get();
             writer.writeStartDocument();
 
             if (writer instanceof JsonStringWriter) {
-                writer.writeInt64(RoleData.ID, value.id.getValue());
+                writer.writeInt64(RoleData.ID, value.id.getValue(transaction));
             } else {
-                writer.writeInt64(RoleData._ID, value.id.getValue());
+                writer.writeInt64(RoleData._ID, value.id.getValue(transaction));
             }
 
-            writer.writeString(RoleData.NAME, value.name.getValue());
-            writer.writeInt32(RoleData.ROLE_TYPE, value.roleType.getValue());
-            writer.writeInt32(RoleData.A, value.a.getValue());
-            writer.writeInt32(RoleData.A2, value.a2.getValue());
-            writer.writeBoolean(RoleData.B, value.b.getValue());
-            writer.writeInt32(RoleData.B2, value.b2.getValue());
-            writer.writeInt32(RoleData.S, value.s.getValue());
-            writer.writeInt32(RoleData.I, value.i.getValue());
-            writer.writeDouble(RoleData.F, value.f.getValue());
-            writer.writeDouble(RoleData.D, value.d.getValue());
+            writer.writeString(RoleData.NAME, value.name.getValue(transaction));
+            writer.writeInt32(RoleData.ROLE_TYPE, value.roleType.getValue(transaction));
+            writer.writeInt32(RoleData.A, value.a.getValue(transaction));
+            writer.writeInt32(RoleData.A2, value.a2.getValue(transaction));
+            writer.writeBoolean(RoleData.B, value.b.getValue(transaction));
+            writer.writeInt32(RoleData.B2, value.b2.getValue(transaction));
+            writer.writeInt32(RoleData.S, value.s.getValue(transaction));
+            writer.writeInt32(RoleData.I, value.i.getValue(transaction));
+            writer.writeDouble(RoleData.F, value.f.getValue(transaction));
+            writer.writeDouble(RoleData.D, value.d.getValue(transaction));
 
-            if (value.item.getValue() != null) {
+            ItemEntity $item = value.item.getValue(transaction);
+            if ($item != null) {
                 writer.writeName(RoleData.ITEM);
-                encoderContext.encodeWithChildContext(registry.get(ItemEntity.class), writer, value.item.getValue());
+                encoderContext.encodeWithChildContext(registry.get(ItemEntity.class), writer, $item);
             }
 
-            if (!value.items.isEmpty()) {
+            Map<Integer, ItemEntity> $items = value.items.getOrigin(transaction);
+            if (!$items.isEmpty()) {
                 writer.writeStartDocument(RoleData.ITEMS);
-                for (Integer itemsKey : value.items.keySet()) {
-                    writer.writeName(String.valueOf(itemsKey));
-                    encoderContext.encodeWithChildContext(registry.get(ItemEntity.class), writer, value.items.get(itemsKey));
+                for (Map.Entry<Integer, ItemEntity> itemsEntry : $items.entrySet()) {
+                    writer.writeName(String.valueOf(itemsEntry.getKey()));
+                    encoderContext.encodeWithChildContext(registry.get(ItemEntity.class), writer, itemsEntry.getValue());
                 }
                 writer.writeEndDocument();
             }
 
-            if (!value.set.isEmpty()) {
+            Collection<Boolean> $set = value.set.getOrigin(transaction);
+            if (!$set.isEmpty()) {
                 writer.writeStartArray(RoleData.SET);
-                for (Boolean setValue : value.set) {
+                for (Boolean setValue : $set) {
                     writer.writeBoolean(setValue);
                 }
                 writer.writeEndArray();
             }
 
-            if (!value.list.isEmpty()) {
+            Collection<String> $list = value.list.getOrigin(transaction);
+            if (!$list.isEmpty()) {
                 writer.writeStartArray(RoleData.LIST);
-                for (String listValue : value.list) {
+                for (String listValue : $list) {
                     writer.writeString(listValue);
                 }
                 writer.writeEndArray();
             }
 
-            if (!value.map.isEmpty()) {
+            Map<Integer, Integer> $map = value.map.getOrigin(transaction);
+            if (!$map.isEmpty()) {
                 writer.writeStartDocument(RoleData.MAP);
-                for (Integer mapKey : value.map.keySet()) {
-                    writer.writeName(String.valueOf(mapKey));
-                    writer.writeInt32(value.map.get(mapKey));
+                for (Map.Entry<Integer, Integer> mapEntry : $map.entrySet()) {
+                    writer.writeName(String.valueOf(mapEntry.getKey()));
+                    writer.writeInt32(mapEntry.getValue());
                 }
                 writer.writeEndDocument();
             }
 
-            if (!value.set2.isEmpty()) {
+            Collection<ItemEntity> $set2 = value.set2.getOrigin(transaction);
+            if (!$set2.isEmpty()) {
                 writer.writeStartArray(RoleData.SET2);
-                for (ItemEntity set2Value : value.set2) {
+                for (ItemEntity set2Value : $set2) {
                     encoderContext.encodeWithChildContext(registry.get(ItemEntity.class), writer, set2Value);
                 }
                 writer.writeEndArray();
             }
 
-            if (!value.list2.isEmpty()) {
+            Collection<ItemEntity> $list2 = value.list2.getOrigin(transaction);
+            if (!$list2.isEmpty()) {
                 writer.writeStartArray(RoleData.LIST2);
-                for (ItemEntity list2Value : value.list2) {
+                for (ItemEntity list2Value : $list2) {
                     encoderContext.encodeWithChildContext(registry.get(ItemEntity.class), writer, list2Value);
                 }
                 writer.writeEndArray();
