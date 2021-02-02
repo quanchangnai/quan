@@ -402,7 +402,24 @@ public class Transaction {
     }
 
 
-    static class Listener {
+    /**
+     * 保存点，存储外层事务日志，支持内嵌事务独立回滚
+     */
+    private static class Savepoint {
+
+        boolean failed;
+
+        Map<Data<?>, Data.Log> dataLogs = new LinkedHashMap<>();
+
+        Map<Node, Data<?>> rootLogs = new HashMap<>();
+
+        Map<Field, Object> fieldLogs = new HashMap<>();
+
+        List<Listener> listeners = new ArrayList<>();
+
+    }
+
+    private static class Listener {
 
         Runnable task;
 
@@ -421,6 +438,7 @@ public class Transaction {
             this.task = task;
             this.when = when;
         }
+
     }
 
 }
