@@ -108,6 +108,17 @@ public class DatabaseTest {
         role.print();
     }
 
+    //测试内嵌事务
+    @Test
+    public void testNested() {
+        Role role = new Role(1L);
+        try {
+            role.test4();
+        } finally {
+            System.err.println("" + role.getRoleData1());
+        }
+    }
+
     @Test
     public void testCollection() {
         Random random = new Random();

@@ -1,5 +1,6 @@
 package quan.data.test;
 
+import quan.data.Transaction;
 import quan.data.Transactional;
 import quan.data.item.ItemEntity;
 import quan.data.item.ItemEntity2;
@@ -157,6 +158,78 @@ public class Role {
         roleData3.setItem(null);
 
     }
+
+    @Transactional
+    public void test4() {
+        System.err.println("Role.test4()");
+
+        roleData1.setName("test4");
+        roleData1.setI(random.nextInt());
+        roleData1.getSet().add(true);
+
+        for (int i = 0; i < 10; i++) {
+            roleData1.getList().add("aaa" + i);
+            roleData1.getMap().put(i, i + random.nextInt());
+            roleData1.getItems().put(i, new ItemEntity(i, "item" + i, new ArrayList<>()));
+        }
+
+        Transaction.onSucceeded(() -> System.err.println("test4 succeeded"));
+        Transaction.onFailed(() -> System.err.println("test4 failed"));
+        Transaction.onFinished(() -> System.err.println("test4 finished"));
+
+        test5();
+
+        ItemEntity itemEntity1 = new ItemEntity();
+        itemEntity1.setId(random.nextInt());
+        itemEntity1.setName("item111");
+
+        roleData1.setItem(itemEntity1);
+
+        System.err.println("test4:" + roleData1);
+        Transaction.rollback();
+    }
+
+    @Transactional(nested = true)
+    public void test5() {
+        System.err.println("Role.test5()");
+        System.err.println("test5:" + roleData1);
+
+        roleData1.setName("test5");
+        roleData1.setI(random.nextInt());
+        roleData1.getSet().clear();
+
+        roleData1.getItems().clear();
+
+        Transaction.onSucceeded(() -> System.err.println("test5 succeeded"));
+        Transaction.onFailed(() -> System.err.println("test5 failed"));
+        Transaction.onFinished(() -> System.err.println("test5 finished"));
+
+        test6(1);
+
+        roleData1.setItem(null);
+
+//        Transaction.rollback();
+    }
+
+    @Transactional(nested = true)
+    public void test6(int i) {
+        System.err.println("Role.test6():" + i);
+        System.err.println("test6:" + roleData1);
+
+        roleData1.setName("test6");
+
+        Transaction.onSucceeded(() -> System.err.println("test6 succeeded:" + i));
+        Transaction.onFailed(() -> System.err.println("test6 failed:" + i));
+        Transaction.onFinished(() -> System.err.println("test6 finished:" + i));
+
+//        Transaction.rollback();
+
+//        throw new RuntimeException("test6:" + i);
+
+        test6(i + 1);
+
+    }
+
 
     public void print() {
         System.err.println("list.size:");

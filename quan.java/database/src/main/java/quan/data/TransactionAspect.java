@@ -3,7 +3,9 @@ package quan.data;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.reflect.MethodSignature;
 
+import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -13,20 +15,25 @@ import java.util.concurrent.atomic.AtomicReference;
 @Aspect
 public class TransactionAspect {
 
-    @Around("@annotation(quan.data.Transactional) && !staticinitialization(*)")
+    @Around("@annotation(quan.data.Transactional) && execution(* *(..))")
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
-        AtomicReference<Throwable> exception = new AtomicReference<>();
+        Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
+        boolean nested = method.getAnnotation(Transactional.class).nested();
+        AtomicReference<Throwable> exceptionReference = new AtomicReference<>();
+
         Object result = Transaction.execute(() -> {
             try {
                 return joinPoint.proceed();
             } catch (Throwable e) {
-                exception.set(e);
+                Transaction.rollback();
+                exceptionReference.set(e);
                 return null;
             }
-        });
+        }, nested);
 
-        if (exception.get() != null) {
-            throw exception.get();
+        Throwable exception = exceptionReference.get();
+        if (exception != null) {
+            throw exception;
         } else {
             return result;
         }
