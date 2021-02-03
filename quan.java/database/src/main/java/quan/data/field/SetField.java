@@ -35,18 +35,18 @@ public final class SetField<E> extends Node implements Set<E>, Field {
 
     @Override
     public void _setChildrenLogRoot(Data<?> root) {
-        for (E e : getOrigin()) {
+        for (E e : getCurrent()) {
             if (e instanceof Entity) {
                 _setLogRoot((Entity) e, root);
             }
         }
     }
 
-    public PSet<E> getOrigin() {
-        return getOrigin(Transaction.get());
+    public PSet<E> getCurrent() {
+        return getCurrent(Transaction.get());
     }
 
-    public PSet<E> getOrigin(Transaction transaction) {
+    public PSet<E> getCurrent(Transaction transaction) {
         if (transaction != null) {
             PSet<E> log = (PSet<E>) _getFieldLog(transaction, this);
             if (log != null) {
@@ -59,34 +59,34 @@ public final class SetField<E> extends Node implements Set<E>, Field {
 
     @Override
     public int size() {
-        return getOrigin().size();
+        return getCurrent().size();
     }
 
     @Override
     public boolean isEmpty() {
-        return getOrigin().isEmpty();
+        return getCurrent().isEmpty();
     }
 
     @Override
     public boolean contains(Object o) {
-        return getOrigin().contains(o);
+        return getCurrent().contains(o);
     }
 
 
-    private class It implements Iterator<E> {
+    private class IteratorImpl implements Iterator<E> {
 
-        private Iterator<E> it = getOrigin().iterator();
+        private Iterator<E> iterator = getCurrent().iterator();
 
         private E current;
 
         @Override
         public boolean hasNext() {
-            return it.hasNext();
+            return iterator.hasNext();
         }
 
         @Override
         public E next() {
-            return current = it.next();
+            return current = iterator.next();
         }
 
         @Override
@@ -100,18 +100,18 @@ public final class SetField<E> extends Node implements Set<E>, Field {
 
     @Override
     public Iterator<E> iterator() {
-        return new It();
+        return new IteratorImpl();
     }
 
     @Override
     public Object[] toArray() {
-        return getOrigin().toArray();
+        return getCurrent().toArray();
     }
 
     @SuppressWarnings("SuspiciousToArrayCall")
     @Override
     public <T> T[] toArray(T[] a) {
-        return getOrigin().toArray(a);
+        return getCurrent().toArray(a);
     }
 
     @Override
@@ -120,7 +120,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
         Transaction transaction = Transaction.get();
 
         if (transaction != null) {
-            PSet<E> oldSet = getOrigin(transaction);
+            PSet<E> oldSet = getCurrent(transaction);
             PSet<E> newSet = oldSet.plus(e);
 
             if (oldSet != newSet) {
@@ -134,7 +134,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
         } else if (Transaction.isOptional()) {
             return plus(e);
         } else {
-            Transaction.error();
+            Validations.transactionError();
         }
 
         return false;
@@ -160,7 +160,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
     public boolean remove(Object o) {
         Transaction transaction = Transaction.get();
         if (transaction != null) {
-            PSet<E> oldSet = getOrigin(transaction);
+            PSet<E> oldSet = getCurrent(transaction);
             PSet<E> newSet = oldSet.minus(o);
             if (oldSet != newSet) {
                 _setFieldLog(transaction, this, newSet, _getLogRoot(transaction));
@@ -179,7 +179,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
                 return true;
             }
         } else {
-            Transaction.error();
+            Validations.transactionError();
         }
 
         return false;
@@ -187,7 +187,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        return getOrigin().containsAll(c);
+        return getCurrent().containsAll(c);
     }
 
     @Override
@@ -197,7 +197,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
         Transaction transaction = Transaction.get();
 
         if (transaction != null) {
-            PSet<E> oldSet = getOrigin(transaction);
+            PSet<E> oldSet = getCurrent(transaction);
             PSet<E> newSet = oldSet.plusAll(c);
             if (oldSet != newSet) {
                 Data<?> root = _getLogRoot(transaction);
@@ -222,7 +222,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
                 return true;
             }
         } else {
-            Transaction.error();
+            Validations.transactionError();
         }
 
         return false;
@@ -261,7 +261,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
     @Override
     public void clear() {
         Transaction transaction = Transaction.get();
-        PSet<E> oldSet = getOrigin(transaction);
+        PSet<E> oldSet = getCurrent(transaction);
         if (oldSet.isEmpty()) {
             return;
         }
@@ -277,14 +277,14 @@ public final class SetField<E> extends Node implements Set<E>, Field {
             }
             this.origin = Empty.set();
         } else {
-            Transaction.error();
+            Validations.transactionError();
         }
 
     }
 
     @Override
     public String toString() {
-        return String.valueOf(getOrigin());
+        return String.valueOf(getCurrent());
     }
 
     @SuppressWarnings("NullableProblems")
@@ -312,7 +312,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
         }
 
         @Override
-        public Iterator<E> iterator() {
+        public java.util.Iterator<E> iterator() {
             return field.iterator();
         }
 

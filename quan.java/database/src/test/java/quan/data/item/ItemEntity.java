@@ -127,7 +127,7 @@ public class ItemEntity extends Entity {
             writer.writeInt32(ItemEntity.ID, value.id.getValue(transaction));
             writer.writeString(ItemEntity.NAME, value.name.getValue(transaction));
 
-            Collection<Integer> $list = value.list.getOrigin(transaction);
+            Collection<Integer> $list = value.list.getCurrent(transaction);
             if (!$list.isEmpty()) {
                 writer.writeStartArray(ItemEntity.LIST);
                 for (Integer listValue : $list) {

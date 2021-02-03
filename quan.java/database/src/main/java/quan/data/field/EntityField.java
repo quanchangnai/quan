@@ -51,7 +51,7 @@ public final class EntityField<V extends Entity> extends Loggable implements Fie
             this.value = value;
             _setRoot(value, root);
         } else {
-            Transaction.error();
+            Validations.transactionError();
         }
     }
 

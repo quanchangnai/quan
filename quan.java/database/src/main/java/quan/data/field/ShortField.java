@@ -3,6 +3,7 @@ package quan.data.field;
 import quan.data.Data;
 import quan.data.Loggable;
 import quan.data.Transaction;
+import quan.data.Validations;
 
 /**
  * Created by quanchangnai on 2020/4/17.
@@ -41,7 +42,7 @@ public class ShortField extends Loggable implements Field {
         } else if (Transaction.isOptional()) {
             this.value = value;
         } else {
-            Transaction.error();
+            Validations.transactionError();
         }
     }
 

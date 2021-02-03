@@ -31,7 +31,7 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
 
     @Override
     public void _setChildrenLogRoot(Data<?> root) {
-        for (V value : getOrigin().values()) {
+        for (V value : getCurrent().values()) {
             if (value instanceof Entity) {
                 _setLogRoot((Entity) value, root);
             }
@@ -39,11 +39,11 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
     }
 
 
-    public PMap<K, V> getOrigin() {
-        return getOrigin(Transaction.get());
+    public PMap<K, V> getCurrent() {
+        return getCurrent(Transaction.get());
     }
 
-    public PMap<K, V> getOrigin(Transaction transaction) {
+    public PMap<K, V> getCurrent(Transaction transaction) {
         if (transaction != null) {
             PMap<K, V> log = (PMap<K, V>) _getFieldLog(transaction, this);
             if (log != null) {
@@ -55,27 +55,27 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
 
     @Override
     public int size() {
-        return getOrigin().size();
+        return getCurrent().size();
     }
 
     @Override
     public boolean isEmpty() {
-        return getOrigin().isEmpty();
+        return getCurrent().isEmpty();
     }
 
     @Override
     public boolean containsKey(Object key) {
-        return getOrigin().containsKey(key);
+        return getCurrent().containsKey(key);
     }
 
     @Override
     public boolean containsValue(Object value) {
-        return getOrigin().containsValue(value);
+        return getCurrent().containsValue(value);
     }
 
     @Override
     public V get(Object key) {
-        return getOrigin().get(key);
+        return getCurrent().get(key);
     }
 
     @Override
@@ -85,7 +85,7 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
 
         Transaction transaction = Transaction.get();
         if (transaction != null) {
-            PMap<K, V> oldMap = getOrigin(transaction);
+            PMap<K, V> oldMap = getCurrent(transaction);
             V oldValue = oldMap.get(key);
             PMap<K, V> newMap = oldMap.plus(key, value);
 
@@ -102,7 +102,7 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
         } else if (Transaction.isOptional()) {
             return plus(key, value);
         } else {
-            Transaction.error();
+            Validations.transactionError();
             return null;
         }
     }
@@ -130,7 +130,7 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
     public V remove(Object key) {
         Transaction transaction = Transaction.get();
         if (transaction != null) {
-            PMap<K, V> oldMap = getOrigin(transaction);
+            PMap<K, V> oldMap = getCurrent(transaction);
             V value = oldMap.get(key);
             if (value != null) {
                 _setFieldLog(transaction, this, oldMap.minus(key), _getLogRoot(transaction));
@@ -146,7 +146,7 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
             }
             return value;
         } else {
-            Transaction.error();
+            Validations.transactionError();
             return null;
         }
     }
@@ -158,7 +158,7 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
 
         Transaction transaction = Transaction.get();
         if (transaction != null) {
-            PMap<K, V> oldMap = getOrigin(transaction);
+            PMap<K, V> oldMap = getCurrent(transaction);
             Data<?> root = _getLogRoot(transaction);
             _setFieldLog(transaction, this, oldMap.plusAll(m), root);
 
@@ -188,14 +188,14 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
                 }
             }
         } else {
-            Transaction.error();
+            Validations.transactionError();
         }
     }
 
     @Override
     public void clear() {
         Transaction transaction = Transaction.get();
-        PMap<K, V> oldMap = getOrigin(transaction);
+        PMap<K, V> oldMap = getCurrent(transaction);
         if (oldMap.isEmpty()) {
             return;
         }
@@ -213,7 +213,7 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
                 this.origin = Empty.map();
             }
         } else {
-            Transaction.error();
+            Validations.transactionError();
         }
     }
 
@@ -358,7 +358,7 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
                 public Iterator<Entry<K, V>> iterator() {
                     return new Iterator<Entry<K, V>>() {
                         //entrySet iterator
-                        private Iterator<Entry<K, V>> it = getOrigin().entrySet().iterator();
+                        private Iterator<Entry<K, V>> it = MapField.this.getCurrent().entrySet().iterator();
 
                         private Entry<K, V> current;
 
@@ -389,7 +389,7 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
 
     @Override
     public String toString() {
-        return String.valueOf(getOrigin());
+        return String.valueOf(getCurrent());
     }
 
     private static class Delegate<K, V> implements Map<K, V> {

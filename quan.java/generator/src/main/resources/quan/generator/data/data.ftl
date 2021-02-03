@@ -336,7 +336,7 @@ public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idFiel
                     <#if field_index gt 0 >
 
                     </#if>
-            Collection<${field.classValueType}> $${field.name} = value.${field.name}.getOrigin(transaction);
+            Collection<${field.classValueType}> $${field.name} = value.${field.name}.getCurrent(transaction);
             if (!$${field.name}.isEmpty()) {
                 writer.writeStartArray(${name}.${field.underscoreName});
                 for (${field.classValueType} ${field.name}Value : $${field.name}) {
@@ -357,7 +357,7 @@ public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idFiel
                     <#if field_index gt 0 >
 
                     </#if>
-            Map<${field.classKeyType}, ${field.classValueType}> $${field.name} = value.${field.name}.getOrigin(transaction);
+            Map<${field.classKeyType}, ${field.classValueType}> $${field.name} = value.${field.name}.getCurrent(transaction);
             if (!$${field.name}.isEmpty()) {
                 writer.writeStartDocument(${name}.${field.underscoreName});
                 for (Map.Entry<${field.classKeyType}, ${field.classValueType}> ${field.name}Entry : $${field.name}.entrySet()) {

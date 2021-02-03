@@ -21,7 +21,7 @@ public class TransactionAspect {
         boolean nested = method.getAnnotation(Transactional.class).nested();
         AtomicReference<Throwable> exceptionReference = new AtomicReference<>();
 
-        Object result = Transaction.execute(() -> {
+        Object result = Transaction.run(() -> {
             try {
                 return joinPoint.proceed();
             } catch (Throwable e) {

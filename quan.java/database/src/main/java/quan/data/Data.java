@@ -68,7 +68,7 @@ public abstract class Data<I> {
         } else if (Transaction.isOptional()) {
             writer.write(Collections.singletonList(this), null, null);
         } else {
-            Transaction.error();
+            Validations.transactionError();
         }
     }
 
@@ -84,7 +84,7 @@ public abstract class Data<I> {
         } else if (Transaction.isOptional()) {
             writer.write(null, Collections.singletonList(this), null);
         } else {
-            Transaction.error();
+            Validations.transactionError();
         }
     }
 
@@ -100,7 +100,7 @@ public abstract class Data<I> {
         } else if (Transaction.isOptional()) {
             writer.write(null, null, Collections.singletonList(this));
         } else {
-            Transaction.error();
+            Validations.transactionError();
         }
     }
 

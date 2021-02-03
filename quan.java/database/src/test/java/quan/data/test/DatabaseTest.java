@@ -209,7 +209,7 @@ public class DatabaseTest {
     private static final double timeBase = 1000000D;
 
     private void testMongoCollection0(Database database) {
-        Transaction.execute(() -> {
+        Transaction.run(() -> {
             MongoCollection<RoleData> roleDataCollection = database.getCollection(RoleData.class);
             RoleData roleData = roleDataCollection.find().first();
             if (roleData != null) {
@@ -223,7 +223,7 @@ public class DatabaseTest {
     private void testMongoCollection1(Database database) {
         System.err.println("testMongoCollection1 start===========");
         long startTime = System.nanoTime();
-        Transaction.execute(() -> doTestMongoCollection1(database));
+        Transaction.run(() -> doTestMongoCollection1(database));
         System.err.println("testMongoCollection1 costTime:" + (System.nanoTime() - startTime) / timeBase);
     }
 

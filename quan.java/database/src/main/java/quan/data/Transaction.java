@@ -6,9 +6,11 @@ import org.slf4j.LoggerFactory;
 import quan.data.field.Field;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static java.lang.Boolean.FALSE;
+import static quan.data.Validations.validateTransaction;
 
 /**
  * 事务实现，多线程并发时需要自己加锁，否则隔离级别就是读已提交<br/>
@@ -96,19 +98,21 @@ public class Transaction {
         if (log != null) {
             return log;
         }
+
         for (int i = depth - 2; i >= 0; i--) {
             log = savepoints[i].dataLogs.get(data);
             if (log != null) {
                 return log;
             }
         }
+
         return null;
     }
 
     void setFieldLog(Field field, Object value, Data<?> data) {
         fieldLogs.put(field, value);
         if (data != null && data.writer != null && data.state != null && !dataLogs.containsKey(data)) {
-            dataLogs.put(data, new Data.Log(data.writer, data.state));
+            setDataLog(data, new Data.Log(data.writer, data.state));
         }
     }
 
@@ -117,12 +121,14 @@ public class Transaction {
         if (log != null) {
             return log;
         }
+
         for (int i = depth - 2; i >= 0; i--) {
             log = savepoints[i].fieldLogs.get(field);
             if (log != null) {
                 return log;
             }
         }
+
         return null;
     }
 
@@ -135,12 +141,14 @@ public class Transaction {
         if (log != null) {
             return log;
         }
+
         for (int i = depth - 2; i >= 0; i--) {
             log = savepoints[i].rootLogs.get(node);
             if (log != null) {
                 return log;
             }
         }
+
         return null;
     }
 
@@ -152,21 +160,6 @@ public class Transaction {
     }
 
     /**
-     * 检测当前是否处于事务之中，如果当前在事务之中则返回当前事务，否则报错
-     */
-    public static Transaction check() {
-        Transaction transaction = threadLocal.get();
-        if (transaction == null) {
-            error();
-        }
-        return transaction;
-    }
-
-    public static void error() {
-        throw new IllegalStateException("当前不在事务中");
-    }
-
-    /**
      * 获取当前事务
      */
     public static Transaction get() {
@@ -174,43 +167,13 @@ public class Transaction {
     }
 
     /**
-     * @see #execute(Runnable, boolean)
-     */
-    public static void execute(Runnable task) {
-        execute(task, false);
-    }
-
-    /**
      * 在事务中执行任务
      *
-     * @param task   执行逻辑
-     * @param nested 如果在事务中再开启事务是开启内嵌事务还是直接使用当前事务
+     * @param task   执行逻辑，带返回结果
+     * @param nested 如果在事务中再次开启事务，是开启内嵌事务还是直接使用当前事务
+     * @return 执行结果
      */
-    public static void execute(Runnable task, boolean nested) {
-        Transaction transaction = Transaction.begin(nested);
-        try {
-            task.run();
-        } catch (Throwable e) {
-            transaction.failed = true;
-            throw e;
-        } finally {
-            end(transaction);
-        }
-    }
-
-    /**
-     * @see #execute(Runnable, boolean)
-     */
-    public static <R> R execute(Supplier<R> task) {
-        return execute(task, false);
-    }
-
-    /**
-     * 在事务中执行任务,带返回结果
-     *
-     * @see #execute(Runnable, boolean)
-     */
-    public static <R> R execute(Supplier<R> task, boolean nested) {
+    public static <R> R run(Supplier<R> task, boolean nested) {
         Transaction transaction = Transaction.begin(nested);
         try {
             return task.get();
@@ -222,6 +185,42 @@ public class Transaction {
         }
     }
 
+    /**
+     * 在事务中执行任务
+     *
+     * @see #run(Supplier, boolean)
+     */
+    public static <R> R run(Supplier<R> task) {
+        return run(task, false);
+    }
+
+
+    /**
+     * 在事务中执行任务
+     *
+     * @see #run(Runnable, boolean)
+     */
+    public static void run(Runnable task) {
+        run(task, false);
+    }
+
+    /**
+     * 在事务中执行任务
+     *
+     * @param task   执行逻辑
+     * @param nested 如果在事务中再次开启事务，是开启内嵌事务还是直接使用当前事务
+     */
+    public static void run(Runnable task, boolean nested) {
+        Transaction transaction = Transaction.begin(nested);
+        try {
+            task.run();
+        } catch (Throwable e) {
+            transaction.failed = true;
+            throw e;
+        } finally {
+            end(transaction);
+        }
+    }
 
     /**
      * 开始事务
@@ -258,10 +257,10 @@ public class Transaction {
 
         //执行事务结束后的特殊任务
         int when = transaction.failed ? Listener.WHEN_FAILED : Listener.WHEN_SUCCEEDED;
-        for (Listener task : transaction.listeners) {
-            if ((task.when & when) == when) {
+        for (Listener listener : transaction.listeners) {
+            if ((listener.when & when) == when) {
                 try {
-                    task.task.run();
+                    listener.task.run();
                 } catch (Exception e) {
                     logger.error("", e);
                 }
@@ -298,8 +297,9 @@ public class Transaction {
      * 结束内嵌事务，恢复外层事务
      */
     private static void restore(Transaction transaction) {
-        Savepoint savepoint = transaction.savepoints[--transaction.depth - 1];
-        transaction.savepoints[transaction.depth - 1] = null;
+        Savepoint savepoint = transaction.savepoints[transaction.depth - 2];
+        transaction.savepoints[transaction.depth - 2] = null;
+        transaction.depth--;
 
         if (!transaction.failed) {
             savepoint.dataLogs.putAll(transaction.dataLogs);
@@ -326,18 +326,19 @@ public class Transaction {
         transaction.listeners = savepoint.listeners;
     }
 
-
     /**
      * 回滚当前事务
      */
     public static void rollback() {
         //标记事务为失败状态
-        check().failed = true;
+        Transaction transaction = validateTransaction();
+        transaction.failed = true;
     }
 
     /**
      * 提交事务
      */
+    @SuppressWarnings("unchecked")
     private void commit() {
         for (Node node : rootLogs.keySet()) {
             node.commit(rootLogs.get(node));
@@ -347,7 +348,9 @@ public class Transaction {
             field.commit(fieldLogs.get(field));
         }
 
-        Map<DataWriter, Triple<List<Data<?>>, List<Data<?>>, List<Data<?>>>> writers = new HashMap<>();
+        Map<DataWriter, Triple> writings = new HashMap<>();
+        Function<DataWriter, Triple> function = w -> Triple.of(new ArrayList(), new ArrayList(), new ArrayList());
+
         for (Data<?> data : dataLogs.keySet()) {
             Data.Log log = dataLogs.get(data);
             data.commit(log);
@@ -355,24 +358,25 @@ public class Transaction {
             if (log.writer == null || log.state == null) {
                 continue;
             }
-            Triple<List<Data<?>>, List<Data<?>>, List<Data<?>>> writings = writers.computeIfAbsent(log.writer, w -> Triple.of(new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
+
+            Triple<List, List, List> writing = writings.computeIfAbsent(log.writer, function);
             switch (log.state) {
                 case INSERTION:
-                    writings.getLeft().add(data);
+                    writing.getLeft().add(data);
                     break;
                 case UPDATE:
-                    writings.getMiddle().add(data);
+                    writing.getMiddle().add(data);
                     break;
                 case DELETION:
-                    writings.getRight().add(data);
+                    writing.getRight().add(data);
                     break;
             }
         }
 
-        for (DataWriter writer : writers.keySet()) {
+        for (DataWriter writer : writings.keySet()) {
             try {
-                Triple<List<Data<?>>, List<Data<?>>, List<Data<?>>> writings = writers.get(writer);
-                writer.write(writings.getLeft(), writings.getMiddle(), writings.getRight());
+                Triple<List, List, List> writing = writings.get(writer);
+                writer.write(writing.getLeft(), writing.getMiddle(), writing.getRight());
             } catch (Exception e) {
                 logger.error("内存事务提交后写数据库出错", e);
             }
@@ -384,21 +388,24 @@ public class Transaction {
      * 在当前事务执行成功之后再执行特殊任务
      */
     public static void onSucceeded(Runnable task) {
-        check().listeners.add(new Listener(task, Listener.WHEN_SUCCEEDED));
+        Transaction transaction = validateTransaction();
+        transaction.listeners.add(new Listener(task, Listener.WHEN_SUCCEEDED));
     }
 
     /**
      * 在当前事务执行失败之后再执行特殊任务
      */
     public static void onFailed(Runnable task) {
-        check().listeners.add(new Listener(task, Listener.WHEN_FAILED));
+        Transaction transaction = validateTransaction();
+        transaction.listeners.add(new Listener(task, Listener.WHEN_FAILED));
     }
 
     /**
      * 在当前事务执行完成(不管成功或者失败)之后再执行特殊任务
      */
     public static void onFinished(Runnable task) {
-        check().listeners.add(new Listener(task, Listener.WHEN_FINISHED));
+        Transaction transaction = validateTransaction();
+        transaction.listeners.add(new Listener(task, Listener.WHEN_FINISHED));
     }
 
 
@@ -419,6 +426,9 @@ public class Transaction {
 
     }
 
+    /**
+     * 事务完成之后需要执行的监听器
+     */
     private static class Listener {
 
         Runnable task;

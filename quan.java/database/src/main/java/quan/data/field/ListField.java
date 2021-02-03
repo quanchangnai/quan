@@ -35,7 +35,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
 
     @Override
     public void _setChildrenLogRoot(Data<?> root) {
-        for (E e : getOrigin()) {
+        for (E e : getCurrent()) {
             if (e instanceof Entity) {
                 _setLogRoot((Entity) e, root);
             }
@@ -56,11 +56,11 @@ public final class ListField<E> extends Node implements List<E>, Field {
         return log;
     }
 
-    public PVector<E> getOrigin() {
-        return getOrigin(Transaction.get());
+    public PVector<E> getCurrent() {
+        return getCurrent(Transaction.get());
     }
 
-    public PVector<E> getOrigin(Transaction transaction) {
+    public PVector<E> getCurrent(Transaction transaction) {
         Log<E> log = getLog(transaction, false);
         if (log != null) {
             return log.list;
@@ -70,20 +70,20 @@ public final class ListField<E> extends Node implements List<E>, Field {
 
     @Override
     public int size() {
-        return getOrigin().size();
+        return getCurrent().size();
     }
 
     @Override
     public boolean isEmpty() {
-        return getOrigin().isEmpty();
+        return getCurrent().isEmpty();
     }
 
     @Override
     public boolean contains(Object o) {
-        return getOrigin().contains(o);
+        return getCurrent().contains(o);
     }
 
-    private class It implements Iterator<E> {
+    private class IteratorImpl implements Iterator<E> {
 
         //提前取出，避免遍历过程中频繁调用
         Transaction transaction = Transaction.get();
@@ -100,7 +100,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
 
         Iterator<E> iterator;
 
-        public It() {
+        public IteratorImpl() {
             //如果迭代过程中没有修改，用这个比较快
             this.iterator = list.iterator();
         }
@@ -171,18 +171,18 @@ public final class ListField<E> extends Node implements List<E>, Field {
 
     @Override
     public Iterator<E> iterator() {
-        return new It();
+        return new IteratorImpl();
     }
 
     @Override
     public Object[] toArray() {
-        return getOrigin().toArray();
+        return getCurrent().toArray();
     }
 
     @SuppressWarnings("SuspiciousToArrayCall")
     @Override
     public <T> T[] toArray(T[] a) {
-        return getOrigin().toArray(a);
+        return getCurrent().toArray(a);
     }
 
     @Override
@@ -200,7 +200,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
         } else if (Transaction.isOptional()) {
             return plus(e);
         } else {
-            Transaction.error();
+            Validations.transactionError();
         }
 
         return true;
@@ -245,7 +245,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
                 return true;
             }
         } else {
-            Transaction.error();
+            Validations.transactionError();
         }
 
         return false;
@@ -253,7 +253,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        return getOrigin().containsAll(c);
+        return getCurrent().containsAll(c);
     }
 
     @Override
@@ -297,7 +297,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
                 return true;
             }
         } else {
-            Transaction.error();
+            Validations.transactionError();
         }
 
         return false;
@@ -325,7 +325,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
                 log.list = Empty.vector();
             }
         } else if (!Transaction.isOptional()) {
-            Transaction.error();
+            Validations.transactionError();
         } else if (!origin.isEmpty()) {
             modCount++;
             for (E e : origin) {
@@ -339,7 +339,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
 
     @Override
     public E get(int index) {
-        return getOrigin().get(index);
+        return getCurrent().get(index);
     }
 
     @Override
@@ -393,7 +393,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
             }
             return old;
         } else {
-            Transaction.error();
+            Validations.transactionError();
             return null;
         }
     }
@@ -417,7 +417,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
                 _setRoot((Entity) e, _getRoot());
             }
         } else {
-            Transaction.error();
+            Validations.transactionError();
         }
     }
 
@@ -446,24 +446,24 @@ public final class ListField<E> extends Node implements List<E>, Field {
 
             return old;
         } else {
-            Transaction.error();
+            Validations.transactionError();
             return null;
         }
     }
 
     @Override
     public int indexOf(Object o) {
-        return getOrigin().indexOf(o);
+        return getCurrent().indexOf(o);
     }
 
     @Override
     public int lastIndexOf(Object o) {
-        return getOrigin().lastIndexOf(o);
+        return getCurrent().lastIndexOf(o);
     }
 
-    private class ListIt extends It implements ListIterator<E> {
+    private class ListIteratorImpl extends IteratorImpl implements ListIterator<E> {
 
-        public ListIt(int index) {
+        public ListIteratorImpl(int index) {
             cursor = index;
             iterator = null;
         }
@@ -529,7 +529,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
 
     @Override
     public ListIterator<E> listIterator() {
-        return new ListIt(0);
+        return new ListIteratorImpl(0);
     }
 
     @Override
@@ -537,17 +537,17 @@ public final class ListField<E> extends Node implements List<E>, Field {
         if (index < 0 || index > size()) {
             throw new IndexOutOfBoundsException("index: " + index + ", size: " + size());
         }
-        return new ListIt(index);
+        return new ListIteratorImpl(index);
     }
 
     @Override
     public List<E> subList(int fromIndex, int toIndex) {
-        return getOrigin().subList(fromIndex, toIndex);
+        return getCurrent().subList(fromIndex, toIndex);
     }
 
     @Override
     public String toString() {
-        return String.valueOf(getOrigin());
+        return String.valueOf(getCurrent());
     }
 
     private static class Log<E> {

@@ -529,7 +529,7 @@ public class RoleData extends Data<Long> {
                 encoderContext.encodeWithChildContext(registry.get(ItemEntity.class), writer, $item);
             }
 
-            Map<Integer, ItemEntity> $items = value.items.getOrigin(transaction);
+            Map<Integer, ItemEntity> $items = value.items.getCurrent(transaction);
             if (!$items.isEmpty()) {
                 writer.writeStartDocument(RoleData.ITEMS);
                 for (Map.Entry<Integer, ItemEntity> itemsEntry : $items.entrySet()) {
@@ -539,7 +539,7 @@ public class RoleData extends Data<Long> {
                 writer.writeEndDocument();
             }
 
-            Collection<Boolean> $set = value.set.getOrigin(transaction);
+            Collection<Boolean> $set = value.set.getCurrent(transaction);
             if (!$set.isEmpty()) {
                 writer.writeStartArray(RoleData.SET);
                 for (Boolean setValue : $set) {
@@ -548,7 +548,7 @@ public class RoleData extends Data<Long> {
                 writer.writeEndArray();
             }
 
-            Collection<String> $list = value.list.getOrigin(transaction);
+            Collection<String> $list = value.list.getCurrent(transaction);
             if (!$list.isEmpty()) {
                 writer.writeStartArray(RoleData.LIST);
                 for (String listValue : $list) {
@@ -557,7 +557,7 @@ public class RoleData extends Data<Long> {
                 writer.writeEndArray();
             }
 
-            Map<Integer, Integer> $map = value.map.getOrigin(transaction);
+            Map<Integer, Integer> $map = value.map.getCurrent(transaction);
             if (!$map.isEmpty()) {
                 writer.writeStartDocument(RoleData.MAP);
                 for (Map.Entry<Integer, Integer> mapEntry : $map.entrySet()) {
@@ -567,7 +567,7 @@ public class RoleData extends Data<Long> {
                 writer.writeEndDocument();
             }
 
-            Collection<ItemEntity> $set2 = value.set2.getOrigin(transaction);
+            Collection<ItemEntity> $set2 = value.set2.getCurrent(transaction);
             if (!$set2.isEmpty()) {
                 writer.writeStartArray(RoleData.SET2);
                 for (ItemEntity set2Value : $set2) {
@@ -576,7 +576,7 @@ public class RoleData extends Data<Long> {
                 writer.writeEndArray();
             }
 
-            Collection<ItemEntity> $list2 = value.list2.getOrigin(transaction);
+            Collection<ItemEntity> $list2 = value.list2.getCurrent(transaction);
             if (!$list2.isEmpty()) {
                 writer.writeStartArray(RoleData.LIST2);
                 for (ItemEntity list2Value : $list2) {
