@@ -17,7 +17,7 @@ import java.util.function.BiConsumer;
  * Created by quanchangnai on 2020/4/22.
  */
 @SuppressWarnings({"deprecation", "unchecked", "rawtypes"})
-class Cursor implements BatchCursor {
+public class Cursor implements BatchCursor {
 
     private static final Logger logger = LoggerFactory.getLogger(Cursor.class);
 
