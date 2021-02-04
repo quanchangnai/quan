@@ -37,7 +37,6 @@ public class DatabaseTest {
 
     static {
         ClassUtils.enableAop();
-        TransactionAspect.class.getName();
     }
 
     @Test

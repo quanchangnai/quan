@@ -1,8 +1,8 @@
 package quan.data;
 
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
 
 import java.lang.reflect.Method;
@@ -15,7 +15,12 @@ import java.lang.reflect.Method;
 @Aspect
 public class TransactionAspect {
 
-    @Around("@annotation(quan.data.Transactional) && execution(* *(..))")
+    @Pointcut("@annotation(quan.data.Transactional) && execution(* *(..))")
+    private void pointcut() {
+    }
+
+    //环绕通知内联支持不是太好
+    //@Around("pointcut()")
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
         Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
         boolean nested = method.getAnnotation(Transactional.class).nested();
@@ -28,6 +33,29 @@ public class TransactionAspect {
             transaction.failed = true;
             throw e;
         } finally {
+            Transaction.end(transaction);
+        }
+    }
+
+    @Before("pointcut()")
+    public void before(JoinPoint joinPoint) {
+        Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
+        boolean nested = method.getAnnotation(Transactional.class).nested();
+        Transaction.begin(nested);
+    }
+
+    @AfterThrowing("pointcut()")
+    public void afterThrowing() {
+        Transaction transaction = Transaction.get();
+        if (transaction != null) {
+            transaction.failed = true;
+        }
+    }
+
+    @After("pointcut()")
+    public void afterFinally() {
+        Transaction transaction = Transaction.get();
+        if (transaction != null) {
             Transaction.end(transaction);
         }
     }
