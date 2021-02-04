@@ -38,7 +38,7 @@ public class Transaction {
     /**
      * 事务是否已失败
      */
-    private boolean failed;
+    boolean failed;
 
     /**
      * 记录数据的状态(插入、更新、删除)和使用的写入器
@@ -225,7 +225,7 @@ public class Transaction {
     /**
      * 开始事务
      */
-    private static Transaction begin(boolean nested) {
+    static Transaction begin(boolean nested) {
         Transaction transaction = threadLocal.get();
         if (transaction == null) {
             transaction = new Transaction();
@@ -241,7 +241,7 @@ public class Transaction {
     /**
      * 结束当前事务
      */
-    private static void end(Transaction transaction) {
+    static void end(Transaction transaction) {
         if (transaction.depth > 1) {
             restore(transaction);
             return;

@@ -3,5 +3,6 @@
 <aspectj>
     <weaver options="-showWeaveInfo -verbose">
         <include within="quan.data.test.*"/>
+        <dump within="*"/>
     </weaver>
 </aspectj>

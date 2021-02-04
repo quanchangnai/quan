@@ -17,6 +17,7 @@ import org.pcollections.PVector;
 import quan.common.utils.ClassUtils;
 import quan.data.Index;
 import quan.data.Transaction;
+import quan.data.TransactionAspect;
 import quan.data.item.ItemEntity;
 import quan.data.item.ItemEntity2;
 import quan.data.mongo.CodecsRegistry;
@@ -36,6 +37,7 @@ public class DatabaseTest {
 
     static {
         ClassUtils.enableAop();
+        TransactionAspect.class.getName();
     }
 
     @Test
@@ -183,9 +185,10 @@ public class DatabaseTest {
     @Ignore
     @Test
     public void testDatabase() {
+        Transaction.setGlobalOptional(true);
         System.err.println("testDatabase==============");
-        String connectionString = "mongodb://127.0.0.1:27017,127.0.0.1:27018,127.0.0.1:27019";
-        Database database = new Database(connectionString, "test", "quan.data", true);
+        String connectionString = "mongodb://127.0.0.1:27017";
+        Database database = new Database(connectionString, "test", "quan.data", false);
 
         testMongoCollection0(database);
 
