@@ -10,6 +10,5 @@ dependencies {
     api 'org.apache.logging.log4j:log4j-slf4j-impl:2.13.3'
     api 'org.apache.commons:commons-lang3:3.9'
     api 'org.aspectj:aspectjweaver:1.9.4'
-    api 'net.bytebuddy:byte-buddy:1.9.13'
     api 'net.bytebuddy:byte-buddy-agent:1.9.13'
 }

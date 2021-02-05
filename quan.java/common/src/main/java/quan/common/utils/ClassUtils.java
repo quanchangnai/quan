@@ -1,7 +1,7 @@
 package quan.common.utils;
 
+import aj.org.objectweb.asm.ClassReader;
 import net.bytebuddy.agent.ByteBuddyAgent;
-import net.bytebuddy.jar.asm.ClassReader;
 import org.aspectj.weaver.loadtime.ClassPreProcessorAgentAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
