@@ -28,12 +28,17 @@ public class ClassUtils {
     private static boolean aop;
 
     /**
-     * 启用AOP
+     * 初始化AOP
      */
-    public synchronized static void enableAop() {
+    public synchronized static void aop() {
         if (!aop) {
             aop = true;
             getInstrumentation().addTransformer(new ClassPreProcessorAgentAdapter());
+            try {
+                //环绕通知内联支持
+                Class.forName("quan.data.TransactionAspect");
+            } catch (Exception ignored) {
+            }
         }
     }
 

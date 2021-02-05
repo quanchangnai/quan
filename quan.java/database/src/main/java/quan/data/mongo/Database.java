@@ -51,7 +51,7 @@ public class Database implements DataWriter, MongoDatabase {
     private final boolean asyncWrite;
 
     static {
-        ClassUtils.enableAop();
+        ClassUtils.aop();
     }
 
     public Database(String connectionString, String databaseName, String dataPackage) {

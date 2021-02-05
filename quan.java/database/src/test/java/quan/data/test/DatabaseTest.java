@@ -17,13 +17,12 @@ import org.pcollections.PVector;
 import quan.common.utils.ClassUtils;
 import quan.data.Index;
 import quan.data.Transaction;
-import quan.data.TransactionAspect;
 import quan.data.item.ItemEntity;
 import quan.data.item.ItemEntity2;
 import quan.data.mongo.CodecsRegistry;
+import quan.data.mongo.Database;
 import quan.data.role.RoleData;
 import quan.data.role.RoleData2;
-import quan.data.mongo.Database;
 
 import java.io.File;
 import java.io.FileReader;
@@ -36,7 +35,7 @@ import java.util.*;
 public class DatabaseTest {
 
     static {
-        ClassUtils.enableAop();
+        ClassUtils.aop();
     }
 
     @Test
