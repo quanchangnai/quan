@@ -391,10 +391,10 @@ public class ConfigDefinition extends BeanDefinition {
         }
 
         int charNumError = 0;
-        if (delimiter.length() != 1 && (field.isBeanType() || field.getType().equals("list") || field.getType().equals("set"))) {
+        if (delimiter.length() != 1 && (field.isBeanType() || field.isListType() || field.isSetType())) {
             charNumError = 1;
         }
-        if (field.getType().equals("map")) {
+        if (field.isMapType()) {
             if (delimiter.length() != 2) {
                 charNumError = 2;
             } else if (delimiter.charAt(0) == delimiter.charAt(1)) {

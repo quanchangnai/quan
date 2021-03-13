@@ -458,7 +458,7 @@ public class BeanDefinition extends ClassDefinition {
             return;
         }
 
-        if (!field.getType().equals("map")) {
+        if (!field.isMapType()) {
             int lastDotIndex = field.getRef().lastIndexOf(".");
             boolean refError = lastDotIndex < 0;
 

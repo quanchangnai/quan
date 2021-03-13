@@ -51,7 +51,7 @@ public class JavaMessageGenerator extends MessageGenerator {
     @Override
     protected void prepareField(FieldDefinition fieldDefinition) {
         super.prepareField(fieldDefinition);
-        if (fieldDefinition.getType().equals("bytes") || fieldDefinition.getType().equals("string")
+        if (fieldDefinition.isBytesType() || fieldDefinition.isStringType()
                 || fieldDefinition.isCollectionType() || fieldDefinition.isTimeType()
                 || fieldDefinition.isBeanType() && !fieldDefinition.isOptional()) {
             fieldDefinition.getOwner().getImports().put("java.util.*", null);

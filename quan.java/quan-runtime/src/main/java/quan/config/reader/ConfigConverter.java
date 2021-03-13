@@ -281,7 +281,7 @@ public class ConfigConverter {
             rowJson.put(fieldDefinition.getName(), array);
         }
 
-        if (fieldDefinition.getType().equals("list")) {
+        if (fieldDefinition.isListType()) {
             array.addAll(convertList(fieldDefinition, value));
             return array;
         }

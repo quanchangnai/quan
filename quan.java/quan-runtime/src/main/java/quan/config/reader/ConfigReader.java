@@ -153,7 +153,7 @@ public abstract class ConfigReader {
             if (!fieldDefinition.isLegalColumnCount() && fieldBean != null) {
                 validatedErrors.add(String.format("配置[%s]的字段类型[%s]对应列数非法，要么单独对应1列，要么按字段拆开对应%s列", table, fieldDefinition.getType(), fieldBean.getFields().size()));
             }
-            if (!fieldDefinition.isLegalColumnCount() && fieldDefinition.getType().equals("map")) {
+            if (!fieldDefinition.isLegalColumnCount() && fieldDefinition.isMapType()) {
                 validatedErrors.add(String.format("配置[%s]的字段类型[%s]对应列数非法，要么单独对应1列，要么按键值对拆开对应偶数列", table, fieldDefinition.getType()));
             }
         }
@@ -182,7 +182,7 @@ public abstract class ConfigReader {
         try {
             if (fieldDefinition.isBeanType()) {
                 fieldValue = converter.convertColumnBean(fieldDefinition, rowJson.getJSONObject(fieldDefinition.getName()), columnValue, column);
-            } else if (fieldDefinition.getType().equals("map")) {
+            } else if (fieldDefinition.isMapType()) {
                 fieldValue = converter.convertColumnMap(fieldDefinition, rowJson, columnValue);
             } else if (fieldType.equals("list") || fieldType.equals("set")) {
                 fieldValue = converter.convertColumnArray(fieldDefinition, rowJson, columnValue);

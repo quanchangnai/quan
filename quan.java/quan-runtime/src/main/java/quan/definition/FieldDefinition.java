@@ -160,8 +160,8 @@ public class FieldDefinition extends Definition implements Cloneable {
         return false;
     }
 
-    public boolean isIntegerType() {
-        return Constants.INTEGER_TYPES.contains(type);
+    public boolean isIntegralNumberType() {
+        return Constants.INTEGRAL_NUMBER_TYPES.contains(type);
     }
 
     public boolean isNumberType() {
@@ -216,6 +216,26 @@ public class FieldDefinition extends Definition implements Cloneable {
     }
 
 
+    public boolean isMapType() {
+        return type.equals("map");
+    }
+
+    public boolean isListType() {
+        return type.equals("list");
+    }
+
+    public boolean isSetType() {
+        return type.equals("set");
+    }
+
+    public boolean isStringType() {
+        return type.equals("string");
+    }
+
+    public boolean isBytesType() {
+        return type.equals("bytes");
+    }
+
     public String getValue() {
         return value;
     }
@@ -245,7 +265,7 @@ public class FieldDefinition extends Definition implements Cloneable {
     //消息tag
     public int getTag() {
         int t;
-        if (type.equals("bool") || isIntegerType() || isEnumType() || scale >= 0) {
+        if (type.equals("bool") || isIntegralNumberType() || isEnumType() || scale >= 0) {
             t = 0;
         } else if (type.equals("float")) {
             t = 1;
@@ -284,6 +304,9 @@ public class FieldDefinition extends Definition implements Cloneable {
         return Constants.PRIMITIVE_TYPES.contains(keyType);
     }
 
+    public boolean isStringKeyType() {
+        return keyType.equals("string");
+    }
 
     public String getValueType() {
         return valueType;
@@ -310,6 +333,10 @@ public class FieldDefinition extends Definition implements Cloneable {
 
     public boolean isBeanValueType() {
         return getValueTypeBean() != null;
+    }
+
+    public boolean isStringValueType() {
+        return valueType.equals("string");
     }
 
     public BeanDefinition getValueTypeBean() {
@@ -456,9 +483,9 @@ public class FieldDefinition extends Definition implements Cloneable {
         if (delimiter != null) {
             return delimiter;
         }
-        if (type.equals("list") || type.equals("set")) {
+        if (isListType() || isSetType()) {
             return ";";
-        } else if (type.equals("map")) {
+        } else if (isMapType()) {
             return "*;";
         }
         return null;
@@ -541,7 +568,7 @@ public class FieldDefinition extends Definition implements Cloneable {
             return null;
         }
 
-        if (type.equals("map")) {
+        if (isMapType()) {
             String[] fieldRefs = ref.split(":", -1);
             ConfigDefinition refConfig = null;
 
@@ -576,7 +603,7 @@ public class FieldDefinition extends Definition implements Cloneable {
             return null;
         }
 
-        if (type.equals("map")) {
+        if (isMapType()) {
             String[] fieldRefs = ref.split(",", -1);
             ConfigDefinition refConfig;
 
@@ -661,7 +688,7 @@ public class FieldDefinition extends Definition implements Cloneable {
             } else {
                 return columnNums.size() == beanDefinition.getFields().size();
             }
-        } else if (type.equals("map")) {
+        } else if (isMapType()) {
             return columnNums.size() > 0 && columnNums.size() % 2 == 0;
         }
         return true;

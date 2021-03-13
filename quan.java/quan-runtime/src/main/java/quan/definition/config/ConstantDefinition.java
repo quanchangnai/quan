@@ -129,7 +129,7 @@ public class ConstantDefinition extends ClassDefinition {
             return;
         }
 
-        if (!keyFieldDefinition.getType().equals("string")) {
+        if (!keyFieldDefinition.isListType()) {
             addValidatedError(getValidatedName() + "的key字段[" + keyField + "]必须是字符串类型");
         }
 

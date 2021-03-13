@@ -330,7 +330,7 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
             validatePrimitiveTypeRef(position, bean, field, value, false, allConfigIndexedJsons);
         } else if (field.isBeanType()) {
             validateBeanTypeRef(position, field.getTypeBean(), (JSONObject) value, allConfigIndexedJsons);
-        } else if (field.getType().equals("map")) {
+        } else if (field.isMapType()) {
             JSONObject map = (JSONObject) value;
             for (String mapKey : map.keySet()) {
                 //校验map的key引用
@@ -344,7 +344,7 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
                 }
             }
 
-        } else if (field.getType().equals("set") || field.getType().equals("list")) {
+        } else if (field.isSetType() || field.isListType()) {
             JSONArray array = (JSONArray) value;
             for (Object arrayValue : array) {
                 if (field.isPrimitiveValueType()) {

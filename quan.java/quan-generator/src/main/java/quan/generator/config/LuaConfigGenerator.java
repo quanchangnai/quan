@@ -95,7 +95,7 @@ public class LuaConfigGenerator extends ConfigGenerator {
 
             luaBuilder.append(field.getName()).append(" = ");
 
-            if (field.getType().equals("string")) {
+            if (field.isStringType()) {
                 luaBuilder.append("\"").append(object.getOrDefault(field.getName(), "")).append("\"");
             } else if (field.isNumberType()) {
                 luaBuilder.append(object.getOrDefault(field.getName(), "0"));
@@ -104,9 +104,9 @@ public class LuaConfigGenerator extends ConfigGenerator {
                 luaBuilder.append(date != null ? date.getTime() : 0);
                 luaBuilder.append(", ").append(field.getName()).append("_ = ");
                 luaBuilder.append("\"").append(object.getOrDefault(field.getName() + "_", "")).append("\"");
-            } else if (field.getType().equals("map")) {
+            } else if (field.isMapType()) {
                 mapLuaString(configDefinition, field, object.getJSONObject(field.getName()), luaBuilder);
-            } else if (field.getType().equals("list") || field.getType().equals("set")) {
+            } else if (field.isListType() || field.isSetType()) {
                 arrayLuaString(configDefinition, field, object.getJSONArray(field.getName()), luaBuilder);
             } else if (field.isBeanType()) {
                 beanLuaString(configDefinition, field.getTypeBean(), object.getJSONObject(field.getName()), luaBuilder);
@@ -134,7 +134,7 @@ public class LuaConfigGenerator extends ConfigGenerator {
             }
             start = false;
 
-            if (field.getKeyType().equals("string")) {
+            if (field.isStringKeyType()) {
                 luaBuilder.append(key);
             } else {
                 luaBuilder.append("[").append(key).append("]");
@@ -142,7 +142,7 @@ public class LuaConfigGenerator extends ConfigGenerator {
 
             luaBuilder.append(" = ");
 
-            if (field.getValueType().equals("string")) {
+            if (field.isStringValueType()) {
                 luaBuilder.append("\"").append(object.getString(key)).append("\"");
             } else if (field.isBeanValueType()) {
                 beanLuaString(configDefinition, field.getValueTypeBean(), object.getJSONObject(key), luaBuilder);
@@ -166,7 +166,7 @@ public class LuaConfigGenerator extends ConfigGenerator {
                 luaBuilder.append(", ");
             }
             start = false;
-            if (field.getValueType().equals("string")) {
+            if (field.isStringValueType()) {
                 luaBuilder.append("\"").append(array.getString(i)).append("\"");
             } else if (field.isBeanValueType()) {
                 beanLuaString(configDefinition, field.getValueTypeBean(), array.getJSONObject(i), luaBuilder);

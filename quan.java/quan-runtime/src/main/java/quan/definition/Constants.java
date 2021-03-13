@@ -15,12 +15,12 @@ public final class Constants {
     /**
      * 整数类型
      */
-    public static final Set<String> INTEGER_TYPES = CollectionUtils.asSet("short", "int", "long");
+    public static final Set<String> INTEGRAL_NUMBER_TYPES = CollectionUtils.asSet("short", "int", "long");
 
     /**
      * 数字类型
      */
-    public static final Set<String> NUMBER_TYPES = CollectionUtils.asSet(INTEGER_TYPES, "float", "double");
+    public static final Set<String> NUMBER_TYPES = CollectionUtils.asSet(INTEGRAL_NUMBER_TYPES, "float", "double");
 
     /**
      * 原生类型
