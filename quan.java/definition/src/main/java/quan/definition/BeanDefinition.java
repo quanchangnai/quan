@@ -371,19 +371,19 @@ public class BeanDefinition extends ClassDefinition {
     protected void validateDependents() {
         BeanDefinition parent = getParent();
         if (parent != null) {
-            addDependent(DependentType.parent, this, this, parent);
+            addDependent(DependentType.PARENT, this, this, parent);
         }
 
         for (FieldDefinition fieldDefinition : getFields()) {
-            addDependent(DependentType.field, this, fieldDefinition, fieldDefinition.getTypeBean());
-            addDependent(DependentType.fieldValue, this, fieldDefinition, fieldDefinition.getValueTypeBean());
+            addDependent(DependentType.FIELD, this, fieldDefinition, fieldDefinition.getTypeBean());
+            addDependent(DependentType.FIELD_VALUE, this, fieldDefinition, fieldDefinition.getValueTypeBean());
             if (fieldDefinition.isSimpleRef()) {
-                addDependent(DependentType.fieldRef, this, fieldDefinition, fieldDefinition.getRefConfig());
+                addDependent(DependentType.FIELD_REF, this, fieldDefinition, fieldDefinition.getRefConfig());
             }
         }
 
         for (BeanDefinition child : getChildren()) {
-            addDependent(DependentType.child, this, child, child);
+            addDependent(DependentType.CHILD, this, child, child);
         }
     }
 

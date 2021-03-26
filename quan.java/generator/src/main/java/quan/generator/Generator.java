@@ -304,15 +304,15 @@ public abstract class Generator {
                 }
 
                 if (useDependent.getLeft()) {
-                    if (dependentSource.getType() == DependentType.field) {
+                    if (dependentSource.getType() == DependentType.FIELD) {
                         ((FieldDefinition) dependentSource.getOwnerDefinition()).setClassType(dependentClassFullName);
-                    } else if (dependentSource.getType() == DependentType.fieldValue) {
+                    } else if (dependentSource.getType() == DependentType.FIELD_VALUE) {
                         ((FieldDefinition) dependentSource.getOwnerDefinition()).setClassValueType(dependentClassFullName);
-                    } else if (dependentSource.getType() == DependentType.fieldRef) {
+                    } else if (dependentSource.getType() == DependentType.FIELD_REF) {
                         ((FieldDefinition) dependentSource.getOwnerDefinition()).setRefType(dependentClassFullName);
-                    }else if (dependentSource.getType() == DependentType.parent) {
+                    }else if (dependentSource.getType() == DependentType.PARENT) {
                         ((BeanDefinition) dependentSource.getOwnerDefinition()).setParentClassName(dependentClassFullName);
-                    } else if (dependentSource.getType() == DependentType.child) {
+                    } else if (dependentSource.getType() == DependentType.CHILD) {
                         ((BeanDefinition) dependentSource.getOwnerDefinition()).getDependentChildren().get(classDefinition.getLongName()).setRight(dependentClassFullName);
                     }
                     //消息头没有同名类

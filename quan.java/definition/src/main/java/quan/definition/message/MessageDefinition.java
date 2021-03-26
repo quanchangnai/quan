@@ -87,7 +87,7 @@ public class MessageDefinition extends BeanDefinition {
     protected void validateDependents() {
         HeaderDefinition header = getHeader();
         if (header != null) {
-            addDependent(DependentType.messageHeader, this, header, header);
+            addDependent(DependentType.MESSAGE_HEADER, this, header, header);
         }
         super.validateDependents();
     }
