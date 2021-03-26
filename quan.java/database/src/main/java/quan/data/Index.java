@@ -18,14 +18,18 @@ public @interface Index {
     String[] fields();
 
     /**
-     * 唯一索引或者普通索引
+     * 索引类型：唯一索引、普通索引或者文本索引
      */
-    boolean unique();
+    Type type();
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.TYPE)
     @interface List {
         Index[] value();
+    }
+
+    enum Type {
+        NORMAL, UNIQUE, TEXT
     }
 
 }

@@ -25,7 +25,7 @@ import ${import};
     <#list index.fields as field>
      <#lt/>${name}.${field.underscoreName}<#if field_has_next>, </#if><#rt/>
     </#list>
-    <#lt/>}, unique = ${index.unique?c})
+    <#lt/>}, type = Index.Type.<#if index.text>TEXT<#elseif index.unique>UNIQUE<#else>NORMAL</#if>)
 </#list>
 </#if>
 public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idField.classType}></#if> {

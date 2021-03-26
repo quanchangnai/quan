@@ -3,10 +3,7 @@ package quan.definition;
 import org.apache.commons.lang3.StringUtils;
 import quan.common.utils.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -15,7 +12,9 @@ import java.util.regex.Pattern;
  */
 public class IndexDefinition extends Definition implements Cloneable {
 
-    public static Set<String> LEGAL_TYPES = CollectionUtils.asSet("normal", "n", "unique", "u");
+    private static Set<String> CONFIG_LEGAL_TYPES = CollectionUtils.asSet("normal", "n", "unique", "u");
+
+    private static Set<String> DATA_LEGAL_TYPES = CollectionUtils.asSet("normal", "n", "unique", "u", "text", "t");
 
     private BeanDefinition owner;
 
@@ -84,8 +83,30 @@ public class IndexDefinition extends Definition implements Cloneable {
         return !StringUtils.isBlank(index) && (index.trim().equals("normal") || index.trim().equals("n"));
     }
 
-    public static boolean isIndex(String index) {
-        return isUnique(index) || isNormal(index);
+    public boolean isText() {
+        return isText(type);
+    }
+
+    public static boolean isText(String index) {
+        return !StringUtils.isBlank(index) && (index.trim().equals("text") || index.trim().equals("t"));
+    }
+
+    public static boolean isIndex(String index, Category category) {
+        boolean result = isUnique(index) || isNormal(index);
+        if (category == Category.data) {
+            result = result || isText(index);
+        }
+        return result;
+    }
+
+    public static Set<String> getLegalTypes(Category category) {
+        if (category == Category.config) {
+            return CONFIG_LEGAL_TYPES;
+        } else if (category == Category.data) {
+            return DATA_LEGAL_TYPES;
+        } else {
+            return Collections.emptySet();
+        }
     }
 
 
@@ -137,8 +158,8 @@ public class IndexDefinition extends Definition implements Cloneable {
             if (StringUtils.isBlank(field.getIndex())) {
                 continue;
             }
-            if (!isIndex(field.getIndex())) {
-                field.getOwner().addValidatedError(field.getOwner().getValidatedName("的") + field.getValidatedName() + "索引类型[" + field.getIndex() + "]不合法,允许类型" + LEGAL_TYPES);
+            if (!isIndex(field.getIndex(), field.category)) {
+                field.getOwner().addValidatedError(field.getOwner().getValidatedName("的") + field.getValidatedName() + "索引类型[" + field.getIndex() + "]不合法,允许类型" + getLegalTypes(field.category));
                 continue;
             }
             if (!field.isPrimitiveType() && !field.isEnumType() && field.getType() != null) {
@@ -182,8 +203,9 @@ public class IndexDefinition extends Definition implements Cloneable {
         if (indexType == null) {
             owner.addValidatedError(owner.getValidatedName("的") + getValidatedName() + "类型不能为空");
         } else {
-            if (!LEGAL_TYPES.contains(indexType)) {
-                owner.addValidatedError(owner.getValidatedName("的") + getValidatedName() + "类型[" + indexType + "]非法,允许类型" + LEGAL_TYPES);
+            Set<String> legalTypes = getLegalTypes(category);
+            if (!legalTypes.contains(indexType)) {
+                owner.addValidatedError(owner.getValidatedName("的") + getValidatedName() + "类型[" + indexType + "]非法,允许类型" + legalTypes);
             }
         }
 

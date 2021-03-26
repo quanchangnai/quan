@@ -8,9 +8,7 @@ namespace Quan.Message
     /// </summary>
     public class Buffer
     {
-        /**
-        * 字节缓冲区
-        */
+        //内部字节数组
         private byte[] _bytes;
 
         //下一个读的位置

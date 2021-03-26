@@ -21,7 +21,7 @@ public abstract class Bean {
     public void decode(Buffer buffer) {
     }
 
-    protected void skipField(int tag, Buffer buffer) {
+    protected static void skipField(int tag, Buffer buffer) {
         switch (tag & 0b11) {
             case 0:
                 buffer.readLong();
@@ -37,4 +37,5 @@ public abstract class Bean {
                 break;
         }
     }
+
 }

@@ -3,10 +3,10 @@
  */
 
 rootProject.name = 'quan'
-include(':common')
-include(':network')
-include(':database')
-include(':message')
-include(':config')
-include(':definition')
-include(':generator')
+include 'common'
+include 'network'
+include 'database'
+include 'message'
+include 'config'
+include 'definition'
+include 'generator'

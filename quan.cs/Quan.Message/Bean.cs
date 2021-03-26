@@ -23,7 +23,7 @@ namespace Quan.Message
         {
         }
 
-        protected void SkipField(int tag, Buffer buffer)
+        protected static void SkipField(int tag, Buffer buffer)
         {
             switch (tag & 0b11)
             {

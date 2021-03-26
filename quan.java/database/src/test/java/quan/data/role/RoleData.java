@@ -13,9 +13,9 @@ import quan.data.item.ItemEntity;
  * 角色<br/>
  * 代码自动生成，请勿手动修改
  */
-@Index(name = "aa", fields = {RoleData.A, RoleData.A2}, unique = false)
-@Index(name = "bb", fields = {RoleData.B, RoleData.B2}, unique = false)
-@Index(name = "name", fields = {RoleData.NAME}, unique = true)
+@Index(name = "aa", fields = {RoleData.A, RoleData.A2}, type = Index.Type.NORMAL)
+@Index(name = "bb", fields = {RoleData.B, RoleData.B2}, type = Index.Type.NORMAL)
+@Index(name = "name", fields = {RoleData.NAME}, type = Index.Type.TEXT)
 public class RoleData extends Data<Long> {
 
     /**

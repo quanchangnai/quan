@@ -105,7 +105,7 @@ public abstract class Data<I> {
     }
 
     /**
-     * 数据从数据查询出来时，会设置默认写入器和状态(更新)，本操作会清除以上设置
+     * 数据从数据库查询出来时，会设置默认写入器和状态(更新)，本操作会清除以上设置
      */
     public final void free() {
         Transaction transaction = Transaction.get();

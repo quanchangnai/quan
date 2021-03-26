@@ -170,8 +170,18 @@ public class Database implements DataWriter, MongoDatabase {
 
         List<IndexModel> createIndexModels = new ArrayList<>();
         for (Index index : collectionIndexes.values()) {
-            IndexOptions indexOptions = new IndexOptions().name(index.name()).unique(index.unique());
-            createIndexModels.add(new IndexModel(Indexes.ascending(index.fields()), indexOptions));
+            IndexOptions indexOptions = new IndexOptions().name(index.name());
+            if (index.type() == Index.Type.TEXT) {
+                List<Bson> textIndexes = new ArrayList<>();
+                for (String field : index.fields()) {
+                    textIndexes.add(Indexes.text(field));
+                }
+                createIndexModels.add(new IndexModel(Indexes.compoundIndex(textIndexes), indexOptions));
+            } else {
+                indexOptions.unique(index.type() == Index.Type.UNIQUE);
+                createIndexModels.add(new IndexModel(Indexes.ascending(index.fields()), indexOptions));
+            }
+
         }
         if (!createIndexModels.isEmpty()) {
             collection.createIndexes(createIndexModels);
