@@ -216,7 +216,7 @@ public class NioClient {
         }
 
         @Override
-        protected void after() {
+        protected void onAfter() {
             try {
                 select();
             } catch (IOException e) {
@@ -225,7 +225,7 @@ public class NioClient {
         }
 
         @Override
-        protected void end() {
+        protected void onEnd() {
             try {
                 Set<SelectionKey> keys = selector.keys();
                 for (SelectionKey key : keys) {

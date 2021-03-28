@@ -26,8 +26,8 @@ public class SingleThreadExecutor implements Executor {
     /**
      * 判断当前线程是不是执行器关联的线程
      */
-    public boolean isInMyTerritory() {
-        return Thread.currentThread().getId() == thread.getId();
+    public boolean isMyThread() {
+        return Thread.currentThread() == thread;
     }
 
     @Override
@@ -51,14 +51,14 @@ public class SingleThreadExecutor implements Executor {
                 }
             }
             try {
-                after();
+                onAfter();
             } catch (Throwable e) {
                 logger.error("", e);
             }
         }
 
         try {
-            end();
+            onEnd();
         } catch (Throwable e) {
             logger.error("", e);
         }
@@ -81,10 +81,10 @@ public class SingleThreadExecutor implements Executor {
         return running;
     }
 
-    protected void after() {
+    protected void onAfter() {
     }
 
-    protected void end() {
+    protected void onEnd() {
     }
 
 }

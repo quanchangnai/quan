@@ -49,14 +49,14 @@ class ConvertException extends RuntimeException {
     }
 
     public enum ErrorType {
-        common,
-        typeError,
-        enumValue,
-        enumName,
-        setDuplicateValue,
-        mapInvalidKey,
-        mapInvalidValue,
-        mapDuplicateKey,
+        COMMON,
+        TYPE_ERROR,
+        ENUM_VALUE,
+        ENUM_NAME,
+        SET_DUPLICATE_VALUE,
+        MAP_INVALID_KEY,
+        MAP_INVALID_VALUE,
+        MAP_DUPLICATE_KEY,
     }
 
 }

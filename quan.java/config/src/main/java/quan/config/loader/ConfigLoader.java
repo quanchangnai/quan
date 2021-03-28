@@ -30,7 +30,7 @@ public abstract class ConfigLoader {
     protected TableType tableType;
 
     //加载模式，加载或者校验
-    protected LoadMode loadMode = LoadMode.validateAndLoad;
+    protected LoadMode loadMode = LoadMode.VALIDATE_AND_LOAD;
 
     protected final Map<String, ConfigReader> readers = new HashMap<>();
 
@@ -60,11 +60,11 @@ public abstract class ConfigLoader {
     }
 
     public boolean needValidate() {
-        return loadMode == LoadMode.onlyValidate || loadMode == LoadMode.validateAndLoad;
+        return loadMode == LoadMode.ONLY_VALIDATE || loadMode == LoadMode.VALIDATE_AND_LOAD;
     }
 
     public boolean needLoad() {
-        return loadMode == LoadMode.onlyLoad || loadMode == LoadMode.validateAndLoad;
+        return loadMode == LoadMode.ONLY_LOAD || loadMode == LoadMode.VALIDATE_AND_LOAD;
     }
 
     /**

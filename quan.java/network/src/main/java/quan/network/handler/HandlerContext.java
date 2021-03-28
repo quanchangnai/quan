@@ -40,7 +40,7 @@ public class HandlerContext {
     }
 
     public void triggerConnected() {
-        if (getExecutor().isInMyTerritory()) {
+        if (getExecutor().isMyThread()) {
             onConnected();
         } else {
             getExecutor().execute(this::onConnected);
@@ -58,7 +58,7 @@ public class HandlerContext {
     }
 
     public void triggerDisconnected() {
-        if (getExecutor().isInMyTerritory()) {
+        if (getExecutor().isMyThread()) {
             onDisconnected();
         } else {
             getExecutor().execute(this::onDisconnected);
@@ -76,7 +76,7 @@ public class HandlerContext {
     }
 
     public void triggerMsgReceived(Object msg) {
-        if (getExecutor().isInMyTerritory()) {
+        if (getExecutor().isMyThread()) {
             onMsgReceived(msg);
         } else {
             getExecutor().execute(() -> onMsgReceived(msg));
@@ -94,7 +94,7 @@ public class HandlerContext {
     }
 
     public void triggerExceptionCaught(Throwable cause) {
-        if (getExecutor().isInMyTerritory()) {
+        if (getExecutor().isMyThread()) {
             onExceptionCaught(cause);
         } else {
             getExecutor().execute(() -> onExceptionCaught(cause));
@@ -115,7 +115,7 @@ public class HandlerContext {
      * 触发自定义事件
      */
     public void triggerEvent(Object event) {
-        if (getExecutor().isInMyTerritory()) {
+        if (getExecutor().isMyThread()) {
             onEventTriggered(event);
         } else {
             getExecutor().execute(() -> onEventTriggered(event));
@@ -134,7 +134,7 @@ public class HandlerContext {
 
     public void sendMsg(Object msg) {
         Objects.requireNonNull(msg, "参数[msg]不能为空");
-        if (getExecutor().isInMyTerritory()) {
+        if (getExecutor().isMyThread()) {
             onSendMsg(msg);
         } else {
             getExecutor().execute(() -> onSendMsg(msg));
@@ -152,7 +152,7 @@ public class HandlerContext {
     }
 
     public void close() {
-        if (getExecutor().isInMyTerritory()) {
+        if (getExecutor().isMyThread()) {
             onClose();
         } else {
             getExecutor().execute(this::onClose);

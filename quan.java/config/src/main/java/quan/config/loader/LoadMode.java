@@ -9,15 +9,15 @@ public enum LoadMode {
     /**
      * 仅校验配置，不实际加载
      */
-    onlyValidate,
+    ONLY_VALIDATE,
 
     /**
      * 仅加载不校验,会创建配置对象并加载到类的缓存里
      */
-    onlyLoad,
+    ONLY_LOAD,
 
     /**
      * 校验并加载,会创建配置对象并加载到类的缓存里
      */
-    validateAndLoad
+    VALIDATE_AND_LOAD
 }

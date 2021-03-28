@@ -221,7 +221,7 @@ public class NioServer {
         }
 
         @Override
-        protected void after() {
+        protected void onAfter() {
             try {
                 select();
             } catch (IOException e) {
@@ -260,7 +260,7 @@ public class NioServer {
         }
 
         @Override
-        protected void end() {
+        protected void onEnd() {
             try {
                 Set<SelectionKey> keys = selector.keys();
                 for (SelectionKey key : keys) {
@@ -313,7 +313,7 @@ public class NioServer {
         }
 
         @Override
-        protected void after() {
+        protected void onAfter() {
             try {
                 select();
                 doRegisterChannels();
@@ -324,7 +324,7 @@ public class NioServer {
         }
 
         @Override
-        protected void end() {
+        protected void onEnd() {
             try {
                 Set<SelectionKey> keys = selector.keys();
                 for (SelectionKey key : keys) {

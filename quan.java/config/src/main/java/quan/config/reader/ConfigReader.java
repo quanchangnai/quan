@@ -265,25 +265,25 @@ public abstract class ConfigReader {
 
         ConvertException e1 = (ConvertException) e;
         switch (e1.getErrorType()) {
-            case typeError:
+            case TYPE_ERROR:
                 validatedErrors.add(String.format(commonError + ",[%s]不匹配期望类型[%s]", e1.getParam(0), e1.getParam(1)));
                 break;
-            case enumName:
+            case ENUM_NAME:
                 validatedErrors.add(String.format(commonError + ",枚举名[%s]不合法", e1.getParam(0)));
                 break;
-            case enumValue:
+            case ENUM_VALUE:
                 validatedErrors.add(String.format(commonError + ",枚举值[%s]不合法", e1.getParam(0)));
                 break;
-            case setDuplicateValue:
+            case SET_DUPLICATE_VALUE:
                 validatedErrors.add(String.format(commonError + ",set不能有重复值%s", e1.getParams()));
                 break;
-            case mapInvalidKey:
+            case MAP_INVALID_KEY:
                 validatedErrors.add(String.format(commonError + ",map不能有无效键[%s]", e1.getParam(0)));
                 break;
-            case mapInvalidValue:
+            case MAP_INVALID_VALUE:
                 validatedErrors.add(String.format(commonError + ",map不能有无效值[%s]", e1.getParam(0)));
                 break;
-            case mapDuplicateKey:
+            case MAP_DUPLICATE_KEY:
                 validatedErrors.add(String.format(commonError + ",map不能有重复键[%s]", e1.getParam(0)));
                 break;
             default:

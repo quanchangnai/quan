@@ -101,7 +101,7 @@ public class ConfigConverter {
                     object = new JSONObject();
                     object.put("class", columnValue);
                 } else if (!StringUtils.isBlank(columnValue)) {
-                    throw new ConvertException(ConvertException.ErrorType.typeError, columnValue, beanDefinition.getName());
+                    throw new ConvertException(ConvertException.ErrorType.TYPE_ERROR, columnValue, beanDefinition.getName());
                 }
                 return object;
             } else {
@@ -154,14 +154,14 @@ public class ConfigConverter {
         if (enumValue > 0) {
             enumField = enumDefinition.getField(enumValue);
             if (enumField == null) {
-                throw new ConvertException(ConvertException.ErrorType.enumValue, value);
+                throw new ConvertException(ConvertException.ErrorType.ENUM_VALUE, value);
             }
             return enumValue;
         }
 
         enumField = enumDefinition.getField(value);
         if (enumField == null) {
-            throw new ConvertException(ConvertException.ErrorType.enumName, value);
+            throw new ConvertException(ConvertException.ErrorType.ENUM_NAME, value);
         }
         enumValue = Integer.parseInt(enumField.getValue());
 
@@ -190,7 +190,7 @@ public class ConfigConverter {
                     return value;
             }
         } catch (Exception e) {
-            throw new ConvertException(ConvertException.ErrorType.typeError, e, value, type);
+            throw new ConvertException(ConvertException.ErrorType.TYPE_ERROR, e, value, type);
         }
     }
 
@@ -210,7 +210,7 @@ public class ConfigConverter {
                 return timeFormat.parse(value);
             }
         } catch (ParseException e) {
-            throw new ConvertException(ConvertException.ErrorType.common, e);
+            throw new ConvertException(ConvertException.ErrorType.COMMON, e);
         }
     }
 
@@ -252,7 +252,7 @@ public class ConfigConverter {
         }
 
         if (!duplicateValues.isEmpty()) {
-            throw new ConvertException(ConvertException.ErrorType.setDuplicateValue, new ArrayList<>(duplicateValues));
+            throw new ConvertException(ConvertException.ErrorType.SET_DUPLICATE_VALUE, new ArrayList<>(duplicateValues));
         }
 
         return convertArray(fieldDefinition, setValues.toArray(new String[0]));
@@ -305,7 +305,7 @@ public class ConfigConverter {
             }
         }
         if (!duplicate.isEmpty()) {
-            throw new ConvertException(ConvertException.ErrorType.setDuplicateValue, new ArrayList<>(duplicate));
+            throw new ConvertException(ConvertException.ErrorType.SET_DUPLICATE_VALUE, new ArrayList<>(duplicate));
         }
 
         return array;
@@ -348,9 +348,9 @@ public class ConfigConverter {
             }
             if (objectKey == null) {
                 object.put(null, null);//标记接下来的value作废
-                throw new ConvertException(ConvertException.ErrorType.mapInvalidKey, value);
+                throw new ConvertException(ConvertException.ErrorType.MAP_INVALID_KEY, value);
             } else if (object.containsKey(objectKey)) {
-                throw new ConvertException(ConvertException.ErrorType.mapDuplicateKey, value);
+                throw new ConvertException(ConvertException.ErrorType.MAP_DUPLICATE_KEY, value);
             }
             object.put(objectKey.toString(), null);
         } else {
@@ -366,7 +366,7 @@ public class ConfigConverter {
             if (objectValue == null) {
                 //value无效删除对应的key
                 object.remove(objectKey);
-                throw new ConvertException(ConvertException.ErrorType.mapInvalidValue, value);
+                throw new ConvertException(ConvertException.ErrorType.MAP_INVALID_VALUE, value);
             }
             object.put(objectKey.toString(), objectValue);
         }
@@ -391,10 +391,10 @@ public class ConfigConverter {
             } catch (Exception ignored) {
             }
             if (k == null) {
-                throw new ConvertException(ConvertException.ErrorType.mapInvalidKey, vi);
+                throw new ConvertException(ConvertException.ErrorType.MAP_INVALID_KEY, vi);
             }
             if (object.containsKey(k)) {
-                throw new ConvertException(ConvertException.ErrorType.mapDuplicateKey, vi);
+                throw new ConvertException(ConvertException.ErrorType.MAP_DUPLICATE_KEY, vi);
             }
 
             Object v = null;
@@ -407,7 +407,7 @@ public class ConfigConverter {
             } catch (Exception ignored) {
             }
             if (v == null) {
-                throw new ConvertException(ConvertException.ErrorType.mapInvalidValue, vi);
+                throw new ConvertException(ConvertException.ErrorType.MAP_INVALID_VALUE, vi);
             }
 
             object.put(k.toString(), v);
@@ -430,7 +430,7 @@ public class ConfigConverter {
         if (beanHasChild) {
             String beanClass = values[0];
             if (!beanDefinition.getMeAndDescendants().contains(beanClass)) {
-                throw new ConvertException(ConvertException.ErrorType.typeError, beanClass, beanDefinition.getName());
+                throw new ConvertException(ConvertException.ErrorType.TYPE_ERROR, beanClass, beanDefinition.getName());
             }
             object.put("class", beanClass);
             beanDefinition = parser.getBean(getLongClassName(owner, beanClass));
