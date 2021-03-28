@@ -235,9 +235,11 @@ public class DatabaseTest {
         System.err.println("roleDataMax:" + roleDataMax);
         if (roleDataMax == null) {
             roleDataMax = new RoleData(1L);
-            roleDataMax.setName("aaa:1");
+            roleDataMax.setName("张三:1");
+            roleDataMax.setName("bbb:1");
             roleDataMax.insert(database);
         } else {
+            roleDataMax.setName("max:" + System.nanoTime());
             roleDataMax.setName("max:" + System.nanoTime());
             System.err.println("roleDataMax:" + roleDataMax.toJson());
 
@@ -250,9 +252,15 @@ public class DatabaseTest {
 //            roleDataMax.getSet().add(i % 2 == 1);
         }
 
-        RoleData roleData1 = new RoleData(roleDataMax.getId() + 1).setName("name:" + roleDataMax.getId() + 1);
-        RoleData roleData2 = new RoleData(roleDataMax.getId() + 2).setName("name:" + roleDataMax.getId() + 2);
-        RoleData roleData3 = new RoleData(roleDataMax.getId() + 3).setName("name:" + roleDataMax.getId() + 3);
+        RoleData roleData1 = new RoleData(roleDataMax.getId() + 1)
+                .setName("name:" + roleDataMax.getId() + 1)
+                .setName2("name2:" + roleDataMax.getId() + 1);
+        RoleData roleData2 = new RoleData(roleDataMax.getId() + 2)
+                .setName("name:" + roleDataMax.getId() + 2)
+                .setName2("发射 火箭:" + roleDataMax.getId() + 1);
+        RoleData roleData3 = new RoleData(roleDataMax.getId() + 3)
+                .setName("name:" + roleDataMax.getId() + 3)
+                .setName2("name2:" + roleDataMax.getId() + 1);
 
         database.insert(roleData1, roleData2, roleData3);
 

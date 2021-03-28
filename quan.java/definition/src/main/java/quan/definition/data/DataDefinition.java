@@ -92,6 +92,17 @@ public class DataDefinition extends BeanDefinition {
         }
 
         IndexDefinition.validate(indexes, indexes, fields);
+
+        boolean textIndex = false;
+        for (IndexDefinition indexDefinition : indexes) {
+            if (indexDefinition.isText()) {
+                if (textIndex) {
+                    addValidatedError(getValidatedName() + "最多只能定义一个文本(组合)索引");
+                } else {
+                    textIndex = true;
+                }
+            }
+        }
     }
 
 }

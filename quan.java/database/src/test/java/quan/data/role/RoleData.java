@@ -15,7 +15,7 @@ import quan.data.item.ItemEntity;
  */
 @Index(name = "aa", fields = {RoleData.A, RoleData.A2}, type = Index.Type.NORMAL)
 @Index(name = "bb", fields = {RoleData.B, RoleData.B2}, type = Index.Type.NORMAL)
-@Index(name = "name", fields = {RoleData.NAME}, type = Index.Type.TEXT)
+@Index(name = "name", fields = {RoleData.NAME, RoleData.NAME2}, type = Index.Type.TEXT)
 public class RoleData extends Data<Long> {
 
     /**
@@ -30,6 +30,8 @@ public class RoleData extends Data<Long> {
     public static final String ID = "id";
 
     public static final String NAME = "name";
+
+    public static final String NAME2 = "name2";
 
     /**
      * 角色类型
@@ -84,6 +86,8 @@ public class RoleData extends Data<Long> {
     private LongField id = new LongField();
 
     private StringField name = new StringField();
+
+    private StringField name2 = new StringField();
 
     private IntField roleType = new IntField();
 
@@ -172,6 +176,15 @@ public class RoleData extends Data<Long> {
 
     public RoleData setName(String name) {
         this.name.setValue(name, this);
+        return this;
+    }
+
+    public String getName2() {
+        return name2.getValue();
+    }
+
+    public RoleData setName2(String name2) {
+        this.name2.setValue(name2, this);
         return this;
     }
 
@@ -373,6 +386,7 @@ public class RoleData extends Data<Long> {
         return "RoleData{" +
                 "id=" + id +
                 ",name='" + name + '\'' +
+                ",name2='" + name2 + '\'' +
                 ",roleType=" + RoleType.valueOf(roleType.getValue()) +
                 ",a=" + a +
                 ",a2=" + a2 +
@@ -419,6 +433,9 @@ public class RoleData extends Data<Long> {
                         break;
                     case RoleData.NAME:
                         value.name.setValue(reader.readString());
+                        break;
+                    case RoleData.NAME2:
+                        value.name2.setValue(reader.readString());
                         break;
                     case RoleData.ROLE_TYPE:
                         value.roleType.setValue(reader.readInt32());
@@ -513,6 +530,7 @@ public class RoleData extends Data<Long> {
             }
 
             writer.writeString(RoleData.NAME, value.name.getValue(transaction));
+            writer.writeString(RoleData.NAME2, value.name2.getValue(transaction));
             writer.writeInt32(RoleData.ROLE_TYPE, value.roleType.getValue(transaction));
             writer.writeInt32(RoleData.A, value.a.getValue(transaction));
             writer.writeInt32(RoleData.A2, value.a2.getValue(transaction));
