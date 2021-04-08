@@ -7,7 +7,8 @@ plugins {
     id 'idea'
 }
 
-group = 'quan'
+group 'quan'
+version '1.0'
 
 def javaVersion = JavaVersion.VERSION_1_8
 sourceCompatibility = javaVersion

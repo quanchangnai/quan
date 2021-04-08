@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package>
+
+    <entity name="ItemEntity">道具
+        <field name="id" type="int"/>
+        <field name="name" type="string"/>
+        <field name="list" type="list:int"/>
+    </entity>
+
+    <enum name="ItemType">道具类型
+        <field name="type1" value="1"/>道具类型1
+        <field name="type2" value="2"/>道具类型2
+    </enum>
+
+</package>

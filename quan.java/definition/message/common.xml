@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<package cs="Common">
-
-    <message-header>消息头
-        <field name="seq" type="long"/>消息序号
-        <field name="error" type="int"/>错误码
-    </message-header>
-
-</package>

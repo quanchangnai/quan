@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package cs="Common">
+
+    <config name="ConstantConfig" table="常量">
+        <field name="key" type="string" column="常量Key" index="u"/>
+        <field name="itemId" type="int" column="道具ID" ref="item.ItemConfig.id"/>
+        <field name="reward" type="Reward" column="奖励"/>
+        <field name="rewardList" type="list:item.Reward" column="奖励List"/>
+        <field name="comment" type="string" column="备注"/>
+        <constant name="ItemConstant" enum="false" key="key" value="itemId" comment="comment"/>
+        <constant name="RewardConstant" enum="true" key="key" value="rewardList"/>
+    </config>
+
+    <bean name="Reward" delimiter="_">奖励
+        <field name="itemId" type="int" ref="item.ItemConfig.id"/>
+        <field name="itemNum" type="int"/>
+    </bean>
+
+</package>

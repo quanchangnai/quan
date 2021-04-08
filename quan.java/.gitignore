@@ -13,5 +13,5 @@
 /out
 /*/out
 .temp
-/config/json
+quan-runtime/config/json
 _ajdump

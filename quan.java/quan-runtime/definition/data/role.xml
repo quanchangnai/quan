@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package>
+
+    <enum name="RoleType">角色类型
+        <field name="type1" value="1"/>角色类型1
+        <field name="type2" value="2"/>角色类型2
+    </enum>
+
+    <data name="RoleData" id="id">角色
+        <field name="id" type="long"/>角色ID
+        <field name="name" type="string"/>
+        <field name="name2" type="string"/>
+        <field name="roleType" type="RoleType"/>角色类型
+        <field name="a" type="int"/>
+        <field name="a2" type="int"/>
+        <field name="b" type="bool"/>
+        <field name="b2" type="int"/>
+        <field name="s" type="short"/>sssss
+        <field name="i" type="int"/>iiii
+        <field name="f" type="float"/>ffff
+        <field name="d" type="double"/>
+        <field name="item" type="item.ItemEntity"/>道具
+        <field name="items" type="map:int:item.ItemEntity"/>
+        <field name="set" type="set:bool"/>
+        <field name="list" type="list:string"/>
+        <field name="map" type="map:int:int"/>
+        <field name="set2" type="set:item.ItemEntity"/>
+        <field name="list2" type="list:item.ItemEntity"/>
+        <field name="map2" type="map:int:item.ItemEntity" ignore="true"/>
+        <index name="aa" type="normal" fields="a,a2"/>两字段普通索引
+        <index name="bb" type="normal" fields="b,b2"/>
+        <index name="name" type="text" fields="name,name2"/>
+    </data>
+
+</package>
