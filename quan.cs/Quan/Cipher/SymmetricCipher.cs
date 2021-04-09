@@ -2,8 +2,9 @@ using System;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Security;
+using Quan.Common.Cipher;
 
-namespace Quan.Common.Cipher
+namespace Quan.Cipher
 {
     /// <summary>
     /// 对称加密器

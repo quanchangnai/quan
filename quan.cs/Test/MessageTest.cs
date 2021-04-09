@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Threading;
+using NUnit.Framework;
 using Quan.Message;
 using Test.Message.Role;
 using RoleInfo = Test.Message.Role.RoleInfo;
@@ -12,17 +13,11 @@ using Buffer = Quan.Message.Buffer;
 
 namespace Test
 {
+    [TestFixture]
     public class MessageTest
     {
-        public static void Test()
-        {
-            Test1();
-            Test2();
-            Test3();
-            Test4();
-        }
-
-        public static void Test1()
+        [Test]
+        public void Test1()
         {
             Console.WriteLine("Test1====================");
 
@@ -56,7 +51,8 @@ namespace Test
             Console.WriteLine(buffer.ReadLong());
         }
 
-        public static void Test2()
+        [Test]
+        public void Test2()
         {
             Console.WriteLine("Test2====================");
 
@@ -93,7 +89,8 @@ namespace Test
             // Console.WriteLine("sRoleLogin2.Seq:" + sRoleLogin2.Seq);
         }
 
-        public static void Test3()
+        [Test]
+        public void Test3()
         {
             Console.WriteLine("Test3====================");
             var messageFactory = new MessageRegistry();
@@ -101,7 +98,8 @@ namespace Test
             Console.WriteLine(messageFactory.Create(544233));
         }
 
-        public static void Test4()
+        [Test]
+        public void Test4()
         {
             Console.WriteLine("Test4====================");
             var fileStream = File.Open("D:\\UserInfo", FileMode.Open);
@@ -113,7 +111,9 @@ namespace Test
             Console.WriteLine($"userInfo:{userInfo}");
         }
 
-        public static void Test5()
+        [Ignore("socket")]
+        [Test]
+        public void Test5()
         {
             Console.WriteLine("Test4====================");
 

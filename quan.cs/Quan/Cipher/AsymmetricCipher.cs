@@ -6,7 +6,7 @@ using Org.BouncyCastle.Pkcs;
 using Org.BouncyCastle.Security;
 using Org.BouncyCastle.X509;
 
-namespace Quan.Common.Cipher
+namespace Quan.Cipher
 {
     /// <summary>
     /// 非对称加密器

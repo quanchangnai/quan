@@ -2,8 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Quan.Common;
-using Quan.Common.Utils;
+using Quan.Utils;
 
 namespace Quan.Config
 {

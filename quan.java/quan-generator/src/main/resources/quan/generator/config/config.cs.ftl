@@ -1,5 +1,5 @@
 using Newtonsoft.Json.Linq;
-using Quan.Common.Utils;
+using Quan.Utils;
 <#if !(parentClassName??) || kind == 6>
 using Quan.Config;
 </#if>

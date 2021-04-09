@@ -1,5 +1,5 @@
 using Newtonsoft.Json.Linq;
-using Quan.Common.Utils;
+using Quan.Utils;
 using Quan.Config;
 using System;
 using System.Collections.Generic;

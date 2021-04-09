@@ -1,17 +1,20 @@
 using System;
 using System.IO;
 using System.Reflection;
+using NUnit.Framework;
 using Quan.Config;
 using Test.Config.Item;
 using Test.Config.Quest;
 
 namespace Test
 {
+    [TestFixture]
     public class ConfigTest
     {
-        public static void Test()
+        [Test]
+        public void Test()
         {
-            const string jsonPath = "..\\..\\..\\..\\quan.java\\config\\json";
+            const string jsonPath = "..\\..\\..\\..\\quan.java\\quan-runtime\\config\\json";
             const string namespacePrefix = "Test.Config";
             var assemblyName = Assembly.GetExecutingAssembly().FullName;
 

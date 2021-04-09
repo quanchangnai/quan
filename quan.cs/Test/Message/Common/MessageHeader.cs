@@ -1,4 +1,4 @@
-using Quan.Common.Utils;
+using Quan.Utils;
 using Quan.Message;
 using Buffer = Quan.Message.Buffer;
 

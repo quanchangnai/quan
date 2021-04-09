@@ -1,22 +1,16 @@
 using System;
 using System.Text;
+using NUnit.Framework;
+using Quan.Cipher;
 using Quan.Common.Cipher;
 
 namespace Test
 {
+    [TestFixture]
     public class CipherTest
     {
-        public static void TestAll()
-        {
-            TestSymmetricEncrypt1();
-            TestSymmetricEncrypt2();
-            TestAsymmetricEncrypt1();
-            TestAsymmetricEncrypt2();
-            TestAsymmetricSign1();
-            TestAsymmetricSign2();
-        }
-
-        public static void TestSymmetricEncrypt1()
+        [Test]
+        public void TestSymmetricEncrypt1()
         {
             Console.WriteLine("TestSymmetric1");
 
@@ -31,8 +25,8 @@ namespace Test
             Console.WriteLine($"decrypted:{Encoding.UTF8.GetString(decrypted)}");
         }
 
-
-        public static void TestSymmetricEncrypt2()
+        [Test]
+        public void TestSymmetricEncrypt2()
         {
             Console.WriteLine("TestSymmetric2");
 
@@ -48,7 +42,8 @@ namespace Test
             Console.WriteLine($"decrypted:{Encoding.UTF8.GetString(decrypted)}");
         }
 
-        public static void TestAsymmetricEncrypt1()
+        [Test]
+        public void TestAsymmetricEncrypt1()
         {
             var data = "非对称加密测试1";
             Console.WriteLine(data);
@@ -70,7 +65,8 @@ namespace Test
             Console.WriteLine($"decrypted:{Encoding.UTF8.GetString(decrypted)}");
         }
 
-        public static void TestAsymmetricEncrypt2()
+        [Test]
+        public void TestAsymmetricEncrypt2()
         {
             var data = "非对称加密测试2";
             Console.WriteLine(data);
@@ -91,7 +87,8 @@ namespace Test
             Console.WriteLine($"decrypted:{Encoding.UTF8.GetString(decrypted)}");
         }
 
-        public static void TestAsymmetricSign1()
+        [Test]
+        public void TestAsymmetricSign1()
         {
             var text = "非对称签名测试1";
             Console.WriteLine(text);
@@ -114,7 +111,8 @@ namespace Test
         }
 
 
-        public static void TestAsymmetricSign2()
+        [Test]
+        public void TestAsymmetricSign2()
         {
             var text = "非对称签名测试2";
             Console.WriteLine(text);

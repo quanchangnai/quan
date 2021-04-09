@@ -1,6 +1,6 @@
 using System;
 
-namespace Quan.Common.Cipher
+namespace Quan.Cipher
 {
     public class AsymmetricAlgorithm
     {
