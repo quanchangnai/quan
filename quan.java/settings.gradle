@@ -5,5 +5,5 @@
 rootProject.name = 'quan'
 include 'quan-editor'
 include 'quan-generator'
-include 'quan-runtime'
+include 'quan-core'
 

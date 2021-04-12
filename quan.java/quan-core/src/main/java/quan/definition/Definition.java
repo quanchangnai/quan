@@ -49,22 +49,20 @@ public abstract class Definition {
     }
 
     public String getValidatedName(String append) {
-        String definitionTypeName = getKindName();
+        String kindName = getKindName();
         String validatedName;
         if (name != null) {
-            validatedName = definitionTypeName + "[" + name + "]" + append;
+            validatedName = kindName + "[" + name + "]" + append;
         } else {
-            validatedName = definitionTypeName + append;
+            validatedName = kindName + append;
         }
         return validatedName;
     }
 
-
     public void setName(String name) {
-        if (StringUtils.isBlank(name)) {
-            return;
+        if (!StringUtils.isBlank(name)) {
+            this.name = name.trim();
         }
-        this.name = name.trim();
     }
 
     public String getUnderscoreName() {
@@ -76,10 +74,9 @@ public abstract class Definition {
     }
 
     public void setComment(String comment) {
-        if (StringUtils.isBlank(comment)) {
-            return;
+        if (!StringUtils.isBlank(comment)) {
+            this.comment = comment.trim();
         }
-        this.comment = comment.trim();
     }
 
     public abstract int getKind();

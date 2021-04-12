@@ -112,12 +112,12 @@ public abstract class ClassDefinition extends Definition {
 
     @Override
     public String getValidatedName(String append) {
-        String definitionTypeName = getKindName();
+        String kindName = getKindName();
         String validatedName;
         if (getName() != null) {
-            validatedName = definitionTypeName + "[" + getLongName() + "]" + append;
+            validatedName = kindName + "[" + getLongName() + "]" + append;
         } else {
-            validatedName = definitionTypeName + append;
+            validatedName = kindName + append;
         }
         return validatedName;
     }
