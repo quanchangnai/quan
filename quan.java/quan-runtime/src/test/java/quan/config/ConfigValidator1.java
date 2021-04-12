@@ -9,11 +9,11 @@ import java.util.List;
 /**
  * Created by quanchangnai on 2019/8/2.
  */
-public class TestConfigValidator1 implements ConfigValidator {
+public class ConfigValidator1 implements ConfigValidator {
 
     @Override
     public void validateConfig(List<String> errors) {
-        String error = "TestConfigValidator1校验测试";
+        String error = "ConfigValidator1校验测试";
         ItemConfig itemConfig = ItemConfig.getById(1);
         if (itemConfig != null) {
             System.err.println("itemConfig.toJson():" + itemConfig.toJson());

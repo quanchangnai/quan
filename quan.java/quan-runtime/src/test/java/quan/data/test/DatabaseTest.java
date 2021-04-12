@@ -16,7 +16,7 @@ import org.pcollections.PMap;
 import org.pcollections.PVector;
 import quan.data.Index;
 import quan.data.Transaction;
-import quan.utils.ClassUtils;
+import quan.util.ClassUtils;
 import quan.data.item.ItemEntity;
 import quan.data.item.ItemEntity2;
 import quan.data.mongo.CodecsRegistry;

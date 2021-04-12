@@ -1,11 +1,11 @@
 package quan.definition;
 
-import quan.utils.CollectionUtils;
+import quan.util.CollectionUtils;
 
 import java.util.Collections;
 import java.util.Set;
 
-import static quan.utils.CollectionUtils.asSet;
+import static quan.util.CollectionUtils.asSet;
 
 /**
  * Created by quanchangnai on 2019/8/3.

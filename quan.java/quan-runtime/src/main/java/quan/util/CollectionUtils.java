@@ -1,4 +1,4 @@
-package quan.utils;
+package quan.util;
 
 import java.util.*;
 

@@ -43,6 +43,7 @@ public class ConfigTest {
         System.err.println("ConfigTest.main()耗时:" + (System.currentTimeMillis() - startTime) / 1000D + "s");
     }
 
+
     private static ConfigLoader withDefinitionConfigLoader() {
         List<String> definitionPaths = new ArrayList<>();
         definitionPaths.add("quan-runtime\\definition\\config");
@@ -54,7 +55,7 @@ public class ConfigTest {
 
         WithDefinitionConfigLoader configLoader = new WithDefinitionConfigLoader(tablePath);
         configLoader.useXmlDefinition(definitionPaths, "quan.config");
-        configLoader.setValidatorPackage("quan");
+        configLoader.setValidatorsPackage("quan");
         configLoader.setTableType(tableType);
 
         return configLoader;
@@ -63,7 +64,7 @@ public class ConfigTest {
     private static ConfigLoader withoutDefinitionConfigLoader() {
         String tablePath = "quan-runtime\\config\\json";
         WithoutDefinitionConfigLoader configLoader = new WithoutDefinitionConfigLoader(tablePath);
-        configLoader.setValidatorPackage("quan");
+        configLoader.setValidatorsPackage("quan");
         configLoader.setPackagePrefix("quan.config");
         return configLoader;
     }

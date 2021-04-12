@@ -3,8 +3,8 @@ package quan.config.loader;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import quan.utils.ClassUtils;
-import quan.utils.PathUtils;
+import quan.util.ClassUtils;
+import quan.util.PathUtils;
 import quan.config.Config;
 import quan.config.ConfigValidator;
 import quan.config.TableType;
@@ -70,7 +70,7 @@ public abstract class ConfigLoader {
     /**
      * 设置自定义配置校验器所在的包并实例化校验器对象
      */
-    public void setValidatorPackage(String packageName) {
+    public void setValidatorsPackage(String packageName) {
         if (StringUtils.isBlank(packageName)) {
             return;
         }
@@ -79,15 +79,14 @@ public abstract class ConfigLoader {
         Set<Class<?>> validatorClasses = ClassUtils.loadClasses(packageName, ConfigValidator.class);
 
         for (Class<?> validatorClass : validatorClasses) {
-            if (validatorClass.isEnum() && validatorClass.getEnumConstants().length > 0) {
-                validators.add((ConfigValidator) validatorClass.getEnumConstants()[0]);
-            }
             if (!validatorClass.isEnum()) {
                 try {
                     validators.add((ConfigValidator) validatorClass.getConstructor().newInstance());
                 } catch (Exception e) {
                     logger.error("实例化配置校验器[{}]失败", validatorClass, e);
                 }
+            } else if (validatorClass.getEnumConstants().length > 0) {
+                validators.add((ConfigValidator) validatorClass.getEnumConstants()[0]);
             }
         }
     }
@@ -170,6 +169,7 @@ public abstract class ConfigLoader {
     public void reloadAll() {
         checkReload();
         loaded = false;
+
         for (ConfigReader reader : readers.values()) {
             reader.clear();
         }

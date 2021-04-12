@@ -1,7 +1,7 @@
 package quan.config.loader;
 
 import org.apache.commons.lang3.StringUtils;
-import quan.utils.PathUtils;
+import quan.util.PathUtils;
 import quan.config.Config;
 import quan.config.TableType;
 import quan.config.reader.ConfigReader;

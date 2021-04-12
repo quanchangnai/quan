@@ -1,6 +1,6 @@
 package quan.data;
 
-import quan.utils.ClassUtils;
+import quan.util.ClassUtils;
 
 import java.lang.annotation.*;
 

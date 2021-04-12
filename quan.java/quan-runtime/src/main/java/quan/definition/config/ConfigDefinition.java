@@ -1,7 +1,7 @@
 package quan.definition.config;
 
 import org.apache.commons.lang3.StringUtils;
-import quan.utils.PathUtils;
+import quan.util.PathUtils;
 import quan.definition.*;
 
 import java.io.File;
@@ -219,7 +219,7 @@ public class ConfigDefinition extends BeanDefinition {
         for (String t : tables) {
             ConfigDefinition other = parser.getTableConfigs().get(t);
             if (other != null && !getName().equals(other.getName())) {
-                addValidatedError(getValidatedName() + other.getValidatedName() + "和表格[" + t + "]不能多对一", other);
+                addValidatedError(getValidatedName() + other.getValidatedName() + "和表格[" + t + "]不能多对一");
             }
             parser.getTableConfigs().put(t, this);
         }

@@ -266,7 +266,7 @@ public class BeanDefinition extends ClassDefinition {
             if (fieldTypes.length == 2 && !StringUtils.isBlank(fieldTypes[1])) {
                 field.setValueType(fieldTypes[1]);
                 if (!field.isLegalValueType()) {
-                    addValidatedError(getValidatedName("的") + field.getValidatedName() + "类型[" + field.getType() + "]的值类型[" + field.getValueType() + "]不合法");
+                    addValidatedError(getValidatedName("的[") + field.getType() + "]类型" + field.getValidatedName() + "的值类型[" + field.getValueType() + "]不合法");
                 }
             } else {
                 addValidatedError(getValidatedName("的") + field.getValidatedName() + "类型[" + field.getTypes() + "]格式错误，合法格式[" + fieldType + ":值类型]");
@@ -278,10 +278,10 @@ public class BeanDefinition extends ClassDefinition {
                 field.setKeyType(fieldTypes[1]);
                 field.setValueType(fieldTypes[2]);
                 if (!field.isPrimitiveKeyType()) {
-                    addValidatedError(getValidatedName("的") + field.getValidatedName() + "类型[" + field.getType() + "]的键类型[" + field.getKeyType() + "]不合法");
+                    addValidatedError(getValidatedName("的[") + field.getType() + "]类型" + field.getValidatedName() + "的键类型[" + field.getKeyType() + "]不合法");
                 }
                 if (!field.isLegalValueType()) {
-                    addValidatedError(getValidatedName("的") + field.getValidatedName() + "类型[" + field.getType() + "]的值类型[" + field.getValueType() + "]不合法");
+                    addValidatedError(getValidatedName("的[") + field.getType() + "]类型" + field.getValidatedName() + "的值类型[" + field.getValueType() + "]不合法");
                 }
             } else {
                 addValidatedError(getValidatedName("的") + field.getValidatedName() + "类型[" + field.getTypes() + "]格式错误，合法格式[" + fieldType + ":键类型:值类型]");

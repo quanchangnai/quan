@@ -110,6 +110,17 @@ public abstract class ClassDefinition extends Definition {
         return getLongClassName(this, getName());
     }
 
+    @Override
+    public String getValidatedName(String append) {
+        String definitionTypeName = getKindName();
+        String validatedName;
+        if (getName() != null) {
+            validatedName = definitionTypeName + "[" + getLongName() + "]" + append;
+        } else {
+            validatedName = definitionTypeName + append;
+        }
+        return validatedName;
+    }
 
     /**
      * 不带包名的类名
@@ -350,16 +361,6 @@ public abstract class ClassDefinition extends Definition {
     }
 
     protected void addValidatedError(String error) {
-        addValidatedError(error, null);
-    }
-
-    protected void addValidatedError(String error, ClassDefinition other) {
-        String position = ",所在定义文件:" + getDefinitionFile();
-        if (other != null) {
-            position = "和" + other.getDefinitionFile();
-        }
-
-        error += position;
         parser.addValidatedError(error);
     }
 

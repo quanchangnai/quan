@@ -1,7 +1,7 @@
 package quan.definition;
 
 import org.apache.commons.lang3.StringUtils;
-import quan.utils.CollectionUtils;
+import quan.util.CollectionUtils;
 
 import java.util.*;
 import java.util.regex.Pattern;

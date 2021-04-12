@@ -3,7 +3,7 @@ package quan.definition.parser;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import quan.utils.PathUtils;
+import quan.util.PathUtils;
 import quan.definition.BeanDefinition;
 import quan.definition.Category;
 import quan.definition.ClassDefinition;

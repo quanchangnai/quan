@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.apache.commons.lang3.tuple.Triple;
-import quan.utils.PathUtils;
+import quan.util.PathUtils;
 import quan.config.TableType;
 import quan.config.ValidatedException;
 import quan.config.reader.CSVConfigReader;

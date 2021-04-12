@@ -1,4 +1,4 @@
-package quan.utils;
+package quan.util;
 
 import aj.org.objectweb.asm.ClassReader;
 import net.bytebuddy.agent.ByteBuddyAgent;

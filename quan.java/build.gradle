@@ -8,11 +8,11 @@ plugins {
 }
 
 group 'quan'
-version '1.0'
 
 def javaVersion = JavaVersion.VERSION_1_8
 sourceCompatibility = javaVersion
 idea.project.languageLevel = javaVersion
+
 
 jar.enabled = false
 uploadArchives.enabled = false
@@ -21,7 +21,6 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'idea'
 
-    version = 1.0
     sourceCompatibility = javaVersion
 
     tasks.withType(JavaCompile) {

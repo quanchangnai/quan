@@ -1,7 +1,7 @@
 package quan.definition;
 
 import org.apache.commons.lang3.tuple.Pair;
-import quan.utils.CollectionUtils;
+import quan.util.CollectionUtils;
 
 import java.util.Collections;
 import java.util.HashSet;
