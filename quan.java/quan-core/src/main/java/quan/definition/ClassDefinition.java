@@ -51,7 +51,7 @@ public abstract class ClassDefinition extends Definition {
 
     @Override
     public String getKindName() {
-        return "类";
+        return "类型";
     }
 
     @Override

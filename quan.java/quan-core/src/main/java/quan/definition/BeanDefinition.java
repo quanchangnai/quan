@@ -67,9 +67,6 @@ public class BeanDefinition extends ClassDefinition {
 
     @Override
     public String getKindName() {
-        if (category == Category.data) {
-            return "数据实体";
-        }
         return super.getKindName();
     }
 
