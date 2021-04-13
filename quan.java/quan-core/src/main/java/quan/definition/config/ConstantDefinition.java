@@ -55,7 +55,7 @@ public class ConstantDefinition extends ClassDefinition {
     }
 
     public ConstantDefinition setUseEnum(String useEnum) {
-        if (useEnum != null && useEnum.equals("false")) {
+        if (useEnum != null && useEnum.trim().equals("false")) {
             this.useEnum = false;
         }
         return this;
@@ -67,19 +67,19 @@ public class ConstantDefinition extends ClassDefinition {
 
     public void setKeyField(String keyField) {
         if (!StringUtils.isBlank(keyField)) {
-            this.keyField = keyField;
+            this.keyField = keyField.trim();
         }
     }
 
     public void setValueField(String valueField) {
         if (!StringUtils.isBlank(valueField)) {
-            this.valueFieldName = valueField;
+            this.valueFieldName = valueField.trim();
         }
     }
 
     public void setCommentField(String commentField) {
         if (!StringUtils.isBlank(commentField)) {
-            this.commentField = commentField;
+            this.commentField = commentField.trim();
         }
     }
 

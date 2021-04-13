@@ -6,7 +6,7 @@ import org.bson.BsonWriter;
 import org.bson.codecs.DecoderContext;
 import org.bson.codecs.EncoderContext;
 import org.bson.codecs.configuration.CodecRegistry;
-import quan.data.item.ItemEntity2;
+import quan.data.item.ItemBean2;
 
 import java.util.*;
 
@@ -84,9 +84,9 @@ public class RoleData2 {
 
     private double d;
 
-    private ItemEntity2 item;
+    private ItemBean2 item;
 
-    private Map<Integer, ItemEntity2> items = new HashMap<>();
+    private Map<Integer, ItemBean2> items = new HashMap<>();
 
     private Set<Boolean> set = new HashSet<>();
 
@@ -94,11 +94,11 @@ public class RoleData2 {
 
     private Map<Integer, Integer> map = new HashMap<>();
 
-    private Set<ItemEntity2> set2 = new HashSet<>();
+    private Set<ItemBean2> set2 = new HashSet<>();
 
-    private List<ItemEntity2> list2 = new ArrayList<>();
+    private List<ItemBean2> list2 = new ArrayList<>();
 
-    private Map<Integer, ItemEntity2> map2 = new HashMap<>();
+    private Map<Integer, ItemBean2> map2 = new HashMap<>();
 
 
     public RoleData2(Long id) {
@@ -238,19 +238,19 @@ public class RoleData2 {
     /**
      * 道具
      */
-    public ItemEntity2 getItem() {
+    public ItemBean2 getItem() {
         return item;
     }
 
     /**
      * 道具
      */
-    public RoleData2 setItem(ItemEntity2 item) {
+    public RoleData2 setItem(ItemBean2 item) {
         this.item = item;
         return this;
     }
 
-    public Map<Integer, ItemEntity2> getItems() {
+    public Map<Integer, ItemBean2> getItems() {
         return items;
     }
 
@@ -266,15 +266,15 @@ public class RoleData2 {
         return map;
     }
 
-    public Set<ItemEntity2> getSet2() {
+    public Set<ItemBean2> getSet2() {
         return set2;
     }
 
-    public List<ItemEntity2> getList2() {
+    public List<ItemBean2> getList2() {
         return list2;
     }
 
-    public Map<Integer, ItemEntity2> getMap2() {
+    public Map<Integer, ItemBean2> getMap2() {
         return map2;
     }
 
@@ -343,12 +343,12 @@ public class RoleData2 {
                         value.d = reader.readDouble();
                         break;
                     case RoleData2.ITEM:
-                        value.item = decoderContext.decodeWithChildContext(registry.get(ItemEntity2.class), reader);
+                        value.item = decoderContext.decodeWithChildContext(registry.get(ItemBean2.class), reader);
                         break;
                     case RoleData2.ITEMS:
                         reader.readStartDocument();
                         while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
-                            value.items.put(reader.readInt32(), decoderContext.decodeWithChildContext(registry.get(ItemEntity2.class), reader));
+                            value.items.put(reader.readInt32(), decoderContext.decodeWithChildContext(registry.get(ItemBean2.class), reader));
                         }
                         reader.readEndDocument();
                         break;
@@ -376,14 +376,14 @@ public class RoleData2 {
                     case RoleData2.SET2:
                         reader.readStartArray();
                         while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
-                            value.set2.add(decoderContext.decodeWithChildContext(registry.get(ItemEntity2.class), reader));
+                            value.set2.add(decoderContext.decodeWithChildContext(registry.get(ItemBean2.class), reader));
                         }
                         reader.readEndArray();
                         break;
                     case RoleData2.LIST2:
                         reader.readStartArray();
                         while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
-                            value.list2.add(decoderContext.decodeWithChildContext(registry.get(ItemEntity2.class), reader));
+                            value.list2.add(decoderContext.decodeWithChildContext(registry.get(ItemBean2.class), reader));
                         }
                         reader.readEndArray();
                         break;
@@ -411,14 +411,14 @@ public class RoleData2 {
 
             if (value.item != null) {
                 writer.writeName(RoleData2.ITEM);
-                encoderContext.encodeWithChildContext(registry.get(ItemEntity2.class), writer, value.item);
+                encoderContext.encodeWithChildContext(registry.get(ItemBean2.class), writer, value.item);
             }
 
             if (!value.items.isEmpty()) {
                 writer.writeStartDocument(RoleData2.ITEMS);
                 for (Integer itemsKey : value.items.keySet()) {
                     writer.writeInt32(itemsKey);
-                    encoderContext.encodeWithChildContext(registry.get(ItemEntity2.class), writer, value.items.get(itemsKey));
+                    encoderContext.encodeWithChildContext(registry.get(ItemBean2.class), writer, value.items.get(itemsKey));
                 }
                 writer.writeEndDocument();
             }
@@ -450,16 +450,16 @@ public class RoleData2 {
 
             if (!value.set2.isEmpty()) {
                 writer.writeStartArray(RoleData2.SET2);
-                for (ItemEntity2 set2Value : value.set2) {
-                    encoderContext.encodeWithChildContext(registry.get(ItemEntity2.class), writer, set2Value);
+                for (ItemBean2 set2Value : value.set2) {
+                    encoderContext.encodeWithChildContext(registry.get(ItemBean2.class), writer, set2Value);
                 }
                 writer.writeEndArray();
             }
 
             if (!value.list2.isEmpty()) {
                 writer.writeStartArray(RoleData2.LIST2);
-                for (ItemEntity2 list2Value : value.list2) {
-                    encoderContext.encodeWithChildContext(registry.get(ItemEntity2.class), writer, list2Value);
+                for (ItemBean2 list2Value : value.list2) {
+                    encoderContext.encodeWithChildContext(registry.get(ItemBean2.class), writer, list2Value);
                 }
                 writer.writeEndArray();
             }

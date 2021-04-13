@@ -17,8 +17,8 @@ import org.pcollections.PVector;
 import quan.data.Index;
 import quan.data.Transaction;
 import quan.util.ClassUtils;
-import quan.data.item.ItemEntity;
-import quan.data.item.ItemEntity2;
+import quan.data.item.ItemBean;
+import quan.data.item.ItemBean2;
 import quan.data.mongo.CodecsRegistry;
 import quan.data.mongo.Database;
 import quan.data.role.RoleData;
@@ -125,11 +125,11 @@ public class DatabaseTest {
 
         PVector<String> list1 = Empty.vector();
         PMap<Integer, Integer> map1 = Empty.map();
-        PMap<Integer, ItemEntity2> items1 = Empty.map();
+        PMap<Integer, ItemBean2> items1 = Empty.map();
 
         List<String> list2 = new ArrayList<>();
         Map<Integer, Integer> map2 = new HashMap<>();
-        Map<Integer, ItemEntity2> items2 = new HashMap<>();
+        Map<Integer, ItemBean2> items2 = new HashMap<>();
 
         int n = 10000;
 
@@ -138,7 +138,7 @@ public class DatabaseTest {
             for (int j = 0; j < 10; j++) {
                 list1 = list1.plus("aaa" + j);
                 map1 = map1.plus(j, j + random.nextInt());
-                items1 = items1.plus(j, new ItemEntity2(i, "item" + j, new ArrayList<>()));
+                items1 = items1.plus(j, new ItemBean2(i, "item" + j, new ArrayList<>()));
             }
 
             for (String s : list1) {
@@ -159,7 +159,7 @@ public class DatabaseTest {
             for (int j = 0; j < 10; j++) {
                 list2.add("aaa" + j);
                 map2.put(j, j + random.nextInt());
-                items2.put(j, new ItemEntity2(j, "item" + j, new ArrayList<>()));
+                items2.put(j, new ItemBean2(j, "item" + j, new ArrayList<>()));
             }
 
             for (String s : list2) {
@@ -269,10 +269,10 @@ public class DatabaseTest {
             RoleData roleData = new RoleData(i);
             roleData.setName("aaa:" + i);
             roleData.setB(i % 2 == 0);
-            roleData.setItem(new ItemEntity().setId((int) i).setName("item:" + i));
+            roleData.setItem(new ItemBean().setId((int) i).setName("item:" + i));
             for (long j = i; j < i + 20; j++) {
                 roleData.getList().add("s:" + j);
-                roleData.getList2().add(new ItemEntity().setId((int) i).setName("item2:" + i));
+                roleData.getList2().add(new ItemBean().setId((int) i).setName("item2:" + i));
             }
             roleDataList.add(roleData);
             roleData.update(database);
@@ -316,10 +316,10 @@ public class DatabaseTest {
         for (long i = roleData3.getId() + 1; i < roleData3.getId() + 20; i++) {
             RoleData2 roleData = new RoleData2(i);
             roleData.setName("aaa:" + i);
-            roleData.setItem(new ItemEntity2().setId((int) i).setName("item:" + i));
+            roleData.setItem(new ItemBean2().setId((int) i).setName("item:" + i));
             for (long j = i; j < i + 20; j++) {
                 roleData.getList().add("s:" + j);
-                roleData.getList2().add(new ItemEntity2().setId((int) i).setName("item2:" + i));
+                roleData.getList2().add(new ItemBean2().setId((int) i).setName("item2:" + i));
             }
             roleDataList.add(roleData);
         }

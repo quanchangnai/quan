@@ -119,16 +119,8 @@ public class XmlDefinitionParser extends DefinitionParser {
             case "enum":
                 classDefinition = new EnumDefinition().setCategory(getCategory());
                 break;
-            case "entity":
-                if (category == Category.data) {
-                    classDefinition = new BeanDefinition(classElement.attributeValue("parent"), classElement.attributeValue("delimiter")).setCategory(getCategory());
-                }
-                break;
             case "bean":
-                //TODO 待优化
-                if (category == Category.message || category == Category.config) {
-                    classDefinition = new BeanDefinition(classElement.attributeValue("parent"), classElement.attributeValue("delimiter")).setCategory(getCategory());
-                }
+                classDefinition = new BeanDefinition(classElement.attributeValue("parent"), classElement.attributeValue("delimiter")).setCategory(getCategory());
                 break;
             case "message":
                 if (category == Category.message) {

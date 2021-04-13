@@ -11,7 +11,7 @@ import quan.data.field.*;
  * 道具<br/>
  * 代码自动生成，请勿手动修改
  */
-public class ItemEntity extends Entity {
+public class ItemBean extends Entity {
 
     public static final String ID = "id";
 
@@ -26,10 +26,10 @@ public class ItemEntity extends Entity {
 
     private ListField<Integer> list = new ListField<>(_getLogRoot());
 
-    public ItemEntity() {
+    public ItemBean() {
     }
     
-    public ItemEntity(int id, String name, List<Integer> list) {
+    public ItemBean(int id, String name, List<Integer> list) {
         this.setId(id);
         this.setName(name);
         this.list.addAll(list);
@@ -39,12 +39,12 @@ public class ItemEntity extends Entity {
         return id.getValue();
     }
 
-    public ItemEntity setId(int id) {
+    public ItemBean setId(int id) {
         this.id.setValue(id, _getLogRoot());
         return this;
     }
 
-    public ItemEntity addId(int id) {
+    public ItemBean addId(int id) {
         setId(getId() + id);
         return this;
     }
@@ -53,7 +53,7 @@ public class ItemEntity extends Entity {
         return name.getValue();
     }
 
-    public ItemEntity setName(String name) {
+    public ItemBean setName(String name) {
         this.name.setValue(name, _getLogRoot());
         return this;
     }
@@ -70,7 +70,7 @@ public class ItemEntity extends Entity {
 
     @Override
     public String toString() {
-        return "ItemEntity{" +
+        return "ItemBean{" +
                 "id=" + id +
                 ",name='" + name + '\'' +
                 ",list=" + list +
@@ -78,7 +78,7 @@ public class ItemEntity extends Entity {
 
     }
 
-    public static class CodecImpl implements Codec<ItemEntity> {
+    public static class CodecImpl implements Codec<ItemBean> {
 
         private CodecRegistry registry;
 
@@ -91,19 +91,19 @@ public class ItemEntity extends Entity {
         }
 
         @Override
-        public ItemEntity decode(BsonReader reader, DecoderContext decoderContext) {
+        public ItemBean decode(BsonReader reader, DecoderContext decoderContext) {
             reader.readStartDocument();
-            ItemEntity value = new ItemEntity(); 
+            ItemBean value = new ItemBean(); 
         
             while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
                 switch (reader.readName()) {
-                    case ItemEntity.ID:
+                    case ItemBean.ID:
                         value.id.setValue(reader.readInt32());
                         break;
-                    case ItemEntity.NAME:
+                    case ItemBean.NAME:
                         value.name.setValue(reader.readString());
                         break;
-                    case ItemEntity.LIST:
+                    case ItemBean.LIST:
                         reader.readStartArray();
                         while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
                             value.list.plus(reader.readInt32());
@@ -120,16 +120,16 @@ public class ItemEntity extends Entity {
         }
 
         @Override
-        public void encode(BsonWriter writer, ItemEntity value, EncoderContext encoderContext) {
+        public void encode(BsonWriter writer, ItemBean value, EncoderContext encoderContext) {
             Transaction transaction = Transaction.get();
             writer.writeStartDocument();
 
-            writer.writeInt32(ItemEntity.ID, value.id.getValue(transaction));
-            writer.writeString(ItemEntity.NAME, value.name.getValue(transaction));
+            writer.writeInt32(ItemBean.ID, value.id.getValue(transaction));
+            writer.writeString(ItemBean.NAME, value.name.getValue(transaction));
 
             Collection<Integer> $list = value.list.getCurrent(transaction);
             if (!$list.isEmpty()) {
-                writer.writeStartArray(ItemEntity.LIST);
+                writer.writeStartArray(ItemBean.LIST);
                 for (Integer listValue : $list) {
                     writer.writeInt32(listValue);
                 }
@@ -140,8 +140,8 @@ public class ItemEntity extends Entity {
         }
 
         @Override
-        public Class<ItemEntity> getEncoderClass() {
-            return ItemEntity.class;
+        public Class<ItemBean> getEncoderClass() {
+            return ItemBean.class;
         }
 
     }

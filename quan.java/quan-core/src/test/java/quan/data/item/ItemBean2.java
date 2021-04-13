@@ -14,7 +14,7 @@ import java.util.List;
  * 道具<br/>
  * 自动生成
  */
-public class ItemEntity2 {
+public class ItemBean2 {
 
     public static final String ID = "id";
 
@@ -26,10 +26,10 @@ public class ItemEntity2 {
 
     private List<Integer> list = new ArrayList<>();
 
-    public ItemEntity2() {
+    public ItemBean2() {
     }
 
-    public ItemEntity2(int id, String name, List<Integer> list) {
+    public ItemBean2(int id, String name, List<Integer> list) {
         this.id = id;
         this.name = name;
         this.list.addAll(list);
@@ -39,12 +39,12 @@ public class ItemEntity2 {
         return id;
     }
 
-    public ItemEntity2 setId(int id) {
+    public ItemBean2 setId(int id) {
         this.id = id;
         return this;
     }
 
-    public ItemEntity2 addId(int id) {
+    public ItemBean2 addId(int id) {
         setId(getId() + id);
         return this;
     }
@@ -53,7 +53,7 @@ public class ItemEntity2 {
         return name;
     }
 
-    public ItemEntity2 setName(String name) {
+    public ItemBean2 setName(String name) {
         this.name = name;
         return this;
     }
@@ -71,7 +71,7 @@ public class ItemEntity2 {
 
     }
 
-    public static class Codec implements org.bson.codecs.Codec<ItemEntity2> {
+    public static class Codec implements org.bson.codecs.Codec<ItemBean2> {
 
         private CodecRegistry registry;
 
@@ -84,16 +84,16 @@ public class ItemEntity2 {
         }
 
         @Override
-        public ItemEntity2 decode(BsonReader reader, DecoderContext decoderContext) {
+        public ItemBean2 decode(BsonReader reader, DecoderContext decoderContext) {
             reader.readStartDocument();
-            ItemEntity2 value = new ItemEntity2();
+            ItemBean2 value = new ItemBean2();
 
             while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
                 switch (reader.readName()) {
-                    case ItemEntity2.ID:
+                    case ItemBean2.ID:
                         value.id = reader.readInt32();
                         break;
-                    case ItemEntity2.NAME:
+                    case ItemBean2.NAME:
                         value.name = reader.readString();
                         break;
                     default:
@@ -106,18 +106,18 @@ public class ItemEntity2 {
         }
 
         @Override
-        public void encode(BsonWriter writer, ItemEntity2 value, EncoderContext encoderContext) {
+        public void encode(BsonWriter writer, ItemBean2 value, EncoderContext encoderContext) {
             writer.writeStartDocument();
 
-            writer.writeInt32(ItemEntity2.ID, value.id);
-            writer.writeString(ItemEntity2.NAME, value.name);
+            writer.writeInt32(ItemBean2.ID, value.id);
+            writer.writeString(ItemBean2.NAME, value.name);
 
             writer.writeEndDocument();
         }
 
         @Override
-        public Class<ItemEntity2> getEncoderClass() {
-            return ItemEntity2.class;
+        public Class<ItemBean2> getEncoderClass() {
+            return ItemBean2.class;
         }
 
     }

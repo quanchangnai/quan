@@ -19,14 +19,14 @@
         <field name="i" type="int"/>iiii
         <field name="f" type="float"/>ffff
         <field name="d" type="double"/>
-        <field name="item" type="item.ItemEntity"/>道具
-        <field name="items" type="map:int:item.ItemEntity"/>
+        <field name="item" type="item.ItemBean"/>道具
+        <field name="items" type="map:int:item.ItemBean"/>
         <field name="set" type="set:bool"/>
         <field name="list" type="list:string"/>
         <field name="map" type="map:int:int"/>
-        <field name="set2" type="set:item.ItemEntity"/>
-        <field name="list2" type="list:item.ItemEntity"/>
-        <field name="map2" type="map:int:item.ItemEntity" ignore="true"/>
+        <field name="set2" type="set:item.ItemBean"/>
+        <field name="list2" type="list:item.ItemBean"/>
+        <field name="map2" type="map:int:item.ItemBean" ignore="true"/>
         <index name="aa" type="normal" fields="a,a2"/>两字段普通索引
         <index name="bb" type="normal" fields="b,b2"/>
         <index name="name" type="text" fields="name,name2"/>

@@ -7,7 +7,7 @@ import org.bson.codecs.configuration.CodecRegistry;
 import quan.data.*;
 import quan.data.field.*;
 import quan.data.mongo.JsonStringWriter;
-import quan.data.item.ItemEntity;
+import quan.data.item.ItemBean;
 
 /**
  * 角色<br/>
@@ -107,9 +107,9 @@ public class RoleData extends Data<Long> {
 
     private DoubleField d = new DoubleField();
 
-    private EntityField<ItemEntity> item = new EntityField<>();
+    private EntityField<ItemBean> item = new EntityField<>();
 
-    private MapField<Integer, ItemEntity> items = new MapField<>(this);
+    private MapField<Integer, ItemBean> items = new MapField<>(this);
 
     private SetField<Boolean> set = new SetField<>(this);
 
@@ -117,11 +117,11 @@ public class RoleData extends Data<Long> {
 
     private MapField<Integer, Integer> map = new MapField<>(this);
 
-    private SetField<ItemEntity> set2 = new SetField<>(this);
+    private SetField<ItemBean> set2 = new SetField<>(this);
 
-    private ListField<ItemEntity> list2 = new ListField<>(this);
+    private ListField<ItemBean> list2 = new ListField<>(this);
 
-    private MapField<Integer, ItemEntity> map2 = new MapField<>(this);
+    private MapField<Integer, ItemBean> map2 = new MapField<>(this);
 
     public RoleData() {
     }
@@ -340,19 +340,19 @@ public class RoleData extends Data<Long> {
     /**
      * 道具
      */
-    public ItemEntity getItem() {
+    public ItemBean getItem() {
         return item.getValue();
     }
 
     /**
      * 道具
      */
-    public RoleData setItem(ItemEntity item) {
+    public RoleData setItem(ItemBean item) {
         this.item.setValue(item, this);
         return this;
     }
 
-    public Map<Integer, ItemEntity> getItems() {
+    public Map<Integer, ItemBean> getItems() {
         return items.getDelegate();
     }
 
@@ -368,15 +368,15 @@ public class RoleData extends Data<Long> {
         return map.getDelegate();
     }
 
-    public Set<ItemEntity> getSet2() {
+    public Set<ItemBean> getSet2() {
         return set2.getDelegate();
     }
 
-    public List<ItemEntity> getList2() {
+    public List<ItemBean> getList2() {
         return list2.getDelegate();
     }
 
-    public Map<Integer, ItemEntity> getMap2() {
+    public Map<Integer, ItemBean> getMap2() {
         return map2.getDelegate();
     }
 
@@ -465,12 +465,12 @@ public class RoleData extends Data<Long> {
                         value.d.setValue(reader.readDouble());
                         break;
                     case RoleData.ITEM:
-                        value.item.setValue(decoderContext.decodeWithChildContext(registry.get(ItemEntity.class), reader));
+                        value.item.setValue(decoderContext.decodeWithChildContext(registry.get(ItemBean.class), reader));
                         break;
                     case RoleData.ITEMS:
                         reader.readStartDocument();
                         while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
-                            value.items.plus(Integer.valueOf(reader.readName()), decoderContext.decodeWithChildContext(registry.get(ItemEntity.class), reader));
+                            value.items.plus(Integer.valueOf(reader.readName()), decoderContext.decodeWithChildContext(registry.get(ItemBean.class), reader));
                         }
                         reader.readEndDocument();
                         break;
@@ -498,14 +498,14 @@ public class RoleData extends Data<Long> {
                     case RoleData.SET2:
                         reader.readStartArray();
                         while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
-                            value.set2.plus(decoderContext.decodeWithChildContext(registry.get(ItemEntity.class), reader));
+                            value.set2.plus(decoderContext.decodeWithChildContext(registry.get(ItemBean.class), reader));
                         }
                         reader.readEndArray();
                         break;
                     case RoleData.LIST2:
                         reader.readStartArray();
                         while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
-                            value.list2.plus(decoderContext.decodeWithChildContext(registry.get(ItemEntity.class), reader));
+                            value.list2.plus(decoderContext.decodeWithChildContext(registry.get(ItemBean.class), reader));
                         }
                         reader.readEndArray();
                         break;
@@ -541,18 +541,18 @@ public class RoleData extends Data<Long> {
             writer.writeDouble(RoleData.F, value.f.getValue(transaction));
             writer.writeDouble(RoleData.D, value.d.getValue(transaction));
 
-            ItemEntity $item = value.item.getValue(transaction);
+            ItemBean $item = value.item.getValue(transaction);
             if ($item != null) {
                 writer.writeName(RoleData.ITEM);
-                encoderContext.encodeWithChildContext(registry.get(ItemEntity.class), writer, $item);
+                encoderContext.encodeWithChildContext(registry.get(ItemBean.class), writer, $item);
             }
 
-            Map<Integer, ItemEntity> $items = value.items.getCurrent(transaction);
+            Map<Integer, ItemBean> $items = value.items.getCurrent(transaction);
             if (!$items.isEmpty()) {
                 writer.writeStartDocument(RoleData.ITEMS);
-                for (Map.Entry<Integer, ItemEntity> itemsEntry : $items.entrySet()) {
+                for (Map.Entry<Integer, ItemBean> itemsEntry : $items.entrySet()) {
                     writer.writeName(String.valueOf(itemsEntry.getKey()));
-                    encoderContext.encodeWithChildContext(registry.get(ItemEntity.class), writer, itemsEntry.getValue());
+                    encoderContext.encodeWithChildContext(registry.get(ItemBean.class), writer, itemsEntry.getValue());
                 }
                 writer.writeEndDocument();
             }
@@ -585,20 +585,20 @@ public class RoleData extends Data<Long> {
                 writer.writeEndDocument();
             }
 
-            Collection<ItemEntity> $set2 = value.set2.getCurrent(transaction);
+            Collection<ItemBean> $set2 = value.set2.getCurrent(transaction);
             if (!$set2.isEmpty()) {
                 writer.writeStartArray(RoleData.SET2);
-                for (ItemEntity set2Value : $set2) {
-                    encoderContext.encodeWithChildContext(registry.get(ItemEntity.class), writer, set2Value);
+                for (ItemBean set2Value : $set2) {
+                    encoderContext.encodeWithChildContext(registry.get(ItemBean.class), writer, set2Value);
                 }
                 writer.writeEndArray();
             }
 
-            Collection<ItemEntity> $list2 = value.list2.getCurrent(transaction);
+            Collection<ItemBean> $list2 = value.list2.getCurrent(transaction);
             if (!$list2.isEmpty()) {
                 writer.writeStartArray(RoleData.LIST2);
-                for (ItemEntity list2Value : $list2) {
-                    encoderContext.encodeWithChildContext(registry.get(ItemEntity.class), writer, list2Value);
+                for (ItemBean list2Value : $list2) {
+                    encoderContext.encodeWithChildContext(registry.get(ItemBean.class), writer, list2Value);
                 }
                 writer.writeEndArray();
             }

@@ -2,8 +2,8 @@ package quan.data.test;
 
 import quan.data.Transaction;
 import quan.data.Transactional;
-import quan.data.item.ItemEntity;
-import quan.data.item.ItemEntity2;
+import quan.data.item.ItemBean;
+import quan.data.item.ItemBean2;
 import quan.data.role.RoleData;
 import quan.data.role.RoleData2;
 
@@ -56,7 +56,7 @@ public class Role {
         for (int i = 0; i < 10; i++) {
             roleData1.getList().add("aaa" + i);
             roleData1.getMap().put(i, i + random.nextInt());
-            roleData1.getItems().put(i, new ItemEntity(i, "item" + i, new ArrayList<>()));
+            roleData1.getItems().put(i, new ItemBean(i, "item" + i, new ArrayList<>()));
         }
 
         for (String s : roleData1.getList()) {
@@ -72,11 +72,11 @@ public class Role {
             }
         }
 
-//        ItemEntity itemEntity1 = new ItemEntity();
-//        itemEntity1.setId(random.nextInt());
-//        itemEntity1.setName("item111");
+//        ItemBean ItemBean1 = new ItemBean();
+//        ItemBean1.setId(random.nextInt());
+//        ItemBean1.setName("item111");
 //
-//        roleData1.setItem(itemEntity1);
+//        roleData1.setItem(ItemBean1);
 //        roleData1.setItem(null);
 
 //        Transaction.rollback();
@@ -95,7 +95,7 @@ public class Role {
         for (int i = 0; i < 10; i++) {
             roleData2.getList().add("aaa" + i);
             roleData2.getMap().put(i, i + random.nextInt());
-            roleData2.getItems().put(i, new ItemEntity(i, "item" + i, new ArrayList<>()));
+            roleData2.getItems().put(i, new ItemBean(i, "item" + i, new ArrayList<>()));
         }
 
         for (String s : roleData2.getList()) {
@@ -110,11 +110,11 @@ public class Role {
             }
         }
 
-        ItemEntity itemEntity1 = new ItemEntity();
-        itemEntity1.setId(random.nextInt());
-        itemEntity1.setName("item111");
+        ItemBean ItemBean1 = new ItemBean();
+        ItemBean1.setId(random.nextInt());
+        ItemBean1.setName("item111");
 
-        roleData2.setItem(itemEntity1);
+        roleData2.setItem(ItemBean1);
         roleData2.setItem(null);
 
     }
@@ -131,7 +131,7 @@ public class Role {
         for (int i = 0; i < 10; i++) {
             roleData3.getList().add("aaa" + i);
             roleData3.getMap().put(i, i + random.nextInt());
-            roleData3.getItems().put(i, new ItemEntity2(i, "item" + i, new ArrayList<>()));
+            roleData3.getItems().put(i, new ItemBean2(i, "item" + i, new ArrayList<>()));
         }
 
         for (String s : roleData3.getList()) {
@@ -147,11 +147,11 @@ public class Role {
         }
 
 
-        ItemEntity2 itemEntity1 = new ItemEntity2();
-        itemEntity1.setId(random.nextInt());
-        itemEntity1.setName("item111");
+        ItemBean2 ItemBean1 = new ItemBean2();
+        ItemBean1.setId(random.nextInt());
+        ItemBean1.setName("item111");
 
-        roleData3.setItem(itemEntity1);
+        roleData3.setItem(ItemBean1);
         roleData3.setItem(null);
 
     }
@@ -167,7 +167,7 @@ public class Role {
         for (int i = 0; i < 10; i++) {
             roleData1.getList().add("aaa" + i);
             roleData1.getMap().put(i, i + random.nextInt());
-            roleData1.getItems().put(i, new ItemEntity(i, "item" + i, new ArrayList<>()));
+            roleData1.getItems().put(i, new ItemBean(i, "item" + i, new ArrayList<>()));
         }
 
         Transaction.onSucceeded(() -> System.err.println("test4 succeeded"));
@@ -176,11 +176,11 @@ public class Role {
 
         test5();
 
-        ItemEntity itemEntity1 = new ItemEntity();
-        itemEntity1.setId(random.nextInt());
-        itemEntity1.setName("item111");
+        ItemBean ItemBean1 = new ItemBean();
+        ItemBean1.setId(random.nextInt());
+        ItemBean1.setName("item111");
 
-        roleData1.setItem(itemEntity1);
+        roleData1.setItem(ItemBean1);
 
         System.err.println("test4:" + roleData1);
         Transaction.rollback();
