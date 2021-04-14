@@ -39,7 +39,10 @@ public class DataDefinition extends BeanDefinition {
 
     @Override
     public DataDefinition setCategory(Category category) {
-        throw new UnsupportedOperationException();
+        if (category != this.category) {
+            throw new IllegalStateException();
+        }
+        return this;
     }
 
     @Override

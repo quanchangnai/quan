@@ -28,7 +28,10 @@ public class HeaderDefinition extends BeanDefinition {
 
     @Override
     public HeaderDefinition setCategory(Category category) {
-        throw new UnsupportedOperationException();
+        if (category != this.category) {
+            throw new IllegalStateException();
+        }
+        return this;
     }
 
     @Override

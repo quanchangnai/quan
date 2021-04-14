@@ -53,7 +53,10 @@ public class ConfigDefinition extends BeanDefinition {
 
     @Override
     public ConfigDefinition setCategory(Category category) {
-        throw new UnsupportedOperationException();
+        if (category != this.category) {
+            throw new IllegalStateException();
+        }
+        return this;
     }
 
     @Override

@@ -76,17 +76,15 @@ public abstract class DefinitionParser {
     }
 
     public void setPackagePrefix(String packagePrefix) {
-        if (StringUtils.isBlank(packagePrefix)) {
-            return;
+        if (!StringUtils.isBlank(packagePrefix)) {
+            this.packagePrefix = packagePrefix;
         }
-        this.packagePrefix = packagePrefix;
     }
 
     public void setEnumPackagePrefix(String enumPackagePrefix) {
-        if (StringUtils.isBlank(enumPackagePrefix)) {
-            return;
+        if (!StringUtils.isBlank(enumPackagePrefix)) {
+            this.enumPackagePrefix = enumPackagePrefix;
         }
-        this.enumPackagePrefix = enumPackagePrefix;
     }
 
     public LinkedHashSet<String> getDefinitionPaths() {

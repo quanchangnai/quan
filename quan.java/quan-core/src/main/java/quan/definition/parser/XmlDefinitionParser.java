@@ -93,15 +93,11 @@ public class XmlDefinitionParser extends DefinitionParser {
             }
             parsedClasses.add(classDefinition);
 
-            classDefinition.setParser(this);
             classDefinition.setDefinitionFile(definitionFile.getName());
             classDefinition.setDefinitionText(classElement.asXML());
 
             classDefinition.setPackageName(packageName);
             classDefinition.getPackageNames().putAll(languagePackageNames);
-
-            classDefinition.setName(classElement.attributeValue("name"));
-            classDefinition.setLang(classElement.attributeValue("lang"));
 
             String comment = rootElement.node(i - 1).getText().replaceAll("[\r\n]", "");
             if (StringUtils.isBlank(comment)) {
@@ -117,10 +113,10 @@ public class XmlDefinitionParser extends DefinitionParser {
         ClassDefinition classDefinition = null;
         switch (classElement.getName()) {
             case "enum":
-                classDefinition = new EnumDefinition().setCategory(getCategory());
+                classDefinition = new EnumDefinition();
                 break;
             case "bean":
-                classDefinition = new BeanDefinition(classElement.attributeValue("parent"), classElement.attributeValue("delimiter")).setCategory(getCategory());
+                classDefinition = new BeanDefinition(classElement.attributeValue("parent"), classElement.attributeValue("delimiter"));
                 break;
             case "message":
                 if (category == Category.message) {
@@ -147,6 +143,13 @@ public class XmlDefinitionParser extends DefinitionParser {
                     classDefinition = new ConfigDefinition(classElement.attributeValue("table"), classElement.attributeValue("parent"));
                 }
                 break;
+        }
+
+        if (classDefinition != null) {
+            classDefinition.setParser(this);
+            classDefinition.setCategory(getCategory());
+            classDefinition.setName(classElement.attributeValue("name"));
+            classDefinition.setLang(classElement.attributeValue("lang"));
         }
 
         return classDefinition;
@@ -185,8 +188,6 @@ public class XmlDefinitionParser extends DefinitionParser {
                 beanDefinition.setParentName(classDefinition.getName());
                 parsedClasses.add(beanDefinition);
 
-                beanDefinition.setParser(this);
-                beanDefinition.setName(childElement.attributeValue("name"));
                 beanDefinition.setDefinitionFile(classDefinition.getDefinitionFile());
                 beanDefinition.setDefinitionText(classDefinition.getDefinitionText());
                 beanDefinition.setPackageName(classDefinition.getPackageName());

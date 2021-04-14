@@ -34,7 +34,10 @@ public class MessageDefinition extends BeanDefinition {
 
     @Override
     public MessageDefinition setCategory(Category category) {
-        throw new UnsupportedOperationException();
+        if (category != this.category) {
+            throw new IllegalStateException();
+        }
+        return this;
     }
 
     @Override
