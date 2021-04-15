@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<package cs="Common">
+<package cs-name="Common">
 
     <message-header>消息头
         <field name="seq" type="long"/>消息序号

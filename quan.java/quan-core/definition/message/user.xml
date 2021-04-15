@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<package cs="User">
+<package cs-name="User">
 
     <bean name="UserInfo">用户信息
         <field id="1" name="id" type="long"/>ID

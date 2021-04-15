@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<package cs="Item">
+<package cs-name="Item">
 
     <bean name="Reward" delimiter="_">奖励
         <field name="itemId" type="int" ref="ItemConfig.id"/>

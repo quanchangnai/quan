@@ -41,7 +41,6 @@ public class XmlDefinitionParser extends DefinitionParser {
             if (rootElement == null || !rootElement.getName().equals("package")) {
                 return;
             }
-
         } catch (Exception e) {
             String error;
             try {
@@ -68,17 +67,22 @@ public class XmlDefinitionParser extends DefinitionParser {
         //具体语言对应的包名
         Map<String, String> languagePackageNames = new HashMap<>();
         for (Object attribute : rootElement.attributes()) {
-            String languageName = ((Attribute) attribute).getName();
-            String languagePackageName = ((Attribute) attribute).getValue();
-            if (languageName.equals("name") || !Language.names().contains(languageName)) {
+            String attrName = ((Attribute) attribute).getName();
+            String attrValue = ((Attribute) attribute).getValue();
+            if (attrName.equals("name") || !attrName.endsWith("-name")) {
                 continue;
             }
-            Language language = Language.valueOf(languageName);
-            if (!language.matchPackageName(languagePackageName)) {
-                addValidatedError("定义文件[" + definitionFile + "]自定义语言[" + language + "]包名[" + languagePackageName + "]格式错误,正确格式:" + language.getPackageNamePattern());
+            Language language;
+            try {
+                language = Language.valueOf(attrName.substring(0, attrName.indexOf("-name")));
+            } catch (IllegalArgumentException e) {
                 continue;
             }
-            languagePackageNames.put(language.name(), languagePackageName);
+            if (!language.matchPackageName(attrValue)) {
+                addValidatedError("定义文件[" + definitionFile + "]自定义语言[" + language + "]包名[" + attrValue + "]格式错误,正确格式:" + language.getPackageNamePattern());
+                continue;
+            }
+            languagePackageNames.put(language.name(), attrValue);
         }
 
         for (int i = 0; i < rootElement.nodeCount(); i++) {
@@ -109,22 +113,25 @@ public class XmlDefinitionParser extends DefinitionParser {
         }
     }
 
-    private ClassDefinition createClassDefinition(Element classElement) {
+    private ClassDefinition createClassDefinition(Element element) {
         ClassDefinition classDefinition = null;
-        switch (classElement.getName()) {
+        switch (element.getName()) {
             case "enum":
                 classDefinition = new EnumDefinition();
                 break;
             case "bean":
-                classDefinition = new BeanDefinition(classElement.attributeValue("parent"), classElement.attributeValue("delimiter"));
+                String beanCategory = element.attributeValue("category");
+                if (StringUtils.isBlank(beanCategory) || beanCategory.equals(this.category.name())) {
+                    classDefinition = new BeanDefinition(element.attributeValue("parent"), element.attributeValue("delimiter"));
+                }
                 break;
             case "message":
-                if (category == Category.message) {
-                    classDefinition = new MessageDefinition(classElement.attributeValue("id"));
+                if (this.category == Category.message) {
+                    classDefinition = new MessageDefinition(element.attributeValue("id"));
                 }
                 break;
             case "message-header":
-                if (category == Category.message) {
+                if (this.category == Category.message) {
                     if (headerDefinition == null) {
                         headerDefinition = new HeaderDefinition();
                         classDefinition = headerDefinition;
@@ -134,13 +141,13 @@ public class XmlDefinitionParser extends DefinitionParser {
                 }
                 break;
             case "data":
-                if (category == Category.data) {
-                    classDefinition = new DataDefinition(classElement.attributeValue("id"));
+                if (this.category == Category.data) {
+                    classDefinition = new DataDefinition(element.attributeValue("id"));
                 }
                 break;
             case "config":
-                if (category == Category.config) {
-                    classDefinition = new ConfigDefinition(classElement.attributeValue("table"), classElement.attributeValue("parent"));
+                if (this.category == Category.config) {
+                    classDefinition = new ConfigDefinition(element.attributeValue("table"), element.attributeValue("parent"));
                 }
                 break;
         }
@@ -148,8 +155,8 @@ public class XmlDefinitionParser extends DefinitionParser {
         if (classDefinition != null) {
             classDefinition.setParser(this);
             classDefinition.setCategory(getCategory());
-            classDefinition.setName(classElement.attributeValue("name"));
-            classDefinition.setLang(classElement.attributeValue("lang"));
+            classDefinition.setName(element.attributeValue("name"));
+            classDefinition.setLang(element.attributeValue("lang"));
         }
 
         return classDefinition;
