@@ -36,8 +36,8 @@ public final class SetField<E> extends Node implements Set<E>, Field {
     @Override
     public void _setChildrenLogRoot(Data<?> root) {
         for (E e : getCurrent()) {
-            if (e instanceof Entity) {
-                _setLogRoot((Entity) e, root);
+            if (e instanceof Bean) {
+                _setLogRoot((Bean) e, root);
             }
         }
     }
@@ -126,8 +126,8 @@ public final class SetField<E> extends Node implements Set<E>, Field {
             if (oldSet != newSet) {
                 Data<?> root = _getLogRoot(transaction);
                 _setFieldLog(transaction, this, newSet, root);
-                if (e instanceof Entity) {
-                    _setLogRoot((Entity) e, root);
+                if (e instanceof Bean) {
+                    _setLogRoot((Bean) e, root);
                 }
                 return true;
             }
@@ -147,8 +147,8 @@ public final class SetField<E> extends Node implements Set<E>, Field {
         origin = oldSet.plus(e);
 
         if (oldSet != origin) {
-            if (e instanceof Entity) {
-                _setRoot((Entity) e, _getRoot());
+            if (e instanceof Bean) {
+                _setRoot((Bean) e, _getRoot());
             }
             return true;
         }
@@ -164,8 +164,8 @@ public final class SetField<E> extends Node implements Set<E>, Field {
             PSet<E> newSet = oldSet.minus(o);
             if (oldSet != newSet) {
                 _setFieldLog(transaction, this, newSet, _getLogRoot(transaction));
-                if (o instanceof Entity) {
-                    _setLogRoot((Entity) o, null);
+                if (o instanceof Bean) {
+                    _setLogRoot((Bean) o, null);
                 }
                 return true;
             }
@@ -173,8 +173,8 @@ public final class SetField<E> extends Node implements Set<E>, Field {
             PSet<E> oldSet = origin;
             origin = origin.minus(o);
             if (oldSet != origin) {
-                if (o instanceof Entity) {
-                    _setRoot((Entity) o, null);
+                if (o instanceof Bean) {
+                    _setRoot((Bean) o, null);
                 }
                 return true;
             }
@@ -203,8 +203,8 @@ public final class SetField<E> extends Node implements Set<E>, Field {
                 Data<?> root = _getLogRoot(transaction);
                 _setFieldLog(transaction, this, newSet, root);
                 for (E e : c) {
-                    if (e instanceof Entity) {
-                        _setLogRoot((Entity) e, root);
+                    if (e instanceof Bean) {
+                        _setLogRoot((Bean) e, root);
                     }
                 }
                 return true;
@@ -215,8 +215,8 @@ public final class SetField<E> extends Node implements Set<E>, Field {
             if (oldSet != origin) {
                 Data<?> root = _getRoot();
                 for (E e : c) {
-                    if (e instanceof Entity) {
-                        _setLogRoot((Entity) e, root);
+                    if (e instanceof Bean) {
+                        _setLogRoot((Bean) e, root);
                     }
                 }
                 return true;
@@ -271,8 +271,8 @@ public final class SetField<E> extends Node implements Set<E>, Field {
             _setFieldLog(transaction, this, Empty.set(), _getLogRoot(transaction));
         } else if (Transaction.isOptional()) {
             for (E e : oldSet) {
-                if (e instanceof Entity) {
-                    _setRoot((Entity) e, null);
+                if (e instanceof Bean) {
+                    _setRoot((Bean) e, null);
                 }
             }
             this.origin = Empty.set();

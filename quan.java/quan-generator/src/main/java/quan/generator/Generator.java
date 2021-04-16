@@ -26,7 +26,7 @@ import java.util.*;
 import static quan.definition.parser.DefinitionParser.createParser;
 
 /**
- * 代码生成器
+ * 代码生成器<br/>
  * Created by quanchangnai on 2019/6/23.
  */
 public abstract class Generator {
@@ -310,7 +310,7 @@ public abstract class Generator {
                         ((FieldDefinition) dependentSource.getOwnerDefinition()).setClassValueType(dependentClassFullName);
                     } else if (dependentSource.getType() == DependentType.FIELD_REF) {
                         ((FieldDefinition) dependentSource.getOwnerDefinition()).setRefType(dependentClassFullName);
-                    }else if (dependentSource.getType() == DependentType.PARENT) {
+                    } else if (dependentSource.getType() == DependentType.PARENT) {
                         ((BeanDefinition) dependentSource.getOwnerDefinition()).setParentClassName(dependentClassFullName);
                     } else if (dependentSource.getType() == DependentType.CHILD) {
                         ((BeanDefinition) dependentSource.getOwnerDefinition()).getDependentChildren().get(classDefinition.getLongName()).setRight(dependentClassFullName);
@@ -381,103 +381,12 @@ public abstract class Generator {
     }
 
     protected void printErrors() {
-        if (parser == null) {
+        if (parser == null || parser.getValidatedErrors().isEmpty()) {
             return;
         }
 
-        List<String> errors = new ArrayList<>(parser.getValidatedErrors());
-        if (errors.isEmpty()) {
-            return;
-        }
-
-        logger.error("生成{}代码失败，解析目录{}下的定义文件共发现{}条错误", category().alias(), parser.getDefinitionPaths(), errors.size());
-        for (int i = 1; i <= errors.size(); i++) {
-            String error = errors.get(i - 1);
-            logger.error(error);
-        }
-    }
-
-    private static Properties loadOptions(String[] args) {
-        boolean test = false;
-        String optionsFileName = "generator.properties";
-
-        if (args.length > 0) {
-            if (args[0].equals("test")) {
-                test = true;
-            } else {
-                optionsFileName = args[0];
-            }
-        } else {
-            logger.info("使用默认位置的生成器选项配置文件[{}]\n", optionsFileName);
-        }
-
-        Properties options = new Properties();
-        InputStream inputStream = null;
-        try {
-            if (test) {
-                inputStream = Generator.class.getResourceAsStream(optionsFileName);
-            } else {
-                inputStream = new FileInputStream(optionsFileName);
-            }
-            options.load(inputStream);
-            return options;
-        } catch (IOException e) {
-            logger.info("加载生成器选项配置文件[{}]出错", optionsFileName, e);
-            return null;
-        } finally {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    logger.error("", e);
-                }
-            }
-        }
-
-    }
-
-    public static void main(String[] args) {
-        long startTime = System.currentTimeMillis();
-
-        Properties options = loadOptions(args);
-        if (options == null) {
-            return;
-        }
-
-        DataGenerator dataGenerator = new DataGenerator(options);
-        dataGenerator.useXmlParser();
-
-        JavaMessageGenerator javaMessageGenerator = new JavaMessageGenerator(options);
-        CSharpMessageGenerator cSharpMessageGenerator = new CSharpMessageGenerator(options);
-        LuaMessageGenerator luaMessageGenerator = new LuaMessageGenerator(options);
-
-        DefinitionParser messageParser = new XmlDefinitionParser();
-        javaMessageGenerator.setParser(messageParser);
-        cSharpMessageGenerator.setParser(messageParser);
-        luaMessageGenerator.setParser(messageParser);
-
-        DefinitionParser configParser = createParser(options.getProperty("config.definitionType").trim());
-        JavaConfigGenerator javaConfigGenerator = new JavaConfigGenerator(options);
-        CSharpConfigGenerator cSharpConfigGenerator = new CSharpConfigGenerator(options);
-        LuaConfigGenerator luaConfigGenerator = new LuaConfigGenerator(options);
-
-        javaConfigGenerator.setParser(configParser);
-        cSharpConfigGenerator.setParser(configParser);
-        luaConfigGenerator.setParser(configParser);
-
-        dataGenerator.tryGenerate(true);
-
-        javaMessageGenerator.tryGenerate(false);
-        cSharpMessageGenerator.tryGenerate(false);
-        luaMessageGenerator.tryGenerate(false);
-        javaMessageGenerator.printErrors();
-
-        javaConfigGenerator.tryGenerate(false);
-        cSharpConfigGenerator.tryGenerate(false);
-        luaConfigGenerator.tryGenerate(false);
-        javaConfigGenerator.printErrors();
-
-        logger.info("生成完成，耗时{}s", (System.currentTimeMillis() - startTime) / 1000D);
+        logger.error("生成{}代码失败，解析目录{}下的定义文件共发现{}条错误", category().alias(), parser.getDefinitionPaths(), parser.getValidatedErrors());
+        parser.getValidatedErrors().forEach(logger::error);
     }
 
 }

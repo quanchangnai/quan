@@ -28,7 +28,7 @@ import ${import};
     <#lt/>}, type = Index.Type.<#if index.text>TEXT<#elseif index.unique>UNIQUE<#else>NORMAL</#if>)
 </#list>
 </#if>
-public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idField.classType}></#if> {
+public class ${name} extends <#if kind ==2>Bean<#elseif kind ==5>Data<${idField.classType}></#if> {
 <#if kind ==5>
 
     /**
@@ -59,7 +59,7 @@ public class ${name} extends <#if kind ==2>Entity<#elseif kind ==5>Data<${idFiel
     <#elseif field.primitiveType>
     private ${field.type?cap_first}Field ${field.name} = new ${field.type?cap_first}Field();
     <#else>
-    private EntityField<${field.classType}> ${field.name} = new EntityField<>();
+    private BeanField<${field.classType}> ${field.name} = new BeanField<>();
     </#if>
 </#list>
 

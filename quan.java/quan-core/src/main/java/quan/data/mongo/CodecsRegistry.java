@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.util.ClassUtils;
 import quan.data.Data;
-import quan.data.Entity;
+import quan.data.Bean;
 
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
@@ -60,7 +60,7 @@ public class CodecsRegistry implements CodecRegistry {
     @Override
     public <T> Codec<T> get(Class<T> clazz) {
         Codec<T> codec = (Codec<T>) codecs.get(clazz);
-        if (codec == null && (Data.class.isAssignableFrom(clazz) || Entity.class.isAssignableFrom(clazz))) {
+        if (codec == null && (Data.class.isAssignableFrom(clazz) || Bean.class.isAssignableFrom(clazz))) {
             register(clazz.getPackage().getName());
             codec = (Codec<T>) codecs.get(clazz);
         }

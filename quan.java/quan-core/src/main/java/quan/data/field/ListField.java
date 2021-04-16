@@ -36,8 +36,8 @@ public final class ListField<E> extends Node implements List<E>, Field {
     @Override
     public void _setChildrenLogRoot(Data<?> root) {
         for (E e : getCurrent()) {
-            if (e instanceof Entity) {
-                _setLogRoot((Entity) e, root);
+            if (e instanceof Bean) {
+                _setLogRoot((Bean) e, root);
             }
         }
     }
@@ -194,8 +194,8 @@ public final class ListField<E> extends Node implements List<E>, Field {
             Log<E> log = getLog(transaction, true);
             log.modCount++;
             log.list = log.list.plus(e);
-            if (e instanceof Entity) {
-                _setLogRoot((Entity) e, _getLogRoot(transaction));
+            if (e instanceof Bean) {
+                _setLogRoot((Bean) e, _getLogRoot(transaction));
             }
         } else if (Transaction.isOptional()) {
             return plus(e);
@@ -211,8 +211,8 @@ public final class ListField<E> extends Node implements List<E>, Field {
 
         modCount++;
         origin = origin.plus(e);
-        if (e instanceof Entity) {
-            _setRoot((Entity) e, _getRoot());
+        if (e instanceof Bean) {
+            _setRoot((Bean) e, _getRoot());
         }
 
         return true;
@@ -228,8 +228,8 @@ public final class ListField<E> extends Node implements List<E>, Field {
             log.list = oldList.minus(o);
 
             if (oldList != log.list) {
-                if (o instanceof Entity) {
-                    _setLogRoot((Entity) o, null);
+                if (o instanceof Bean) {
+                    _setLogRoot((Bean) o, null);
                 }
                 return true;
             }
@@ -239,8 +239,8 @@ public final class ListField<E> extends Node implements List<E>, Field {
             origin = oldList.minus(o);
 
             if (oldList != origin) {
-                if (o instanceof Entity) {
-                    _setRoot((Entity) o, null);
+                if (o instanceof Bean) {
+                    _setRoot((Bean) o, null);
                 }
                 return true;
             }
@@ -276,8 +276,8 @@ public final class ListField<E> extends Node implements List<E>, Field {
             if (oldList != log.list) {
                 Data<?> root = _getLogRoot(transaction);
                 for (E e : c) {
-                    if (e instanceof Entity) {
-                        _setLogRoot((Entity) e, root);
+                    if (e instanceof Bean) {
+                        _setLogRoot((Bean) e, root);
                     }
                 }
                 return true;
@@ -290,8 +290,8 @@ public final class ListField<E> extends Node implements List<E>, Field {
             if (oldList != origin) {
                 Data<?> root = _getRoot();
                 for (E e : c) {
-                    if (e instanceof Entity) {
-                        _setRoot((Entity) e, root);
+                    if (e instanceof Bean) {
+                        _setRoot((Bean) e, root);
                     }
                 }
                 return true;
@@ -329,8 +329,8 @@ public final class ListField<E> extends Node implements List<E>, Field {
         } else if (!origin.isEmpty()) {
             modCount++;
             for (E e : origin) {
-                if (e instanceof Entity) {
-                    _setRoot((Entity) e, null);
+                if (e instanceof Bean) {
+                    _setRoot((Bean) e, null);
                 }
             }
             origin = Empty.vector();
@@ -371,12 +371,12 @@ public final class ListField<E> extends Node implements List<E>, Field {
             log.modCount++;
             log.list = oldList.with(index, e);
 
-            if (e instanceof Entity) {
-                _setLogRoot((Entity) e, _getLogRoot(transaction));
+            if (e instanceof Bean) {
+                _setLogRoot((Bean) e, _getLogRoot(transaction));
             }
             E old = oldList.get(index);
-            if (old instanceof Entity) {
-                _setLogRoot((Entity) old, null);
+            if (old instanceof Bean) {
+                _setLogRoot((Bean) old, null);
             }
             return old;
         } else if (Transaction.isOptional()) {
@@ -384,12 +384,12 @@ public final class ListField<E> extends Node implements List<E>, Field {
             modCount++;
             origin = oldList.with(index, e);
 
-            if (e instanceof Entity) {
-                _setRoot((Entity) e, _getRoot());
+            if (e instanceof Bean) {
+                _setRoot((Bean) e, _getRoot());
             }
             E old = oldList.get(index);
-            if (old instanceof Entity) {
-                _setRoot((Entity) old, null);
+            if (old instanceof Bean) {
+                _setRoot((Bean) old, null);
             }
             return old;
         } else {
@@ -407,14 +407,14 @@ public final class ListField<E> extends Node implements List<E>, Field {
             Log<E> log = getLog(transaction, true);
             log.modCount++;
             log.list = log.list.plus(index, e);
-            if (e instanceof Entity) {
-                _setLogRoot((Entity) e, _getLogRoot(transaction));
+            if (e instanceof Bean) {
+                _setLogRoot((Bean) e, _getLogRoot(transaction));
             }
         } else if (Transaction.isOptional()) {
             modCount++;
             origin = origin.plus(index, e);
-            if (e instanceof Entity) {
-                _setRoot((Entity) e, _getRoot());
+            if (e instanceof Bean) {
+                _setRoot((Bean) e, _getRoot());
             }
         } else {
             Validations.transactionError();
@@ -430,8 +430,8 @@ public final class ListField<E> extends Node implements List<E>, Field {
             log.modCount++;
             log.list = log.list.minus(index);
 
-            if (old instanceof Entity) {
-                _setLogRoot((Entity) old, null);
+            if (old instanceof Bean) {
+                _setLogRoot((Bean) old, null);
             }
 
             return old;
@@ -440,8 +440,8 @@ public final class ListField<E> extends Node implements List<E>, Field {
             modCount++;
             origin = origin.minus(index);
 
-            if (old instanceof Entity) {
-                _setRoot((Entity) old, null);
+            if (old instanceof Bean) {
+                _setRoot((Bean) old, null);
             }
 
             return old;

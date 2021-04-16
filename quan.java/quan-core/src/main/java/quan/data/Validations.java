@@ -14,16 +14,16 @@ public class Validations {
 
     public static void validateCollectionValue(Object value) {
         Objects.requireNonNull(value, "集合元素不能为null");
-        if (value instanceof Entity) {
-            validateEntityRoot((Entity) value);
+        if (value instanceof Bean) {
+            validateEntityRoot((Bean) value);
         }
     }
 
-    public static void validateEntityRoot(Entity entity) {
-        if (entity == null) {
+    public static void validateEntityRoot(Bean bean) {
+        if (bean == null) {
             return;
         }
-        Data<?> root = entity._getLogRoot();
+        Data<?> root = bean._getLogRoot();
         if (root != null) {
             throw new IllegalStateException("参数已经受到了" + root.getClass().getSimpleName() + "[" + root._id() + "]的管理");
         }

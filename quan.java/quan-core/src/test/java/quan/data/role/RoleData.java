@@ -107,7 +107,7 @@ public class RoleData extends Data<Long> {
 
     private DoubleField d = new DoubleField();
 
-    private EntityField<ItemBean> item = new EntityField<>();
+    private BeanField<ItemBean> item = new BeanField<>();
 
     private MapField<Integer, ItemBean> items = new MapField<>(this);
 

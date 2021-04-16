@@ -6,11 +6,11 @@ import quan.data.*;
  * Created by quanchangnai on 2019/5/16.
  */
 @SuppressWarnings("unchecked")
-public final class EntityField<V extends Entity> extends Loggable implements Field {
+public final class BeanField<V extends Bean> extends Loggable implements Field {
 
     private V value;
 
-    public EntityField() {
+    public BeanField() {
     }
 
     public void setValue(V value) {

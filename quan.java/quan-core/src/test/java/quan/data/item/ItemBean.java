@@ -11,7 +11,7 @@ import quan.data.field.*;
  * 道具<br/>
  * 代码自动生成，请勿手动修改
  */
-public class ItemBean extends Entity {
+public class ItemBean extends Bean {
 
     public static final String ID = "id";
 
