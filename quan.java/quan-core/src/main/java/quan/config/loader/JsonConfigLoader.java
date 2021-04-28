@@ -11,11 +11,11 @@ import java.io.File;
 import java.util.*;
 
 /**
- * 没有配置定义时加载配置<br/>
- * 配置文件名必须是[不含前缀的配置包名.类名.格式]，目前仅支持JSON格式
+ * 直接加载JSON格式配置的加载器<br/>
+ * 配置文件名必须是[不含前缀的配置包名.类名.格式]<br/>
  * Created by quanchangnai on 2019/8/23.
  */
-public class WithoutDefinitionConfigLoader extends ConfigLoader {
+public class JsonConfigLoader extends ConfigLoader {
 
     //包名前缀，在没有配置定义加载时需要
     private String packagePrefix = "";
@@ -27,7 +27,7 @@ public class WithoutDefinitionConfigLoader extends ConfigLoader {
         tableType = TableType.json;
     }
 
-    public WithoutDefinitionConfigLoader(String tablePath) {
+    public JsonConfigLoader(String tablePath) {
         super(tablePath);
     }
 

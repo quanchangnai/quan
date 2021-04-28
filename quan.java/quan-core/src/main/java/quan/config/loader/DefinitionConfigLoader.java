@@ -24,11 +24,11 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * 使用配置定义加载配置，根据配置定义实现了索引、引用校验等
+ * 使用配置定义的配置加载器，根据配置定义实现了索引、引用校验等<br/>
  * Created by quanchangnai on 2019/8/23.
  */
 @SuppressWarnings({"unchecked"})
-public class WithDefinitionConfigLoader extends ConfigLoader {
+public class DefinitionConfigLoader extends ConfigLoader {
 
     protected DefinitionParser parser;
 
@@ -39,7 +39,7 @@ public class WithDefinitionConfigLoader extends ConfigLoader {
         tableType = TableType.xlsx;
     }
 
-    public WithDefinitionConfigLoader(String tablePath) {
+    public DefinitionConfigLoader(String tablePath) {
         super(tablePath);
     }
 

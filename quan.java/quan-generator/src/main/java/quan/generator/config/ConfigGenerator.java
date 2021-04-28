@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import freemarker.template.Template;
 import org.apache.commons.lang3.StringUtils;
 import quan.config.TableType;
-import quan.config.loader.WithDefinitionConfigLoader;
+import quan.config.loader.DefinitionConfigLoader;
 import quan.config.reader.ConfigConverter;
 import quan.definition.BeanDefinition;
 import quan.definition.Category;
@@ -24,7 +24,7 @@ import java.util.Properties;
 public abstract class ConfigGenerator extends Generator {
 
     //配置加载器用于生成常量
-    protected WithDefinitionConfigLoader configLoader;
+    protected DefinitionConfigLoader configLoader;
 
     protected String definitionType;
 
@@ -144,7 +144,7 @@ public abstract class ConfigGenerator extends Generator {
         if (parser == null) {
             throw new IllegalArgumentException(category().alias() + "的定义解析器[definitionParser]不能为空");
         }
-        configLoader = new WithDefinitionConfigLoader(tablePath);
+        configLoader = new DefinitionConfigLoader(tablePath);
         configLoader.setParser(parser);
         configLoader.setTableType(tableType);
         configLoader.setTableBodyStartRow(tableBodyStartRow);

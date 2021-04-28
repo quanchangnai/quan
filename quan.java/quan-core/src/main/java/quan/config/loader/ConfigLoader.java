@@ -15,7 +15,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 /**
- * 抽象配置加载器
+ * 配置加载器<br/>
  * Created by quanchangnai on 2019/7/30.
  */
 @SuppressWarnings({"unchecked"})

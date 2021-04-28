@@ -4,8 +4,8 @@ import quan.config.item.EquipConfig;
 import quan.config.item.ItemConfig;
 import quan.config.item.WeaponConfig;
 import quan.config.loader.ConfigLoader;
-import quan.config.loader.WithDefinitionConfigLoader;
-import quan.config.loader.WithoutDefinitionConfigLoader;
+import quan.config.loader.DefinitionConfigLoader;
+import quan.config.loader.JsonConfigLoader;
 import quan.config.quest.QuestConfig;
 import quan.definition.Language;
 
@@ -53,7 +53,7 @@ public class ConfigTest {
         TableType tableType = TableType.xlsx;
         String tablePath = "quan-core\\config\\excel";
 
-        WithDefinitionConfigLoader configLoader = new WithDefinitionConfigLoader(tablePath);
+        DefinitionConfigLoader configLoader = new DefinitionConfigLoader(tablePath);
         configLoader.useXmlDefinition(definitionPaths, "quan.config");
         configLoader.setValidatorsPackage("quan");
         configLoader.setTableType(tableType);
@@ -63,7 +63,7 @@ public class ConfigTest {
 
     private static ConfigLoader withoutDefinitionConfigLoader() {
         String tablePath = "quan-core\\config\\json";
-        WithoutDefinitionConfigLoader configLoader = new WithoutDefinitionConfigLoader(tablePath);
+        JsonConfigLoader configLoader = new JsonConfigLoader(tablePath);
         configLoader.setValidatorsPackage("quan");
         configLoader.setPackagePrefix("quan.config");
         return configLoader;
@@ -85,11 +85,11 @@ public class ConfigTest {
     }
 
     private static void writeJson(ConfigLoader configLoader) {
-        if (configLoader.getTableType() == TableType.json || !(configLoader instanceof WithDefinitionConfigLoader)) {
+        if (configLoader.getTableType() == TableType.json || !(configLoader instanceof DefinitionConfigLoader)) {
             return;
         }
 
-        WithDefinitionConfigLoader configLoader1 = (WithDefinitionConfigLoader) configLoader;
+        DefinitionConfigLoader configLoader1 = (DefinitionConfigLoader) configLoader;
 
         System.err.println("writeJson()=============");
         long startTime = System.currentTimeMillis();
@@ -132,11 +132,11 @@ public class ConfigTest {
     }
 
     private static void reloadByTableName(ConfigLoader configLoader) {
-        if (!(configLoader instanceof WithDefinitionConfigLoader)) {
+        if (!(configLoader instanceof DefinitionConfigLoader)) {
             return;
         }
 
-        WithDefinitionConfigLoader configLoader1 = (WithDefinitionConfigLoader) configLoader;
+        DefinitionConfigLoader configLoader1 = (DefinitionConfigLoader) configLoader;
         List<String> reloadConfigs = Arrays.asList("道具/道具", "装备1");
         System.err.println("reloadByTableName()=============" + reloadConfigs);
         long startTime = System.currentTimeMillis();
@@ -153,11 +153,11 @@ public class ConfigTest {
     }
 
     private static void reloadByOriginalName(ConfigLoader configLoader) {
-        if (!(configLoader instanceof WithDefinitionConfigLoader)) {
+        if (!(configLoader instanceof DefinitionConfigLoader)) {
             return;
         }
 
-        WithDefinitionConfigLoader configLoader1 = (WithDefinitionConfigLoader) configLoader;
+        DefinitionConfigLoader configLoader1 = (DefinitionConfigLoader) configLoader;
         List<String> reloadConfigs = Arrays.asList("道具", "道具/武器");
         System.err.println("reloadByOriginalName()=============" + reloadConfigs);
         long startTime = System.currentTimeMillis();
