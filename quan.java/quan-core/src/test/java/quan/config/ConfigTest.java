@@ -23,9 +23,9 @@ public class ConfigTest {
 
         ConfigLoader configLoader;
         if (args.length > 0 && args[0].equals("1")) {
-            configLoader = withoutDefinitionConfigLoader();
+            configLoader = jsonConfigLoader();
         } else {
-            configLoader = withDefinitionConfigLoader();
+            configLoader = definitionConfigLoader();
         }
 
         loadConfig(configLoader);
@@ -44,7 +44,7 @@ public class ConfigTest {
     }
 
 
-    private static ConfigLoader withDefinitionConfigLoader() {
+    private static ConfigLoader definitionConfigLoader() {
         List<String> definitionPaths = new ArrayList<>();
         definitionPaths.add("quan-core\\definition\\config");
 
@@ -61,7 +61,7 @@ public class ConfigTest {
         return configLoader;
     }
 
-    private static ConfigLoader withoutDefinitionConfigLoader() {
+    private static ConfigLoader jsonConfigLoader() {
         String tablePath = "quan-core\\config\\json";
         JsonConfigLoader configLoader = new JsonConfigLoader(tablePath);
         configLoader.setValidatorsPackage("quan");
