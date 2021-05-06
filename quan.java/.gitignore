@@ -13,5 +13,6 @@
 /out
 /*/out
 .temp
-quan-core/config/json
 _ajdump
+/quan-core/config/json
+/quan-editor/src/main/resources/static/
