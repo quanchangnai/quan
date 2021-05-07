@@ -1,18 +1,17 @@
 package quan.config.loader;
 
+import java.lang.reflect.Method;
+import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import quan.util.ClassUtils;
-import quan.util.PathUtils;
 import quan.config.Config;
 import quan.config.ConfigValidator;
 import quan.config.TableType;
 import quan.config.ValidatedException;
 import quan.config.reader.ConfigReader;
-
-import java.lang.reflect.Method;
-import java.util.*;
+import quan.util.ClassUtils;
+import quan.util.PathUtils;
 
 /**
  * 配置加载器<br/>
@@ -138,7 +137,7 @@ public abstract class ConfigLoader {
         List<Config> configs = new ArrayList<>();
         for (String table : configTables) {
             ConfigReader configReader = getReader(table);
-            configs.addAll(configReader.readObjects());
+            configs.addAll(configReader.getConfigs());
         }
 
         Method loadMethod;
@@ -198,7 +197,7 @@ public abstract class ConfigLoader {
         reloadByConfigName(Arrays.asList(configNames));
     }
 
-    protected ConfigReader getReader(String table) {
+    public ConfigReader getReader(String table) {
         ConfigReader configReader = readers.get(table);
         if (configReader == null) {
             configReader = createReader(table);
@@ -208,5 +207,6 @@ public abstract class ConfigLoader {
     }
 
     protected abstract ConfigReader createReader(String table);
+
 
 }

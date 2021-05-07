@@ -1,5 +1,6 @@
 package quan.editor;
 
+import com.alibaba.fastjson.JSONObject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.boot.SpringApplication;
@@ -27,8 +28,12 @@ public class EditorMain implements WebMvcConfigurer, WebServerFactoryCustomizer<
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new HandlerInterceptor() {
             @Override
+            @SuppressWarnings("NullableProblems")
             public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
                 System.err.println("RequestURI:" + request.getRequestURI());
+                JSONObject parameter = new JSONObject();
+                parameter.putAll(request.getParameterMap());
+                System.err.println("ParameterMap:" + parameter);
                 return true;
             }
         }).addPathPatterns("/**");

@@ -28,6 +28,14 @@ public class XmlDefinitionParser extends DefinitionParser {
         definitionFileEncoding = Charset.defaultCharset().name();
     }
 
+    public XmlDefinitionParser() {
+    }
+
+    public XmlDefinitionParser(Category category) {
+        this.category = category;
+    }
+
+
     @Override
     protected String definitionFileType() {
         return "xml";
@@ -61,7 +69,8 @@ public class XmlDefinitionParser extends DefinitionParser {
 
         packageName = rootElement.attributeValue("name", packageName);
         if (!Language.java.matchPackageName(packageName)) {
-            addValidatedError("定义文件[" + definitionFile.getName() + "]的包名[" + packageName + "]格式错误,正确格式:" + Language.LOWER_PACKAGE_NAME_PATTERN);
+            addValidatedError(
+                "定义文件[" + definitionFile.getName() + "]的包名[" + packageName + "]格式错误,正确格式:" + Language.LOWER_PACKAGE_NAME_PATTERN);
         }
 
         //具体语言对应的包名
@@ -79,7 +88,8 @@ public class XmlDefinitionParser extends DefinitionParser {
                 continue;
             }
             if (!language.matchPackageName(attrValue)) {
-                addValidatedError("定义文件[" + definitionFile + "]自定义语言[" + language + "]包名[" + attrValue + "]格式错误,正确格式:" + language.getPackageNamePattern());
+                addValidatedError("定义文件[" + definitionFile + "]自定义语言[" + language + "]包名[" + attrValue + "]格式错误,正确格式:" +
+                    language.getPackageNamePattern());
                 continue;
             }
             languagePackageNames.put(language.name(), attrValue);

@@ -92,7 +92,7 @@ public abstract class ConfigReader {
         return configDefinition;
     }
 
-    public List<JSONObject> readJsons() {
+    public List<JSONObject> getJsons() {
         if (jsons.isEmpty() && tableFile.exists()) {
             read();
         }
@@ -100,12 +100,12 @@ public abstract class ConfigReader {
     }
 
 
-    public List<Config> readObjects() {
+    public List<Config> getConfigs() {
         if (prototype == null || !configs.isEmpty()) {
             return configs;
         }
 
-        readJsons();
+        getJsons();
 
         for (JSONObject json : jsons) {
             configs.add(prototype.create(json));

@@ -75,6 +75,10 @@ public class DefinitionConfigLoader extends ConfigLoader {
         return useXmlDefinition(Collections.singletonList(definitionPath), packagePrefix);
     }
 
+    public DefinitionParser useXmlDefinition(String definitionPath) {
+        return useXmlDefinition(Collections.singletonList(definitionPath), "");
+    }
+
     /**
      * 设置配置解析器
      */
@@ -85,6 +89,10 @@ public class DefinitionConfigLoader extends ConfigLoader {
         if (parser instanceof TableDefinitionParser && tableBodyStartRow == 0) {
             tableBodyStartRow = 5;
         }
+    }
+
+    public DefinitionParser getParser() {
+        return parser;
     }
 
     /**
@@ -105,7 +113,8 @@ public class DefinitionConfigLoader extends ConfigLoader {
 
         LinkedHashSet<String> validatedErrors = parser.getValidatedErrors();
         if (!validatedErrors.isEmpty()) {
-            ValidatedException validatedException = new ValidatedException(String.format("解析配置定义文件%s共发现%d条错误。", parser.getDefinitionPaths(), validatedErrors.size()));
+            ValidatedException validatedException =
+                new ValidatedException(String.format("解析配置定义文件%s共发现%d条错误。", parser.getDefinitionPaths(), validatedErrors.size()));
             validatedException.addErrors(validatedErrors);
             throw validatedException;
         }
@@ -162,7 +171,7 @@ public class DefinitionConfigLoader extends ConfigLoader {
 
         for (String configTable : configTables) {
             ConfigReader configReader = getReader(configTable);
-            jsons.addAll(configReader.readJsons());
+            jsons.addAll(configReader.getJsons());
         }
 
         return jsons;
@@ -190,7 +199,7 @@ public class DefinitionConfigLoader extends ConfigLoader {
                     logger.error("配置[{}]从未被加载", table);
                     continue;
                 }
-                List<JSONObject> jsons = reader.readJsons();
+                List<JSONObject> jsons = reader.getJsons();
                 rows.addAll(jsons);
             }
 
@@ -222,7 +231,7 @@ public class DefinitionConfigLoader extends ConfigLoader {
     /**
      * 配置的所有分表和子表
      */
-    private Collection<String> getConfigTables(ConfigDefinition configDefinition) {
+    protected Collection<String> getConfigTables(ConfigDefinition configDefinition) {
         if (tableType == TableType.json) {
             //Json的表名实际上就是配置类名
             return configDefinition.getMeAndDescendants();
@@ -238,7 +247,7 @@ public class DefinitionConfigLoader extends ConfigLoader {
         Map<JSONObject, String> jsonTables = new HashMap();
 
         for (String table : getConfigTables(configDefinition)) {
-            List<JSONObject> tableJsons = getReader(table).readJsons();
+            List<JSONObject> tableJsons = getReader(table).getJsons();
             for (JSONObject json : tableJsons) {
                 jsonTables.put(json, table + "." + tableType);
                 //校验索引
@@ -252,7 +261,8 @@ public class DefinitionConfigLoader extends ConfigLoader {
         return configIndexedJsons;
     }
 
-    private void validateTableIndex(IndexDefinition indexDefinition, Map indexedJsons, Map<JSONObject, String> jsonTables, JSONObject json) {
+    private void validateTableIndex(IndexDefinition indexDefinition, Map indexedJsons, Map<JSONObject, String> jsonTables,
+                                    JSONObject json) {
         String table = jsonTables.get(json);
 
         if (indexDefinition.isUnique() && indexDefinition.getFields().size() == 1) {
@@ -278,13 +288,15 @@ public class DefinitionConfigLoader extends ConfigLoader {
                 return;
             }
 
-            JSONObject oldJson = (JSONObject) ((Map) indexedJsons.computeIfAbsent(json.get(field1.getName()), k -> new HashMap<>())).put(json.get(field2.getName()), json);
+            JSONObject oldJson = (JSONObject) ((Map) indexedJsons.computeIfAbsent(json.get(field1.getName()), k -> new HashMap<>()))
+                .put(json.get(field2.getName()), json);
             if (oldJson != null) {
                 String repeatedTables = table;
                 if (!jsonTables.get(oldJson).equals(table)) {
                     repeatedTables += "," + jsonTables.get(oldJson);
                 }
-                validatedErrors.add(String.format("配置[%s]有重复数据[(%s,%s) = (%s,%s)]", repeatedTables, field1.getColumn(), field2.getColumn(), json.get(field1.getName()), json.get(field2.getName())));
+                validatedErrors.add(String.format("配置[%s]有重复数据[(%s,%s) = (%s,%s)]", repeatedTables, field1.getColumn(), field2.getColumn(),
+                    json.get(field1.getName()), json.get(field2.getName())));
             }
         }
 
@@ -296,20 +308,23 @@ public class DefinitionConfigLoader extends ConfigLoader {
                 return;
             }
 
-            JSONObject oldJson = (JSONObject) ((Map) ((Map) indexedJsons.computeIfAbsent(json.get(field1.getName()), k -> new HashMap<>())).computeIfAbsent(json.get(field2.getName()), k -> new HashMap<>())).put(json.get(field3.getName()), json);
+            JSONObject oldJson = (JSONObject) ((Map) ((Map) indexedJsons.computeIfAbsent(json.get(field1.getName()), k -> new HashMap<>()))
+                .computeIfAbsent(json.get(field2.getName()), k -> new HashMap<>())).put(json.get(field3.getName()), json);
             if (oldJson != null) {
                 String repeatedTables = table;
                 if (!jsonTables.get(oldJson).equals(table)) {
                     repeatedTables += "," + jsonTables.get(oldJson);
                 }
-                validatedErrors.add(String.format("配置[%s]有重复数据[(%s,%s,%s) = (%s,%s,%s)]", repeatedTables, field1.getColumn(), field2.getColumn(), field3.getColumn(), json.get(field1.getName()), json.get(field2.getName()), json.get(field3.getName())));
+                validatedErrors.add(String
+                    .format("配置[%s]有重复数据[(%s,%s,%s) = (%s,%s,%s)]", repeatedTables, field1.getColumn(), field2.getColumn(),
+                        field3.getColumn(), json.get(field1.getName()), json.get(field2.getName()), json.get(field3.getName())));
             }
         }
     }
 
     private void validateRef(ConfigDefinition configDefinition, Map<ConfigDefinition, Map<IndexDefinition, Map>> allConfigIndexedJsons) {
         for (String table : getConfigTables(configDefinition)) {
-            List<JSONObject> tableJsons = getReader(table).readJsons();
+            List<JSONObject> tableJsons = getReader(table).getJsons();
             for (int i = 0; i < tableJsons.size(); i++) {
                 JSONObject json = tableJsons.get(i);
                 for (String fieldName : json.keySet()) {
@@ -325,7 +340,8 @@ public class DefinitionConfigLoader extends ConfigLoader {
         }
     }
 
-    private void validateFieldRef(Triple position, BeanDefinition bean, FieldDefinition field, Object value, Map<ConfigDefinition, Map<IndexDefinition, Map>> allConfigIndexedJsons) {
+    private void validateFieldRef(Triple position, BeanDefinition bean, FieldDefinition field, Object value,
+                                  Map<ConfigDefinition, Map<IndexDefinition, Map>> allConfigIndexedJsons) {
         if (field.isPrimitiveType()) {
             validatePrimitiveTypeRef(position, bean, field, value, false, allConfigIndexedJsons);
         } else if (field.isBeanType()) {
@@ -356,7 +372,8 @@ public class DefinitionConfigLoader extends ConfigLoader {
         }
     }
 
-    private void validatePrimitiveTypeRef(Triple position, BeanDefinition bean, FieldDefinition field, Object value, boolean mapKey, Map<ConfigDefinition, Map<IndexDefinition, Map>> allConfigIndexedJsons) {
+    private void validatePrimitiveTypeRef(Triple position, BeanDefinition bean, FieldDefinition field, Object value, boolean mapKey,
+                                          Map<ConfigDefinition, Map<IndexDefinition, Map>> allConfigIndexedJsons) {
         ConfigDefinition fieldRefConfig = field.getRefConfig(mapKey);
         FieldDefinition fieldRefField = field.getRefField(mapKey);
         if (fieldRefConfig == null || fieldRefField == null) {
@@ -379,15 +396,20 @@ public class DefinitionConfigLoader extends ConfigLoader {
                 keyOrValue = mapKey ? "键" : "值";
             }
             if (bean instanceof ConfigDefinition) {
-                error = String.format("配置[%s]的第%s行[%s]的%s引用[%s]数据[%s]不存在", position.getLeft(), position.getMiddle(), position.getRight(), keyOrValue, fieldRefs, value);
+                error = String
+                    .format("配置[%s]的第%s行[%s]的%s引用[%s]数据[%s]不存在", position.getLeft(), position.getMiddle(), position.getRight(), keyOrValue,
+                        fieldRefs, value);
             } else {
-                error = String.format("配置[%s]第%s行[%s]的对象[%s]字段[%s]%s引用[%s]数据[%s]不存在", position.getLeft(), position.getMiddle(), position.getRight(), bean.getName(), field.getName(), keyOrValue, fieldRefs, value);
+                error = String
+                    .format("配置[%s]第%s行[%s]的对象[%s]字段[%s]%s引用[%s]数据[%s]不存在", position.getLeft(), position.getMiddle(), position.getRight(),
+                        bean.getName(), field.getName(), keyOrValue, fieldRefs, value);
             }
             validatedErrors.add(error);
         }
     }
 
-    private void validateBeanTypeRef(Triple position, BeanDefinition bean, JSONObject json, Map<ConfigDefinition, Map<IndexDefinition, Map>> allConfigIndexedJsons) {
+    private void validateBeanTypeRef(Triple position, BeanDefinition bean, JSONObject json,
+                                     Map<ConfigDefinition, Map<IndexDefinition, Map>> allConfigIndexedJsons) {
         if (json == null) {
             return;
         }

@@ -47,6 +47,7 @@ public abstract class DefinitionParser {
     //表名:配置
     private Map<String, ConfigDefinition> tableConfigs = new HashMap<>();
 
+
     public DefinitionParser setCategory(Category category) {
         this.category = category;
         return this;
@@ -142,6 +143,7 @@ public abstract class DefinitionParser {
     protected abstract String definitionFileType();
 
     public void parse() {
+        Objects.requireNonNull(category);
         if (!validatedClasses.isEmpty()) {
             return;
         }
