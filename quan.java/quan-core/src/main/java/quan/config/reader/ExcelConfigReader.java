@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class ExcelConfigReader extends ConfigReader {
 
-    private static final DataFormatter dataFormatter = new DataFormatter();
+    private static final DataFormatter formatter = new DataFormatter();
 
     public ExcelConfigReader(File tableFile, ConfigDefinition configDefinition) {
         super(tableFile, configDefinition);
@@ -36,7 +36,7 @@ public class ExcelConfigReader extends ConfigReader {
             //第一行是表头
             List<String> columnNames = new ArrayList<>();
             for (Cell cell : sheet.getRow(0)) {
-                columnNames.add(dataFormatter.formatCellValue(cell).trim());
+                columnNames.add(formatter.formatCellValue(cell).trim());
             }
             validateColumnNames(columnNames);
 
@@ -50,7 +50,7 @@ public class ExcelConfigReader extends ConfigReader {
                 JSONObject rowJson = null;
 
                 for (int c = 1; c <= columnNames.size(); c++) {
-                    String columnValue = dataFormatter.formatCellValue(row.getCell(c - 1)).trim();
+                    String columnValue = formatter.formatCellValue(row.getCell(c - 1)).trim();
                     if (c == 1) {
                         if (columnValue.startsWith("#")) {
                             break;

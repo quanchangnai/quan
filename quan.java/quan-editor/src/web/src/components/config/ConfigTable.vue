@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-table :data="pageRows" size="medium" stripe border :height="height-30">
+        <el-table :data="pageRows" @row-click="onRowClick" size="medium" stripe border :height="height-30">
             <el-table-column v-for="(field,index) in fields"
                              :prop="field.name"
                              :label="field.name"
@@ -40,9 +40,7 @@ export default {
         };
     },
     async created() {
-        let formData = new FormData();
-        formData.append("tableName", this.name);
-        let table = (await request.post("config/table", formData)).data;
+        let table = await request.post("config/table", FormData.encode({tableName: this.name}));
         this.fields = table.fields;
         this.rows = table.rows;
     },
@@ -52,6 +50,9 @@ export default {
         }
     },
     methods: {
+        onRowClick(row) {
+            console.log("onRowClick:" + row)
+        },
         onPageChange(page) {
             this.pageNo = page;
         },

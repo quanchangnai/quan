@@ -47,7 +47,7 @@ export default {
         }
     },
     async created() {
-        this.allTables = (await request("/config/tables")).data;
+        this.allTables = await request.get("/config/tables");
         this.showTables = this.allTables;
         window.addEventListener("resize", this.calcConfigTableHeight);
     },
