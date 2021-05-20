@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace Quan.Common.Cipher
+namespace Quan.Cipher
 {
     public class SymmetricAlgorithm
     {

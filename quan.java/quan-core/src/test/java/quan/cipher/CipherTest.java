@@ -1,11 +1,8 @@
 package quan.cipher;
 
+import java.util.Base64;
 import org.junit.Assert;
 import org.junit.Test;
-import quan.cipher.KeyPairCipher;
-import quan.cipher.SecretKeyCipher;
-
-import java.util.Base64;
 
 /**
  * Created by quanchangnai on 2020/5/22.
