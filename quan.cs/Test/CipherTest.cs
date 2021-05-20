@@ -2,7 +2,6 @@ using System;
 using System.Text;
 using NUnit.Framework;
 using Quan.Cipher;
-using Quan.Cipher;
 
 namespace Test
 {
