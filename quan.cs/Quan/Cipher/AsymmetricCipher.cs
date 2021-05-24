@@ -145,14 +145,14 @@ namespace Quan.Cipher
         public byte[] Decrypt(byte[] data, bool usePublicKey = true)
         {
             Algorithm.CheckEncrypt();
-            var keyParameters = usePublicKey ? _privateKeyParameter : _publicKeyParameter;
+            var keyParameters = usePublicKey ? _publicKeyParameter : _privateKeyParameter;
             if (keyParameters == null)
             {
                 throw new ArgumentException($"未设置{(usePublicKey ? '公' : '私')}钥");
             }
 
             var cipher = CipherUtilities.GetCipher(Algorithm.Encryption);
-            cipher.Init(false, usePublicKey ? _publicKeyParameter : _privateKeyParameter);
+            cipher.Init(false, keyParameters);
             return cipher.DoFinal(data);
         }
 

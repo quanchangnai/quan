@@ -12,7 +12,7 @@ import java.util.Objects;
  * 对称加密，支持DES、AES算法<br/>
  * Created by quanchangnai on 2020/5/21.
  */
-public class SecretKeyCipher {
+public class SymmetricCipher {
 
     private final Algorithm algorithm;
 
@@ -25,7 +25,7 @@ public class SecretKeyCipher {
      *
      * @param algorithm 算法
      */
-    public SecretKeyCipher(Algorithm algorithm) {
+    public SymmetricCipher(Algorithm algorithm) {
         this.algorithm = Objects.requireNonNull(algorithm, "加密算法不能为空");
         this.iv = algorithm.getIvParameterSpec();
         try {
@@ -43,23 +43,23 @@ public class SecretKeyCipher {
      * @param algorithm 算法
      * @param secretKey 密钥
      */
-    public SecretKeyCipher(Algorithm algorithm, byte[] secretKey) {
+    public SymmetricCipher(Algorithm algorithm, byte[] secretKey) {
         this.algorithm = Objects.requireNonNull(algorithm, "加密算法不能为空");
         this.secretKey = new SecretKeySpec(secretKey, algorithm.generation);
         this.iv = algorithm.getIvParameterSpec();
     }
 
     /**
-     * @see #SecretKeyCipher(Algorithm, byte[])
+     * @see #SymmetricCipher(Algorithm, byte[])
      */
-    public SecretKeyCipher(Algorithm algorithm, String secretKey) {
+    public SymmetricCipher(Algorithm algorithm, String secretKey) {
         this(algorithm, Base64.getDecoder().decode(secretKey));
     }
 
     /**
      * 自定义初始向量
      */
-    public SecretKeyCipher setIv(byte[] iv) {
+    public SymmetricCipher setIv(byte[] iv) {
         if (algorithm.getIv() == null) {
             throw new UnsupportedOperationException("算法[" + algorithm.encryption + "]不支持初始向量");
         }

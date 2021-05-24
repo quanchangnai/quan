@@ -11,7 +11,7 @@ import java.util.Objects;
  * 非对称加密，支持RSA、DSA算法，支持数字签名<br/>
  * Created by quanchangnai on 2020/5/21.
  */
-public class KeyPairCipher {
+public class AsymmetricCipher {
 
     private final Algorithm algorithm;
 
@@ -24,7 +24,7 @@ public class KeyPairCipher {
      *
      * @param algorithm 算法
      */
-    public KeyPairCipher(Algorithm algorithm) {
+    public AsymmetricCipher(Algorithm algorithm) {
         this(algorithm, 1024);
     }
 
@@ -34,7 +34,7 @@ public class KeyPairCipher {
      * @param algorithm 算法
      * @param keySize   密钥长度
      */
-    public KeyPairCipher(Algorithm algorithm, int keySize) {
+    public AsymmetricCipher(Algorithm algorithm, int keySize) {
         this.algorithm = Objects.requireNonNull(algorithm, "加密算法不能为空");
         KeyPairGenerator keyPairGenerator;
 
@@ -58,7 +58,7 @@ public class KeyPairCipher {
      * @param publicKey  公钥
      * @param privateKey 私钥
      */
-    public KeyPairCipher(Algorithm algorithm, byte[] publicKey, byte[] privateKey) {
+    public AsymmetricCipher(Algorithm algorithm, byte[] publicKey, byte[] privateKey) {
         this.algorithm = Objects.requireNonNull(algorithm, "加密算法不能为空");
         if (publicKey == null && privateKey != null) {
             throw new IllegalArgumentException("公钥和私钥不能都为空");
@@ -79,9 +79,9 @@ public class KeyPairCipher {
     }
 
     /**
-     * @see #KeyPairCipher(Algorithm, byte[], byte[])
+     * @see #AsymmetricCipher(Algorithm, byte[], byte[])
      */
-    public KeyPairCipher(Algorithm algorithm, String publicKey, String privateKey) {
+    public AsymmetricCipher(Algorithm algorithm, String publicKey, String privateKey) {
         this(algorithm, publicKey != null ? Base64.getDecoder().decode(publicKey) : null, privateKey != null ? Base64.getDecoder().decode(privateKey) : null);
     }
 

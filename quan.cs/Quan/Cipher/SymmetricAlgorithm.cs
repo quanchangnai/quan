@@ -25,7 +25,7 @@ namespace Quan.Cipher
         //密钥大小
         public readonly int KeySize;
 
-        public SymmetricAlgorithm(string generation, string encryption, string iv, int keySize)
+        private SymmetricAlgorithm(string generation, string encryption, string iv, int keySize)
         {
             Generation = generation;
             Encryption = encryption;

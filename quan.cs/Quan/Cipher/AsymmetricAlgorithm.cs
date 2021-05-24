@@ -18,7 +18,7 @@ namespace Quan.Cipher
         //签名、验签算法
         public readonly string Signature;
 
-        public AsymmetricAlgorithm(string generation, string encryption, string signature)
+        private AsymmetricAlgorithm(string generation, string encryption, string signature)
         {
             Generation = generation;
             Encryption = encryption;
