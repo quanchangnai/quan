@@ -18,26 +18,26 @@ namespace Quan.Cipher
         /// 指定密钥构造或者随机生成密钥构造
         /// </summary>
         /// <param name="algorithm">算法</param>
-        /// <param name="secretKey">指定的密钥，该参数值为null则随机生成密钥</param>
-        public SymmetricCipher(SymmetricAlgorithm algorithm, byte[] secretKey = null)
+        /// <param name="key">指定的密钥，该参数值为null则随机生成密钥</param>
+        public SymmetricCipher(SymmetricAlgorithm algorithm, byte[] key = null)
         {
             Algorithm = algorithm ?? throw new NullReferenceException("加密算法不能为空");
 
-            if (secretKey == null)
+            if (key == null)
             {
                 var keyGenerator = GeneratorUtilities.GetKeyGenerator(algorithm.Generation);
                 keyGenerator.Init(new KeyGenerationParameters(new SecureRandom(), algorithm.KeySize));
-                secretKey = keyGenerator.GenerateKey();
+                key = keyGenerator.GenerateKey();
             }
 
-            _keyParameter = ParameterUtilities.CreateKeyParameter(algorithm.Generation, secretKey);
+            _keyParameter = ParameterUtilities.CreateKeyParameter(algorithm.Generation, key);
             if (algorithm.Iv != null)
             {
                 _keyParameter = new ParametersWithIV(_keyParameter, algorithm.Iv);
             }
         }
 
-        public SymmetricCipher(SymmetricAlgorithm algorithm, string secretKey) : this(algorithm, Convert.FromBase64String(secretKey))
+        public SymmetricCipher(SymmetricAlgorithm algorithm, string key) : this(algorithm, Convert.FromBase64String(key))
         {
         }
 
@@ -63,7 +63,7 @@ namespace Quan.Cipher
             }
         }
 
-        public byte[] SecretKey
+        public byte[] Key
         {
             get
             {
@@ -76,7 +76,7 @@ namespace Quan.Cipher
             }
         }
 
-        public string Base64SecretKey => Convert.ToBase64String(SecretKey);
+        public string Base64Key => Convert.ToBase64String(Key);
 
 
         /// <summary>

@@ -16,7 +16,7 @@ public class CipherTest {
             System.err.println(data);
 
             SymmetricCipher symmetricCipher = new SymmetricCipher(algorithm);
-            System.err.println("secretKey:" + symmetricCipher.getBase64SecretKey());
+            System.err.println("key:" + symmetricCipher.getBase64Key());
 
             byte[] encrypted = symmetricCipher.encrypt(data.getBytes());
             System.err.println("encrypted:" + Base64.getEncoder().encodeToString(encrypted));
@@ -31,13 +31,13 @@ public class CipherTest {
 
     @Test
     public void testSymmetricEncrypt2() {
-        SymmetricCipher.Algorithm algorithm = SymmetricCipher.Algorithm.DES;
-        String secretKey = "6V2SlGS25bw=";
+        SymmetricCipher.Algorithm algorithm = SymmetricCipher.Algorithm.AES;
+        String key = "Fk26wjjtd8nSMj8/mwdeqQ==";
 
         String data = algorithm.name() + "对称加密测试2";
         System.err.println(data);
 
-        SymmetricCipher symmetricCipher = new SymmetricCipher(algorithm, secretKey);
+        SymmetricCipher symmetricCipher = new SymmetricCipher(algorithm, key);
 
         byte[] encrypted = symmetricCipher.encrypt(data.getBytes());
         System.err.println("encrypted:" + Base64.getEncoder().encodeToString(encrypted));
@@ -52,12 +52,12 @@ public class CipherTest {
     @Test
     public void testSymmetricEncrypt3() {
         SymmetricCipher.Algorithm algorithm = SymmetricCipher.Algorithm.DES;
-        String secretKey = "6V2SlGS25bw=";
+        String key = "6V2SlGS25bw=";
 
         String data = algorithm.name() + "对称加密测试3";
         System.err.println(data);
 
-        SymmetricCipher symmetricCipher = new SymmetricCipher(algorithm, secretKey);
+        SymmetricCipher symmetricCipher = new SymmetricCipher(algorithm, key);
 
         long startTime = System.currentTimeMillis();
         for (int i = 0; i < 10; i++) {

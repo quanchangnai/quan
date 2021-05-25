@@ -15,7 +15,7 @@ namespace Test
 
             var cipher = new SymmetricCipher(SymmetricAlgorithm.Des);
 
-            Console.WriteLine($"secretKey:{cipher.Base64SecretKey}");
+            Console.WriteLine($"key:{cipher.Base64Key}");
 
             var encrypted = cipher.Encrypt(Encoding.UTF8.GetBytes("对称加密测试1"));
             Console.WriteLine($"encrypted:{Convert.ToBase64String(encrypted)}");
@@ -29,8 +29,8 @@ namespace Test
         {
             Console.WriteLine("TestSymmetric2");
 
-            var secretKey = Convert.FromBase64String("6V2SlGS25bw=");
-            var cipher = new SymmetricCipher(SymmetricAlgorithm.Des, secretKey);
+            var key = Convert.FromBase64String("6V2SlGS25bw=");
+            var cipher = new SymmetricCipher(SymmetricAlgorithm.Des, key);
 
             var encrypted = cipher.Encrypt(Encoding.UTF8.GetBytes("对称加密测试2"));
             Console.WriteLine($"encrypted:{Convert.ToBase64String(encrypted)}");
@@ -57,10 +57,10 @@ namespace Test
             Console.WriteLine(cipher.Base64PrivateKey);
             Console.WriteLine();
 
-            var encrypted = cipher.Encrypt(Encoding.UTF8.GetBytes(data));
+            var encrypted = cipher.Encrypt(Encoding.UTF8.GetBytes(data),true);
             Console.WriteLine($"encrypted:{Convert.ToBase64String(encrypted)}");
 
-            var decrypted = cipher.Decrypt(encrypted);
+            var decrypted = cipher.Decrypt(encrypted,true);
             Console.WriteLine($"decrypted:{Encoding.UTF8.GetString(decrypted)}");
         }
 
@@ -77,12 +77,12 @@ namespace Test
 
             var cipher = new AsymmetricCipher(AsymmetricAlgorithm.Rsa, publicKey, privateKey);
 
-            var encrypted = cipher.Encrypt(Encoding.UTF8.GetBytes("非对称加密测试2"));
+            var encrypted = cipher.Encrypt(Encoding.UTF8.GetBytes("非对称加密测试2"),false);
             Console.WriteLine($"encrypted:{Convert.ToBase64String(encrypted)}");
 
             // encrypted = Convert.FromBase64String("js3wD7eeMtEVyZvO0HrvlRU5esVrmXOyW21c+woVC5r9no1xm3KT1IBMcrGPWj8YL1NIjdBW+Qfq81bCRC1Oqsxou/5IZOIV4JFSnY0k1yxF+8TH9IWXsfU/nrFyQagQrJZ3gGG7NygIM6dxK8StsCLTVNmJX8vxvwPNqITql1A=");
 
-            var decrypted = cipher.Decrypt(encrypted);
+            var decrypted = cipher.Decrypt(encrypted,false);
             Console.WriteLine($"decrypted:{Encoding.UTF8.GetString(decrypted)}");
         }
 

@@ -125,13 +125,13 @@ namespace Quan.Cipher
         /// <summary>
         /// 加密
         /// </summary>
-        public byte[] Encrypt(byte[] data, bool usePrivateKey = true)
+        public byte[] Encrypt(byte[] data, bool privateKey)
         {
             Algorithm.CheckEncrypt();
-            var keyParameters = usePrivateKey ? _privateKeyParameter : _publicKeyParameter;
+            var keyParameters = privateKey ? _privateKeyParameter : _publicKeyParameter;
             if (keyParameters == null)
             {
-                throw new ArgumentException($"未设置{(usePrivateKey ? '私' : '公')}钥");
+                throw new ArgumentException($"未设置{(privateKey ? '私' : '公')}钥");
             }
 
             var cipher = CipherUtilities.GetCipher(Algorithm.Encryption);
@@ -142,13 +142,13 @@ namespace Quan.Cipher
         /// <summary>
         /// 解密
         /// </summary>
-        public byte[] Decrypt(byte[] data, bool usePublicKey = true)
+        public byte[] Decrypt(byte[] data, bool publicKey)
         {
             Algorithm.CheckEncrypt();
-            var keyParameters = usePublicKey ? _publicKeyParameter : _privateKeyParameter;
+            var keyParameters = publicKey ? _publicKeyParameter : _privateKeyParameter;
             if (keyParameters == null)
             {
-                throw new ArgumentException($"未设置{(usePublicKey ? '公' : '私')}钥");
+                throw new ArgumentException($"未设置{(publicKey ? '公' : '私')}钥");
             }
 
             var cipher = CipherUtilities.GetCipher(Algorithm.Encryption);
