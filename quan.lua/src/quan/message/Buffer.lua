@@ -121,9 +121,9 @@ function Buffer:readFloat(scale)
         local n = string.unpack("<f", self.bytes, self.readIndex)
         self.readIndex = self.readIndex + 4
         return n
+    else
+        return self:readLong() / 10 ^ scale
     end
-
-    return self:readLong() / 10 ^ scale
 
 end
 
@@ -138,9 +138,10 @@ function Buffer:readDouble(scale)
         local n = string.unpack("<d", self.bytes, self.readIndex)
         self.readIndex = self.readIndex + 8
         return n
+    else
+        return self:readLong() / 10 ^ scale
     end
 
-    return self:readLong() / 10 ^ scale
 end
 
 function Buffer:readBytes()
