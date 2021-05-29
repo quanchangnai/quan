@@ -82,27 +82,35 @@ public class SymmetricCipher {
         return Base64.getEncoder().encodeToString(key.getEncoded());
     }
 
+    private Cipher encryptor;
+
     /**
      * 加密
      */
     public byte[] encrypt(byte[] data) {
         try {
-            Cipher cipher = Cipher.getInstance(algorithm.encryption);
-            cipher.init(Cipher.ENCRYPT_MODE, key, iv);
-            return cipher.doFinal(data);
+            if (encryptor == null) {
+                encryptor = Cipher.getInstance(algorithm.encryption);
+                encryptor.init(Cipher.ENCRYPT_MODE, key, iv);
+            }
+            return encryptor.doFinal(data);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
+
+    private Cipher decryptor;
 
     /**
      * 解密
      */
     public byte[] decrypt(byte[] data) {
         try {
-            Cipher cipher = Cipher.getInstance(algorithm.encryption);
-            cipher.init(Cipher.DECRYPT_MODE, key, iv);
-            return cipher.doFinal(data);
+            if (decryptor == null) {
+                decryptor = Cipher.getInstance(algorithm.encryption);
+                decryptor.init(Cipher.DECRYPT_MODE, key, iv);
+            }
+            return decryptor.doFinal(data);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -111,9 +119,9 @@ public class SymmetricCipher {
     @Override
     public String toString() {
         return "SymmetricCipher{" +
-            "algorithm=" + algorithm +
-            ", key=" + getBase64Key() +
-            '}';
+                "algorithm=" + algorithm +
+                ", key=" + getBase64Key() +
+                '}';
     }
 
     /**
@@ -168,11 +176,11 @@ public class SymmetricCipher {
         @Override
         public String toString() {
             return "SymmetricCipher.Algorithm{" +
-                "generation='" + generation + '\'' +
-                ", encryption='" + encryption + '\'' +
-                ", iv='" + (iv != null ? new String(iv) : "null") + '\'' +
-                ", keySize=" + keySize +
-                '}';
+                    "generation='" + generation + '\'' +
+                    ", encryption='" + encryption + '\'' +
+                    ", iv='" + (iv != null ? new String(iv) : "null") + '\'' +
+                    ", keySize=" + keySize +
+                    '}';
         }
     }
 }

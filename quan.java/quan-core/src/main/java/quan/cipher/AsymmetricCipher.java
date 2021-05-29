@@ -82,8 +82,8 @@ public class AsymmetricCipher {
      * @see #AsymmetricCipher(Algorithm, byte[], byte[])
      */
     public AsymmetricCipher(Algorithm algorithm, String publicKey, String privateKey) {
-        this(algorithm, publicKey != null ? Base64.getDecoder().decode(publicKey) : null,
-            privateKey != null ? Base64.getDecoder().decode(privateKey) : null);
+        this(algorithm, publicKey == null ? null : Base64.getDecoder().decode(publicKey),
+                privateKey == null ? null : Base64.getDecoder().decode(privateKey));
     }
 
     public Algorithm getAlgorithm() {
@@ -118,6 +118,8 @@ public class AsymmetricCipher {
         return Base64.getEncoder().encodeToString(privateKey.getEncoded());
     }
 
+    private Cipher encryptor;
+
     /**
      * 加密
      *
@@ -127,18 +129,22 @@ public class AsymmetricCipher {
      */
     public byte[] encrypt(byte[] data, boolean privateKey) {
         algorithm.checkEncryption();
-        Key key = privateKey ? this.privateKey : publicKey;
+        Key key = privateKey ? this.privateKey : this.publicKey;
         if (key == null) {
             throw new IllegalStateException("未设置" + (privateKey ? "私" : "公") + "钥");
         }
         try {
-            Cipher cipher = Cipher.getInstance(algorithm.encryption);
-            cipher.init(Cipher.ENCRYPT_MODE, key);
-            return cipher.doFinal(data);
+            if (encryptor == null) {
+                encryptor = Cipher.getInstance(algorithm.encryption);
+                encryptor.init(Cipher.ENCRYPT_MODE, key);
+            }
+            return encryptor.doFinal(data);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
+
+    private Cipher decryptor;
 
     /**
      * 解密
@@ -149,18 +155,22 @@ public class AsymmetricCipher {
      */
     public byte[] decrypt(byte[] data, boolean publicKey) {
         algorithm.checkEncryption();
-        Key key = publicKey ? this.publicKey : privateKey;
+        Key key = publicKey ? this.publicKey : this.privateKey;
         if (key == null) {
             throw new IllegalStateException("未设置" + (publicKey ? "公" : "私") + "钥");
         }
         try {
-            Cipher cipher = Cipher.getInstance(algorithm.encryption);
-            cipher.init(Cipher.DECRYPT_MODE, key);
-            return cipher.doFinal(data);
+            if (decryptor == null) {
+                decryptor = Cipher.getInstance(algorithm.encryption);
+                decryptor.init(Cipher.DECRYPT_MODE, key);
+            }
+            return decryptor.doFinal(data);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
+
+    private Signature signer;
 
     /**
      * 用私钥签名
@@ -171,14 +181,18 @@ public class AsymmetricCipher {
             throw new IllegalStateException("未设置私钥");
         }
         try {
-            Signature signer = Signature.getInstance(algorithm.signature);
-            signer.initSign(privateKey);
+            if (signer == null) {
+                signer = Signature.getInstance(algorithm.signature);
+                signer.initSign(privateKey);
+            }
             signer.update(data);
             return signer.sign();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
+
+    private Signature verifier;
 
     /**
      * 用公钥验签
@@ -189,10 +203,12 @@ public class AsymmetricCipher {
             throw new IllegalStateException("未设置公钥");
         }
         try {
-            Signature signer = Signature.getInstance(algorithm.signature);
-            signer.initVerify(publicKey);
-            signer.update(data);
-            return signer.verify(signature);
+            if (verifier == null) {
+                verifier = Signature.getInstance(algorithm.signature);
+                verifier.initVerify(publicKey);
+            }
+            verifier.update(data);
+            return verifier.verify(signature);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -201,10 +217,10 @@ public class AsymmetricCipher {
     @Override
     public String toString() {
         return "AsymmetricCipher{" +
-            "algorithm=" + algorithm +
-            ", publicKey=" + getBase64PublicKey() +
-            ", privateKey=" + getBase64PrivateKey() +
-            '}';
+                "algorithm=" + algorithm +
+                ", publicKey=" + getBase64PublicKey() +
+                ", privateKey=" + getBase64PrivateKey() +
+                '}';
     }
 
     /**
@@ -247,10 +263,10 @@ public class AsymmetricCipher {
         @Override
         public String toString() {
             return "AsymmetricCipher.Algorithm{" +
-                "generation='" + generation + '\'' +
-                ", encryption='" + encryption + '\'' +
-                ", signature='" + signature + '\'' +
-                '}';
+                    "generation='" + generation + '\'' +
+                    ", encryption='" + encryption + '\'' +
+                    ", signature='" + signature + '\'' +
+                    '}';
         }
     }
 }

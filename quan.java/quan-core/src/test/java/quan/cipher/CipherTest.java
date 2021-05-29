@@ -1,6 +1,7 @@
 package quan.cipher;
 
 import java.util.Base64;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -58,6 +59,13 @@ public class CipherTest {
         System.err.println(data);
 
         SymmetricCipher symmetricCipher = new SymmetricCipher(algorithm, key);
+
+        {
+            byte[] encrypted = symmetricCipher.encrypt(data.getBytes());
+            String decrypted = new String(symmetricCipher.decrypt(encrypted));
+
+            Assert.assertEquals(data, decrypted);
+        }
 
         long startTime = System.currentTimeMillis();
         for (int i = 0; i < 10; i++) {
