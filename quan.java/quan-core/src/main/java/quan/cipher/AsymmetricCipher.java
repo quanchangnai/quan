@@ -199,7 +199,7 @@ public class AsymmetricCipher {
      */
     public boolean verify(byte[] data, byte[] signature) {
         algorithm.checkSignature();
-        if (privateKey == null) {
+        if (publicKey == null) {
             throw new IllegalStateException("未设置公钥");
         }
         try {

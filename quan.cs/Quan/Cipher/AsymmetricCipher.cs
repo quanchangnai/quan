@@ -72,7 +72,7 @@ namespace Quan.Cipher
             }
         }
 
-        
+
         /// <summary>
         /// 指定已有密钥构造，至少要提供公私钥中的一个
         /// </summary>
@@ -122,6 +122,8 @@ namespace Quan.Cipher
         public string Base64PrivateKey => PrivateKey != null ? Convert.ToBase64String(PrivateKey) : null;
 
 
+        private IBufferedCipher _encryptor;
+
         /// <summary>
         /// 加密
         /// </summary>
@@ -134,10 +136,16 @@ namespace Quan.Cipher
                 throw new ArgumentException($"未设置{(privateKey ? '私' : '公')}钥");
             }
 
-            var cipher = CipherUtilities.GetCipher(Algorithm.Encryption);
-            cipher.Init(true, keyParameters);
-            return cipher.DoFinal(data);
+            if (_encryptor == null)
+            {
+                _encryptor = CipherUtilities.GetCipher(Algorithm.Encryption);
+                _encryptor.Init(true, keyParameters);
+            }
+
+            return _encryptor.DoFinal(data);
         }
+
+        private IBufferedCipher _decryptor;
 
         /// <summary>
         /// 解密
@@ -151,10 +159,18 @@ namespace Quan.Cipher
                 throw new ArgumentException($"未设置{(publicKey ? '公' : '私')}钥");
             }
 
-            var cipher = CipherUtilities.GetCipher(Algorithm.Encryption);
-            cipher.Init(false, keyParameters);
-            return cipher.DoFinal(data);
+            if (_decryptor == null)
+            {
+                _decryptor = CipherUtilities.GetCipher(Algorithm.Encryption);
+                _decryptor.Init(false, keyParameters);
+            }
+
+            return _decryptor.DoFinal(data);
         }
+
+
+        private ISigner _signer;
+
 
         /// <summary>
         /// 用私钥签名
@@ -167,11 +183,18 @@ namespace Quan.Cipher
                 throw new ArgumentException("未设置私钥");
             }
 
-            var signer = SignerUtilities.GetSigner(Algorithm.Signature);
-            signer.Init(true, _privateKeyParameter);
-            signer.BlockUpdate(data, 0, data.Length);
-            return signer.GenerateSignature();
+            if (_signer == null)
+            {
+                _signer = SignerUtilities.GetSigner(Algorithm.Signature);
+                _signer.Init(true, _privateKeyParameter);
+            }
+
+            _signer.BlockUpdate(data, 0, data.Length);
+            return _signer.GenerateSignature();
         }
+
+
+        private ISigner _verifier;
 
         /// <summary>
         /// 用公钥验签
@@ -179,15 +202,19 @@ namespace Quan.Cipher
         public bool Verify(byte[] data, byte[] signature)
         {
             Algorithm.CheckSign();
-            if (_privateKeyParameter == null)
+            if (_publicKeyParameter == null)
             {
                 throw new ArgumentException("未设置公钥");
             }
 
-            var signer = SignerUtilities.GetSigner(Algorithm.Signature);
-            signer.Init(false, _publicKeyParameter);
-            signer.BlockUpdate(data, 0, data.Length);
-            return signer.VerifySignature(signature);
+            if (_verifier == null)
+            {
+                _verifier = SignerUtilities.GetSigner(Algorithm.Signature);
+                _verifier.Init(false, _publicKeyParameter);
+            }
+
+            _verifier.BlockUpdate(data, 0, data.Length);
+            return _verifier.VerifySignature(signature);
         }
     }
 }
