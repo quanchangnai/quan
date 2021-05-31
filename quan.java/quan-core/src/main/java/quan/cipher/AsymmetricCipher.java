@@ -118,7 +118,8 @@ public class AsymmetricCipher {
         return Base64.getEncoder().encodeToString(privateKey.getEncoded());
     }
 
-    private Cipher encryptor;
+    private Cipher privateEncryptCipher;
+    private Cipher publicEncryptCipher;
 
     /**
      * 加密
@@ -134,17 +135,27 @@ public class AsymmetricCipher {
             throw new IllegalStateException("未设置" + (privateKey ? "私" : "公") + "钥");
         }
         try {
-            if (encryptor == null) {
-                encryptor = Cipher.getInstance(algorithm.encryption);
-                encryptor.init(Cipher.ENCRYPT_MODE, key);
+            if (privateEncryptCipher == null && this.privateKey != null) {
+                privateEncryptCipher = Cipher.getInstance(algorithm.encryption);
+                privateEncryptCipher.init(Cipher.ENCRYPT_MODE, this.privateKey);
             }
-            return encryptor.doFinal(data);
+            if (publicEncryptCipher == null && this.publicKey != null) {
+                publicEncryptCipher = Cipher.getInstance(algorithm.encryption);
+                publicEncryptCipher.init(Cipher.ENCRYPT_MODE, this.publicKey);
+            }
+            if (privateKey) {
+                return privateEncryptCipher.doFinal(data);
+            } else {
+                //noinspection ConstantConditions
+                return publicEncryptCipher.doFinal(data);
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    private Cipher decryptor;
+    private Cipher privateDecryptCipher;
+    private Cipher publicDecryptCipher;
 
     /**
      * 解密
@@ -160,11 +171,20 @@ public class AsymmetricCipher {
             throw new IllegalStateException("未设置" + (publicKey ? "公" : "私") + "钥");
         }
         try {
-            if (decryptor == null) {
-                decryptor = Cipher.getInstance(algorithm.encryption);
-                decryptor.init(Cipher.DECRYPT_MODE, key);
+            if (privateDecryptCipher == null && this.privateKey != null) {
+                privateDecryptCipher = Cipher.getInstance(algorithm.encryption);
+                privateDecryptCipher.init(Cipher.DECRYPT_MODE, this.privateKey);
             }
-            return decryptor.doFinal(data);
+            if (publicDecryptCipher == null && this.publicKey != null) {
+                publicDecryptCipher = Cipher.getInstance(algorithm.encryption);
+                publicDecryptCipher.init(Cipher.DECRYPT_MODE, this.publicKey);
+            }
+            if (publicKey) {
+                //noinspection ConstantConditions
+                return publicDecryptCipher.doFinal(data);
+            } else {
+                return privateDecryptCipher.doFinal(data);
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

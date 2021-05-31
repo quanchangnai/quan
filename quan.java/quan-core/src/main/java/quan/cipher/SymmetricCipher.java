@@ -82,35 +82,35 @@ public class SymmetricCipher {
         return Base64.getEncoder().encodeToString(key.getEncoded());
     }
 
-    private Cipher encryptor;
+    private Cipher encryptCipher;
 
     /**
      * 加密
      */
     public byte[] encrypt(byte[] data) {
         try {
-            if (encryptor == null) {
-                encryptor = Cipher.getInstance(algorithm.encryption);
-                encryptor.init(Cipher.ENCRYPT_MODE, key, iv);
+            if (encryptCipher == null) {
+                encryptCipher = Cipher.getInstance(algorithm.encryption);
+                encryptCipher.init(Cipher.ENCRYPT_MODE, key, iv);
             }
-            return encryptor.doFinal(data);
+            return encryptCipher.doFinal(data);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    private Cipher decryptor;
+    private Cipher decryptCipher;
 
     /**
      * 解密
      */
     public byte[] decrypt(byte[] data) {
         try {
-            if (decryptor == null) {
-                decryptor = Cipher.getInstance(algorithm.encryption);
-                decryptor.init(Cipher.DECRYPT_MODE, key, iv);
+            if (decryptCipher == null) {
+                decryptCipher = Cipher.getInstance(algorithm.encryption);
+                decryptCipher.init(Cipher.DECRYPT_MODE, key, iv);
             }
-            return decryptor.doFinal(data);
+            return decryptCipher.doFinal(data);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

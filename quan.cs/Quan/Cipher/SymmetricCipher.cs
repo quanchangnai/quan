@@ -79,36 +79,36 @@ namespace Quan.Cipher
         public string Base64Key => Convert.ToBase64String(Key);
 
 
-        private IBufferedCipher _encryptor;
+        private IBufferedCipher _encryptCipher;
 
         /// <summary>
         /// 加密
         /// </summary>
         public byte[] Encrypt(byte[] data)
         {
-            if (_encryptor == null)
+            if (_encryptCipher == null)
             {
-                _encryptor = CipherUtilities.GetCipher(Algorithm.Encryption);
-                _encryptor.Init(true, _keyParameter);
+                _encryptCipher = CipherUtilities.GetCipher(Algorithm.Encryption);
+                _encryptCipher.Init(true, _keyParameter);
             }
 
-            return _encryptor.DoFinal(data);
+            return _encryptCipher.DoFinal(data);
         }
 
-        private IBufferedCipher _decryptor;
+        private IBufferedCipher _decryptCipher;
 
         /// <summary>
         /// 解密
         /// </summary>
         public byte[] Decrypt(byte[] data)
         {
-            if (_decryptor == null)
+            if (_decryptCipher == null)
             {
-                _decryptor = CipherUtilities.GetCipher(Algorithm.Encryption);
-                _decryptor.Init(false, _keyParameter);
+                _decryptCipher = CipherUtilities.GetCipher(Algorithm.Encryption);
+                _decryptCipher.Init(false, _keyParameter);
             }
 
-            return _decryptor.DoFinal(data);
+            return _decryptCipher.DoFinal(data);
         }
     }
 }

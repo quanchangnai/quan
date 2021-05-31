@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Parameters;
@@ -122,7 +123,8 @@ namespace Quan.Cipher
         public string Base64PrivateKey => PrivateKey != null ? Convert.ToBase64String(PrivateKey) : null;
 
 
-        private IBufferedCipher _encryptor;
+        private IBufferedCipher _privateEncryptCipher;
+        private IBufferedCipher _publicEncryptCipher;
 
         /// <summary>
         /// 加密
@@ -136,16 +138,30 @@ namespace Quan.Cipher
                 throw new ArgumentException($"未设置{(privateKey ? '私' : '公')}钥");
             }
 
-            if (_encryptor == null)
+            if (_privateEncryptCipher == null && _privateKeyParameter != null)
             {
-                _encryptor = CipherUtilities.GetCipher(Algorithm.Encryption);
-                _encryptor.Init(true, keyParameters);
+                _privateEncryptCipher = CipherUtilities.GetCipher(Algorithm.Encryption);
+                _privateEncryptCipher.Init(true, _privateKeyParameter);
             }
 
-            return _encryptor.DoFinal(data);
+            if (_publicEncryptCipher == null && _publicKeyParameter != null)
+            {
+                _publicEncryptCipher = CipherUtilities.GetCipher(Algorithm.Encryption);
+                _publicEncryptCipher.Init(true, _publicKeyParameter);
+            }
+
+            if (privateKey)
+            {
+                Debug.Assert(_privateEncryptCipher != null, nameof(_privateEncryptCipher) + " != null");
+                return _privateEncryptCipher.DoFinal(data);
+            }
+
+            Debug.Assert(_publicEncryptCipher != null, nameof(_publicEncryptCipher) + " != null");
+            return _publicEncryptCipher.DoFinal(data);
         }
 
-        private IBufferedCipher _decryptor;
+        private IBufferedCipher _privateDecryptCipher;
+        private IBufferedCipher _publicDecryptCipher;
 
         /// <summary>
         /// 解密
@@ -159,13 +175,26 @@ namespace Quan.Cipher
                 throw new ArgumentException($"未设置{(publicKey ? '公' : '私')}钥");
             }
 
-            if (_decryptor == null)
+            if (_privateDecryptCipher == null && _privateKeyParameter != null)
             {
-                _decryptor = CipherUtilities.GetCipher(Algorithm.Encryption);
-                _decryptor.Init(false, keyParameters);
+                _privateDecryptCipher = CipherUtilities.GetCipher(Algorithm.Encryption);
+                _privateDecryptCipher.Init(false, _privateKeyParameter);
             }
 
-            return _decryptor.DoFinal(data);
+            if (_publicDecryptCipher == null && _publicKeyParameter != null)
+            {
+                _publicDecryptCipher = CipherUtilities.GetCipher(Algorithm.Encryption);
+                _publicDecryptCipher.Init(false, _publicKeyParameter);
+            }
+
+            if (publicKey)
+            {
+                Debug.Assert(_publicDecryptCipher != null, nameof(_publicDecryptCipher) + " != null");
+                return _publicDecryptCipher.DoFinal(data);
+            }
+
+            Debug.Assert(_privateDecryptCipher != null, nameof(_privateDecryptCipher) + " != null");
+            return _privateDecryptCipher.DoFinal(data);
         }
 
 
