@@ -44,11 +44,6 @@ public class ItemBean extends Bean {
         return this;
     }
 
-    public ItemBean addId(int id) {
-        setId(getId() + id);
-        return this;
-    }
-
     public String getName() {
         return name.getValue();
     }

@@ -95,7 +95,7 @@ public class Database implements DataWriter, MongoDatabase {
         this.client = Assertions.notNull("client", client);
         this.dataPackage = Assertions.notNull("dataPackage", dataPackage);
         this.asyncWrite = asyncWrite;
-        Assertions.notNull("name", databaseName);
+        Assertions.notNull("databaseName", databaseName);
 
         if (asyncWrite && !executors.containsKey(client)) {
             initExecutors();
@@ -134,11 +134,9 @@ public class Database implements DataWriter, MongoDatabase {
     }
 
     private void initCollection(Class<?> clazz) {
-        String collectionName;
-        try {
-            collectionName = (String) clazz.getField("_NAME").get(clazz);
-        } catch (Exception e) {
-            logger.error("", e);
+        String collectionName = Data.name((Class<? extends Data>) clazz);
+        if (collectionName == null) {
+            logger.error("{}._NAME未定义", clazz.getSimpleName());
             return;
         }
 
@@ -251,14 +249,14 @@ public class Database implements DataWriter, MongoDatabase {
 
         if (updates != null) {
             for (Data<?> data : updates) {
-                ReplaceOneModel<Data<?>> replaceOneModel = new ReplaceOneModel<>(Filters.eq(data._id()), data, replaceOptions);
+                ReplaceOneModel<Data<?>> replaceOneModel = new ReplaceOneModel<>(Filters.eq(data.id()), data, replaceOptions);
                 writeModels.computeIfAbsent(collections.get(data.getClass()), this::list).add(replaceOneModel);
             }
         }
 
         if (deletions != null) {
             for (Data<?> data : deletions) {
-                writeModels.computeIfAbsent(collections.get(data.getClass()), this::list).add(new DeleteOneModel<>(Filters.eq(data._id())));
+                writeModels.computeIfAbsent(collections.get(data.getClass()), this::list).add(new DeleteOneModel<>(Filters.eq(data.id())));
             }
         }
 
@@ -373,7 +371,8 @@ public class Database implements DataWriter, MongoDatabase {
     }
 
     @Override
-    public <TResult> TResult runCommand(ClientSession clientSession, Bson command, ReadPreference readPreference, Class<TResult> resultClass) {
+    public <TResult> TResult runCommand(ClientSession clientSession, Bson command, ReadPreference readPreference,
+                                        Class<TResult> resultClass) {
         return database.runCommand(clientSession, command, readPreference, resultClass);
     }
 
@@ -453,7 +452,8 @@ public class Database implements DataWriter, MongoDatabase {
     }
 
     @Override
-    public void createView(ClientSession clientSession, String viewName, String viewOn, List<? extends Bson> pipeline, CreateViewOptions createViewOptions) {
+    public void createView(ClientSession clientSession, String viewName, String viewOn, List<? extends Bson> pipeline,
+                           CreateViewOptions createViewOptions) {
         database.createView(clientSession, viewName, viewOn, pipeline, createViewOptions);
     }
 
@@ -493,7 +493,8 @@ public class Database implements DataWriter, MongoDatabase {
     }
 
     @Override
-    public <TResult> ChangeStreamIterable<TResult> watch(ClientSession clientSession, List<? extends Bson> pipeline, Class<TResult> resultClass) {
+    public <TResult> ChangeStreamIterable<TResult> watch(ClientSession clientSession, List<? extends Bson> pipeline,
+                                                         Class<TResult> resultClass) {
         return database.watch(clientSession, pipeline, resultClass);
     }
 
@@ -513,7 +514,8 @@ public class Database implements DataWriter, MongoDatabase {
     }
 
     @Override
-    public <TResult> AggregateIterable<TResult> aggregate(ClientSession clientSession, List<? extends Bson> pipeline, Class<TResult> resultClass) {
+    public <TResult> AggregateIterable<TResult> aggregate(ClientSession clientSession, List<? extends Bson> pipeline,
+                                                          Class<TResult> resultClass) {
         return database.aggregate(clientSession, pipeline, resultClass);
     }
 

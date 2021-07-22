@@ -75,18 +75,10 @@ public class ${name} extends <#if kind ==2>Bean<#elseif kind ==5>Data<${idField.
     }
 
     /**
-     * 表名
+     * 主键
      */
     @Override
-    public String _name() {
-        return _NAME;
-    }
-
-    /**
-     * 主键(_id)
-     */
-    @Override
-    public ${idField.classType} _id() {
+    public ${idField.classType} id() {
         return ${idName}.getValue();
     }
 
@@ -165,18 +157,6 @@ public class ${name} extends <#if kind ==2>Bean<#elseif kind ==5>Data<${idField.
         this.${field.name}.setValue(${field.name}, ${root});
         return this;
     }
-        <#if field.numberType>
-
-        <#if field.comment !="">
-    /**
-     * ${field.comment}
-     */
-        </#if>
-    public ${name} add${field.name?cap_first}(${field.type} ${field.name}) {
-        set${field.name?cap_first}(<#if field.type=="short">(short) (</#if>get${field.name?cap_first}() + ${field.name}<#if field.type=="short">)</#if>);
-        return this;
-    }
-        </#if>
 
     <#else>
     public ${field.classType} get${field.name?cap_first}() {

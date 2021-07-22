@@ -26,15 +26,18 @@ public abstract class Data<I> {
 
     State state;
 
-    /**
-     * 表名
-     */
-    public abstract String _name();
+    public static String name(Class<? extends Data> clazz) {
+        try {
+            return (String) clazz.getField("_NAME").get(clazz);
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
     /**
-     * 主键(_id)
+     * 主键
      */
-    public abstract I _id();
+    public abstract I id();
 
     /**
      * 不在事务中需要设置写入器时通过反射引用此方法

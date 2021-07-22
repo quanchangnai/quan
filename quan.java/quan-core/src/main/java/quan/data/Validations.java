@@ -25,7 +25,7 @@ public class Validations {
         }
         Data<?> root = bean._getLogRoot();
         if (root != null) {
-            throw new IllegalStateException("参数已经受到了" + root.getClass().getSimpleName() + "[" + root._id() + "]的管理");
+            throw new IllegalStateException("参数已经受到了" + root.getClass().getSimpleName() + "[" + root.id() + "]的管理");
         }
     }
 

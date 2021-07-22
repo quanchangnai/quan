@@ -131,18 +131,10 @@ public class RoleData extends Data<Long> {
     }
 
     /**
-     * 表名
+     * 主键
      */
     @Override
-    public String _name() {
-        return _NAME;
-    }
-
-    /**
-     * 主键(_id)
-     */
-    @Override
-    public Long _id() {
+    public Long id() {
         return id.getValue();
     }
 
@@ -159,14 +151,6 @@ public class RoleData extends Data<Long> {
      */
     public RoleData setId(long id) {
         this.id.setValue(id, this);
-        return this;
-    }
-
-    /**
-     * 角色ID
-     */
-    public RoleData addId(long id) {
-        setId(getId() + id);
         return this;
     }
 
@@ -212,22 +196,12 @@ public class RoleData extends Data<Long> {
         return this;
     }
 
-    public RoleData addA(int a) {
-        setA(getA() + a);
-        return this;
-    }
-
     public int getA2() {
         return a2.getValue();
     }
 
     public RoleData setA2(int a2) {
         this.a2.setValue(a2, this);
-        return this;
-    }
-
-    public RoleData addA2(int a2) {
-        setA2(getA2() + a2);
         return this;
     }
 
@@ -249,11 +223,6 @@ public class RoleData extends Data<Long> {
         return this;
     }
 
-    public RoleData addB2(int b2) {
-        setB2(getB2() + b2);
-        return this;
-    }
-
     /**
      * sssss
      */
@@ -266,14 +235,6 @@ public class RoleData extends Data<Long> {
      */
     public RoleData setS(short s) {
         this.s.setValue(s, this);
-        return this;
-    }
-
-    /**
-     * sssss
-     */
-    public RoleData addS(short s) {
-        setS((short) (getS() + s));
         return this;
     }
 
@@ -293,14 +254,6 @@ public class RoleData extends Data<Long> {
     }
 
     /**
-     * iiii
-     */
-    public RoleData addI(int i) {
-        setI(getI() + i);
-        return this;
-    }
-
-    /**
      * ffff
      */
     public float getF() {
@@ -315,25 +268,12 @@ public class RoleData extends Data<Long> {
         return this;
     }
 
-    /**
-     * ffff
-     */
-    public RoleData addF(float f) {
-        setF(getF() + f);
-        return this;
-    }
-
     public double getD() {
         return d.getValue();
     }
 
     public RoleData setD(double d) {
         this.d.setValue(d, this);
-        return this;
-    }
-
-    public RoleData addD(double d) {
-        setD(getD() + d);
         return this;
     }
 
