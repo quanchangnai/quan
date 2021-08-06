@@ -101,7 +101,7 @@ function Buffer:readFloat(scale)
 
     if scale < 0 then
         if self.readIndex + 3 > self:size() then
-            error("读数据出错", 2)
+            error("读数据出错")
         end
         local n = string.unpack("<f", self.bytes, self.readIndex)
         self.readIndex = self.readIndex + 4
@@ -118,7 +118,7 @@ function Buffer:readDouble(scale)
 
     if scale < 0 then
         if self.readIndex + 7 > self:size() then
-            error("读数据出错", 2)
+            error("读数据出错")
         end
         local n = string.unpack("<d", self.bytes, self.readIndex)
         self.readIndex = self.readIndex + 8
@@ -133,7 +133,7 @@ function Buffer:readBytes()
     local length = self:readInt()
     local readableCount = self:readableCount()
     if length > readableCount then
-        error(string.format("读数据出错，希望读取%d字节,实际剩余%d字节", length, readableCount), 2)
+        error(string.format("读数据出错，希望读取%d字节,实际剩余%d字节", length, readableCount))
     end
 
     local bytes = self.bytes:sub(self.readIndex, self.readIndex + length - 1)
@@ -145,7 +145,7 @@ function Buffer:skipBytes()
     local length = self:readInt()
     local readableCount = self:readableCount()
     if length > readableCount then
-        error(string.format("读数据出错，希望跳过%d字节,实际剩余%d字节", length, readableCount), 2)
+        error(string.format("读数据出错，希望跳过%d字节,实际剩余%d字节", length, readableCount))
     end
 
     self.readIndex = self.readIndex + length
@@ -201,7 +201,7 @@ function Buffer:writeDouble(n, scale)
     local times = 10 ^ scale
     local threshold = 0x7fffffffffffffff / times;
     if n < -threshold or n > threshold then
-        error(string.format("参数[%s]超出了限定范围[%s,%s],无法转换为指定精度[%s]的定点型数据", n, -threshold, threshold, scale), 2)
+        error(string.format("参数[%s]超出了限定范围[%s,%s],无法转换为指定精度[%s]的定点型数据", n, -threshold, threshold, scale))
     else
         self:writeLong(math.floor(n * times))
     end

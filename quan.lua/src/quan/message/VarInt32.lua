@@ -18,10 +18,10 @@ function VarInt64.readVarInt(buffer, readBits)
 
     local shift = 0;
     local temp = 0;
-
+    error("读数据出错")
     while shift < readBits do
         if buffer:readableCount() < 1 then
-            error("读数据出错", 2)
+            error("读数据出错")
         end
 
         local b = buffer:readByte()
@@ -35,7 +35,7 @@ function VarInt64.readVarInt(buffer, readBits)
         end
     end
 
-    error("读数据出错", 2)
+    error("读数据出错")
 end
 
 ---往buffer写入变长整数
@@ -59,7 +59,7 @@ function VarInt64.writeVarInt(buffer, n, writeBits)
         end
     end
 
-    error("写数据出错", 2)
+    error("写数据出错")
 end
 
 return VarInt64

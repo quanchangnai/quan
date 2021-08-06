@@ -23,7 +23,7 @@ function table.readOnly(origin)
     local meta = {
         __index = origin,
         __newindex = function(table, key, value)
-            error("不能修改只读表", 2)
+            error("不能修改只读表")
         end
     }
     return setmetatable({}, meta)
