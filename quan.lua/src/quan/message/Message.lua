@@ -26,8 +26,16 @@ function Message.decode(buffer, msg)
     return msg
 end
 
+--按位与
+local band;
+if _VERSION == "Lua 5.3" or _VERSION == "Lua 5.4" then
+    band = require("quan.message.bits").band
+else
+    band = require("bit").band
+end
+
 function Message.skipField(tag, buffer)
-    local t = tag & 3
+    local t = band(tag, 3)
     if t == 0 then
         buffer:readLong()
     elseif t == 1 then

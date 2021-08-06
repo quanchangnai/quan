@@ -15,7 +15,7 @@ namespace Test.Message.Role
         /// <summary>
 		/// 角色id
 		/// </summary>
-		public long id { get; set; }
+		public int id { get; set; }
 
 		private string _name = "";
 
@@ -36,20 +36,6 @@ namespace Test.Message.Role
 
 		public int i { get; set; }
 
-        private float _f;
-
-        public float f
-        {
-            get => _f;
-            set
-            {
-                Buffer.CheckScale(value, 2);
-                _f = value;
-            }
-        }
-
-		public double d { get; set; }
-
 		private byte[] _data = new byte[0];
 
 		public byte[] data
@@ -69,14 +55,12 @@ namespace Test.Message.Role
 		{
 	    	base.Encode(buffer);
 
-		    buffer.WriteLong(id);
+		    buffer.WriteInt(id);
 		    buffer.WriteString(name);
 			buffer.WriteInt((int)type);
 		    buffer.WriteBool(b);
 		    buffer.WriteShort(s);
 		    buffer.WriteInt(i);
-			buffer.WriteFloat(f, 2);
-			buffer.WriteDouble(d);
 		    buffer.WriteBytes(data);
 
 		    buffer.WriteInt(list.Count);
@@ -94,14 +78,12 @@ namespace Test.Message.Role
 		{
 	    	base.Decode(buffer);
 
-		    id = buffer.ReadLong();
+		    id = buffer.ReadInt();
 		    name = buffer.ReadString();
 		    type = (RoleType)buffer.ReadInt();
 		    b = buffer.ReadBool();
 		    s = buffer.ReadShort();
 		    i = buffer.ReadInt();
-			f = buffer.ReadFloat(2);
-			d = buffer.ReadDouble();
 		    data = buffer.ReadBytes();
 
 		    var listSize = buffer.ReadInt();
@@ -126,8 +108,6 @@ namespace Test.Message.Role
 				   ",b=" + b.ToString2() +
 				   ",s=" + s.ToString2() +
 				   ",i=" + i.ToString2() +
-				   ",f=" + f.ToString2() +
-				   ",d=" + d.ToString2() +
 				   ",data=" + data.ToString2() +
 				   ",list=" + list.ToString2() +
 				   ",set=" + set.ToString2() +

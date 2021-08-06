@@ -61,12 +61,10 @@ public abstract class Buffer {
             temp |= (b & 0b1111111L) << shift;
             shift += 7;
 
-            if ((b & 0b10000000) != 0) {
-                continue;
+            if ((b & 0b10000000) == 0) {
+                //ZigZag解码
+                return (temp >> 1) ^ -(temp & 1);
             }
-
-            //ZigZag解码
-            return (temp >>> 1) ^ -(temp & 1);
         }
 
         throw new RuntimeException("读数据出错");
@@ -185,7 +183,7 @@ public abstract class Buffer {
                 return;
             } else {
                 writeByte((byte) (n & 0b1111111 | 0b10000000));
-                n >>>= 7;
+                n >>= 7;
             }
         }
     }

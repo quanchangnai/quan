@@ -14,7 +14,7 @@ namespace Test.Message.User
         /// <summary>
 		/// 角色id
 		/// </summary>
-		public long id { get; set; }
+		public int id { get; set; }
 
 		private string _name = "";
 
@@ -32,7 +32,7 @@ namespace Test.Message.User
 		{
 	    	base.Encode(buffer);
 
-		    buffer.WriteLong(id);
+		    buffer.WriteInt(id);
 		    buffer.WriteString(name);
 		}
 
@@ -40,7 +40,7 @@ namespace Test.Message.User
 		{
 	    	base.Decode(buffer);
 
-		    id = buffer.ReadLong();
+		    id = buffer.ReadInt();
 		    name = buffer.ReadString();
 		}
 

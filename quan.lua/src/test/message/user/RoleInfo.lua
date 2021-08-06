@@ -59,7 +59,7 @@ function RoleInfo:encode(buffer)
 
     buffer = buffer or _Buffer.new()
 
-    buffer:writeLong(self.id)
+    buffer:writeInt(self.id)
     buffer:writeString(self.name)
 
     return buffer
@@ -77,7 +77,7 @@ function RoleInfo.decode(buffer, self)
 
     self = self or RoleInfo.new()
 
-    self.id = buffer:readLong()
+    self.id = buffer:readInt()
     self.name = buffer:readString()
 
     return self

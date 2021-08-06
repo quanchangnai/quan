@@ -83,7 +83,7 @@ function UserInfo:encode(buffer)
     buffer = buffer or _Buffer.new()
 
     buffer:writeTag(4)
-    buffer:writeLong(self.id)
+    buffer:writeInt(self.id)
 
     buffer:writeTag(11)
     buffer:writeString(self.name)
@@ -129,7 +129,7 @@ function UserInfo:encode(buffer)
     local roleMapBuffer = _Buffer.new()
     roleMapBuffer:writeInt(table.size(self.roleMap))
     for key, value in pairs(self.roleMap) do
-        roleMapBuffer:writeLong(key)
+        roleMapBuffer:writeInt(key)
         test.message.role.RoleInfo.encode(value, roleMapBuffer)
     end
     buffer:writeBuffer(roleMapBuffer)
@@ -156,7 +156,7 @@ function UserInfo.decode(buffer, self)
         if tag == 0 then
             break
         elseif tag == 4 then
-            self.id = buffer:readLong()
+            self.id = buffer:readInt()
         elseif tag == 11 then
             self.name = buffer:readString()
         elseif tag == 12 then
@@ -185,7 +185,7 @@ function UserInfo.decode(buffer, self)
         elseif tag == 39 then
             buffer:readInt()
             for i = 1, buffer:readInt() do
-                self.roleMap[buffer:readLong()] = test_message_role_RoleInfo.decode(buffer)
+                self.roleMap[buffer:readInt()] = test_message_role_RoleInfo.decode(buffer)
             end
         else
             _Message.skipField(tag, buffer)

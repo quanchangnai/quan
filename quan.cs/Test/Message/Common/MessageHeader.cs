@@ -13,7 +13,7 @@ namespace Test.Message.Common
         /// <summary>
 		/// 消息序号
 		/// </summary>
-		public long seq { get; set; }
+		public int seq { get; set; }
 
         /// <summary>
 		/// 错误码
@@ -25,7 +25,7 @@ namespace Test.Message.Common
 		{
 	    	base.Encode(buffer);
 
-		    buffer.WriteLong(seq);
+		    buffer.WriteInt(seq);
 		    buffer.WriteInt(error);
 		}
 
@@ -33,7 +33,7 @@ namespace Test.Message.Common
 		{
 	    	base.Decode(buffer);
 
-		    seq = buffer.ReadLong();
+		    seq = buffer.ReadInt();
 		    error = buffer.ReadInt();
 		}
 

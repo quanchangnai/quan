@@ -22,7 +22,7 @@ namespace Test.Message.Role
         /// <summary>
 		/// 角色id
 		/// </summary>
-		public long roleId { get; set; }
+		public int roleId { get; set; }
 
 		private string _roleName = "";
 
@@ -59,7 +59,7 @@ namespace Test.Message.Role
         /// <summary>
 		/// 角色信息
 		/// </summary>
-		public Dictionary<long, RoleInfo> roleInfoMap { get; } = new Dictionary<long, RoleInfo>();
+		public Dictionary<int, RoleInfo> roleInfoMap { get; } = new Dictionary<int, RoleInfo>();
 
         /// <summary>
 		/// 用户信息
@@ -76,7 +76,7 @@ namespace Test.Message.Role
 		{
 	    	base.Encode(buffer);
 
-		    buffer.WriteLong(roleId);
+		    buffer.WriteInt(roleId);
 		    buffer.WriteString(roleName);
 		    roleInfo.Encode(buffer);
 
@@ -92,7 +92,7 @@ namespace Test.Message.Role
 
 		    buffer.WriteInt(roleInfoMap.Count);
 		    foreach (var roleInfoMapKey in roleInfoMap.Keys) {
-		        buffer.WriteLong(roleInfoMapKey);
+		        buffer.WriteInt(roleInfoMapKey);
 			    roleInfoMap[roleInfoMapKey].Encode(buffer);
 		    }
 
@@ -104,7 +104,7 @@ namespace Test.Message.Role
 		{
 	    	base.Decode(buffer);
 
-		    roleId = buffer.ReadLong();
+		    roleId = buffer.ReadInt();
 		    roleName = buffer.ReadString();
 		    roleInfo.Decode(buffer);
 
@@ -127,7 +127,7 @@ namespace Test.Message.Role
 		    var roleInfoMapSize = buffer.ReadInt();
 		    for (var i = 0; i < roleInfoMapSize; i++) 
 			{
-			    var roleInfoMapKey = buffer.ReadLong();
+			    var roleInfoMapKey = buffer.ReadInt();
 			    var roleInfoMapValue = new RoleInfo();
 				roleInfoMapValue.Decode(buffer);
 			    roleInfoMap.Add(roleInfoMapKey, roleInfoMapValue);

@@ -10,7 +10,7 @@ import java.util.*;
 public class UserInfo extends Bean {
 
     //ID
-    private long id;
+    private int id;
 
     //名字
     private String name = "";
@@ -34,20 +34,20 @@ public class UserInfo extends Bean {
     private Set<quan.message.role.RoleInfo> roleSet = new HashSet<>();
 
     //角色信息Map
-    private Map<Long, quan.message.role.RoleInfo> roleMap = new HashMap<>();
+    private Map<Integer, quan.message.role.RoleInfo> roleMap = new HashMap<>();
 
 
     /**
      * ID
      */
-    public long getId() {
+    public int getId() {
         return id;
     }
 
     /**
      * ID
      */
-    public UserInfo setId(long id) {
+    public UserInfo setId(int id) {
         this.id = id;
         return this;
     }
@@ -147,7 +147,7 @@ public class UserInfo extends Bean {
     /**
      * 角色信息Map
      */
-    public Map<Long, quan.message.role.RoleInfo> getRoleMap() {
+    public Map<Integer, quan.message.role.RoleInfo> getRoleMap() {
         return roleMap;
     }
 
@@ -156,7 +156,7 @@ public class UserInfo extends Bean {
         super.encode(buffer);
 
         buffer.writeTag(4);
-        buffer.writeLong(this.id);
+        buffer.writeInt(this.id);
 
         buffer.writeTag(11);
         buffer.writeString(this.name);
@@ -195,8 +195,8 @@ public class UserInfo extends Bean {
 
         buffer.writeTag(39);
         buffer.getTemp().writeInt(this.roleMap.size());
-        for (Long roleMap$Key : this.roleMap.keySet()) {
-            buffer.getTemp().writeLong(roleMap$Key);
+        for (Integer roleMap$Key : this.roleMap.keySet()) {
+            buffer.getTemp().writeInt(roleMap$Key);
             this.roleMap.get(roleMap$Key).encode(buffer.getTemp());
         }
         buffer.writeTemp();
@@ -211,7 +211,7 @@ public class UserInfo extends Bean {
         for (int tag = buffer.readTag(); tag != 0; tag = buffer.readTag()) {
             switch (tag) {
                 case 4:
-                    this.id = buffer.readLong();
+                    this.id = buffer.readInt();
                     break;
                 case 11:
                     this.name = buffer.readString();
@@ -258,7 +258,7 @@ public class UserInfo extends Bean {
                     buffer.readInt();
                     int roleMap$Size = buffer.readInt();
                     for (int i = 0; i < roleMap$Size; i++) {
-                        Long roleMap$Key = buffer.readLong();
+                        Integer roleMap$Key = buffer.readInt();
                         quan.message.role.RoleInfo roleMap$Value = new quan.message.role.RoleInfo();
                         roleMap$Value.decode(buffer);
                         this.roleMap.put(roleMap$Key, roleMap$Value);

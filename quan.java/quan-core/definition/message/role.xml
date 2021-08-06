@@ -7,14 +7,14 @@
     </enum>
 
     <bean name="RoleInfo">角色信息
-        <field name="id" type="long"/>角色id
+        <field name="long" type="int"/>角色id
         <field name="name" type="string"/>角色名
         <field name="type" type="RoleType"/>
         <field name="b" type="bool"/>
         <field name="s" type="short"/>
         <field name="i" type="int"/>
-        <field name="f" type="float:2"/>
-        <field name="d" type="double"/>
+<!--        <field name="f" type="float:2"/>-->
+<!--        <field name="d" type="double"/>-->
         <field name="data" type="bytes"/>
         <field name="list" type="list:int"/>
         <field name="set" type="set:int"/>
@@ -22,7 +22,7 @@
     </bean>
 
     <message name="CRoleLogin" id="1" lang="cs,java,lua">角色登录，自定义ID
-        <field name="roleId" type="long"/>角色id
+        <field name="roleId" type="int"/>角色id
         <field name="roleName" type="string"/>角色名
         <field name="roleInfo" type="RoleInfo"/>角色信息
         <field name="roleInfoList" type="list:RoleInfo"/>角色信息
@@ -32,12 +32,12 @@
     </message>
 
     <message name="SRoleLogin">角色登录，哈希生成ID
-        <field name="roleId" type="long"/>角色id
+        <field name="roleId" type="int"/>角色id
         <field name="roleName" type="string"/>角色名
         <field name="roleInfo" type="RoleInfo"/>角色信息
         <field name="roleInfoList" type="list:RoleInfo"/>角色信息
         <field name="roleInfoSet" type="set:RoleInfo"/>角色信息
-        <field name="roleInfoMap" type="map:long:RoleInfo"/>角色信息
+        <field name="roleInfoMap" type="map:int:RoleInfo"/>角色信息
         <field name="userInfo" type="user.UserInfo" optional="true"/>用户信息
     </message>
 

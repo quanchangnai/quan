@@ -15,7 +15,7 @@ namespace Test.Message.User
         /// <summary>
 		/// ID
 		/// </summary>
-		public long id { get; set; }
+		public int id { get; set; }
 
 		private string _name = "";
 
@@ -73,7 +73,7 @@ namespace Test.Message.User
         /// <summary>
 		/// 角色信息Map
 		/// </summary>
-		public Dictionary<long, Test.Message.Role.RoleInfo> roleMap { get; } = new Dictionary<long, Test.Message.Role.RoleInfo>();
+		public Dictionary<int, Test.Message.Role.RoleInfo> roleMap { get; } = new Dictionary<int, Test.Message.Role.RoleInfo>();
 
 
 		public override void Encode(Buffer buffer)
@@ -81,7 +81,7 @@ namespace Test.Message.User
 	    	base.Encode(buffer);
 
         	buffer.WriteTag(4);
-		    buffer.WriteLong(id);
+		    buffer.WriteInt(id);
 
         	buffer.WriteTag(11);
 		    buffer.WriteString(name);
@@ -125,7 +125,7 @@ namespace Test.Message.User
 			var roleMapBuffer = new Buffer();
 			roleMapBuffer.WriteInt(roleMap.Count);
 		    foreach (var roleMapKey in roleMap.Keys) {
-		        roleMapBuffer.WriteLong(roleMapKey);
+		        roleMapBuffer.WriteInt(roleMapKey);
 			    roleMap[roleMapKey].Encode(roleMapBuffer);
 		    }
 			buffer.WriteBuffer(roleMapBuffer);
@@ -142,7 +142,7 @@ namespace Test.Message.User
             	switch (tag) 
 				{
                 	case 4:
-                    	id = buffer.ReadLong();
+                    	id = buffer.ReadInt();
                     	break;
                 	case 11:
                     	name = buffer.ReadString();
@@ -194,7 +194,7 @@ namespace Test.Message.User
                     	var roleMapSize = buffer.ReadInt();
 		    			for (var i = 0; i < roleMapSize; i++) 
 						{
-			    			var roleMapKey = buffer.ReadLong();
+			    			var roleMapKey = buffer.ReadInt();
 			    			var roleMapValue = new Test.Message.Role.RoleInfo();
 							roleMapValue.Decode(buffer);
 			    			roleMap.Add(roleMapKey, roleMapValue);

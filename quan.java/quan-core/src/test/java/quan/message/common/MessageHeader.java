@@ -9,7 +9,7 @@ import quan.message.*;
 public abstract class MessageHeader extends Message {
 
     //消息序号
-    protected long seq;
+    protected int seq;
 
     //错误码
     protected int error;
@@ -18,14 +18,14 @@ public abstract class MessageHeader extends Message {
     /**
      * 消息序号
      */
-    public long getSeq() {
+    public int getSeq() {
         return seq;
     }
 
     /**
      * 消息序号
      */
-    public MessageHeader setSeq(long seq) {
+    public MessageHeader setSeq(int seq) {
         this.seq = seq;
         return this;
     }
@@ -49,7 +49,7 @@ public abstract class MessageHeader extends Message {
     public void encode(Buffer buffer) {
         super.encode(buffer);
 
-        buffer.writeLong(this.seq);
+        buffer.writeInt(this.seq);
         buffer.writeInt(this.error);
     }
 
@@ -57,7 +57,7 @@ public abstract class MessageHeader extends Message {
     public void decode(Buffer buffer) {
         super.decode(buffer);
 
-        this.seq = buffer.readLong();
+        this.seq = buffer.readInt();
         this.error = buffer.readInt();
     }
 

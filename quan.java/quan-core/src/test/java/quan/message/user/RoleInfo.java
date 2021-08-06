@@ -10,7 +10,7 @@ import java.util.*;
 public class RoleInfo extends Bean {
 
     //角色id
-    private long id;
+    private int id;
 
     //角色名
     private String name = "";
@@ -18,7 +18,7 @@ public class RoleInfo extends Bean {
     public RoleInfo() {
     }
 
-    public RoleInfo(long id, String name) {
+    public RoleInfo(int id, String name) {
         this.setId(id);
         this.setName(name);
     }
@@ -26,14 +26,14 @@ public class RoleInfo extends Bean {
     /**
      * 角色id
      */
-    public long getId() {
+    public int getId() {
         return id;
     }
 
     /**
      * 角色id
      */
-    public RoleInfo setId(long id) {
+    public RoleInfo setId(int id) {
         this.id = id;
         return this;
     }
@@ -58,7 +58,7 @@ public class RoleInfo extends Bean {
     public void encode(Buffer buffer) {
         super.encode(buffer);
 
-        buffer.writeLong(this.id);
+        buffer.writeInt(this.id);
         buffer.writeString(this.name);
     }
 
@@ -66,7 +66,7 @@ public class RoleInfo extends Bean {
     public void decode(Buffer buffer) {
         super.decode(buffer);
 
-        this.id = buffer.readLong();
+        this.id = buffer.readInt();
         this.name = buffer.readString();
     }
 

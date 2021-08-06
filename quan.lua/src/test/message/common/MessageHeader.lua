@@ -24,7 +24,7 @@ function MessageHeader:encode(buffer)
 
     buffer = buffer or _Buffer.new()
 
-    buffer:writeLong(self.seq)
+    buffer:writeInt(self.seq)
     buffer:writeInt(self.error)
 
     return buffer
@@ -41,7 +41,7 @@ function MessageHeader.decode(buffer, self)
 
     self = self or MessageHeader.new()
 
-    self.seq = buffer:readLong()
+    self.seq = buffer:readInt()
     self.error = buffer:readInt()
 
     return self

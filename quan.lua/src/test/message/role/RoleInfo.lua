@@ -27,8 +27,6 @@ local function toString(self)
             ",b=" .. tostring(self.b) ..
             ",s=" .. tostring(self.s) ..
             ",i=" .. tostring(self.i) ..
-            ",f=" .. tostring(self.f) ..
-            ",d=" .. tostring(self.d) ..
             ",data=" .. tostring(self.data) ..
             ",list=" .. table.listToString(self.list) ..
             ",set=" .. table.setToString(self.set) ..
@@ -56,8 +54,6 @@ function RoleInfo.new(args)
         b = args.b or false,
         s = args.s or 0,
         i = args.i or 0,
-        f = args.f or 0.0,
-        d = args.d or 0.0,
         data = args.data or "",
         list = args.list or {},
         set = args.set or {},
@@ -79,14 +75,12 @@ function RoleInfo:encode(buffer)
 
     buffer = buffer or _Buffer.new()
 
-    buffer:writeLong(self.id)
+    buffer:writeInt(self.id)
     buffer:writeString(self.name)
     buffer:writeInt(self.type or 0)
     buffer:writeBool(self.b)
     buffer:writeShort(self.s)
     buffer:writeInt(self.i)
-    buffer:writeFloat(self.f, 2)
-    buffer:writeDouble(self.d)
     buffer:writeBytes(self.data)
 
     buffer:writeInt(#self.list)
@@ -114,14 +108,12 @@ function RoleInfo.decode(buffer, self)
 
     self = self or RoleInfo.new()
 
-    self.id = buffer:readLong()
+    self.id = buffer:readInt()
     self.name = buffer:readString()
     self.type = buffer:readInt()
     self.b = buffer:readBool()
     self.s = buffer:readShort()
     self.i = buffer:readInt()
-    self.f = buffer:readFloat(2)
-    self.d = buffer:readDouble()
     self.data = buffer:readBytes()
 
     for i = 1, buffer:readInt() do

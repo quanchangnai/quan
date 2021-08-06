@@ -6,7 +6,18 @@
 
 require("quan.table")
 
+local VarInt;
+if _VERSION == "Lua 5.3" or _VERSION == "Lua 5.4" then
+    VarInt = require("quan.message.VarInt64")
+else
+    VarInt = require("quan.message.VarInt32")
+end
+
+local readVarInt = VarInt.readVarInt;
+local writeVarInt = VarInt.writeVarInt;
+
 ---
+---@class quan.message.Buffer
 ---基于VarInt和ZigZag编码的字节缓冲区，字节顺序采用小端模式
 ---
 local Buffer = {
@@ -62,36 +73,10 @@ function Buffer:discardReadBytes()
     self.readIndex = 1;
 end
 
-local function readByte(buffer)
-    local b = buffer.bytes:byte(buffer.readIndex)
-    buffer.readIndex = buffer.readIndex + 1
+function Buffer:readByte()
+    local b = self.bytes:byte(self.readIndex)
+    self.readIndex = self.readIndex + 1
     return b
-end
-
----从buff重读取变长整数
----@param buffer
----@param readBits 最多读几个bit位，合法值:16,32,64
-local function readVarInt(buffer, readBits)
-    local shift = 0;
-    local temp = 0;
-
-    while shift < readBits do
-        if buffer.readIndex > buffer:size() then
-            error("读数据出错", 2)
-        end
-
-        local b = readByte(buffer)
-
-        temp = temp | (b & 0x7F) << shift;
-        shift = shift + 7
-
-        if (b & 0x80) == 0 then
-            --ZigZag解码
-            return (temp >> 1) ~ -(temp & 1);
-        end
-    end
-
-    error("读数据出错", 2)
 end
 
 function Buffer:readBool()
@@ -170,29 +155,8 @@ function Buffer:readString()
     return self:readBytes()
 end
 
-local function writeByte(buffer, b)
-    buffer.bytes = buffer.bytes .. string.char(b)
-end
-
-local function writeVarInt(buffer, n, bits)
-    assert(math.type(n) == "integer", "参数[n]类型错误")
-
-    --ZigZag编码
-    n = (n << 1) ~ (n >> 63);
-    local shift = 0;
-
-    while shift < bits do
-        if ((n & ~0x7F) == 0) then
-            writeByte(buffer, n & 0x7F)
-            return
-        else
-            writeByte(buffer, n & 0x7F | 0x80)
-            n = n >> 7
-            shift = shift + 7
-        end
-    end
-
-    error("写数据出错", 2)
+function Buffer:writeByte(b)
+    self.bytes = self.bytes .. string.char(b)
 end
 
 function Buffer:writeBool(b)
@@ -215,7 +179,7 @@ end
 function Buffer:writeFloat(n, scale)
     scale = scale or -1
     assert(type(n) == "number", "参数[n]类型错误")
-    assert(math.type(scale) == "integer", "参数[scale]类型错误")
+    --assert(math.type(scale) == "integer", "参数[scale]类型错误")
 
     if scale < 0 then
         self.bytes = self.bytes .. string.pack("<f", n)
@@ -227,7 +191,7 @@ end
 function Buffer:writeDouble(n, scale)
     scale = scale or -1
     assert(type(n) == "number", "参数[n]类型错误")
-    assert(math.type(scale) == "integer", "参数[scale]类型错误")
+    --assert(math.type(scale) == "integer", "参数[scale]类型错误")
 
     if scale < 0 then
         self.bytes = self.bytes .. string.pack("<d", n)
@@ -258,11 +222,11 @@ function Buffer:writeString(s)
 end
 
 function Buffer:writeTag(tag)
-    writeByte(self, tag)
+    self:writeByte(tag)
 end
 
 function Buffer:readTag()
-    return readByte(self)
+    return self:readByte()
 end
 
 Buffer = table.readOnly(Buffer)

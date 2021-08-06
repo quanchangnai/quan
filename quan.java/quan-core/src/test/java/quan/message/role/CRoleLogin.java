@@ -17,7 +17,7 @@ public class CRoleLogin extends MessageHeader {
     public static final int ID = 1;
 
     //角色id
-    private long roleId;
+    private int roleId;
 
     //角色名
     private String roleName = "";
@@ -32,7 +32,7 @@ public class CRoleLogin extends MessageHeader {
     private Set<RoleInfo> roleInfoSet = new HashSet<>();
 
     //角色信息
-    private Map<Long, RoleInfo> roleInfoMap = new HashMap<>();
+    private Map<Integer, RoleInfo> roleInfoMap = new HashMap<>();
 
     //用户信息
     private UserInfo userInfo;
@@ -50,7 +50,7 @@ public class CRoleLogin extends MessageHeader {
      * 消息序号
      */
     @Override
-    public CRoleLogin setSeq(long seq) {
+    public CRoleLogin setSeq(int seq) {
         super.setSeq(seq);
         return this;
     }
@@ -67,14 +67,14 @@ public class CRoleLogin extends MessageHeader {
     /**
      * 角色id
      */
-    public long getRoleId() {
+    public int getRoleId() {
         return roleId;
     }
 
     /**
      * 角色id
      */
-    public CRoleLogin setRoleId(long roleId) {
+    public CRoleLogin setRoleId(int roleId) {
         this.roleId = roleId;
         return this;
     }
@@ -128,7 +128,7 @@ public class CRoleLogin extends MessageHeader {
     /**
      * 角色信息
      */
-    public Map<Long, RoleInfo> getRoleInfoMap() {
+    public Map<Integer, RoleInfo> getRoleInfoMap() {
         return roleInfoMap;
     }
 
@@ -156,7 +156,7 @@ public class CRoleLogin extends MessageHeader {
     public void encode(Buffer buffer) {
         super.encode(buffer);
 
-        buffer.writeLong(this.roleId);
+        buffer.writeInt(this.roleId);
         buffer.writeString(this.roleName);
         this.roleInfo.encode(buffer);
 
@@ -171,8 +171,8 @@ public class CRoleLogin extends MessageHeader {
         }
 
         buffer.writeInt(this.roleInfoMap.size());
-        for (Long roleInfoMap$Key : this.roleInfoMap.keySet()) {
-            buffer.writeLong(roleInfoMap$Key);
+        for (Integer roleInfoMap$Key : this.roleInfoMap.keySet()) {
+            buffer.writeInt(roleInfoMap$Key);
             this.roleInfoMap.get(roleInfoMap$Key).encode(buffer);
         }
 
@@ -186,7 +186,7 @@ public class CRoleLogin extends MessageHeader {
     public void decode(Buffer buffer) {
         super.decode(buffer);
 
-        this.roleId = buffer.readLong();
+        this.roleId = buffer.readInt();
         this.roleName = buffer.readString();
         this.roleInfo.decode(buffer);
 
@@ -206,7 +206,7 @@ public class CRoleLogin extends MessageHeader {
 
         int roleInfoMap$Size = buffer.readInt();
         for (int i = 0; i < roleInfoMap$Size; i++) {
-            Long roleInfoMap$Key = buffer.readLong();
+            Integer roleInfoMap$Key = buffer.readInt();
             RoleInfo roleInfoMap$Value = new RoleInfo();
             roleInfoMap$Value.decode(buffer);
             this.roleInfoMap.put(roleInfoMap$Key, roleInfoMap$Value);

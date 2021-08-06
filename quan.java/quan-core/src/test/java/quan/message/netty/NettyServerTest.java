@@ -56,10 +56,11 @@ public class NettyServerTest {
         @Override
         public void channelActive(ChannelHandlerContext ctx) {
             new Thread(() -> {
+                int roleId = 1;
                 while (true) {
 
                     SRoleLogin sRoleLogin = new SRoleLogin();
-                    sRoleLogin.setRoleId(System.currentTimeMillis());
+                    sRoleLogin.setRoleId(roleId++);
                     sRoleLogin.setRoleName("name:" + System.currentTimeMillis());
 
                     ctx.writeAndFlush(sRoleLogin);

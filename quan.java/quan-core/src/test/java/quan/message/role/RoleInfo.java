@@ -10,7 +10,7 @@ import java.util.*;
 public class RoleInfo extends Bean {
 
     //角色id
-    private long id;
+    private int id;
 
     //角色名
     private String name = "";
@@ -22,10 +22,6 @@ public class RoleInfo extends Bean {
     private short s;
 
     private int i;
-
-    private float f;
-
-    private double d;
 
     private byte[] data = new byte[0];
 
@@ -39,14 +35,14 @@ public class RoleInfo extends Bean {
     /**
      * 角色id
      */
-    public long getId() {
+    public int getId() {
         return id;
     }
 
     /**
      * 角色id
      */
-    public RoleInfo setId(long id) {
+    public RoleInfo setId(int id) {
         this.id = id;
         return this;
     }
@@ -103,25 +99,6 @@ public class RoleInfo extends Bean {
         return this;
     }
 
-    public float getF() {
-        return f;
-    }
-
-    public RoleInfo setF(float f) {
-        Buffer.checkScale(f, 2);
-        this.f = f;
-        return this;
-    }
-
-    public double getD() {
-        return d;
-    }
-
-    public RoleInfo setD(double d) {
-        this.d = d;
-        return this;
-    }
-
     public byte[] getData() {
         return data;
     }
@@ -148,14 +125,12 @@ public class RoleInfo extends Bean {
     public void encode(Buffer buffer) {
         super.encode(buffer);
 
-        buffer.writeLong(this.id);
+        buffer.writeInt(this.id);
         buffer.writeString(this.name);
         buffer.writeInt(this.type == null ? 0 : this.type.value());
         buffer.writeBool(this.b);
         buffer.writeShort(this.s);
         buffer.writeInt(this.i);
-        buffer.writeFloat(this.f, 2);
-        buffer.writeDouble(this.d);
         buffer.writeBytes(this.data);
 
         buffer.writeInt(this.list.size());
@@ -173,14 +148,12 @@ public class RoleInfo extends Bean {
     public void decode(Buffer buffer) {
         super.decode(buffer);
 
-        this.id = buffer.readLong();
+        this.id = buffer.readInt();
         this.name = buffer.readString();
         this.type = RoleType.valueOf(buffer.readInt());
         this.b = buffer.readBool();
         this.s = buffer.readShort();
         this.i = buffer.readInt();
-        this.f = buffer.readFloat(2);
-        this.d = buffer.readDouble();
         this.data = buffer.readBytes();
 
         int list$Size = buffer.readInt();
@@ -203,8 +176,6 @@ public class RoleInfo extends Bean {
                 ",b=" + b +
                 ",s=" + s +
                 ",i=" + i +
-                ",f=" + f +
-                ",d=" + d +
                 ",data=" + Arrays.toString(data) +
                 ",list=" + list +
                 ",set=" + set +

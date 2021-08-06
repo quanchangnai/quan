@@ -84,9 +84,9 @@ function SRoleLogin:encode()
     local buffer = _Message.encode(self)
     _MessageHeader.encode(self, buffer)
 
-    buffer:writeLong(self.seq)
+    buffer:writeInt(self.seq)
     buffer:writeInt(self.error)
-    buffer:writeLong(self.roleId)
+    buffer:writeInt(self.roleId)
     buffer:writeString(self.roleName)
     RoleInfo.encode(self.roleInfo, buffer)
 
@@ -102,7 +102,7 @@ function SRoleLogin:encode()
 
     buffer:writeInt(table.size(self.roleInfoMap))
     for key, value in pairs(self.roleInfoMap) do
-        buffer:writeLong(key)
+        buffer:writeInt(key)
         RoleInfo.encode(value, buffer)
     end
 
@@ -127,9 +127,9 @@ function SRoleLogin.decode(buffer)
     _Message.decode(buffer, self)
     _MessageHeader.decode(buffer, self)
 
-    self.seq = buffer:readLong()
+    self.seq = buffer:readInt()
     self.error = buffer:readInt()
-    self.roleId = buffer:readLong()
+    self.roleId = buffer:readInt()
     self.roleName = buffer:readString()
     self.roleInfo = RoleInfo.decode(buffer, self.roleInfo)
 
@@ -142,7 +142,7 @@ function SRoleLogin.decode(buffer)
     end
 
     for i = 1, buffer:readInt() do
-        self.roleInfoMap[buffer:readLong()] = RoleInfo.decode(buffer)
+        self.roleInfoMap[buffer:readInt()] = RoleInfo.decode(buffer)
     end
 
     if buffer:readBool() then

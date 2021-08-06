@@ -40,7 +40,7 @@ public class MessageTest {
         buffer.writeFloat(132.32434F, 2);
         buffer.writeDouble(342254.653254, 2);
         buffer.writeString("搭顺风车");
-        buffer.writeLong(12324);
+        buffer.writeLong(-12324);
 
         System.err.println("buffer.readableCount()=" + buffer.readableCount());
 

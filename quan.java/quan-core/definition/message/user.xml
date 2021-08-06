@@ -2,7 +2,7 @@
 <package cs-name="User">
 
     <bean name="UserInfo">用户信息
-        <field id="1" name="id" type="long"/>ID
+        <field id="1" name="id" type="int"/>ID
         <field id="2" name="name" type="string"/>名字
         <field id="3" name="level" type="int"/>等级
         <field id="4" name="roleInfo1" type="role.RoleInfo" optional="true"/>角色信息
@@ -14,7 +14,7 @@
     </bean>
 
     <bean name="RoleInfo">角色信息2
-        <field name="id" type="long"/>角色id
+        <field name="id" type="int"/>角色id
         <field name="name" type="string"/>角色名
     </bean>
 
