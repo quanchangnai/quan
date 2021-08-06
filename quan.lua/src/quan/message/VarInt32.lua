@@ -4,6 +4,7 @@
 --- DateTime: 2021/8/5 18:27
 ---
 
+--https://bitop.luajit.org/
 local bit = require("bit")
 
 ---@module VarInt32 32位变长整数

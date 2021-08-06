@@ -119,7 +119,7 @@ namespace Test
 
             var sRoleLogin1 = new SRoleLogin {roleId = 1111, roleName = "张三1111"};
 
-            var roleInfo = new RoleInfo {id = 1312, name = "李四1123123", f = 343.435F, d = 4242.54453D};
+            var roleInfo = new RoleInfo {id = 1312, name = "李四1123123"};
 
             sRoleLogin1.roleInfo = roleInfo;
 
