@@ -18,7 +18,7 @@ function VarInt64.readVarInt(buffer, readBits)
 
     local shift = 0;
     local temp = 0;
-    error("读数据出错")
+
     while shift < readBits do
         if buffer:readableCount() < 1 then
             error("读数据出错")

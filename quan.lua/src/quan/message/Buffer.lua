@@ -7,10 +7,17 @@
 require("quan.table")
 
 local VarInt;
+local unpack;
 if _VERSION == "Lua 5.3" or _VERSION == "Lua 5.4" then
     VarInt = require("quan.message.VarInt64")
+    unpack = string.unpack
 else
     VarInt = require("quan.message.VarInt32")
+    unpack = function(f, s, p)
+        --https://web.tecgraf.puc-rio.br/~lhf/ftp/lua/#lpack
+        local next, result = string.unpack(s, f, p)
+        return result
+    end
 end
 
 local readVarInt = VarInt.readVarInt;
@@ -97,13 +104,13 @@ end
 
 function Buffer:readFloat(scale)
     scale = scale or -1
-    assert(math.type(scale) == "integer", "参数[scale]类型错误")
+    --assert(math.type(scale) == "integer", "参数[scale]类型错误")
 
     if scale < 0 then
         if self.readIndex + 3 > self:size() then
             error("读数据出错")
         end
-        local n = string.unpack("<f", self.bytes, self.readIndex)
+        local n = unpack("<f", self.bytes, self.readIndex)
         self.readIndex = self.readIndex + 4
         return n
     else
@@ -114,13 +121,13 @@ end
 
 function Buffer:readDouble(scale)
     scale = scale or -1
-    assert(math.type(scale) == "integer", "参数[scale]类型错误")
+    --assert(math.type(scale) == "integer", "参数[scale]类型错误")
 
     if scale < 0 then
         if self.readIndex + 7 > self:size() then
             error("读数据出错")
         end
-        local n = string.unpack("<d", self.bytes, self.readIndex)
+        local n = unpack("<d", self.bytes, self.readIndex)
         self.readIndex = self.readIndex + 8
         return n
     else
