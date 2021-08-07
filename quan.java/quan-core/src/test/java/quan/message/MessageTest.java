@@ -40,7 +40,9 @@ public class MessageTest {
         buffer.writeFloat(132.32434F, 2);
         buffer.writeDouble(342254.653254, 2);
         buffer.writeString("搭顺风车");
-        buffer.writeLong(-12324);
+        buffer.writeLong(424234);
+        buffer.writeLong(Long.MAX_VALUE);
+        buffer.writeLong(Long.MIN_VALUE);
 
         System.err.println("buffer.readableCount()=" + buffer.readableCount());
 
@@ -59,6 +61,8 @@ public class MessageTest {
         System.err.println(buffer.readDouble(2));
         System.err.println(buffer.readString());
         System.err.println(buffer.readLong());
+        System.err.println(buffer.readLong()==Long.MAX_VALUE);
+        System.err.println(buffer.readLong()==Long.MIN_VALUE);
 
 //        buffer.reset();
 //        buffer.writeInt(45);

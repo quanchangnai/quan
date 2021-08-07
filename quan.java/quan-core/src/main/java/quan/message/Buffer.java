@@ -63,7 +63,7 @@ public abstract class Buffer {
 
             if ((b & 0b10000000) == 0) {
                 //ZigZag解码
-                return (temp >> 1) ^ -(temp & 1);
+                return (temp >>> 1) ^ -(temp & 1);
             }
         }
 
@@ -183,7 +183,7 @@ public abstract class Buffer {
                 return;
             } else {
                 writeByte((byte) (n & 0b1111111 | 0b10000000));
-                n >>= 7;
+                n >>>= 7;
             }
         }
     }

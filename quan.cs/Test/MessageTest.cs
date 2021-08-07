@@ -30,15 +30,16 @@ namespace Test
             buffer.WriteFloat(132.32434F, 2);
             buffer.WriteDouble(342254.653254, 2);
             buffer.WriteString("搭顺风车");
-            buffer.WriteLong(12324);
+            buffer.WriteLong(long.MaxValue);
+            buffer.WriteLong(long.MinValue);
 
             Console.WriteLine("buffer.ReadableCount:{0}", buffer.ReadableCount);
 
-            var fileStream = File.Open("D:\\buffer", FileMode.Open);
-            var bytes = new byte[fileStream.Length];
-            fileStream.Read(bytes, 0, bytes.Length);
-            Console.WriteLine($"bytes.Length={bytes.Length}");
-            buffer = new Buffer(bytes);
+            // var fileStream = File.Open("D:\\buffer", FileMode.Open);
+            // var bytes = new byte[fileStream.Length];
+            // fileStream.Read(bytes, 0, bytes.Length);
+            // Console.WriteLine($"bytes.Length={bytes.Length}");
+            // buffer = new Buffer(bytes);
 
             Console.WriteLine(buffer.ReadBool());
             Console.WriteLine(buffer.ReadInt());
@@ -48,6 +49,7 @@ namespace Test
             Console.WriteLine(buffer.ReadFloat(2));
             Console.WriteLine(buffer.ReadDouble(2));
             Console.WriteLine(buffer.ReadString());
+            Console.WriteLine(buffer.ReadLong());
             Console.WriteLine(buffer.ReadLong());
         }
 

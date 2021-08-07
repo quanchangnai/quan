@@ -122,7 +122,7 @@ namespace Quan.Message
                 }
 
                 //ZigZag解码
-                return (temp >> 1) ^ -(temp & 1);
+                return temp >> 1 & 0x7FFFFFFFFFFFFFFFL ^ -(temp & 1);
             }
 
             throw new IOException("读数据出错");
@@ -275,7 +275,7 @@ namespace Quan.Message
                 }
 
                 _bytes[_writeIndex++] = (byte) (n & 0b1111111 | 0b10000000);
-                n >>= 7;
+                n = (n >> 7) & 0xFFFFFFFFFFFFFFFL;
             }
         }
 
