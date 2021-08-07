@@ -14,7 +14,10 @@ local VarInt32 = {}
 ---@param buffer quan.message.Buffer
 ---@param readBits int 最多读几个bit位，合法值:16,32
 function VarInt32.readVarInt(buffer, readBits)
-    assert(readBits == 16 or readBits == 32, "不支持" .. tostring(readBits) .. "位整数")
+    --assert(readBits == 16 or readBits == 32, "不支持" .. tostring(readBits) .. "位整数")
+    if readBits > 32 then
+        readBits = 32
+    end
 
     local shift = 0;
     local temp = 0;
@@ -40,8 +43,11 @@ end
 ---往buffer写入变长整数
 ---@param buffer quan.message.Buffer
 ---@param readBits int 最多读几个bit位，合法值:16,32
-function VarInt64.writeVarInt(buffer, n, writeBits)
-    assert(writeBits == 16 or writeBits == 32, "不支持" .. tostring(writeBits) .. "位整数")
+function VarInt32.writeVarInt(buffer, n, writeBits)
+    --assert(writeBits == 16 or writeBits == 32, "不支持" .. tostring(writeBits) .. "位整数")
+    if writeBits > 32 then
+        writeBits = 32
+    end
 
     --ZigZag编码
     n = bit.bxor(bit.lshift(n, 1), bit.arshift(n, 31))

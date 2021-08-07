@@ -23,6 +23,8 @@ public class RoleInfo extends Bean {
 
     private int i;
 
+    private double d;
+
     private byte[] data = new byte[0];
 
     private List<Integer> list = new ArrayList<>();
@@ -99,6 +101,15 @@ public class RoleInfo extends Bean {
         return this;
     }
 
+    public double getD() {
+        return d;
+    }
+
+    public RoleInfo setD(double d) {
+        this.d = d;
+        return this;
+    }
+
     public byte[] getData() {
         return data;
     }
@@ -131,6 +142,7 @@ public class RoleInfo extends Bean {
         buffer.writeBool(this.b);
         buffer.writeShort(this.s);
         buffer.writeInt(this.i);
+        buffer.writeDouble(this.d);
         buffer.writeBytes(this.data);
 
         buffer.writeInt(this.list.size());
@@ -154,6 +166,7 @@ public class RoleInfo extends Bean {
         this.b = buffer.readBool();
         this.s = buffer.readShort();
         this.i = buffer.readInt();
+        this.d = buffer.readDouble();
         this.data = buffer.readBytes();
 
         int list$Size = buffer.readInt();
@@ -176,6 +189,7 @@ public class RoleInfo extends Bean {
                 ",b=" + b +
                 ",s=" + s +
                 ",i=" + i +
+                ",d=" + d +
                 ",data=" + Arrays.toString(data) +
                 ",list=" + list +
                 ",set=" + set +

@@ -206,7 +206,7 @@ function Buffer:writeDouble(n, scale)
     end
 
     local times = 10 ^ scale
-    local threshold = 0x7fffffffffffffff / times;
+    local threshold = 0x7FFFFFFFFFFFFFFF / times;
     if n < -threshold or n > threshold then
         error(string.format("参数[%s]超出了限定范围[%s,%s],无法转换为指定精度[%s]的定点型数据", n, -threshold, threshold, scale))
     else

@@ -27,6 +27,7 @@ local function toString(self)
             ",b=" .. tostring(self.b) ..
             ",s=" .. tostring(self.s) ..
             ",i=" .. tostring(self.i) ..
+            ",d=" .. tostring(self.d) ..
             ",data=" .. tostring(self.data) ..
             ",list=" .. table.listToString(self.list) ..
             ",set=" .. table.setToString(self.set) ..
@@ -54,6 +55,7 @@ function RoleInfo.new(args)
         b = args.b or false,
         s = args.s or 0,
         i = args.i or 0,
+        d = args.d or 0.0,
         data = args.data or "",
         list = args.list or {},
         set = args.set or {},
@@ -81,6 +83,7 @@ function RoleInfo:encode(buffer)
     buffer:writeBool(self.b)
     buffer:writeShort(self.s)
     buffer:writeInt(self.i)
+    buffer:writeDouble(self.d)
     buffer:writeBytes(self.data)
 
     buffer:writeInt(#self.list)
@@ -114,6 +117,7 @@ function RoleInfo.decode(buffer, self)
     self.b = buffer:readBool()
     self.s = buffer:readShort()
     self.i = buffer:readInt()
+    self.d = buffer:readDouble()
     self.data = buffer:readBytes()
 
     for i = 1, buffer:readInt() do

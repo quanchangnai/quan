@@ -36,6 +36,8 @@ namespace Test.Message.Role
 
 		public int i { get; set; }
 
+		public double d { get; set; }
+
 		private byte[] _data = new byte[0];
 
 		public byte[] data
@@ -61,6 +63,7 @@ namespace Test.Message.Role
 		    buffer.WriteBool(b);
 		    buffer.WriteShort(s);
 		    buffer.WriteInt(i);
+			buffer.WriteDouble(d);
 		    buffer.WriteBytes(data);
 
 		    buffer.WriteInt(list.Count);
@@ -84,6 +87,7 @@ namespace Test.Message.Role
 		    b = buffer.ReadBool();
 		    s = buffer.ReadShort();
 		    i = buffer.ReadInt();
+			d = buffer.ReadDouble();
 		    data = buffer.ReadBytes();
 
 		    var listSize = buffer.ReadInt();
@@ -108,6 +112,7 @@ namespace Test.Message.Role
 				   ",b=" + b.ToString2() +
 				   ",s=" + s.ToString2() +
 				   ",i=" + i.ToString2() +
+				   ",d=" + d.ToString2() +
 				   ",data=" + data.ToString2() +
 				   ",list=" + list.ToString2() +
 				   ",set=" + set.ToString2() +

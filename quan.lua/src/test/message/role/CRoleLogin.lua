@@ -102,7 +102,7 @@ function CRoleLogin:encode()
 
     buffer:writeInt(table.size(self.roleInfoMap))
     for key, value in pairs(self.roleInfoMap) do
-        buffer:writeInt(key)
+        buffer:writeLong(key)
         RoleInfo.encode(value, buffer)
     end
 
@@ -142,7 +142,7 @@ function CRoleLogin.decode(buffer)
     end
 
     for i = 1, buffer:readInt() do
-        self.roleInfoMap[buffer:readInt()] = RoleInfo.decode(buffer)
+        self.roleInfoMap[buffer:readLong()] = RoleInfo.decode(buffer)
     end
 
     if buffer:readBool() then

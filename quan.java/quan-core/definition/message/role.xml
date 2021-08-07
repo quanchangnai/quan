@@ -7,14 +7,14 @@
     </enum>
 
     <bean name="RoleInfo">角色信息
-        <field name="long" type="int"/>角色id
+        <field name="id" type="int"/>角色id
         <field name="name" type="string"/>角色名
         <field name="type" type="RoleType"/>
         <field name="b" type="bool"/>
         <field name="s" type="short"/>
         <field name="i" type="int"/>
 <!--        <field name="f" type="float:2"/>-->
-<!--        <field name="d" type="double"/>-->
+        <field name="d" type="double"/>
         <field name="data" type="bytes"/>
         <field name="list" type="list:int"/>
         <field name="set" type="set:int"/>
