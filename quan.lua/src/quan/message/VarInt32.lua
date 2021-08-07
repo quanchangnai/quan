@@ -8,24 +8,23 @@
 local bit = require("bit")
 
 ---@module VarInt32 32位变长整数
-local VarInt64 = {}
+local VarInt32 = {}
 
 ---从buffer里读取变长整数
 ---@param buffer quan.message.Buffer
 ---@param readBits int 最多读几个bit位，合法值:16,32
-function VarInt64.readVarInt(buffer, readBits)
-    assert(readBits == 16 or readBits == 32, "不支持" .. tostring(readBits) .. "整数")
+function VarInt32.readVarInt(buffer, readBits)
+    assert(readBits == 16 or readBits == 32, "不支持" .. tostring(readBits) .. "位整数")
 
     local shift = 0;
     local temp = 0;
 
     while shift < readBits do
         if buffer:readableCount() < 1 then
-            error("读数据出错")
+            break
         end
 
         local b = buffer:readByte()
-
         temp = bit.bor(temp, bit.lshift(bit.band(b, 0x7F), shift))
         shift = shift + 7
 
@@ -62,4 +61,4 @@ function VarInt64.writeVarInt(buffer, n, writeBits)
     error("写数据出错")
 end
 
-return VarInt64
+return VarInt32

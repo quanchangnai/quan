@@ -40,10 +40,10 @@ end
 
 ---有符号右移位
 function bits.arshift(a, b)
-    if a > 0 or b <= 0 then
+    if a >= 0 or b <= 0 then
         return a >> b
     else
-        return (a >> b) | ~(-1 >> b)
+        return a >> b | ~(-1 >> b)
     end
 end
 

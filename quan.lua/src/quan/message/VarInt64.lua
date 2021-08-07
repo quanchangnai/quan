@@ -16,14 +16,12 @@ function VarInt64.readVarInt(buffer, readBits)
     local shift = 0;
     local temp = 0;
 
-    while shift < readBits do
+    while shift < 64 do
         if buffer:readableCount() < 1 then
-            error("读数据出错")
+            break
         end
 
         local b = buffer:readByte()
-        print(b)
-
         temp = temp | (b & 0x7F) << shift;
         shift = shift + 7
 
@@ -41,7 +39,6 @@ end
 ---@param readBits int 最多读几个bit位，合法值:16,32,64
 function VarInt64.writeVarInt(buffer, n, writeBits)
     --assert(math.type(n) == "integer", "参数[n]类型错误")
-
     --ZigZag编码
     n = (n << 1) ~ bits.arshift(n, 63);
     local shift = 0;
