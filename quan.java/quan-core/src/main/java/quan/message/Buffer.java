@@ -284,7 +284,7 @@ public abstract class Buffer {
     }
 
     public int readTag() {
-        return readByte() & 0b11111111;
+        return readByte() & 0xFF;
     }
 
     public Buffer getTemp() {

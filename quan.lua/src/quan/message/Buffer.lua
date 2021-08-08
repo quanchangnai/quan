@@ -229,6 +229,7 @@ function Buffer:writeString(s)
 end
 
 function Buffer:writeTag(tag)
+    assert(tag >= 0 and tag <= 255, "参数[tag]超出限定范围0-255")
     self:writeByte(tag)
 end
 

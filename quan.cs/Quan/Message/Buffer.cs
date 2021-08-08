@@ -397,7 +397,7 @@ namespace Quan.Message
 
         public int ReadTag()
         {
-            return _bytes[_readIndex++] & 0b11111111;
+            return _bytes[_readIndex++];
         }
     }
 }

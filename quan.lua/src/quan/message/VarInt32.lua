@@ -15,9 +15,6 @@ local VarInt32 = {}
 ---@param maxBytes 最多读几个字节，short:3，int:5，long:10
 function VarInt32.readVarInt(buffer, maxBytes)
     --assert(maxBytes == 16 or maxBytes == 32, "不支持" .. tostring(maxBytes*8) .. "位整数")
-    if maxBytes > 5 then
-        readBits = 10
-    end
 
     local shift = 0
     local temp = 0
@@ -47,9 +44,6 @@ end
 ---@param maxBytes 最多写几个字节，short:3，int:5，long:10
 function VarInt32.writeVarInt(buffer, n, maxBytes)
     --assert(maxBytes == 16 or maxBytes == 32, "不支持" .. tostring(maxBytes*8) .. "位整数")
-    if maxBytes > 5 then
-        maxBytes = 5
-    end
 
     --ZigZag编码
     n = bit.bxor(bit.lshift(n, 1), bit.arshift(n, 31))
