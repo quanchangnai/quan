@@ -48,20 +48,22 @@ public abstract class Buffer {
     /**
      * 读取变长整数
      *
-     * @param readBits 最多读几个bit位，合法值:16,32,64
+     * @param maxBytes 最多读几个字节，short:3，int:5，long:10
      */
-    protected long readVarInt(int readBits) {
+    protected long readVarInt(int maxBytes) {
         onRead();
 
-        int shift = 0;
         long temp = 0;
+        int shift = 0;
+        int count = 0;
 
-        while (shift < readBits) {
+        while (count < maxBytes) {
             final byte b = readByte();
-            temp |= (b & 0b1111111L) << shift;
+            temp |= (b & 0x7FL) << shift;
             shift += 7;
+            count++;
 
-            if ((b & 0b10000000) == 0) {
+            if ((b & 0x80) == 0) {
                 //ZigZag解码
                 return (temp >>> 1) ^ -(temp & 1);
             }
@@ -86,15 +88,15 @@ public abstract class Buffer {
     }
 
     public short readShort() {
-        return (short) readVarInt(16);
+        return (short) readVarInt(3);
     }
 
     public int readInt() {
-        return (int) readVarInt(32);
+        return (int) readVarInt(5);
     }
 
     public long readLong() {
-        return readVarInt(64);
+        return readVarInt(10);
     }
 
     public float readFloat() {
@@ -178,11 +180,11 @@ public abstract class Buffer {
         n = (n << 1) ^ (n >> 63);
 
         while (true) {
-            if ((n & ~0b1111111) == 0) {
-                writeByte((byte) (n & 0b1111111));
+            if ((n & ~0x7F) == 0) {
+                writeByte((byte) (n & 0x7F));
                 return;
             } else {
-                writeByte((byte) (n & 0b1111111 | 0b10000000));
+                writeByte((byte) (n & 0x7F | 0x80));
                 n >>>= 7;
             }
         }

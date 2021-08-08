@@ -33,7 +33,7 @@ public class MessageTest {
 //        buffer = new NettyBuffer(Unpooled.buffer());
 
         buffer.writeBool(true);
-        buffer.writeInt(70);
+        buffer.writeShort(Short.MAX_VALUE);
         buffer.writeInt(2423);
         buffer.writeFloat(13.43F);
         buffer.writeDouble(4242.432);
@@ -53,7 +53,7 @@ public class MessageTest {
 //        buffer = new Buffer(bytes);
 
         System.err.println(buffer.readBool());
-        System.err.println(buffer.readInt());
+        System.err.println(buffer.readShort());
         System.err.println(buffer.readInt());
         System.err.println(buffer.readFloat());
         System.err.println(buffer.readDouble());
@@ -61,8 +61,8 @@ public class MessageTest {
         System.err.println(buffer.readDouble(2));
         System.err.println(buffer.readString());
         System.err.println(buffer.readLong());
-        System.err.println(buffer.readLong()==Long.MAX_VALUE);
-        System.err.println(buffer.readLong()==Long.MIN_VALUE);
+        System.err.println(buffer.readLong() == Long.MAX_VALUE);
+        System.err.println(buffer.readLong() == Long.MIN_VALUE);
 
 //        buffer.reset();
 //        buffer.writeInt(45);

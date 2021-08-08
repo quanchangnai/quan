@@ -12,17 +12,18 @@ local VarInt32 = {}
 
 ---从buffer里读取变长整数
 ---@param buffer quan.message.Buffer
----@param readBits int 最多读几个bit位，合法值:16,32
-function VarInt32.readVarInt(buffer, readBits)
-    --assert(readBits == 16 or readBits == 32, "不支持" .. tostring(readBits) .. "位整数")
-    if readBits > 32 then
-        readBits = 32
+---@param maxBytes 最多读几个字节，short:3，int:5，long:10
+function VarInt32.readVarInt(buffer, maxBytes)
+    --assert(maxBytes == 16 or maxBytes == 32, "不支持" .. tostring(maxBytes*8) .. "位整数")
+    if maxBytes > 5 then
+        readBits = 10
     end
 
-    local shift = 0;
-    local temp = 0;
+    local shift = 0
+    local temp = 0
+    local count = 0
 
-    while shift < readBits do
+    while count < maxBytes do
         if buffer:readableCount() < 1 then
             break
         end
@@ -30,6 +31,7 @@ function VarInt32.readVarInt(buffer, readBits)
         local b = buffer:readByte()
         temp = bit.bor(temp, bit.lshift(bit.band(b, 0x7F), shift))
         shift = shift + 7
+        count = count + 1
 
         if bit.band(b, 0x80) == 0 then
             --ZigZag解码
@@ -42,18 +44,19 @@ end
 
 ---往buffer写入变长整数
 ---@param buffer quan.message.Buffer
----@param readBits int 最多读几个bit位，合法值:16,32
-function VarInt32.writeVarInt(buffer, n, writeBits)
-    --assert(writeBits == 16 or writeBits == 32, "不支持" .. tostring(writeBits) .. "位整数")
-    if writeBits > 32 then
-        writeBits = 32
+---@param maxBytes 最多写几个字节，short:3，int:5，long:10
+function VarInt32.writeVarInt(buffer, n, maxBytes)
+    --assert(maxBytes == 16 or maxBytes == 32, "不支持" .. tostring(maxBytes*8) .. "位整数")
+    if maxBytes > 5 then
+        maxBytes = 5
     end
 
     --ZigZag编码
     n = bit.bxor(bit.lshift(n, 1), bit.arshift(n, 31))
     local shift = 0;
+    local count = 0;
 
-    while shift < writeBits do
+    while count < maxBytes do
         if (bit.band(n, bit.bnot(0x7F)) == 0) then
             buffer:writeByte(bit.band(n, 0x7F))
             return
@@ -61,6 +64,7 @@ function VarInt32.writeVarInt(buffer, n, writeBits)
             buffer:writeByte(bit.bor(bit.band(n, 0x7F), 0x80))
             n = bit.rshift(n, 7)
             shift = shift + 7
+            count = count + 1
         end
     end
 

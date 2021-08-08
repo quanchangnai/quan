@@ -97,15 +97,14 @@ namespace Quan.Message
         /// <summary>
         /// 读取VarInt
         /// </summary>
-        /// <param name="readBits">最多读几个bit位，合法值:16,32,64</param>
-        /// <returns></returns>
-        /// <exception cref="IOException"></exception>
-        protected long ReadVarInt(int readBits)
+        /// <param name="maxBytes">最多读几个字节，short:3，int:5，long:10</param>
+        protected long ReadVarInt(int maxBytes)
         {
             var shift = 0;
             long temp = 0;
+            long count = 0;
 
-            while (shift < readBits)
+            while (count < maxBytes)
             {
                 if (ReadableCount < 1)
                 {
@@ -113,10 +112,11 @@ namespace Quan.Message
                 }
 
                 var b = _bytes[_readIndex++];
-                temp |= (b & 0b1111111L) << shift;
+                temp |= (b & 0x7FL) << shift;
                 shift += 7;
+                count++;
 
-                if ((b & 0b10000000) != 0)
+                if ((b & 0x80) != 0)
                 {
                     continue;
                 }
@@ -135,17 +135,17 @@ namespace Quan.Message
 
         public short ReadShort()
         {
-            return (short) ReadVarInt(16);
+            return (short) ReadVarInt(3);
         }
 
         public int ReadInt()
         {
-            return (int) ReadVarInt(32);
+            return (int) ReadVarInt(5);
         }
 
         public long ReadLong()
         {
-            return ReadVarInt(64);
+            return ReadVarInt(10);
         }
 
         public float ReadFloat()
@@ -268,13 +268,13 @@ namespace Quan.Message
 
             while (true)
             {
-                if ((n & ~0b1111111) == 0)
+                if ((n & ~0x7F) == 0)
                 {
-                    _bytes[_writeIndex++] = (byte) (n & 0b1111111);
+                    _bytes[_writeIndex++] = (byte) (n & 0x7F);
                     return;
                 }
 
-                _bytes[_writeIndex++] = (byte) (n & 0b1111111 | 0b10000000);
+                _bytes[_writeIndex++] = (byte) (n & 0x7F | 0x80);
                 n = (n >> 7) & 0xFFFFFFFFFFFFFFFL;
             }
         }

@@ -91,15 +91,15 @@ function Buffer:readBool()
 end
 
 function Buffer:readShort()
-    return readVarInt(self, 16)
+    return readVarInt(self, 3)
 end
 
 function Buffer:readInt()
-    return readVarInt(self, 32)
+    return readVarInt(self, 5)
 end
 
 function Buffer:readLong()
-    return readVarInt(self, 64)
+    return readVarInt(self, 10)
 end
 
 function Buffer:readFloat(scale)
@@ -172,15 +172,15 @@ function Buffer:writeBool(b)
 end
 
 function Buffer:writeShort(n)
-    writeVarInt(self, n, 16)
+    writeVarInt(self, n, 3)
 end
 
 function Buffer:writeInt(n)
-    writeVarInt(self, n, 32)
+    writeVarInt(self, n, 5)
 end
 
 function Buffer:writeLong(n)
-    writeVarInt(self, n, 64)
+    writeVarInt(self, n, 10)
 end
 
 function Buffer:writeFloat(n, scale)
