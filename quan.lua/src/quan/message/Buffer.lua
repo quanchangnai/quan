@@ -13,8 +13,9 @@ if _VERSION == "Lua 5.3" or _VERSION == "Lua 5.4" then
     unpack = string.unpack
 else
     VarInt = require("quan.message.VarInt32")
+    --https://web.tecgraf.puc-rio.br/~lhf/ftp/lua/#lpack
+    require("pack")
     unpack = function(f, s, p)
-        --https://web.tecgraf.puc-rio.br/~lhf/ftp/lua/#lpack
         local next, result = string.unpack(s, f, p)
         return result
     end

@@ -107,7 +107,7 @@ public abstract class Buffer {
 
         while (shift < 32) {
             final byte b = readByte();
-            temp |= (b & 0b11111111L) << shift;
+            temp |= (b & 0xFFL) << shift;
             shift += 8;
         }
 
@@ -130,7 +130,7 @@ public abstract class Buffer {
 
         while (shift < 64) {
             final byte b = readByte();
-            temp |= (b & 0b11111111L) << shift;
+            temp |= (b & 0xFFL) << shift;
             shift += 8;
         }
 
@@ -226,7 +226,7 @@ public abstract class Buffer {
         int shift = 0;
 
         while (shift < 32) {
-            writeByte((byte) (temp >> shift & 0b11111111));
+            writeByte((byte) (temp >> shift & 0xFF));
             shift += 8;
         }
     }
@@ -246,7 +246,7 @@ public abstract class Buffer {
         int shift = 0;
 
         while (shift < 64) {
-            writeByte((byte) (temp >>> shift & 0b11111111));
+            writeByte((byte) (temp >>> shift & 0xFF));
             shift += 8;
         }
     }
