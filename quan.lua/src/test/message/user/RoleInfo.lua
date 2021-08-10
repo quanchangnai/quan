@@ -48,6 +48,8 @@ function RoleInfo.new(args)
     return instance
 end
 
+setmetatable(RoleInfo, { __call = RoleInfo.new })
+
 ---
 ---[角色信息2].编码
 ---@param buffer quan.message.Buffer 可以为空

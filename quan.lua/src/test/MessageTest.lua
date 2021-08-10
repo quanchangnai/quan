@@ -18,55 +18,71 @@ print("MessageTest===========")
 local function test1()
     print()
     print("test1===========")
-    local str = ""
-    for i = 1, 3 do
-        str = str .. string.char(i)
-    end
-    print("str[2]", str[2])
-    print("str", str, "str.len()", string.len(str))
-    print(string.unpack("bbb", str))
-    print(str:byte(1, string.len(str)))
+    --local str = ""
+    --for i = 1, 3 do
+    --    str = str .. string.char(i)
+    --end
+    --print("str[2]", str[2])
+    --print("str", str, "str.len()", string.len(str))
+    --print(string.unpack("bbb", str))
+    --print(str:byte(1, string.len(str)))
+    --
+    --str = string.pack("bbb", 23, 43, 54)
+    --print(string.unpack("bbb", str))
 
-    str = string.pack("bbb", 23, 43, 54)
-    print(string.unpack("bbb", str))
+    --https://web.tecgraf.puc-rio.br/~lhf/ftp/lua/#lint64
+    --local int64 = require("int64")
+    --local a = int64.new("1628499791603")
+    --local b = int64.new("1628499791603")
+    --print("a", type(a), a)
+    --
+    --local t = {}
+    --t[a] = "aaa"
+    --print("a==b", a == b)
+    --print("t[a]", t[a])
+    --print("t[a]", t[b])
 end
 
 local function testBuffer()
     print()
-    print("testBuffer===========",20000000000)
+    print("testBuffer===========")
+
+    print()
+
     local buffer = Buffer.new()
-    buffer:writeBool(false)
-    buffer:writeInt(-70)
-    buffer:writeInt(2423)
-    buffer:writeFloat(13.43)
-    buffer:writeDouble(4242.432)
-    buffer:writeFloat(132.32434, 2)
-    buffer:writeDouble(342254.653254, 2)
-    buffer:writeString("搭顺风车")
-    buffer:writeLong(1628419835799)
-    buffer:writeTag(253)
+    --buffer:writeBool(false)
+    --buffer:writeInt(-70)
+    --buffer:writeInt(2423)
+    --buffer:writeFloat(13.43)
+    --buffer:writeDouble(4242.432)
+    --buffer:writeFloat(132.32434, 2)
+    --buffer:writeDouble(342254.653254, 2)
+    --buffer:writeString("搭顺风车")
+    buffer:writeLong(23432)
+    --buffer:writeTag(253)
+
+    local file = io.open("D:\\buffer", "r")
+    buffer = Buffer.new(file:read())
 
     print("buffer:readableCount()", buffer:readableCount())
 
-    buffer = Buffer.new(buffer.bytes)
-
-    print(buffer:readBool())
-    print(buffer:readInt())
-    buffer:reset()
-    print(buffer:readBool())
-    print(buffer:readInt())
-    print(buffer:readInt())
-    print(buffer:readFloat())
-    print(buffer:readDouble())
-    print(buffer:readFloat(2))
-    print(buffer:readDouble(2))
-    print(buffer:readString())
+    --print(buffer:readBool())
+    --print(buffer:readInt())
+    --buffer:reset()
+    --print(buffer:readBool())
+    --print(buffer:readInt())
+    --print(buffer:readInt())
+    --print(buffer:readFloat())
+    --print(buffer:readDouble())
+    --print(buffer:readFloat(2))
+    --print(buffer:readDouble(2))
+    --print(buffer:readString())
     print(buffer:readLong())
-    print(buffer:readTag())
+    --print(buffer:readTag())
 
     print("=================")
 
-    --local file = io.open("../../.temp/message/buffer", "w")
+    --local file = io.open("D:\buffer", "w")
     --if file then
     --    file:write(buffer.bytes)
     --    file:flush()
@@ -161,15 +177,15 @@ local function testMessage2()
     --sRoleLogin1.roleId = "1322"
     print("sRoleLogin1.roleId", sRoleLogin1.roleId)
 
-    sRoleLogin1.userInfo = UserInfo.new()
+    sRoleLogin1.userInfo = UserInfo()
     print("sRoleLogin1.userInfo", sRoleLogin1.userInfo)
 
 end
 
 --test1()
-testBuffer()
-testMessage1()
---testMessage2()
+--testBuffer()
+--testMessage1()
+testMessage2()
 
 
 

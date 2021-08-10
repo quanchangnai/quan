@@ -29,9 +29,9 @@ local function toString(self)
             ",roleInfo1=" .. tostring(self.roleInfo1) ..
             ",roleInfo2=" .. tostring(self.roleInfo2) ..
             ",roleInfo3=" .. tostring(self.roleInfo3) ..
-            ",roleList=" .. table.listToString(self.roleList) ..
-            ",roleSet=" .. table.setToString(self.roleSet) ..
-            ",roleMap=" .. table.mapToString(self.roleMap) ..
+            ",roleList=" .. table.toString(self.roleList) ..
+            ",roleSet=" .. table.toString(self.roleSet) ..
+            ",roleMap=" .. table.toString(self.roleMap) ..
             '}';
 end
 
@@ -70,6 +70,8 @@ function UserInfo.new(args)
     instance = setmetatable(instance, meta)
     return instance
 end
+
+setmetatable(UserInfo, { __call = UserInfo.new })
 
 ---
 ---[用户信息].编码

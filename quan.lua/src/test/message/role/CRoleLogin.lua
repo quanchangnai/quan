@@ -31,9 +31,9 @@ local function toString(self)
             ",roleId=" .. tostring(self.roleId) ..
             ",roleName='" .. tostring(self.roleName) .. '\'' ..
             ",roleInfo=" .. tostring(self.roleInfo) ..
-            ",roleInfoList=" .. table.listToString(self.roleInfoList) ..
-            ",roleInfoSet=" .. table.setToString(self.roleInfoSet) ..
-            ",roleInfoMap=" .. table.mapToString(self.roleInfoMap) ..
+            ",roleInfoList=" .. table.toString(self.roleInfoList) ..
+            ",roleInfoSet=" .. table.toString(self.roleInfoSet) ..
+            ",roleInfoMap=" .. table.toString(self.roleInfoMap) ..
             ",userInfo=" .. tostring(self.userInfo) ..
             '}';
 end
@@ -73,6 +73,8 @@ function CRoleLogin.new(args)
     instance = setmetatable(instance, meta)
     return instance
 end
+
+setmetatable(CRoleLogin, { __call = CRoleLogin.new })
 
 ---
 ---[角色登录，自定义ID].编码

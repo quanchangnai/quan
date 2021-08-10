@@ -44,7 +44,7 @@ local function toString(self)
         <#if field.type == "string">
              <#lt>${field.name}='" .. tostring(self.${field.name}) .. '\'' ..
         <#elseif field.collectionType>
-             <#lt>${field.name}=" .. table.${field.type}ToString(self.${field.name}) ..
+             <#lt>${field.name}=" .. table.toString(self.${field.name}) ..
         <#else>
              <#lt>${field.name}=" .. tostring(self.${field.name}) ..
         </#if>
@@ -87,6 +87,8 @@ function ${name}.new(args)
     instance = setmetatable(instance, meta)
     return instance
 end
+
+setmetatable(${name}, { __call = ${name}.new })
 
 </#if>
 <#if kind ==3>

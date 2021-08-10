@@ -49,6 +49,8 @@ function Buffer.new(bytes)
     return instance
 end
 
+setmetatable(Buffer, { __call = Buffer.new })
+
 function Buffer:size()
     return self.bytes:len()
 end

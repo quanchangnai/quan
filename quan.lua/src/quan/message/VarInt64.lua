@@ -24,13 +24,14 @@ function VarInt64.readVarInt(buffer, maxBytes)
 
         local b = buffer:readByte()
         temp = temp | (b & 0x7F) << shift
+
+        if b & 0x80 == 0 then
+            --ZigZag解码
+            return temp >> 1 ~ -(temp & 1)
+        end
+
         shift = shift + 7
         count = count + 1
-
-        if (b & 0x80) == 0 then
-            --ZigZag解码
-            return (temp >> 1) ~ -(temp & 1)
-        end
     end
 
     error("读数据出错")
@@ -42,13 +43,13 @@ end
 function VarInt64.writeVarInt(buffer, n, maxBytes)
     --assert(math.type(n) == "integer", "参数[n]类型错误")
     --ZigZag编码
-    n = (n << 1) ~ bits.arshift(n, 63);
+    n = n << 1 ~ bits.arshift(n, 63);
 
     local shift = 0
     local count = 0
 
     while count < maxBytes do
-        if ((n & ~0x7F) == 0) then
+        if n & ~0x7F == 0 then
             buffer:writeByte(n & 0x7F)
             return
         else

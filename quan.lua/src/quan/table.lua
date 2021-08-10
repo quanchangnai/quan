@@ -24,6 +24,9 @@ function table.readOnly(origin)
         __index = origin,
         __newindex = function(table, key, value)
             error("不能修改只读表")
+        end,
+        __call = function(...)
+            return origin(...)
         end
     }
     return setmetatable({}, meta)
@@ -35,37 +38,14 @@ function table.empty()
     return empty
 end
 
-function table.listToString(list)
-    if not list then
-        return "nil"
-    end
-
-    local result = "["
-    local start = true
-    for i, v in ipairs(list) do
-        if not start then
-            result = result .. ", ";
-        end
-        result = result .. tostring(v)
-        start = false
-    end
-    result = result .. "]";
-
-    return result;
-end
-
-function table.setToString(set)
-    return table.listToString(set)
-end
-
-function table.mapToString(map)
-    if not map then
+function table.toString(t)
+    if not t then
         return "nil"
     end
 
     local result = "{"
     local start = true
-    for k, v in pairs(map) do
+    for k, v in pairs(t) do
         if not start then
             result = result .. ", ";
         end
