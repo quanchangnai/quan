@@ -13,8 +13,8 @@ local long = require("long")
 --src/int64/varint64.c
 local varint64 = require("varint64")
 
----@module VarInt32 32位变长整数
-local VarInt32 = {}
+---@module VarInt Lua5.2及以下的变长整数工具
+local VarInt = {}
 
 local function readVarInt64(buffer)
     local shift = 0
@@ -43,7 +43,7 @@ end
 ---从buffer里读取变长整数
 ---@param buffer quan.message.Buffer
 ---@param maxBytes 最多读几个字节，short:3，int:5，long:10
-function VarInt32.readVarInt(buffer, maxBytes)
+function VarInt.readVarInt(buffer, maxBytes)
     if maxBytes == 10 then
         return readVarInt64(buffer)
     end
@@ -75,7 +75,7 @@ end
 ---往buffer写入变长整数
 ---@param buffer quan.message.Buffer
 ---@param maxBytes 最多写几个字节，short:3，int:5，long:10
-function VarInt32.writeVarInt(buffer, n, maxBytes)
+function VarInt.writeVarInt(buffer, n, maxBytes)
     if maxBytes == 10 then
         --n:long
         buffer.bytes = buffer.bytes .. varint64.encode(n)
@@ -102,4 +102,4 @@ function VarInt32.writeVarInt(buffer, n, maxBytes)
     error("写数据出错")
 end
 
-return VarInt32
+return VarInt

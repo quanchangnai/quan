@@ -6,13 +6,13 @@
 
 local bits = require("quan.message.bits")
 
----@module VarInt64 64位变长整数
-local VarInt64 = {}
+---@module VarInt Lua5.3及以上的变长整数工具
+local VarInt = {}
 
 ---从buffer里读取变长整数
 ---@param buffer quan.message.Buffer
 ---@param maxBytes 最多读几个字节，short:3，int:5，long:10
-function VarInt64.readVarInt(buffer, maxBytes)
+function VarInt.readVarInt(buffer, maxBytes)
     local temp = 0
     local shift = 0
     local count = 0
@@ -40,7 +40,7 @@ end
 ---往buffer写入变长整数
 ---@param buffer quan.message.Buffer
 ---@param maxBytes 最多写几个字节，short:3，int:5，long:10
-function VarInt64.writeVarInt(buffer, n, maxBytes)
+function VarInt.writeVarInt(buffer, n, maxBytes)
     --assert(math.type(n) == "integer", "参数[n]类型错误")
     --ZigZag编码
     n = n << 1 ~ bits.arshift(n, 63);
@@ -63,4 +63,4 @@ function VarInt64.writeVarInt(buffer, n, maxBytes)
     error("写数据出错")
 end
 
-return VarInt64
+return VarInt
