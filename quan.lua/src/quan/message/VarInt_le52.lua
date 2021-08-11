@@ -7,14 +7,46 @@
 --https://bitop.luajit.org/
 local bit = require("bit")
 
+--src/int64/long.c
+local long = require("long")
+
+--src/int64/varint64.c
+local varint64 = require("varint64")
+
 ---@module VarInt32 32位变长整数
 local VarInt32 = {}
+
+local function readVarInt64(buffer)
+    local shift = 0
+    local count = 0
+    local result = long.new(0)
+
+    while count < 10 do
+        if buffer:readableCount() < 1 then
+            break
+        end
+
+        local b = buffer:readByte()
+        local finish
+        finish, result = varint64.decode(b, shift, result)
+        if finish == 0 then
+            return result
+        end
+
+        shift = shift + 7
+        count = count + 1
+    end
+
+    error("读数据出错")
+end
 
 ---从buffer里读取变长整数
 ---@param buffer quan.message.Buffer
 ---@param maxBytes 最多读几个字节，short:3，int:5，long:10
 function VarInt32.readVarInt(buffer, maxBytes)
-    --assert(maxBytes == 3 or maxBytes == 5, "不支持64位整数")
+    if maxBytes == 10 then
+        return readVarInt64(buffer)
+    end
 
     local shift = 0
     local temp = 0
@@ -27,13 +59,14 @@ function VarInt32.readVarInt(buffer, maxBytes)
 
         local b = buffer:readByte()
         temp = bit.bor(temp, bit.lshift(bit.band(b, 0x7F), shift))
-        shift = shift + 7
-        count = count + 1
 
         if bit.band(b, 0x80) == 0 then
             --ZigZag解码
             return bit.bxor(bit.rshift(temp, 1), -bit.band(temp, 1))
         end
+
+        shift = shift + 7
+        count = count + 1
     end
 
     error("读数据出错")
@@ -43,7 +76,11 @@ end
 ---@param buffer quan.message.Buffer
 ---@param maxBytes 最多写几个字节，short:3，int:5，long:10
 function VarInt32.writeVarInt(buffer, n, maxBytes)
-    --assert(maxBytes == 3 or maxBytes == 5, "不支持64位整数")
+    if maxBytes == 10 then
+        --n:long
+        buffer.bytes = buffer.bytes .. varint64.encode(n)
+        return
+    end
 
     --ZigZag编码
     n = bit.bxor(bit.lshift(n, 1), bit.arshift(n, 31))

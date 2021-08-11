@@ -9,10 +9,10 @@ require("quan.table")
 local VarInt;
 local unpack;
 if _VERSION == "Lua 5.3" or _VERSION == "Lua 5.4" then
-    VarInt = require("quan.message.VarInt64")
+    VarInt = require("quan.message.VarInt_ge53")
     unpack = string.unpack
 else
-    VarInt = require("quan.message.VarInt32")
+    VarInt = require("quan.message.VarInt_le52")
     --https://web.tecgraf.puc-rio.br/~lhf/ftp/lua/#lpack
     require("pack")
     unpack = function(f, s, p)

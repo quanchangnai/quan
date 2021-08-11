@@ -308,7 +308,7 @@ namespace Quan.Message
 
             while (shift < 32)
             {
-                _bytes[_writeIndex++] = (byte) (temp >> shift & 0b11111111);
+                _bytes[_writeIndex++] = (byte) (temp >> shift & 0xFF);
                 shift += 8;
             }
         }
@@ -334,7 +334,7 @@ namespace Quan.Message
 
             while (shift < 64)
             {
-                _bytes[_writeIndex++] = (byte) (temp >> shift & 0b11111111);
+                _bytes[_writeIndex++] = (byte) (temp >> shift & 0xFF);
                 shift += 8;
             }
         }

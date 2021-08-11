@@ -23,6 +23,11 @@ public class MessageTest {
 
     @Test
     public void test() throws Exception {
+        long n = 1628419835799L;
+        n = (n << 1) ^ (n >> 63);
+        System.err.println(n);
+        System.err.println(Long.toBinaryString(n));
+        System.err.println(Long.toBinaryString(n).length());
     }
 
     @Test
@@ -47,11 +52,14 @@ public class MessageTest {
 
         System.err.println("buffer.readableCount()=" + buffer.readableCount());
 
-//        FileInputStream fileInputStream = new FileInputStream(new File("D:\\buffer"));
-//        byte[] bytes = new byte[fileInputStream.available()];
-//        fileInputStream.read(bytes);
+//        FileOutputStream fos = new FileOutputStream(new File("D:\\buffer"));
+//        fos.write(buffer.remainingBytes());
+//
+//        FileInputStream fis = new FileInputStream(new File("D:\\buffer"));
+//        byte[] bytes = new byte[fis.available()];
+//        fis.read(bytes);
 //        System.err.println("bytes.length=" + bytes.length);
-//        buffer = new Buffer(bytes);
+//        buffer = new SimpleBuffer(bytes);
 
         System.err.println(buffer.readBool());
         System.err.println(buffer.readShort());
@@ -62,7 +70,7 @@ public class MessageTest {
         System.err.println(buffer.readDouble(2));
         System.err.println(buffer.readString());
         System.err.println(buffer.readLong());
-        System.err.println(buffer.readLong() == Long.MAX_VALUE);
+        System.err.println(Long.MAX_VALUE + ":" + buffer.readLong());
         System.err.println(buffer.readLong() == Long.MIN_VALUE);
         System.err.println(buffer.readTag());
 
