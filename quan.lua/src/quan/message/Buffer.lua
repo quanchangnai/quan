@@ -117,9 +117,8 @@ function Buffer:readFloat(scale)
         self.readIndex = self.readIndex + 4
         return n
     else
-        return self:readLong() / 10 ^ scale
+        return self:readInt() / 10 ^ scale
     end
-
 end
 
 function Buffer:readDouble(scale)
@@ -134,9 +133,8 @@ function Buffer:readDouble(scale)
         self.readIndex = self.readIndex + 8
         return n
     else
-        return self:readLong() / 10 ^ scale
+        return self:readInt() / 10 ^ scale
     end
-
 end
 
 function Buffer:readBytes()
@@ -194,7 +192,7 @@ function Buffer:writeFloat(n, scale)
     if scale < 0 then
         self.bytes = self.bytes .. string.pack("<f", n)
     else
-        self:writeDouble(n, scale)
+        self:writeFixed(n, scale)
     end
 end
 
@@ -205,21 +203,25 @@ function Buffer:writeDouble(n, scale)
 
     if scale < 0 then
         self.bytes = self.bytes .. string.pack("<d", n)
-        return
-    end
-
-    local times = 10 ^ scale
-    local threshold = 0x7FFFFFFFFFFFFFFF / times;
-    if n < -threshold or n > threshold then
-        error(string.format("参数[%s]超出了限定范围[%s,%s],无法转换为指定精度[%s]的定点型数据", n, -threshold, threshold, scale))
     else
-        self:writeLong(math.floor(n * times))
+        self:writeFixed(n, scale)
+    end
+end
+
+function Buffer:writeFixed(n, scale)
+    local times = 10 ^ scale
+    local r = math.floor(n * times)
+
+    if r < -0x80000000 or r > 0x7FFFFFFF then
+        error(string.format("参数[%s]超出了限定范围[%s,%s],无法转换为指定精度[%s]的定点型数据", n, -0x80000000 * times, 0x7FFFFFFF * times, scale))
+    else
+        self:writeInt(r)
     end
 end
 
 function Buffer:writeBytes(bytes)
     assert(type(bytes) == "string", "参数[bytes]类型错误")
-    self:writeInt(bytes:len())
+    self:writeInt(string.len(bytes))
     self.bytes = self.bytes .. bytes
 end
 

@@ -175,7 +175,7 @@ namespace Quan.Message
                 return ReadFloat();
             }
 
-            return (float) (ReadLong() / Math.Pow(10, scale));
+            return (float) (ReadInt() / Math.Pow(10, scale));
         }
 
         public double ReadDouble()
@@ -205,7 +205,7 @@ namespace Quan.Message
                 return ReadDouble();
             }
 
-            return ReadLong() / Math.Pow(10, scale);
+            return ReadInt() / Math.Pow(10, scale);
         }
 
         public byte[] ReadBytes()
@@ -321,7 +321,7 @@ namespace Quan.Message
             }
             else
             {
-                WriteDouble(n, scale);
+                WriteLong(CheckScale(n, scale));
             }
         }
 
@@ -339,17 +339,18 @@ namespace Quan.Message
             }
         }
 
-        public static long CheckScale(double n, int scale)
+        public static int CheckScale(double n, int scale)
         {
-            var times = (int) Math.Pow(10, scale);
+            var times = Math.Pow(10, scale);
+            var r = Math.Floor(n * times);
             var threshold = long.MaxValue / times;
-            if (n >= -threshold && n <= threshold)
+            if (r < int.MinValue || r > int.MaxValue)
             {
-                return (long) Math.Floor(n * times);
+                var error = $"参数[{n}]超出了限定范围[{-threshold},{threshold}],无法转换为指定精度[{scale}]的定点型数据";
+                throw new ArgumentException(error);
             }
 
-            var error = $"参数[{n}]超出了限定范围[{-threshold},{threshold}],无法转换为指定精度[{scale}]的定点型数据";
-            throw new ArgumentException(error);
+            return (int) r;
         }
 
         public void WriteDouble(double n, int scale)

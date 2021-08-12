@@ -118,7 +118,7 @@ public abstract class Buffer {
         if (scale < 0) {
             return readFloat();
         } else {
-            return (float) (readLong() / Math.pow(10, scale));
+            return (float) (readInt() / Math.pow(10, scale));
         }
     }
 
@@ -141,7 +141,7 @@ public abstract class Buffer {
         if (scale < 0) {
             return readDouble();
         } else {
-            return readLong() / Math.pow(10, scale);
+            return readInt() / Math.pow(10, scale);
         }
     }
 
@@ -235,7 +235,7 @@ public abstract class Buffer {
         if (scale < 0) {
             writeFloat(n);
         } else {
-            writeDouble(n, scale);
+            writeInt(checkScale(n, scale));
         }
     }
 
@@ -251,22 +251,22 @@ public abstract class Buffer {
         }
     }
 
-    public static long checkScale(double n, int scale) {
-        int times = (int) Math.pow(10, scale);
-        long threshold = Long.MAX_VALUE / times;
-        if (n < -threshold || n > threshold) {
-            throw new IllegalArgumentException(String.format("参数[%s]超出了限定范围[%s,%s],无法转换为指定精度[%s]的定点型数据", n, -threshold, threshold, scale));
+    public static int checkScale(double n, int scale) {
+        double times = Math.pow(10, scale);
+        double r = Math.floor(n * times);
+        if (r < Integer.MIN_VALUE || r > Integer.MAX_VALUE) {
+            String format = "参数[%s]超出了限定范围[%s,%s],无法转换为指定精度[%s]的定点型数据";
+            throw new IllegalArgumentException(String.format(format, n, Integer.MIN_VALUE * times, Integer.MAX_VALUE * times, scale));
         }
-        return (long) Math.floor(n * times);
+        return (int) r;
     }
 
     public void writeDouble(double n, int scale) {
         if (scale < 0) {
             writeDouble(n);
-            return;
+        } else {
+            writeInt(checkScale(n, scale));
         }
-
-        writeLong(checkScale(n, scale));
     }
 
     public abstract void writeBytes(byte[] bytes);

@@ -69,7 +69,7 @@ static int l_div(lua_State *L) {
   return 1;
 }
 
-// a == b (both a and b are lualongnumber's)
+// a == b
 static int l_eq(lua_State *L) {
   int64_t a, b;
   a = lua_checklong(L, 1);
