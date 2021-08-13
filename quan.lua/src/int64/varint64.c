@@ -10,7 +10,7 @@ extern int64_t lua_pushlong(lua_State *L, int64_t *val);
 /**
  * Convert an i64 to a varint. Results in 1-10 bytes on the buffer.
  */
-static int write(lua_State *L) {
+static int l_write(lua_State *L) {
   uint8_t data[10];
   int64_t p = lua_checklong(L, 1);
   uint32_t wsize = 0;
@@ -38,7 +38,7 @@ static int write(lua_State *L) {
 /**
  * Convert a varint to i64. Convert one byte at a time.
  */
-static int read(lua_State *L) {
+static int l_read(lua_State *L) {
   int64_t result;
   uint8_t byte = luaL_checknumber(L, 1);
   int32_t shift = luaL_checknumber(L, 2);
@@ -57,13 +57,18 @@ static int read(lua_State *L) {
   return 2;
 }
 
-static const struct luaL_Reg lua_reg_varint64[] = {
-  {"write", write},
-  {"read", read},
+static const struct luaL_Reg funcs[] = {
+  {"write", l_write},
+  {"read", l_read},
   {NULL, NULL}
 };
 
 int luaopen_varint64(lua_State *L) {
-  luaL_register(L, "varint64", lua_reg_varint64);
+#if LUA_VERSION_NUM <= 501
+  lua_newtable(L);
+  luaL_register(L, NULL, funcs);
+#elif
+  luaL_newlib(L, funcs)
+#endif
   return 1;
 }

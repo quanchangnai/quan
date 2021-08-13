@@ -144,14 +144,6 @@ static int l_sub(lua_State *L) {
   return 1;
 }
 
-// tostring()
-static int l_tostring(lua_State *L) {
-  char str[256];
-  l_serialize(str, 256, lua_checklong(L, 1));
-  lua_pushstring(L, str);
-  return 1;
-}
-
 // -a
 static int l_unm(lua_State *L) {
   int64_t a, c;
@@ -161,9 +153,25 @@ static int l_unm(lua_State *L) {
   return 1;
 }
 
+// tostring()
+static int l_tostring(lua_State *L) {
+  char str[256];
+  l_serialize(str, 256, lua_checklong(L, 1));
+  lua_pushstring(L, str);
+  return 1;
+}
+
+// tonumber()
+static int l_tonumber(lua_State *L)
+{
+  int64_t a = lua_checklong(L, 1);
+  lua_pushnumber(L,(lua_Number)a);
+  return 1;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
-static const luaL_Reg methods[] = {
+static const luaL_Reg mt_methods[] = {
   {"__add", l_add},
   {"__div", l_div},
   {"__eq", l_eq},
@@ -174,8 +182,8 @@ static const luaL_Reg methods[] = {
   {"__mul", l_mul},
   {"__pow", l_pow},
   {"__sub", l_sub},
-  {"__tostring", l_tostring},
   {"__unm", l_unm},
+  {"__tostring", l_tostring},
   {NULL, NULL},
 };
 
@@ -184,40 +192,61 @@ static const luaL_Reg funcs[] = {
   {NULL, NULL}
 };
 
+static const luaL_Reg index_methods[] = {
+  {"tostring", l_tostring},
+  {"tonumber", l_tonumber},
+  {NULL, NULL}
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 
 static void set_methods(lua_State *L,const struct luaL_Reg *methods) {
-  luaL_getmetatable(L, LONG_TYPE);   // mt
   // No need for a __index table since everything is __*
   for (; methods->name; methods++) {
     lua_pushstring(L, methods->name);    // mt, "name"
     lua_pushcfunction(L, methods->func); // mt, "name", func
     lua_rawset(L, -3);                   // mt
   }
-  lua_pop(L, 1);
 }
 
 static void create_cache(lua_State *L){
-  luaL_getmetatable(L,LONG_TYPE);
-  lua_pushstring(L,"cache");
+  lua_pushliteral(L,"cache");
   lua_newtable(L);
 
   luaL_newmetatable(L, "__long_cache");
-  lua_pushstring(L,"__mode");  // weak table
-  lua_pushstring(L,"kv");
+  lua_pushliteral(L,"__mode");  // weak table
+  lua_pushliteral(L,"kv");
   lua_rawset(L, -3);
   lua_setmetatable(L, -2);      
 
   lua_rawset(L, -3);
-  lua_pop(L, 1);
+}
+
+static void set_index_table(lua_State *L){
+  lua_newtable(L);
+  set_methods(L,index_methods);
+  lua_setfield(L, -2, "__index");
 }
 
 LUALIB_API int luaopen_long(lua_State *L) {
   luaL_newmetatable(L, LONG_TYPE);
-  lua_pop(L, 1);
-  set_methods(L, methods);
+  set_methods(L, mt_methods);
   create_cache(L);
+  set_index_table(L);
 
+#if LUA_VERSION_NUM <= 501
   luaL_register(L, "long", funcs);
+#elif
+  luaL_newlib(L, funcs)
+#endif
+
+  int64_t min = LLONG_MIN;
+  lua_pushlong(L ,&min);
+  lua_setfield(L,-2,"min");
+
+  int64_t max = LLONG_MAX;
+  lua_pushlong(L, &max);
+  lua_setfield(L, -2, "max");
+ 
   return 1;
 }

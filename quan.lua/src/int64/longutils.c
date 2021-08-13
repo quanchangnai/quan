@@ -18,7 +18,7 @@ int64_t lua_checklong(lua_State *L, int index) {
 
 static int check_cache(lua_State *L,char* key){
   luaL_getmetatable(L, LONG_TYPE); 
-  lua_pushstring(L,"cache");
+  lua_pushliteral(L,"cache");
   lua_gettable(L,-2);
 
   lua_pushstring(L,key);
@@ -36,15 +36,13 @@ static int check_cache(lua_State *L,char* key){
   return result;
 }
 
-
 static void set_cache(lua_State *L,char* key){
   luaL_getmetatable(L, LONG_TYPE); 
-  lua_pushstring(L,"cache");
+  lua_pushliteral(L,"cache");
   lua_gettable(L,-2);
 
   lua_pushstring(L,key);
   lua_pushvalue(L,-4);
- 
   lua_settable(L,-3);
 
   lua_pop(L,2);
