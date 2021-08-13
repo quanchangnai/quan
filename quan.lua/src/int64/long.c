@@ -186,10 +186,8 @@ static const luaL_Reg funcs[] = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static void set_methods(lua_State *L,
-  const char *metatablename,
-  const struct luaL_Reg *methods) {
-  luaL_getmetatable(L, metatablename);   // mt
+static void set_methods(lua_State *L,const struct luaL_Reg *methods) {
+  luaL_getmetatable(L, LONG_TYPE);   // mt
   // No need for a __index table since everything is __*
   for (; methods->name; methods++) {
     lua_pushstring(L, methods->name);    // mt, "name"
@@ -199,10 +197,26 @@ static void set_methods(lua_State *L,
   lua_pop(L, 1);
 }
 
+static void create_cache(lua_State *L){
+  luaL_getmetatable(L,LONG_TYPE);
+  lua_pushstring(L,"cache");
+  lua_newtable(L);
+
+  luaL_newmetatable(L, "__long_cache");
+  lua_pushstring(L,"__mode");  // weak table
+  lua_pushstring(L,"kv");
+  lua_rawset(L, -3);
+  lua_setmetatable(L, -2);      
+
+  lua_rawset(L, -3);
+  lua_pop(L, 1);
+}
+
 LUALIB_API int luaopen_long(lua_State *L) {
   luaL_newmetatable(L, LONG_TYPE);
   lua_pop(L, 1);
-  set_methods(L, LONG_TYPE, methods);
+  set_methods(L, methods);
+  create_cache(L);
 
   luaL_register(L, "long", funcs);
   return 1;

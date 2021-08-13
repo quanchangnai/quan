@@ -16,13 +16,57 @@ int64_t lua_checklong(lua_State *L, int index) {
   }
 }
 
+static int check_cache(lua_State *L,char* key){
+  luaL_getmetatable(L, LONG_TYPE); 
+  lua_pushstring(L,"cache");
+  lua_gettable(L,-2);
+
+  lua_pushstring(L,key);
+  lua_gettable(L,-2);
+  
+  int result = lua_isuserdata(L,-1);
+  if (result == 1)
+  {
+    lua_remove(L,-2);
+    lua_remove(L,-2);
+  }else{
+    lua_pop(L,3);
+  }
+
+  return result;
+}
+
+
+static void set_cache(lua_State *L,char* key){
+  luaL_getmetatable(L, LONG_TYPE); 
+  lua_pushstring(L,"cache");
+  lua_gettable(L,-2);
+
+  lua_pushstring(L,key);
+  lua_pushvalue(L,-4);
+ 
+  lua_settable(L,-3);
+
+  lua_pop(L,2);
+}
+
 // Creates a new long and pushes it onto the statck
 int64_t * lua_pushlong(lua_State *L, int64_t *val) {
+  char key[256];
+  snprintf(key, sizeof(key), "%"PRId64, *val);
+  if (check_cache(L,key)==1)
+  {
+    return val;
+  }
+  
   int64_t *data = (int64_t *)lua_newuserdata(L, sizeof(int64_t)); 
   luaL_getmetatable(L, LONG_TYPE);                           
   lua_setmetatable(L, -2);                                     
   if (val) {
     *data = *val;
   }
+
+  set_cache(L,key);
+
   return data;
 }

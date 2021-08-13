@@ -27,9 +27,9 @@ local function readVarInt64(buffer)
         end
 
         local b = buffer:readByte()
-        local finish
-        finish, result = varint64.decode(b, shift, result)
-        if finish == 0 then
+        local finished
+        finished, result = varint64.read(b, shift, result)
+        if finished == 0 then
             return result
         end
 
@@ -78,7 +78,7 @@ end
 function VarInt.writeVarInt(buffer, n, maxBytes)
     if maxBytes == 10 then
         --n:long
-        buffer.bytes = buffer.bytes .. varint64.encode(n)
+        buffer.bytes = buffer.bytes .. varint64.write(n)
         return
     end
 
