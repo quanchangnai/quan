@@ -49,22 +49,18 @@ static void set_cache(lua_State *L,char* key){
 }
 
 // Creates a new long and pushes it onto the statck
-int64_t * lua_pushlong(lua_State *L, int64_t *val) {
+void lua_pushlong(lua_State *L, int64_t val) {
   char key[256];
-  snprintf(key, sizeof(key), "%"PRId64, *val);
+  snprintf(key, sizeof(key), "%"PRId64, val);
   if (check_cache(L,key)==1)
   {
-    return val;
+    return;
   }
   
   int64_t *data = (int64_t *)lua_newuserdata(L, sizeof(int64_t)); 
+  *data = val;
   luaL_getmetatable(L, LONG_TYPE);                           
   lua_setmetatable(L, -2);                                     
-  if (val) {
-    *data = *val;
-  }
 
   set_cache(L,key);
-
-  return data;
 }

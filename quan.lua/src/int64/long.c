@@ -43,7 +43,7 @@ static int l_new(lua_State *L) {
     val = (int64_t)lua_tonumber(L, 1);
     str = (const char *)1;
   }
-  lua_pushlong(L, (str ? &val : NULL));
+  lua_pushlong(L, (str ? val : NULL));
   return 1;
 }
 
@@ -55,7 +55,7 @@ static int l_add(lua_State *L) {
   a = lua_checklong(L, 1);
   b = lua_checklong(L, 2);
   c = a + b;
-  lua_pushlong(L, &c);
+  lua_pushlong(L, c);
   return 1;
 }
 
@@ -65,7 +65,7 @@ static int l_div(lua_State *L) {
   a = lua_checklong(L, 1);
   b = lua_checklong(L, 2);
   c = a / b;
-  lua_pushlong(L, &c);
+  lua_pushlong(L, c);
   return 1;
 }
 
@@ -109,7 +109,7 @@ static int l_mod(lua_State *L) {
   a = lua_checklong(L, 1);
   b = lua_checklong(L, 2);
   c = a % b;
-  lua_pushlong(L, &c);
+  lua_pushlong(L, c);
   return 1;
 }
 
@@ -119,7 +119,7 @@ static int l_mul(lua_State *L) {
   a = lua_checklong(L, 1);
   b = lua_checklong(L, 2);
   c = a * b;
-  lua_pushlong(L, &c);
+  lua_pushlong(L, c);
   return 1;
 }
 
@@ -130,7 +130,7 @@ static int l_pow(lua_State *L) {
   a = (long double)lua_checklong(L, 1);
   b = (long double)lua_checklong(L, 2);
   c = (int64_t)pow(a, b);
-  lua_pushlong(L, &c);
+  lua_pushlong(L, c);
   return 1;
 }
 
@@ -140,7 +140,7 @@ static int l_sub(lua_State *L) {
   a = lua_checklong(L, 1);
   b = lua_checklong(L, 2);
   c = a - b;
-  lua_pushlong(L, &c);
+  lua_pushlong(L, c);
   return 1;
 }
 
@@ -149,7 +149,7 @@ static int l_unm(lua_State *L) {
   int64_t a, c;
   a = lua_checklong(L, 1);
   c = -a;
-  lua_pushlong(L, &c);
+  lua_pushlong(L, c);
   return 1;
 }
 
@@ -235,17 +235,15 @@ LUALIB_API int luaopen_long(lua_State *L) {
   set_index_table(L);
 
 #if LUA_VERSION_NUM <= 501
-  luaL_register(L, "long", funcs);
+  lua_newtable(L);
+  luaL_register(L, NULL, funcs);
 #elif
   luaL_newlib(L, funcs)
 #endif
 
-  int64_t min = LLONG_MIN;
-  lua_pushlong(L ,&min);
-  lua_setfield(L,-2,"min");
-
-  int64_t max = LLONG_MAX;
-  lua_pushlong(L, &max);
+  lua_pushlong(L, LLONG_MIN);
+  lua_setfield(L, -2, "min");
+  lua_pushlong(L, LLONG_MAX);
   lua_setfield(L, -2, "max");
  
   return 1;

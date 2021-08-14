@@ -53,7 +53,7 @@ static int l_read(lua_State *L) {
     result = n;
     lua_pushnumber(L, 1);
   }
-  lua_pushlong(L, &result);
+  lua_pushlong(L, result);
   return 2;
 }
 
