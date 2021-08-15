@@ -8,8 +8,8 @@
 
 @setlocal
 @rem Path to the Lua includes and the library file for the Lua DLL:
-@set LUA_INC=C:\Users\admin\Downloads\LuaJIT-2.0.5\src
-@set LUA_LIB=%LUA_INC%\lua51.lib
+@set LUA_INC=C:\Users\admin\Downloads\lua-5.1.4_Win32_dll12_lib\include
+@set LUA_LIB=C:\Users\admin\Downloads\lua-5.1.4_Win32_dll12_lib\lua5.1.lib
 
 @set MYCOMPILE=cl /nologo /MD /O2 /W3 /c -I %LUA_INC%
 @set MYLINK=link /nologo
