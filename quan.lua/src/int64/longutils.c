@@ -5,6 +5,7 @@
 #include <inttypes.h>
 
 const char * LONG_TYPE = "__long";
+
 int64_t lua_checklong(lua_State *L, int index) {
   switch (lua_type(L, index)) {
     case LUA_TNUMBER:

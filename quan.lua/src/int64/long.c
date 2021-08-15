@@ -8,7 +8,7 @@
 
 extern const char * LONG_TYPE;
 extern int64_t lua_checklong(lua_State *L, int index);
-extern int64_t lua_pushlong(lua_State *L, int64_t *val);
+extern int64_t lua_pushlong(lua_State *L, int64_t val);
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -43,7 +43,7 @@ static int l_new(lua_State *L) {
     val = (int64_t)lua_tonumber(L, 1);
     str = (const char *)1;
   }
-  lua_pushlong(L, (str ? val : NULL));
+  lua_pushlong(L, (str ? val : 0));
   return 1;
 }
 
@@ -171,7 +171,7 @@ static int l_tonumber(lua_State *L)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static const luaL_Reg mt_methods[] = {
+static const luaL_Reg meta_methods[] = {
   {"__add", l_add},
   {"__div", l_div},
   {"__eq", l_eq},
@@ -187,7 +187,7 @@ static const luaL_Reg mt_methods[] = {
   {NULL, NULL},
 };
 
-static const luaL_Reg funcs[] = {
+static const luaL_Reg lib_funcs[] = {
   {"new", l_new},
   {NULL, NULL}
 };
@@ -222,7 +222,7 @@ static void create_cache(lua_State *L){
   lua_rawset(L, -3);
 }
 
-static void set_index_table(lua_State *L){
+static void create_index_table(lua_State *L){
   lua_newtable(L);
   set_methods(L,index_methods);
   lua_setfield(L, -2, "__index");
@@ -230,15 +230,15 @@ static void set_index_table(lua_State *L){
 
 LUALIB_API int luaopen_long(lua_State *L) {
   luaL_newmetatable(L, LONG_TYPE);
-  set_methods(L, mt_methods);
+  set_methods(L, meta_methods);
+  create_index_table(L);
   create_cache(L);
-  set_index_table(L);
 
 #if LUA_VERSION_NUM <= 501
   lua_newtable(L);
-  luaL_register(L, NULL, funcs);
-#elif
-  luaL_newlib(L, funcs)
+  luaL_register(L, NULL, lib_funcs);
+#else
+  luaL_newlib(L, lib_funcs);
 #endif
 
   lua_pushlong(L, LLONG_MIN);

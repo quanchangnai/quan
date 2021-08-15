@@ -5,7 +5,7 @@
 #include <inttypes.h>
 
 extern int64_t lua_checklong(lua_State *L, int index);
-extern int64_t lua_pushlong(lua_State *L, int64_t *val);
+extern int64_t lua_pushlong(lua_State *L, int64_t val);
 
 /**
  * Convert an i64 to a varint. Results in 1-10 bytes on the buffer.
@@ -57,7 +57,7 @@ static int l_read(lua_State *L) {
   return 2;
 }
 
-static const struct luaL_Reg funcs[] = {
+static const struct luaL_Reg lib_funcs[] = {
   {"write", l_write},
   {"read", l_read},
   {NULL, NULL}
@@ -66,9 +66,9 @@ static const struct luaL_Reg funcs[] = {
 int luaopen_varint64(lua_State *L) {
 #if LUA_VERSION_NUM <= 501
   lua_newtable(L);
-  luaL_register(L, NULL, funcs);
-#elif
-  luaL_newlib(L, funcs)
+  luaL_register(L, NULL, lib_funcs);
+#else
+  luaL_newlib(L, lib_funcs);
 #endif
   return 1;
 }
