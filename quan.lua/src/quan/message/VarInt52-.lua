@@ -7,13 +7,13 @@
 --https://bitop.luajit.org/
 local bit = require("bit")
 
---src/int64/long.c
+--/c/long.c
 local long = require("long")
 
---src/int64/varint64.c
+--/c/varint64.c
 local varint64 = require("varint64")
 
----@module VarInt Lua5.2及以下的变长整数工具
+--- @module VarInt Lua5.2及以下的变长整数工具
 local VarInt = {}
 
 local function readVarInt64(buffer)

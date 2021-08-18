@@ -49,7 +49,7 @@ static void set_cache(lua_State *L,char* key){
   lua_pop(L,2);
 }
 
-// Creates a new long and pushes it onto the statck
+// Creates a new long and pushes it onto the stack
 void lua_pushlong(lua_State *L, int64_t val) {
   char key[256];
   snprintf(key, sizeof(key), "%"PRId64, val);

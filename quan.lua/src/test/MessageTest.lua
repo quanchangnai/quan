@@ -18,29 +18,6 @@ print("MessageTest===========")
 local function test1()
     print()
     print("test1===========")
-    --local str = ""
-    --for i = 1, 3 do
-    --    str = str .. string.char(i)
-    --end
-    --print("str[2]", str[2])
-    --print("str", str, "str.len()", string.len(str))
-    --print(string.unpack("bbb", str))
-    --print(str:byte(1, string.len(str)))
-    --
-    --str = string.pack("bbb", 23, 43, 54)
-    --print(string.unpack("bbb", str))
-
-    --https://web.tecgraf.puc-rio.br/~lhf/ftp/lua/#lint64
-    --local int64 = require("int64")
-    --local a = int64.new("1628499791603")
-    --local b = int64.new("1628499791603")
-    --print("a", type(a), a)
-    --
-    --local t = {}
-    --t[a] = "aaa"
-    --print("a==b", a == b)
-    --print("t[a]", t[a])
-    --print("t[a]", t[b])
 end
 
 local function testBuffer()
@@ -87,23 +64,6 @@ local function testBuffer()
     print(buffer:readLong())
     print(buffer:readLong())
     print(buffer:readTag())
-
-    print("=================")
-
-    --local file = io.open("D:\buffer", "w")
-    --if file then
-    --    file:write(buffer.bytes)
-    --    file:flush()
-    --end
-
-    --buffer:reset()
-    --print(buffer:readBool())
-    --buffer:clear()
-    --buffer:writeInt(45)
-    --buffer:writeString("奋斗服务")
-    --print(buffer:readInt())
-    --buffer = Buffer.new(buffer:remainingBytes())
-    --print(buffer:readString())
 
 end
 
@@ -194,7 +154,6 @@ end
 testBuffer()
 testMessage1()
 --testMessage2()
-
 
 
 
