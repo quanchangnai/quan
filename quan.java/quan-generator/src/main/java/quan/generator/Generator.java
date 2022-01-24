@@ -11,19 +11,10 @@ import quan.definition.*;
 import quan.definition.DependentSource.DependentType;
 import quan.definition.parser.DefinitionParser;
 import quan.definition.parser.XmlDefinitionParser;
-import quan.generator.config.CSharpConfigGenerator;
-import quan.generator.config.JavaConfigGenerator;
-import quan.generator.config.LuaConfigGenerator;
-import quan.generator.data.DataGenerator;
-import quan.generator.message.CSharpMessageGenerator;
-import quan.generator.message.JavaMessageGenerator;
-import quan.generator.message.LuaMessageGenerator;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-
-import static quan.definition.parser.DefinitionParser.createParser;
 
 /**
  * 代码生成器<br/>

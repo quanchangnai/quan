@@ -26,8 +26,8 @@ public class ConfigController implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        String definitionPath = "quan-core\\definition\\config";
-        String tablePath = "quan-core\\config\\excel";
+        String definitionPath = "quan-config\\definition";
+        String tablePath = "quan-config\\config\\excel";
         TableType tableType = TableType.xlsx;
 
         configLoader = new DefinitionConfigLoader(tablePath);

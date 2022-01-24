@@ -3,7 +3,6 @@
  */
 
 dependencies {
-    implementation project(':quan-core')
-    implementation 'dom4j:dom4j:1.6.1'
+    implementation project(':quan-config')
     implementation 'org.freemarker:freemarker:2.3.29'
 }

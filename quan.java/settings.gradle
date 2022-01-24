@@ -3,7 +3,12 @@
  */
 
 rootProject.name = 'quan'
-include 'quan-core'
-include 'quan-editor'
+include 'quan-common'
+include 'quan-network'
+include 'quan-message'
+include 'quan-config'
+include 'quan-data'
 include 'quan-generator'
+include 'quan-editor'
+
 

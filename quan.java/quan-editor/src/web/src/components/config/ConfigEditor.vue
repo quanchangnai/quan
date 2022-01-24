@@ -1,7 +1,7 @@
 <template>
     <div id="container">
         <div id="left">
-            <el-table :data="showTables" @row-click="onRowClick" size="medium" stripe border height="calc(100% - 10px)">
+            <el-table :data="showTables" @row-click="onRowClick" size="medium" stripe border>
                 <el-table-column prop="tableName">
                     <template #header>
                         <el-input v-model="keyword" clearable size="medium" placeholder="输入关键字" prefix-icon="el-icon-search"/>
@@ -112,8 +112,14 @@ export default {
     right: 0;
 }
 
+.el-table{
+    left: 8px;
+    height: calc(100% - 10px);
+    width: calc(100% - 10px);
+}
 .el-tabs {
-    height: calc(100% - 12px)
+    height: calc(100% - 12px);
+    width: calc(100% - 10px);
 }
 
 </style>
