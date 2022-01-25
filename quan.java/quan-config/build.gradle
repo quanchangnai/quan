@@ -6,4 +6,8 @@ apply plugin: 'java-library'
 
 dependencies {
     api project(':quan-common')
+    api 'dom4j:dom4j:1.6.1'
+    api 'org.apache.poi:poi:4.1.0'
+    api 'org.apache.poi:poi-ooxml:4.1.0'
+    api 'org.apache.commons:commons-csv:1.7'
 }

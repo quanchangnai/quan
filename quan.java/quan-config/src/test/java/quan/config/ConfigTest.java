@@ -46,12 +46,12 @@ public class ConfigTest {
 
     private static ConfigLoader definitionConfigLoader() {
         List<String> definitionPaths = new ArrayList<>();
-        definitionPaths.add("quan-core\\definition\\config");
+        definitionPaths.add("quan-config\\definition");
 
 //        TableType tableType = TableType.csv;
 //        String tablePath = "config\\csv";
         TableType tableType = TableType.xlsx;
-        String tablePath = "quan-core\\config\\excel";
+        String tablePath = "quan-config\\excel";
 
         DefinitionConfigLoader configLoader = new DefinitionConfigLoader(tablePath);
         configLoader.useXmlDefinition(definitionPaths, "quan.config");
@@ -62,7 +62,7 @@ public class ConfigTest {
     }
 
     private static ConfigLoader jsonConfigLoader() {
-        String tablePath = "quan-core\\config\\json";
+        String tablePath = "quan-config\\json";
         JsonConfigLoader configLoader = new JsonConfigLoader(tablePath);
         configLoader.setValidatorsPackage("quan");
         configLoader.setPackagePrefix("quan.config");
@@ -94,7 +94,7 @@ public class ConfigTest {
         System.err.println("writeJson()=============");
         long startTime = System.currentTimeMillis();
 
-        configLoader1.writeJson("quan-core\\config\\json", true, Language.cs);
+        configLoader1.writeJson("quan-config\\json", true, Language.cs);
 
         System.err.println("writeJson()耗时:" + (System.currentTimeMillis() - startTime) / 1000D + "s");
         System.err.println();

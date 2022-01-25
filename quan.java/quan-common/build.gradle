@@ -13,8 +13,8 @@ dependencies {
     api 'com.google.guava:guava:28.0-jre'
     api 'org.aspectj:aspectjweaver:1.9.4'
     api 'net.bytebuddy:byte-buddy-agent:1.9.13'
-    api 'dom4j:dom4j:1.6.1'
-    api 'org.apache.poi:poi:4.1.0'
-    api 'org.apache.poi:poi-ooxml:4.1.0'
-    api 'org.apache.commons:commons-csv:1.7'
+    implementation 'dom4j:dom4j:1.6.1'
+    implementation 'org.apache.poi:poi:4.1.0'
+    implementation 'org.apache.poi:poi-ooxml:4.1.0'
+    implementation 'org.apache.commons:commons-csv:1.7'
 }
