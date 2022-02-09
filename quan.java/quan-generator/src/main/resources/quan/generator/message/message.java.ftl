@@ -11,7 +11,7 @@ import ${import};
 </#if>
  * 代码自动生成，请勿手动修改
  */
-public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#elseif kind ==3 && header??>${header.name}<#else>Message</#if> {
+public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#else>Message</#if> {
 
 <#if kind ==3>
     /**
@@ -85,21 +85,6 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
         return ID;
     }
 
-</#if>
-<#if header??>
-    <#list header.fields as field>
-        <#if field.comment !="">
-    /**
-     * ${field.comment}
-     */
-        </#if>
-    @Override
-    public ${name} set${field.name?cap_first}(${field.basicType} ${field.name}) {
-        super.set${field.name?cap_first}(${field.name});
-        return this;
-    }
-
-    </#list>
 </#if>
 <#list selfFields as field>
     <#if field.comment !="">

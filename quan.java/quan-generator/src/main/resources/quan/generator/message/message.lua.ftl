@@ -7,9 +7,6 @@
 
 local _Buffer = require("quan.message.Buffer")
 local _Message = require("quan.message.Message")
-<#if header??>
-local _MessageHeader = require("${header.getFullName("lua")}")
-</#if>
 <#list imports?keys as import>
 local ${imports[import]?replace('.','_')} = require("${import}")
 </#list>
@@ -100,10 +97,6 @@ function ${name}:encode()
     assert(type(self) == "table" and self.class == ${name}.class, "参数[self]类型错误")
 
     local buffer = _Message.encode(self)
-    <#if header??>
-    _MessageHeader.encode(self, buffer)
-
-    </#if>
 <#else>
 ---
 ---<#if comment !="">[${comment}]<#else>${name}</#if>.编码
@@ -118,10 +111,6 @@ function ${name}:encode(buffer)
 
     buffer = buffer or _Buffer.new()
 
-    <#if header??>
-    _MessageHeader.encode(self,buffer)
-
-    </#if>
 </#if>
 <#list fields as field>
     <#if field.ignore>
@@ -246,10 +235,6 @@ function ${name}.decode(buffer)
     local self = ${name}.new()
 
     _Message.decode(buffer, self)
-    <#if header??>
-    _MessageHeader.decode(buffer, self)
-
-    </#if>
 <#else>
 ---
 ---<#if comment !="">[${comment}]<#else>${name}</#if>.解码
@@ -265,10 +250,6 @@ function ${name}.decode(buffer, self)
 
     self = self or ${name}.new()
 
-    <#if header??>
-    _MessageHeader.decode(buffer, self)
-
-    </#if>
 </#if>
 <#if definedFieldId>
     while true do

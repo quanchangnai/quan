@@ -3,12 +3,11 @@ package quan.definition.parser;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import quan.util.PathUtils;
 import quan.definition.BeanDefinition;
 import quan.definition.Category;
 import quan.definition.ClassDefinition;
 import quan.definition.config.ConfigDefinition;
-import quan.definition.message.HeaderDefinition;
+import quan.util.PathUtils;
 
 import java.io.File;
 import java.util.*;
@@ -34,9 +33,6 @@ public abstract class DefinitionParser {
 
     //解析出来的类定义
     protected List<ClassDefinition> parsedClasses = new ArrayList<>();
-
-    //消息头定义，最多只能有一个
-    protected HeaderDefinition headerDefinition;
 
     //已校验过的类定义，类名:类定义
     private Map<String, ClassDefinition> validatedClasses = new HashMap<>();
@@ -106,10 +102,6 @@ public abstract class DefinitionParser {
 
     public ClassDefinition getClass(String name) {
         return validatedClasses.get(name);
-    }
-
-    public HeaderDefinition getMessageHeader() {
-        return headerDefinition;
     }
 
     public ConfigDefinition getConfig(String name) {

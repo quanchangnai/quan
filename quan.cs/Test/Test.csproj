@@ -90,7 +90,6 @@
     <Compile Include="Config\Quest\QuestTargetConfig.cs" />
     <Compile Include="Config\Quest\QuestType.cs" />
     <Compile Include="MessageTest.cs" />
-    <Compile Include="Message\Common\MessageHeader.cs" />
     <Compile Include="Message\Role\CRoleLogin.cs" />
     <Compile Include="Message\Role\RoleInfo.cs" />
     <Compile Include="Message\Role\RoleType.cs" />

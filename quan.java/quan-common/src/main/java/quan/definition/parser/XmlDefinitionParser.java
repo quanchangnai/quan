@@ -8,7 +8,6 @@ import quan.definition.*;
 import quan.definition.config.ConfigDefinition;
 import quan.definition.config.ConstantDefinition;
 import quan.definition.data.DataDefinition;
-import quan.definition.message.HeaderDefinition;
 import quan.definition.message.MessageDefinition;
 
 import java.io.File;
@@ -69,8 +68,7 @@ public class XmlDefinitionParser extends DefinitionParser {
 
         packageName = rootElement.attributeValue("name", packageName);
         if (!Language.java.matchPackageName(packageName)) {
-            addValidatedError(
-                "定义文件[" + definitionFile.getName() + "]的包名[" + packageName + "]格式错误,正确格式:" + Language.LOWER_PACKAGE_NAME_PATTERN);
+            addValidatedError("定义文件[" + definitionFile.getName() + "]的包名[" + packageName + "]格式错误,正确格式:" + Language.LOWER_PACKAGE_NAME_PATTERN);
         }
 
         //具体语言对应的包名
@@ -78,7 +76,7 @@ public class XmlDefinitionParser extends DefinitionParser {
         for (Object attribute : rootElement.attributes()) {
             String attrName = ((Attribute) attribute).getName();
             String attrValue = ((Attribute) attribute).getValue();
-            if (attrName.equals("name") || !attrName.endsWith("-name")) {
+            if (!attrName.endsWith("-name")) {
                 continue;
             }
             Language language;
@@ -88,8 +86,7 @@ public class XmlDefinitionParser extends DefinitionParser {
                 continue;
             }
             if (!language.matchPackageName(attrValue)) {
-                addValidatedError("定义文件[" + definitionFile + "]自定义语言[" + language + "]包名[" + attrValue + "]格式错误,正确格式:" +
-                    language.getPackageNamePattern());
+                addValidatedError("定义文件[" + definitionFile + "]自定义语言[" + language + "]包名[" + attrValue + "]格式错误,正确格式:" + language.getPackageNamePattern());
                 continue;
             }
             languagePackageNames.put(language.name(), attrValue);
@@ -138,16 +135,6 @@ public class XmlDefinitionParser extends DefinitionParser {
             case "message":
                 if (this.category == Category.message) {
                     classDefinition = new MessageDefinition(element.attributeValue("id"));
-                }
-                break;
-            case "message-header":
-                if (this.category == Category.message) {
-                    if (headerDefinition == null) {
-                        headerDefinition = new HeaderDefinition();
-                        classDefinition = headerDefinition;
-                    } else {
-                        addValidatedError("消息头不能重复定义");
-                    }
                 }
                 break;
             case "data":

@@ -3,7 +3,6 @@ using Quan.Message;
 using Buffer = Quan.Message.Buffer;
 using System;
 using System.Collections.Generic;
-using Test.Message.Common;
 using Test.Message.User;
 
 namespace Test.Message.Role
@@ -12,7 +11,7 @@ namespace Test.Message.Role
 	/// 角色登录，自定义ID<br/>
 	/// 代码自动生成，请勿手动修改
 	/// </summary>
-    public class CRoleLogin : MessageHeader
+    public class CRoleLogin : MessageBase
     {
 		/// <summary>
 		/// 消息ID
@@ -145,9 +144,7 @@ namespace Test.Message.Role
 		public override string ToString()
 		{
 			return "CRoleLogin{" +
-				   "seq=" + seq.ToString2() +
-				   ",error=" + error.ToString2() +
-				   ",roleId=" + roleId.ToString2() +
+				   "roleId=" + roleId.ToString2() +
 				   ",roleName='" + roleName + '\'' +
 				   ",roleInfo=" + roleInfo.ToString2() +
 				   ",roleInfoList=" + roleInfoList.ToString2() +

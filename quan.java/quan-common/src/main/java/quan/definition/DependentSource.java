@@ -57,7 +57,6 @@ public class DependentSource implements Comparable<DependentSource> {
         FIELD_REF,//集合引用依赖
         PARENT,//父类依赖
         CHILD,//子类依赖
-        MESSAGE_HEADER//消息头依赖
     }
 
 }

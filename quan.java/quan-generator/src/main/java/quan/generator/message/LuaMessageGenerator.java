@@ -3,7 +3,6 @@ package quan.generator.message;
 import freemarker.template.Template;
 import quan.definition.ClassDefinition;
 import quan.definition.Language;
-import quan.definition.message.HeaderDefinition;
 import quan.definition.message.MessageDefinition;
 
 import java.io.*;
@@ -71,17 +70,6 @@ public class LuaMessageGenerator extends MessageGenerator {
         }
 
         logger.info("生成消息注册表[{}]完成", filePath + File.separator + fileName);
-    }
-
-    @Override
-    protected void prepareClass(ClassDefinition classDefinition) {
-        super.prepareClass(classDefinition);
-        if (classDefinition instanceof MessageDefinition) {
-            HeaderDefinition headerDefinition = ((MessageDefinition) classDefinition).getHeader();
-            if (headerDefinition != null) {
-                classDefinition.getImports().remove(headerDefinition.getOtherImport(language()));
-            }
-        }
     }
 
 }

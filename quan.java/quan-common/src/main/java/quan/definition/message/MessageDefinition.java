@@ -68,32 +68,8 @@ public class MessageDefinition extends BeanDefinition {
                 addValidatedError(getValidatedName("的") + "ID[" + strId + "]不合法");
             }
         }
-
-        if (getHeader() != null) {
-            fields.addAll(0, getHeader().getFields());
-        }
     }
 
-    @Override
-    protected void validateFieldNameDuplicate(FieldDefinition fieldDefinition) {
-        HeaderDefinition headerDefinition = parser.getMessageHeader();
-        if (fieldDefinition.getName() != null && headerDefinition != null) {
-            headerDefinition.validate1();
-            if (headerDefinition.getField(fieldDefinition.getName()) != null) {
-                addValidatedError(getValidatedName("的") + "字段名[" + fieldDefinition.getName() + "]不能和消息头的字段重复");
-            }
-        }
-        super.validateFieldNameDuplicate(fieldDefinition);
-    }
-
-    @Override
-    protected void validateDependents() {
-        HeaderDefinition header = getHeader();
-        if (header != null) {
-            addDependent(DependentType.MESSAGE_HEADER, this, header, header);
-        }
-        super.validateDependents();
-    }
 
     @Override
     protected boolean isReservedWord(String fieldName) {
@@ -101,10 +77,6 @@ public class MessageDefinition extends BeanDefinition {
             return true;
         }
         return fieldName.equals("id");
-    }
-
-    public HeaderDefinition getHeader() {
-        return parser.getMessageHeader();
     }
 
 }

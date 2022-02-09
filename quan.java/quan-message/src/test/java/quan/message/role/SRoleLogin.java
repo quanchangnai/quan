@@ -2,14 +2,13 @@ package quan.message.role;
 
 import quan.message.*;
 import java.util.*;
-import quan.message.common.MessageHeader;
 import quan.message.user.UserInfo;
 
 /**
  * 角色登录，哈希生成ID<br/>
  * 代码自动生成，请勿手动修改
  */
-public class SRoleLogin extends MessageHeader {
+public class SRoleLogin extends Message {
 
     /**
      * 消息ID
@@ -44,24 +43,6 @@ public class SRoleLogin extends MessageHeader {
     @Override
     public final int getId() {
         return ID;
-    }
-
-    /**
-     * 消息序号
-     */
-    @Override
-    public SRoleLogin setSeq(int seq) {
-        super.setSeq(seq);
-        return this;
-    }
-
-    /**
-     * 错误码
-     */
-    @Override
-    public SRoleLogin setError(int error) {
-        super.setError(error);
-        return this;
     }
 
     /**
@@ -223,9 +204,7 @@ public class SRoleLogin extends MessageHeader {
     @Override
     public String toString() {
         return "SRoleLogin{" +
-                "seq=" + seq +
-                ",error=" + error +
-                ",roleId=" + roleId +
+                "roleId=" + roleId +
                 ",roleName='" + roleName + '\'' +
                 ",roleInfo=" + roleInfo +
                 ",roleInfoList=" + roleInfoList +

@@ -5,7 +5,6 @@
 
 local _Buffer = require("quan.message.Buffer")
 local _Message = require("quan.message.Message")
-local _MessageHeader = require("test.message.common.MessageHeader")
 local RoleInfo = require("test.message.role.RoleInfo")
 local UserInfo = require("test.message.user.UserInfo")
 
@@ -26,9 +25,7 @@ end
 
 local function toString(self)
     return "CRoleLogin{" ..
-            "seq=" .. tostring(self.seq) ..
-            ",error=" .. tostring(self.error) ..
-            ",roleId=" .. tostring(self.roleId) ..
+            "roleId=" .. tostring(self.roleId) ..
             ",roleName='" .. tostring(self.roleName) .. '\'' ..
             ",roleInfo=" .. tostring(self.roleInfo) ..
             ",roleInfoList=" .. table.toString(self.roleInfoList) ..
@@ -50,10 +47,6 @@ function CRoleLogin.new(args)
     args = args or {}
 
     local instance = {
-        ---消息序号
-        seq = args.seq or 0,
-        ---错误码
-        error = args.error or 0,
         ---角色id
         roleId = args.roleId or 0,
         ---角色名
@@ -84,10 +77,6 @@ function CRoleLogin:encode()
     assert(type(self) == "table" and self.class == CRoleLogin.class, "参数[self]类型错误")
 
     local buffer = _Message.encode(self)
-    _MessageHeader.encode(self, buffer)
-
-    buffer:writeInt(self.seq)
-    buffer:writeInt(self.error)
     buffer:writeInt(self.roleId)
     buffer:writeString(self.roleName)
     RoleInfo.encode(self.roleInfo, buffer)
@@ -127,10 +116,6 @@ function CRoleLogin.decode(buffer)
     local self = CRoleLogin.new()
 
     _Message.decode(buffer, self)
-    _MessageHeader.decode(buffer, self)
-
-    self.seq = buffer:readInt()
-    self.error = buffer:readInt()
     self.roleId = buffer:readInt()
     self.roleName = buffer:readString()
     self.roleInfo = RoleInfo.decode(buffer, self.roleInfo)
