@@ -268,36 +268,36 @@ public class UserInfo extends Bean {
             buffer.writeTag(4);
             buffer.writeInt(this.id);
         }
-    
+
         if (!this.name.isEmpty()) {
             buffer.writeTag(11);
             buffer.writeString(this.name);
         }
-    
+
         if (this.level != 0) {
             buffer.writeTag(12);
             buffer.writeInt(this.level);
         }
-    
+
         if (this.type != null) {
             buffer.writeTag(16);
             buffer.writeInt(this.type.value());
         }
-    
+
         if (this.roleInfo1 != null) {
             buffer.writeTag(23);
             this.roleInfo1.encode(buffer.getTemp());
             buffer.writeTemp();
         }
-    
+
         buffer.writeTag(27);
         this.roleInfo2.encode(buffer.getTemp());
         buffer.writeTemp();
-    
+
         buffer.writeTag(31);
         this.roleInfo3.encode(buffer.getTemp());
         buffer.writeTemp();
-    
+
         if (!this.roleList.isEmpty()) {
             buffer.writeTag(35);
             buffer.getTemp().writeInt(this.roleList.size());
@@ -306,7 +306,7 @@ public class UserInfo extends Bean {
             }
             buffer.writeTemp();
         }
-    
+
         if (!this.roleSet.isEmpty()) {
             buffer.writeTag(39);
             buffer.getTemp().writeInt(this.roleSet.size());
@@ -315,7 +315,7 @@ public class UserInfo extends Bean {
             }
             buffer.writeTemp();
         }
-    
+
         if (!this.roleMap.isEmpty()) {
             buffer.writeTag(43);
             buffer.getTemp().writeInt(this.roleMap.size());
@@ -325,47 +325,47 @@ public class UserInfo extends Bean {
             }
             buffer.writeTemp();
         }
-    
+
         if (this.f11.length > 0) {
             buffer.writeTag(47);
             buffer.writeBytes(this.f11);
         }
-    
+
         if (this.f12) {
             buffer.writeTag(48);
             buffer.writeBool(this.f12);
         }
-    
+
         if (this.f13) {
             buffer.writeTag(52);
             buffer.writeBool(this.f13);
         }
-    
+
         if (this.f14 != 0) {
             buffer.writeTag(56);
             buffer.writeShort(this.f14);
         }
-    
+
         if (this.f15 != 0) {
             buffer.writeTag(61);
             buffer.writeFloat(this.f15);
         }
-    
+
         if (this.f16 != 0) {
             buffer.writeTag(64);
             buffer.writeFloat(this.f16, 2);
         }
-    
+
         if (this.f17 != 0) {
             buffer.writeTag(70);
             buffer.writeDouble(this.f17);
         }
-    
+
         if (this.f18 != 0) {
             buffer.writeTag(72);
             buffer.writeDouble(this.f18, 2);
         }
-    
+
         buffer.writeTag(0);
     }
 
@@ -405,7 +405,7 @@ public class UserInfo extends Bean {
                 case 35:
                     buffer.readInt();
                     int roleList$Size = buffer.readInt();
-                    for (int i = 0; i < roleList$Size; i++) {     
+                    for (int i = 0; i < roleList$Size; i++) {
                         quan.message.role.RoleInfo roleList$Value = new quan.message.role.RoleInfo();
                         roleList$Value.decode(buffer);
                         this.roleList.add(roleList$Value);
@@ -414,7 +414,7 @@ public class UserInfo extends Bean {
                 case 39:
                     buffer.readInt();
                     int roleSet$Size = buffer.readInt();
-                    for (int i = 0; i < roleSet$Size; i++) {     
+                    for (int i = 0; i < roleSet$Size; i++) {
                         quan.message.role.RoleInfo roleSet$Value = new quan.message.role.RoleInfo();
                         roleSet$Value.decode(buffer);
                         this.roleSet.add(roleSet$Value);

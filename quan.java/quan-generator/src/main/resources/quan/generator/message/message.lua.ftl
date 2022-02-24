@@ -133,7 +133,7 @@ function ${name}:encode(buffer)
     end
         <#elseif field.type=="map">
     local ${field.name}Size = table.size(self.${field.name})
-    if ${field.name}Size > 0  then
+    if ${field.name}Size > 0 then
         buffer:writeTag(${field.tag})
         local ${field.name}Buffer = _Buffer.new()
         ${field.name}Buffer:writeInt(${field.name}Size)
@@ -161,14 +161,14 @@ function ${name}:encode(buffer)
     if self.${field.name} then
         buffer:writeTag(${field.tag})
         buffer:write${field.type?cap_first}(self.${field.name})
-    end    
+    end
         <#elseif field.type=="string" || field.type=="bytes">
     if #self.${field.name} > 0 then
         buffer:writeTag(${field.tag})
         buffer:write${field.type?cap_first}(self.${field.name})
-    end   
+    end
         <#elseif field.enumType>
-    if self.${field.name} ~= nil and self.${field.name} ~= 0  then
+    if self.${field.name} ~= nil and self.${field.name} ~= 0 then
         buffer:writeTag(${field.tag})
         buffer:writeInt(self.${field.name})
     end

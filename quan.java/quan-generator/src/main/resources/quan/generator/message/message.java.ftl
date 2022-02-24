@@ -226,7 +226,7 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
         this.${field.name}.encode(buffer.getTemp());
         buffer.writeTemp();
         </#if>
-    
+
     <#else>
         <#if field.type=="set" || field.type=="list">
             <#if field?index gt 0>
@@ -299,7 +299,7 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
                 <#if field.type=="set" || field.type=="list">
                     buffer.readInt();
                     int ${field.name}$Size = buffer.readInt();
-                    for (int i = 0; i < ${field.name}$Size; i++) {     
+                    for (int i = 0; i < ${field.name}$Size; i++) {
                     <#if field.builtinValueType>
                         this.${field.name}.add(buffer.read${field.valueType?cap_first}());
                     <#else>

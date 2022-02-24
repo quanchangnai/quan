@@ -111,14 +111,14 @@ function UserInfo:encode(buffer)
     if #self.name > 0 then
         buffer:writeTag(11)
         buffer:writeString(self.name)
-    end   
+    end
 
     if self.level ~= 0 then
         buffer:writeTag(12)
         buffer:writeInt(self.level)
     end
 
-    if self.type ~= nil and self.type ~= 0  then
+    if self.type ~= nil and self.type ~= 0 then
         buffer:writeTag(16)
         buffer:writeInt(self.type)
     end
@@ -161,7 +161,7 @@ function UserInfo:encode(buffer)
     end
 
     local roleMapSize = table.size(self.roleMap)
-    if roleMapSize > 0  then
+    if roleMapSize > 0 then
         buffer:writeTag(43)
         local roleMapBuffer = _Buffer.new()
         roleMapBuffer:writeInt(roleMapSize)
@@ -175,17 +175,17 @@ function UserInfo:encode(buffer)
     if #self.f11 > 0 then
         buffer:writeTag(47)
         buffer:writeBytes(self.f11)
-    end   
+    end
 
     if self.f12 then
         buffer:writeTag(48)
         buffer:writeBool(self.f12)
-    end    
+    end
 
     if self.f13 then
         buffer:writeTag(52)
         buffer:writeBool(self.f13)
-    end    
+    end
 
     if self.f14 ~= 0 then
         buffer:writeTag(56)
