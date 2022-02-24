@@ -210,12 +210,14 @@ end
 
 function Buffer:writeFixed(n, scale)
     local times = 10 ^ scale
-    local r = math.floor(n * times)
+    local minValue = -0x80000000 * times;
+    local maxValue = 0x7FFFFFFF * times;
 
-    if r < -0x80000000 or r > 0x7FFFFFFF then
-        error(string.format("参数[%s]超出了限定范围[%s,%s],无法转换为指定精度[%s]的定点型数据", n, -0x80000000 * times, 0x7FFFFFFF * times, scale))
+    if n < minValue or n > maxValue then
+        local format = "参数[%s]超出了限定范围[%s,%s],无法转换为指定精度[%s]的定点型数据";
+        error(string.format(format, n, minValue, maxValue, scale))
     else
-        self:writeInt(r)
+        self:writeInt(math.floor(n * times))
     end
 end
 

@@ -96,6 +96,7 @@
     <Compile Include="Message\Role\SRoleLogin.cs" />
     <Compile Include="Message\User\RoleInfo.cs" />
     <Compile Include="Message\User\UserInfo.cs" />
+    <Compile Include="Message\User\UserType.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

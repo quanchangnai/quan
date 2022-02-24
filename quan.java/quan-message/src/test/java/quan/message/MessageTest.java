@@ -5,6 +5,7 @@ import quan.message.role.RoleInfo;
 import quan.message.role.RoleType;
 import quan.message.role.SRoleLogin;
 import quan.message.user.UserInfo;
+import quan.message.user.UserType;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -112,10 +113,14 @@ public class MessageTest {
         userInfo.setId(1);
         userInfo.setLevel(2);
         userInfo.setName("addadas");
+        userInfo.setType(UserType.type1);
         userInfo.setRoleInfo1(roleInfo1);
 //        userInfo.setRoleInfo2(new quan.message.user.RoleInfo());
         userInfo.getRoleList().add(roleInfo1);
         userInfo.getRoleMap().put(roleInfo2.getId(), roleInfo2);
+        userInfo.setF15(343.6F);
+        userInfo.setF17(-Double.MAX_VALUE);
+        userInfo.setF18(4534545);
 
         sRoleLogin1.setUserInfo(userInfo);
 
@@ -136,7 +141,6 @@ public class MessageTest {
         sRoleLogin2.decode(encodedBytes);
 
         System.err.println("sRoleLogin2:" + sRoleLogin2);
-//        System.err.println("sRoleLogin2.seq:" + sRoleLogin2.getSeq());
 
         Buffer buffer = new SimpleBuffer();
         sRoleLogin1.encode(buffer);

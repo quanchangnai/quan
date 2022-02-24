@@ -75,8 +75,8 @@ namespace Test.Message.Role
 		{
 	    	base.Encode(buffer);
 
-		    buffer.WriteInt(roleId);
-		    buffer.WriteString(roleName);
+			buffer.WriteInt(roleId);
+			buffer.WriteString(roleName);
 		    roleInfo.Encode(buffer);
 
 		    buffer.WriteInt(roleInfoList.Count);

@@ -117,21 +117,77 @@ function ${name}:encode(buffer)
         <#continue/>
     </#if>
     <#if definedFieldId>
-    buffer:writeTag(${field.tag})
-    </#if>
-    <#if field.type=="set" || field.type=="list">
-        <#if definedFieldId>
-    local ${field.name}Buffer = _Buffer.new()
-    ${field.name}Buffer:writeInt(#self.${field.name})
-    for i, value in ipairs(self.${field.name}) do
+        <#if field.type=="set" || field.type=="list">
+    if #self.${field.name} > 0 then
+        buffer:writeTag(${field.tag})
+        local ${field.name}Buffer = _Buffer.new()
+        ${field.name}Buffer:writeInt(#self.${field.name})
+        for i, value in ipairs(self.${field.name}) do
         <#if field.builtinValueType>
-        ${field.name}Buffer:write${field.valueType?cap_first}(value)
+            ${field.name}Buffer:write${field.valueType?cap_first}(value)
         <#else>
-        ${field.classValueType?replace('.','_')}.encode(value, ${field.name}Buffer)
+            ${field.classValueType?replace('.','_')}.encode(value, ${field.name}Buffer)
         </#if>
+        end
+        buffer:writeBuffer(${field.name}Buffer)
     end
-    buffer:writeBuffer(${field.name}Buffer)
+        <#elseif field.type=="map">
+    local ${field.name}Size = table.size(self.${field.name})
+    if ${field.name}Size > 0  then
+        buffer:writeTag(${field.tag})
+        local ${field.name}Buffer = _Buffer.new()
+        ${field.name}Buffer:writeInt(${field.name}Size)
+        for key, value in pairs(self.${field.name}) do
+            ${field.name}Buffer:write${field.keyType?cap_first}(key)
+        <#if field.builtinValueType>
+            ${field.name}Buffer:write${field.valueType?cap_first}(value)
         <#else>
+            ${field.classValueType?replace('.','_')}.encode(value, ${field.name}Buffer)
+        </#if>
+        end
+        buffer:writeBuffer(${field.name}Buffer)
+    end
+        <#elseif field.type=="float"||field.type=="double">
+    if self.${field.name} ~= 0 then
+        buffer:writeTag(${field.tag})
+        buffer:write${field.type?cap_first}(self.${field.name}<#if field.scale gt 0>, ${field.scale}</#if>)
+    end
+        <#elseif field.numberType>
+    if self.${field.name} ~= 0 then
+        buffer:writeTag(${field.tag})
+        buffer:write${field.type?cap_first}(self.${field.name})
+    end
+        <#elseif field.type=="bool">
+    if self.${field.name} then
+        buffer:writeTag(${field.tag})
+        buffer:write${field.type?cap_first}(self.${field.name})
+    end    
+        <#elseif field.type=="string" || field.type=="bytes">
+    if #self.${field.name} > 0 then
+        buffer:writeTag(${field.tag})
+        buffer:write${field.type?cap_first}(self.${field.name})
+    end   
+        <#elseif field.enumType>
+    if self.${field.name} ~= nil and self.${field.name} ~= 0  then
+        buffer:writeTag(${field.tag})
+        buffer:writeInt(self.${field.name})
+    end
+        <#elseif field.optional>
+    if self.${field.name} ~= nil then
+        buffer:writeTag(${field.tag})
+        local ${field.name}Buffer = _Buffer.new()
+        ${field.classType?replace('.','_')}.encode(self.${field.name}, ${field.name}Buffer)
+        buffer:writeBuffer(${field.name}Buffer)
+    end
+    <#else>
+    buffer:writeTag(${field.tag})
+    local ${field.name}Buffer = _Buffer.new()
+    ${field.classType?replace('.','_')}.encode(self.${field.name}, ${field.name}Buffer)
+    buffer:writeBuffer(${field.name}Buffer)
+    </#if>
+
+    <#else>
+        <#if field.type=="set" || field.type=="list">
         <#if field?index gt 0>
 
         </#if>
@@ -146,21 +202,7 @@ function ${name}:encode(buffer)
         <#if field?has_next && !fields[field?index+1].collectionType && (fields[field?index+1].primitiveType || fields[field?index+1].enumType || !fields[field?index+1].optional) >
 
         </#if>
-        </#if>
-    <#elseif field.type=="map">
-        <#if definedFieldId>
-    local ${field.name}Buffer = _Buffer.new()
-    ${field.name}Buffer:writeInt(table.size(self.${field.name}))
-    for key, value in pairs(self.${field.name}) do
-        ${field.name}Buffer:write${field.keyType?cap_first}(key)
-        <#if field.builtinValueType>
-        ${field.name}Buffer:write${field.valueType?cap_first}(value)
-        <#else>
-        ${field.classValueType}.encode(value, ${field.name}Buffer)
-        </#if>
-    end
-    buffer:writeBuffer(${field.name}Buffer)
-        <#else>
+        <#elseif field.type=="map">
         <#if field?index gt 0>
 
         </#if>
@@ -176,22 +218,13 @@ function ${name}:encode(buffer)
         <#if field?has_next && !fields[field?index+1].collectionType && (fields[field?index+1].primitiveType || fields[field?index+1].enumType || !fields[field?index+1].optional) >
 
         </#if>
-        </#if>
-    <#elseif field.type=="float"||field.type=="double">
+        <#elseif field.type=="float"||field.type=="double">
     buffer:write${field.type?cap_first}(self.${field.name}<#if field.scale gt 0>, ${field.scale}</#if>)
-    <#elseif field.builtinType>
+        <#elseif field.builtinType>
     buffer:write${field.type?cap_first}(self.${field.name})
-    <#elseif field.enumType>
+        <#elseif field.enumType>
     buffer:writeInt(self.${field.name} or 0)
-    <#elseif field.optional>
-        <#if definedFieldId>
-    local ${field.name}Buffer = _Buffer.new()
-    ${field.name}Buffer:writeBool(self.${field.name} ~= nil)
-    if self.${field.name} ~= nil then
-        ${field.classType?replace('.','_')}.encode(self.${field.name}, ${field.name}Buffer)
-    end
-    buffer:writeBuffer(${field.name}Buffer)
-        <#else>
+        <#elseif field.optional>
         <#if field?index gt 0>
 
         </#if>
@@ -202,18 +235,9 @@ function ${name}:encode(buffer)
         <#if field?has_next && !fields[field?index+1].collectionType && (fields[field?index+1].primitiveType || fields[field?index+1].enumType || !fields[field?index+1].optional) >
 
         </#if>
-        </#if>
-    <#else>
-    <#if definedFieldId>
-    local ${field.name}Buffer = _Buffer.new()
-    ${field.classType?replace('.','_')}.encode(self.${field.name}, ${field.name}Buffer)
-    buffer:writeBuffer(${field.name}Buffer)
-    <#else>
+        <#else>
     ${field.classType?replace('.','_')}.encode(self.${field.name}, buffer)
-    </#if>
-    </#if>
-    <#if definedFieldId>
-
+        </#if>
     </#if>
 </#list>
 <#if definedFieldId>
@@ -285,9 +309,7 @@ function ${name}.decode(buffer, self)
             self.${field.name} = buffer:readInt()
         <#elseif field.optional>
             buffer:readInt()
-            if buffer:readBool() then
-                self.${field.name} = ${field.classType?replace('.','_')}.decode(buffer)
-            end
+            self.${field.name} = ${field.classType?replace('.','_')}.decode(buffer)
         <#else>
             buffer:readInt()
             self.${field.name} = ${field.classType?replace('.','_')}.decode(buffer, self.${field.name})

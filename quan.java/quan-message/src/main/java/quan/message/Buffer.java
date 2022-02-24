@@ -253,12 +253,13 @@ public abstract class Buffer {
 
     public static int checkScale(double n, int scale) {
         double times = Math.pow(10, scale);
-        double r = Math.floor(n * times);
-        if (r < Integer.MIN_VALUE || r > Integer.MAX_VALUE) {
+        double minValue = Integer.MIN_VALUE * times;
+        double maxValue = Integer.MAX_VALUE * times;
+        if (n < minValue || n > maxValue) {
             String format = "参数[%s]超出了限定范围[%s,%s],无法转换为指定精度[%s]的定点型数据";
-            throw new IllegalArgumentException(String.format(format, n, Integer.MIN_VALUE * times, Integer.MAX_VALUE * times, scale));
+            throw new IllegalArgumentException(String.format(format, n, minValue, maxValue, scale));
         }
-        return (int) r;
+        return (int) Math.floor(n * times);
     }
 
     public void writeDouble(double n, int scale) {

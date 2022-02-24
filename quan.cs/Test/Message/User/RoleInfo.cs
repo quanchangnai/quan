@@ -32,8 +32,8 @@ namespace Test.Message.User
 		{
 	    	base.Encode(buffer);
 
-		    buffer.WriteInt(id);
-		    buffer.WriteString(name);
+			buffer.WriteInt(id);
+			buffer.WriteString(name);
 		}
 
 		public override void Decode(Buffer buffer)

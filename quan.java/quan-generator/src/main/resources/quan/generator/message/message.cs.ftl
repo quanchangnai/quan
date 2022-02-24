@@ -133,22 +133,82 @@ namespace ${getFullPackageName("cs")}
 	 <#if field.ignore>
         <#continue/>
 	</#if>
-	 <#if definedFieldId>
-        	buffer.WriteTag(${field.tag});
-    </#if>
-	<#if field.type=="set" || field.type=="list">
-		<#if definedFieldId>
-			var ${field.name}Buffer = new Buffer();
-			${field.name}Buffer.WriteInt(${field.name}.Count);
-		    foreach (var ${field.name}Value in ${field.name}) {
-			<#if field.builtinValueType>
-			    ${field.name}Buffer.Write${field.valueType?cap_first}(${field.name}Value);
-			<#else>
-				${field.name}Value.Encode(${field.name}Buffer);
-			</#if>
-		    }
-			buffer.WriteBuffer(${field.name}Buffer);
+	<#if definedFieldId>
+		<#if field.type=="set" || field.type=="list">
+			if (${field.name}.Count > 0) {
+				buffer.WriteTag(${field.tag});
+				var ${field.name}Buffer = new Buffer();
+				${field.name}Buffer.WriteInt(${field.name}.Count);
+		    	foreach (var ${field.name}Value in ${field.name}) {
+				<#if field.builtinValueType>
+			    	${field.name}Buffer.Write${field.valueType?cap_first}(${field.name}Value);
+				<#else>
+					${field.name}Value.Encode(${field.name}Buffer);
+				</#if>
+		    	}
+				buffer.WriteBuffer(${field.name}Buffer);
+			}
+		<#elseif field.type=="map">
+			if (${field.name}.Count > 0) {
+				buffer.WriteTag(${field.tag});
+				var ${field.name}Buffer = new Buffer();
+				${field.name}Buffer.WriteInt(${field.name}.Count);
+		    	foreach (var ${field.name}Key in ${field.name}.Keys) {
+		        	${field.name}Buffer.Write${field.keyType?cap_first}(${field.name}Key);
+				<#if field.builtinValueType>
+			    	${field.name}Buffer.Write${field.valueType?cap_first}(${field.name}[${field.name}Key]);
+				<#else>
+			    	${field.name}[${field.name}Key].Encode(${field.name}Buffer);
+				</#if>
+		    	}
+				buffer.WriteBuffer(${field.name}Buffer);
+			}
+		<#elseif field.type=="float"||field.type=="double">
+        	if (${field.name} != 0) {
+            	buffer.WriteTag(${field.tag});
+            	buffer.Write${field.type?cap_first}(${field.name}<#if field.scale gt 0>, ${field.scale}</#if>);
+        	}
+		<#elseif field.numberType>
+        	if (${field.name} != 0) {
+           	 	buffer.WriteTag(${field.tag});
+            	buffer.Write${field.type?cap_first}(${field.name});
+        	}
+		<#elseif field.type=="bool">
+        	if (${field.name}) {
+            	buffer.WriteTag(${field.tag});
+            	buffer.Write${field.type?cap_first}(${field.name});
+        	}
+		<#elseif field.type=="string">
+        	if (${field.name}.Length > 0) {
+            	buffer.WriteTag(${field.tag});
+            	buffer.Write${field.type?cap_first}(${field.name});
+        	}
+		<#elseif field.type=="bytes">
+        	if (${field.name}.Length > 0) {
+            	buffer.WriteTag(${field.tag});
+           		buffer.Write${field.type?cap_first}(${field.name});
+        	}
+		<#elseif field.enumType>
+        	if (${field.name} != 0) {
+            	buffer.WriteTag(${field.tag});
+            	buffer.WriteInt((int)${field.name});
+        	}
+		<#elseif field.optional>
+		 	if (${field.name} != null) {
+				buffer.WriteTag(${field.tag});
+				var ${field.name}Buffer = new Buffer();
+		    	${field.name}.Encode(${field.name}Buffer);
+				buffer.WriteBuffer(${field.name}Buffer);
+		 	}
 		<#else>
+			buffer.WriteTag(${field.tag});
+        	var ${field.name}Buffer = new Buffer();
+        	${field.name}.Encode(${field.name}Buffer);
+        	buffer.WriteBuffer(${field.name}Buffer);
+		</#if>
+
+	<#else>
+		<#if field.type=="set" || field.type=="list">
 			<#if field?index gt 0>
 
         	</#if>
@@ -163,21 +223,7 @@ namespace ${getFullPackageName("cs")}
         	<#if field?has_next && !selfFields[field?index+1].collectionType && (selfFields[field?index+1].primitiveType || !selfFields[field?index+1].optional) >
 
         	</#if>
-		</#if>
-	<#elseif field.type=="map">
-		<#if definedFieldId>
-			var ${field.name}Buffer = new Buffer();
-			${field.name}Buffer.WriteInt(${field.name}.Count);
-		    foreach (var ${field.name}Key in ${field.name}.Keys) {
-		        ${field.name}Buffer.Write${field.keyType?cap_first}(${field.name}Key);
-			<#if field.builtinValueType>
-			    ${field.name}Buffer.Write${field.valueType?cap_first}(${field.name}[${field.name}Key]);
-			<#else>
-			    ${field.name}[${field.name}Key].Encode(${field.name}Buffer);
-			</#if>
-		    }
-			buffer.WriteBuffer(${field.name}Buffer);
-		<#else>
+		<#elseif field.type=="map">
 			<#if field?index gt 0>
 
         	</#if>
@@ -193,20 +239,13 @@ namespace ${getFullPackageName("cs")}
         	<#if field?has_next && !selfFields[field?index+1].collectionType && (selfFields[field?index+1].primitiveType || !selfFields[field?index+1].optional) >
 
         	</#if>
-		</#if>
-	<#elseif field.type=="float"||field.type=="double">
-			buffer.Write${field.type?cap_first}(${field.name}<#if field.scale gt 0>, ${field.scale}</#if>);
-	<#elseif field.builtinType>
-		    buffer.Write${field.type?cap_first}(${field.name});
-	<#elseif field.enumType>
-			buffer.WriteInt((int)${field.name});
-	<#elseif field.optional>
-		<#if definedFieldId>
-			var ${field.name}Buffer = new Buffer();
-			${field.name}Buffer.WriteBool(${field.name} != null);
-		    ${field.name}?.Encode(${field.name}Buffer);
-			buffer.WriteBuffer(${field.name}Buffer);
-		<#else>
+		<#elseif field.type=="float"||field.type=="double">
+        	buffer.Write${field.type?cap_first}(${field.name}<#if field.scale gt 0>, ${field.scale}</#if>);
+		<#elseif field.builtinType>
+			buffer.Write${field.type?cap_first}(${field.name});
+		<#elseif field.enumType>
+        	buffer.WriteInt((int)${field.name});
+		<#elseif field.optional>
 			<#if field?index gt 0>
 
         	</#if>
@@ -215,19 +254,10 @@ namespace ${getFullPackageName("cs")}
         	<#if field?has_next && !selfFields[field?index+1].collectionType && (selfFields[field?index+1].primitiveType || !selfFields[field?index+1].optional) >
 
         	</#if>
-		</#if>
-	<#else>
-		<#if definedFieldId>
-        	var ${field.name}Buffer = new Buffer();
-        	${field.name}.Encode(${field.name}Buffer);
-        	buffer.WriteBuffer(${field.name}Buffer);
-        <#else>
+		<#else>
 		    ${field.name}.Encode(buffer);
 		</#if>
 	</#if>
-	<#if definedFieldId>
-
-    </#if>
 </#list>
 <#if definedFieldId>
         	buffer.WriteTag(0);
@@ -283,14 +313,11 @@ namespace ${getFullPackageName("cs")}
                     	${field.name} = (${field.type})buffer.ReadInt();
                 	<#elseif field.optional>
                     	buffer.ReadInt();
-                    	if (buffer.ReadBool()) 
+                    	if (${field.name} == null)
 						{
-		        			if (${field.name} == null)
-							{
-		            			${field.name} = new ${field.classType}();
-		        			}
-		        			${field.name}.Decode(buffer);
-            			}
+		            		${field.name} = new ${field.classType}();
+		        		}
+		        		${field.name}.Decode(buffer);
            	 		<#else>
                     	buffer.ReadInt();
                     	${field.name}.Decode(buffer);

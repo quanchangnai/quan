@@ -109,14 +109,18 @@ local function testMessage1()
 
     print("sRoleLogin2：", sRoleLogin1)
 
-    --local buffer = SRoleLogin.encode(sRoleLogin2)
-    --local file1 = io.open("D:\\SRoleLogin", "w")
-    --file1:write(buffer.bytes)
-    --file1:flush()
+    local file1 = io.open("D:\\SRoleLogin", "r")
+    local bytes = file1:read("*a")
+    print("bytes length",#bytes)
+    local buffer = Buffer.new(bytes);
+    local sRoleLogin3 = SRoleLogin.decode(buffer)
+    print("buffer:readableCount()",buffer:readableCount())
 
-    --local file2 = io.open("D:\\SRoleLogin", "r")
-    --local bytes = file2:read("*a")
-    --local sRoleLogin3 = SRoleLogin.decode(Buffer.new(bytes))
+    local buffer = SRoleLogin.encode(sRoleLogin3)
+    print("buffer:size()",buffer:size())
+    local file2 = io.open("D:\\SRoleLogin", "w")
+    file2:write(buffer.bytes)
+    file2:flush()
 
     print("SRoleLogin1", sRoleLogin1)
     print("SRoleLogin2", sRoleLogin2)

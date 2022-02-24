@@ -342,15 +342,15 @@ namespace Quan.Message
         public static int CheckScale(double n, int scale)
         {
             var times = Math.Pow(10, scale);
-            var r = Math.Floor(n * times);
-            var threshold = long.MaxValue / times;
-            if (r < int.MinValue || r > int.MaxValue)
+            var minValue = int.MinValue * times;
+            var maxValue = int.MaxValue * times;
+            if (n < minValue || n > maxValue)
             {
-                var error = $"参数[{n}]超出了限定范围[{-threshold},{threshold}],无法转换为指定精度[{scale}]的定点型数据";
+                var error = $"参数[{n}]超出了限定范围[{minValue},{maxValue}],无法转换为指定精度[{scale}]的定点型数据";
                 throw new ArgumentException(error);
             }
 
-            return (int) r;
+            return (int) Math.Floor(n * times);
         }
 
         public void WriteDouble(double n, int scale)

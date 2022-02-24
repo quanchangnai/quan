@@ -114,7 +114,7 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
     </#if>
     public ${name} set${field.name?cap_first}(${field.basicType} ${field.name}) {
         <#if field.type == "string" || field.type == "bytes">
-        Objects.requireNonNull(${field.name});<#if field.scale gt 0>, ${field.scale}</#if>
+        Objects.requireNonNull(${field.name});
         <#elseif (field.type=="float"||field.type=="double") && field.scale gt 0>
         Buffer.checkScale(${field.name}, ${field.scale});
         </#if>
@@ -158,20 +158,77 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
         <#continue/>
     </#if>
     <#if definedFieldId>
-        buffer.writeTag(${field.tag});
-    </#if>
-    <#if field.type=="set" || field.type=="list">
-        <#if definedFieldId>
-        buffer.getTemp().writeInt(this.${field.name}.size());
-        for (${field.classValueType} ${field.name}$Value : this.${field.name}) {
-            <#if field.builtinValueType>
-            buffer.getTemp().write${field.valueType?cap_first}(${field.name}$Value);
-            <#else>
-            ${field.name}$Value.encode(buffer.getTemp());
-            </#if>
+        <#if field.type=="set" || field.type=="list">
+        if (!this.${field.name}.isEmpty()) {
+            buffer.writeTag(${field.tag});
+            buffer.getTemp().writeInt(this.${field.name}.size());
+            for (${field.classValueType} ${field.name}$Value : this.${field.name}) {
+                <#if field.builtinValueType>
+                buffer.getTemp().write${field.valueType?cap_first}(${field.name}$Value);
+                <#else>
+                ${field.name}$Value.encode(buffer.getTemp());
+                </#if>
+            }
+            buffer.writeTemp();
         }
-        buffer.writeTemp();
+        <#elseif field.type=="map">
+        if (!this.${field.name}.isEmpty()) {
+            buffer.writeTag(${field.tag});
+            buffer.getTemp().writeInt(this.${field.name}.size());
+            for (${field.classKeyType} ${field.name}$Key : this.${field.name}.keySet()) {
+                buffer.getTemp().write${field.keyType?cap_first}(${field.name}$Key);
+                <#if field.builtinValueType>
+                buffer.getTemp().write${field.valueType?cap_first}(this.${field.name}.get(${field.name}$Key));
+                <#else>
+                this.${field.name}.get(${field.name}$Key).encode(buffer.getTemp());
+                </#if>
+            }
+            buffer.writeTemp();
+        }
+        <#elseif field.type=="float"||field.type=="double">
+        if (this.${field.name} != 0) {
+            buffer.writeTag(${field.tag});
+            buffer.write${field.type?cap_first}(this.${field.name}<#if field.scale gt 0>, ${field.scale}</#if>);
+        }
+        <#elseif field.numberType>
+        if (this.${field.name} != 0) {
+            buffer.writeTag(${field.tag});
+            buffer.write${field.type?cap_first}(this.${field.name});
+        }
+        <#elseif field.type=="bool">
+        if (this.${field.name}) {
+            buffer.writeTag(${field.tag});
+            buffer.write${field.type?cap_first}(this.${field.name});
+        }
+        <#elseif field.type=="string">
+        if (!this.${field.name}.isEmpty()) {
+            buffer.writeTag(${field.tag});
+            buffer.write${field.type?cap_first}(this.${field.name});
+        }
+        <#elseif field.type=="bytes">
+        if (this.${field.name}.length > 0) {
+            buffer.writeTag(${field.tag});
+            buffer.write${field.type?cap_first}(this.${field.name});
+        }
+        <#elseif field.enumType>
+        if (this.${field.name} != null) {
+            buffer.writeTag(${field.tag});
+            buffer.writeInt(this.${field.name}.value());
+        }
+        <#elseif field.optional>
+        if (this.${field.name} != null) {
+            buffer.writeTag(${field.tag});
+            this.${field.name}.encode(buffer.getTemp());
+            buffer.writeTemp();
+        }
         <#else>
+        buffer.writeTag(${field.tag});
+        this.${field.name}.encode(buffer.getTemp());
+        buffer.writeTemp();
+        </#if>
+    
+    <#else>
+        <#if field.type=="set" || field.type=="list">
             <#if field?index gt 0>
 
             </#if>
@@ -183,23 +240,10 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
             ${field.name}$Value.encode(buffer);
             </#if>
         }
-            <#if field?has_next && !selfFields[field?index+1].collectionType && (selfFields[field?index+1].primitiveType|| selfFields[field?index+1].enumType || !selfFields[field?index+1].optional) >
+        <#if field?has_next && !selfFields[field?index+1].collectionType && (selfFields[field?index+1].primitiveType|| selfFields[field?index+1].enumType || !selfFields[field?index+1].optional) >
 
-            </#if>
         </#if>
-    <#elseif field.type=="map">
-        <#if definedFieldId>
-        buffer.getTemp().writeInt(this.${field.name}.size());
-        for (${field.classKeyType} ${field.name}$Key : this.${field.name}.keySet()) {
-            buffer.getTemp().write${field.keyType?cap_first}(${field.name}$Key);
-            <#if field.builtinValueType>
-            buffer.getTemp().write${field.valueType?cap_first}(this.${field.name}.get(${field.name}$Key));
-            <#else>
-            this.${field.name}.get(${field.name}$Key).encode(buffer.getTemp());
-            </#if>
-        }
-        buffer.writeTemp();
-        <#else>
+        <#elseif field.type=="map">
             <#if field?index gt 0>
 
             </#if>
@@ -215,21 +259,13 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
             <#if field?has_next && !selfFields[field?index+1].collectionType && (selfFields[field?index+1].primitiveType|| selfFields[field?index+1].enumType || !selfFields[field?index+1].optional) >
 
             </#if>
-        </#if>
-    <#elseif field.type=="float"||field.type=="double">
+        <#elseif field.type=="float"||field.type=="double">
         buffer.write${field.type?cap_first}(this.${field.name}<#if field.scale gt 0>, ${field.scale}</#if>);
-    <#elseif field.builtinType>
+        <#elseif field.builtinType>
         buffer.write${field.type?cap_first}(this.${field.name});
-    <#elseif field.enumType>
+        <#elseif field.enumType>
         buffer.writeInt(this.${field.name} == null ? 0 : this.${field.name}.value());
-    <#elseif field.optional>
-        <#if definedFieldId>
-        buffer.getTemp().writeBool(this.${field.name} != null);
-        if (this.${field.name} != null) {
-            this.${field.name}.encode(buffer.getTemp());
-        }
-        buffer.writeTemp();
-        <#else>
+        <#elseif field.optional>
             <#if field?index gt 0>
 
             </#if>
@@ -240,17 +276,9 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
             <#if field?has_next && !selfFields[field?index+1].collectionType && (selfFields[field?index+1].primitiveType || selfFields[field?index+1].enumType || !selfFields[field?index+1].optional) >
 
             </#if>
-        </#if>
-    <#else>
-        <#if definedFieldId>
-        this.${field.name}.encode(buffer.getTemp());
-        buffer.writeTemp();
         <#else>
         this.${field.name}.encode(buffer);
         </#if>
-    </#if>
-    <#if definedFieldId>
-
     </#if>
 </#list>
 <#if definedFieldId>
@@ -301,12 +329,10 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
                     this.${field.name} = ${field.type}.valueOf(buffer.readInt());
                 <#elseif field.optional>
                     buffer.readInt();
-                    if (buffer.readBool()) {
-                        if (this.${field.name} == null) {
-                            this.${field.name} = new ${field.classType}();
-                        }
-                        this.${field.name}.decode(buffer);
+                    if (this.${field.name} == null) {
+                        this.${field.name} = new ${field.classType}();
                     }
+                    this.${field.name}.decode(buffer);
             <#else>
                     buffer.readInt();
                     this.${field.name}.decode(buffer);

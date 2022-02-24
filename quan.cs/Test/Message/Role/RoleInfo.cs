@@ -57,14 +57,14 @@ namespace Test.Message.Role
 		{
 	    	base.Encode(buffer);
 
-		    buffer.WriteInt(id);
-		    buffer.WriteString(name);
-			buffer.WriteInt((int)type);
-		    buffer.WriteBool(b);
-		    buffer.WriteShort(s);
-		    buffer.WriteInt(i);
-			buffer.WriteDouble(d);
-		    buffer.WriteBytes(data);
+			buffer.WriteInt(id);
+			buffer.WriteString(name);
+        	buffer.WriteInt((int)type);
+			buffer.WriteBool(b);
+			buffer.WriteShort(s);
+			buffer.WriteInt(i);
+        	buffer.WriteDouble(d);
+			buffer.WriteBytes(data);
 
 		    buffer.WriteInt(list.Count);
 		    foreach (var listValue in list) {
