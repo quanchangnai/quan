@@ -2,7 +2,7 @@ package quan.util;
 
 import aj.org.objectweb.asm.ClassReader;
 import net.bytebuddy.agent.ByteBuddyAgent;
-import org.aspectj.weaver.loadtime.ClassPreProcessorAgentAdapter;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +15,7 @@ import java.net.URL;
 import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.regex.Pattern;
 
 /**
  * Created by quanchangnai on 2018/12/25.
@@ -24,23 +25,6 @@ public class ClassUtils {
     private static final Logger logger = LoggerFactory.getLogger(ClassUtils.class);
 
     private static Instrumentation instrumentation;
-
-    private static boolean aop;
-
-    /**
-     * 初始化AOP
-     */
-    public synchronized static void aop() {
-        if (!aop) {
-            aop = true;
-            getInstrumentation().addTransformer(new ClassPreProcessorAgentAdapter());
-            try {
-                //环绕通知内联支持
-                Class.forName("quan.data.TransactionAspect");
-            } catch (Exception ignored) {
-            }
-        }
-    }
 
     public static Instrumentation getInstrumentation() {
         if (instrumentation == null) {
@@ -80,39 +64,42 @@ public class ClassUtils {
     }
 
     /**
-     * @see #loadClasses(String, Class, ClassLoader)
+     * @see #loadClasses(String, Class, String)
      */
     public static Set<Class<?>> loadClasses(String packageName) {
         return loadClasses(packageName, null, null);
     }
 
     /**
-     * @see #loadClasses(String, Class, ClassLoader)
+     * @see #loadClasses(String, Class, String)
      */
     public static Set<Class<?>> loadClasses(String packageName, Class<?> superClass) {
         return loadClasses(packageName, superClass, null);
     }
 
     /**
-     * @see #loadClasses(String, Class, ClassLoader)
+     * @see #loadClasses(String, Class, String)
      */
-    public static Set<Class<?>> loadClasses(String packageName, ClassLoader classLoader) {
-        return loadClasses(packageName, null, classLoader);
+    public static Set<Class<?>> loadClasses(String packageName, String classNamePattern) {
+        return loadClasses(packageName, null, classNamePattern);
     }
+
 
     /**
      * 加载符合条件的类
      *
-     * @param packageName 该包以及子包下面的所有类
-     * @param superClass  该类的子孙类
+     * @param packageName      该包以及子包下面的所有类
+     * @param superClass       该类的子孙类
+     * @param classNamePattern 类名要求的正则格式
      * @return 符合条件的类
      */
-    public static Set<Class<?>> loadClasses(String packageName, Class<?> superClass, ClassLoader classLoader) {
+    public static Set<Class<?>> loadClasses(String packageName, Class<?> superClass, String classNamePattern) {
         Objects.requireNonNull(packageName, "包名[packageName]不能为空");
         packageName = packageName.replace(".", "/");
 
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         if (classLoader == null) {
-            classLoader = Thread.currentThread().getContextClassLoader();
+            classLoader = ClassUtils.class.getClassLoader();
         }
 
 
@@ -140,8 +127,16 @@ public class ClassUtils {
             }
         }
 
+        Pattern pattern = null;
+        if (!StringUtils.isBlank(classNamePattern)) {
+            pattern = Pattern.compile(classNamePattern);
+        }
+
         Set<Class<?>> classes = new HashSet<>();
         for (String className : classNames) {
+            if (pattern != null && !pattern.matcher(className).matches()) {
+                continue;
+            }
             Class<?> clazz;
             try {
                 clazz = classLoader.loadClass(className);
