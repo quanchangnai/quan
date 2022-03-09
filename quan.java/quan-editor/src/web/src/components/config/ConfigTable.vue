@@ -1,24 +1,29 @@
 <template>
     <div>
-        <el-table :data="pageRows" @row-click="onRowClick" size="medium" stripe border :height="height-30">
+        <el-table ref="table"
+                  :data="pageRows"
+                  stripe border
+                  size="medium"
+                  :height="height-30"
+                  @row-click="onRowClick">
             <el-table-column v-for="(field,index) in fields"
                              :prop="field.name"
                              :label="field.name"
                              :key="'column-'+index">
                 <template v-if="field.showJson"
                           v-slot:default="{row}">
-                    {{JSON.stringify(row[field.name])}}
+                    {{ JSON.stringify(row[field.name]) }}
                 </template>
             </el-table-column>
         </el-table>
         <el-pagination
-            style="padding-top: 7px"
-            layout="total,prev,pager,next,sizes"
-            :page-size="pageSize"
-            :page-sizes="[20, 50, 100]"
-            :total="rows.length"
-            @current-change="onPageChange"
-            @size-change="onSizeChange"/>
+                style="padding-top: 7px"
+                layout="total,prev,pager,next,sizes"
+                :page-size="pageSize"
+                :page-sizes="[20, 50, 100]"
+                :total="rows.length"
+                @current-change="onPageChange"
+                @size-change="onSizeChange"/>
     </div>
 </template>
 
@@ -39,10 +44,12 @@ export default {
             pageNo: 1,
         };
     },
-    async created() {
+    async mounted() {
         let table = await request.post("config/table", FormData.encode({tableName: this.name}));
         this.fields = table.fields;
         this.rows = table.rows;
+
+        await this.doLayout();
     },
     computed: {
         pageRows() {
@@ -58,6 +65,10 @@ export default {
         },
         onSizeChange(size) {
             this.pageSize = size;
+        },
+        async doLayout() {
+            await this.$nextTick();
+            this.$refs.table.doLayout();
         }
     }
 }

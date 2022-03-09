@@ -1,23 +1,37 @@
 <template>
-    <div id="container">
+    <div ref="body" class="config-editor">
         <div id="left">
-            <el-table :data="showTables" @row-click="onRowClick" size="medium" stripe border>
-                <el-table-column prop="tableName">
-                    <template #header>
-                        <el-input v-model="keyword" clearable size="medium" placeholder="输入关键字" prefix-icon="el-icon-search"/>
-                    </template>
-                    <template #default="{row}">
-                        {{row.tableName}}<br>
-                        {{row.configName}}
-                    </template>
-                </el-table-column>
-            </el-table>
+            <div ref="search" class="search">
+                <el-input v-model="keyword"
+                          clearable
+                          size="small"
+                          placeholder="输入关键字搜索"
+                          prefix-icon="el-icon-search"/>
+            </div>
+            <el-scrollbar ref="scrollbar" :style="{height: listHeight}">
+                <el-table ref="table"
+                          stripe
+                          size="medium"
+                          :show-header="false"
+                          :data="showTables"
+                          @row-click="onRowClick">
+                    <el-table-column prop="tableName">
+                        <template #default="{row}">
+                            {{ row.tableName }}<br>
+                            {{ row.configName }}
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </el-scrollbar>
         </div>
         <div id="right">
-            <el-tabs type="border-card" v-model="activeTab" @tab-remove="onTabRemove">
+            <el-tabs type="border-card"
+                     v-model="activeTab"
+                     @tab-click="onTabClick"
+                     @tab-remove="onTabRemove">
                 <el-tab-pane label="测试" name="first">测试测试测试</el-tab-pane>
-                <el-tab-pane v-for="(table,index) in selectedTables"
-                             :key="'tab-'+index"
+                <el-tab-pane v-for="table in selectedTables"
+                             :key="'tab-'+table"
                              :name="table"
                              :label="table"
                              closable>
@@ -38,6 +52,7 @@ export default {
     components: {ConfigTable},
     data() {
         return {
+            listHeight: "100%",
             keyword: "",
             allTables: [],
             showTables: [],
@@ -47,15 +62,18 @@ export default {
         }
     },
     async created() {
+        window.addEventListener("resize", this.calcConfigTableHeight);
         this.allTables = await request.get("/config/tables");
         this.showTables = this.allTables;
-        window.addEventListener("resize", this.calcConfigTableHeight);
     },
     mounted() {
         this.calcConfigTableHeight();
+        this.resizeObserver = new ResizeObserver(this.doLayout);
+        this.resizeObserver.observe(this.$refs.body);
     },
     destroyed() {
         window.removeEventListener("resize", this.calcConfigTableHeight);
+        this.resizeObserver.disconnect();
     },
     watch: {
         keyword: function (value) {
@@ -76,6 +94,10 @@ export default {
 
             this.activeTab = row.tableName;
         },
+        onTabClick(tab) {
+            // noinspection JSUnresolvedFunction
+            this.$refs["tab-" + tab.name][0].doLayout();
+        },
         onTabRemove(tabName) {
             this.selectedTables = this.selectedTables.filter(table => table !== tabName);
             if (tabName === this.activeTab) {
@@ -84,6 +106,12 @@ export default {
         },
         calcConfigTableHeight() {
             this.configTableHeight = document.querySelector("#right").offsetHeight - 90;
+        },
+        async doLayout() {
+            this.listHeight = (this.$refs.body.offsetHeight - this.$refs.search.offsetHeight - 21) + "px";
+            await this.$nextTick();
+            this.$refs.scrollbar.update();
+            this.$refs.table.doLayout();
         }
     }
 }
@@ -92,7 +120,7 @@ export default {
 <!--suppress CssUnusedSymbol -->
 <style scoped>
 
-#container {
+.config-editor {
     height: 100%;
 }
 
@@ -112,11 +140,33 @@ export default {
     right: 0;
 }
 
-.el-table{
+.search {
+    position: relative;
+    margin-left: 8px;
+    margin-bottom: -1px;
+    padding: 8px 10px;
+    border: solid #ebeef5 1px;
+    z-index: 10;
+}
+
+.el-scrollbar {
+    border: solid #ebeef5 1px;
     left: 8px;
-    height: calc(100% - 10px);
     width: calc(100% - 10px);
 }
+
+.el-scrollbar >>> .el-scrollbar__wrap {
+    overflow-x: hidden;
+}
+
+.el-table:before {
+    content: none;
+}
+
+>>> .el-table__empty-block {
+    margin-top: 40vh;
+}
+
 .el-tabs {
     height: calc(100% - 12px);
     width: calc(100% - 10px);
