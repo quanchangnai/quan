@@ -6,7 +6,7 @@
              active-text-color="#409eff"
              @select="onSelect"
              router>
-        <el-menu-item index="/config-editor">配置表</el-menu-item>
+        <el-menu-item index="/config">配置表</el-menu-item>
         <el-menu-item index="/bbb">菜单项2</el-menu-item>
         <el-menu-item index="/ccc/3?limit=3">菜单项3</el-menu-item>
     </el-menu>

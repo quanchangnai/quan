@@ -17,7 +17,10 @@ export default {
     async get(url) {
         return (await baseAxios.get(url)).data;
     },
-    async post(url, data) {
+    async post(url, data, body = false) {
+        if (data && !body) {
+            data = FormData.encode(data)
+        }
         return (await baseAxios.post(url, data)).data;
     }
 };

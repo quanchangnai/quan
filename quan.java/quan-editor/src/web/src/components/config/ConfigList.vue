@@ -1,5 +1,5 @@
 <template>
-    <div ref="body" class="config-editor">
+    <div ref="body" class="config-list">
         <div id="left">
             <div ref="search" class="search">
                 <el-input v-model="keyword"
@@ -13,9 +13,10 @@
                           stripe
                           size="medium"
                           :show-header="false"
-                          :data="showTables"
-                          @row-click="onRowClick">
-                    <el-table-column prop="tableName">
+                          tooltip-effect="light"
+                          :data="visibleTables"
+                          @row-click="selectConfig">
+                    <el-table-column :show-overflow-tooltip="true">
                         <template #default="{row}">
                             {{ row.tableName }}<br>
                             {{ row.configName }}
@@ -25,18 +26,21 @@
             </el-scrollbar>
         </div>
         <div id="right">
-            <el-tabs type="border-card"
-                     v-model="activeTab"
+            <el-tabs ref="tabs"
+                     type="border-card"
+                     v-model="activeTable"
                      @tab-click="onTabClick"
                      @tab-remove="onTabRemove">
-                <el-tab-pane label="测试" name="first">测试测试测试</el-tab-pane>
                 <el-tab-pane v-for="table in selectedTables"
                              :key="'tab-'+table"
                              :name="table"
                              :label="table"
                              closable>
-                    <config-table :name="table" :height="configTableHeight"/>
+                    <config-table :name="table"
+                                  :ref="'tab-'+table"
+                                  :height="configTableHeight"/>
                 </el-tab-pane>
+                <el-empty v-if="!selectedTables.length" :style="{height: configTableHeight+'px'}"/>
             </el-tabs>
         </div>
     </div>
@@ -48,23 +52,26 @@ import request from "@/request";
 import ConfigTable from "@/components/config/ConfigTable";
 
 export default {
-    name: "ConfigEditor",
+    name: "ConfigList",
     components: {ConfigTable},
     data() {
         return {
             listHeight: "100%",
             keyword: "",
             allTables: [],
-            showTables: [],
+            visibleTables: [],
             selectedTables: [],
-            activeTab: "first",
+            activeTable: "",
             configTableHeight: 0,
         }
     },
     async created() {
         window.addEventListener("resize", this.calcConfigTableHeight);
         this.allTables = await request.get("/config/tables");
-        this.showTables = this.allTables;
+        this.visibleTables = this.allTables;
+        if (this.visibleTables.length > 0) {
+            this.selectConfig(this.visibleTables[0]);
+        }
     },
     mounted() {
         this.calcConfigTableHeight();
@@ -77,35 +84,36 @@ export default {
     },
     watch: {
         keyword: function (value) {
-            this.showTables = this.allTables.filter(table => {
+            this.visibleTables = this.allTables.filter(table => {
                 return table.tableName.includes(value) || table.configName.includes(value);
             });
         }
     },
     methods: {
-        onRowClick(row) {
-            if (!this.selectedTables.includes(row.tableName)) {
-                this.selectedTables.push(row.tableName);
+        selectConfig(config) {
+            if (!this.selectedTables.includes(config.tableName)) {
+                this.selectedTables.push(config.tableName);
             }
 
             if (this.selectedTables.length >= 10) {
                 this.selectedTables.shift();
             }
 
-            this.activeTab = row.tableName;
+            this.activeTable = config.tableName;
         },
-        onTabClick(tab) {
+        onTabClick() {
             // noinspection JSUnresolvedFunction
-            this.$refs["tab-" + tab.name][0].doLayout();
+            this.$refs["tab-" + this.activeTable][0].doLayout();
         },
-        onTabRemove(tabName) {
-            this.selectedTables = this.selectedTables.filter(table => table !== tabName);
-            if (tabName === this.activeTab) {
-                this.activeTab = "first";
+        onTabRemove(table) {
+            this.selectedTables = this.selectedTables.filter(t => t !== table);
+            if (table === this.activeTable) {
+                this.activeTable = this.selectedTables[0];
             }
         },
         calcConfigTableHeight() {
-            this.configTableHeight = document.querySelector("#right").offsetHeight - 90;
+            // noinspection JSUnresolvedVariable
+            this.configTableHeight = this.$refs.tabs.$el.offsetHeight - 60;
         },
         async doLayout() {
             this.listHeight = (this.$refs.body.offsetHeight - this.$refs.search.offsetHeight - 21) + "px";
@@ -119,8 +127,7 @@ export default {
 
 <!--suppress CssUnusedSymbol -->
 <style scoped>
-
-.config-editor {
+.config-list {
     height: 100%;
 }
 
@@ -132,11 +139,11 @@ export default {
 }
 
 #left {
-    width: 300px;
+    width: 250px;
 }
 
 #right {
-    left: 310px;
+    left: 260px;
     right: 0;
 }
 
@@ -163,8 +170,8 @@ export default {
     content: none;
 }
 
->>> .el-table__empty-block {
-    margin-top: 40vh;
+>>> #left .el-table__empty-block {
+    margin-top: 50%;
 }
 
 .el-tabs {
@@ -172,4 +179,7 @@ export default {
     width: calc(100% - 10px);
 }
 
+>>> .el-tabs__content {
+    padding-top: 10px;
+}
 </style>
