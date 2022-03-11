@@ -9,7 +9,7 @@
                     <i class="el-icon-arrow-down el-icon--right"/>
                 </el-button>
                 <el-dropdown-menu slot="dropdown" :class="{'too-much-item-dropdown-menu':allFields.length>15}">
-                    <el-dropdown-item>
+                    <el-dropdown-item v-if="allFields.length-fixedFieldsCount>1">
                         <div class="field-dropdown-item" @click.stop>
                             <el-checkbox v-model="checkAllFields"
                                          :indeterminate="indeterminate"
@@ -57,11 +57,9 @@
                              :label="field.name"
                              min-width="150px"
                              :fixed="field.fixed"
-                             :key="'column-'+field.name">
-                <template v-if="field.showJson"
-                          v-slot:default="{row}">
-                    {{ JSON.stringify(row[field.name]) }}
-                </template>
+                             :key="'column-'+field.name"
+                             #default="{row}">
+                {{ row[field.name] }}
             </el-table-column>
         </el-table>
     </div>
@@ -84,29 +82,16 @@ export default {
             visibleRows: [],
             indeterminate: false,
             checkAllFields: false,
+            fixedFieldsCount: 0,
             keyword: "",
             pageSize: 20,
             pageNo: 1,
         };
     },
     async mounted() {
-        let table = await request.post("config/table", FormData.encode({tableName: this.name}));
-        table.fields.forEach((field, index) => {
-            field.checked = true;
-            field.fixed = index === 0;
-            this.allFields.push(field)
-        });
-        this.setCheckedFields();
-
-        for (let row of table.rows) {
-            for (let key of Object.keys(row)) {
-                if (Array.isArray(row[key])) {
-                    row[key] = JSON.stringify(row[key]);
-                }
-            }
-        }
-        this.allRows = table.rows;
-        this.setVisibleRows();
+        let table = await request.post("config/table", {name: this.name});
+        this.initFields(table.fields);
+        this.initRows(table.rows);
     },
     computed: {
         pageRows() {
@@ -119,6 +104,18 @@ export default {
         },
     },
     methods: {
+        initFields(fields) {
+            fields.forEach((field, index) => {
+                field.checked = true;
+                field.fixed = index === 0;
+                if (field.fixed) {
+                    this.fixedFieldsCount++;
+                }
+                this.allFields.push(field);
+
+            });
+            this.setCheckedFields();
+        },
         setCheckedFields() {
             this.checkedFields = [];
             let fixedCount = 0;
@@ -136,6 +133,18 @@ export default {
             this.indeterminate = checkedCount > 0 && checkedCount < this.allFields.length - fixedCount;
 
             this.doLayout();
+        },
+        initRows(rows) {
+            for (let row of rows) {
+                for (let key of Object.keys(row)) {
+                    if (typeof row[key] === "object") {
+                        row[key] = JSON.stringify(row[key]);
+                    }
+                }
+            }
+
+            this.allRows = rows;
+            this.setVisibleRows();
         },
         setVisibleRows() {
             let keyword = this.keyword.trim().toLowerCase();

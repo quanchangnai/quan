@@ -3,6 +3,7 @@ package quan.editor.config;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.web.bind.annotation.*;
 import quan.config.TableType;
@@ -10,6 +11,7 @@ import quan.config.loader.DefinitionConfigLoader;
 import quan.config.loader.LoadMode;
 import quan.config.reader.ConfigReader;
 import quan.definition.FieldDefinition;
+import quan.definition.IndexDefinition;
 import quan.definition.config.ConfigDefinition;
 import quan.definition.parser.DefinitionParser;
 
@@ -54,18 +56,18 @@ public class ConfigController implements InitializingBean {
         return tables;
     }
 
-
     @PostMapping("/table")
-    public Object table(@RequestParam String tableName) {
-        ConfigDefinition configDefinition = definitionParser.getTableConfigs().get(tableName);
-        ConfigReader configReader = configLoader.getReader(tableName);
+    public Object table(@RequestParam String name) {
+        ConfigDefinition configDefinition = definitionParser.getTableConfigs().get(name);
+        ConfigReader configReader = configLoader.getReader(name);
 
         List<Object> fields = new ArrayList<>();
         for (FieldDefinition field : configDefinition.getFields()) {
+
             fields.add(Map.of("name", field.getName(),
-                "column", field.getColumn(),
-                "type", field.getType(),
-                "showJson", field.isCollectionType() || field.isBeanType()));
+                    "column", field.getColumn(),
+                    "type", field.getType(),
+                    "unique", IndexDefinition.isUnique(field.getIndex())));
         }
 
         return Map.of("fields", fields, "rows", configReader.getJsons());
