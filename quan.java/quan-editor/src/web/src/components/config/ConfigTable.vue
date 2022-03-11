@@ -9,6 +9,15 @@
                     <i class="el-icon-arrow-down el-icon--right"/>
                 </el-button>
                 <el-dropdown-menu slot="dropdown" :class="{'too-much-item-dropdown-menu':allFields.length>15}">
+                    <el-dropdown-item>
+                        <div class="field-dropdown-item" @click.stop>
+                            <el-checkbox v-model="checkAllFields"
+                                         :indeterminate="indeterminate"
+                                         @change="onCheckAllFieldsChange">
+                                全选
+                            </el-checkbox>
+                        </div>
+                    </el-dropdown-item>
                     <el-dropdown-item v-for="field in allFields"
                                       :key="field.name">
                         <div class="field-dropdown-item" @click.stop>
@@ -73,6 +82,8 @@ export default {
             checkedFields: [],
             allRows: [],
             visibleRows: [],
+            indeterminate: false,
+            checkAllFields: false,
             keyword: "",
             pageSize: 20,
             pageNo: 1,
@@ -109,7 +120,21 @@ export default {
     },
     methods: {
         setCheckedFields() {
-            this.checkedFields = this.allFields.filter(field => field.checked);
+            this.checkedFields = [];
+            let fixedCount = 0;
+            for (let field of this.allFields) {
+                if (field.checked) {
+                    this.checkedFields.push(field);
+                }
+                if (field.fixed) {
+                    fixedCount++;
+                }
+            }
+
+            let checkedCount = this.checkedFields.length - fixedCount;
+            this.checkAllFields = checkedCount === this.allFields.length - fixedCount;
+            this.indeterminate = checkedCount > 0 && checkedCount < this.allFields.length - fixedCount;
+
             this.doLayout();
         },
         setVisibleRows() {
@@ -127,6 +152,15 @@ export default {
                     }
                 }
             }
+        },
+        onCheckAllFieldsChange(value) {
+            this.indeterminate = false;
+            for (let field of this.allFields) {
+                if (!field.fixed) {
+                    field.checked = value;
+                }
+            }
+            this.setCheckedFields();
         },
         onFieldCheckedChange() {
             this.setCheckedFields();
