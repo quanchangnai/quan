@@ -50,6 +50,7 @@
                   stripe border
                   size="medium"
                   :height="height-45"
+                  :cell-style="cellStyle"
                   @row-click="onRowClick">
             <el-table-column v-for="field in checkedFields"
                              sortable
@@ -147,20 +148,31 @@ export default {
             this.setVisibleRows();
         },
         setVisibleRows() {
-            let keyword = this.keyword.trim().toLowerCase();
-            this.visibleRows = keyword === "" ? this.allRows : [];
-            if (keyword === "") {
+            if (this.isMatchKeyword()) {
+                this.visibleRows = this.allRows;
                 return;
             }
 
+            this.visibleRows = [];
+
             for (let row of this.allRows) {
                 for (let field of this.checkedFields) {
-                    if (row[field.name]?.toString().toLowerCase().includes(keyword)) {
+                    if (this.isMatchKeyword(row[field.name])) {
                         this.visibleRows.push(row);
                         break;
                     }
                 }
             }
+        },
+        isMatchKeyword(value) {
+            let keyword = this.keyword.trim().toLowerCase();
+            if (keyword === "") {
+                return -1;
+            }
+            if (value?.toString().toLowerCase().includes(keyword)) {
+                return 1;
+            }
+            return 0;
         },
         onCheckAllFieldsChange(value) {
             this.indeterminate = false;
@@ -183,6 +195,14 @@ export default {
         },
         onSizeChange(size) {
             this.pageSize = size;
+        },
+        cellStyle({row, column}) {
+            if (this.isMatchKeyword(row[column.property]) === 1) {
+                return {
+                    color: "red",
+                    fontWeight: "bold",
+                };
+            }
         },
         async doLayout() {
             await this.$nextTick();
