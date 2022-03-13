@@ -50,7 +50,6 @@
                   stripe border
                   size="medium"
                   :height="height-45"
-                  :cell-style="cellStyle"
                   @row-click="onRowClick">
             <el-table-column v-for="field in checkedFields"
                              sortable
@@ -60,7 +59,7 @@
                              :fixed="field.fixed"
                              :key="'column-'+field.name"
                              #default="{row}">
-                {{ row[field.name] }}
+                <span v-html="cell(row[field.name])"></span>
             </el-table-column>
         </el-table>
     </div>
@@ -163,6 +162,8 @@ export default {
                     }
                 }
             }
+
+            this.doLayout();
         },
         isMatchKeyword(value) {
             let keyword = this.keyword.trim().toLowerCase();
@@ -196,13 +197,13 @@ export default {
         onSizeChange(size) {
             this.pageSize = size;
         },
-        cellStyle({row, column}) {
-            if (this.isMatchKeyword(row[column.property]) === 1) {
-                return {
-                    color: "red",
-                    fontWeight: "bold",
-                };
+        cell(value) {
+            if (value===undefined){
+                return "";
             }
+            return value.toString().replace(new RegExp(this.keyword, "ig"), substr=>{
+               return `<span style="color: red">${substr}</span>`;
+            })
         },
         async doLayout() {
             await this.$nextTick();
