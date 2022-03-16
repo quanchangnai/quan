@@ -52,7 +52,7 @@ namespace ${getFullPackageName("cs")}
         <#else >
         public IList<${field.refType}> ${field.name}_Ref => <#rt/>
         </#if>
-        <#lt/>${field.refType}.GetBy${field.refIndex.name?cap_first}(${field.name});
+        <#lt/>${field.refType}.Get${field.refIndex.suffix}(${field.name});
     </#if>
 
 </#list>
@@ -210,7 +210,7 @@ namespace ${getFullPackageName("cs")}
             return _${index.name}Configs;
         }
 
-        public ${newMethod}static ${name} GetBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name})
+        public ${newMethod}static ${name} Get${index.suffix}(${index.fields[0].basicType} ${index.fields[0].name})
         {
             _${index.name}Configs.TryGetValue(${index.fields[0].name}, out var result);
             return result;
@@ -222,7 +222,7 @@ namespace ${getFullPackageName("cs")}
             return _${index.name}Configs;
         }
 
-        public ${newMethod}static IList<${name}> GetBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name})
+        public ${newMethod}static IList<${name}> Get${index.suffix}(${index.fields[0].basicType} ${index.fields[0].name})
         {
             _${index.name}Configs.TryGetValue(${index.fields[0].name}, out var result);
             return result ?? ImmutableList<${name}>.Empty;
@@ -234,15 +234,15 @@ namespace ${getFullPackageName("cs")}
             return _${index.name}Configs;
         }
 
-        public ${newMethod}static IDictionary<${index.fields[1].classType}, ${name}> GetBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name})
+        public ${newMethod}static IDictionary<${index.fields[1].classType}, ${name}> Get${index.suffix}(${index.fields[0].basicType} ${index.fields[0].name})
         {
             _${index.name}Configs.TryGetValue(${index.fields[0].name}, out var result);
             return result ?? ImmutableDictionary<${index.fields[1].classType}, ${name}>.Empty;
         }
 
-        public ${newMethod}static ${name} GetBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name})
+        public ${newMethod}static ${name} Get${index.suffix}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name})
         {
-            GetBy${index.name?cap_first}(${index.fields[0].name}).TryGetValue(${index.fields[1].name}, out var result);
+            Get${index.suffix}(${index.fields[0].name}).TryGetValue(${index.fields[1].name}, out var result);
             return result;
         }
 
@@ -252,15 +252,15 @@ namespace ${getFullPackageName("cs")}
             return _${index.name}Configs;
         }
 
-        public ${newMethod}static IDictionary<${index.fields[1].classType}, IList<${name}>> GetBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name})
+        public ${newMethod}static IDictionary<${index.fields[1].classType}, IList<${name}>> Get${index.suffix}(${index.fields[0].basicType} ${index.fields[0].name})
         {
             _${index.name}Configs.TryGetValue(${index.fields[0].name}, out var result);
             return result ?? ImmutableDictionary<${index.fields[1].classType}, IList<${name}>>.Empty;
         }
 
-        public ${newMethod}static IList<${name}> GetBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name})
+        public ${newMethod}static IList<${name}> Get${index.suffix}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name})
         {
-            GetBy${index.name?cap_first}(${index.fields[0].name}).TryGetValue(${index.fields[1].name}, out var result);
+            Get${index.suffix}(${index.fields[0].name}).TryGetValue(${index.fields[1].name}, out var result);
             return result ?? ImmutableList<${name}>.Empty;
         }
 
@@ -270,21 +270,21 @@ namespace ${getFullPackageName("cs")}
             return _${index.name}Configs;
         }
 
-        public ${newMethod}static IDictionary<${index.fields[1].classType}, IDictionary<${index.fields[2].classType}, ${name}>> GetBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name})
+        public ${newMethod}static IDictionary<${index.fields[1].classType}, IDictionary<${index.fields[2].classType}, ${name}>> Get${index.suffix}(${index.fields[0].basicType} ${index.fields[0].name})
         {
             _${index.name}Configs.TryGetValue(${index.fields[0].name}, out var result);
             return result ?? ImmutableDictionary<${index.fields[1].classType}, IDictionary<${index.fields[2].classType}, ${name}>>.Empty;
         }
 
-        public ${newMethod}static IDictionary<${index.fields[2].classType}, ${name}> GetBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name})
+        public ${newMethod}static IDictionary<${index.fields[2].classType}, ${name}> Get${index.suffix}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name})
         {
-            GetBy${index.name?cap_first}(${index.fields[0].name}).TryGetValue(${index.fields[1].name}, out var result);
+            Get${index.suffix}(${index.fields[0].name}).TryGetValue(${index.fields[1].name}, out var result);
             return result ?? ImmutableDictionary<${index.fields[2].classType}, ${name}>.Empty;
         }
 
-        public  ${newMethod}static ${name} GetBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name}, ${index.fields[2].basicType} ${index.fields[2].name})
+        public  ${newMethod}static ${name} Get${index.suffix}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name}, ${index.fields[2].basicType} ${index.fields[2].name})
         {
-            GetBy${index.name?cap_first}(${index.fields[0].name}, ${index.fields[1].name}).TryGetValue(${index.fields[2].name}, out var result);
+            Get${index.suffix}(${index.fields[0].name}, ${index.fields[1].name}).TryGetValue(${index.fields[2].name}, out var result);
             return result;
         }
 
@@ -294,21 +294,21 @@ namespace ${getFullPackageName("cs")}
             return _${index.name}Configs;
         }
 
-        public ${newMethod}static IDictionary<${index.fields[1].classType}, IDictionary<${index.fields[2].classType}, IList<${name}>>> GetBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name})
+        public ${newMethod}static IDictionary<${index.fields[1].classType}, IDictionary<${index.fields[2].classType}, IList<${name}>>> Get${index.suffix}(${index.fields[0].basicType} ${index.fields[0].name})
         {
             _${index.name}Configs.TryGetValue(${index.fields[0].name}, out var result);
             return result ?? ImmutableDictionary<${index.fields[1].classType}, IDictionary<${index.fields[2].classType}, IList<${name}>>>.Empty;
         }
 
-        public ${newMethod}static IDictionary<${index.fields[2].classType}, IList<${name}>> GetBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name})
+        public ${newMethod}static IDictionary<${index.fields[2].classType}, IList<${name}>> Get${index.suffix}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name})
         {
-            GetBy${index.name?cap_first}(${index.fields[0].name}).TryGetValue(${index.fields[1].name}, out var result);
+            Get${index.suffix}(${index.fields[0].name}).TryGetValue(${index.fields[1].name}, out var result);
             return result ?? ImmutableDictionary<${index.fields[2].classType}, IList<${name}>>.Empty;
         }
 
-        public ${newMethod}static IList<${name}> GetBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name}, ${index.fields[2].basicType} ${index.fields[2].name})
+        public ${newMethod}static IList<${name}> Get${index.suffix}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name}, ${index.fields[2].basicType} ${index.fields[2].name})
         {
-            GetBy${index.name?cap_first}(${index.fields[0].name}, ${index.fields[1].name}).TryGetValue(${index.fields[2].name}, out var result);
+            Get${index.suffix}(${index.fields[0].name}, ${index.fields[1].name}).TryGetValue(${index.fields[2].name}, out var result);
             return result ?? ImmutableList<${name}>.Empty;
         }
 

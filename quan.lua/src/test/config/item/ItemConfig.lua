@@ -94,7 +94,7 @@ end
 ---@overload fun():map<id:int,ItemConfig>
 ---@param id int ID
 ---@return ItemConfig
-function ItemConfig.getById(id)
+function ItemConfig.get(id)
     if (not id) then
         return idConfigs
     end

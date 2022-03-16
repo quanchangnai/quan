@@ -144,6 +144,17 @@ public class IndexDefinition extends Definition implements Cloneable {
         return this;
     }
 
+    /**
+     * 索引方法的后缀
+     */
+    public String getSuffix() {
+        String name = getName();
+        if (name.equals("id")) {
+            return "";
+        }
+        return "By" + name.substring(0, 1).toUpperCase(Locale.ROOT) + name.substring(1);
+    }
+
     @Override
     public IndexDefinition clone() {
         try {
@@ -154,6 +165,7 @@ public class IndexDefinition extends Definition implements Cloneable {
     }
 
     public static void validate(List<IndexDefinition> indexes, List<IndexDefinition> selfIndexes, List<FieldDefinition> fields) {
+        List<IndexDefinition> fieldIndexes = new ArrayList<>();
         for (FieldDefinition field : fields) {
             if (StringUtils.isBlank(field.getIndex())) {
                 continue;
@@ -169,10 +181,12 @@ public class IndexDefinition extends Definition implements Cloneable {
 
             IndexDefinition indexDefinition = new IndexDefinition(field);
             indexDefinition.setOwner((BeanDefinition) field.getOwner());
-            indexes.add(indexDefinition);
-            if (indexes != selfIndexes) {
-                selfIndexes.add(indexDefinition);
-            }
+            fieldIndexes.add(indexDefinition);
+        }
+
+        indexes.addAll(0, fieldIndexes);
+        if (indexes != selfIndexes) {
+            selfIndexes.addAll(0, fieldIndexes);
         }
 
         selfIndexes.forEach(IndexDefinition::validate);

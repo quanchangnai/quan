@@ -2,6 +2,7 @@ package quan.config.item;
 
 import com.alibaba.fastjson.*;
 import quan.config.*;
+import quan.config.loader.ConfigLoader;
 import java.util.*;
 
 /**
@@ -10,23 +11,35 @@ import java.util.*;
  */
 public class WeaponConfig extends EquipConfig {
 
-    //字段1
-    protected final int w1;
+    /**
+     * 字段1
+     */
+    public final int w1;
 
-    //字段2
-    protected final int w2;
+    /**
+     * 字段2
+     */
+    public final int w2;
 
-    //奖励List
-    protected final List<Reward> rewardList;
+    /**
+     * 奖励List
+     */
+    public final List<Reward> rewardList;
 
-    //奖励Set
-    protected final Set<Reward> rewardSet;
+    /**
+     * 奖励Set
+     */
+    public final Set<Reward> rewardSet;
 
-    //奖励Map
-    protected final Map<Integer, Reward> rewardMap;
+    /**
+     * 奖励Map
+     */
+    public final Map<Integer, Reward> rewardMap;
 
-    //List2
-    protected final List<Integer> list2;
+    /**
+     * List2
+     */
+    public final List<Integer> list2;
 
 
     public WeaponConfig(JSONObject json) {
@@ -75,49 +88,6 @@ public class WeaponConfig extends EquipConfig {
         this.list2 = Collections.unmodifiableList(list2$2);
     }
 
-    /**
-     * 字段1
-     */
-    public final int getW1() {
-        return w1;
-    }
-
-    /**
-     * 字段2
-     */
-    public final int getW2() {
-        return w2;
-    }
-
-    /**
-     * 奖励List
-     */
-    public final List<Reward> getRewardList() {
-        return rewardList;
-    }
-
-    /**
-     * 奖励Set
-     */
-    public final Set<Reward> getRewardSet() {
-        return rewardSet;
-    }
-
-    /**
-     * 奖励Map
-     */
-    public final Map<Integer, Reward> getRewardMap() {
-        return rewardMap;
-    }
-
-    /**
-     * List2
-     */
-    public final List<Integer> getList2() {
-        return list2;
-    }
-
-
     @Override
     public WeaponConfig create(JSONObject json) {
         return new WeaponConfig(json);
@@ -155,23 +125,23 @@ public class WeaponConfig extends EquipConfig {
         }
 
         //所有WeaponConfig
-        private static volatile List<WeaponConfig> configs = new ArrayList<>();
+        private static volatile List<WeaponConfig> configs = Collections.emptyList();
 
         //索引:ID
-        private static volatile Map<Integer, WeaponConfig> idConfigs = new HashMap<>();
+        private static volatile Map<Integer, WeaponConfig> idConfigs = Collections.emptyMap();
 
         //索引:常量Key
-        private static volatile Map<String, WeaponConfig> keyConfigs = new HashMap<>();
+        private static volatile Map<String, WeaponConfig> keyConfigs = Collections.emptyMap();
 
         //索引:类型
-        private static volatile Map<ItemType, List<WeaponConfig>> typeConfigs = new HashMap<>();
+        private static volatile Map<ItemType, List<WeaponConfig>> typeConfigs = Collections.emptyMap();
 
         //索引:部位
-        private static volatile Map<Integer, List<WeaponConfig>> positionConfigs = new HashMap<>();
+        private static volatile Map<Integer, List<WeaponConfig>> positionConfigs = Collections.emptyMap();
 
-        private static volatile Map<Integer, Map<Integer, List<WeaponConfig>>> composite1Configs = new HashMap<>();
+        private static volatile Map<Integer, Map<Integer, List<WeaponConfig>>> composite1Configs = Collections.emptyMap();
 
-        private static volatile Map<Integer, Map<Integer, WeaponConfig>> composite2Configs = new HashMap<>();
+        private static volatile Map<Integer, Map<Integer, WeaponConfig>> composite2Configs = Collections.emptyMap();
 
         public static List<WeaponConfig> getConfigs() {
             return configs;
@@ -181,7 +151,7 @@ public class WeaponConfig extends EquipConfig {
             return idConfigs;
         }
 
-        public static WeaponConfig getById(int id) {
+        public static WeaponConfig get(int id) {
             return idConfigs.get(id);
         }
 
@@ -240,7 +210,7 @@ public class WeaponConfig extends EquipConfig {
          * @return 错误信息
          */
         @SuppressWarnings({"unchecked"})
-        public static List<String> load(List<WeaponConfig> configs) {
+        private static List<String> load(List<WeaponConfig> configs) {
             Map<Integer, WeaponConfig> idConfigs = new HashMap<>();
             Map<String, WeaponConfig> keyConfigs = new HashMap<>();
             Map<ItemType, List<WeaponConfig>> typeConfigs = new HashMap<>();
@@ -280,6 +250,10 @@ public class WeaponConfig extends EquipConfig {
             return errors;
         }
 
+    }
+
+    static {
+        ConfigLoader.registerLoadFunction(WeaponConfig.class, WeaponConfig.self::load);
     }
 
 }

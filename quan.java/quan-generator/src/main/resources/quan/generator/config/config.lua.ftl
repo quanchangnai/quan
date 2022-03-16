@@ -64,7 +64,7 @@ end
 ---@overload fun():map<${index.fields[0].name}:${index.fields[0].type},${name}>
 ---@param ${index.fields[0].name} ${index.fields[0].type} ${index.fields[0].comment}
 ---@return ${name}
-function ${name}.getBy${index.name?cap_first}(${index.fields[0].name})
+function ${name}.get${index.suffix}(${index.fields[0].name})
     if (not ${index.fields[0].name}) then
         return ${index.name}Configs
     end
@@ -77,7 +77,7 @@ end
 ---@overload fun():map<${index.fields[0].name}:${index.fields[0].type},list<${name}>> 
 ---@param ${index.fields[0].name} ${index.fields[0].type} ${index.fields[0].comment}
 ---@return list<${name}>
-function ${name}.getBy${index.name?cap_first}(${index.fields[0].name})
+function ${name}.get${index.suffix}(${index.fields[0].name})
     return ${index.name}Configs[${index.fields[0].name}] or table.empty()
 end
 
@@ -89,7 +89,7 @@ end
 ---@param ${index.fields[0].name} ${index.fields[0].type} ${index.fields[0].comment}
 ---@param ${index.fields[1].name} ${index.fields[1].type} ${index.fields[1].comment}
 ---@return ${name}
-function ${name}.getBy${index.name?cap_first}(${index.fields[0].name}, ${index.fields[1].name})
+function ${name}.get${index.suffix}(${index.fields[0].name}, ${index.fields[1].name})
     if (not ${index.fields[0].name}) then
         return ${index.name}Configs
     end
@@ -110,7 +110,7 @@ end
 ---@param ${index.fields[0].name} ${index.fields[0].type} ${index.fields[0].comment}
 ---@param ${index.fields[1].name} ${index.fields[1].type} ${index.fields[1].comment}
 ---@return list<${name}>
-function ${name}.getBy${index.name?cap_first}(${index.fields[0].name}, ${index.fields[1].name})
+function ${name}.get${index.suffix}(${index.fields[0].name}, ${index.fields[1].name})
     if (not ${index.fields[0].name}) then
         return ${index.name}Configs
     end
@@ -132,7 +132,7 @@ end
 ---@param ${index.fields[1].name} ${index.fields[1].type} ${index.fields[1].comment}
 ---@param ${index.fields[2].name} ${index.fields[2].type} ${index.fields[2].comment}
 ---@return ${name}
-function ${name}.getBy${index.name?cap_first}(${index.fields[0].name}, ${index.fields[1].name}, ${index.fields[2].name})
+function ${name}.get${index.suffix}(${index.fields[0].name}, ${index.fields[1].name}, ${index.fields[2].name})
     if (not ${index.fields[0].name}) then
         return ${index.name}Configs
     end
@@ -160,7 +160,7 @@ end
 ---@param ${index.fields[1].name} ${index.fields[1].type} ${index.fields[1].comment}
 ---@param ${index.fields[2].name} ${index.fields[2].type} ${index.fields[2].comment}
 ---@return list<${name}>
-function ${name}.getBy${index.name?cap_first}(${index.fields[0].name}, ${index.fields[1].name}, ${index.fields[2].name})
+function ${name}.get${index.suffix}(${index.fields[0].name}, ${index.fields[1].name}, ${index.fields[2].name})
     if (not ${index.fields[0].name}) then
         return ${index.name}Configs
     end

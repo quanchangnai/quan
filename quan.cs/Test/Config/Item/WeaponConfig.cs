@@ -151,7 +151,7 @@ namespace Test.Config.Item
             return _idConfigs;
         }
 
-        public new static WeaponConfig GetById(int id)
+        public new static WeaponConfig Get(int id)
         {
             _idConfigs.TryGetValue(id, out var result);
             return result;

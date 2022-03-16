@@ -4,6 +4,9 @@ import com.alibaba.fastjson.*;
 <#if (!(parentClassName??) || kind == 6) && getFullPackageName("java")!="quan.config">
 import quan.config.*;
 </#if>
+<#if (!(parentClassName??) || kind == 6) && getFullPackageName("java")!="quan.config.loader">
+import quan.config.loader.ConfigLoader;
+</#if>
 <#list imports?keys as import>
 import ${import};
 </#list>
@@ -25,25 +28,27 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
     </#if>
 
     <#if field.comment !="">
-    //${field.comment}
+    /**
+     * ${field.comment}
+     */
     </#if>
     <#if field.type=="list">
-    protected final ${field.basicType}<${field.classValueType}> ${field.name};
+    public final ${field.basicType}<${field.classValueType}> ${field.name};
     <#elseif field.type=="set">
-    protected final ${field.basicType}<${field.classValueType}> ${field.name};
+    public final ${field.basicType}<${field.classValueType}> ${field.name};
     <#elseif field.type=="map">
-    protected final ${field.basicType}<${field.classKeyType}, ${field.classValueType}> ${field.name};
+    public final ${field.basicType}<${field.classKeyType}, ${field.classValueType}> ${field.name};
     <#elseif  field.timeType>
-    protected final ${field.basicType} ${field.name};
+    public final ${field.basicType} ${field.name};
 
     <#if field.comment !="">
     //${field.comment}
     </#if>
-    protected final String ${field.name}_;
+    public final String ${field.name}_;
     <#elseif field.builtinType>
-    protected final ${field.basicType} ${field.name};
+    public final ${field.basicType} ${field.name};
     <#else>
-    protected final ${field.classType} ${field.name};
+    public final ${field.classType} ${field.name};
     </#if>
 </#list>
 
@@ -123,58 +128,6 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
 </#list>
     }
 
-<#list selfFields as field>
-    <#if !(supportJava &&field.isSupportLanguage("java"))>
-        <#continue>
-    </#if>
-    <#if field.comment !="">
-    /**
-     * ${field.comment}
-     */
-    </#if>
-    <#if field.type=="list" || field.type=="set">
-    public final ${field.basicType}<${field.classValueType}> get${field.name?cap_first}() {
-        return ${field.name};
-    }
-    <#elseif field.type=="map">
-    public final ${field.basicType}<${field.classKeyType}, ${field.classValueType}> get${field.name?cap_first}() {
-        return ${field.name};
-    }
-    <#elseif field.timeType>
-    public final ${field.basicType} get${field.name?cap_first}() {
-        return ${field.name};
-    }
-
-    <#if field.comment !="">
-    /**
-     * ${field.comment}
-     */
-    </#if>
-    public final String get${field.name?cap_first}_() {
-        return ${field.name}_;
-    }
-    <#elseif field.builtinType>
-    public final ${field.basicType} get${field.name?cap_first}() {
-        return ${field.name};
-    }
-    <#else >
-    public final ${field.classType} get${field.name?cap_first}() {
-        return ${field.name};
-    }
-    </#if>
-    <#if field.simpleRef>
-
-        <#if field.refIndex.unique>
-    public final ${field.refType} get${field.name?cap_first}$Ref() {
-        <#else >
-    public final List<${field.refType}> get${field.name?cap_first}$Ref() {
-        </#if>
-        return ${field.refType}.getBy${field.refIndex.name?cap_first}(${field.name});
-    }
-    </#if>
-
-</#list>
-
  <#if kind ==6>
     @Override
     public ${name} create(JSONObject json) {
@@ -224,29 +177,29 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
     }
 <#macro indexer tab>
     ${tab}//所有${name}
-    ${tab}private static volatile List<${name}> configs = new ArrayList<>();
+    ${tab}private static volatile List<${name}> configs = Collections.emptyList();
 
     <#list indexes as index>
         <#if index.comment !="">
     ${tab}//索引:${index.comment}
         </#if>
         <#if index.unique && index.fields?size==1>
-    ${tab}private static volatile Map<${index.fields[0].classType}, ${name}> ${index.name}Configs = new HashMap<>();
+    ${tab}private static volatile Map<${index.fields[0].classType}, ${name}> ${index.name}Configs = Collections.emptyMap();
 
         <#elseif index.normal && index.fields?size==1>
-    ${tab}private static volatile Map<${index.fields[0].classType}, List<${name}>> ${index.name}Configs = new HashMap<>();
+    ${tab}private static volatile Map<${index.fields[0].classType}, List<${name}>> ${index.name}Configs = Collections.emptyMap();
 
         <#elseif index.unique && index.fields?size==2>
-    ${tab}private static volatile Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, ${name}>> ${index.name}Configs = new HashMap<>();
+    ${tab}private static volatile Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, ${name}>> ${index.name}Configs = Collections.emptyMap();
 
         <#elseif index.normal && index.fields?size==2>
-    ${tab}private static volatile Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, List<${name}>>> ${index.name}Configs = new HashMap<>();
+    ${tab}private static volatile Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, List<${name}>>> ${index.name}Configs = Collections.emptyMap();
 
         <#elseif index.unique && index.fields?size==3>
-    ${tab}private static volatile Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, ${name}>>> ${index.name}Configs = new HashMap<>();
+    ${tab}private static volatile Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, ${name}>>> ${index.name}Configs = Collections.emptyMap();
 
         <#elseif index.normal && index.fields?size==3>
-    ${tab}private static volatile Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, List<${name}>>>> ${index.name}Configs = new HashMap<>();
+    ${tab}private static volatile Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, List<${name}>>>> ${index.name}Configs = Collections.emptyMap();
 
         </#if>
     </#list>
@@ -260,7 +213,7 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
         ${tab}return ${index.name}Configs;
     ${tab}}
 
-    ${tab}public static ${name} getBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}) {
+    ${tab}public static ${name} get${index.suffix}(${index.fields[0].basicType} ${index.fields[0].name}) {
         ${tab}return ${index.name}Configs.get(${index.fields[0].name});
     ${tab}}
 
@@ -269,7 +222,7 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
         ${tab}return ${index.name}Configs;
     ${tab}}
 
-    ${tab}public static List<${name}> getBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}) {
+    ${tab}public static List<${name}> get${index.suffix}(${index.fields[0].basicType} ${index.fields[0].name}) {
         ${tab}return ${index.name}Configs.getOrDefault(${index.fields[0].name}, Collections.emptyList());
     ${tab}}
 
@@ -278,12 +231,12 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
         ${tab}return ${index.name}Configs;
     ${tab}}
 
-    ${tab}public static Map<${index.fields[1].classType}, ${name}> getBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}) {
+    ${tab}public static Map<${index.fields[1].classType}, ${name}> get${index.suffix}(${index.fields[0].basicType} ${index.fields[0].name}) {
         ${tab}return ${index.name}Configs.getOrDefault(${index.fields[0].name}, Collections.emptyMap());
     ${tab}}
 
-    ${tab}public static ${name} getBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name}) {
-        ${tab}return getBy${index.name?cap_first}(${index.fields[0].name}).get(${index.fields[1].name});
+    ${tab}public static ${name} get${index.suffix}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name}) {
+        ${tab}return get${index.suffix}(${index.fields[0].name}).get(${index.fields[1].name});
     ${tab}}
 
         <#elseif index.normal && index.fields?size==2>
@@ -291,12 +244,12 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
         ${tab}return ${index.name}Configs;
     ${tab}}
 
-    ${tab}public static Map<${index.fields[1].classType}, List<${name}>> getBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}) {
+    ${tab}public static Map<${index.fields[1].classType}, List<${name}>> get${index.suffix}(${index.fields[0].basicType} ${index.fields[0].name}) {
         ${tab}return ${index.name}Configs.getOrDefault(${index.fields[0].name}, Collections.emptyMap());
     ${tab}}
 
-    ${tab}public static List<${name}> getBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name}) {
-        ${tab}return getBy${index.name?cap_first}(${index.fields[0].name}).getOrDefault(${index.fields[1].name}, Collections.emptyList());
+    ${tab}public static List<${name}> get${index.suffix}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name}) {
+        ${tab}return get${index.suffix}(${index.fields[0].name}).getOrDefault(${index.fields[1].name}, Collections.emptyList());
     ${tab}}
 
         <#elseif index.unique && index.fields?size==3>
@@ -304,16 +257,16 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
         ${tab}return ${index.name}Configs;
     ${tab}}
 
-    ${tab}public static Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, ${name}>> getBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}) {
+    ${tab}public static Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, ${name}>> get${index.suffix}(${index.fields[0].basicType} ${index.fields[0].name}) {
         ${tab}return ${index.name}Configs.getOrDefault(${index.fields[0].name}, Collections.emptyMap());
     ${tab}}
 
-    ${tab}public static Map<${index.fields[2].classType}, ${name}> getBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name}) {
-        ${tab}return getBy${index.name?cap_first}(${index.fields[0].name}).getOrDefault(${index.fields[1].name}, Collections.emptyMap());
+    ${tab}public static Map<${index.fields[2].classType}, ${name}> get${index.suffix}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name}) {
+        ${tab}return get${index.suffix}(${index.fields[0].name}).getOrDefault(${index.fields[1].name}, Collections.emptyMap());
     ${tab}}
 
-    ${tab}public static ${name} getBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name}, ${index.fields[2].basicType} ${index.fields[2].name}) {
-        ${tab}return getBy${index.name?cap_first}(${index.fields[0].name}, ${index.fields[1].name}).get(${index.fields[2].name});
+    ${tab}public static ${name} get${index.suffix}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name}, ${index.fields[2].basicType} ${index.fields[2].name}) {
+        ${tab}return get${index.suffix}(${index.fields[0].name}, ${index.fields[1].name}).get(${index.fields[2].name});
     ${tab}}
 
         <#elseif index.normal && index.fields?size==3>
@@ -321,16 +274,16 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
         ${tab}return ${index.name}Configs;
     ${tab}}
 
-    ${tab}public static Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, List<${name}>>> getBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}) {
+    ${tab}public static Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, List<${name}>>> get${index.suffix}(${index.fields[0].basicType} ${index.fields[0].name}) {
         ${tab}return ${index.name}Configs.getOrDefault(${index.fields[0].name}, Collections.emptyMap());
     ${tab}}
 
-    ${tab}public static Map<${index.fields[2].classType}, List<${name}>> getBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name}) {
-        ${tab}return getBy${index.name?cap_first}(${index.fields[0].name}).getOrDefault(${index.fields[1].name}, Collections.emptyMap());
+    ${tab}public static Map<${index.fields[2].classType}, List<${name}>> get${index.suffix}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name}) {
+        ${tab}return get${index.suffix}(${index.fields[0].name}).getOrDefault(${index.fields[1].name}, Collections.emptyMap());
     ${tab}}
 
-    ${tab}public static List<${name}> getBy${index.name?cap_first}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name}, ${index.fields[2].basicType} ${index.fields[2].name}) {
-        ${tab}return getBy${index.name?cap_first}(${index.fields[0].name}, ${index.fields[1].name}).getOrDefault(${index.fields[2].name}, Collections.emptyList());
+    ${tab}public static List<${name}> get${index.suffix}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name}, ${index.fields[2].basicType} ${index.fields[2].name}) {
+        ${tab}return get${index.suffix}(${index.fields[0].name}, ${index.fields[1].name}).getOrDefault(${index.fields[2].name}, Collections.emptyList());
     ${tab}}
 
         </#if>
@@ -342,7 +295,7 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
      ${tab}* @return 错误信息
      ${tab}*/
     ${tab}@SuppressWarnings({"unchecked"})
-    ${tab}public static List<String> load(List<${name}> configs) {
+    ${tab}private static List<String> load(List<${name}> configs) {
     <#list indexes as index>
         <#if index.unique && index.fields?size==1>
         ${tab}Map<${index.fields[0].classType}, ${name}> ${index.name}Configs = new HashMap<>();
@@ -407,6 +360,10 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
     <#else>
         <@indexer tab=""/>
     </#if>
+
+    static {
+        ConfigLoader.registerLoadFunction(${name}.class, ${name}<#if parent??>.self</#if>::load);
+    }
 
 </#if>
 }

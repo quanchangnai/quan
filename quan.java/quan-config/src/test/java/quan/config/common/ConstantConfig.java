@@ -2,8 +2,8 @@ package quan.config.common;
 
 import com.alibaba.fastjson.*;
 import quan.config.*;
+import quan.config.loader.ConfigLoader;
 import java.util.*;
-import quan.config.item.ItemConfig;
 
 /**
  * 常量<br/>
@@ -11,20 +11,30 @@ import quan.config.item.ItemConfig;
  */
 public class ConstantConfig extends Config {
 
-    //常量Key
-    protected final String key;
+    /**
+     * 常量Key
+     */
+    public final String key;
 
-    //道具ID
-    protected final int itemId;
+    /**
+     * 道具ID
+     */
+    public final int itemId;
 
-    //奖励
-    protected final Reward reward;
+    /**
+     * 奖励
+     */
+    public final Reward reward;
 
-    //奖励List
-    protected final List<quan.config.item.Reward> rewardList;
+    /**
+     * 奖励List
+     */
+    public final List<quan.config.item.Reward> rewardList;
 
-    //备注
-    protected final String comment;
+    /**
+     * 备注
+     */
+    public final String comment;
 
 
     public ConstantConfig(JSONObject json) {
@@ -53,46 +63,6 @@ public class ConstantConfig extends Config {
         this.comment = json.getOrDefault("comment", "").toString();
     }
 
-    /**
-     * 常量Key
-     */
-    public final String getKey() {
-        return key;
-    }
-
-    /**
-     * 道具ID
-     */
-    public final int getItemId() {
-        return itemId;
-    }
-
-    public final ItemConfig getItemId$Ref() {
-        return ItemConfig.getById(itemId);
-    }
-
-    /**
-     * 奖励
-     */
-    public final Reward getReward() {
-        return reward;
-    }
-
-    /**
-     * 奖励List
-     */
-    public final List<quan.config.item.Reward> getRewardList() {
-        return rewardList;
-    }
-
-    /**
-     * 备注
-     */
-    public final String getComment() {
-        return comment;
-    }
-
-
     @Override
     public ConstantConfig create(JSONObject json) {
         return new ConstantConfig(json);
@@ -112,10 +82,10 @@ public class ConstantConfig extends Config {
 
 
     //所有ConstantConfig
-    private static volatile List<ConstantConfig> configs = new ArrayList<>();
+    private static volatile List<ConstantConfig> configs = Collections.emptyList();
 
     //索引:常量Key
-    private static volatile Map<String, ConstantConfig> keyConfigs = new HashMap<>();
+    private static volatile Map<String, ConstantConfig> keyConfigs = Collections.emptyMap();
 
     public static List<ConstantConfig> getConfigs() {
         return configs;
@@ -136,7 +106,7 @@ public class ConstantConfig extends Config {
      * @return 错误信息
      */
     @SuppressWarnings({"unchecked"})
-    public static List<String> load(List<ConstantConfig> configs) {
+    private static List<String> load(List<ConstantConfig> configs) {
         Map<String, ConstantConfig> keyConfigs = new HashMap<>();
 
         List<String> errors = new ArrayList<>();
@@ -154,6 +124,10 @@ public class ConstantConfig extends Config {
         ConstantConfig.keyConfigs = keyConfigs;
 
         return errors;
+    }
+
+    static {
+        ConfigLoader.registerLoadFunction(ConstantConfig.class, ConstantConfig::load);
     }
 
 }

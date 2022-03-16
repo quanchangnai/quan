@@ -113,8 +113,8 @@ public class DefinitionConfigLoader extends ConfigLoader {
 
         LinkedHashSet<String> validatedErrors = parser.getValidatedErrors();
         if (!validatedErrors.isEmpty()) {
-            ValidatedException validatedException =
-                    new ValidatedException(String.format("解析配置定义文件%s共发现%d条错误。", parser.getDefinitionPaths(), validatedErrors.size()));
+            String error = String.format("解析配置定义文件%s共发现%d条错误。", parser.getDefinitionPaths(), validatedErrors.size());
+            ValidatedException validatedException = new ValidatedException(error);
             validatedException.addErrors(validatedErrors);
             throw validatedException;
         }
@@ -153,7 +153,7 @@ public class DefinitionConfigLoader extends ConfigLoader {
      *
      * @param configDefinition 配置定义
      * @param onlySelf         true:只包含自己的数据，false:包含自己和子孙配置的数据
-     * @return SON格式配置数据
+     * @return JSON格式配置数据
      */
     public List<JSONObject> loadJsons(ConfigDefinition configDefinition, boolean onlySelf) {
         TreeSet<String> configTables = new TreeSet<>();

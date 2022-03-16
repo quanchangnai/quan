@@ -10,6 +10,12 @@ local configs = {
     { id = 1, name = "任务1", type = 1, target = 1, reward = nil, a1 = 1, a2 = 2, b1 = 11, b2 = false, c1 = "111", c2 = 222, c3 = 333, d1 = "1111", d2 = 2222, d3 = 333, s1 = {  }, l1 = {  }, m1 = {  } },
 }
 
+---索引:ID
+local idConfigs = {}
+
+---索引:类型
+local typeConfigs = {}
+
 ---索引:两字段唯一索引
 local composite1Configs = {}
 
@@ -22,21 +28,15 @@ local composite3Configs = {}
 ---索引:三字段普通索引
 local composite4Configs = {}
 
----索引:ID
-local idConfigs = {}
-
----索引:类型
-local typeConfigs = {}
-
 ---加载配置，建立索引
 local function loadConfigs()
     for i, config in ipairs(configs) do
+        Config.load(idConfigs, config, true, { "id" }, { config.id })
+        Config.load(typeConfigs, config, false, { "type" }, { config.type })
         Config.load(composite1Configs, config, true, { "a1", "a2" }, { config.a1, config.a2 })
         Config.load(composite2Configs, config, false, { "b1", "b2" }, { config.b1, config.b2 })
         Config.load(composite3Configs, config, true, { "c1", "c2", "c3" }, { config.c1, config.c2, config.c3 })
         Config.load(composite4Configs, config, false, { "d1", "d2", "d3" }, { config.d1, config.d2, config.d3 })
-        Config.load(idConfigs, config, true, { "id" }, { config.id })
-        Config.load(typeConfigs, config, false, { "type" }, { config.type })
     end
 end
 
@@ -50,6 +50,27 @@ local QuestConfig = {}
 ---@return list<QuestConfig>
 function QuestConfig.getConfigs()
     return configs
+end
+
+---
+---通过索引[id]获取QuestConfig
+---@overload fun():map<id:int,QuestConfig>
+---@param id int ID
+---@return QuestConfig
+function QuestConfig.get(id)
+    if (not id) then
+        return idConfigs
+    end
+    return idConfigs[id]
+end
+
+---
+---通过索引[type]获取QuestConfig
+---@overload fun():map<type:QuestType,list<QuestConfig>> 
+---@param type QuestType 类型
+---@return list<QuestConfig>
+function QuestConfig.getByType(type)
+    return typeConfigs[type] or table.empty()
 end
 
 ---
@@ -143,27 +164,6 @@ function QuestConfig.getByComposite4(d1, d2, d3)
     end
 
     return map2[d3]
-end
-
----
----通过索引[id]获取QuestConfig
----@overload fun():map<id:int,QuestConfig>
----@param id int ID
----@return QuestConfig
-function QuestConfig.getById(id)
-    if (not id) then
-        return idConfigs
-    end
-    return idConfigs[id]
-end
-
----
----通过索引[type]获取QuestConfig
----@overload fun():map<type:QuestType,list<QuestConfig>> 
----@param type QuestType 类型
----@return list<QuestConfig>
-function QuestConfig.getByType(type)
-    return typeConfigs[type] or table.empty()
 end
 
 return QuestConfig

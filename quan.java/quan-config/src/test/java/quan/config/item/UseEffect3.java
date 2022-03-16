@@ -8,7 +8,7 @@ import com.alibaba.fastjson.*;
  */
 public class UseEffect3 extends UseEffect {
 
-    protected final int ccc;
+    public final int ccc;
 
 
     public UseEffect3(JSONObject json) {
@@ -16,11 +16,6 @@ public class UseEffect3 extends UseEffect {
 
         this.ccc = json.getIntValue("ccc");
     }
-
-    public final int getCcc() {
-        return ccc;
-    }
-
 
     public static UseEffect3 create(JSONObject json) {
         return new UseEffect3(json);

@@ -23,10 +23,10 @@ public class ConfigDefinition extends BeanDefinition {
     private TreeSet<String> allTables = new TreeSet<>();
 
     //所有索引,包含继承下来的索引
-    private List<IndexDefinition> indexes = new ArrayList<>();
+    private List<IndexDefinition> indexes = new LinkedList<>();
 
     //仅自己的索引
-    private List<IndexDefinition> selfIndexes = new ArrayList<>();
+    private List<IndexDefinition> selfIndexes = new LinkedList<>();
 
     //列名:字段
     private Map<String, FieldDefinition> columnFields = new HashMap<>();

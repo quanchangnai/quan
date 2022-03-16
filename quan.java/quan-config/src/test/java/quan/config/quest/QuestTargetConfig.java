@@ -2,6 +2,7 @@ package quan.config.quest;
 
 import com.alibaba.fastjson.*;
 import quan.config.*;
+import quan.config.loader.ConfigLoader;
 import java.util.*;
 
 /**
@@ -10,14 +11,18 @@ import java.util.*;
  */
 public class QuestTargetConfig extends Config {
 
-    //ID
-    protected final int id;
+    /**
+     * ID
+     */
+    public final int id;
+
+    /**
+     * 中午
+     */
+    public final Date noon;
 
     //中午
-    protected final Date noon;
-
-    //中午
-    protected final String noon_;
+    public final String noon_;
 
 
     public QuestTargetConfig(JSONObject json) {
@@ -27,28 +32,6 @@ public class QuestTargetConfig extends Config {
         this.noon = json.getDate("noon");
         this.noon_ = json.getOrDefault("noon_", "").toString();
     }
-
-    /**
-     * ID
-     */
-    public final int getId() {
-        return id;
-    }
-
-    /**
-     * 中午
-     */
-    public final Date getNoon() {
-        return noon;
-    }
-
-    /**
-     * 中午
-     */
-    public final String getNoon_() {
-        return noon_;
-    }
-
 
     @Override
     public QuestTargetConfig create(JSONObject json) {
@@ -66,10 +49,10 @@ public class QuestTargetConfig extends Config {
 
 
     //所有QuestTargetConfig
-    private static volatile List<QuestTargetConfig> configs = new ArrayList<>();
+    private static volatile List<QuestTargetConfig> configs = Collections.emptyList();
 
     //索引:ID
-    private static volatile Map<Integer, QuestTargetConfig> idConfigs = new HashMap<>();
+    private static volatile Map<Integer, QuestTargetConfig> idConfigs = Collections.emptyMap();
 
     public static List<QuestTargetConfig> getConfigs() {
         return configs;
@@ -79,7 +62,7 @@ public class QuestTargetConfig extends Config {
         return idConfigs;
     }
 
-    public static QuestTargetConfig getById(int id) {
+    public static QuestTargetConfig get(int id) {
         return idConfigs.get(id);
     }
 
@@ -90,7 +73,7 @@ public class QuestTargetConfig extends Config {
      * @return 错误信息
      */
     @SuppressWarnings({"unchecked"})
-    public static List<String> load(List<QuestTargetConfig> configs) {
+    private static List<String> load(List<QuestTargetConfig> configs) {
         Map<Integer, QuestTargetConfig> idConfigs = new HashMap<>();
 
         List<String> errors = new ArrayList<>();
@@ -106,6 +89,10 @@ public class QuestTargetConfig extends Config {
         QuestTargetConfig.idConfigs = idConfigs;
 
         return errors;
+    }
+
+    static {
+        ConfigLoader.registerLoadFunction(QuestTargetConfig.class, QuestTargetConfig::load);
     }
 
 }

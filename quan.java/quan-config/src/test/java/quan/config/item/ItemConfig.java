@@ -2,6 +2,7 @@ package quan.config.item;
 
 import com.alibaba.fastjson.*;
 import quan.config.*;
+import quan.config.loader.ConfigLoader;
 import java.util.*;
 
 /**
@@ -10,38 +11,58 @@ import java.util.*;
  */
 public class ItemConfig extends Config {
 
-    //ID
-    protected final int id;
+    /**
+     * ID
+     */
+    public final int id;
 
-    //常量Key
-    protected final String key;
+    /**
+     * 常量Key
+     */
+    public final String key;
 
-    //名字
-    protected final String name;
+    /**
+     * 名字
+     */
+    public final String name;
 
-    //类型
-    protected final ItemType type;
+    /**
+     * 类型
+     */
+    public final ItemType type;
 
-    //使用效果
-    protected final UseEffect useEffect;
+    /**
+     * 使用效果
+     */
+    public final UseEffect useEffect;
 
-    //奖励
-    protected final Reward reward;
+    /**
+     * 奖励
+     */
+    public final Reward reward;
 
-    //List
-    protected final List<Integer> list;
+    /**
+     * List
+     */
+    public final List<Integer> list;
 
-    //Set
-    protected final Set<Integer> set;
+    /**
+     * Set
+     */
+    public final Set<Integer> set;
 
-    //Map
-    protected final Map<Integer, Integer> map;
+    /**
+     * Map
+     */
+    public final Map<Integer, Integer> map;
+
+    /**
+     * 生效时间
+     */
+    public final Date effectiveTime;
 
     //生效时间
-    protected final Date effectiveTime;
-
-    //生效时间
-    protected final String effectiveTime_;
+    public final String effectiveTime_;
 
 
     public ItemConfig(JSONObject json) {
@@ -97,84 +118,6 @@ public class ItemConfig extends Config {
         this.effectiveTime_ = json.getOrDefault("effectiveTime_", "").toString();
     }
 
-    /**
-     * ID
-     */
-    public final int getId() {
-        return id;
-    }
-
-    /**
-     * 常量Key
-     */
-    public final String getKey() {
-        return key;
-    }
-
-    /**
-     * 名字
-     */
-    public final String getName() {
-        return name;
-    }
-
-    /**
-     * 类型
-     */
-    public final ItemType getType() {
-        return type;
-    }
-
-    /**
-     * 使用效果
-     */
-    public final UseEffect getUseEffect() {
-        return useEffect;
-    }
-
-    /**
-     * 奖励
-     */
-    public final Reward getReward() {
-        return reward;
-    }
-
-    /**
-     * List
-     */
-    public final List<Integer> getList() {
-        return list;
-    }
-
-    /**
-     * Set
-     */
-    public final Set<Integer> getSet() {
-        return set;
-    }
-
-    /**
-     * Map
-     */
-    public final Map<Integer, Integer> getMap() {
-        return map;
-    }
-
-    /**
-     * 生效时间
-     */
-    public final Date getEffectiveTime() {
-        return effectiveTime;
-    }
-
-    /**
-     * 生效时间
-     */
-    public final String getEffectiveTime_() {
-        return effectiveTime_;
-    }
-
-
     @Override
     public ItemConfig create(JSONObject json) {
         return new ItemConfig(json);
@@ -199,16 +142,16 @@ public class ItemConfig extends Config {
 
 
     //所有ItemConfig
-    private static volatile List<ItemConfig> configs = new ArrayList<>();
+    private static volatile List<ItemConfig> configs = Collections.emptyList();
 
     //索引:ID
-    private static volatile Map<Integer, ItemConfig> idConfigs = new HashMap<>();
+    private static volatile Map<Integer, ItemConfig> idConfigs = Collections.emptyMap();
 
     //索引:常量Key
-    private static volatile Map<String, ItemConfig> keyConfigs = new HashMap<>();
+    private static volatile Map<String, ItemConfig> keyConfigs = Collections.emptyMap();
 
     //索引:类型
-    private static volatile Map<ItemType, List<ItemConfig>> typeConfigs = new HashMap<>();
+    private static volatile Map<ItemType, List<ItemConfig>> typeConfigs = Collections.emptyMap();
 
     public static List<ItemConfig> getConfigs() {
         return configs;
@@ -218,7 +161,7 @@ public class ItemConfig extends Config {
         return idConfigs;
     }
 
-    public static ItemConfig getById(int id) {
+    public static ItemConfig get(int id) {
         return idConfigs.get(id);
     }
 
@@ -245,7 +188,7 @@ public class ItemConfig extends Config {
      * @return 错误信息
      */
     @SuppressWarnings({"unchecked"})
-    public static List<String> load(List<ItemConfig> configs) {
+    private static List<String> load(List<ItemConfig> configs) {
         Map<Integer, ItemConfig> idConfigs = new HashMap<>();
         Map<String, ItemConfig> keyConfigs = new HashMap<>();
         Map<ItemType, List<ItemConfig>> typeConfigs = new HashMap<>();
@@ -271,6 +214,10 @@ public class ItemConfig extends Config {
         ItemConfig.typeConfigs = typeConfigs;
 
         return errors;
+    }
+
+    static {
+        ConfigLoader.registerLoadFunction(ItemConfig.class, ItemConfig::load);
     }
 
 }

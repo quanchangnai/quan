@@ -55,6 +55,9 @@ namespace Test.Config.Item
         // 所有EquipConfig
         private static volatile IList<EquipConfig> _configs = new List<EquipConfig>();
 
+        // 索引:部位
+        private static volatile IDictionary<int, IList<EquipConfig>> _positionConfigs = new Dictionary<int, IList<EquipConfig>>();
+
         // 索引:ID
         private static volatile IDictionary<int, EquipConfig> _idConfigs = new Dictionary<int, EquipConfig>();
 
@@ -64,12 +67,20 @@ namespace Test.Config.Item
         // 索引:类型
         private static volatile IDictionary<ItemType, IList<EquipConfig>> _typeConfigs = new Dictionary<ItemType, IList<EquipConfig>>();
 
-        // 索引:部位
-        private static volatile IDictionary<int, IList<EquipConfig>> _positionConfigs = new Dictionary<int, IList<EquipConfig>>();
-
         public new static IList<EquipConfig> GetConfigs()
         {
             return _configs;
+        }
+
+        public static IDictionary<int, IList<EquipConfig>> GetPositionConfigs()
+        {
+            return _positionConfigs;
+        }
+
+        public static IList<EquipConfig> GetByPosition(int position)
+        {
+            _positionConfigs.TryGetValue(position, out var result);
+            return result ?? ImmutableList<EquipConfig>.Empty;
         }
 
         public new static IDictionary<int, EquipConfig> GetIdConfigs()
@@ -77,7 +88,7 @@ namespace Test.Config.Item
             return _idConfigs;
         }
 
-        public new static EquipConfig GetById(int id)
+        public new static EquipConfig Get(int id)
         {
             _idConfigs.TryGetValue(id, out var result);
             return result;
@@ -105,44 +116,33 @@ namespace Test.Config.Item
             return result ?? ImmutableList<EquipConfig>.Empty;
         }
 
-        public static IDictionary<int, IList<EquipConfig>> GetPositionConfigs()
-        {
-            return _positionConfigs;
-        }
-
-        public static IList<EquipConfig> GetByPosition(int position)
-        {
-            _positionConfigs.TryGetValue(position, out var result);
-            return result ?? ImmutableList<EquipConfig>.Empty;
-        }
-
 
         public static void Load(IList<EquipConfig> configs)
         {
+            IDictionary<int, IList<EquipConfig>> positionConfigs = new Dictionary<int, IList<EquipConfig>>();
             IDictionary<int, EquipConfig> idConfigs = new Dictionary<int, EquipConfig>();
             IDictionary<string, EquipConfig> keyConfigs = new Dictionary<string, EquipConfig>();
             IDictionary<ItemType, IList<EquipConfig>> typeConfigs = new Dictionary<ItemType, IList<EquipConfig>>();
-            IDictionary<int, IList<EquipConfig>> positionConfigs = new Dictionary<int, IList<EquipConfig>>();
 
             foreach (var config in configs)
             {
+                ConfigBase.Load(positionConfigs, config, config.position);
                 ConfigBase.Load(idConfigs, config, config.id);
                 ConfigBase.Load(keyConfigs, config, config.key);
                 ConfigBase.Load(typeConfigs, config, config.type);
-                ConfigBase.Load(positionConfigs, config, config.position);
             }
 
             configs = configs.ToImmutableList();
+            positionConfigs = ToImmutableDictionary(positionConfigs);
             idConfigs = ToImmutableDictionary(idConfigs);
             keyConfigs = ToImmutableDictionary(keyConfigs);
             typeConfigs = ToImmutableDictionary(typeConfigs);
-            positionConfigs = ToImmutableDictionary(positionConfigs);
 
             _configs = configs;
+            _positionConfigs = positionConfigs;
             _idConfigs = idConfigs;
             _keyConfigs = keyConfigs;
             _typeConfigs = typeConfigs;
-            _positionConfigs = positionConfigs;
         }
     }
 }

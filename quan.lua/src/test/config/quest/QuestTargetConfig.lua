@@ -37,7 +37,7 @@ end
 ---@overload fun():map<id:int,QuestTargetConfig>
 ---@param id int ID
 ---@return QuestTargetConfig
-function QuestTargetConfig.getById(id)
+function QuestTargetConfig.get(id)
     if (not id) then
         return idConfigs
     end

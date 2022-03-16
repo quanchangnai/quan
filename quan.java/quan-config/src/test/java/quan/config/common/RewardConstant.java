@@ -13,7 +13,7 @@ public enum RewardConstant {
     constant2;
 
     public List<Reward> value() {
-        return ConstantConfig.getByKey(name()).getRewardList();
+        return ConstantConfig.getByKey(name()).rewardList;
     }
 
 }

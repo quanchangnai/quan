@@ -57,7 +57,7 @@ end
 ---@overload fun():map<id:int,WeaponConfig>
 ---@param id int ID
 ---@return WeaponConfig
-function WeaponConfig.getById(id)
+function WeaponConfig.get(id)
     if (not id) then
         return idConfigs
     end

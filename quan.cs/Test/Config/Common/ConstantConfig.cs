@@ -23,7 +23,7 @@ namespace Test.Config.Common
         /// </summary>
         public readonly int itemId;
 
-        public ItemConfig itemId_Ref => ItemConfig.GetById(itemId);
+        public ItemConfig itemId_Ref => ItemConfig.Get(itemId);
 
         /// <summary>
         /// 奖励

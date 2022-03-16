@@ -2,6 +2,7 @@ package quan.config.item;
 
 import com.alibaba.fastjson.*;
 import quan.config.*;
+import quan.config.loader.ConfigLoader;
 
 /**
  * 使用效果<br/>
@@ -9,7 +10,7 @@ import quan.config.*;
  */
 public class UseEffect extends Bean {
 
-    protected final int aaa;
+    public final int aaa;
 
 
     public UseEffect(JSONObject json) {
@@ -17,11 +18,6 @@ public class UseEffect extends Bean {
 
         this.aaa = json.getIntValue("aaa");
     }
-
-    public final int getAaa() {
-        return aaa;
-    }
-
 
     public static UseEffect create(JSONObject json) {
         String clazz = json.getOrDefault("class", "").toString();

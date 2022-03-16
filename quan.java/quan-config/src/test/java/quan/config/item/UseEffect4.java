@@ -9,7 +9,7 @@ import java.util.*;
  */
 public class UseEffect4 extends UseEffect {
 
-    protected final ItemType itemType;
+    public final ItemType itemType;
 
 
     public UseEffect4(JSONObject json) {
@@ -17,15 +17,6 @@ public class UseEffect4 extends UseEffect {
 
         this.itemType = ItemType.valueOf(json.getIntValue("itemType"));
     }
-
-    public final ItemType getItemType() {
-        return itemType;
-    }
-
-    public final List<ItemConfig> getItemType$Ref() {
-        return ItemConfig.getByType(itemType);
-    }
-
 
     public static UseEffect4 create(JSONObject json) {
         return new UseEffect4(json);

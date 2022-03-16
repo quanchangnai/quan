@@ -7,5 +7,4 @@ apply plugin: 'java-library'
 dependencies {
     api project(':quan-common')
     implementation project(':quan-message')
-
 }

@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Reflection;
 using NUnit.Framework;
 using Quan.Config;
@@ -27,7 +26,7 @@ namespace Test
             }
 
             EquipConfig.GetByPosition(1);
-            QuestConfig.GetById(1);
+            QuestConfig.Get(1);
         }
     }
 }

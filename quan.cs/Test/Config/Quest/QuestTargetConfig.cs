@@ -69,7 +69,7 @@ namespace Test.Config.Quest
             return _idConfigs;
         }
 
-        public static QuestTargetConfig GetById(int id)
+        public static QuestTargetConfig Get(int id)
         {
             _idConfigs.TryGetValue(id, out var result);
             return result;

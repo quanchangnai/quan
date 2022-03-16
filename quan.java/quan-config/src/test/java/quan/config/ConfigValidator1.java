@@ -14,10 +14,10 @@ public class ConfigValidator1 implements ConfigValidator {
     @Override
     public void validateConfig(List<String> errors) {
         String error = "ConfigValidator1校验测试";
-        ItemConfig itemConfig = ItemConfig.getById(1);
+        ItemConfig itemConfig = ItemConfig.get(1);
         if (itemConfig != null) {
             System.err.println("itemConfig.toJson():" + itemConfig.toJson());
-            error += ":" + itemConfig.getName();
+            error += ":" + itemConfig.name;
         }
         System.err.println("ItemIds.item2=" + ItemIds.item2.value());
         System.err.println("ItemConstant.constant2()=" + ItemConstant.constant2());

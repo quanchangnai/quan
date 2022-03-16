@@ -33,7 +33,7 @@ namespace Test.Config.Quest
         /// </summary>
         public readonly int target;
 
-        public QuestTargetConfig target_Ref => QuestTargetConfig.GetById(target);
+        public QuestTargetConfig target_Ref => QuestTargetConfig.Get(target);
 
         /// <summary>
         /// 奖励
@@ -190,6 +190,12 @@ namespace Test.Config.Quest
         // 所有QuestConfig
         private static volatile IList<QuestConfig> _configs = new List<QuestConfig>();
 
+        // 索引:ID
+        private static volatile IDictionary<int, QuestConfig> _idConfigs = new Dictionary<int, QuestConfig>();
+
+        // 索引:类型
+        private static volatile IDictionary<QuestType, IList<QuestConfig>> _typeConfigs = new Dictionary<QuestType, IList<QuestConfig>>();
+
         // 索引:两字段唯一索引
         private static volatile IDictionary<int, IDictionary<int, QuestConfig>> _composite1Configs = new Dictionary<int, IDictionary<int, QuestConfig>>();
 
@@ -202,15 +208,31 @@ namespace Test.Config.Quest
         // 索引:三字段普通索引
         private static volatile IDictionary<string, IDictionary<int, IDictionary<int, IList<QuestConfig>>>> _composite4Configs = new Dictionary<string, IDictionary<int, IDictionary<int, IList<QuestConfig>>>>();
 
-        // 索引:ID
-        private static volatile IDictionary<int, QuestConfig> _idConfigs = new Dictionary<int, QuestConfig>();
-
-        // 索引:类型
-        private static volatile IDictionary<QuestType, IList<QuestConfig>> _typeConfigs = new Dictionary<QuestType, IList<QuestConfig>>();
-
         public static IList<QuestConfig> GetConfigs()
         {
             return _configs;
+        }
+
+        public static IDictionary<int, QuestConfig> GetIdConfigs()
+        {
+            return _idConfigs;
+        }
+
+        public static QuestConfig Get(int id)
+        {
+            _idConfigs.TryGetValue(id, out var result);
+            return result;
+        }
+
+        public static IDictionary<QuestType, IList<QuestConfig>> GetTypeConfigs()
+        {
+            return _typeConfigs;
+        }
+
+        public static IList<QuestConfig> GetByType(QuestType type)
+        {
+            _typeConfigs.TryGetValue(type, out var result);
+            return result ?? ImmutableList<QuestConfig>.Empty;
         }
 
         public static IDictionary<int, IDictionary<int, QuestConfig>> GetComposite1Configs()
@@ -293,63 +315,41 @@ namespace Test.Config.Quest
             return result ?? ImmutableList<QuestConfig>.Empty;
         }
 
-        public static IDictionary<int, QuestConfig> GetIdConfigs()
-        {
-            return _idConfigs;
-        }
-
-        public static QuestConfig GetById(int id)
-        {
-            _idConfigs.TryGetValue(id, out var result);
-            return result;
-        }
-
-        public static IDictionary<QuestType, IList<QuestConfig>> GetTypeConfigs()
-        {
-            return _typeConfigs;
-        }
-
-        public static IList<QuestConfig> GetByType(QuestType type)
-        {
-            _typeConfigs.TryGetValue(type, out var result);
-            return result ?? ImmutableList<QuestConfig>.Empty;
-        }
-
 
         public static void Load(IList<QuestConfig> configs)
         {
+            IDictionary<int, QuestConfig> idConfigs = new Dictionary<int, QuestConfig>();
+            IDictionary<QuestType, IList<QuestConfig>> typeConfigs = new Dictionary<QuestType, IList<QuestConfig>>();
             IDictionary<int, IDictionary<int, QuestConfig>> composite1Configs = new Dictionary<int, IDictionary<int, QuestConfig>>();
             IDictionary<int, IDictionary<bool, IList<QuestConfig>>> composite2Configs = new Dictionary<int, IDictionary<bool, IList<QuestConfig>>>();
             IDictionary<string, IDictionary<int, IDictionary<int, QuestConfig>>> composite3Configs = new Dictionary<string, IDictionary<int, IDictionary<int, QuestConfig>>>();
             IDictionary<string, IDictionary<int, IDictionary<int, IList<QuestConfig>>>> composite4Configs = new Dictionary<string, IDictionary<int, IDictionary<int, IList<QuestConfig>>>>();
-            IDictionary<int, QuestConfig> idConfigs = new Dictionary<int, QuestConfig>();
-            IDictionary<QuestType, IList<QuestConfig>> typeConfigs = new Dictionary<QuestType, IList<QuestConfig>>();
 
             foreach (var config in configs)
             {
+                Load(idConfigs, config, config.id);
+                Load(typeConfigs, config, config.type);
                 Load(composite1Configs, config, config.a1, config.a2);
                 Load(composite2Configs, config, config.b1, config.b2);
                 Load(composite3Configs, config, config.c1, config.c2, config.c3);
                 Load(composite4Configs, config, config.d1, config.d2, config.d3);
-                Load(idConfigs, config, config.id);
-                Load(typeConfigs, config, config.type);
             }
 
             configs = configs.ToImmutableList();
+            idConfigs = ToImmutableDictionary(idConfigs);
+            typeConfigs = ToImmutableDictionary(typeConfigs);
             composite1Configs = ToImmutableDictionary(composite1Configs);
             composite2Configs = ToImmutableDictionary(composite2Configs);
             composite3Configs = ToImmutableDictionary(composite3Configs);
             composite4Configs = ToImmutableDictionary(composite4Configs);
-            idConfigs = ToImmutableDictionary(idConfigs);
-            typeConfigs = ToImmutableDictionary(typeConfigs);
 
             _configs = configs;
+            _idConfigs = idConfigs;
+            _typeConfigs = typeConfigs;
             _composite1Configs = composite1Configs;
             _composite2Configs = composite2Configs;
             _composite3Configs = composite3Configs;
             _composite4Configs = composite4Configs;
-            _idConfigs = idConfigs;
-            _typeConfigs = typeConfigs;
         }
     }
 }

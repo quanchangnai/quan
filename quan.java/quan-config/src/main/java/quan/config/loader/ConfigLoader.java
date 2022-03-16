@@ -1,7 +1,5 @@
 package quan.config.loader;
 
-import java.lang.reflect.Method;
-import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +11,9 @@ import quan.config.reader.ConfigReader;
 import quan.util.ClassUtils;
 import quan.util.PathUtils;
 
+import java.util.*;
+import java.util.function.Function;
+
 /**
  * 配置加载器<br/>
  * Created by quanchangnai on 2019/7/30.
@@ -21,6 +22,8 @@ import quan.util.PathUtils;
 public abstract class ConfigLoader {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
+
+    protected static Map<Class<? extends Config>, Function<List, List>> loadFunctions = new HashMap<>();
 
     //配置表所在目录
     protected String tablePath;
@@ -43,6 +46,10 @@ public abstract class ConfigLoader {
     public ConfigLoader(String tablePath) {
         Objects.requireNonNull(tablePath, "配置表路径不能为空");
         this.tablePath = PathUtils.toPlatPath(tablePath);
+    }
+
+    public static void registerLoadFunction(Class<? extends Config> clazz, Function<List, List> function) {
+        loadFunctions.put(clazz, function);
     }
 
     public LoadMode getLoadMode() {
@@ -140,25 +147,26 @@ public abstract class ConfigLoader {
             configs.addAll(configReader.getConfigs());
         }
 
-        Method loadMethod;
+        Function<List, List> loadFunction;
         try {
-            loadMethod = Class.forName(configFullName + "$self").getMethod("load", List.class);
-        } catch (Exception e1) {
-            try {
-                loadMethod = Class.forName(configFullName).getMethod("load", List.class);
-            } catch (Exception e2) {
-                logger.error("加载配置[{}]类出错，配置类[{}]不存在或者没有加载方法", configName, configFullName);
-                return;
-            }
+            loadFunction = loadFunctions.get(Class.forName(configFullName));
+        } catch (Exception e) {
+            logger.error("加载配置[{}]类出错，配置类[{}]不存在", configName, configFullName);
+            return;
+        }
+
+        if (loadFunction == null) {
+            logger.error("加载配置[{}]类出错，配置类[{}]的load方法不存在", configName, configFullName);
+            return;
         }
 
         try {
-            List<String> indexErrors = (List<String>) loadMethod.invoke(null, configs);
+            List<String> loadErrors = (List<String>) loadFunction.apply(configs);
             if (needValidate() && validate) {
-                validatedErrors.addAll(indexErrors);
+                validatedErrors.addAll(loadErrors);
             }
         } catch (Exception e) {
-            logger.error("加载配置[{}]类出错，调用配置类[{}]的索引方法出错", configName, configFullName, e);
+            logger.error("加载配置[{}]类出错，调用配置类[{}]的load方法出错", configName, configFullName, e);
         }
     }
 

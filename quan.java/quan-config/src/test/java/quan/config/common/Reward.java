@@ -2,6 +2,7 @@ package quan.config.common;
 
 import com.alibaba.fastjson.*;
 import quan.config.*;
+import quan.config.loader.ConfigLoader;
 import quan.config.item.ItemConfig;
 
 /**
@@ -10,9 +11,9 @@ import quan.config.item.ItemConfig;
  */
 public class Reward extends Bean {
 
-    protected final int itemId;
+    public final int itemId;
 
-    protected final int itemNum;
+    public final int itemNum;
 
 
     public Reward(JSONObject json) {
@@ -21,19 +22,6 @@ public class Reward extends Bean {
         this.itemId = json.getIntValue("itemId");
         this.itemNum = json.getIntValue("itemNum");
     }
-
-    public final int getItemId() {
-        return itemId;
-    }
-
-    public final ItemConfig getItemId$Ref() {
-        return ItemConfig.getById(itemId);
-    }
-
-    public final int getItemNum() {
-        return itemNum;
-    }
-
 
     public static Reward create(JSONObject json) {
         return new Reward(json);

@@ -2,6 +2,7 @@ package quan.config.quest;
 
 import com.alibaba.fastjson.*;
 import quan.config.*;
+import quan.config.loader.ConfigLoader;
 import java.util.*;
 import quan.config.item.Reward;
 
@@ -11,59 +12,95 @@ import quan.config.item.Reward;
  */
 public class QuestConfig extends Config {
 
-    //ID
-    protected final int id;
+    /**
+     * ID
+     */
+    public final int id;
 
-    //名字
-    protected final String name;
+    /**
+     * 名字
+     */
+    public final String name;
 
-    //类型
-    protected final QuestType type;
+    /**
+     * 类型
+     */
+    public final QuestType type;
 
-    //任务目标
-    protected final int target;
+    /**
+     * 任务目标
+     */
+    public final int target;
 
-    //奖励
-    protected final Reward reward;
+    /**
+     * 奖励
+     */
+    public final Reward reward;
 
-    //A1
-    protected final int a1;
+    /**
+     * A1
+     */
+    public final int a1;
 
-    //A2
-    protected final int a2;
+    /**
+     * A2
+     */
+    public final int a2;
 
-    //B1
-    protected final int b1;
+    /**
+     * B1
+     */
+    public final int b1;
 
-    //B2
-    protected final boolean b2;
+    /**
+     * B2
+     */
+    public final boolean b2;
 
-    //C1
-    protected final String c1;
+    /**
+     * C1
+     */
+    public final String c1;
 
-    //C2
-    protected final int c2;
+    /**
+     * C2
+     */
+    public final int c2;
 
-    //C3
-    protected final int c3;
+    /**
+     * C3
+     */
+    public final int c3;
 
-    //D1
-    protected final String d1;
+    /**
+     * D1
+     */
+    public final String d1;
 
-    //D2
-    protected final int d2;
+    /**
+     * D2
+     */
+    public final int d2;
 
-    //D3
-    protected final int d3;
+    /**
+     * D3
+     */
+    public final int d3;
 
-    //S1
-    protected final Set<Integer> s1;
+    /**
+     * S1
+     */
+    public final Set<Integer> s1;
 
-    //L1
-    protected final List<Integer> l1;
+    /**
+     * L1
+     */
+    public final List<Integer> l1;
 
-    //M1
-    protected final Map<Integer, Integer> m1;
+    /**
+     * M1
+     */
+    public final Map<Integer, Integer> m1;
 
 
     public QuestConfig(JSONObject json) {
@@ -120,137 +157,6 @@ public class QuestConfig extends Config {
         this.m1 = Collections.unmodifiableMap(m1$2);
     }
 
-    /**
-     * ID
-     */
-    public final int getId() {
-        return id;
-    }
-
-    /**
-     * 名字
-     */
-    public final String getName() {
-        return name;
-    }
-
-    /**
-     * 类型
-     */
-    public final QuestType getType() {
-        return type;
-    }
-
-    /**
-     * 任务目标
-     */
-    public final int getTarget() {
-        return target;
-    }
-
-    public final QuestTargetConfig getTarget$Ref() {
-        return QuestTargetConfig.getById(target);
-    }
-
-    /**
-     * 奖励
-     */
-    public final Reward getReward() {
-        return reward;
-    }
-
-    /**
-     * A1
-     */
-    public final int getA1() {
-        return a1;
-    }
-
-    /**
-     * A2
-     */
-    public final int getA2() {
-        return a2;
-    }
-
-    /**
-     * B1
-     */
-    public final int getB1() {
-        return b1;
-    }
-
-    /**
-     * B2
-     */
-    public final boolean getB2() {
-        return b2;
-    }
-
-    /**
-     * C1
-     */
-    public final String getC1() {
-        return c1;
-    }
-
-    /**
-     * C2
-     */
-    public final int getC2() {
-        return c2;
-    }
-
-    /**
-     * C3
-     */
-    public final int getC3() {
-        return c3;
-    }
-
-    /**
-     * D1
-     */
-    public final String getD1() {
-        return d1;
-    }
-
-    /**
-     * D2
-     */
-    public final int getD2() {
-        return d2;
-    }
-
-    /**
-     * D3
-     */
-    public final int getD3() {
-        return d3;
-    }
-
-    /**
-     * S1
-     */
-    public final Set<Integer> getS1() {
-        return s1;
-    }
-
-    /**
-     * L1
-     */
-    public final List<Integer> getL1() {
-        return l1;
-    }
-
-    /**
-     * M1
-     */
-    public final Map<Integer, Integer> getM1() {
-        return m1;
-    }
-
-
     @Override
     public QuestConfig create(JSONObject json) {
         return new QuestConfig(json);
@@ -283,28 +189,44 @@ public class QuestConfig extends Config {
 
 
     //所有QuestConfig
-    private static volatile List<QuestConfig> configs = new ArrayList<>();
-
-    //索引:两字段唯一索引
-    private static volatile Map<Integer, Map<Integer, QuestConfig>> composite1Configs = new HashMap<>();
-
-    //索引:两字段普通索引
-    private static volatile Map<Integer, Map<Boolean, List<QuestConfig>>> composite2Configs = new HashMap<>();
-
-    //索引:三字段唯一索引
-    private static volatile Map<String, Map<Integer, Map<Integer, QuestConfig>>> composite3Configs = new HashMap<>();
-
-    //索引:三字段普通索引
-    private static volatile Map<String, Map<Integer, Map<Integer, List<QuestConfig>>>> composite4Configs = new HashMap<>();
+    private static volatile List<QuestConfig> configs = Collections.emptyList();
 
     //索引:ID
-    private static volatile Map<Integer, QuestConfig> idConfigs = new HashMap<>();
+    private static volatile Map<Integer, QuestConfig> idConfigs = Collections.emptyMap();
 
     //索引:类型
-    private static volatile Map<QuestType, List<QuestConfig>> typeConfigs = new HashMap<>();
+    private static volatile Map<QuestType, List<QuestConfig>> typeConfigs = Collections.emptyMap();
+
+    //索引:两字段唯一索引
+    private static volatile Map<Integer, Map<Integer, QuestConfig>> composite1Configs = Collections.emptyMap();
+
+    //索引:两字段普通索引
+    private static volatile Map<Integer, Map<Boolean, List<QuestConfig>>> composite2Configs = Collections.emptyMap();
+
+    //索引:三字段唯一索引
+    private static volatile Map<String, Map<Integer, Map<Integer, QuestConfig>>> composite3Configs = Collections.emptyMap();
+
+    //索引:三字段普通索引
+    private static volatile Map<String, Map<Integer, Map<Integer, List<QuestConfig>>>> composite4Configs = Collections.emptyMap();
 
     public static List<QuestConfig> getConfigs() {
         return configs;
+    }
+
+    public static Map<Integer, QuestConfig> getIdConfigs() {
+        return idConfigs;
+    }
+
+    public static QuestConfig get(int id) {
+        return idConfigs.get(id);
+    }
+
+    public static Map<QuestType, List<QuestConfig>> getTypeConfigs() {
+        return typeConfigs;
+    }
+
+    public static List<QuestConfig> getByType(QuestType type) {
+        return typeConfigs.getOrDefault(type, Collections.emptyList());
     }
 
     public static Map<Integer, Map<Integer, QuestConfig>> getComposite1Configs() {
@@ -363,22 +285,6 @@ public class QuestConfig extends Config {
         return getByComposite4(d1, d2).getOrDefault(d3, Collections.emptyList());
     }
 
-    public static Map<Integer, QuestConfig> getIdConfigs() {
-        return idConfigs;
-    }
-
-    public static QuestConfig getById(int id) {
-        return idConfigs.get(id);
-    }
-
-    public static Map<QuestType, List<QuestConfig>> getTypeConfigs() {
-        return typeConfigs;
-    }
-
-    public static List<QuestConfig> getByType(QuestType type) {
-        return typeConfigs.getOrDefault(type, Collections.emptyList());
-    }
-
 
     /**
      * 加载配置，建立索引
@@ -386,42 +292,46 @@ public class QuestConfig extends Config {
      * @return 错误信息
      */
     @SuppressWarnings({"unchecked"})
-    public static List<String> load(List<QuestConfig> configs) {
+    private static List<String> load(List<QuestConfig> configs) {
+        Map<Integer, QuestConfig> idConfigs = new HashMap<>();
+        Map<QuestType, List<QuestConfig>> typeConfigs = new HashMap<>();
         Map<Integer, Map<Integer, QuestConfig>> composite1Configs = new HashMap<>();
         Map<Integer, Map<Boolean, List<QuestConfig>>> composite2Configs = new HashMap<>();
         Map<String, Map<Integer, Map<Integer, QuestConfig>>> composite3Configs = new HashMap<>();
         Map<String, Map<Integer, Map<Integer, List<QuestConfig>>>> composite4Configs = new HashMap<>();
-        Map<Integer, QuestConfig> idConfigs = new HashMap<>();
-        Map<QuestType, List<QuestConfig>> typeConfigs = new HashMap<>();
 
         List<String> errors = new ArrayList<>();
 
         for (QuestConfig config : configs) {
+            load(idConfigs, errors, config, true, Collections.singletonList("id"), config.id);
+            load(typeConfigs, errors, config, false, Collections.singletonList("type"), config.type);
             load(composite1Configs, errors, config, true, Arrays.asList("a1", "a2"), config.a1, config.a2);
             load(composite2Configs, errors, config, false, Arrays.asList("b1", "b2"), config.b1, config.b2);
             load(composite3Configs, errors, config, true, Arrays.asList("c1", "c2", "c3"), config.c1, config.c2, config.c3);
             load(composite4Configs, errors, config, false, Arrays.asList("d1", "d2", "d3"), config.d1, config.d2, config.d3);
-            load(idConfigs, errors, config, true, Collections.singletonList("id"), config.id);
-            load(typeConfigs, errors, config, false, Collections.singletonList("type"), config.type);
         }
 
         configs = Collections.unmodifiableList(configs);
+        idConfigs = unmodifiableMap(idConfigs);
+        typeConfigs = unmodifiableMap(typeConfigs);
         composite1Configs = unmodifiableMap(composite1Configs);
         composite2Configs = unmodifiableMap(composite2Configs);
         composite3Configs = unmodifiableMap(composite3Configs);
         composite4Configs = unmodifiableMap(composite4Configs);
-        idConfigs = unmodifiableMap(idConfigs);
-        typeConfigs = unmodifiableMap(typeConfigs);
 
         QuestConfig.configs = configs;
+        QuestConfig.idConfigs = idConfigs;
+        QuestConfig.typeConfigs = typeConfigs;
         QuestConfig.composite1Configs = composite1Configs;
         QuestConfig.composite2Configs = composite2Configs;
         QuestConfig.composite3Configs = composite3Configs;
         QuestConfig.composite4Configs = composite4Configs;
-        QuestConfig.idConfigs = idConfigs;
-        QuestConfig.typeConfigs = typeConfigs;
 
         return errors;
+    }
+
+    static {
+        ConfigLoader.registerLoadFunction(QuestConfig.class, QuestConfig::load);
     }
 
 }

@@ -13,7 +13,7 @@ namespace Test.Config.Common
     {
         public readonly int itemId;
 
-        public ItemConfig itemId_Ref => ItemConfig.GetById(itemId);
+        public ItemConfig itemId_Ref => ItemConfig.Get(itemId);
 
         public readonly int itemNum;
 

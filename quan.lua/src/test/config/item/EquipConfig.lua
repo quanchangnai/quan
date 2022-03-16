@@ -11,6 +11,9 @@ local configs = {
     { id = 5, key = "", name = "装备2", type = 2, useEffect = nil, reward = { itemId = 6, itemNum = 11 }, list = { 44, 223, 342, 45 }, set = {  }, map = { [43] = 45 }, effectiveTime = 1565152435000, effectiveTime_ = "2019-08-07 12:33:55", position = 3, color = 2 },
 }
 
+---索引:部位
+local positionConfigs = {}
+
 ---索引:ID
 local idConfigs = {}
 
@@ -20,9 +23,6 @@ local keyConfigs = {}
 ---索引:类型
 local typeConfigs = {}
 
----索引:部位
-local positionConfigs = {}
-
 ---加载配置，建立索引
 local function loadConfigs()
     local WeaponConfig = require("test.config.item.WeaponConfig")
@@ -31,10 +31,10 @@ local function loadConfigs()
     end
 
     for i, config in ipairs(configs) do
+        Config.load(positionConfigs, config, false, { "position" }, { config.position })
         Config.load(idConfigs, config, true, { "id" }, { config.id })
         Config.load(keyConfigs, config, true, { "key" }, { config.key })
         Config.load(typeConfigs, config, false, { "type" }, { config.type })
-        Config.load(positionConfigs, config, false, { "position" }, { config.position })
     end
 end
 
@@ -51,11 +51,20 @@ function EquipConfig.getConfigs()
 end
 
 ---
+---通过索引[position]获取EquipConfig
+---@overload fun():map<position:int,list<EquipConfig>> 
+---@param position int 部位
+---@return list<EquipConfig>
+function EquipConfig.getByPosition(position)
+    return positionConfigs[position] or table.empty()
+end
+
+---
 ---通过索引[id]获取EquipConfig
 ---@overload fun():map<id:int,EquipConfig>
 ---@param id int ID
 ---@return EquipConfig
-function EquipConfig.getById(id)
+function EquipConfig.get(id)
     if (not id) then
         return idConfigs
     end
@@ -81,15 +90,6 @@ end
 ---@return list<EquipConfig>
 function EquipConfig.getByType(type)
     return typeConfigs[type] or table.empty()
-end
-
----
----通过索引[position]获取EquipConfig
----@overload fun():map<position:int,list<EquipConfig>> 
----@param position int 部位
----@return list<EquipConfig>
-function EquipConfig.getByPosition(position)
-    return positionConfigs[position] or table.empty()
 end
 
 return EquipConfig

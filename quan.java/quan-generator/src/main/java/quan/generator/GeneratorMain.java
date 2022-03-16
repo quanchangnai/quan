@@ -1,5 +1,6 @@
 package quan.generator;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.definition.parser.DefinitionParser;
@@ -28,10 +29,30 @@ public class GeneratorMain {
     protected static final Logger logger = LoggerFactory.getLogger(GeneratorMain.class);
 
     public static void main(String[] args) {
+        if (args.length > 0) {
+            generate(args[0]);
+        } else {
+            generate();
+        }
+    }
+
+    public static void generate() {
+        generate(null);
+    }
+
+    public static void generate(String optionsFile) {
         long startTime = System.currentTimeMillis();
 
-        Properties options = loadOptions(args);
-        if (options == null) {
+        if (StringUtils.isBlank(optionsFile)) {
+            optionsFile = "generator.properties";
+            logger.info("使用默认位置的生成器选项配置文件[{}]\n", optionsFile);
+        }
+
+        Properties options = new Properties();
+        try (InputStream inputStream = new FileInputStream(optionsFile.trim())) {
+            options.load(inputStream);
+        } catch (IOException e) {
+            logger.info("加载生成器选项配置文件[{}]出错", optionsFile, e);
             return;
         }
 
@@ -70,24 +91,4 @@ public class GeneratorMain {
 
         logger.info("生成完成，耗时{}s", (System.currentTimeMillis() - startTime) / 1000D);
     }
-
-    private static Properties loadOptions(String[] args) {
-        String optionsFileName = "generator.properties";
-
-        if (args.length > 0) {
-            optionsFileName = args[0];
-        } else {
-            logger.info("使用默认位置的生成器选项配置文件[{}]\n", optionsFileName);
-        }
-
-        try (InputStream inputStream = new FileInputStream(optionsFileName)) {
-            Properties options = new Properties();
-            options.load(inputStream);
-            return options;
-        } catch (IOException e) {
-            logger.info("加载生成器选项配置文件[{}]出错", optionsFileName, e);
-            return null;
-        }
-    }
-
 }
