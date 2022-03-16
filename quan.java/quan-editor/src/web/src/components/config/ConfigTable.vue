@@ -198,11 +198,15 @@ export default {
             this.pageSize = size;
         },
         cell(value) {
-            if (value===undefined){
+            if (value === undefined) {
                 return "";
             }
-            return value.toString().replace(new RegExp(this.keyword, "ig"), substr=>{
-               return `<span style="color: red">${substr}</span>`;
+            let keyword = this.keyword.trim();
+            if (keyword === "") {
+                return value;
+            }
+            return value.toString().replace(new RegExp(keyword, "ig"), substr => {
+                return `<span style="color: red">${substr}</span>`;
             })
         },
         async doLayout() {
