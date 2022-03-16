@@ -14,7 +14,7 @@ namespace Test
         [Test]
         public void Test()
         {
-            const string jsonPath = "..\\..\\..\\..\\quan.java\\quan-runtime\\config\\json";
+            const string jsonPath = "..\\..\\..\\..\\quan.java\\quan-config\\json";
             const string namespacePrefix = "Test.Config";
             var assemblyName = Assembly.GetExecutingAssembly().FullName;
 

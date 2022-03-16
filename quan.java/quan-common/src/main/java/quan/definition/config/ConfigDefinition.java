@@ -107,10 +107,7 @@ public class ConfigDefinition extends BeanDefinition {
             return allTables;
         }
 
-        for (String configName : getMeAndDescendants()) {
-            if (!configName.contains(".")) {
-                configName = getPackageName() + "." + configName;
-            }
+        for (String configName : getMeAndDescendantLongNames()) {
             ConfigDefinition configDefinition = parser.getConfig(configName);
             if (configDefinition == null) {
                 continue;

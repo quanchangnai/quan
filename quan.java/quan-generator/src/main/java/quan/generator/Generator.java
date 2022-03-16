@@ -189,28 +189,19 @@ public abstract class Generator {
         parser.parse();
     }
 
-    public boolean tryGenerate(boolean printError) {
-        if (!enable) {
-            return false;
-        }
-        generate(printError);
-        return true;
-    }
-
-    public boolean tryGenerate() {
-        return tryGenerate(true);
-    }
-
     public void generate() {
         generate(true);
     }
 
-    public void generate(boolean printError) {
+    public void generate(boolean printErrors) {
+        if (!enable) {
+            return;
+        }
         checkOptions();
         parseDefinitions();
 
         if (!parser.getValidatedErrors().isEmpty()) {
-            if (printError) {
+            if (printErrors) {
                 printErrors();
             }
             return;

@@ -20,9 +20,11 @@ public class BeanDefinition extends ClassDefinition {
     protected String parentClassName;
 
     //配置的所有后代类
-    protected Set<String> descendants = new HashSet<>();
+    protected Set<String> descendantLongNames = new HashSet<>();
 
-    private TreeSet<String> meAndDescendants = new TreeSet<>();
+    private TreeSet<String> meAndDescendantLongNames = new TreeSet<>();
+
+    private TreeSet<String> meAndDescendantShortNames = new TreeSet<>();
 
     //配置的所有子类
     protected Set<BeanDefinition> children = new HashSet<>();
@@ -119,23 +121,25 @@ public class BeanDefinition extends ClassDefinition {
         return !children.isEmpty();
     }
 
-    public Set<String> getDescendants() {
-        return descendants;
+    public TreeSet<String> getMeAndDescendantLongNames() {
+        if (meAndDescendantLongNames.isEmpty()) {
+            meAndDescendantLongNames.addAll(descendantLongNames);
+            meAndDescendantLongNames.add(getLongName());
+        }
+        return meAndDescendantLongNames;
     }
 
-    public TreeSet<String> getMeAndDescendants() {
-        if (meAndDescendants.isEmpty()) {
-            meAndDescendants.addAll(descendants);
-            meAndDescendants.add(getName());
+    public TreeSet<String> getMeAndDescendantShortNames() {
+        if (meAndDescendantShortNames.isEmpty()) {
+            for (String meAndDescendantLongName : getMeAndDescendantLongNames()) {
+                meAndDescendantShortNames.add(getShortClassName(meAndDescendantLongName));
+            }
         }
-        return meAndDescendants;
+        return meAndDescendantShortNames;
     }
 
     public int getDescendantMaxFieldCount() {
-        if (descendantMaxFieldCount == 0) {
-            return fields.size();
-        }
-        return descendantMaxFieldCount;
+        return descendantMaxFieldCount == 0 ? fields.size() : descendantMaxFieldCount;
     }
 
     public Map<String, MutablePair<String, String>> getDependentChildren() {
@@ -191,11 +195,11 @@ public class BeanDefinition extends ClassDefinition {
 
         Set<String> ancestors = new HashSet<>();
         while (parent != null) {
-            if (ancestors.contains(parent.getName())) {
+            if (ancestors.contains(parent.getLongName())) {
                 addValidatedError(getValidatedName() + "和" + ancestors + "的父子关系不能有循环");
                 return;
             }
-            ancestors.add(parent.getName());
+            ancestors.add(parent.getLongName());
 
             for (int i = parent.selfFields.size() - 1; i >= 0; i--) {
                 FieldDefinition parentField = parent.selfFields.get(i).clone();
@@ -203,7 +207,7 @@ public class BeanDefinition extends ClassDefinition {
                 fields.add(0, parentField);
             }
 
-            parent.descendants.add(getName());
+            parent.descendantLongNames.add(getLongName());
             parent = parent.getParent();
         }
 

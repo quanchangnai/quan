@@ -114,7 +114,7 @@ public class DefinitionConfigLoader extends ConfigLoader {
         LinkedHashSet<String> validatedErrors = parser.getValidatedErrors();
         if (!validatedErrors.isEmpty()) {
             ValidatedException validatedException =
-                new ValidatedException(String.format("解析配置定义文件%s共发现%d条错误。", parser.getDefinitionPaths(), validatedErrors.size()));
+                    new ValidatedException(String.format("解析配置定义文件%s共发现%d条错误。", parser.getDefinitionPaths(), validatedErrors.size()));
             validatedException.addErrors(validatedErrors);
             throw validatedException;
         }
@@ -177,7 +177,7 @@ public class DefinitionConfigLoader extends ConfigLoader {
         return jsons;
     }
 
-    public void writeJson(String path, boolean useNameWithPackage, Language language) {
+    public void writeJson(String path, Language language) {
         if (parser == null) {
             return;
         }
@@ -203,14 +203,11 @@ public class DefinitionConfigLoader extends ConfigLoader {
                 rows.addAll(jsons);
             }
 
-            String configName = configDefinition.getName();
-            if (useNameWithPackage) {
-                configName = configDefinition.getPackageName(language) + "." + configDefinition.getName();
-            }
-            try (FileOutputStream fileOutputStream = new FileOutputStream(new File(pathFile, configName + ".json"))) {
-                JSON.writeJSONString(fileOutputStream, rows, SerializerFeature.PrettyFormat);
+            String jsonFileName = configDefinition.getPackageName(language) + "." + configDefinition.getName() + ".json";
+            try (FileOutputStream fos = new FileOutputStream(new File(pathFile, jsonFileName))) {
+                JSON.writeJSONString(fos, rows, SerializerFeature.PrettyFormat);
             } catch (Exception e) {
-                logger.error("配置[{}]写到JSON文件出错", configName, e);
+                logger.error("配置[{}]写到JSON文件出错", configDefinition.getName(), e);
             }
         }
     }
@@ -233,8 +230,13 @@ public class DefinitionConfigLoader extends ConfigLoader {
      */
     protected Collection<String> getConfigTables(ConfigDefinition configDefinition) {
         if (tableType == TableType.json) {
-            //Json的表名实际上就是配置类名
-            return configDefinition.getMeAndDescendants();
+            //Json的表名实际上就是不含前缀包名的配置类名
+            List<String> configTables = new ArrayList<>();
+            for (String configLongName : configDefinition.getMeAndDescendantLongNames()) {
+                ConfigDefinition configDefinition1 = parser.getConfig(configLongName);
+                configTables.add(configDefinition1.getPackageName(Language.java) + "." + configDefinition1.getName());
+            }
+            return configTables;
         } else {
             return configDefinition.getAllTables();
         }
@@ -289,14 +291,14 @@ public class DefinitionConfigLoader extends ConfigLoader {
             }
 
             JSONObject oldJson = (JSONObject) ((Map) indexedJsons.computeIfAbsent(json.get(field1.getName()), k -> new HashMap<>()))
-                .put(json.get(field2.getName()), json);
+                    .put(json.get(field2.getName()), json);
             if (oldJson != null) {
                 String repeatedTables = table;
                 if (!jsonTables.get(oldJson).equals(table)) {
                     repeatedTables += "," + jsonTables.get(oldJson);
                 }
                 validatedErrors.add(String.format("配置[%s]有重复数据[(%s,%s) = (%s,%s)]", repeatedTables, field1.getColumn(), field2.getColumn(),
-                    json.get(field1.getName()), json.get(field2.getName())));
+                        json.get(field1.getName()), json.get(field2.getName())));
             }
         }
 
@@ -309,15 +311,15 @@ public class DefinitionConfigLoader extends ConfigLoader {
             }
 
             JSONObject oldJson = (JSONObject) ((Map) ((Map) indexedJsons.computeIfAbsent(json.get(field1.getName()), k -> new HashMap<>()))
-                .computeIfAbsent(json.get(field2.getName()), k -> new HashMap<>())).put(json.get(field3.getName()), json);
+                    .computeIfAbsent(json.get(field2.getName()), k -> new HashMap<>())).put(json.get(field3.getName()), json);
             if (oldJson != null) {
                 String repeatedTables = table;
                 if (!jsonTables.get(oldJson).equals(table)) {
                     repeatedTables += "," + jsonTables.get(oldJson);
                 }
                 validatedErrors.add(String
-                    .format("配置[%s]有重复数据[(%s,%s,%s) = (%s,%s,%s)]", repeatedTables, field1.getColumn(), field2.getColumn(),
-                        field3.getColumn(), json.get(field1.getName()), json.get(field2.getName()), json.get(field3.getName())));
+                        .format("配置[%s]有重复数据[(%s,%s,%s) = (%s,%s,%s)]", repeatedTables, field1.getColumn(), field2.getColumn(),
+                                field3.getColumn(), json.get(field1.getName()), json.get(field2.getName()), json.get(field3.getName())));
             }
         }
     }
@@ -396,13 +398,11 @@ public class DefinitionConfigLoader extends ConfigLoader {
                 keyOrValue = mapKey ? "键" : "值";
             }
             if (bean instanceof ConfigDefinition) {
-                error = String
-                    .format("配置[%s]的第%s行[%s]的%s引用[%s]数据[%s]不存在", position.getLeft(), position.getMiddle(), position.getRight(), keyOrValue,
-                        fieldRefs, value);
+                String format = "配置[%s]的第%s行[%s]的%s引用[%s]数据[%s]不存在";
+                error = String.format(format, position.getLeft(), position.getMiddle(), position.getRight(), keyOrValue, fieldRefs, value);
             } else {
-                error = String
-                    .format("配置[%s]第%s行[%s]的对象[%s]字段[%s]%s引用[%s]数据[%s]不存在", position.getLeft(), position.getMiddle(), position.getRight(),
-                        bean.getName(), field.getName(), keyOrValue, fieldRefs, value);
+                String format = "配置[%s]第%s行[%s]的对象[%s]字段[%s]%s引用[%s]数据[%s]不存在";
+                error = String.format(format, position.getLeft(), position.getMiddle(), position.getRight(), bean.getName(), field.getName(), keyOrValue, fieldRefs, value);
             }
             validatedErrors.add(error);
         }
@@ -425,48 +425,46 @@ public class DefinitionConfigLoader extends ConfigLoader {
         Objects.requireNonNull(parser, "配置定义解析器不能为空");
     }
 
-    /**
-     * 通过配置类名重加载，部分加载不校验依赖
-     *
-     * @param configNames 配置类名
-     */
     @Override
     public void reloadByConfigName(Collection<String> configNames) {
         checkReload();
         validatedErrors.clear();
 
-        Set<String> tableNames = new LinkedHashSet<>();
+        Map<String, ConfigDefinition> configDefinitions = new HashMap<>();
+        for (ConfigDefinition configDefinition : parser.getTableConfigs().values()) {
+            String configName = configDefinition.getPackageName(Language.java) + "." + configDefinition.getName();
+            configDefinitions.put(configName, configDefinition);
+        }
+
+        Set<String> readerNames = new LinkedHashSet<>();
         for (String configName : configNames) {
-            ConfigDefinition configDefinition = parser.getConfig(configName);
+            ConfigDefinition configDefinition = configDefinitions.get(configName);
             if (configDefinition == null) {
                 logger.error("重加载[{}]失败，不存在该配置", configName);
                 continue;
             }
-            tableNames.addAll(getConfigTables(configDefinition));
+            readerNames.addAll(getConfigTables(configDefinition));
         }
-        reloadByTableName(tableNames);
+        reloadByReaderName(readerNames);
     }
 
-    /**
-     * 通过表名(包含目录)重加载,表格转成JSON格式后使用的表名实际上是配置类名
-     */
-    public void reloadByTableName(Collection<String> tableNames) {
+    private void reloadByReaderName(Collection<String> readerNames) {
         checkReload();
         validatedErrors.clear();
 
         Set<ConfigDefinition> needReloadConfigs = new LinkedHashSet<>();
         Set<ConfigReader> reloadReaders = new LinkedHashSet<>();
 
-        for (String table : tableNames) {
-            ConfigReader configReader = readers.get(table);
+        for (String readerName : readerNames) {
+            ConfigReader configReader = readers.get(readerName);
             if (configReader == null) {
-                logger.error("重加载[{}]失败，对应配置从未被加载", table);
+                logger.error("重加载[{}]失败，对应配置从未被加载", readerName);
                 continue;
             }
             configReader.clear();
             reloadReaders.add(configReader);
 
-            ConfigDefinition configDefinition = getConfigByTable(table);
+            ConfigDefinition configDefinition = getConfigByTable(readerName);
             while (configDefinition != null) {
                 needReloadConfigs.add(configDefinition);
                 configDefinition = configDefinition.getParent();
@@ -490,36 +488,33 @@ public class DefinitionConfigLoader extends ConfigLoader {
     }
 
     /**
-     * @see #reloadByTableName(Collection)
+     * 通过表名(包含目录)重加载
      */
-    public void reloadByTableName(String... tableNames) {
-        reloadByTableName(Arrays.asList(tableNames));
-    }
-
-    /**
-     * 通过表格原名(包含目录)重加载
-     */
-    public void reloadByOriginalName(Collection<String> originalNames) {
+    public void reloadByTableName(Collection<String> tableNames) {
         checkReload();
 
-        List<String> configNames = new ArrayList<>();
-        for (String originalName : originalNames) {
-            ConfigDefinition configDefinition = parser.getTableConfigs().get(originalName);
+        Set<String> readerNames = new LinkedHashSet<>();
+        for (String tableName : tableNames) {
+            ConfigDefinition configDefinition = parser.getTableConfigs().get(tableName);
             if (configDefinition == null) {
-                logger.error("重加载[{}]失败，不存在该配置", originalName);
+                logger.error("重加载[{}]失败，不存在该配置", tableName);
                 continue;
             }
-            configNames.add(configDefinition.getName());
+            if (tableType == TableType.json) {
+                readerNames.add(configDefinition.getFullName(Language.java));
+            } else {
+                readerNames.add(tableName);
+            }
         }
 
-        reloadByConfigName(configNames);
+        reloadByReaderName(readerNames);
     }
 
     /**
-     * @see #reloadByOriginalName(Collection)
+     * @see #reloadByTableName(Collection)
      */
-    public void reloadByOriginalName(String... originalNames) {
-        reloadByOriginalName(Arrays.asList(originalNames));
+    public void reloadByTableName(String... originalNames) {
+        reloadByTableName(Arrays.asList(originalNames));
     }
 
 

@@ -151,13 +151,16 @@ public abstract class ConfigGenerator extends Generator {
     }
 
     @Override
-    public void generate(boolean printError) {
+    public void generate(boolean printErrors) {
+        if (!enable) {
+            return;
+        }
         int tableBodyStartRow = 0;
         if (!StringUtils.isBlank(this.tableBodyStartRow)) {
             tableBodyStartRow = Integer.parseInt(this.tableBodyStartRow);
         }
         initConfigLoader(TableType.valueOf(tableType), tablePath, tableBodyStartRow);
-        super.generate(printError);
+        super.generate(printErrors);
     }
 
     @Override

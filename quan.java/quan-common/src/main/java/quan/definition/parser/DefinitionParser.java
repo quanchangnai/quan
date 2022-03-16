@@ -21,6 +21,7 @@ public abstract class DefinitionParser {
 
     protected Category category;
 
+    //包名前缀，没有区分具体语言，切换语言的时候需要重新设置
     protected String packagePrefix;
 
     protected String enumPackagePrefix;
@@ -100,6 +101,9 @@ public abstract class DefinitionParser {
         return validatedClasses;
     }
 
+    /**
+     * 通过[与语言无关的的包名.类名]获取类定义
+     */
     public ClassDefinition getClass(String name) {
         return validatedClasses.get(name);
     }

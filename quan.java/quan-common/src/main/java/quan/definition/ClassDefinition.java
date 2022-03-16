@@ -139,9 +139,9 @@ public abstract class ClassDefinition extends Definition {
     /**
      * 和具体语言环境无关的[不含前缀的包名.类名]
      */
-    public static String getLongClassName(ClassDefinition owner, String className) {
+    public static String getLongClassName(ClassDefinition classDefinition, String className) {
         if (!isBlank(className) && !className.contains(".")) {
-            className = owner.getPackageName() + "." + className;
+            className = classDefinition.getPackageName() + "." + className;
         }
         return className;
     }

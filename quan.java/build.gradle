@@ -45,11 +45,18 @@ subprojects {
         }
     }
 
+    task copyDependencies(type: Copy) {
+        from configurations.runtimeClasspath
+        include "**/*.jar"
+        into "$buildDir/dependencies"
+        includeEmptyDirs = false
+    }
+
     dependencies {
         testImplementation 'junit:junit:4.13'
     }
 
     test {
-        useJUnitPlatform()
+        useJUnit()
     }
 }

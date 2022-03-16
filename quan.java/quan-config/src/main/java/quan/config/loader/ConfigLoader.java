@@ -186,7 +186,7 @@ public abstract class ConfigLoader {
     }
 
     /**
-     * 通过配置类名(包含包名)重加载
+     * 通过配置的[不含前缀的包名.类名]重加载
      */
     public abstract void reloadByConfigName(Collection<String> configNames);
 

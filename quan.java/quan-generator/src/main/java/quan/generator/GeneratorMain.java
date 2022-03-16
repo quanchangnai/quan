@@ -56,16 +56,16 @@ public class GeneratorMain {
         cSharpConfigGenerator.setParser(configParser);
         luaConfigGenerator.setParser(configParser);
 
-        dataGenerator.tryGenerate(true);
+        dataGenerator.generate(true);
 
-        javaMessageGenerator.tryGenerate(false);
-        cSharpMessageGenerator.tryGenerate(false);
-        luaMessageGenerator.tryGenerate(false);
+        javaMessageGenerator.generate(false);
+        cSharpMessageGenerator.generate(false);
+        luaMessageGenerator.generate(false);
         javaMessageGenerator.printErrors();
 
-        javaConfigGenerator.tryGenerate(false);
-        cSharpConfigGenerator.tryGenerate(false);
-        luaConfigGenerator.tryGenerate(false);
+        javaConfigGenerator.generate(false);
+        cSharpConfigGenerator.generate(false);
+        luaConfigGenerator.generate(false);
         javaConfigGenerator.printErrors();
 
         logger.info("生成完成，耗时{}s", (System.currentTimeMillis() - startTime) / 1000D);

@@ -38,8 +38,6 @@ public class ConfigTest {
 
         reloadByTableName(configLoader);
 
-        reloadByOriginalName(configLoader);
-
         System.err.println("ConfigTest.main()耗时:" + (System.currentTimeMillis() - startTime) / 1000D + "s");
     }
 
@@ -94,7 +92,7 @@ public class ConfigTest {
         System.err.println("writeJson()=============");
         long startTime = System.currentTimeMillis();
 
-        configLoader1.writeJson("quan-config\\json", true, Language.cs);
+        configLoader1.writeJson("quan-config\\json",  Language.cs);
 
         System.err.println("writeJson()耗时:" + (System.currentTimeMillis() - startTime) / 1000D + "s");
         System.err.println();
@@ -149,27 +147,6 @@ public class ConfigTest {
         printConfig();
 
         System.err.println("reloadByTableName()耗时:" + (System.currentTimeMillis() - startTime) / 1000D + "s");
-        System.err.println();
-    }
-
-    private static void reloadByOriginalName(ConfigLoader configLoader) {
-        if (!(configLoader instanceof DefinitionConfigLoader)) {
-            return;
-        }
-
-        DefinitionConfigLoader configLoader1 = (DefinitionConfigLoader) configLoader;
-        List<String> reloadConfigs = Arrays.asList("道具", "道具/武器");
-        System.err.println("reloadByOriginalName()=============" + reloadConfigs);
-        long startTime = System.currentTimeMillis();
-
-        try {
-            configLoader1.reloadByOriginalName(reloadConfigs);
-        } catch (ValidatedException e) {
-            printErrors(e);
-        }
-        printConfig();
-
-        System.err.println("reloadByOriginalName()耗时:" + (System.currentTimeMillis() - startTime) / 1000D + "s");
         System.err.println();
     }
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Quan.Utils;
@@ -69,6 +70,7 @@ namespace Quan.Config
                     var config2NameWithPackage = config2.GetType().FullName;
                     if (NamespacePrefix != null)
                     {
+                        Debug.Assert(config2NameWithPackage != null, nameof(config2NameWithPackage) + " != null");
                         config2NameWithPackage = config2NameWithPackage.Substring(NamespacePrefix.Length + 1);
                     }
 

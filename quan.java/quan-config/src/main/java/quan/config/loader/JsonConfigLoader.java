@@ -92,33 +92,25 @@ public class JsonConfigLoader extends ConfigLoader {
         checkReload();
         validatedErrors.clear();
 
-        Set<File> tableFiles = PathUtils.listFiles(new File(tablePath), tableType.name());
         LinkedHashMap<String, ConfigReader> reloadReaders = new LinkedHashMap<>();
 
-        for (File tableFile : tableFiles) {
-            String configNameWithPackage = tableFile.getName().substring(0, tableFile.getName().lastIndexOf("."));
-            String configFullName = StringUtils.isBlank(packagePrefix) ? configNameWithPackage : packagePrefix + "." + configNameWithPackage;
-            String configName = configNameWithPackage.substring(configNameWithPackage.lastIndexOf(".") + 1);
-
-            if (!configNames.contains(configName)) {
+        for (String configName : configNames) {
+            File jsonFile = new File(tablePath, configName + ".json");
+            if (!jsonFile.exists()) {
+                logger.error("重加载[{}]失败，不存在该配置文件", configName);
                 continue;
             }
-
-            ConfigReader configReader = readers.get(configNameWithPackage);
+            ConfigReader configReader = readers.get(configName);
             if (configReader == null) {
                 logger.error("重加载[{}]失败，对应配置从未被加载", configName);
                 continue;
             }
+
             configReader.clear();
             reloadReaders.put(configName, configReader);
 
+            String configFullName = StringUtils.isBlank(packagePrefix) ? configName : packagePrefix + "." + configName;
             load(configFullName, configDescendants.get(configFullName), true);
-        }
-
-        for (String configName : configNames) {
-            if (!reloadReaders.containsKey(configName)) {
-                logger.error("重加载[{}]失败，不存在该配置文件", configName);
-            }
         }
 
         for (ConfigReader reloadReader : reloadReaders.values()) {
