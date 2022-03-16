@@ -33,6 +33,13 @@ public class QuestConfig extends Config {
     public final int target;
 
     /**
+     * 任务目标
+     */
+    public final QuestTargetConfig targetRef() {
+        return QuestTargetConfig.get(target);
+    }
+
+    /**
      * 奖励
      */
     public final Reward reward;

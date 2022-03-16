@@ -61,7 +61,9 @@ public class ItemConfig extends Config {
      */
     public final Date effectiveTime;
 
-    //生效时间
+    /**
+     * 生效时间
+     */
     public final String effectiveTime_;
 
 

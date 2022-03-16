@@ -1,11 +1,13 @@
 package ${getFullPackageName("java")};
 
 import com.alibaba.fastjson.*;
-<#if (!(parentClassName??) || kind == 6) && getFullPackageName("java")!="quan.config">
+<#if (!(parentClassName??) || kind == 6)>
+<#if getFullPackageName("java")!="quan.config">
 import quan.config.*;
 </#if>
-<#if (!(parentClassName??) || kind == 6) && getFullPackageName("java")!="quan.config.loader">
+<#if getFullPackageName("java")!="quan.config.loader">
 import quan.config.loader.ConfigLoader;
+</#if>
 </#if>
 <#list imports?keys as import>
 import ${import};
@@ -42,13 +44,28 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
     public final ${field.basicType} ${field.name};
 
     <#if field.comment !="">
-    //${field.comment}
+    /**
+     * ${field.comment}
+     */
     </#if>
     public final String ${field.name}_;
     <#elseif field.builtinType>
     public final ${field.basicType} ${field.name};
     <#else>
     public final ${field.classType} ${field.name};
+    </#if>
+    <#if field.simpleRef>
+
+    /**
+     * ${field.comment}
+     */
+        <#if field.refIndex.unique>
+    public final ${field.refType} ${field.name}Ref() {
+        <#else >
+    public final List<${field.refType}> ${field.name}Ref() {
+        </#if>
+        return ${field.refType}.get${field.refIndex.suffix}(${field.name});
+    }
     </#if>
 </#list>
 

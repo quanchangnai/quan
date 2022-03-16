@@ -13,6 +13,13 @@ public class Reward extends Bean {
 
     public final int itemId;
 
+    /**
+     * 
+     */
+    public final ItemConfig itemIdRef() {
+        return ItemConfig.get(itemId);
+    }
+
     public final int itemNum;
 
 

@@ -21,7 +21,9 @@ public class QuestTargetConfig extends Config {
      */
     public final Date noon;
 
-    //中午
+    /**
+     * 中午
+     */
     public final String noon_;
 
 

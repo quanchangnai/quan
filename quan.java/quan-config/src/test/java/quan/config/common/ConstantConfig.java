@@ -4,6 +4,7 @@ import com.alibaba.fastjson.*;
 import quan.config.*;
 import quan.config.loader.ConfigLoader;
 import java.util.*;
+import quan.config.item.ItemConfig;
 
 /**
  * 常量<br/>
@@ -20,6 +21,13 @@ public class ConstantConfig extends Config {
      * 道具ID
      */
     public final int itemId;
+
+    /**
+     * 道具ID
+     */
+    public final ItemConfig itemIdRef() {
+        return ItemConfig.get(itemId);
+    }
 
     /**
      * 奖励
