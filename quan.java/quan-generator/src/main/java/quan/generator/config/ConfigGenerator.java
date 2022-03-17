@@ -82,6 +82,7 @@ public abstract class ConfigGenerator extends Generator {
         if (tableType == null) {
             throw new IllegalArgumentException(category().alias() + "的表格类型[tableType]不能为空");
         }
+
         try {
             TableType.valueOf(tableType);
         } catch (IllegalArgumentException e) {
@@ -91,20 +92,18 @@ public abstract class ConfigGenerator extends Generator {
             throw new IllegalArgumentException(category().alias() + "的表格文件路径[tablePath]不能为空");
         }
 
-        if (!StringUtils.isBlank(tableBodyStartRow)) {
+        int minTableBodyStartRow = definitionType.equals("xml") ? 2 : 4;
+        if (!StringUtils.isBlank(this.tableBodyStartRow)) {
             try {
-                if (Integer.parseInt(tableBodyStartRow) <= 1) {
+                int tableBodyStartRow = Integer.parseInt(this.tableBodyStartRow);
+                if (tableBodyStartRow < minTableBodyStartRow) {
                     throw new Exception();
                 }
             } catch (Exception e) {
-                throw new IllegalArgumentException(category().alias() + "的表格正文开始行号[tableBodyStartRow]不合法，合法值为空值或者大于1的整数");
+                throw new IllegalArgumentException(category().alias() + "的表格正文开始行号[tableBodyStartRow]不合法，合法值为空值或者大于等于" + minTableBodyStartRow + "的整数");
             }
         } else {
-            if (definitionType.equals("xml")) {
-                tableBodyStartRow = "3";
-            } else {
-                tableBodyStartRow = "5";
-            }
+            tableBodyStartRow = String.valueOf(minTableBodyStartRow);
         }
     }
 

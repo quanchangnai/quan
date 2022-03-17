@@ -43,11 +43,19 @@ public class DefinitionConfigLoader extends ConfigLoader {
         super(tablePath);
     }
 
+    private int getMinTableBodyStartRow() {
+        if (parser instanceof TableDefinitionParser) {
+            return 4;
+        } else {
+            return 2;
+        }
+    }
+
     /**
      * 设置表格正文起始行号
      */
     public void setTableBodyStartRow(int tableBodyStartRow) {
-        if (tableBodyStartRow > 1 && this.tableBodyStartRow == 0) {
+        if (tableBodyStartRow >= getMinTableBodyStartRow() && this.tableBodyStartRow == 0) {
             this.tableBodyStartRow = tableBodyStartRow;
         }
     }
@@ -62,9 +70,9 @@ public class DefinitionConfigLoader extends ConfigLoader {
      */
     public DefinitionParser useXmlDefinition(List<String> definitionPaths, String packagePrefix) {
         parser = new XmlDefinitionParser();
-        parser.setCategory(Category.config);
         parser.setDefinitionPaths(definitionPaths);
         parser.setPackagePrefix(packagePrefix);
+        setParser(parser);
         return parser;
     }
 
@@ -86,8 +94,8 @@ public class DefinitionConfigLoader extends ConfigLoader {
         Objects.requireNonNull(parser, "配置解析器不能为空");
         parser.setCategory(Category.config);
         this.parser = parser;
-        if (parser instanceof TableDefinitionParser && tableBodyStartRow == 0) {
-            tableBodyStartRow = 5;
+        if (tableBodyStartRow == 0) {
+            tableBodyStartRow = getMinTableBodyStartRow();
         }
     }
 
