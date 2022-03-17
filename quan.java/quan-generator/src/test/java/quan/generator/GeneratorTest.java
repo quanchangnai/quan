@@ -6,7 +6,7 @@ package quan.generator;
 public class GeneratorTest {
 
     public static void main(String[] args) {
-        GeneratorMain.main(new String[]{"quan-generator/src/main/resources/quan/generator/generator.properties"});
+        Generator.generate("quan-generator/src/main/resources/quan/generator/generator.properties");
     }
 
 }

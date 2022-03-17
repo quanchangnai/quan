@@ -1,18 +1,18 @@
 package quan.config.loader;
 
 import org.apache.commons.lang3.StringUtils;
-import quan.util.PathUtils;
 import quan.config.Config;
 import quan.config.TableType;
 import quan.config.reader.ConfigReader;
 import quan.config.reader.JsonConfigReader;
+import quan.util.CommonUtils;
 
 import java.io.File;
 import java.util.*;
 
 /**
  * 直接加载JSON格式配置的加载器<br/>
- * 配置文件名必须是[不含前缀的配置包名.类名.格式]<br/>
+ * 配置文件名必须是[不含前缀的配置包名.类名.json]<br/>
  * Created by quanchangnai on 2019/8/23.
  */
 public class JsonConfigLoader extends ConfigLoader {
@@ -56,7 +56,7 @@ public class JsonConfigLoader extends ConfigLoader {
      * 初始化配置类对应的后代子孙类，包含自己
      */
     private void initConfigDescendants() {
-        Set<File> tableFiles = PathUtils.listFiles(new File(tablePath), tableType.name());
+        Set<File> tableFiles = CommonUtils.listFiles(new File(tablePath), tableType.name());
         List<Config> configs = new ArrayList<>();
 
         for (File tableFile : tableFiles) {

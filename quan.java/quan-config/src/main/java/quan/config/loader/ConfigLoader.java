@@ -9,7 +9,7 @@ import quan.config.TableType;
 import quan.config.ValidatedException;
 import quan.config.reader.ConfigReader;
 import quan.util.ClassUtils;
-import quan.util.PathUtils;
+import quan.util.CommonUtils;
 
 import java.util.*;
 import java.util.function.Function;
@@ -45,7 +45,7 @@ public abstract class ConfigLoader {
 
     public ConfigLoader(String tablePath) {
         Objects.requireNonNull(tablePath, "配置表路径不能为空");
-        this.tablePath = PathUtils.toPlatPath(tablePath);
+        this.tablePath = CommonUtils.toPlatPath(tablePath);
     }
 
     public static void registerLoadFunction(Class<? extends Config> clazz, Function<List, List> function) {
@@ -74,9 +74,11 @@ public abstract class ConfigLoader {
     }
 
     /**
-     * 设置自定义配置校验器所在的包并实例化校验器对象
+     * 初始化配置校验器
+     *
+     * @param packageName 校验器所在的包名
      */
-    public void setValidatorsPackage(String packageName) {
+    public void initValidators(String packageName) {
         if (StringUtils.isBlank(packageName)) {
             return;
         }

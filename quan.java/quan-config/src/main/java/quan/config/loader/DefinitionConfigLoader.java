@@ -5,7 +5,6 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.apache.commons.lang3.tuple.Triple;
-import quan.util.PathUtils;
 import quan.config.TableType;
 import quan.config.ValidatedException;
 import quan.config.reader.CSVConfigReader;
@@ -17,6 +16,7 @@ import quan.definition.config.ConfigDefinition;
 import quan.definition.parser.DefinitionParser;
 import quan.definition.parser.TableDefinitionParser;
 import quan.definition.parser.XmlDefinitionParser;
+import quan.util.CommonUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -183,7 +183,7 @@ public class DefinitionConfigLoader extends ConfigLoader {
         }
 
         Objects.requireNonNull(path, "输出目录不能为空");
-        File pathFile = new File(PathUtils.toPlatPath(path));
+        File pathFile = new File(CommonUtils.toPlatPath(path));
         if (!pathFile.exists() && !pathFile.mkdirs()) {
             logger.error("输出目录[{}]创建失败", path);
             return;

@@ -53,7 +53,7 @@ public class ConfigTest {
 
         DefinitionConfigLoader configLoader = new DefinitionConfigLoader(tablePath);
         configLoader.useXmlDefinition(definitionPaths, "quan.config");
-        configLoader.setValidatorsPackage("quan");
+        configLoader.initValidators("quan");
         configLoader.setTableType(tableType);
 
         return configLoader;
@@ -62,7 +62,7 @@ public class ConfigTest {
     private static ConfigLoader jsonConfigLoader() {
         String tablePath = "quan-config\\json";
         JsonConfigLoader configLoader = new JsonConfigLoader(tablePath);
-        configLoader.setValidatorsPackage("quan");
+        configLoader.initValidators("quan");
         configLoader.setPackagePrefix("quan.config");
         return configLoader;
     }

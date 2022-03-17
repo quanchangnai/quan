@@ -36,9 +36,6 @@ public class JavaMessageGenerator extends MessageGenerator {
         classTypes.put("bytes", "byte[]");
     }
 
-    public JavaMessageGenerator() {
-    }
-
     public JavaMessageGenerator(Properties options) {
         super(options);
     }

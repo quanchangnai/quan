@@ -36,9 +36,6 @@ public class CSharpMessageGenerator extends MessageGenerator {
         classTypes.put("bytes", "byte[]");
     }
 
-    public CSharpMessageGenerator() {
-    }
-
     public CSharpMessageGenerator(Properties options) {
         super(options);
     }

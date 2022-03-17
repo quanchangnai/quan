@@ -6,15 +6,24 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import quan.util.PathUtils;
+import quan.generator.config.CSharpConfigGenerator;
+import quan.generator.config.JavaConfigGenerator;
+import quan.generator.config.LuaConfigGenerator;
+import quan.generator.data.DataGenerator;
+import quan.generator.message.CSharpMessageGenerator;
+import quan.generator.message.JavaMessageGenerator;
+import quan.generator.message.LuaMessageGenerator;
 import quan.definition.*;
 import quan.definition.DependentSource.DependentType;
 import quan.definition.parser.DefinitionParser;
 import quan.definition.parser.XmlDefinitionParser;
+import quan.util.CommonUtils;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+
+import static quan.definition.parser.DefinitionParser.createParser;
 
 /**
  * 代码生成器<br/>
@@ -49,9 +58,6 @@ public abstract class Generator {
     //具体语言包下的类定义,<包名,<类名,类定义>
     protected Map<String, Map<String, ClassDefinition>> packagesClasses = new HashMap<>();
 
-    public Generator() {
-    }
-
     public Generator(Properties options) {
         parseOptions(options);
         if (enable) {
@@ -70,7 +76,7 @@ public abstract class Generator {
     }
 
     public void setCodePath(String codePath) {
-        this.codePath = PathUtils.toPlatPath(codePath);
+        this.codePath = CommonUtils.toPlatPath(codePath);
     }
 
     public void setPackagePrefix(String packagePrefix) {
@@ -359,7 +365,6 @@ public abstract class Generator {
                 fieldDefinition.setClassValueType(classTypes.get(fieldValueType));
             }
         }
-
     }
 
     protected void printErrors() {
@@ -369,6 +374,71 @@ public abstract class Generator {
 
         logger.error("生成{}代码失败，解析目录{}下的定义文件共发现{}条错误", category().alias(), parser.getDefinitionPaths(), parser.getValidatedErrors());
         parser.getValidatedErrors().forEach(logger::error);
+    }
+
+    /**
+     * 指定生成器选项配置文件执行代码生成
+     *
+     * @param optionsFile 选项文件名为空时使用默认文件
+     */
+    public static void generate(String optionsFile) {
+        long startTime = System.currentTimeMillis();
+
+        if (StringUtils.isBlank(optionsFile)) {
+            optionsFile = "generator.properties";
+            logger.info("使用默认位置的生成器选项配置文件[{}]\n", optionsFile);
+        }
+
+        Properties options = new Properties();
+        try (InputStream inputStream = new FileInputStream(optionsFile.trim())) {
+            options.load(inputStream);
+        } catch (IOException e) {
+            logger.info("加载生成器选项配置文件[{}]出错", optionsFile, e);
+            return;
+        }
+
+        DataGenerator dataGenerator = new DataGenerator(options);
+        dataGenerator.useXmlParser();
+
+        JavaMessageGenerator javaMessageGenerator = new JavaMessageGenerator(options);
+        CSharpMessageGenerator cSharpMessageGenerator = new CSharpMessageGenerator(options);
+        LuaMessageGenerator luaMessageGenerator = new LuaMessageGenerator(options);
+
+        DefinitionParser messageParser = new XmlDefinitionParser();
+        javaMessageGenerator.setParser(messageParser);
+        cSharpMessageGenerator.setParser(messageParser);
+        luaMessageGenerator.setParser(messageParser);
+
+        DefinitionParser configParser = createParser(options.getProperty("config.definitionType").trim());
+        JavaConfigGenerator javaConfigGenerator = new JavaConfigGenerator(options);
+        CSharpConfigGenerator cSharpConfigGenerator = new CSharpConfigGenerator(options);
+        LuaConfigGenerator luaConfigGenerator = new LuaConfigGenerator(options);
+
+        javaConfigGenerator.setParser(configParser);
+        cSharpConfigGenerator.setParser(configParser);
+        luaConfigGenerator.setParser(configParser);
+
+        dataGenerator.generate(true);
+
+        javaMessageGenerator.generate(false);
+        cSharpMessageGenerator.generate(false);
+        luaMessageGenerator.generate(false);
+        javaMessageGenerator.printErrors();
+
+        javaConfigGenerator.generate(false);
+        cSharpConfigGenerator.generate(false);
+        luaConfigGenerator.generate(false);
+        javaConfigGenerator.printErrors();
+
+        logger.info("生成完成，耗时{}s", (System.currentTimeMillis() - startTime) / 1000D);
+    }
+
+    public static void main(String[] args) {
+        if (args.length > 0) {
+            generate(args[0]);
+        } else {
+            generate("");
+        }
     }
 
 }

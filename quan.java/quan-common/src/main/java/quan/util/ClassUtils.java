@@ -173,7 +173,7 @@ public class ClassUtils {
             rootPath += File.separator;
         }
 
-        Set<File> classFiles = PathUtils.listFiles(path, "class");
+        Set<File> classFiles = CommonUtils.listFiles(path, "class");
 
         for (File classFile : classFiles) {
             String classFilePath = classFile.getCanonicalPath();

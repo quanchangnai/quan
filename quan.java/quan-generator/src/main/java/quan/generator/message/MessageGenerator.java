@@ -19,9 +19,6 @@ public abstract class MessageGenerator extends Generator {
     //ID冲突时重新哈希计算
     private boolean rehashId;
 
-    public MessageGenerator() {
-    }
-
     public MessageGenerator(Properties properties) {
         super(properties);
     }

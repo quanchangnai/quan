@@ -34,9 +34,6 @@ public abstract class ConfigGenerator extends Generator {
 
     protected String tableBodyStartRow;
 
-    public ConfigGenerator() {
-    }
-
     public ConfigGenerator(Properties options) {
         super(options);
     }

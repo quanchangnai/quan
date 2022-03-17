@@ -42,9 +42,6 @@ public class JavaConfigGenerator extends ConfigGenerator {
         classTypes.put("datetime", "Date");
     }
 
-    public JavaConfigGenerator() {
-    }
-
     public JavaConfigGenerator(Properties options) {
         super(options);
     }

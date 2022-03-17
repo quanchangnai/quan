@@ -21,9 +21,6 @@ import static quan.definition.ClassDefinition.getLongClassName;
  */
 public class LuaConfigGenerator extends ConfigGenerator {
 
-    public LuaConfigGenerator() {
-    }
-
     public LuaConfigGenerator(Properties options) {
         super(options);
     }

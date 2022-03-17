@@ -43,10 +43,6 @@ public class CSharpConfigGenerator extends ConfigGenerator {
         classTypes.put("datetime", "DateTime");
     }
 
-    public CSharpConfigGenerator() {
-        super();
-    }
-
     public CSharpConfigGenerator(Properties options) {
         super(options);
     }

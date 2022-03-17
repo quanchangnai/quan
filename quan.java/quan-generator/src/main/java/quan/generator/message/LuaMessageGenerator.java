@@ -16,9 +16,6 @@ public class LuaMessageGenerator extends MessageGenerator {
 
     private Template registryTemplate;
 
-    public LuaMessageGenerator() {
-    }
-
     public LuaMessageGenerator(Properties options) {
         super(options);
     }

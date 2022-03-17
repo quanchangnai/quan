@@ -39,9 +39,6 @@ public class DataGenerator extends Generator {
         classTypes.put("map", "MapField");
     }
 
-    public DataGenerator() {
-    }
-
     public DataGenerator(Properties options) {
         super(options);
     }

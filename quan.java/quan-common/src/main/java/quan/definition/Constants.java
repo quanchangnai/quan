@@ -3,7 +3,7 @@ package quan.definition;
 import java.util.Collections;
 import java.util.Set;
 
-import static quan.util.CollectionUtils.asSet;
+import static quan.util.CommonUtils.asSet;
 
 /**
  * Created by quanchangnai on 2019/8/3.

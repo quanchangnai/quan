@@ -1,8 +1,8 @@
 package quan.definition.config;
 
 import org.apache.commons.lang3.StringUtils;
-import quan.util.PathUtils;
 import quan.definition.*;
+import quan.util.CommonUtils;
 
 import java.io.File;
 import java.util.*;
@@ -232,7 +232,7 @@ public class ConfigDefinition extends BeanDefinition {
                     comment.append(",");
                 }
                 start = false;
-                String t2 = PathUtils.toPlatPath(t1);
+                String t2 = CommonUtils.toPlatPath(t1);
                 int lastSepIndex = t2.lastIndexOf(File.separator);
                 if (lastSepIndex >= 0) {
                     comment.append(t2.substring(lastSepIndex + 1));
