@@ -197,7 +197,7 @@ namespace ${getFullPackageName("cs")}
 
         </#if>
     </#list>
-        public <#if parentClassName??>new </#if>static IList<${name}> GetConfigs()
+        public <#if parentClassName??>new </#if>static IList<${name}> GetAll()
         {
             return _configs;
         }
@@ -205,7 +205,7 @@ namespace ${getFullPackageName("cs")}
     <#list indexes as index>
         <#assign newMethod><#if !isSelfIndex(index)>new <#else></#if></#assign>
         <#if index.unique && index.fields?size==1>
-        public ${newMethod}static IDictionary<${index.fields[0].classType}, ${name}> Get${index.name?cap_first}Configs()
+        public ${newMethod}static IDictionary<${index.fields[0].classType}, ${name}> Get${index.name?cap_first}All()
         {
             return _${index.name}Configs;
         }
@@ -217,7 +217,7 @@ namespace ${getFullPackageName("cs")}
         }
 
         <#elseif index.normal && index.fields?size==1>
-        public ${newMethod}static IDictionary<${index.fields[0].classType}, IList<${name}>> Get${index.name?cap_first}Configs()
+        public ${newMethod}static IDictionary<${index.fields[0].classType}, IList<${name}>> Get${index.name?cap_first}All()
         {
             return _${index.name}Configs;
         }
@@ -229,7 +229,7 @@ namespace ${getFullPackageName("cs")}
         }
 
         <#elseif index.unique && index.fields?size==2>
-        public ${newMethod}static IDictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, ${name}>> Get${index.name?cap_first}Configs()
+        public ${newMethod}static IDictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, ${name}>> Get${index.name?cap_first}All()
         {
             return _${index.name}Configs;
         }
@@ -247,7 +247,7 @@ namespace ${getFullPackageName("cs")}
         }
 
         <#elseif index.normal && index.fields?size==2>
-        public ${newMethod}static IDictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, IList<${name}>>> Get${index.name?cap_first}Configs()
+        public ${newMethod}static IDictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, IList<${name}>>> Get${index.name?cap_first}All()
         {
             return _${index.name}Configs;
         }
@@ -265,7 +265,7 @@ namespace ${getFullPackageName("cs")}
         }
 
         <#elseif index.unique && index.fields?size==3>
-        public ${newMethod}static IDictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, IDictionary<${index.fields[2].classType}, ${name}>>> Get${index.name?cap_first}Configs()
+        public ${newMethod}static IDictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, IDictionary<${index.fields[2].classType}, ${name}>>> Get${index.name?cap_first}All()
         {
             return _${index.name}Configs;
         }
@@ -289,7 +289,7 @@ namespace ${getFullPackageName("cs")}
         }
 
         <#elseif index.normal && index.fields?size==3>
-        public ${newMethod}static IDictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, IDictionary<${index.fields[2].classType}, IList<${name}>>>> Get${index.name?cap_first}Configs()
+        public ${newMethod}static IDictionary<${index.fields[0].classType}, IDictionary<${index.fields[1].classType}, IDictionary<${index.fields[2].classType}, IList<${name}>>>> Get${index.name?cap_first}All()
         {
             return _${index.name}Configs;
         }

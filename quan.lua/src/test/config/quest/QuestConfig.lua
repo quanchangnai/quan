@@ -48,8 +48,15 @@ local QuestConfig = {}
 ---
 ---获取所有QuestConfig
 ---@return list<QuestConfig>
-function QuestConfig.getConfigs()
+function QuestConfig.getAll()
     return configs
+end
+
+---
+---获取所有QuestConfig
+---@return map<id:int,QuestConfig>
+function QuestConfig.getIdAll()
+     return idConfigs
 end
 
 ---
@@ -65,12 +72,26 @@ function QuestConfig.get(id)
 end
 
 ---
+---获取所有QuestConfig
+---@return map<type:QuestType,list<QuestConfig>> 
+function QuestConfig.getTypeAll()
+     return typeConfigs
+end
+
+---
 ---通过索引[type]获取QuestConfig
 ---@overload fun():map<type:QuestType,list<QuestConfig>> 
 ---@param type QuestType 类型
 ---@return list<QuestConfig>
 function QuestConfig.getByType(type)
     return typeConfigs[type] or table.empty()
+end
+
+---
+---获取所有QuestConfig
+---@return map<a1:int,map<a2:int,QuestConfig>>
+function QuestConfig.getComposite1All()
+     return composite1Configs
 end
 
 ---
@@ -94,6 +115,13 @@ function QuestConfig.getByComposite1(a1, a2)
 end
 
 ---
+---获取所有QuestConfig
+---@return map<b1:int,map<b2:bool,list<QuestConfig>>>
+function QuestConfig.getComposite2All()
+     return composite2Configs
+end
+
+---
 ---通过索引[composite2]获取QuestConfig
 ---@overload fun():map<b1:int,map<b2:bool,list<QuestConfig>>>
 ---@overload fun(b1:int):map<b2:bool,list<QuestConfig>>
@@ -110,6 +138,13 @@ function QuestConfig.getByComposite2(b1, b2)
         return map
     end
     return map[b2]
+end
+
+---
+---获取所有QuestConfig
+---@return map<c1:string,map<c2:int,map<c3:int,QuestConfig>>>
+function QuestConfig.getComposite3All()
+     return composite3Configs
 end
 
 ---
@@ -137,6 +172,13 @@ function QuestConfig.getByComposite3(c1, c2, c3)
     end
 
     return map2[c3]
+end
+
+---
+---获取所有QuestConfig
+---@return map<d1:string,map<d2:int,map<d3:int,list<QuestConfig>>>>
+function QuestConfig.getComposite4All()
+     return composite4Configs
 end
 
 ---

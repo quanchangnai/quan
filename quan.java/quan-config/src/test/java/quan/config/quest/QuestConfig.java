@@ -196,76 +196,76 @@ public class QuestConfig extends Config {
 
 
     //所有QuestConfig
-    private static volatile List<QuestConfig> configs = Collections.emptyList();
+    private static volatile List<QuestConfig> _configs = Collections.emptyList();
 
     //索引:ID
-    private static volatile Map<Integer, QuestConfig> idConfigs = Collections.emptyMap();
+    private static volatile Map<Integer, QuestConfig> _idConfigs = Collections.emptyMap();
 
     //索引:类型
-    private static volatile Map<QuestType, List<QuestConfig>> typeConfigs = Collections.emptyMap();
+    private static volatile Map<QuestType, List<QuestConfig>> _typeConfigs = Collections.emptyMap();
 
     //索引:两字段唯一索引
-    private static volatile Map<Integer, Map<Integer, QuestConfig>> composite1Configs = Collections.emptyMap();
+    private static volatile Map<Integer, Map<Integer, QuestConfig>> _composite1Configs = Collections.emptyMap();
 
     //索引:两字段普通索引
-    private static volatile Map<Integer, Map<Boolean, List<QuestConfig>>> composite2Configs = Collections.emptyMap();
+    private static volatile Map<Integer, Map<Boolean, List<QuestConfig>>> _composite2Configs = Collections.emptyMap();
 
     //索引:三字段唯一索引
-    private static volatile Map<String, Map<Integer, Map<Integer, QuestConfig>>> composite3Configs = Collections.emptyMap();
+    private static volatile Map<String, Map<Integer, Map<Integer, QuestConfig>>> _composite3Configs = Collections.emptyMap();
 
     //索引:三字段普通索引
-    private static volatile Map<String, Map<Integer, Map<Integer, List<QuestConfig>>>> composite4Configs = Collections.emptyMap();
+    private static volatile Map<String, Map<Integer, Map<Integer, List<QuestConfig>>>> _composite4Configs = Collections.emptyMap();
 
-    public static List<QuestConfig> getConfigs() {
-        return configs;
+    public static List<QuestConfig> getAll() {
+        return _configs;
     }
 
-    public static Map<Integer, QuestConfig> getIdConfigs() {
-        return idConfigs;
+    public static Map<Integer, QuestConfig> getIdAll() {
+        return _idConfigs;
     }
 
     public static QuestConfig get(int id) {
-        return idConfigs.get(id);
+        return _idConfigs.get(id);
     }
 
-    public static Map<QuestType, List<QuestConfig>> getTypeConfigs() {
-        return typeConfigs;
+    public static Map<QuestType, List<QuestConfig>> getTypeAll() {
+        return _typeConfigs;
     }
 
     public static List<QuestConfig> getByType(QuestType type) {
-        return typeConfigs.getOrDefault(type, Collections.emptyList());
+        return _typeConfigs.getOrDefault(type, Collections.emptyList());
     }
 
-    public static Map<Integer, Map<Integer, QuestConfig>> getComposite1Configs() {
-        return composite1Configs;
+    public static Map<Integer, Map<Integer, QuestConfig>> getComposite1All() {
+        return _composite1Configs;
     }
 
     public static Map<Integer, QuestConfig> getByComposite1(int a1) {
-        return composite1Configs.getOrDefault(a1, Collections.emptyMap());
+        return _composite1Configs.getOrDefault(a1, Collections.emptyMap());
     }
 
     public static QuestConfig getByComposite1(int a1, int a2) {
         return getByComposite1(a1).get(a2);
     }
 
-    public static Map<Integer, Map<Boolean, List<QuestConfig>>> getComposite2Configs() {
-        return composite2Configs;
+    public static Map<Integer, Map<Boolean, List<QuestConfig>>> getComposite2All() {
+        return _composite2Configs;
     }
 
     public static Map<Boolean, List<QuestConfig>> getByComposite2(int b1) {
-        return composite2Configs.getOrDefault(b1, Collections.emptyMap());
+        return _composite2Configs.getOrDefault(b1, Collections.emptyMap());
     }
 
     public static List<QuestConfig> getByComposite2(int b1, boolean b2) {
         return getByComposite2(b1).getOrDefault(b2, Collections.emptyList());
     }
 
-    public static Map<String, Map<Integer, Map<Integer, QuestConfig>>> getComposite3Configs() {
-        return composite3Configs;
+    public static Map<String, Map<Integer, Map<Integer, QuestConfig>>> getComposite3All() {
+        return _composite3Configs;
     }
 
     public static Map<Integer, Map<Integer, QuestConfig>> getByComposite3(String c1) {
-        return composite3Configs.getOrDefault(c1, Collections.emptyMap());
+        return _composite3Configs.getOrDefault(c1, Collections.emptyMap());
     }
 
     public static Map<Integer, QuestConfig> getByComposite3(String c1, int c2) {
@@ -276,12 +276,12 @@ public class QuestConfig extends Config {
         return getByComposite3(c1, c2).get(c3);
     }
 
-    public static Map<String, Map<Integer, Map<Integer, List<QuestConfig>>>> getComposite4Configs() {
-        return composite4Configs;
+    public static Map<String, Map<Integer, Map<Integer, List<QuestConfig>>>> getComposite4All() {
+        return _composite4Configs;
     }
 
     public static Map<Integer, Map<Integer, List<QuestConfig>>> getByComposite4(String d1) {
-        return composite4Configs.getOrDefault(d1, Collections.emptyMap());
+        return _composite4Configs.getOrDefault(d1, Collections.emptyMap());
     }
 
     public static Map<Integer, List<QuestConfig>> getByComposite4(String d1, int d2) {
@@ -293,11 +293,6 @@ public class QuestConfig extends Config {
     }
 
 
-    /**
-     * 加载配置，建立索引
-     * @param configs 所有配置
-     * @return 错误信息
-     */
     @SuppressWarnings({"unchecked"})
     private static List<String> load(List<QuestConfig> configs) {
         Map<Integer, QuestConfig> idConfigs = new HashMap<>();
@@ -326,13 +321,13 @@ public class QuestConfig extends Config {
         composite3Configs = unmodifiableMap(composite3Configs);
         composite4Configs = unmodifiableMap(composite4Configs);
 
-        QuestConfig.configs = configs;
-        QuestConfig.idConfigs = idConfigs;
-        QuestConfig.typeConfigs = typeConfigs;
-        QuestConfig.composite1Configs = composite1Configs;
-        QuestConfig.composite2Configs = composite2Configs;
-        QuestConfig.composite3Configs = composite3Configs;
-        QuestConfig.composite4Configs = composite4Configs;
+        QuestConfig._configs = configs;
+        QuestConfig._idConfigs = idConfigs;
+        QuestConfig._typeConfigs = typeConfigs;
+        QuestConfig._composite1Configs = composite1Configs;
+        QuestConfig._composite2Configs = composite2Configs;
+        QuestConfig._composite3Configs = composite3Configs;
+        QuestConfig._composite4Configs = composite4Configs;
 
         return errors;
     }

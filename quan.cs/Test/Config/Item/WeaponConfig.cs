@@ -141,12 +141,12 @@ namespace Test.Config.Item
 
         private static volatile IDictionary<int, IDictionary<int, WeaponConfig>> _composite2Configs = new Dictionary<int, IDictionary<int, WeaponConfig>>();
 
-        public new static IList<WeaponConfig> GetConfigs()
+        public new static IList<WeaponConfig> GetAll()
         {
             return _configs;
         }
 
-        public new static IDictionary<int, WeaponConfig> GetIdConfigs()
+        public new static IDictionary<int, WeaponConfig> GetIdAll()
         {
             return _idConfigs;
         }
@@ -157,7 +157,7 @@ namespace Test.Config.Item
             return result;
         }
 
-        public new static IDictionary<string, WeaponConfig> GetKeyConfigs()
+        public new static IDictionary<string, WeaponConfig> GetKeyAll()
         {
             return _keyConfigs;
         }
@@ -168,7 +168,7 @@ namespace Test.Config.Item
             return result;
         }
 
-        public new static IDictionary<ItemType, IList<WeaponConfig>> GetTypeConfigs()
+        public new static IDictionary<ItemType, IList<WeaponConfig>> GetTypeAll()
         {
             return _typeConfigs;
         }
@@ -179,7 +179,7 @@ namespace Test.Config.Item
             return result ?? ImmutableList<WeaponConfig>.Empty;
         }
 
-        public new static IDictionary<int, IList<WeaponConfig>> GetPositionConfigs()
+        public new static IDictionary<int, IList<WeaponConfig>> GetPositionAll()
         {
             return _positionConfigs;
         }
@@ -190,7 +190,7 @@ namespace Test.Config.Item
             return result ?? ImmutableList<WeaponConfig>.Empty;
         }
 
-        public static IDictionary<int, IDictionary<int, IList<WeaponConfig>>> GetComposite1Configs()
+        public static IDictionary<int, IDictionary<int, IList<WeaponConfig>>> GetComposite1All()
         {
             return _composite1Configs;
         }
@@ -207,7 +207,7 @@ namespace Test.Config.Item
             return result ?? ImmutableList<WeaponConfig>.Empty;
         }
 
-        public static IDictionary<int, IDictionary<int, WeaponConfig>> GetComposite2Configs()
+        public static IDictionary<int, IDictionary<int, WeaponConfig>> GetComposite2All()
         {
             return _composite2Configs;
         }

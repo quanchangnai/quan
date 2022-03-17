@@ -90,29 +90,24 @@ public class ConstantConfig extends Config {
 
 
     //所有ConstantConfig
-    private static volatile List<ConstantConfig> configs = Collections.emptyList();
+    private static volatile List<ConstantConfig> _configs = Collections.emptyList();
 
     //索引:常量Key
-    private static volatile Map<String, ConstantConfig> keyConfigs = Collections.emptyMap();
+    private static volatile Map<String, ConstantConfig> _keyConfigs = Collections.emptyMap();
 
-    public static List<ConstantConfig> getConfigs() {
-        return configs;
+    public static List<ConstantConfig> getAll() {
+        return _configs;
     }
 
-    public static Map<String, ConstantConfig> getKeyConfigs() {
-        return keyConfigs;
+    public static Map<String, ConstantConfig> getKeyAll() {
+        return _keyConfigs;
     }
 
     public static ConstantConfig getByKey(String key) {
-        return keyConfigs.get(key);
+        return _keyConfigs.get(key);
     }
 
 
-    /**
-     * 加载配置，建立索引
-     * @param configs 所有配置
-     * @return 错误信息
-     */
     @SuppressWarnings({"unchecked"})
     private static List<String> load(List<ConstantConfig> configs) {
         Map<String, ConstantConfig> keyConfigs = new HashMap<>();
@@ -128,8 +123,8 @@ public class ConstantConfig extends Config {
         configs = Collections.unmodifiableList(configs);
         keyConfigs = unmodifiableMap(keyConfigs);
 
-        ConstantConfig.configs = configs;
-        ConstantConfig.keyConfigs = keyConfigs;
+        ConstantConfig._configs = configs;
+        ConstantConfig._keyConfigs = keyConfigs;
 
         return errors;
     }

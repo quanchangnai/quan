@@ -31,8 +31,15 @@ local ConstantConfig = {}
 ---
 ---获取所有ConstantConfig
 ---@return list<ConstantConfig>
-function ConstantConfig.getConfigs()
+function ConstantConfig.getAll()
     return configs
+end
+
+---
+---获取所有ConstantConfig
+---@return map<key:string,ConstantConfig>
+function ConstantConfig.getKeyAll()
+     return keyConfigs
 end
 
 ---

@@ -48,8 +48,15 @@ local WeaponConfig = {}
 ---
 ---获取所有WeaponConfig
 ---@return list<WeaponConfig>
-function WeaponConfig.getConfigs()
+function WeaponConfig.getAll()
     return configs
+end
+
+---
+---获取所有WeaponConfig
+---@return map<id:int,WeaponConfig>
+function WeaponConfig.getIdAll()
+     return idConfigs
 end
 
 ---
@@ -65,6 +72,13 @@ function WeaponConfig.get(id)
 end
 
 ---
+---获取所有WeaponConfig
+---@return map<key:string,WeaponConfig>
+function WeaponConfig.getKeyAll()
+     return keyConfigs
+end
+
+---
 ---通过索引[key]获取WeaponConfig
 ---@overload fun():map<key:string,WeaponConfig>
 ---@param key string 常量Key
@@ -77,6 +91,13 @@ function WeaponConfig.getByKey(key)
 end
 
 ---
+---获取所有WeaponConfig
+---@return map<type:ItemType,list<WeaponConfig>> 
+function WeaponConfig.getTypeAll()
+     return typeConfigs
+end
+
+---
 ---通过索引[type]获取WeaponConfig
 ---@overload fun():map<type:ItemType,list<WeaponConfig>> 
 ---@param type ItemType 类型
@@ -86,12 +107,26 @@ function WeaponConfig.getByType(type)
 end
 
 ---
+---获取所有WeaponConfig
+---@return map<position:int,list<WeaponConfig>> 
+function WeaponConfig.getPositionAll()
+     return positionConfigs
+end
+
+---
 ---通过索引[position]获取WeaponConfig
 ---@overload fun():map<position:int,list<WeaponConfig>> 
 ---@param position int 部位
 ---@return list<WeaponConfig>
 function WeaponConfig.getByPosition(position)
     return positionConfigs[position] or table.empty()
+end
+
+---
+---获取所有WeaponConfig
+---@return map<color:int,map<w1:int,list<WeaponConfig>>>
+function WeaponConfig.getComposite1All()
+     return composite1Configs
 end
 
 ---
@@ -111,6 +146,13 @@ function WeaponConfig.getByComposite1(color, w1)
         return map
     end
     return map[w1]
+end
+
+---
+---获取所有WeaponConfig
+---@return map<w1:int,map<w2:int,WeaponConfig>>
+function WeaponConfig.getComposite2All()
+     return composite2Configs
 end
 
 ---

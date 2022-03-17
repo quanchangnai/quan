@@ -66,7 +66,7 @@ local typeConfigs = {}
 ---加载配置，建立索引
 local function loadConfigs()
     local EquipConfig = require("test.config.item.EquipConfig")
-    for i, equipConfig in ipairs(EquipConfig.getConfigs()) do
+    for i, equipConfig in ipairs(EquipConfig.getAll()) do
         table.insert(configs, equipConfig)
     end
 
@@ -85,8 +85,15 @@ local ItemConfig = {}
 ---
 ---获取所有ItemConfig
 ---@return list<ItemConfig>
-function ItemConfig.getConfigs()
+function ItemConfig.getAll()
     return configs
+end
+
+---
+---获取所有ItemConfig
+---@return map<id:int,ItemConfig>
+function ItemConfig.getIdAll()
+     return idConfigs
 end
 
 ---
@@ -102,6 +109,13 @@ function ItemConfig.get(id)
 end
 
 ---
+---获取所有ItemConfig
+---@return map<key:string,ItemConfig>
+function ItemConfig.getKeyAll()
+     return keyConfigs
+end
+
+---
 ---通过索引[key]获取ItemConfig
 ---@overload fun():map<key:string,ItemConfig>
 ---@param key string 常量Key
@@ -111,6 +125,13 @@ function ItemConfig.getByKey(key)
         return keyConfigs
     end
     return keyConfigs[key]
+end
+
+---
+---获取所有ItemConfig
+---@return map<type:ItemType,list<ItemConfig>> 
+function ItemConfig.getTypeAll()
+     return typeConfigs
 end
 
 ---

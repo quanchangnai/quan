@@ -167,16 +167,16 @@ public class ConfigTest {
         System.err.println("printConfigs start============");
 
         System.err.println("ItemConfig============");
-        ItemConfig.getConfigs().forEach(System.err::println);
+        ItemConfig.getAll().forEach(System.err::println);
 
         System.err.println("EquipConfig============");
-        EquipConfig.self.getConfigs().forEach(System.err::println);
+        EquipConfig.self.getAll().forEach(System.err::println);
 
         System.err.println("WeaponConfig============");
-        WeaponConfig.self.getConfigs().forEach(System.err::println);
+        WeaponConfig.self.getAll().forEach(System.err::println);
 
         System.err.println("QuestConfig============");
-        QuestConfig.getConfigs().forEach(System.err::println);
+        QuestConfig.getAll().forEach(System.err::println);
 
         System.err.println("CardConfig============");
         CardConfig.getConfigs().forEach(System.err::println);

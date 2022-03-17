@@ -144,51 +144,46 @@ public class ItemConfig extends Config {
 
 
     //所有ItemConfig
-    private static volatile List<ItemConfig> configs = Collections.emptyList();
+    private static volatile List<ItemConfig> _configs = Collections.emptyList();
 
     //索引:ID
-    private static volatile Map<Integer, ItemConfig> idConfigs = Collections.emptyMap();
+    private static volatile Map<Integer, ItemConfig> _idConfigs = Collections.emptyMap();
 
     //索引:常量Key
-    private static volatile Map<String, ItemConfig> keyConfigs = Collections.emptyMap();
+    private static volatile Map<String, ItemConfig> _keyConfigs = Collections.emptyMap();
 
     //索引:类型
-    private static volatile Map<ItemType, List<ItemConfig>> typeConfigs = Collections.emptyMap();
+    private static volatile Map<ItemType, List<ItemConfig>> _typeConfigs = Collections.emptyMap();
 
-    public static List<ItemConfig> getConfigs() {
-        return configs;
+    public static List<ItemConfig> getAll() {
+        return _configs;
     }
 
-    public static Map<Integer, ItemConfig> getIdConfigs() {
-        return idConfigs;
+    public static Map<Integer, ItemConfig> getIdAll() {
+        return _idConfigs;
     }
 
     public static ItemConfig get(int id) {
-        return idConfigs.get(id);
+        return _idConfigs.get(id);
     }
 
-    public static Map<String, ItemConfig> getKeyConfigs() {
-        return keyConfigs;
+    public static Map<String, ItemConfig> getKeyAll() {
+        return _keyConfigs;
     }
 
     public static ItemConfig getByKey(String key) {
-        return keyConfigs.get(key);
+        return _keyConfigs.get(key);
     }
 
-    public static Map<ItemType, List<ItemConfig>> getTypeConfigs() {
-        return typeConfigs;
+    public static Map<ItemType, List<ItemConfig>> getTypeAll() {
+        return _typeConfigs;
     }
 
     public static List<ItemConfig> getByType(ItemType type) {
-        return typeConfigs.getOrDefault(type, Collections.emptyList());
+        return _typeConfigs.getOrDefault(type, Collections.emptyList());
     }
 
 
-    /**
-     * 加载配置，建立索引
-     * @param configs 所有配置
-     * @return 错误信息
-     */
     @SuppressWarnings({"unchecked"})
     private static List<String> load(List<ItemConfig> configs) {
         Map<Integer, ItemConfig> idConfigs = new HashMap<>();
@@ -210,10 +205,10 @@ public class ItemConfig extends Config {
         keyConfigs = unmodifiableMap(keyConfigs);
         typeConfigs = unmodifiableMap(typeConfigs);
 
-        ItemConfig.configs = configs;
-        ItemConfig.idConfigs = idConfigs;
-        ItemConfig.keyConfigs = keyConfigs;
-        ItemConfig.typeConfigs = typeConfigs;
+        ItemConfig._configs = configs;
+        ItemConfig._idConfigs = idConfigs;
+        ItemConfig._keyConfigs = keyConfigs;
+        ItemConfig._typeConfigs = typeConfigs;
 
         return errors;
     }

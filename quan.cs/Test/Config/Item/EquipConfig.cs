@@ -67,12 +67,12 @@ namespace Test.Config.Item
         // 索引:类型
         private static volatile IDictionary<ItemType, IList<EquipConfig>> _typeConfigs = new Dictionary<ItemType, IList<EquipConfig>>();
 
-        public new static IList<EquipConfig> GetConfigs()
+        public new static IList<EquipConfig> GetAll()
         {
             return _configs;
         }
 
-        public static IDictionary<int, IList<EquipConfig>> GetPositionConfigs()
+        public static IDictionary<int, IList<EquipConfig>> GetPositionAll()
         {
             return _positionConfigs;
         }
@@ -83,7 +83,7 @@ namespace Test.Config.Item
             return result ?? ImmutableList<EquipConfig>.Empty;
         }
 
-        public new static IDictionary<int, EquipConfig> GetIdConfigs()
+        public new static IDictionary<int, EquipConfig> GetIdAll()
         {
             return _idConfigs;
         }
@@ -94,7 +94,7 @@ namespace Test.Config.Item
             return result;
         }
 
-        public new static IDictionary<string, EquipConfig> GetKeyConfigs()
+        public new static IDictionary<string, EquipConfig> GetKeyAll()
         {
             return _keyConfigs;
         }
@@ -105,7 +105,7 @@ namespace Test.Config.Item
             return result;
         }
 
-        public new static IDictionary<ItemType, IList<EquipConfig>> GetTypeConfigs()
+        public new static IDictionary<ItemType, IList<EquipConfig>> GetTypeAll()
         {
             return _typeConfigs;
         }

@@ -28,8 +28,15 @@ local QuestTargetConfig = {}
 ---
 ---获取所有QuestTargetConfig
 ---@return list<QuestTargetConfig>
-function QuestTargetConfig.getConfigs()
+function QuestTargetConfig.getAll()
     return configs
+end
+
+---
+---获取所有QuestTargetConfig
+---@return map<id:int,QuestTargetConfig>
+function QuestTargetConfig.getIdAll()
+     return idConfigs
 end
 
 ---

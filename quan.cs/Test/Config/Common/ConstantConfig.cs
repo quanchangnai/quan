@@ -83,12 +83,12 @@ namespace Test.Config.Common
         // 索引:常量Key
         private static volatile IDictionary<string, ConstantConfig> _keyConfigs = new Dictionary<string, ConstantConfig>();
 
-        public static IList<ConstantConfig> GetConfigs()
+        public static IList<ConstantConfig> GetAll()
         {
             return _configs;
         }
 
-        public static IDictionary<string, ConstantConfig> GetKeyConfigs()
+        public static IDictionary<string, ConstantConfig> GetKeyAll()
         {
             return _keyConfigs;
         }

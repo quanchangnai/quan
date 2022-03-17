@@ -125,78 +125,78 @@ public class WeaponConfig extends EquipConfig {
         }
 
         //所有WeaponConfig
-        private static volatile List<WeaponConfig> configs = Collections.emptyList();
+        private static volatile List<WeaponConfig> _configs = Collections.emptyList();
 
         //索引:ID
-        private static volatile Map<Integer, WeaponConfig> idConfigs = Collections.emptyMap();
+        private static volatile Map<Integer, WeaponConfig> _idConfigs = Collections.emptyMap();
 
         //索引:常量Key
-        private static volatile Map<String, WeaponConfig> keyConfigs = Collections.emptyMap();
+        private static volatile Map<String, WeaponConfig> _keyConfigs = Collections.emptyMap();
 
         //索引:类型
-        private static volatile Map<ItemType, List<WeaponConfig>> typeConfigs = Collections.emptyMap();
+        private static volatile Map<ItemType, List<WeaponConfig>> _typeConfigs = Collections.emptyMap();
 
         //索引:部位
-        private static volatile Map<Integer, List<WeaponConfig>> positionConfigs = Collections.emptyMap();
+        private static volatile Map<Integer, List<WeaponConfig>> _positionConfigs = Collections.emptyMap();
 
-        private static volatile Map<Integer, Map<Integer, List<WeaponConfig>>> composite1Configs = Collections.emptyMap();
+        private static volatile Map<Integer, Map<Integer, List<WeaponConfig>>> _composite1Configs = Collections.emptyMap();
 
-        private static volatile Map<Integer, Map<Integer, WeaponConfig>> composite2Configs = Collections.emptyMap();
+        private static volatile Map<Integer, Map<Integer, WeaponConfig>> _composite2Configs = Collections.emptyMap();
 
-        public static List<WeaponConfig> getConfigs() {
-            return configs;
+        public static List<WeaponConfig> getAll() {
+            return _configs;
         }
 
-        public static Map<Integer, WeaponConfig> getIdConfigs() {
-            return idConfigs;
+        public static Map<Integer, WeaponConfig> getIdAll() {
+            return _idConfigs;
         }
 
         public static WeaponConfig get(int id) {
-            return idConfigs.get(id);
+            return _idConfigs.get(id);
         }
 
-        public static Map<String, WeaponConfig> getKeyConfigs() {
-            return keyConfigs;
+        public static Map<String, WeaponConfig> getKeyAll() {
+            return _keyConfigs;
         }
 
         public static WeaponConfig getByKey(String key) {
-            return keyConfigs.get(key);
+            return _keyConfigs.get(key);
         }
 
-        public static Map<ItemType, List<WeaponConfig>> getTypeConfigs() {
-            return typeConfigs;
+        public static Map<ItemType, List<WeaponConfig>> getTypeAll() {
+            return _typeConfigs;
         }
 
         public static List<WeaponConfig> getByType(ItemType type) {
-            return typeConfigs.getOrDefault(type, Collections.emptyList());
+            return _typeConfigs.getOrDefault(type, Collections.emptyList());
         }
 
-        public static Map<Integer, List<WeaponConfig>> getPositionConfigs() {
-            return positionConfigs;
+        public static Map<Integer, List<WeaponConfig>> getPositionAll() {
+            return _positionConfigs;
         }
 
         public static List<WeaponConfig> getByPosition(int position) {
-            return positionConfigs.getOrDefault(position, Collections.emptyList());
+            return _positionConfigs.getOrDefault(position, Collections.emptyList());
         }
 
-        public static Map<Integer, Map<Integer, List<WeaponConfig>>> getComposite1Configs() {
-            return composite1Configs;
+        public static Map<Integer, Map<Integer, List<WeaponConfig>>> getComposite1All() {
+            return _composite1Configs;
         }
 
         public static Map<Integer, List<WeaponConfig>> getByComposite1(int color) {
-            return composite1Configs.getOrDefault(color, Collections.emptyMap());
+            return _composite1Configs.getOrDefault(color, Collections.emptyMap());
         }
 
         public static List<WeaponConfig> getByComposite1(int color, int w1) {
             return getByComposite1(color).getOrDefault(w1, Collections.emptyList());
         }
 
-        public static Map<Integer, Map<Integer, WeaponConfig>> getComposite2Configs() {
-            return composite2Configs;
+        public static Map<Integer, Map<Integer, WeaponConfig>> getComposite2All() {
+            return _composite2Configs;
         }
 
         public static Map<Integer, WeaponConfig> getByComposite2(int w1) {
-            return composite2Configs.getOrDefault(w1, Collections.emptyMap());
+            return _composite2Configs.getOrDefault(w1, Collections.emptyMap());
         }
 
         public static WeaponConfig getByComposite2(int w1, int w2) {
@@ -204,11 +204,6 @@ public class WeaponConfig extends EquipConfig {
         }
 
 
-        /**
-         * 加载配置，建立索引
-         * @param configs 所有配置
-         * @return 错误信息
-         */
         @SuppressWarnings({"unchecked"})
         private static List<String> load(List<WeaponConfig> configs) {
             Map<Integer, WeaponConfig> idConfigs = new HashMap<>();
@@ -239,13 +234,13 @@ public class WeaponConfig extends EquipConfig {
             composite1Configs = unmodifiableMap(composite1Configs);
             composite2Configs = unmodifiableMap(composite2Configs);
 
-            WeaponConfig.self.configs = configs;
-            WeaponConfig.self.idConfigs = idConfigs;
-            WeaponConfig.self.keyConfigs = keyConfigs;
-            WeaponConfig.self.typeConfigs = typeConfigs;
-            WeaponConfig.self.positionConfigs = positionConfigs;
-            WeaponConfig.self.composite1Configs = composite1Configs;
-            WeaponConfig.self.composite2Configs = composite2Configs;
+            WeaponConfig.self._configs = configs;
+            WeaponConfig.self._idConfigs = idConfigs;
+            WeaponConfig.self._keyConfigs = keyConfigs;
+            WeaponConfig.self._typeConfigs = typeConfigs;
+            WeaponConfig.self._positionConfigs = positionConfigs;
+            WeaponConfig.self._composite1Configs = composite1Configs;
+            WeaponConfig.self._composite2Configs = composite2Configs;
 
             return errors;
         }

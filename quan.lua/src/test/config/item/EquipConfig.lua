@@ -26,7 +26,7 @@ local typeConfigs = {}
 ---加载配置，建立索引
 local function loadConfigs()
     local WeaponConfig = require("test.config.item.WeaponConfig")
-    for i, weaponConfig in ipairs(WeaponConfig.getConfigs()) do
+    for i, weaponConfig in ipairs(WeaponConfig.getAll()) do
         table.insert(configs, weaponConfig)
     end
 
@@ -46,8 +46,15 @@ local EquipConfig = {}
 ---
 ---获取所有EquipConfig
 ---@return list<EquipConfig>
-function EquipConfig.getConfigs()
+function EquipConfig.getAll()
     return configs
+end
+
+---
+---获取所有EquipConfig
+---@return map<position:int,list<EquipConfig>> 
+function EquipConfig.getPositionAll()
+     return positionConfigs
 end
 
 ---
@@ -57,6 +64,13 @@ end
 ---@return list<EquipConfig>
 function EquipConfig.getByPosition(position)
     return positionConfigs[position] or table.empty()
+end
+
+---
+---获取所有EquipConfig
+---@return map<id:int,EquipConfig>
+function EquipConfig.getIdAll()
+     return idConfigs
 end
 
 ---
@@ -72,6 +86,13 @@ function EquipConfig.get(id)
 end
 
 ---
+---获取所有EquipConfig
+---@return map<key:string,EquipConfig>
+function EquipConfig.getKeyAll()
+     return keyConfigs
+end
+
+---
 ---通过索引[key]获取EquipConfig
 ---@overload fun():map<key:string,EquipConfig>
 ---@param key string 常量Key
@@ -81,6 +102,13 @@ function EquipConfig.getByKey(key)
         return keyConfigs
     end
     return keyConfigs[key]
+end
+
+---
+---获取所有EquipConfig
+---@return map<type:ItemType,list<EquipConfig>> 
+function EquipConfig.getTypeAll()
+     return typeConfigs
 end
 
 ---

@@ -60,62 +60,57 @@ public class EquipConfig extends ItemConfig {
         }
 
         //所有EquipConfig
-        private static volatile List<EquipConfig> configs = Collections.emptyList();
+        private static volatile List<EquipConfig> _configs = Collections.emptyList();
 
         //索引:部位
-        private static volatile Map<Integer, List<EquipConfig>> positionConfigs = Collections.emptyMap();
+        private static volatile Map<Integer, List<EquipConfig>> _positionConfigs = Collections.emptyMap();
 
         //索引:ID
-        private static volatile Map<Integer, EquipConfig> idConfigs = Collections.emptyMap();
+        private static volatile Map<Integer, EquipConfig> _idConfigs = Collections.emptyMap();
 
         //索引:常量Key
-        private static volatile Map<String, EquipConfig> keyConfigs = Collections.emptyMap();
+        private static volatile Map<String, EquipConfig> _keyConfigs = Collections.emptyMap();
 
         //索引:类型
-        private static volatile Map<ItemType, List<EquipConfig>> typeConfigs = Collections.emptyMap();
+        private static volatile Map<ItemType, List<EquipConfig>> _typeConfigs = Collections.emptyMap();
 
-        public static List<EquipConfig> getConfigs() {
-            return configs;
+        public static List<EquipConfig> getAll() {
+            return _configs;
         }
 
-        public static Map<Integer, List<EquipConfig>> getPositionConfigs() {
-            return positionConfigs;
+        public static Map<Integer, List<EquipConfig>> getPositionAll() {
+            return _positionConfigs;
         }
 
         public static List<EquipConfig> getByPosition(int position) {
-            return positionConfigs.getOrDefault(position, Collections.emptyList());
+            return _positionConfigs.getOrDefault(position, Collections.emptyList());
         }
 
-        public static Map<Integer, EquipConfig> getIdConfigs() {
-            return idConfigs;
+        public static Map<Integer, EquipConfig> getIdAll() {
+            return _idConfigs;
         }
 
         public static EquipConfig get(int id) {
-            return idConfigs.get(id);
+            return _idConfigs.get(id);
         }
 
-        public static Map<String, EquipConfig> getKeyConfigs() {
-            return keyConfigs;
+        public static Map<String, EquipConfig> getKeyAll() {
+            return _keyConfigs;
         }
 
         public static EquipConfig getByKey(String key) {
-            return keyConfigs.get(key);
+            return _keyConfigs.get(key);
         }
 
-        public static Map<ItemType, List<EquipConfig>> getTypeConfigs() {
-            return typeConfigs;
+        public static Map<ItemType, List<EquipConfig>> getTypeAll() {
+            return _typeConfigs;
         }
 
         public static List<EquipConfig> getByType(ItemType type) {
-            return typeConfigs.getOrDefault(type, Collections.emptyList());
+            return _typeConfigs.getOrDefault(type, Collections.emptyList());
         }
 
 
-        /**
-         * 加载配置，建立索引
-         * @param configs 所有配置
-         * @return 错误信息
-         */
         @SuppressWarnings({"unchecked"})
         private static List<String> load(List<EquipConfig> configs) {
             Map<Integer, List<EquipConfig>> positionConfigs = new HashMap<>();
@@ -140,11 +135,11 @@ public class EquipConfig extends ItemConfig {
             keyConfigs = unmodifiableMap(keyConfigs);
             typeConfigs = unmodifiableMap(typeConfigs);
 
-            EquipConfig.self.configs = configs;
-            EquipConfig.self.positionConfigs = positionConfigs;
-            EquipConfig.self.idConfigs = idConfigs;
-            EquipConfig.self.keyConfigs = keyConfigs;
-            EquipConfig.self.typeConfigs = typeConfigs;
+            EquipConfig.self._configs = configs;
+            EquipConfig.self._positionConfigs = positionConfigs;
+            EquipConfig.self._idConfigs = idConfigs;
+            EquipConfig.self._keyConfigs = keyConfigs;
+            EquipConfig.self._typeConfigs = typeConfigs;
 
             return errors;
         }

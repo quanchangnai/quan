@@ -194,62 +194,62 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
     }
 <#macro indexer tab>
     ${tab}//所有${name}
-    ${tab}private static volatile List<${name}> configs = Collections.emptyList();
+    ${tab}private static volatile List<${name}> _configs = Collections.emptyList();
 
     <#list indexes as index>
         <#if index.comment !="">
     ${tab}//索引:${index.comment}
         </#if>
         <#if index.unique && index.fields?size==1>
-    ${tab}private static volatile Map<${index.fields[0].classType}, ${name}> ${index.name}Configs = Collections.emptyMap();
+    ${tab}private static volatile Map<${index.fields[0].classType}, ${name}> _${index.name}Configs = Collections.emptyMap();
 
         <#elseif index.normal && index.fields?size==1>
-    ${tab}private static volatile Map<${index.fields[0].classType}, List<${name}>> ${index.name}Configs = Collections.emptyMap();
+    ${tab}private static volatile Map<${index.fields[0].classType}, List<${name}>> _${index.name}Configs = Collections.emptyMap();
 
         <#elseif index.unique && index.fields?size==2>
-    ${tab}private static volatile Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, ${name}>> ${index.name}Configs = Collections.emptyMap();
+    ${tab}private static volatile Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, ${name}>> _${index.name}Configs = Collections.emptyMap();
 
         <#elseif index.normal && index.fields?size==2>
-    ${tab}private static volatile Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, List<${name}>>> ${index.name}Configs = Collections.emptyMap();
+    ${tab}private static volatile Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, List<${name}>>> _${index.name}Configs = Collections.emptyMap();
 
         <#elseif index.unique && index.fields?size==3>
-    ${tab}private static volatile Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, ${name}>>> ${index.name}Configs = Collections.emptyMap();
+    ${tab}private static volatile Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, ${name}>>> _${index.name}Configs = Collections.emptyMap();
 
         <#elseif index.normal && index.fields?size==3>
-    ${tab}private static volatile Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, List<${name}>>>> ${index.name}Configs = Collections.emptyMap();
+    ${tab}private static volatile Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, List<${name}>>>> _${index.name}Configs = Collections.emptyMap();
 
         </#if>
     </#list>
-    ${tab}public static List<${name}> getConfigs() {
-        ${tab}return configs;
+    ${tab}public static List<${name}> getAll() {
+        ${tab}return _configs;
     ${tab}}
 
     <#list indexes as index>
         <#if index.unique && index.fields?size==1>
-    ${tab}public static Map<${index.fields[0].classType}, ${name}> get${index.name?cap_first}Configs() {
-        ${tab}return ${index.name}Configs;
+    ${tab}public static Map<${index.fields[0].classType}, ${name}> get${index.name?cap_first}All() {
+        ${tab}return _${index.name}Configs;
     ${tab}}
 
     ${tab}public static ${name} get${index.suffix}(${index.fields[0].basicType} ${index.fields[0].name}) {
-        ${tab}return ${index.name}Configs.get(${index.fields[0].name});
+        ${tab}return _${index.name}Configs.get(${index.fields[0].name});
     ${tab}}
 
         <#elseif index.normal && index.fields?size==1>
-    ${tab}public static Map<${index.fields[0].classType}, List<${name}>> get${index.name?cap_first}Configs() {
-        ${tab}return ${index.name}Configs;
+    ${tab}public static Map<${index.fields[0].classType}, List<${name}>> get${index.name?cap_first}All() {
+        ${tab}return _${index.name}Configs;
     ${tab}}
 
     ${tab}public static List<${name}> get${index.suffix}(${index.fields[0].basicType} ${index.fields[0].name}) {
-        ${tab}return ${index.name}Configs.getOrDefault(${index.fields[0].name}, Collections.emptyList());
+        ${tab}return _${index.name}Configs.getOrDefault(${index.fields[0].name}, Collections.emptyList());
     ${tab}}
 
         <#elseif index.unique && index.fields?size==2>
-    ${tab}public static Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, ${name}>> get${index.name?cap_first}Configs() {
-        ${tab}return ${index.name}Configs;
+    ${tab}public static Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, ${name}>> get${index.name?cap_first}All() {
+        ${tab}return _${index.name}Configs;
     ${tab}}
 
     ${tab}public static Map<${index.fields[1].classType}, ${name}> get${index.suffix}(${index.fields[0].basicType} ${index.fields[0].name}) {
-        ${tab}return ${index.name}Configs.getOrDefault(${index.fields[0].name}, Collections.emptyMap());
+        ${tab}return _${index.name}Configs.getOrDefault(${index.fields[0].name}, Collections.emptyMap());
     ${tab}}
 
     ${tab}public static ${name} get${index.suffix}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name}) {
@@ -257,12 +257,12 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
     ${tab}}
 
         <#elseif index.normal && index.fields?size==2>
-    ${tab}public static Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, List<${name}>>> get${index.name?cap_first}Configs() {
-        ${tab}return ${index.name}Configs;
+    ${tab}public static Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, List<${name}>>> get${index.name?cap_first}All() {
+        ${tab}return _${index.name}Configs;
     ${tab}}
 
     ${tab}public static Map<${index.fields[1].classType}, List<${name}>> get${index.suffix}(${index.fields[0].basicType} ${index.fields[0].name}) {
-        ${tab}return ${index.name}Configs.getOrDefault(${index.fields[0].name}, Collections.emptyMap());
+        ${tab}return _${index.name}Configs.getOrDefault(${index.fields[0].name}, Collections.emptyMap());
     ${tab}}
 
     ${tab}public static List<${name}> get${index.suffix}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name}) {
@@ -270,12 +270,12 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
     ${tab}}
 
         <#elseif index.unique && index.fields?size==3>
-    ${tab}public static Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, ${name}>>> get${index.name?cap_first}Configs() {
-        ${tab}return ${index.name}Configs;
+    ${tab}public static Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, ${name}>>> get${index.name?cap_first}All() {
+        ${tab}return _${index.name}Configs;
     ${tab}}
 
     ${tab}public static Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, ${name}>> get${index.suffix}(${index.fields[0].basicType} ${index.fields[0].name}) {
-        ${tab}return ${index.name}Configs.getOrDefault(${index.fields[0].name}, Collections.emptyMap());
+        ${tab}return _${index.name}Configs.getOrDefault(${index.fields[0].name}, Collections.emptyMap());
     ${tab}}
 
     ${tab}public static Map<${index.fields[2].classType}, ${name}> get${index.suffix}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name}) {
@@ -287,12 +287,12 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
     ${tab}}
 
         <#elseif index.normal && index.fields?size==3>
-    ${tab}public static Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, List<${name}>>>> get${index.name?cap_first}Configs() {
-        ${tab}return ${index.name}Configs;
+    ${tab}public static Map<${index.fields[0].classType}, Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, List<${name}>>>> get${index.name?cap_first}All() {
+        ${tab}return _${index.name}Configs;
     ${tab}}
 
     ${tab}public static Map<${index.fields[1].classType}, Map<${index.fields[2].classType}, List<${name}>>> get${index.suffix}(${index.fields[0].basicType} ${index.fields[0].name}) {
-        ${tab}return ${index.name}Configs.getOrDefault(${index.fields[0].name}, Collections.emptyMap());
+        ${tab}return _${index.name}Configs.getOrDefault(${index.fields[0].name}, Collections.emptyMap());
     ${tab}}
 
     ${tab}public static Map<${index.fields[2].classType}, List<${name}>> get${index.suffix}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name}) {
@@ -306,11 +306,6 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
         </#if>
     </#list>
 
-    ${tab}/**
-     ${tab}* 加载配置，建立索引
-     ${tab}* @param configs 所有配置
-     ${tab}* @return 错误信息
-     ${tab}*/
     ${tab}@SuppressWarnings({"unchecked"})
     ${tab}private static List<String> load(List<${name}> configs) {
     <#list indexes as index>
@@ -354,9 +349,9 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
         ${tab}${index.name}Configs = unmodifiableMap(${index.name}Configs);
     </#list>
 
-        ${tab}${name}.<#if parent??>self.</#if>configs = configs;
+        ${tab}${name}.<#if parent??>self.</#if>_configs = configs;
     <#list indexes as index>
-        ${tab}${name}.<#if parent??>self.</#if>${index.name}Configs = ${index.name}Configs;
+        ${tab}${name}.<#if parent??>self.</#if>_${index.name}Configs = ${index.name}Configs;
     </#list>
 
         ${tab}return errors;

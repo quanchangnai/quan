@@ -25,7 +25,7 @@ local ${index.name}Configs = {}
 local function loadConfigs()
 <#list children as child>
     local ${child.name} = require("${child.getFullName("lua")}")
-    for i, ${child.name?uncap_first} in ipairs(${child.name}.getConfigs()) do
+    for i, ${child.name?uncap_first} in ipairs(${child.name}.getAll()) do
         table.insert(configs, ${child.name?uncap_first})
     end
 
@@ -53,12 +53,19 @@ local ${name} = {}
 ---
 ---获取所有${name}
 ---@return list<${name}>
-function ${name}.getConfigs()
+function ${name}.getAll()
     return configs
 end
 
 <#list indexes as index>
    <#if index.unique && index.fields?size==1>
+---
+---获取所有${name}
+---@return map<${index.fields[0].name}:${index.fields[0].type},${name}>
+function ${name}.get${index.name?cap_first}All()
+     return ${index.name}Configs
+end
+
 ---
 ---通过索引[${index.name}]获取${name}
 ---@overload fun():map<${index.fields[0].name}:${index.fields[0].type},${name}>
@@ -73,6 +80,13 @@ end
 
    <#elseif index.normal && index.fields?size==1>
 ---
+---获取所有${name}
+---@return map<${index.fields[0].name}:${index.fields[0].type},list<${name}>> 
+function ${name}.get${index.name?cap_first}All()
+     return ${index.name}Configs
+end
+
+---
 ---通过索引[${index.name}]获取${name}
 ---@overload fun():map<${index.fields[0].name}:${index.fields[0].type},list<${name}>> 
 ---@param ${index.fields[0].name} ${index.fields[0].type} ${index.fields[0].comment}
@@ -82,6 +96,13 @@ function ${name}.get${index.suffix}(${index.fields[0].name})
 end
 
    <#elseif index.unique && index.fields?size==2>
+---
+---获取所有${name}
+---@return map<${index.fields[0].name}:${index.fields[0].type},map<${index.fields[1].name}:${index.fields[1].type},${name}>>
+function ${name}.get${index.name?cap_first}All()
+     return ${index.name}Configs
+end
+
 ---
 ---通过索引[${index.name}]获取${name}
 ---@overload fun():map<${index.fields[0].name}:${index.fields[0].type},map<${index.fields[1].name}:${index.fields[1].type},${name}>>
@@ -104,6 +125,13 @@ end
 
    <#elseif index.normal && index.fields?size==2>
 ---
+---获取所有${name}
+---@return map<${index.fields[0].name}:${index.fields[0].type},map<${index.fields[1].name}:${index.fields[1].type},list<${name}>>>
+function ${name}.get${index.name?cap_first}All()
+     return ${index.name}Configs
+end
+
+---
 ---通过索引[${index.name}]获取${name}
 ---@overload fun():map<${index.fields[0].name}:${index.fields[0].type},map<${index.fields[1].name}:${index.fields[1].type},list<${name}>>>
 ---@overload fun(${index.fields[0].name}:${index.fields[0].type}):map<${index.fields[1].name}:${index.fields[1].type},list<${name}>>
@@ -123,6 +151,13 @@ function ${name}.get${index.suffix}(${index.fields[0].name}, ${index.fields[1].n
 end
 
    <#elseif index.unique && index.fields?size==3>
+---
+---获取所有${name}
+---@return map<${index.fields[0].name}:${index.fields[0].type},map<${index.fields[1].name}:${index.fields[1].type},map<${index.fields[2].name}:${index.fields[2].type},${name}>>>
+function ${name}.get${index.name?cap_first}All()
+     return ${index.name}Configs
+end
+
 ---
 ---通过索引[${index.name}]获取${name}
 ---@overload fun():map<${index.fields[0].name}:${index.fields[0].type},map<${index.fields[1].name}:${index.fields[1].type},map<${index.fields[2].name}:${index.fields[2].type},${name}>>>
@@ -151,6 +186,13 @@ function ${name}.get${index.suffix}(${index.fields[0].name}, ${index.fields[1].n
 end
 
    <#elseif index.normal && index.fields?size==3>
+---
+---获取所有${name}
+---@return map<${index.fields[0].name}:${index.fields[0].type},map<${index.fields[1].name}:${index.fields[1].type},map<${index.fields[2].name}:${index.fields[2].type},list<${name}>>>>
+function ${name}.get${index.name?cap_first}All()
+     return ${index.name}Configs
+end
+
 ---
 ---通过索引[${index.name}]获取${name}
 ---@overload fun():map<${index.fields[0].name}:${index.fields[0].type},map<${index.fields[1].name}:${index.fields[1].type},map<${index.fields[2].name}:${index.fields[2].type},list<${name}>>>>

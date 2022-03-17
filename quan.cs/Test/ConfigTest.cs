@@ -20,7 +20,7 @@ namespace Test
             var configLoader = new ConfigLoader {JsonPath = jsonPath, NamespacePrefix = namespacePrefix, ConfigAssemblies = {assemblyName}};
             configLoader.Load();
 
-            foreach (var config in ItemConfig.GetIdConfigs().Values)
+            foreach (var config in ItemConfig.GetIdAll().Values)
             {
                 Console.WriteLine(config);
             }

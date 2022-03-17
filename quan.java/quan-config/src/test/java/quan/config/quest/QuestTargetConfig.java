@@ -51,29 +51,24 @@ public class QuestTargetConfig extends Config {
 
 
     //所有QuestTargetConfig
-    private static volatile List<QuestTargetConfig> configs = Collections.emptyList();
+    private static volatile List<QuestTargetConfig> _configs = Collections.emptyList();
 
     //索引:ID
-    private static volatile Map<Integer, QuestTargetConfig> idConfigs = Collections.emptyMap();
+    private static volatile Map<Integer, QuestTargetConfig> _idConfigs = Collections.emptyMap();
 
-    public static List<QuestTargetConfig> getConfigs() {
-        return configs;
+    public static List<QuestTargetConfig> getAll() {
+        return _configs;
     }
 
-    public static Map<Integer, QuestTargetConfig> getIdConfigs() {
-        return idConfigs;
+    public static Map<Integer, QuestTargetConfig> getIdAll() {
+        return _idConfigs;
     }
 
     public static QuestTargetConfig get(int id) {
-        return idConfigs.get(id);
+        return _idConfigs.get(id);
     }
 
 
-    /**
-     * 加载配置，建立索引
-     * @param configs 所有配置
-     * @return 错误信息
-     */
     @SuppressWarnings({"unchecked"})
     private static List<String> load(List<QuestTargetConfig> configs) {
         Map<Integer, QuestTargetConfig> idConfigs = new HashMap<>();
@@ -87,8 +82,8 @@ public class QuestTargetConfig extends Config {
         configs = Collections.unmodifiableList(configs);
         idConfigs = unmodifiableMap(idConfigs);
 
-        QuestTargetConfig.configs = configs;
-        QuestTargetConfig.idConfigs = idConfigs;
+        QuestTargetConfig._configs = configs;
+        QuestTargetConfig._idConfigs = idConfigs;
 
         return errors;
     }

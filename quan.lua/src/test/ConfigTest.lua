@@ -16,7 +16,7 @@ function testConfig()
     print()
 
     print("ItemConfig=====")
-    for i, v in ipairs(ItemConfig.getConfigs()) do
+    for i, v in ipairs(ItemConfig.getAll()) do
         print(v.id, v.name)
     end
     print()

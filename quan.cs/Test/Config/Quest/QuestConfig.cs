@@ -208,12 +208,12 @@ namespace Test.Config.Quest
         // 索引:三字段普通索引
         private static volatile IDictionary<string, IDictionary<int, IDictionary<int, IList<QuestConfig>>>> _composite4Configs = new Dictionary<string, IDictionary<int, IDictionary<int, IList<QuestConfig>>>>();
 
-        public static IList<QuestConfig> GetConfigs()
+        public static IList<QuestConfig> GetAll()
         {
             return _configs;
         }
 
-        public static IDictionary<int, QuestConfig> GetIdConfigs()
+        public static IDictionary<int, QuestConfig> GetIdAll()
         {
             return _idConfigs;
         }
@@ -224,7 +224,7 @@ namespace Test.Config.Quest
             return result;
         }
 
-        public static IDictionary<QuestType, IList<QuestConfig>> GetTypeConfigs()
+        public static IDictionary<QuestType, IList<QuestConfig>> GetTypeAll()
         {
             return _typeConfigs;
         }
@@ -235,7 +235,7 @@ namespace Test.Config.Quest
             return result ?? ImmutableList<QuestConfig>.Empty;
         }
 
-        public static IDictionary<int, IDictionary<int, QuestConfig>> GetComposite1Configs()
+        public static IDictionary<int, IDictionary<int, QuestConfig>> GetComposite1All()
         {
             return _composite1Configs;
         }
@@ -252,7 +252,7 @@ namespace Test.Config.Quest
             return result;
         }
 
-        public static IDictionary<int, IDictionary<bool, IList<QuestConfig>>> GetComposite2Configs()
+        public static IDictionary<int, IDictionary<bool, IList<QuestConfig>>> GetComposite2All()
         {
             return _composite2Configs;
         }
@@ -269,7 +269,7 @@ namespace Test.Config.Quest
             return result ?? ImmutableList<QuestConfig>.Empty;
         }
 
-        public static IDictionary<string, IDictionary<int, IDictionary<int, QuestConfig>>> GetComposite3Configs()
+        public static IDictionary<string, IDictionary<int, IDictionary<int, QuestConfig>>> GetComposite3All()
         {
             return _composite3Configs;
         }
@@ -292,7 +292,7 @@ namespace Test.Config.Quest
             return result;
         }
 
-        public static IDictionary<string, IDictionary<int, IDictionary<int, IList<QuestConfig>>>> GetComposite4Configs()
+        public static IDictionary<string, IDictionary<int, IDictionary<int, IList<QuestConfig>>>> GetComposite4All()
         {
             return _composite4Configs;
         }
