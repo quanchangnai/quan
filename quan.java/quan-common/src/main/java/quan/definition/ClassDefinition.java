@@ -16,7 +16,7 @@ public abstract class ClassDefinition extends Definition {
 
     public static final Pattern NAME_PATTERN = Pattern.compile("[A-Z][a-zA-Z\\d]*");
 
-    //不含前缀的默认包名，
+    //不含前缀的默认包名
     private String packageName;
 
     //不同语言对应的不含前缀的包名，为空时使用默认包名
@@ -140,7 +140,7 @@ public abstract class ClassDefinition extends Definition {
      * 和具体语言环境无关的[不含前缀的包名.类名]
      */
     public static String getLongClassName(ClassDefinition classDefinition, String className) {
-        if (!isBlank(className) && !className.contains(".")) {
+        if (!isBlank(classDefinition.getPackageName()) && !isBlank(className) && !className.contains(".")) {
             className = classDefinition.getPackageName() + "." + className;
         }
         return className;
