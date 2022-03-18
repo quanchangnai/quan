@@ -133,10 +133,20 @@ namespace ${getFullPackageName("cs")}
             switch (clazz) 
             {
                 <#list dependentChildren?keys as key>
-                case "${dependentChildren[key].left}":
-                    return ${dependentChildren[key].right}.Create(json);
+                    <#assign childPackageName>
+                        <#if key?contains('.')>${key?substring(0,key?last_index_of('.'))}<#else></#if><#t>
+                    </#assign>
+                    <#assign childClassName>
+                        <#if key?contains('.')>${key?substring(key?last_index_of('.')+1)}<#else>${key}</#if><#t>
+                    </#assign>
+                <#if childPackageName == packageName>
+                case "${childClassName}":
+                </#if>
+                case "${key}":
+                    return ${dependentChildren[key]}.Create(json);
                 </#list> 
                 case "${name}":
+                case "${longName}":
                     return new ${name}(json);
                 default:
                     return null;   

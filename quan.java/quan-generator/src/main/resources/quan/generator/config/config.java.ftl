@@ -2,12 +2,12 @@ package ${getFullPackageName("java")};
 
 import com.alibaba.fastjson.*;
 <#if (!(parentClassName??) || kind == 6)>
-<#if getFullPackageName("java")!="quan.config">
+    <#if getFullPackageName("java")!="quan.config">
 import quan.config.*;
-</#if>
-<#if getFullPackageName("java")!="quan.config.loader">
+    </#if>
+    <#if kind == 6 && getFullPackageName("java")!="quan.config.loader">
 import quan.config.loader.ConfigLoader;
-</#if>
+    </#if>
 </#if>
 <#list imports?keys as import>
 import ${import};
@@ -56,9 +56,11 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
     </#if>
     <#if field.simpleRef>
 
+    <#if field.comment !="">
     /**
      * ${field.comment}
      */
+    </#if>
         <#if field.refIndex.unique>
     public final ${field.refType} ${field.name}Ref() {
         <#else >
@@ -156,10 +158,20 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
         String clazz = json.getOrDefault("class", "").toString();
         switch (clazz) {
             <#list dependentChildren?keys as key>
-            case "${dependentChildren[key].left}":
-                return ${dependentChildren[key].right}.create(json);
+                <#assign childPackageName>
+                    <#if key?contains('.')>${key?substring(0,key?last_index_of('.'))}<#else></#if><#t>
+                </#assign>
+                <#assign childClassName>
+                    <#if key?contains('.')>${key?substring(key?last_index_of('.')+1)}<#else>${key}</#if><#t>
+                </#assign>
+            <#if childPackageName == packageName>
+            case "${childClassName}":
+            </#if>
+            case "${key}":
+                return ${dependentChildren[key]}.create(json);
             </#list>
             case "${name}":
+            case "${longName}":
                 return new ${name}(json);
             default:
                 return null;

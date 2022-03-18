@@ -2,7 +2,6 @@ package quan.config.item;
 
 import com.alibaba.fastjson.*;
 import quan.config.*;
-import quan.config.loader.ConfigLoader;
 
 /**
  * 使用效果<br/>
@@ -23,12 +22,16 @@ public class UseEffect extends Bean {
         String clazz = json.getOrDefault("class", "").toString();
         switch (clazz) {
             case "UseEffect4":
+            case "item.UseEffect4":
                 return UseEffect4.create(json);
             case "UseEffect3":
+            case "item.UseEffect3":
                 return UseEffect3.create(json);
             case "UseEffect2":
+            case "item.UseEffect2":
                 return UseEffect2.create(json);
             case "UseEffect":
+            case "item.UseEffect":
                 return new UseEffect(json);
             default:
                 return null;

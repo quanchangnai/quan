@@ -6,6 +6,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import quan.definition.*;
+import quan.definition.DependentSource.DependentType;
+import quan.definition.parser.DefinitionParser;
+import quan.definition.parser.XmlDefinitionParser;
 import quan.generator.config.CSharpConfigGenerator;
 import quan.generator.config.JavaConfigGenerator;
 import quan.generator.config.LuaConfigGenerator;
@@ -13,10 +17,6 @@ import quan.generator.data.DataGenerator;
 import quan.generator.message.CSharpMessageGenerator;
 import quan.generator.message.JavaMessageGenerator;
 import quan.generator.message.LuaMessageGenerator;
-import quan.definition.*;
-import quan.definition.DependentSource.DependentType;
-import quan.definition.parser.DefinitionParser;
-import quan.definition.parser.XmlDefinitionParser;
 import quan.util.CommonUtils;
 
 import java.io.*;
@@ -272,7 +272,7 @@ public abstract class Generator {
         //不同包下的同名类依赖
         Map<String, TreeMap<DependentSource, ClassDefinition>> dependentsClasses = classDefinition.getDependentsClasses();
         for (String dependentName : dependentsClasses.keySet()) {
-            ClassDefinition simpleNameClassDefinition = null;
+            ClassDefinition simpleNameClassDefinition = null;//同名类中只有一个可以使用简单类名
             TreeMap<DependentSource, ClassDefinition> dependentClasses = dependentsClasses.get(dependentName);
             for (DependentSource dependentSource : dependentClasses.keySet()) {
                 ClassDefinition dependentClassDefinition = dependentClasses.get(dependentSource);
@@ -301,9 +301,8 @@ public abstract class Generator {
                     } else if (dependentSource.getType() == DependentType.PARENT) {
                         ((BeanDefinition) dependentSource.getOwnerDefinition()).setParentClassName(dependentClassFullName);
                     } else if (dependentSource.getType() == DependentType.CHILD) {
-                        ((BeanDefinition) dependentSource.getOwnerDefinition()).getDependentChildren().get(classDefinition.getLongName()).setRight(dependentClassFullName);
+                        ((BeanDefinition) dependentSource.getOwnerDefinition()).getDependentChildren().put(dependentClassDefinition.getLongName(),dependentClassFullName);
                     }
-                    //消息头没有同名类
                 }
             }
         }
@@ -319,19 +318,27 @@ public abstract class Generator {
         String packageName = ownerClassDefinition.getPackageName(language);
         String fullPackageName = ownerClassDefinition.getFullPackageName(language);
         String dependentFullPackageName = dependentClassDefinition.getFullPackageName(language);
-        ClassDefinition packagedClassDefinition = packagesClasses.get(packageName).get(dependentClassDefinition.getName());
 
         if (language == Language.java) {
-            if (simpleNameClassDefinition == null) {
+            if (ownerClassDefinition.getName().equals(dependentClassDefinition.getName())) {
+                return Pair.of(true, false);
+            } else if (simpleNameClassDefinition == null) {
                 return fullPackageName.equals(dependentFullPackageName) ? Pair.of(false, false) : Pair.of(false, true);
             } else {
                 return dependentClassDefinition == simpleNameClassDefinition ? Pair.of(false, false) : Pair.of(true, false);
             }
         } else if (language == Language.cs) {
-            if (packagedClassDefinition == null) {
-                return Pair.of(false, true);
+            ClassDefinition packagedClassDefinition = packagesClasses.get(packageName).get(dependentClassDefinition.getName());
+            if (ownerClassDefinition.getName().equals(dependentClassDefinition.getName())) {
+                return Pair.of(true, false);
+            }else if (simpleNameClassDefinition == null) {
+                if (packagedClassDefinition == null) {
+                    return Pair.of(false, true);
+                }
+                return packagedClassDefinition == dependentClassDefinition ? Pair.of(false, false) : Pair.of(true, false);
+            }else {
+                return dependentClassDefinition == simpleNameClassDefinition ? Pair.of(false, false) : Pair.of(true, false);
             }
-            return packagedClassDefinition == dependentClassDefinition ? Pair.of(false, false) : Pair.of(true, false);
         } else {
             //lua
             if (simpleNameClassDefinition == null || simpleNameClassDefinition == dependentClassDefinition) {

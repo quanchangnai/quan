@@ -15,6 +15,11 @@ subprojects {
         options.encoding = 'UTF-8'
     }
 
+    javadoc {
+        options.addStringOption('Xdoclint:none', '-quiet')
+        options.addStringOption('encoding', 'UTF-8')
+    }
+
     idea.module {
         def outputPath = "$projectDir${File.separator}build${File.separator}out${File.separator}"
         outputDir file("${outputPath}main")

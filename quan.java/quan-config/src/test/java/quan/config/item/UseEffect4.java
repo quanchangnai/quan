@@ -11,9 +11,6 @@ public class UseEffect4 extends UseEffect {
 
     public final ItemType itemType;
 
-    /**
-     * 
-     */
     public final List<ItemConfig> itemTypeRef() {
         return ItemConfig.getByType(itemType);
     }

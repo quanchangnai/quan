@@ -24,12 +24,16 @@ namespace Test.Config.Item
             switch (clazz) 
             {
                 case "UseEffect4":
+                case "item.UseEffect4":
                     return UseEffect4.Create(json);
                 case "UseEffect3":
+                case "item.UseEffect3":
                     return UseEffect3.Create(json);
                 case "UseEffect2":
+                case "item.UseEffect2":
                     return UseEffect2.Create(json);
                 case "UseEffect":
+                case "item.UseEffect":
                     return new UseEffect(json);
                 default:
                     return null;   
