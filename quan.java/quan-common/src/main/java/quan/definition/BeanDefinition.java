@@ -1,7 +1,6 @@
 package quan.definition;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.MutablePair;
 import quan.definition.DependentSource.DependentType;
 import quan.definition.config.ConfigDefinition;
 
@@ -19,12 +18,10 @@ public class BeanDefinition extends ClassDefinition {
     //和具体语言相关的父类名，可能会包含包名
     protected String parentClassName;
 
-    //配置的所有后代类
-    protected Set<String> descendantLongNames = new HashSet<>();
+    //配置的所有后代类，key：长类名
+    protected TreeMap<String,BeanDefinition> descendants = new TreeMap<>();
 
-    private TreeSet<String> meAndDescendantLongNames = new TreeSet<>();
-
-    private TreeSet<String> meAndDescendantShortNames = new TreeSet<>();
+    private TreeMap<String,BeanDefinition> meAndDescendants = new TreeMap<>();
 
     //配置的所有子类
     protected Set<BeanDefinition> children = new HashSet<>();
@@ -121,22 +118,14 @@ public class BeanDefinition extends ClassDefinition {
         return !children.isEmpty();
     }
 
-    public TreeSet<String> getMeAndDescendantLongNames() {
-        if (meAndDescendantLongNames.isEmpty()) {
-            meAndDescendantLongNames.addAll(descendantLongNames);
-            meAndDescendantLongNames.add(getLongName());
+    public TreeMap<String,BeanDefinition> getMeAndDescendants() {
+        if (meAndDescendants.isEmpty()) {
+            meAndDescendants.putAll(descendants);
+            meAndDescendants.put(getLongName(),this);
         }
-        return meAndDescendantLongNames;
+        return meAndDescendants;
     }
 
-    public TreeSet<String> getMeAndDescendantShortNames() {
-        if (meAndDescendantShortNames.isEmpty()) {
-            for (String meAndDescendantLongName : getMeAndDescendantLongNames()) {
-                meAndDescendantShortNames.add(getShortClassName(meAndDescendantLongName));
-            }
-        }
-        return meAndDescendantShortNames;
-    }
 
     public int getDescendantMaxFieldCount() {
         return descendantMaxFieldCount == 0 ? fields.size() : descendantMaxFieldCount;
@@ -207,7 +196,7 @@ public class BeanDefinition extends ClassDefinition {
                 fields.add(0, parentField);
             }
 
-            parent.descendantLongNames.add(getLongName());
+            parent.descendants.put(getLongName(),this);
             parent = parent.getParent();
         }
 

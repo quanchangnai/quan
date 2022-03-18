@@ -107,8 +107,8 @@ public class ConfigDefinition extends BeanDefinition {
             return allTables;
         }
 
-        for (String configName : getMeAndDescendantLongNames()) {
-            ConfigDefinition configDefinition = parser.getConfig(configName);
+        for (String configLongName : getMeAndDescendants().keySet()) {
+            ConfigDefinition configDefinition = parser.getConfig(configLongName);
             if (configDefinition == null) {
                 continue;
             }

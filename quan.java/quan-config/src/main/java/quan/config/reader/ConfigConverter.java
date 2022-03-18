@@ -97,7 +97,11 @@ public class ConfigConverter {
         if (columnNum == fieldDefinition.getColumnNums().get(0)) {
             if (beanDefinition.hasChild()) {
                 //第1列是类名
-                if (beanDefinition.getMeAndDescendantShortNames().contains(columnValue)) {
+                String className = columnValue;
+                if (!columnValue.contains(".")) {
+                    className = beanDefinition.getPackageName() + "." + columnValue;
+                }
+                if (beanDefinition.getMeAndDescendants().containsKey(className)) {
                     object = new JSONObject();
                     object.put("class", columnValue);
                 } else if (!StringUtils.isBlank(columnValue)) {
@@ -428,12 +432,16 @@ public class ConfigConverter {
         //有子类，按具体类型转换
         boolean beanHasChild = beanDefinition.hasChild();
         if (beanHasChild) {
-            String beanClass = values[0];
-            if (!beanDefinition.getMeAndDescendantShortNames().contains(beanClass)) {
-                throw new ConvertException(ConvertException.ErrorType.TYPE_ERROR, beanClass, beanDefinition.getName());
+            String className = values[0];
+            if (!values[0].contains(".")) {
+                className = beanDefinition.getPackageName() + "." + values[0];
             }
-            object.put("class", beanClass);
-            beanDefinition = parser.getBean(getLongClassName(owner, beanClass));
+            if (beanDefinition.getMeAndDescendants().containsKey(className)) {
+                object.put("class", className);
+                beanDefinition = parser.getBean(getLongClassName(owner, className));
+            } else {
+                throw new ConvertException(ConvertException.ErrorType.TYPE_ERROR, values[0], beanDefinition.getName());
+            }
         }
 
         for (int i = 0; i < beanDefinition.getFields().size(); i++) {
