@@ -20,7 +20,7 @@ public class CSVDefinitionParser extends TableDefinitionParser {
     }
 
     @Override
-    protected String definitionFileType() {
+    public String getDefinitionType() {
         return "csv";
     }
 

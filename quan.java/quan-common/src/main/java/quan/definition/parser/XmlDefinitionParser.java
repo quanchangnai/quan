@@ -36,7 +36,7 @@ public class XmlDefinitionParser extends DefinitionParser {
 
 
     @Override
-    protected String definitionFileType() {
+    public String getDefinitionType() {
         return "xml";
     }
 

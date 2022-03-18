@@ -14,7 +14,6 @@ import quan.config.reader.JsonConfigReader;
 import quan.definition.*;
 import quan.definition.config.ConfigDefinition;
 import quan.definition.parser.DefinitionParser;
-import quan.definition.parser.TableDefinitionParser;
 import quan.definition.parser.XmlDefinitionParser;
 import quan.util.CommonUtils;
 
@@ -22,6 +21,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
+
+import static quan.config.reader.ConfigReader.getMinTableBodyStartRow;
 
 /**
  * 使用配置定义的配置加载器，根据配置定义实现了索引、引用校验等<br/>
@@ -43,21 +44,16 @@ public class DefinitionConfigLoader extends ConfigLoader {
         super(tablePath);
     }
 
-    private int getMinTableBodyStartRow() {
-        if (parser instanceof TableDefinitionParser) {
-            return 4;
-        } else {
-            return 2;
-        }
-    }
 
     /**
      * 设置表格正文起始行号
      */
     public void setTableBodyStartRow(int tableBodyStartRow) {
-        if (tableBodyStartRow >= getMinTableBodyStartRow() && this.tableBodyStartRow == 0) {
-            this.tableBodyStartRow = tableBodyStartRow;
+        int minTableBodyStartRow = getMinTableBodyStartRow(parser.getDefinitionType());
+        if (tableBodyStartRow < minTableBodyStartRow) {
+            throw new IllegalArgumentException("表格正文起始行号不能小于" + minTableBodyStartRow);
         }
+        this.tableBodyStartRow = tableBodyStartRow;
     }
 
     public void setLoadMode(LoadMode loadMode) {
@@ -95,7 +91,7 @@ public class DefinitionConfigLoader extends ConfigLoader {
         parser.setCategory(Category.config);
         this.parser = parser;
         if (tableBodyStartRow == 0) {
-            tableBodyStartRow = getMinTableBodyStartRow();
+            tableBodyStartRow = getMinTableBodyStartRow(parser.getDefinitionType());
         }
     }
 

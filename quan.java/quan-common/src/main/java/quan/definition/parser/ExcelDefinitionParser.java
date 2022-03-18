@@ -26,7 +26,7 @@ public class ExcelDefinitionParser extends TableDefinitionParser {
     }
 
     @Override
-    protected String definitionFileType() {
+    public String getDefinitionType() {
         return definitionType;
     }
 

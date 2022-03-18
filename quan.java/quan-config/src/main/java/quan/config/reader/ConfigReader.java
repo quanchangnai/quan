@@ -9,6 +9,7 @@ import quan.definition.BeanDefinition;
 import quan.definition.FieldDefinition;
 import quan.definition.Language;
 import quan.definition.config.ConfigDefinition;
+import quan.definition.parser.TableDefinitionParser;
 
 import java.io.File;
 import java.util.*;
@@ -29,8 +30,8 @@ public abstract class ConfigReader {
 
     protected ConfigConverter converter;
 
-    //表格正文开始行号，默认是第3行，第1行固定是表头，中间是注释等，行号从1开始
-    protected int tableBodyStartRow = 3;
+    //表格正文开始行号(从1开始计数)
+    protected int tableBodyStartRow = 2;
 
     protected Config prototype;
 
@@ -82,10 +83,12 @@ public abstract class ConfigReader {
     }
 
     public ConfigReader setTableBodyStartRow(int tableBodyStartRow) {
-        if (tableBodyStartRow > 1) {
-            this.tableBodyStartRow = tableBodyStartRow;
-        }
+        this.tableBodyStartRow = tableBodyStartRow;
         return this;
+    }
+
+    public static int getMinTableBodyStartRow(String definitionType) {
+        return  definitionType.equals("xml") ? 2 : 4;
     }
 
     public ConfigDefinition getConfigDefinition() {

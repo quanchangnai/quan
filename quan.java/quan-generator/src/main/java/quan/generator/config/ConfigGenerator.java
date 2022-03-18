@@ -18,6 +18,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
+import static quan.config.reader.ConfigReader.getMinTableBodyStartRow;
+
 /**
  * Created by quanchangnai on 2019/7/11.
  */
@@ -92,7 +94,7 @@ public abstract class ConfigGenerator extends Generator {
             throw new IllegalArgumentException(category().alias() + "的表格文件路径[tablePath]不能为空");
         }
 
-        int minTableBodyStartRow = definitionType.equals("xml") ? 2 : 4;
+        int minTableBodyStartRow = getMinTableBodyStartRow(definitionType);
         if (!StringUtils.isBlank(this.tableBodyStartRow)) {
             try {
                 int tableBodyStartRow = Integer.parseInt(this.tableBodyStartRow);

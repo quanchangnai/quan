@@ -64,7 +64,7 @@ public abstract class DefinitionParser {
         for (String path : definitionPaths) {
             path = CommonUtils.toPlatPath(path);
             this.definitionPaths.add(path);
-            Set<File> files = CommonUtils.listFiles(new File(path), definitionFileType());
+            Set<File> files = CommonUtils.listFiles(new File(path), getDefinitionType());
             definitionFiles.addAll(files);
         }
     }
@@ -136,7 +136,7 @@ public abstract class DefinitionParser {
         return validatedErrors;
     }
 
-    protected abstract String definitionFileType();
+    public abstract String getDefinitionType();
 
     public void parse() {
         Objects.requireNonNull(category);
