@@ -101,7 +101,7 @@ public class ConfigConverter {
                 if (!columnValue.contains(".")) {
                     className = getLongClassName(beanDefinition, columnValue);
                 }
-                if (beanDefinition.getMeAndDescendants().containsKey(className)) {
+                if (beanDefinition.getMeAndDescendants().contains(className)) {
                     object = new JSONObject();
                     object.put("class", columnValue);
                 } else if (!StringUtils.isBlank(columnValue)) {
@@ -439,7 +439,7 @@ public class ConfigConverter {
             if (!values[0].contains(".")) {
                 className = getLongClassName(beanDefinition, values[0]);
             }
-            if (beanDefinition.getMeAndDescendants().containsKey(className)) {
+            if (beanDefinition.getMeAndDescendants().contains(className)) {
                 object.put("class", values[0]);
                 beanDefinition = parser.getBean(getLongClassName(owner, className));
             } else {

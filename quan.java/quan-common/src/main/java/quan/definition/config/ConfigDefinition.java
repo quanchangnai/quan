@@ -79,7 +79,7 @@ public class ConfigDefinition extends BeanDefinition {
 
     @Override
     public ConfigDefinition getParent() {
-        return parser.getConfig(getWholeParentName());
+        return parser.getConfig(getParentLongName());
     }
 
     public ConfigDefinition setTable(String table) {
@@ -107,7 +107,7 @@ public class ConfigDefinition extends BeanDefinition {
             return allTables;
         }
 
-        for (String configLongName : getMeAndDescendants().keySet()) {
+        for (String configLongName : getMeAndDescendants()) {
             ConfigDefinition configDefinition = parser.getConfig(configLongName);
             if (configDefinition == null) {
                 continue;

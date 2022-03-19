@@ -179,7 +179,7 @@ public class ConfigTest {
         QuestConfig.getAll().forEach(System.err::println);
 
         System.err.println("CardConfig============");
-        CardConfig.getConfigs().forEach(System.err::println);
+        CardConfig.getAll().forEach(System.err::println);
 
         System.err.println("printConfigs end============");
     }

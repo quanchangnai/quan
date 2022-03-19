@@ -236,7 +236,7 @@ public class DefinitionConfigLoader extends ConfigLoader {
         if (tableType == TableType.json) {
             //Json的表名实际上就是不含前缀包名的配置类名
             List<String> configTables = new ArrayList<>();
-            for (String configLongName : configDefinition.getMeAndDescendants().keySet()) {
+            for (String configLongName : configDefinition.getMeAndDescendants()) {
                 ConfigDefinition configDefinition1 = parser.getConfig(configLongName);
                 configTables.add(configDefinition1.getPackageName(Language.java) + "." + configDefinition1.getName());
             }

@@ -1,7 +1,8 @@
 package quan.config;
 
-import java.util.*;
 import com.alibaba.fastjson.*;
+import quan.config.loader.ConfigLoader;
+import java.util.*;
 
 /**
  * CardConfig<br/>
@@ -9,32 +10,50 @@ import com.alibaba.fastjson.*;
  */
 public class CardConfig extends Config {
 
-    //ID
-    protected final int id;
+    /**
+     * ID
+     */
+    public final int id;
 
-    //常量Key
-    protected final String key;
+    /**
+     * 常量Key
+     */
+    public final String key;
 
-    //名字
-    protected final String name;
+    /**
+     * 名字
+     */
+    public final String name;
 
-    //类型
-    protected final int type;
+    /**
+     * 类型
+     */
+    public final int type;
 
-    //List
-    protected final List<Integer> list;
+    /**
+     * List
+     */
+    public final List<Integer> list;
 
-    //Set
-    protected final Set<Integer> set;
+    /**
+     * Set
+     */
+    public final Set<Integer> set;
 
-    //Map
-    protected final Map<Integer, Integer> map;
+    /**
+     * Map
+     */
+    public final Map<Integer, Integer> map;
 
-    //生效时间
-    protected final Date effectiveTime;
+    /**
+     * 生效时间
+     */
+    public final Date effectiveTime;
 
-    //生效时间
-    protected final String effectiveTime_;
+    /**
+     * 生效时间
+     */
+    public final String effectiveTime_;
 
 
     public CardConfig(JSONObject json) {
@@ -76,70 +95,6 @@ public class CardConfig extends Config {
         this.effectiveTime_ = json.getOrDefault("effectiveTime_", "").toString();
     }
 
-    /**
-     * ID
-     */
-    public final int getId() {
-        return id;
-    }
-
-    /**
-     * 常量Key
-     */
-    public final String getKey() {
-        return key;
-    }
-
-    /**
-     * 名字
-     */
-    public final String getName() {
-        return name;
-    }
-
-    /**
-     * 类型
-     */
-    public final int getType() {
-        return type;
-    }
-
-    /**
-     * List
-     */
-    public final List<Integer> getList() {
-        return list;
-    }
-
-    /**
-     * Set
-     */
-    public final Set<Integer> getSet() {
-        return set;
-    }
-
-    /**
-     * Map
-     */
-    public final Map<Integer, Integer> getMap() {
-        return map;
-    }
-
-    /**
-     * 生效时间
-     */
-    public final Date getEffectiveTime() {
-        return effectiveTime;
-    }
-
-    /**
-     * 生效时间
-     */
-    public final String getEffectiveTime_() {
-        return effectiveTime_;
-    }
-
-
     @Override
     public CardConfig create(JSONObject json) {
         return new CardConfig(json);
@@ -162,42 +117,37 @@ public class CardConfig extends Config {
 
 
     //所有CardConfig
-    private static volatile List<CardConfig> configs = new ArrayList<>();
+    private static volatile List<CardConfig> _configs = Collections.emptyList();
 
     //索引:ID
-    private static volatile Map<Integer, CardConfig> idConfigs = new HashMap<>();
+    private static volatile Map<Integer, CardConfig> _idConfigs = Collections.emptyMap();
 
     //索引:类型
-    private static volatile Map<Integer, List<CardConfig>> typeConfigs = new HashMap<>();
+    private static volatile Map<Integer, List<CardConfig>> _typeConfigs = Collections.emptyMap();
 
-    public static List<CardConfig> getConfigs() {
-        return configs;
+    public static List<CardConfig> getAll() {
+        return _configs;
     }
 
-    public static Map<Integer, CardConfig> getIdConfigs() {
-        return idConfigs;
+    public static Map<Integer, CardConfig> getIdAll() {
+        return _idConfigs;
     }
 
-    public static CardConfig getById(int id) {
-        return idConfigs.get(id);
+    public static CardConfig get(int id) {
+        return _idConfigs.get(id);
     }
 
-    public static Map<Integer, List<CardConfig>> getTypeConfigs() {
-        return typeConfigs;
+    public static Map<Integer, List<CardConfig>> getTypeAll() {
+        return _typeConfigs;
     }
 
     public static List<CardConfig> getByType(int type) {
-        return typeConfigs.getOrDefault(type, Collections.emptyList());
+        return _typeConfigs.getOrDefault(type, Collections.emptyList());
     }
 
 
-    /**
-     * 加载配置，建立索引
-     * @param configs 所有配置
-     * @return 错误信息
-     */
     @SuppressWarnings({"unchecked"})
-    public static List<String> load(List<CardConfig> configs) {
+    private static List<String> load(List<CardConfig> configs) {
         Map<Integer, CardConfig> idConfigs = new HashMap<>();
         Map<Integer, List<CardConfig>> typeConfigs = new HashMap<>();
 
@@ -212,11 +162,15 @@ public class CardConfig extends Config {
         idConfigs = unmodifiableMap(idConfigs);
         typeConfigs = unmodifiableMap(typeConfigs);
 
-        CardConfig.configs = configs;
-        CardConfig.idConfigs = idConfigs;
-        CardConfig.typeConfigs = typeConfigs;
+        CardConfig._configs = configs;
+        CardConfig._idConfigs = idConfigs;
+        CardConfig._typeConfigs = typeConfigs;
 
         return errors;
+    }
+
+    static {
+        ConfigLoader.registerLoadFunction(CardConfig.class, CardConfig::load);
     }
 
 }

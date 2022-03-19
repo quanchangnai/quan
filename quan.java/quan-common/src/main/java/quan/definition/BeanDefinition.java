@@ -18,10 +18,10 @@ public class BeanDefinition extends ClassDefinition {
     //和具体语言相关的父类名，可能会包含包名
     protected String parentClassName;
 
-    //配置的所有后代类，key：长类名
-    protected TreeMap<String,BeanDefinition> descendants = new TreeMap<>();
+    //配置的所有后代类长类名
+    protected TreeSet<String> descendants = new TreeSet<>();
 
-    private TreeMap<String,BeanDefinition> meAndDescendants = new TreeMap<>();
+    private TreeSet<String> meAndDescendants = new TreeSet<>();
 
     //配置的所有子类
     protected Set<BeanDefinition> children = new HashSet<>();
@@ -102,12 +102,12 @@ public class BeanDefinition extends ClassDefinition {
         return parentClassName;
     }
 
-    public String getWholeParentName() {
+    public String getParentLongName() {
         return getLongClassName(this, parentName);
     }
 
     public BeanDefinition getParent() {
-        return parser.getBean(getWholeParentName());
+        return parser.getBean(getParentLongName());
     }
 
     public Set<BeanDefinition> getChildren() {
@@ -118,10 +118,10 @@ public class BeanDefinition extends ClassDefinition {
         return !children.isEmpty();
     }
 
-    public TreeMap<String,BeanDefinition> getMeAndDescendants() {
+    public TreeSet<String> getMeAndDescendants() {
         if (meAndDescendants.isEmpty()) {
-            meAndDescendants.putAll(descendants);
-            meAndDescendants.put(getLongName(),this);
+            meAndDescendants.addAll(descendants);
+            meAndDescendants.add(getLongName());
         }
         return meAndDescendants;
     }
@@ -196,7 +196,7 @@ public class BeanDefinition extends ClassDefinition {
                 fields.add(0, parentField);
             }
 
-            parent.descendants.put(getLongName(),this);
+            parent.descendants.add(getLongName());
             parent = parent.getParent();
         }
 

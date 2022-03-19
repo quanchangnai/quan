@@ -31,8 +31,15 @@ local CardConfig = {}
 ---
 ---获取所有CardConfig
 ---@return list<CardConfig>
-function CardConfig.getConfigs()
+function CardConfig.getAll()
     return configs
+end
+
+---
+---获取所有CardConfig
+---@return map<id:int,CardConfig>
+function CardConfig.getIdAll()
+     return idConfigs
 end
 
 ---
@@ -40,11 +47,18 @@ end
 ---@overload fun():map<id:int,CardConfig>
 ---@param id int ID
 ---@return CardConfig
-function CardConfig.getById(id)
+function CardConfig.get(id)
     if (not id) then
         return idConfigs
     end
     return idConfigs[id]
+end
+
+---
+---获取所有CardConfig
+---@return map<type:int,list<CardConfig>> 
+function CardConfig.getTypeAll()
+     return typeConfigs
 end
 
 ---
