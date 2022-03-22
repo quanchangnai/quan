@@ -1,5 +1,5 @@
 ---
----CardConfig
+---卡片
 ---代码自动生成，请勿手动修改
 ---
 
@@ -25,7 +25,7 @@ end
 
 loadConfigs()
 
----CardConfig
+---卡片
 local CardConfig = {}
 
 ---

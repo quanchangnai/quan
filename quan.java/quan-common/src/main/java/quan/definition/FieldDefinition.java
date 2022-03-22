@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import static quan.definition.ClassDefinition.getLongClassName;
-import static quan.definition.ClassDefinition.getShortClassName;
 
 /**
  * 字段定义，被数据、消息和配置共用
@@ -193,7 +191,7 @@ public class FieldDefinition extends Definition implements Cloneable {
     }
 
     public ClassDefinition getClassDefinition() {
-        return parser.getClass(getLongClassName(owner, type));
+        return parser.getClass(ClassDefinition.getLongName(owner, type));
     }
 
     public BeanDefinition getTypeBean() {
@@ -343,7 +341,7 @@ public class FieldDefinition extends Definition implements Cloneable {
         if (!isCollectionType()) {
             return null;
         }
-        ClassDefinition classDefinition = parser.getClass(getLongClassName(owner, getValueType()));
+        ClassDefinition classDefinition = parser.getClass(ClassDefinition.getLongName(owner, getValueType()));
         if (classDefinition != null && classDefinition.getClass() == BeanDefinition.class) {
             return (BeanDefinition) classDefinition;
         }
@@ -392,7 +390,7 @@ public class FieldDefinition extends Definition implements Cloneable {
 
     public String getClassType() {
         if (classType == null) {
-            return getShortClassName(type);
+            return ClassDefinition.getShortName(type);
         }
         return classType;
     }
@@ -414,7 +412,7 @@ public class FieldDefinition extends Definition implements Cloneable {
 
     public String getClassValueType() {
         if (classValueType == null) {
-            return getShortClassName(getValueType());
+            return ClassDefinition.getShortName(getValueType());
         }
         return classValueType;
     }
@@ -574,18 +572,18 @@ public class FieldDefinition extends Definition implements Cloneable {
 
             if (keyRef && fieldRefs.length >= 1) {
                 String refConfigName = fieldRefs[0].substring(0, fieldRefs[0].lastIndexOf("."));
-                refConfig = parser.getConfig(getLongClassName(owner, refConfigName));
+                refConfig = parser.getConfig(ClassDefinition.getLongName(owner, refConfigName));
             }
             if (!keyRef && fieldRefs.length == 2) {
                 String refConfigName = fieldRefs[1].substring(0, fieldRefs[1].lastIndexOf("."));
-                refConfig = parser.getConfig(getLongClassName(owner, refConfigName));
+                refConfig = parser.getConfig(ClassDefinition.getLongName(owner, refConfigName));
             }
             return refConfig;
         }
 
         //list set 原生类型
         String refConfigName = ref.substring(0, ref.lastIndexOf("."));
-        return parser.getConfig(getLongClassName(owner, refConfigName));
+        return parser.getConfig(ClassDefinition.getLongName(owner, refConfigName));
     }
 
     public FieldDefinition getRefField() {
@@ -609,7 +607,7 @@ public class FieldDefinition extends Definition implements Cloneable {
 
             if (keyRef && fieldRefs.length >= 1) {
                 String refConfigName = fieldRefs[0].substring(0, fieldRefs[0].lastIndexOf("."));
-                refConfig = parser.getConfig(getLongClassName(owner, refConfigName));
+                refConfig = parser.getConfig(ClassDefinition.getLongName(owner, refConfigName));
                 if (refConfig != null) {
                     String refFieldName = fieldRefs[0].substring(fieldRefs[0].lastIndexOf(".") + 1);
                     return refConfig.getField(refFieldName);
@@ -617,7 +615,7 @@ public class FieldDefinition extends Definition implements Cloneable {
             }
             if (!keyRef && fieldRefs.length == 2) {
                 String refConfigName = fieldRefs[1].substring(0, fieldRefs[1].lastIndexOf("."));
-                refConfig = parser.getConfig(getLongClassName(owner, refConfigName));
+                refConfig = parser.getConfig(ClassDefinition.getLongName(owner, refConfigName));
                 if (refConfig != null) {
                     String refFieldName = fieldRefs[1].substring(fieldRefs[1].lastIndexOf(".") + 1);
                     return refConfig.getField(refFieldName);
@@ -628,7 +626,7 @@ public class FieldDefinition extends Definition implements Cloneable {
 
         //list set 原生类型
         String refConfigName = ref.substring(0, ref.lastIndexOf("."));
-        ConfigDefinition refConfig = parser.getConfig(getLongClassName(owner, refConfigName));
+        ConfigDefinition refConfig = parser.getConfig(ClassDefinition.getLongName(owner, refConfigName));
 
         if (refConfig != null) {
             String refFieldName = ref.substring(ref.lastIndexOf(".") + 1);

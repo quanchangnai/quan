@@ -41,19 +41,16 @@ public abstract class TableDefinitionParser extends DefinitionParser {
         fieldDefinition.setCategory(getCategory());
         fieldDefinition.setName(fieldName);
         fieldDefinition.setColumn(columnName);
-
         configDefinition.addField(fieldDefinition);
 
         if (StringUtils.isBlank(constraint)) {
+            addValidatedError(configDefinition.getValidatedName() + "的列[" + columnName + "]约束不能为空");
             return;
         }
 
         String[] constraints = constraint.split(";", -1);
 
-        if (constraints.length > 0) {
-            fieldDefinition.setTypes(constraints[0]);
-        }
-
+        fieldDefinition.setTypes(constraints[0]);
         Set<String> constraintNames = new HashSet<>();
 
         for (int i = 1; i < constraints.length; i++) {
@@ -71,6 +68,9 @@ public abstract class TableDefinitionParser extends DefinitionParser {
             } else {
                 constraintNames.add(constraintName);
             }
+            if (constraintValue.isEmpty()) {
+                addValidatedError(configDefinition.getValidatedName() + "的列[" + columnName + "]约束[" + constraint + "]不能为空值");
+            }
 
             switch (constraintName) {
                 case "ref":
@@ -82,6 +82,8 @@ public abstract class TableDefinitionParser extends DefinitionParser {
                 case "optional":
                     fieldDefinition.setOptional(constraintValue);
                     break;
+                case "lang":
+                    fieldDefinition.setLanguage(constraintValue);
                 default:
                     addValidatedError(configDefinition.getValidatedName() + "的列[" + columnName + "]不支持该约束类型:" + constraintName);
                     break;

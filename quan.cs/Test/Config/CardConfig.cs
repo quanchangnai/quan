@@ -8,7 +8,7 @@ using System.Collections.Immutable;
 namespace Test.Config
 {
     /// <summary>
-	/// CardConfig<br/>
+	/// 卡片<br/>
 	/// 代码自动生成，请勿手动修改
 	/// </summary>
     public class CardConfig : ConfigBase

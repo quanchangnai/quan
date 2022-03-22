@@ -27,7 +27,7 @@ public class BeanDefinition extends ClassDefinition {
     protected Set<BeanDefinition> children = new HashSet<>();
 
     //和语言无关的带包子类名:和语言相关的完整子类名
-    protected Map<String,String> dependentChildren = new HashMap<>();
+    protected Map<String, String> dependentChildren = new HashMap<>();
 
     protected int descendantMaxFieldCount;
 
@@ -97,13 +97,13 @@ public class BeanDefinition extends ClassDefinition {
 
     public String getParentClassName() {
         if (parentClassName == null) {
-            return getShortClassName(parentName);
+            return getShortName(parentName);
         }
         return parentClassName;
     }
 
     public String getParentLongName() {
-        return getLongClassName(this, parentName);
+        return getLongName(this, parentName);
     }
 
     public BeanDefinition getParent() {
@@ -131,7 +131,7 @@ public class BeanDefinition extends ClassDefinition {
         return descendantMaxFieldCount == 0 ? fields.size() : descendantMaxFieldCount;
     }
 
-    public Map<String,String> getDependentChildren() {
+    public Map<String, String> getDependentChildren() {
         return dependentChildren;
     }
 
@@ -180,7 +180,7 @@ public class BeanDefinition extends ClassDefinition {
         }
 
         parent.children.add(this);
-        parent.dependentChildren.put(this.getLongName(),getName());
+        parent.dependentChildren.put(this.getLongName(), getName());
 
         Set<String> ancestors = new HashSet<>();
         while (parent != null) {
@@ -512,7 +512,7 @@ public class BeanDefinition extends ClassDefinition {
 
     protected String getRefConfigName(String refConfigName) {
         if (!refConfigName.contains(".")) {
-            return getPackageName() + "." + refConfigName;
+            return getLongName(this, refConfigName);
         }
         return refConfigName;
     }

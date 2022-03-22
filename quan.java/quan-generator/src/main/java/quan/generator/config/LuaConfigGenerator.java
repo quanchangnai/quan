@@ -14,7 +14,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
-import static quan.definition.ClassDefinition.getLongClassName;
 
 /**
  * Created by quanchangnai on 2020/3/15.
@@ -66,7 +65,7 @@ public class LuaConfigGenerator extends ConfigGenerator {
 
         String clazz = object.getString("class");
         if (!StringUtils.isEmpty(clazz)) {
-            beanDefinition = parser.getBean(getLongClassName(configDefinition, clazz));
+            beanDefinition = parser.getBean(ClassDefinition.getLongName(configDefinition, clazz));
         }
 
         if (beanDefinition == null) {

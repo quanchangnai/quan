@@ -5,7 +5,7 @@ import quan.config.loader.ConfigLoader;
 import java.util.*;
 
 /**
- * CardConfig<br/>
+ * 卡片<br/>
  * 代码自动生成，请勿手动修改
  */
 public class CardConfig extends Config {

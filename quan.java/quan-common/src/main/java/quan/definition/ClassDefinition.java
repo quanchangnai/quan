@@ -75,8 +75,8 @@ public abstract class ClassDefinition extends Definition {
     }
 
     public String getPackagePrefix() {
-        if (this instanceof EnumDefinition) {
-            return isBlank(parser.getEnumPackagePrefix()) ? parser.getPackagePrefix() : parser.getEnumPackagePrefix();
+        if (this instanceof EnumDefinition && !isBlank(parser.getEnumPackagePrefix())) {
+            return parser.getEnumPackagePrefix();
         } else {
             return parser.getPackagePrefix();
         }
@@ -107,7 +107,7 @@ public abstract class ClassDefinition extends Definition {
 
 
     public String getLongName() {
-        return getLongClassName(this, getName());
+        return getLongName(this, getName());
     }
 
     @Override
@@ -125,11 +125,11 @@ public abstract class ClassDefinition extends Definition {
     /**
      * 不带包名的类名
      */
-    public static String getShortClassName(String className) {
+    public static String getShortName(String className) {
         if (className == null) {
             return null;
         }
-        int index = className.indexOf(".");
+        int index = className.lastIndexOf(".");
         if (index >= 0) {
             return className.substring(index + 1);
         }
@@ -139,7 +139,7 @@ public abstract class ClassDefinition extends Definition {
     /**
      * 和具体语言环境无关的[不含前缀的包名.类名]
      */
-    public static String getLongClassName(ClassDefinition classDefinition, String className) {
+    public static String getLongName(ClassDefinition classDefinition, String className) {
         if (!isBlank(classDefinition.getPackageName()) && !isBlank(className) && !className.contains(".")) {
             className = classDefinition.getPackageName() + "." + className;
         }

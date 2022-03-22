@@ -16,8 +16,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import static quan.definition.ClassDefinition.getLongClassName;
-
 /**
  * Created by quanchangnai on 2019/8/7.
  */
@@ -99,7 +97,7 @@ public class ConfigConverter {
                 //第1列是类名
                 String className = columnValue;
                 if (!columnValue.contains(".")) {
-                    className = getLongClassName(beanDefinition, columnValue);
+                    className = ClassDefinition.getLongName(beanDefinition, columnValue);
                 }
                 if (beanDefinition.getMeAndDescendants().contains(className)) {
                     object = new JSONObject();
@@ -120,7 +118,7 @@ public class ConfigConverter {
         if (beanDefinition.hasChild()) {
             String className = object.getString("class");
             if (!className.contains(".")) {
-                className = getLongClassName(fieldDefinition.getOwner(), className);
+                className = ClassDefinition.getLongName(fieldDefinition.getOwner(), className);
             }
             beanDefinition = parser.getBean(className);
         }
@@ -437,11 +435,11 @@ public class ConfigConverter {
         if (beanHasChild) {
             String className = values[0];
             if (!values[0].contains(".")) {
-                className = getLongClassName(beanDefinition, values[0]);
+                className = ClassDefinition.getLongName(beanDefinition, values[0]);
             }
             if (beanDefinition.getMeAndDescendants().contains(className)) {
                 object.put("class", values[0]);
-                beanDefinition = parser.getBean(getLongClassName(owner, className));
+                beanDefinition = parser.getBean(ClassDefinition.getLongName(owner, className));
             } else {
                 throw new ConvertException(ConvertException.ErrorType.TYPE_ERROR, values[0], beanDefinition.getName());
             }

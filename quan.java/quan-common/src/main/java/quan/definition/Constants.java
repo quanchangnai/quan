@@ -53,11 +53,11 @@ public final class Constants {
     /**
      * 配置支持的合法分隔符
      */
-    public static final Set<String> LEGAL_DELIMITERS = asSet(";", ":", "_", "*", "|", "$", "@", "&", "?");
+    public static final Set<String> LEGAL_DELIMITERS = asSet(",", ";", ":", "-", "_", "*", "|", "$", "@", "&", "?");
 
     /**
      * 配置支持的需要转义的分隔符(正则表达式特殊字符)
      */
-    public static final Set<String> NEED_ESCAPE_DELIMITERS = asSet("*", "|", "?");
+    public static final Set<String> NEED_ESCAPE_DELIMITERS = asSet("-", "*", "|", "$", "?");
 
 }
