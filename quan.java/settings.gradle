@@ -4,11 +4,12 @@
 
 rootProject.name = 'quan'
 include 'quan-common'
-include 'quan-network'
-include 'quan-message'
 include 'quan-config'
 include 'quan-data'
+include 'quan-message'
+include 'quan-rpc'
 include 'quan-generator'
+include 'quan-network'
 include 'quan-editor'
 
 
