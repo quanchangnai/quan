@@ -51,6 +51,11 @@ public class NioServer {
         this.port = port;
     }
 
+    public NioServer(String ip, int port) {
+        this.ip = ip;
+        this.port = port;
+    }
+
     public NioServer(int port, Handler handler) {
         this(port);
         this.handler = handler;

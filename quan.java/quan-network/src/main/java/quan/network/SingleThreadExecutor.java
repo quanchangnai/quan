@@ -42,6 +42,7 @@ public class SingleThreadExecutor implements Executor {
     }
 
     protected void run() {
+        running = true;
         while (isRunning()) {
             for (Runnable task = taskQueue.poll(); task != null; task = taskQueue.poll()) {
                 try {
@@ -68,7 +69,6 @@ public class SingleThreadExecutor implements Executor {
     }
 
     public void start() {
-        running = true;
         thread = new Thread(this::run);
         thread.start();
     }

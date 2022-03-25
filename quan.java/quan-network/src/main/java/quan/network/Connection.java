@@ -16,7 +16,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * nio网络连接的封装，提供读写数据等功能
+ * 网络连接的封装，提供读写数据等功能
  *
  * @author quanchangnai
  */
