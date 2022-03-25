@@ -106,14 +106,15 @@ public class RpcThread {
     public Promise sendRequest(int targetServerId, Object serviceId, String methodName, Object... params) {
         checkThread(this.id);
 
+        int callId = nextCallId++;
         Request request = new Request(targetServerId, serviceId, methodName, params);
-        request.setCallId(nextCallId++);
+        request.setCallId(callId);
         request.setOriginServer(this.server.getId());
         request.setOriginThread(this.id);
         server.sendRequest(request);
 
-        Promise<?> promise = new Promise<>(request.getCallId());
-        promises.put(promise.getCallId(), promise);
+        Promise<?> promise = new Promise<>(callId);
+        promises.put(callId, promise);
 
         return promise;
     }

@@ -28,7 +28,7 @@ public class TestService extends Service {
     }
 
     public Integer add(Integer a, Integer b) {
-        logger.info("TestService{}.add({},{})", id, a, b);
+        logger.info("execute TestService{}.add({},{})", id, a, b);
         return a + b;
     }
 
@@ -41,12 +41,14 @@ public class TestService extends Service {
         lastTime = now;
 
         if (this.id == 1) {
+            logger.info("TestService{} call TestService{}", this.id, testServiceProxy2.getServiceId());
+
             int a = (int) (now % 3);
             int b = (int) (now % 10);
-            logger.info("我是:TestService{}", id);
             Promise<Integer> promise = testServiceProxy2.add(a, b);
-            promise.then(r -> {
-                logger.info("call TestService{}.add({},{})={}", testServiceProxy2.getServiceId(), a, b, r);
+            promise.then(result -> {
+                logger.info("TestService{} call TestService{}.add({},{})={}", this.id, testServiceProxy2.getServiceId(), a, b, result);
+                System.err.println();
             });
         }
     }

@@ -38,6 +38,9 @@ public abstract class Service {
         }
     }
 
+    /**
+     * 刷帧
+     */
     protected void update() {
 
     }

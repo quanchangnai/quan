@@ -47,7 +47,7 @@ public class RpcServer {
         for (RpcThread thread : threads.values()) {
             thread.start();
         }
-        scheduler.scheduleAtFixedRate(this::update, 20, 20, TimeUnit.MILLISECONDS);
+        scheduler.scheduleAtFixedRate(this::update, 50, 50, TimeUnit.MILLISECONDS);
     }
 
     public void stop() {
