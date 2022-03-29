@@ -12,21 +12,11 @@ public class Promise<R> {
 
     private static Logger logger = LoggerFactory.getLogger(Promise.class);
 
-    /**
-     * 调用ID
-     */
-    private int callId;
-
     private R result;
 
     private Consumer<R> resultHandler;
 
-    protected Promise(int callId) {
-        this.callId = callId;
-    }
-
-    protected int getCallId() {
-        return callId;
+    protected Promise() {
     }
 
     void setResult(Object result) {
@@ -34,10 +24,6 @@ public class Promise<R> {
         if (resultHandler != null) {
             resultHandler.accept(this.result);
         }
-    }
-
-    public R await() {
-        return result;
     }
 
     public void then(Consumer<R> handler) {

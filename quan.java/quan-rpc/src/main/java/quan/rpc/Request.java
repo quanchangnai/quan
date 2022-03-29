@@ -10,104 +10,56 @@ public class Request {
     /**
      * 调用ID
      */
-    private int callId;
-
-    /**
-     * 调用的来源服务器ID
-     */
-    private int originServer;
-
-    /**
-     * 调用的来源线程ID，发起调用请求和处理返回结果要在同一个线程里
-     */
-    private int originThread;
-
-    /**
-     * 目标服务器
-     */
-    private int targetServer;
+    private long callId;
 
     /**
      * 目标服务ID
      */
-    private Object service;
+    private Object serviceId;
 
     /**
-     * 目标方法名
+     * 目标方法ID
      */
-    private String method;
+    private String methodId;
 
     /**
      * 目标方法参数
      */
-    private Object[] params;
+    private Object[] methodParams;
 
-    public Request(int targetServer, Object service, String method, Object... params) {
-        this.targetServer = targetServer;
-        this.service = service;
-        this.method = method;
-        this.params = params;
+    public Request(Object serviceId, String methodId, Object... methodParams) {
+        this.serviceId = serviceId;
+        this.methodId = methodId;
+        this.methodParams = methodParams;
     }
 
-    public int getCallId() {
+    public long getCallId() {
         return callId;
     }
 
-    protected void setCallId(int callId) {
+    protected void setCallId(long callId) {
         this.callId = callId;
     }
 
     /**
-     * @see #originServer
+     * @see #serviceId
      */
-    public int getOriginServer() {
-        return originServer;
+    public Object getServiceId() {
+        return serviceId;
     }
 
     /**
-     * @see #originServer
+     * @see #methodId
      */
-    protected void setOriginServer(int originServer) {
-        this.originServer = originServer;
+    public String getMethodId() {
+        return methodId;
     }
 
     /**
-     * @see #originThread
+     * @see #methodParams
      */
-    protected void setOriginThread(int originThread) {
-        this.originThread = originThread;
-    }
-
-    /**
-     * @see #originThread
-     */
-    public int getOriginThread() {
-        return originThread;
-    }
-
-    public int getTargetServer() {
-        return targetServer;
-    }
-
-    /**
-     * @see #service
-     */
-    public Object getService() {
-        return service;
-    }
-
-    /**
-     * @see #method
-     */
-    public String getMethod() {
-        return method;
-    }
-
-    /**
-     * @see #params
-     */
-    public Object[] getParams() {
-        return params;
+    public Object[] getMethodParams() {
+        return methodParams;
     }
 
 }

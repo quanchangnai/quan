@@ -28,8 +28,13 @@ public class TestService extends Service {
     }
 
     public Integer add(Integer a, Integer b) {
-        logger.info("execute TestService{}.add({},{})", id, a, b);
+        logger.info("execute TestService{}.add({},{}) at thread{}", id, a, b, this.getThread().getId());
         return a + b;
+    }
+
+    public Integer remove(Integer a) {
+        logger.info("execute TestService{}.remove({}) at thread{}", id, a, this.getThread().getId());
+        return a;
     }
 
     @Override
@@ -41,7 +46,7 @@ public class TestService extends Service {
         lastTime = now;
 
         if (this.id == 1) {
-            logger.info("TestService{} call TestService{}", this.id, testServiceProxy2.getServiceId());
+            logger.info("TestService{} call TestService{}  at thread{}", this.id, testServiceProxy2.getServiceId(), this.getThread().getId());
 
             int a = (int) (now % 3);
             int b = (int) (now % 10);

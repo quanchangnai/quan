@@ -25,8 +25,6 @@ public class RpcThread {
 
     private BlockingQueue<Runnable> taskQueue = new LinkedBlockingQueue<>();
 
-    private Thread thread;
-
     private RpcServer server;
 
     //所有的服务，key:服务ID
@@ -34,7 +32,7 @@ public class RpcThread {
 
     private int nextCallId = 1;
 
-    private Map<Integer, Promise<?>> promises = new HashMap<>();
+    private Map<Long, Promise<?>> promises = new HashMap<>();
 
     protected RpcThread(int id, RpcServer server) {
         this.id = id;
@@ -55,15 +53,23 @@ public class RpcThread {
         }
     }
 
+    public int getId() {
+        return id;
+    }
+
     protected void addService(Service service) {
         service.thread = this;
         services.put(service.getId(), service);
     }
 
+    protected void removeService(Service service) {
+        service.thread = null;
+        services.remove(service.getId());
+    }
+
     protected void start() {
         logger.info("RpcThread.start():" + id);
-        thread = new Thread(this::run);
-        thread.start();
+        new Thread(this::run).start();
     }
 
     protected void stop() {
@@ -103,32 +109,34 @@ public class RpcThread {
         }
     }
 
-    public Promise sendRequest(int targetServerId, Object serviceId, String methodName, Object... params) {
+    public <R> Promise<R> sendRequest(int targetServerId, Object serviceId, String methodId, Object... methodParams) {
         checkThread(this.id);
 
-        int callId = nextCallId++;
-        Request request = new Request(targetServerId, serviceId, methodName, params);
-        request.setCallId(callId);
-        request.setOriginServer(this.server.getId());
-        request.setOriginThread(this.id);
-        server.sendRequest(request);
+        long callId = (long) this.id << 32 | nextCallId++;
+        if (nextCallId < 0) {
+            nextCallId = 1;
+        }
 
-        Promise<?> promise = new Promise<>(callId);
+        Request request = new Request(serviceId, methodId, methodParams);
+        request.setCallId(callId);
+        server.sendRequest(targetServerId, request);
+
+        Promise<R> promise = new Promise<>();
         promises.put(callId, promise);
 
         return promise;
     }
 
-    protected void handleRequest(Request request) {
-        Service service = services.get(request.getService());
-        Object result = service.call(request.getMethod(), request.getParams());
+    protected void handleRequest(int originServerId, Request request) {
+        Service service = services.get(request.getServiceId());
+        Object result = service.call(request.getMethodId(), request.getMethodParams());
 
-        Response response = new Response(request.getCallId(), request.getOriginServer(), request.getOriginThread(), result);
-        server.sendResponse(response);
+        Response response = new Response(request.getCallId(), result);
+        server.sendResponse(originServerId, response);
     }
 
     protected void handleResponse(Response response) {
-        int callId = response.getCallId();
+        long callId = response.getCallId();
         Promise<?> promise = promises.remove(callId);
         if (promise == null) {
             logger.error("处理RPC响应，调用[{}]不存在", callId);

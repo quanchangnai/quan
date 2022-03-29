@@ -1,16 +1,27 @@
 package quan.rpc;
 
-import java.lang.reflect.Method;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Constructor;
 
 /**
  * @author quanchangnai
  */
 public abstract class Service {
 
+    private Logger logger = LoggerFactory.getLogger(getClass());
+
     /**
      * 服务所属的线程
      */
     RpcThread thread;
+
+    private Caller caller;
+
+    {
+        initCaller();
+    }
 
     /**
      * 服务ID，在同一个RPC服务器内必需保证唯一性
@@ -24,18 +35,19 @@ public abstract class Service {
         return thread;
     }
 
-    public Object call(String methodName, Object... params) {
-        Class<?>[] parameterTypes = new Class[params.length];
-        for (int i = 0; i < params.length; i++) {
-            parameterTypes[i] = params[i].getClass();
-        }
+    private void initCaller() {
         try {
-            Method method = getClass().getMethod(methodName, parameterTypes);
-            return method.invoke(this, params);
+            Class<?> callerClass = Class.forName(getClass().getName() + "Proxy$Caller");
+            Constructor<?> constructor = callerClass.getDeclaredConstructor();
+            constructor.setAccessible(true);
+            this.caller = (Caller) constructor.newInstance();
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            logger.error("", e);
         }
+    }
+
+    public Object call(String methodId, Object... methodParams) {
+        return caller.call(this, methodId, methodParams);
     }
 
     /**
