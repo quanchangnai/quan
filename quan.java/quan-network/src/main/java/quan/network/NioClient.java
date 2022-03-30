@@ -188,7 +188,7 @@ public class NioClient {
         connect();
     }
 
-    private static class ReadWriteExecutor extends SingleThreadExecutor {
+    private static class ReadWriteExecutor extends TaskExecutor {
 
         private NioClient client;
 
@@ -216,7 +216,8 @@ public class NioClient {
         }
 
         @Override
-        protected void onAfter() {
+        protected void runTasks() throws InterruptedException {
+            super.runTasks();
             try {
                 select();
             } catch (IOException e) {
@@ -225,10 +226,10 @@ public class NioClient {
         }
 
         @Override
-        protected void onEnd() {
+        protected void destroy() {
+            super.destroy();
             try {
-                Set<SelectionKey> keys = selector.keys();
-                for (SelectionKey key : keys) {
+                for (SelectionKey key : selector.keys()) {
                     Connection connection = (Connection) key.attachment();
                     connection.close();
                 }
@@ -258,7 +259,7 @@ public class NioClient {
                             socketChannel.finishConnect();
                         } catch (Exception e) {
                             logger.error("", e);
-                            tryReconnect();
+                            reconnect();
                             break;
                         }
 
@@ -274,7 +275,7 @@ public class NioClient {
                     Connection connection = (Connection) selectedKey.attachment();
                     int readCount = connection.read();
                     if (readCount < 0) {
-                        tryReconnect();
+                        reconnect();
                         break;
                     }
                 }
@@ -283,14 +284,14 @@ public class NioClient {
                     Connection connection = (Connection) selectedKey.attachment();
                     int writeCount = connection.write();
                     if (writeCount < 0) {
-                        tryReconnect();
+                        reconnect();
                         break;
                     }
                 }
             }
         }
 
-        private void tryReconnect() {
+        private void reconnect() {
             if (client.isAutoReconnect()) {
                 execute(client::reconnect);
             }

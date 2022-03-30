@@ -30,7 +30,7 @@ public class Connection {
 
     private SocketChannel socketChannel;
 
-    private SingleThreadExecutor executor;
+    private TaskExecutor executor;
 
     protected HandlerChain handlerChain;
 
@@ -53,7 +53,7 @@ public class Connection {
 
     private Map<Object, Object> attachments = new ConcurrentHashMap<>();
 
-    public Connection(SelectionKey selectionKey, SingleThreadExecutor executor, int readBufferSize, int writeBufferSize) {
+    public Connection(SelectionKey selectionKey, TaskExecutor executor, int readBufferSize, int writeBufferSize) {
         this.executor = executor;
         this.selectionKey = selectionKey;
         this.socketChannel = (SocketChannel) selectionKey.channel();
@@ -66,7 +66,7 @@ public class Connection {
         return handlerChain;
     }
 
-    public SingleThreadExecutor getExecutor() {
+    public TaskExecutor getExecutor() {
         return executor;
     }
 

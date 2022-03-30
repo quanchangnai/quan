@@ -1,6 +1,6 @@
 package quan.network.handler;
 
-import quan.network.SingleThreadExecutor;
+import quan.network.TaskExecutor;
 
 import java.net.InetSocketAddress;
 import java.util.Map;
@@ -35,7 +35,7 @@ public class HandlerContext {
         return chain;
     }
 
-    public SingleThreadExecutor getExecutor() {
+    public TaskExecutor getExecutor() {
         return chain.getExecutor();
     }
 

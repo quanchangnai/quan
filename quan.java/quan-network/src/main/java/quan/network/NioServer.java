@@ -36,7 +36,7 @@ public class NioServer {
 
     private int writeBufferSize = 8096;
 
-    private AcceptExecutor acceptExecutor;
+    private AcceptWorker acceptWorker;
 
     private int readWriteThreadNum;
 
@@ -145,7 +145,7 @@ public class NioServer {
     }
 
     private void doStart() throws Exception {
-        acceptExecutor = new AcceptExecutor(this);
+        acceptWorker = new AcceptWorker(this);
         if (readWriteThreadNum <= 0) {
             readWriteThreadNum = Runtime.getRuntime().availableProcessors() * 2;
         }
@@ -157,7 +157,7 @@ public class NioServer {
 
         running = true;
 
-        acceptExecutor.start();
+        acceptWorker.start();
         for (ReadWriteExecutor readWriteExecutor : readWriteExecutors) {
             readWriteExecutor.start();
         }
@@ -175,14 +175,14 @@ public class NioServer {
         }
 
         serverSocketChannel.socket().bind(new InetSocketAddress(getIp(), getPort()));
-        acceptExecutor.registerChannel(serverSocketChannel);
+        acceptWorker.registerChannel(serverSocketChannel);
     }
 
     public void stop() {
         running = false;
 
-        acceptExecutor.stop();
-        acceptExecutor = null;
+        acceptWorker.stop();
+        acceptWorker = null;
 
         for (ReadWriteExecutor readWriteExecutor : readWriteExecutors) {
             readWriteExecutor.stop();
@@ -197,13 +197,13 @@ public class NioServer {
         return readWriteExecutors[readWriteExecutorIndex++];
     }
 
-    private static class AcceptExecutor extends SingleThreadExecutor {
+    private static class AcceptWorker extends TaskExecutor {
 
         private NioServer server;
 
         private Selector selector;
 
-        public AcceptExecutor(NioServer server) throws IOException {
+        public AcceptWorker(NioServer server) throws IOException {
             this.server = server;
             this.selector = Selector.open();
         }
@@ -226,7 +226,8 @@ public class NioServer {
         }
 
         @Override
-        protected void onAfter() {
+        protected void runTasks() throws InterruptedException {
+            super.runTasks();
             try {
                 select();
             } catch (IOException e) {
@@ -265,10 +266,10 @@ public class NioServer {
         }
 
         @Override
-        protected void onEnd() {
+        protected void destroy() {
+            super.destroy();
             try {
-                Set<SelectionKey> keys = selector.keys();
-                for (SelectionKey key : keys) {
+                for (SelectionKey key : selector.keys()) {
                     key.channel().close();
                 }
                 selector.close();
@@ -282,7 +283,7 @@ public class NioServer {
         }
     }
 
-    private static class ReadWriteExecutor extends SingleThreadExecutor {
+    private static class ReadWriteExecutor extends TaskExecutor {
 
         private NioServer server;
 
@@ -318,21 +319,21 @@ public class NioServer {
         }
 
         @Override
-        protected void onAfter() {
+        protected void runTasks() throws InterruptedException {
+            super.runTasks();
             try {
                 select();
                 doRegisterChannels();
             } catch (IOException e) {
                 logger.error("", e);
             }
-
         }
 
         @Override
-        protected void onEnd() {
+        protected void destroy() {
+            super.destroy();
             try {
-                Set<SelectionKey> keys = selector.keys();
-                for (SelectionKey key : keys) {
+                for (SelectionKey key : selector.keys()) {
                     Connection connection = (Connection) key.attachment();
                     connection.close();
                 }

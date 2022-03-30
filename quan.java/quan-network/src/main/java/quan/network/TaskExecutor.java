@@ -7,13 +7,14 @@ import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 基于单线程的任务执行器
  *
  * @author quanchangnai
  */
-public class SingleThreadExecutor implements Executor {
+public class TaskExecutor implements Executor {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -41,31 +42,27 @@ public class SingleThreadExecutor implements Executor {
         }
     }
 
+    protected void runTasks() throws InterruptedException {
+        while (true) {
+            Runnable task = taskQueue.poll(20, TimeUnit.MILLISECONDS);
+            if (task == null) {
+                break;
+            }
+            task.run();
+        }
+    }
+
     protected void run() {
         running = true;
-        while (isRunning()) {
-            for (Runnable task = taskQueue.poll(); task != null; task = taskQueue.poll()) {
-                try {
-                    task.run();
-                } catch (Throwable e) {
-                    logger.error("", e);
-                }
-            }
+        while (running) {
             try {
-                onAfter();
+                runTasks();
             } catch (Throwable e) {
                 logger.error("", e);
             }
         }
 
-        try {
-            onEnd();
-        } catch (Throwable e) {
-            logger.error("", e);
-        }
-
-        taskQueue.clear();
-        thread = null;
+        destroy();
     }
 
     public void start() {
@@ -81,10 +78,9 @@ public class SingleThreadExecutor implements Executor {
         return running;
     }
 
-    protected void onAfter() {
-    }
-
-    protected void onEnd() {
+    protected void destroy() {
+        taskQueue.clear();
+        thread = null;
     }
 
 }
