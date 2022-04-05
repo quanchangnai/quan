@@ -20,17 +20,17 @@ public class Request {
     /**
      * 目标方法ID
      */
-    private String methodId;
+    private int methodId;
 
     /**
      * 目标方法参数
      */
-    private Object[] methodParams;
+    private Object[] params;
 
-    public Request(Object serviceId, String methodId, Object... methodParams) {
+    public Request(Object serviceId, int methodId, Object... params) {
         this.serviceId = serviceId;
         this.methodId = methodId;
-        this.methodParams = methodParams;
+        this.params = params;
     }
 
     public long getCallId() {
@@ -51,15 +51,15 @@ public class Request {
     /**
      * @see #methodId
      */
-    public String getMethodId() {
+    public int getMethodId() {
         return methodId;
     }
 
     /**
-     * @see #methodParams
+     * @see #params
      */
-    public Object[] getMethodParams() {
-        return methodParams;
+    public Object[] getParams() {
+        return params;
     }
 
 }

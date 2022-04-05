@@ -7,7 +7,7 @@ import quan.rpc.RpcServer;
  */
 public class RpcTest {
 
-    public static void main(String[] args)  throws Exception{
+    public static void main(String[] args) {
         RpcServer rpcServer = new RpcServer(1, 5);
         rpcServer.addService(new TestService(1));
         rpcServer.addService(new TestService(2));

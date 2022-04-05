@@ -3,8 +3,12 @@ package quan.rpc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author quanchangnai
@@ -15,21 +19,21 @@ public class RpcServer {
 
     private int id;
 
-    //所有的服务，key:服务ID
-    private Map<Object, Service> services = new HashMap<>();
+    //管理的所有工作线程，key:工作线程ID
+    private Map<Integer, Worker> workers = new HashMap<>();
 
-    //所有的线程
-    private Map<Integer, RpcThread> threads = new HashMap<>();
+    //管理的所有服务，key:服务ID
+    private Map<Object, Service> services = new HashMap<>();
 
     private ScheduledExecutorService scheduler;
 
-    public RpcServer(int id, int threadNum) {
+    public RpcServer(int id, int workerNum) {
         this.id = id;
-        if (threadNum <= 0) {
-            threadNum = Runtime.getRuntime().availableProcessors();
+        if (workerNum <= 0) {
+            workerNum = Runtime.getRuntime().availableProcessors();
         }
-        for (int i = 1; i <= threadNum; i++) {
-            threads.put(i, new RpcThread(i, this));
+        for (int i = 1; i <= workerNum; i++) {
+            workers.put(i, new Worker(i, this));
         }
     }
 
@@ -37,14 +41,14 @@ public class RpcServer {
         return id;
     }
 
-    public int getThreadNum() {
-        return threads.size();
+    public int getWorkerNum() {
+        return workers.size();
     }
 
     public void start() {
         logger.info("RpcServer.start()");
-        for (RpcThread thread : threads.values()) {
-            thread.start();
+        for (Worker worker : workers.values()) {
+            worker.start();
         }
         scheduler = Executors.newScheduledThreadPool(1);
         scheduler.scheduleAtFixedRate(this::update, 50, 50, TimeUnit.MILLISECONDS);
@@ -53,37 +57,37 @@ public class RpcServer {
     public void stop() {
         logger.info("RpcServer.stop()");
         scheduler.shutdown();
-        for (RpcThread thread : threads.values()) {
-            thread.stop();
+        for (Worker worker : workers.values()) {
+            worker.stop();
         }
     }
 
     protected void update() {
-        for (RpcThread thread : threads.values()) {
-            thread.execute(thread::update);
+        for (Worker worker : workers.values()) {
+            worker.execute(worker::update);
         }
     }
 
     public synchronized void addService(Service service) {
-        Object id = service.getId();
-        if (services.putIfAbsent(id, service) != null) {
-            logger.error("RPC服务[{}]已存在", id);
+        Object serviceId = service.getId();
+        if (services.putIfAbsent(serviceId, service) != null) {
+            logger.error("RPC服务[{}]已存在", serviceId);
             return;
         }
         randomThread().addService(service);
     }
 
     public synchronized void removeService(Service service) {
-        Object id = service.getId();
-        if (!services.remove(id, service)) {
-            logger.error("RPC服务[{}]不存在", id);
+        Object serviceId = service.getId();
+        if (!services.remove(serviceId, service)) {
+            logger.error("RPC服务[{}]不存在", serviceId);
         }
-        service.getThread().removeService(service);
+        service.getWorker().removeService(service);
     }
 
-    protected RpcThread randomThread() {
-        int threadId = new Random().nextInt(threads.size()) + 1;
-        return threads.get(threadId);
+    protected Worker randomThread() {
+        int workerId = new Random().nextInt(workers.size()) + 1;
+        return workers.get(workerId);
     }
 
     /**
@@ -108,8 +112,8 @@ public class RpcServer {
             return;
         }
 
-        RpcThread thread = service.getThread();
-        thread.execute(() -> thread.handleRequest(originServerId, request));
+        Worker worker = service.getWorker();
+        worker.execute(() -> worker.handleRequest(originServerId, request));
     }
 
     /**
@@ -128,14 +132,14 @@ public class RpcServer {
      * 处理RPC响应
      */
     protected void handleResponse(Response response) {
-        int threadId = (int) (response.getCallId() >> 32);
-        RpcThread thread = threads.get(threadId);
-        if (thread == null) {
-            logger.error("处理RPC响应，线程[{}]不存在", threadId);
+        int workerId = (int) (response.getCallId() >> 32);
+        Worker worker = workers.get(workerId);
+        if (worker == null) {
+            logger.error("处理RPC响应，工作线程[{}]不存在", workerId);
             return;
         }
 
-        thread.execute(() -> thread.handleResponse(response));
+        worker.execute(() -> worker.handleResponse(response));
     }
 
 }

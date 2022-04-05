@@ -6,4 +6,5 @@ apply plugin: 'java-library'
 
 dependencies {
     api project(':quan-common')
+    testAnnotationProcessor project(':quan-generator')
 }

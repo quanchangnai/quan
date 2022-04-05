@@ -3,7 +3,10 @@ package quan.rpc.test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.rpc.Promise;
+import quan.rpc.RPC;
 import quan.rpc.Service;
+
+import java.util.List;
 
 /**
  * @author quanchangnai
@@ -16,7 +19,7 @@ public class TestService extends Service {
 
     private long lastTime;
 
-    private TestServiceProxy testServiceProxy2 = TestServiceProxy.newInstance(1, 2);
+    private TestServiceProxy testServiceProxy2 = new TestServiceProxy(1, 2);
 
     public TestService(int id) {
         this.id = id;
@@ -27,14 +30,20 @@ public class TestService extends Service {
         return id;
     }
 
+    @RPC
     public Integer add(Integer a, Integer b) {
-        logger.info("execute TestService{}.add({},{}) at thread{}", id, a, b, this.getThread().getId());
+        logger.info("execute TestService{}.add({},{}) at worker{}", id, a, b, this.getWorker().getId());
         return a + b;
     }
 
-    public Integer remove(Integer a) {
-        logger.info("execute TestService{}.remove({}) at thread{}", id, a, this.getThread().getId());
-        return a;
+    @RPC
+    public void remove(int a) {
+        logger.info("execute TestService{}.remove({}) at worker{}", id, a, this.getWorker().getId());
+    }
+
+    @RPC
+    public Integer a(List<Integer> list) {
+        return 1;
     }
 
     @Override
@@ -46,7 +55,7 @@ public class TestService extends Service {
         lastTime = now;
 
         if (this.id == 1) {
-            logger.info("TestService{} call TestService{}  at thread{}", this.id, testServiceProxy2.getServiceId(), this.getThread().getId());
+            logger.info("TestService{} call TestService{}  at worker{}", this.id, testServiceProxy2.getServiceId(), this.getWorker().getId());
 
             int a = (int) (now % 3);
             int b = (int) (now % 10);

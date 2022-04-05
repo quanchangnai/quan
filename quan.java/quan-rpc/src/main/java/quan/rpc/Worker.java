@@ -11,45 +11,47 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
+ * RPC工作线程
+ *
  * @author quanchangnai
  */
-public class RpcThread {
+public class Worker {
 
-    private static Logger logger = LoggerFactory.getLogger(RpcThread.class);
+    private static Logger logger = LoggerFactory.getLogger(Worker.class);
 
-    private static ThreadLocal<RpcThread> threadLocal = new ThreadLocal<>();
+    private static ThreadLocal<Worker> threadLocal = new ThreadLocal<>();
 
     private int id;
 
     private boolean running;
 
-    private BlockingQueue<Runnable> taskQueue = new LinkedBlockingQueue<>();
-
     private RpcServer server;
 
-    //所有的服务，key:服务ID
+    private BlockingQueue<Runnable> taskQueue = new LinkedBlockingQueue<>();
+
+    //管理的所有服务，key:服务ID
     private Map<Object, Service> services = new ConcurrentHashMap<>();
 
     private int nextCallId = 1;
 
     private Map<Long, Promise<?>> promises = new HashMap<>();
 
-    protected RpcThread(int id, RpcServer server) {
+    protected Worker(int id, RpcServer server) {
         this.id = id;
         this.server = server;
     }
 
-    public static RpcThread current() {
+    public static Worker current() {
         return threadLocal.get();
     }
 
-    protected static void checkThread(int id) {
-        RpcThread current = current();
+    protected static void check(int id) {
+        Worker current = current();
         if (current == null) {
-            throw new RuntimeException("当前不在RPC线程中");
+            throw new RuntimeException("当前不在RPC工作线程中");
         }
         if (id > 0 && current.id != id) {
-            throw new RuntimeException("当前RPC线程" + current.id + "不是期望线程" + id);
+            throw new RuntimeException("当前RPC工作线程[" + current.id + "]不是期望值:" + id);
         }
     }
 
@@ -58,22 +60,22 @@ public class RpcThread {
     }
 
     protected void addService(Service service) {
-        service.thread = this;
+        service.worker = this;
         services.put(service.getId(), service);
     }
 
     protected void removeService(Service service) {
-        service.thread = null;
+        service.worker = null;
         services.remove(service.getId());
     }
 
     protected void start() {
-        logger.info("RpcThread.start():" + id);
+        logger.info("Worker.start():" + id);
         new Thread(this::run).start();
     }
 
     protected void stop() {
-        logger.info("RpcThread.stop():" + id);
+        logger.info("Worker.stop():" + id);
         running = false;
     }
 
@@ -82,12 +84,10 @@ public class RpcThread {
         running = true;
 
         while (running) {
-            for (Runnable task = taskQueue.poll(); task != null; task = taskQueue.poll()) {
-                try {
-                    task.run();
-                } catch (Throwable e) {
-                    logger.error("", e);
-                }
+            try {
+                taskQueue.take().run();
+            } catch (Throwable e) {
+                logger.error("", e);
             }
         }
 
@@ -109,15 +109,15 @@ public class RpcThread {
         }
     }
 
-    public <R> Promise<R> sendRequest(int targetServerId, Object serviceId, String methodId, Object... methodParams) {
-        checkThread(this.id);
+    public <R> Promise<R> sendRequest(int targetServerId, Object serviceId, int methodId, Object... params) {
+        check(this.id);
 
         long callId = (long) this.id << 32 | nextCallId++;
         if (nextCallId < 0) {
             nextCallId = 1;
         }
 
-        Request request = new Request(serviceId, methodId, methodParams);
+        Request request = new Request(serviceId, methodId, params);
         request.setCallId(callId);
         server.sendRequest(targetServerId, request);
 
@@ -129,7 +129,7 @@ public class RpcThread {
 
     protected void handleRequest(int originServerId, Request request) {
         Service service = services.get(request.getServiceId());
-        Object result = service.call(request.getMethodId(), request.getMethodParams());
+        Object result = service.call(request.getMethodId(), request.getParams());
 
         Response response = new Response(request.getCallId(), result);
         server.sendResponse(originServerId, response);

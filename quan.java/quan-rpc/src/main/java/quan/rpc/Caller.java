@@ -1,7 +1,7 @@
 package quan.rpc;
 
-public abstract class Caller<S extends Service> {
+public  interface Caller {
 
-    public abstract Object call(S service, String methodId, Object... methodParams);
+    Object call(Service service, int methodId, Object... params);
 
 }

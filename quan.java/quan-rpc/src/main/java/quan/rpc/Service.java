@@ -3,7 +3,9 @@ package quan.rpc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author quanchangnai
@@ -13,15 +15,11 @@ public abstract class Service {
     private Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
-     * 服务所属的线程
+     * 服务所属的工作线程
      */
-    RpcThread thread;
+    Worker worker;
 
     private Caller caller;
-
-    {
-        initCaller();
-    }
 
     /**
      * 服务ID，在同一个RPC服务器内必需保证唯一性
@@ -29,25 +27,24 @@ public abstract class Service {
     public abstract Object getId();
 
     /**
-     * @see #thread
+     * @see #worker
      */
-    public RpcThread getThread() {
-        return thread;
+    public Worker getWorker() {
+        return worker;
     }
 
-    private void initCaller() {
-        try {
-            Class<?> callerClass = Class.forName(getClass().getName() + "Proxy$Caller");
-            Constructor<?> constructor = callerClass.getDeclaredConstructor();
-            constructor.setAccessible(true);
-            this.caller = (Caller) constructor.newInstance();
-        } catch (Exception e) {
-            logger.error("", e);
+    final Object call(int methodId, Object... params) {
+        if (caller == null) {
+            try {
+                Class<?> callerClass = Class.forName(getClass().getName() + "Caller");
+                this.caller = (Caller) callerClass.getField("instance").get(callerClass);
+            } catch (Exception e) {
+                logger.error("", e);
+                return null;
+            }
         }
-    }
 
-    public Object call(String methodId, Object... methodParams) {
-        return caller.call(this, methodId, methodParams);
+        return caller.call(this, methodId, params);
     }
 
     /**
