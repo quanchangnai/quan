@@ -7,6 +7,7 @@ import quan.rpc.RPC;
 import quan.rpc.Service;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author quanchangnai
@@ -30,20 +31,24 @@ public class TestService extends Service {
         return id;
     }
 
+    /**
+     * a+b
+     */
     @RPC
-    public Integer add(Integer a, Integer b) {
+    public int add(Integer a, Integer b) {
         logger.info("execute TestService{}.add({},{}) at worker{}", id, a, b, this.getWorker().getId());
         return a + b;
     }
 
     @RPC
-    public void remove(int a) {
+    public void remove(Map<Integer, String> map, int a) {
+        map.remove(a);
         logger.info("execute TestService{}.remove({}) at worker{}", id, a, this.getWorker().getId());
     }
 
     @RPC
-    public Integer a(List<Integer> list) {
-        return 1;
+    public <E> Integer size(List<E> list) {
+        return list.size();
     }
 
     @Override

@@ -1,30 +1,33 @@
+<#if packageName??>
 package ${packageName};
 
+ </#if>
 import quan.rpc.Caller;
 import quan.rpc.Service;
 
 import javax.annotation.processing.Generated;
 
 @Generated("quan.generator.rpc.RpcGenerator")
-public final class ${simpleName}Caller implements Caller {
+public final class ${name}Caller implements Caller {
 
-    public static final ${simpleName}Caller instance = new ${simpleName}Caller();
+    public static final ${name}Caller instance = new ${name}Caller();
 
-    private ${simpleName}Caller() {
+    private ${name}Caller() {
     }
 
+    @Override
     public Object call(Service service, int methodId, Object... params) {
-        ${simpleName} ${simpleName?uncap_first} = (${simpleName}) service;
+        ${name} ${name?uncap_first} = (${name}) service;
         switch (methodId) {
         <#list methods as method>
             case ${method?index+1}:
-            <#if !method.returnVoid>
-                return ${simpleName?uncap_first}.${method.name}(<#rt>
+            <#if method.returnVoid>
+                ${name?uncap_first}.${method.name}(<#rt>
             <#else>
-                ${simpleName?uncap_first}.${method.name}(<#rt>
+                return ${name?uncap_first}.${method.name}(<#rt>
             </#if>
             <#list method.parameters?keys as paramName>
-                (${method.parameters[paramName]}) params[${paramName?index}]<#if paramName?has_next>, </#if><#t>
+                (${method.eraseParameterType(method.parameters[paramName])}) params[${paramName?index}]<#if paramName?has_next>, </#if><#t>
             </#list>
             <#lt>);
             <#if method.returnVoid>

@@ -1,22 +1,27 @@
 package quan.generator.rpc;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 
-public class RpcMethod {
+public class RpcMethod extends RpcElement {
 
-    private String name;
+    private RpcClass rpcClass;
 
     public String returnType;
 
     //参数名:参数类型
     private LinkedHashMap<String, String> parameters = new LinkedHashMap<>();
 
-    public RpcMethod(String name) {
-        this.name = name;
+    public RpcMethod(CharSequence name) {
+        this.name = name.toString();
     }
 
-    public String getName() {
-        return name;
+    public RpcClass getRpcClass() {
+        return rpcClass;
+    }
+
+    public void setRpcClass(RpcClass rpcClass) {
+        this.rpcClass = rpcClass;
     }
 
     public String getReturnType() {
@@ -28,21 +33,42 @@ public class RpcMethod {
     }
 
     public boolean isReturnVoid() {
-        return Void.class.getName().equals(returnType);
+        return Void.class.getSimpleName().equals(returnType);
     }
 
-    public void addParameter(String type, String name) {
-        parameters.put(name, type);
+    public void addParameter(CharSequence name, String type) {
+        parameters.put(name.toString(), type);
     }
 
     public LinkedHashMap<String, String> getParameters() {
         return parameters;
     }
 
+    //擦除方法参数的泛型
+    public String eraseParameterType(String type) {
+        int index = type.indexOf("<");
+        if (index > 0) {
+            return type.substring(0, index);
+        }
+
+        List<String> typeBounds = typeParameters.get(type);
+        if (typeBounds == null || typeBounds.isEmpty()) {
+            typeBounds = rpcClass.typeParameters.get(type);
+        }
+        if (typeBounds != null && !typeBounds.isEmpty()) {
+            return typeBounds.get(0);
+        }
+
+        return type;
+    }
+
+
     @Override
     public String toString() {
         return "RpcMethod{" +
                 "name='" + name + '\'' +
+                ", comment='" + comment + '\'' +
+                ", typeParameters=" + typeParameters +
                 ", returnType='" + returnType + '\'' +
                 ", parameters=" + parameters +
                 '}';

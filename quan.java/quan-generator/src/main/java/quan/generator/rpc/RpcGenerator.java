@@ -5,13 +5,11 @@ import freemarker.template.Template;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
+import javax.lang.model.element.*;
 import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
@@ -25,9 +23,11 @@ public class RpcGenerator extends AbstractProcessor {
 
     private Messager messager;
 
+    private Filer filer;
+
     private Types typeUtils;
 
-    private Filer filer;
+    private Elements elementUtils;
 
     public static final String SERVICE_CLASS_NAME = "quan.rpc.Service";
 
@@ -41,9 +41,10 @@ public class RpcGenerator extends AbstractProcessor {
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
         messager = processingEnv.getMessager();
-        typeUtils = processingEnv.getTypeUtils();
         filer = processingEnv.getFiler();
-        serviceType = processingEnv.getElementUtils().getTypeElement(SERVICE_CLASS_NAME).asType();
+        typeUtils = processingEnv.getTypeUtils();
+        elementUtils = processingEnv.getElementUtils();
+        serviceType = elementUtils.getTypeElement(SERVICE_CLASS_NAME).asType();
 
         try {
             Configuration freemarkerCfg = new Configuration(Configuration.VERSION_2_3_23);
@@ -52,9 +53,13 @@ public class RpcGenerator extends AbstractProcessor {
             proxyTemplate = freemarkerCfg.getTemplate("proxy.ftl");
             callerTemplate = freemarkerCfg.getTemplate("caller.ftl");
         } catch (IOException e) {
-            processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, e.toString());
+            error(e.toString());
             e.printStackTrace();
         }
+    }
+
+    private void error(String msg) {
+        messager.printMessage(Diagnostic.Kind.ERROR, msg);
     }
 
     @Override
@@ -69,41 +74,81 @@ public class RpcGenerator extends AbstractProcessor {
         }
 
         for (TypeElement typeElement : elements.keySet()) {
-            if (!typeUtils.isSubtype(typeElement.asType(), serviceType)) {
-                messager.printMessage(Diagnostic.Kind.WARNING, typeElement + " cannot declare an rpc method because it is not a subtype of " + serviceType);
-                continue;
-            }
-
-            List<ExecutableElement> executableElements = elements.get(typeElement);
-            RpcClass rpcClass = new RpcClass(typeElement.getQualifiedName().toString());
-
-            for (ExecutableElement executableElement : executableElements) {
-                RpcMethod rpcMethod = new RpcMethod(executableElement.getSimpleName().toString());
-
-                TypeMirror returnType = executableElement.getReturnType();
-                if (returnType.getKind().isPrimitive()) {
-                    rpcMethod.setReturnType(typeUtils.boxedClass((PrimitiveType) returnType).asType().toString());
-                } else if (returnType.getKind() == TypeKind.VOID) {
-                    rpcMethod.setReturnType(Void.class.getName());
-                } else {
-                    rpcMethod.setReturnType(returnType.toString());
-                }
-
-                for (VariableElement parameter : executableElement.getParameters()) {
-                    rpcMethod.addParameter(parameter.asType().toString(), parameter.toString());
-                }
-
-                rpcClass.getMethods().add(rpcMethod);
-            }
-
-            try {
-                generate(rpcClass);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            processClass(typeElement, elements.get(typeElement));
         }
 
         return true;
+    }
+
+    private void processClass(TypeElement typeElement, List<ExecutableElement> executableElements) {
+        if (!typeUtils.isSubtype(typeElement.asType(), serviceType)) {
+            error(typeElement + " cannot declare an rpc method, because it is not a subtype of " + serviceType);
+            return;
+        }
+
+        if (typeElement.getNestingKind().isNested()) {
+            error(typeElement + " cannot declare an rpc method, because it is nested kind");
+            return;
+        }
+
+        RpcClass rpcClass = new RpcClass(typeElement.getQualifiedName().toString());
+        rpcClass.setComment(elementUtils.getDocComment(typeElement));
+        rpcClass.setTypeParameters(processTypeParameters(typeElement.getTypeParameters()));
+
+        for (ExecutableElement executableElement : executableElements) {
+            if (executableElement.getModifiers().contains(Modifier.PRIVATE)) {
+                error(typeElement + "." + executableElement + " cannot be declared as rpc method, because it is private");
+                continue;
+            }
+            RpcMethod rpcMethod = processMethod(executableElement);
+            rpcMethod.setRpcClass(rpcClass);
+            rpcClass.getMethods().add(rpcMethod);
+        }
+
+        try {
+            generate(rpcClass);
+        } catch (IOException e) {
+            error(e.toString());
+            e.printStackTrace();
+        }
+    }
+
+    private LinkedHashMap<String, List<String>> processTypeParameters(List<? extends TypeParameterElement> typeParameterElements) {
+        LinkedHashMap<String, List<String>> typeParameters = new LinkedHashMap<>();
+
+        for (TypeParameterElement typeParameter : typeParameterElements) {
+            List<String> typeBounds = new ArrayList<>();
+            for (TypeMirror typeBound : typeParameter.getBounds()) {
+                String typeBoundStr = typeBound.toString();
+                if (!typeBoundStr.equals(Object.class.getName())) {
+                    typeBounds.add(typeBoundStr);
+                }
+            }
+            typeParameters.put(typeParameter.getSimpleName().toString(), typeBounds);
+        }
+
+        return typeParameters;
+    }
+
+    private RpcMethod processMethod(ExecutableElement executableElement) {
+        RpcMethod rpcMethod = new RpcMethod(executableElement.getSimpleName());
+        rpcMethod.setComment(elementUtils.getDocComment(executableElement));
+        rpcMethod.setTypeParameters(processTypeParameters(executableElement.getTypeParameters()));
+
+        for (VariableElement parameter : executableElement.getParameters()) {
+            rpcMethod.addParameter(parameter.getSimpleName(), parameter.asType().toString());
+        }
+
+        TypeMirror returnType = executableElement.getReturnType();
+        if (returnType.getKind().isPrimitive()) {
+            rpcMethod.setReturnType(typeUtils.boxedClass((PrimitiveType) returnType).asType().toString());
+        } else if (returnType.getKind() == TypeKind.VOID) {
+            rpcMethod.setReturnType(Void.class.getSimpleName());
+        } else {
+            rpcMethod.setReturnType(returnType.toString());
+        }
+
+        return rpcMethod;
     }
 
 
@@ -112,6 +157,7 @@ public class RpcGenerator extends AbstractProcessor {
         try (Writer proxyWriter = proxyFile.openWriter()) {
             proxyTemplate.process(rpcClass, proxyWriter);
         } catch (Exception e) {
+            error(e.toString());
             e.printStackTrace();
         }
 
@@ -119,6 +165,7 @@ public class RpcGenerator extends AbstractProcessor {
         try (Writer callerWriter = callerFile.openWriter()) {
             callerTemplate.process(rpcClass, callerWriter);
         } catch (Exception e) {
+            error(e.toString());
             e.printStackTrace();
         }
     }
