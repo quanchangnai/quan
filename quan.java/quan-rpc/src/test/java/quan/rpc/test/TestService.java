@@ -60,13 +60,13 @@ public class TestService extends Service {
         lastTime = now;
 
         if (this.id == 1) {
-            logger.info("TestService{} call TestService{}  at worker{}", this.id, testServiceProxy2.getServiceId(), this.getWorker().getId());
+            logger.info("TestService{} call TestService{}  at worker{}", this.id, testServiceProxy2.serviceId, this.getWorker().getId());
 
             int a = (int) (now % 3);
             int b = (int) (now % 10);
             Promise<Integer> promise = testServiceProxy2.add(a, b);
             promise.then(result -> {
-                logger.info("TestService{} call TestService{}.add({},{})={}", this.id, testServiceProxy2.getServiceId(), a, b, result);
+                logger.info("TestService{} call TestService{}.add({},{})={}", this.id, testServiceProxy2.serviceId, a, b, result);
                 System.err.println();
             });
         }

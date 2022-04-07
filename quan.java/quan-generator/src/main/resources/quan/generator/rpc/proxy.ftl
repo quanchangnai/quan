@@ -16,32 +16,23 @@ import javax.annotation.processing.Generated;
 @Generated("quan.generator.rpc.RpcGenerator")
 public final class ${name}Proxy${typeParametersStr}{
 
-    private final int serverId;
-
-    private final Object serviceId;
+    /**
+     * 目标服务器ID
+     */
+    public final int serverId;
 
     /**
-     *
+     * 目标服务ID
+     */
+    public final Object serviceId;
+
+    /**
      * @param serverId 目标服务器ID
      * @param serviceId 目标服务ID
      */
     public ${name}Proxy(int serverId, Object serviceId) {
         this.serverId = serverId;
         this.serviceId = serviceId;
-    }
-
-    /**
-     * 目标服务器ID
-     */
-    public int getServerId() {
-        return serverId;
-    }
-
-    /**
-     * 目标服务ID
-     */
-    public Object getServiceId() {
-        return serviceId;
     }
 
 <#list methods as method>
