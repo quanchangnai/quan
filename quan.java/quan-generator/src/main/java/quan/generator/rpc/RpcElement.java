@@ -1,5 +1,6 @@
 package quan.generator.rpc;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -47,8 +48,10 @@ public abstract class RpcElement {
                 if (i++ > 0) {
                     sb.append(",");
                 }
-                List<String> typeBounds = typeParameters.get(typeName);
                 sb.append(typeName);
+
+                List<String> typeBounds = new ArrayList<>(typeParameters.get(typeName));
+                typeBounds.remove(Object.class.getName());
                 if (!typeBounds.isEmpty()) {
                     sb.append(" extends ");
                     sb.append(String.join("&", typeBounds));

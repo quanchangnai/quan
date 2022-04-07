@@ -119,10 +119,7 @@ public class RpcGenerator extends AbstractProcessor {
         for (TypeParameterElement typeParameter : typeParameterElements) {
             List<String> typeBounds = new ArrayList<>();
             for (TypeMirror typeBound : typeParameter.getBounds()) {
-                String typeBoundStr = typeBound.toString();
-                if (!typeBoundStr.equals(Object.class.getName())) {
-                    typeBounds.add(typeBoundStr);
-                }
+                typeBounds.add(typeBound.toString());
             }
             typeParameters.put(typeParameter.getSimpleName().toString(), typeBounds);
         }

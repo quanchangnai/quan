@@ -55,8 +55,13 @@ public class RpcMethod extends RpcElement {
         if (typeBounds == null || typeBounds.isEmpty()) {
             typeBounds = rpcClass.typeParameters.get(type);
         }
+
         if (typeBounds != null && !typeBounds.isEmpty()) {
-            return typeBounds.get(0);
+            if (typeBounds.contains(Object.class.getName()) && typeBounds.size() > 1) {
+                return typeBounds.get(1);
+            } else {
+                return typeBounds.get(0);
+            }
         }
 
         return type;
