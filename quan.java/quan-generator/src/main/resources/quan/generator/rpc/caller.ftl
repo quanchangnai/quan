@@ -2,12 +2,11 @@
 package ${packageName};
 
  </#if>
-import quan.rpc.Caller;
-import quan.rpc.Service;
+<#list imports?keys as importKey>
+import ${imports[importKey]};
+</#list>
 
-import javax.annotation.processing.Generated;
-
-@Generated("quan.generator.rpc.RpcGenerator")
+@Generated("${generatorName}")
 public final class ${name}Caller implements Caller {
 
     public static final ${name}Caller instance = new ${name}Caller();
@@ -26,8 +25,8 @@ public final class ${name}Caller implements Caller {
             <#else>
                 return ${name?uncap_first}.${method.name}(<#rt>
             </#if>
-            <#list method.parameters?keys as paramName>
-                (${method.eraseParameterType(method.parameters[paramName])}) params[${paramName?index}]<#if paramName?has_next>, </#if><#t>
+            <#list method.optimizedParameters?keys as paramName>
+                (${method.optimizedParameters[paramName]}) params[${paramName?index}]<#if paramName?has_next>, </#if><#t>
             </#list>
             <#lt>);
             <#if method.returnVoid>

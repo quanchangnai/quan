@@ -47,7 +47,7 @@ public class TestService extends Service {
     }
 
     @RPC
-    public <E> Integer size(List<E> list) {
+    public <E> Integer size(List<? super Runnable> list) {
         return list.size();
     }
 
@@ -71,4 +71,5 @@ public class TestService extends Service {
             });
         }
     }
+
 }

@@ -29,8 +29,6 @@ public class RpcGenerator extends AbstractProcessor {
 
     private Elements elementUtils;
 
-    public static final String SERVICE_CLASS_NAME = "quan.rpc.Service";
-
     private TypeMirror serviceType;
 
     private Template proxyTemplate;
@@ -44,7 +42,7 @@ public class RpcGenerator extends AbstractProcessor {
         filer = processingEnv.getFiler();
         typeUtils = processingEnv.getTypeUtils();
         elementUtils = processingEnv.getElementUtils();
-        serviceType = elementUtils.getTypeElement(SERVICE_CLASS_NAME).asType();
+        serviceType = elementUtils.getTypeElement("quan.rpc.Service").asType();
 
         try {
             Configuration freemarkerCfg = new Configuration(Configuration.VERSION_2_3_23);
@@ -93,7 +91,7 @@ public class RpcGenerator extends AbstractProcessor {
 
         RpcClass rpcClass = new RpcClass(typeElement.getQualifiedName().toString());
         rpcClass.setComment(elementUtils.getDocComment(typeElement));
-        rpcClass.setTypeParameters(processTypeParameters(typeElement.getTypeParameters()));
+        rpcClass.setOriginalTypeParameters(processTypeParameters(typeElement.getTypeParameters()));
 
         for (ExecutableElement executableElement : executableElements) {
             if (executableElement.getModifiers().contains(Modifier.PRIVATE)) {
@@ -130,7 +128,7 @@ public class RpcGenerator extends AbstractProcessor {
     private RpcMethod processMethod(ExecutableElement executableElement) {
         RpcMethod rpcMethod = new RpcMethod(executableElement.getSimpleName());
         rpcMethod.setComment(elementUtils.getDocComment(executableElement));
-        rpcMethod.setTypeParameters(processTypeParameters(executableElement.getTypeParameters()));
+        rpcMethod.setOriginalTypeParameters(processTypeParameters(executableElement.getTypeParameters()));
 
         for (VariableElement parameter : executableElement.getParameters()) {
             rpcMethod.addParameter(parameter.getSimpleName(), parameter.asType().toString());
@@ -138,11 +136,11 @@ public class RpcGenerator extends AbstractProcessor {
 
         TypeMirror returnType = executableElement.getReturnType();
         if (returnType.getKind().isPrimitive()) {
-            rpcMethod.setReturnType(typeUtils.boxedClass((PrimitiveType) returnType).asType().toString());
+            rpcMethod.setOriginalReturnType(typeUtils.boxedClass((PrimitiveType) returnType).asType().toString());
         } else if (returnType.getKind() == TypeKind.VOID) {
-            rpcMethod.setReturnType(Void.class.getSimpleName());
+            rpcMethod.setOriginalReturnType(Void.class.getSimpleName());
         } else {
-            rpcMethod.setReturnType(returnType.toString());
+            rpcMethod.setOriginalReturnType(returnType.toString());
         }
 
         return rpcMethod;
@@ -150,6 +148,7 @@ public class RpcGenerator extends AbstractProcessor {
 
 
     private void generate(RpcClass rpcClass) throws IOException {
+        rpcClass.optimizeImport4Proxy();
         JavaFileObject proxyFile = filer.createSourceFile(rpcClass.getFullName() + "Proxy");
         try (Writer proxyWriter = proxyFile.openWriter()) {
             proxyTemplate.process(rpcClass, proxyWriter);
@@ -158,6 +157,7 @@ public class RpcGenerator extends AbstractProcessor {
             e.printStackTrace();
         }
 
+        rpcClass.optimizeImport4Caller();
         JavaFileObject callerFile = filer.createSourceFile(rpcClass.getFullName() + "Caller");
         try (Writer callerWriter = callerFile.openWriter()) {
             callerTemplate.process(rpcClass, callerWriter);

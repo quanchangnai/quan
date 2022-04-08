@@ -11,10 +11,15 @@ public abstract class RpcElement {
 
     protected String name;
 
-    protected String comment = "";
+    protected String comment;
 
-    //泛型的类型参数，参数名：类型边界
-    protected LinkedHashMap<String, List<String>> typeParameters = new LinkedHashMap<>();
+    //泛型的类型参数，参数名：类型上边界<T extends Object&Runnable>
+    protected LinkedHashMap<String, List<String>> originalTypeParameters = new LinkedHashMap<>();
+
+    //原始数据的类型都是全类名，这里的类型名都是优化导入之后的类型名，大部分会变成简单类名
+    protected LinkedHashMap<String, List<String>> optimizedTypeParameters = new LinkedHashMap<>();
+
+    protected RpcClass rpcClass;
 
     public String getName() {
         return name;
@@ -25,44 +30,69 @@ public abstract class RpcElement {
     }
 
     public void setComment(String comment) {
-        if (comment != null) {
-            this.comment = comment;
+        this.comment = comment;
+    }
+
+    public String[] getComments() {
+        if (comment == null) {
+            return new String[0];
+        } else {
+            return comment.split("\n");
         }
     }
 
-    public LinkedHashMap<String, List<String>> getTypeParameters() {
-        return typeParameters;
+    public LinkedHashMap<String, List<String>> getOriginalTypeParameters() {
+        return originalTypeParameters;
     }
 
-    public void setTypeParameters(LinkedHashMap<String, List<String>> typeParameters) {
-        this.typeParameters = typeParameters;
+    public void setOriginalTypeParameters(LinkedHashMap<String, List<String>> originalTypeParameters) {
+        this.originalTypeParameters = originalTypeParameters;
     }
 
     public String getTypeParametersStr() {
         StringBuilder sb = new StringBuilder();
 
-        if (!typeParameters.isEmpty()) {
+        if (!optimizedTypeParameters.isEmpty()) {
             sb.append("<");
             int i = 0;
-            for (String typeName : typeParameters.keySet()) {
+            for (String typeName : optimizedTypeParameters.keySet()) {
                 if (i++ > 0) {
                     sb.append(",");
                 }
                 sb.append(typeName);
 
-                List<String> typeBounds = new ArrayList<>(typeParameters.get(typeName));
+                List<String> typeBounds = new ArrayList<>(optimizedTypeParameters.get(typeName));
                 typeBounds.remove(Object.class.getName());
                 if (!typeBounds.isEmpty()) {
                     sb.append(" extends ");
-                    sb.append(String.join("&", typeBounds));
+                    sb.append(String.join(" & ", typeBounds));
                 }
             }
-            sb.append(">");
+            sb.append("> ");
         }
 
-        sb.append(" ");
-
         return sb.toString();
+    }
+
+    public RpcClass getRpcClass() {
+        return rpcClass;
+    }
+
+    public void setRpcClass(RpcClass rpcClass) {
+        this.rpcClass = rpcClass;
+    }
+
+    public String getGeneratorName() {
+        return RpcGenerator.class.getName();
+    }
+
+    public void optimizeImport4Proxy() {
+        optimizedTypeParameters.clear();
+        for (String name : originalTypeParameters.keySet()) {
+            for (String bound : originalTypeParameters.get(name)) {
+                optimizedTypeParameters.computeIfAbsent(name, k -> new ArrayList<>()).add(rpcClass.optimizeImport(bound));
+            }
+        }
     }
 
 }

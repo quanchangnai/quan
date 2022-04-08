@@ -10,7 +10,6 @@ public class RoleService<T extends Object & Runnable> extends Service {
 
     private T id;
 
-
     @Override
     public Object getId() {
         return "role";
@@ -31,9 +30,9 @@ public class RoleService<T extends Object & Runnable> extends Service {
     }
 
     @RPC
-    public <R extends Object> R login3(T id) {
+    public <R extends Runnable> R login3(T id) {
         System.err.println("login3:" + id);
-        return (R) "";
+        return null;
     }
 
 }
