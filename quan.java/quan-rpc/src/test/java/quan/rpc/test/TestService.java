@@ -3,7 +3,7 @@ package quan.rpc.test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.rpc.Promise;
-import quan.rpc.RPC;
+import quan.rpc.Endpoint;
 import quan.rpc.Service;
 
 import java.util.List;
@@ -34,19 +34,19 @@ public class TestService extends Service {
     /**
      * a+b
      */
-    @RPC
+    @Endpoint
     public int add(Integer a, Integer b) {
         logger.info("execute TestService{}.add({},{}) at worker{}", id, a, b, this.getWorker().getId());
         return a + b;
     }
 
-    @RPC
+    @Endpoint
     public void remove(Map<Integer, String> map, int a) {
         map.remove(a);
         logger.info("execute TestService{}.remove({}) at worker{}", id, a, this.getWorker().getId());
     }
 
-    @RPC
+    @Endpoint
     public <E> Integer size(List<? super Runnable> list) {
         return list.size();
     }

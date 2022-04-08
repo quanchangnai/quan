@@ -1,6 +1,6 @@
 package quan.rpc.test;
 
-import quan.rpc.RPC;
+import quan.rpc.Endpoint;
 import quan.rpc.Service;
 
 /**
@@ -18,18 +18,18 @@ public class RoleService<T extends Object & Runnable> extends Service {
     /**
      * 角色登陆1
      */
-    @RPC
+    @Endpoint
     public void login1(T id) {
         this.id = id;
         System.err.println("login1:" + this.id);
     }
 
-    @RPC
+    @Endpoint
     public <T> void login2(T id) {
         System.err.println("login2:" + id);
     }
 
-    @RPC
+    @Endpoint
     public <R extends Runnable> R login3(T id) {
         System.err.println("login3:" + id);
         return null;

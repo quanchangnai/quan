@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
 
-@SupportedAnnotationTypes("quan.rpc.RPC")
+@SupportedAnnotationTypes("quan.rpc.Endpoint")
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class RpcGenerator extends AbstractProcessor {
 
@@ -80,12 +80,12 @@ public class RpcGenerator extends AbstractProcessor {
 
     private void processClass(TypeElement typeElement, List<ExecutableElement> executableElements) {
         if (!typeUtils.isSubtype(typeElement.asType(), serviceType)) {
-            error(typeElement + " cannot declare an rpc method, because it is not a subtype of " + serviceType);
+            error(typeElement + " cannot declare an endpoint method, because it is not a subtype of " + serviceType);
             return;
         }
 
         if (typeElement.getNestingKind().isNested()) {
-            error(typeElement + " cannot declare an rpc method, because it is nested kind");
+            error(typeElement + " cannot declare an endpoint method, because it is nested kind");
             return;
         }
 
@@ -95,7 +95,7 @@ public class RpcGenerator extends AbstractProcessor {
 
         for (ExecutableElement executableElement : executableElements) {
             if (executableElement.getModifiers().contains(Modifier.PRIVATE)) {
-                error(typeElement + "." + executableElement + " cannot be declared as rpc method, because it is private");
+                error(typeElement + "." + executableElement + " cannot be declared as endpoint method, because it is private");
                 continue;
             }
             RpcMethod rpcMethod = processMethod(executableElement);

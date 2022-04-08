@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public abstract class Service {
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
      * 服务所属的工作线程
@@ -29,7 +29,7 @@ public abstract class Service {
     /**
      * @see #worker
      */
-    public Worker getWorker() {
+    public final Worker getWorker() {
         return worker;
     }
 
@@ -51,7 +51,6 @@ public abstract class Service {
      * 刷帧
      */
     protected void update() {
-
     }
 
 }
