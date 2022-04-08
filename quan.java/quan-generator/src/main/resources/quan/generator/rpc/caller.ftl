@@ -6,7 +6,6 @@ package ${packageName};
 import ${imports[importKey]};
 </#list>
 
-@Generated("${generatorName}")
 public final class ${name}Caller implements Caller {
 
     public static final ${name}Caller instance = new ${name}Caller();

@@ -131,7 +131,6 @@ public class RpcClass extends RpcElement {
         imports.clear();
         imports.put("Promise", "quan.rpc.Promise");
         imports.put("Worker", "quan.rpc.Worker");
-        imports.put("Generated", "javax.annotation.processing.Generated");
 
         super.optimizeImport4Proxy();
         methods.forEach(RpcMethod::optimizeImport4Proxy);
@@ -141,7 +140,6 @@ public class RpcClass extends RpcElement {
         imports.clear();
         imports.put("Caller", "quan.rpc.Caller");
         imports.put("Service", "quan.rpc.Service");
-        imports.put("Generated", "javax.annotation.processing.Generated");
 
         methods.forEach(RpcMethod::optimizeImport4Caller);
     }

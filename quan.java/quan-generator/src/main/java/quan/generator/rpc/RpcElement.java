@@ -62,7 +62,9 @@ public abstract class RpcElement {
                 sb.append(typeName);
 
                 List<String> typeBounds = new ArrayList<>(optimizedTypeParameters.get(typeName));
-                typeBounds.remove(Object.class.getName());
+                if (originalTypeParameters.get(typeName).contains(Object.class.getName())) {
+                    typeBounds.remove(0);
+                }
                 if (!typeBounds.isEmpty()) {
                     sb.append(" extends ");
                     sb.append(String.join(" & ", typeBounds));

@@ -12,7 +12,6 @@ import ${imports[importKey]};
 </#list>
  * @see ${name}
  */
-@Generated("${generatorName}")
 public final class ${name}Proxy${typeParametersStr}{
 
     public final int serverId;
