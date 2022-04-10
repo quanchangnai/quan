@@ -1,6 +1,5 @@
 using Quan.Utils;
 using Quan.Message;
-using Buffer = Quan.Message.Buffer;
 using System;
 
 namespace Test.Message.User
@@ -28,7 +27,7 @@ namespace Test.Message.User
         }
 
 
-        public override void Encode(Buffer buffer)
+        public override void Encode(CodedBuffer buffer)
         {
             base.Encode(buffer);
 
@@ -36,7 +35,7 @@ namespace Test.Message.User
             buffer.WriteString(name);
         }
 
-        public override void Decode(Buffer buffer)
+        public override void Decode(CodedBuffer buffer)
         {
             base.Decode(buffer);
 

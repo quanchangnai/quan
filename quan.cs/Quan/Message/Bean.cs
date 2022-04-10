@@ -4,26 +4,36 @@ namespace Quan.Message
     {
         public byte[] Encode()
         {
-            var buffer = new Buffer();
+            var buffer = new CodedBuffer();
             Encode(buffer);
             return buffer.RemainingBytes();
         }
 
-        public virtual void Encode(Buffer buffer)
+        public virtual void Encode(CodedBuffer buffer)
         {
         }
 
         public void Decode(byte[] bytes)
         {
-            var buffer = new Buffer(bytes);
+            var buffer = new CodedBuffer(bytes);
             Decode(buffer);
         }
 
-        public virtual void Decode(Buffer buffer)
+        public virtual void Decode(CodedBuffer buffer)
         {
         }
 
-        protected static void SkipField(int tag, Buffer buffer)
+        public void WriteTag(CodedBuffer buffer, int tag)
+        {
+            buffer.WriteByte((byte) tag);
+        }
+
+        public int ReadTag(CodedBuffer buffer)
+        {
+            return buffer.ReadByte();
+        }
+
+        protected static void SkipField(int tag, CodedBuffer buffer)
         {
             switch (tag & 0b11)
             {

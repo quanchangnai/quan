@@ -2,10 +2,10 @@ package quan.network.codec;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import quan.message.Buffer;
+import quan.message.CodedBuffer;
 import quan.message.Message;
 import quan.message.MessageRegistry;
-import quan.message.SimpleBuffer;
+import quan.message.DefaultCodedBuffer;
 
 import java.nio.ByteBuffer;
 import java.util.Collections;
@@ -33,11 +33,11 @@ public class MessageCodec extends Codec {
 
     @Override
     protected List<Object> decode(Object msg) {
-        Buffer buffer;
+        CodedBuffer buffer;
         if (msg instanceof ByteBuffer) {
-            buffer = new SimpleBuffer((ByteBuffer) msg);
+            buffer = new DefaultCodedBuffer((ByteBuffer) msg);
         } else {
-            buffer = new SimpleBuffer((byte[]) msg);
+            buffer = new DefaultCodedBuffer((byte[]) msg);
         }
 
         int msgId = buffer.readInt();

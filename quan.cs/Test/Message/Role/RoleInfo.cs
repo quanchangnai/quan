@@ -1,6 +1,5 @@
 using Quan.Utils;
 using Quan.Message;
-using Buffer = Quan.Message.Buffer;
 using System;
 using System.Collections.Generic;
 
@@ -53,7 +52,7 @@ namespace Test.Message.Role
         public Dictionary<int, int> map { get; } = new Dictionary<int, int>();
 
 
-        public override void Encode(Buffer buffer)
+        public override void Encode(CodedBuffer buffer)
         {
             base.Encode(buffer);
 
@@ -79,7 +78,7 @@ namespace Test.Message.Role
             }
         }
 
-        public override void Decode(Buffer buffer)
+        public override void Decode(CodedBuffer buffer)
         {
             base.Decode(buffer);
 

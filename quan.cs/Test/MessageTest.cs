@@ -9,7 +9,6 @@ using Quan.Message;
 using Test.Message.Role;
 using RoleInfo = Test.Message.Role.RoleInfo;
 using Test.Message.User;
-using Buffer = Quan.Message.Buffer;
 
 namespace Test
 {
@@ -21,7 +20,7 @@ namespace Test
         {
             Console.WriteLine("Test1====================");
 
-            var buffer = new Buffer();
+            var buffer = new CodedBuffer();
             buffer.WriteBool(true);
             buffer.WriteInt(70);
             buffer.WriteInt(2423);

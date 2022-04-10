@@ -14,12 +14,12 @@ public abstract class Message extends Bean {
     public abstract Message create();
 
     @Override
-    public void encode(Buffer buffer) {
+    public void encode(CodedBuffer buffer) {
         buffer.writeInt(getId());
     }
 
     @Override
-    public void decode(Buffer buffer) {
+    public void decode(CodedBuffer buffer) {
         int msgId = buffer.readInt();
         if (msgId != getId()) {
             throw new RuntimeException(String.format("消息ID不匹配,期望值[%s],实际值[%s]", getId(), msgId));

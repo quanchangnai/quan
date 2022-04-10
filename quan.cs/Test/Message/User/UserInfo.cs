@@ -1,6 +1,5 @@
 using Quan.Utils;
 using Quan.Message;
-using Buffer = Quan.Message.Buffer;
 using System;
 using System.Collections.Generic;
 
@@ -103,7 +102,7 @@ namespace Test.Message.User
             get => _f16;
             set
             {
-                Buffer.CheckScale(value, 2);
+                CodedBuffer.CheckScale(value, 2);
                 _f16 = value;
             }
         }
@@ -117,62 +116,62 @@ namespace Test.Message.User
             get => _f18;
             set
             {
-                Buffer.CheckScale(value, 2);
+                CodedBuffer.CheckScale(value, 2);
                 _f18 = value;
             }
         }
 
 
-        public override void Encode(Buffer buffer)
+        public override void Encode(CodedBuffer buffer)
         {
             base.Encode(buffer);
 
             if (id != 0)
             {
-                buffer.WriteTag(4);
+                WriteTag(buffer, 4);
                 buffer.WriteInt(id);
             }
 
             if (name.Length > 0)
             {
-                buffer.WriteTag(11);
+                WriteTag(buffer, 11);
                 buffer.WriteString(name);
             }
 
             if (level != 0)
             {
-                buffer.WriteTag(12);
+                WriteTag(buffer, 12);
                 buffer.WriteInt(level);
             }
 
             if (type != 0)
             {
-                buffer.WriteTag(16);
+                WriteTag(buffer, 16);
                 buffer.WriteInt((int) type);
             }
 
             if (roleInfo1 != null)
             {
-                buffer.WriteTag(23);
-                var roleInfo1Buffer = new Buffer();
+                WriteTag(buffer, 23);
+                var roleInfo1Buffer = new CodedBuffer();
                 roleInfo1.Encode(roleInfo1Buffer);
                 buffer.WriteBuffer(roleInfo1Buffer);
             }
 
-            buffer.WriteTag(27);
-            var roleInfo2Buffer = new Buffer();
+            WriteTag(buffer, 27);
+            var roleInfo2Buffer = new CodedBuffer();
             roleInfo2.Encode(roleInfo2Buffer);
             buffer.WriteBuffer(roleInfo2Buffer);
 
-            buffer.WriteTag(31);
-            var roleInfo3Buffer = new Buffer();
+            WriteTag(buffer, 31);
+            var roleInfo3Buffer = new CodedBuffer();
             roleInfo3.Encode(roleInfo3Buffer);
             buffer.WriteBuffer(roleInfo3Buffer);
 
             if (roleList.Count > 0)
             {
-                buffer.WriteTag(35);
-                var roleListBuffer = new Buffer();
+                WriteTag(buffer, 35);
+                var roleListBuffer = new CodedBuffer();
                 roleListBuffer.WriteInt(roleList.Count);
                 foreach (var roleListValue in roleList)
                 {
@@ -183,8 +182,8 @@ namespace Test.Message.User
 
             if (roleSet.Count > 0)
             {
-                buffer.WriteTag(39);
-                var roleSetBuffer = new Buffer();
+                WriteTag(buffer, 39);
+                var roleSetBuffer = new CodedBuffer();
                 roleSetBuffer.WriteInt(roleSet.Count);
                 foreach (var roleSetValue in roleSet)
                 {
@@ -195,8 +194,8 @@ namespace Test.Message.User
 
             if (roleMap.Count > 0)
             {
-                buffer.WriteTag(43);
-                var roleMapBuffer = new Buffer();
+                WriteTag(buffer, 43);
+                var roleMapBuffer = new CodedBuffer();
                 roleMapBuffer.WriteInt(roleMap.Count);
                 foreach (var roleMapKey in roleMap.Keys)
                 {
@@ -208,60 +207,60 @@ namespace Test.Message.User
 
             if (f11.Length > 0)
             {
-                buffer.WriteTag(47);
+                WriteTag(buffer, 47);
                 buffer.WriteBytes(f11);
             }
 
             if (f12)
             {
-                buffer.WriteTag(48);
+                WriteTag(buffer, 48);
                 buffer.WriteBool(f12);
             }
 
             if (f13)
             {
-                buffer.WriteTag(52);
+                WriteTag(buffer, 52);
                 buffer.WriteBool(f13);
             }
 
             if (f14 != 0)
             {
-                buffer.WriteTag(56);
+                WriteTag(buffer, 56);
                 buffer.WriteShort(f14);
             }
 
             if (f15 != 0)
             {
-                buffer.WriteTag(61);
+                WriteTag(buffer, 61);
                 buffer.WriteFloat(f15);
             }
 
             if (f16 != 0)
             {
-                buffer.WriteTag(64);
+                WriteTag(buffer, 64);
                 buffer.WriteFloat(f16, 2);
             }
 
             if (f17 != 0)
             {
-                buffer.WriteTag(70);
+                WriteTag(buffer, 70);
                 buffer.WriteDouble(f17);
             }
 
             if (f18 != 0)
             {
-                buffer.WriteTag(72);
+                WriteTag(buffer, 72);
                 buffer.WriteDouble(f18, 2);
             }
 
-            buffer.WriteTag(0);
+            WriteTag(buffer,0);
         }
 
-        public override void Decode(Buffer buffer)
+        public override void Decode(CodedBuffer buffer)
         {
             base.Decode(buffer);
 
-            for (var tag = buffer.ReadTag(); tag != 0; tag = buffer.ReadTag())
+            for (var tag = ReadTag(buffer); tag != 0; tag = ReadTag(buffer))
             {
                 switch (tag)
                 {

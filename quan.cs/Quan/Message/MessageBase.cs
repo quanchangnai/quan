@@ -11,12 +11,12 @@ namespace Quan.Message
 
         public abstract MessageBase Create();
 
-        public override void Encode(Buffer buffer)
+        public override void Encode(CodedBuffer buffer)
         {
             buffer.WriteInt(Id);
         }
 
-        public override void Decode(Buffer buffer)
+        public override void Decode(CodedBuffer buffer)
         {
             var id = buffer.ReadInt();
             if (id != Id)

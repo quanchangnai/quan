@@ -236,7 +236,7 @@ public class UserInfo extends Bean {
     }
 
     public UserInfo setF16(float f16) {
-        Buffer.checkScale(f16, 2);
+        CodedBuffer.checkScale(f16, 2);
         this.f16 = f16;
         return this;
     }
@@ -255,51 +255,51 @@ public class UserInfo extends Bean {
     }
 
     public UserInfo setF18(double f18) {
-        Buffer.checkScale(f18, 2);
+        CodedBuffer.checkScale(f18, 2);
         this.f18 = f18;
         return this;
     }
 
     @Override
-    public void encode(Buffer buffer) {
+    public void encode(CodedBuffer buffer) {
         super.encode(buffer);
 
         if (this.id != 0) {
-            buffer.writeTag(4);
+            writeTag(buffer, 4);
             buffer.writeInt(this.id);
         }
 
         if (!this.name.isEmpty()) {
-            buffer.writeTag(11);
+            writeTag(buffer, 11);
             buffer.writeString(this.name);
         }
 
         if (this.level != 0) {
-            buffer.writeTag(12);
+            writeTag(buffer, 12);
             buffer.writeInt(this.level);
         }
 
         if (this.type != null) {
-            buffer.writeTag(16);
+            writeTag(buffer, 16);
             buffer.writeInt(this.type.value());
         }
 
         if (this.roleInfo1 != null) {
-            buffer.writeTag(23);
+            writeTag(buffer, 23);
             this.roleInfo1.encode(buffer.getTemp());
             buffer.writeTemp();
         }
 
-        buffer.writeTag(27);
+        writeTag(buffer, 27);
         this.roleInfo2.encode(buffer.getTemp());
         buffer.writeTemp();
 
-        buffer.writeTag(31);
+        writeTag(buffer, 31);
         this.roleInfo3.encode(buffer.getTemp());
         buffer.writeTemp();
 
         if (!this.roleList.isEmpty()) {
-            buffer.writeTag(35);
+            writeTag(buffer, 35);
             buffer.getTemp().writeInt(this.roleList.size());
             for (quan.message.role.RoleInfo roleList$Value : this.roleList) {
                 roleList$Value.encode(buffer.getTemp());
@@ -308,7 +308,7 @@ public class UserInfo extends Bean {
         }
 
         if (!this.roleSet.isEmpty()) {
-            buffer.writeTag(39);
+            writeTag(buffer, 39);
             buffer.getTemp().writeInt(this.roleSet.size());
             for (quan.message.role.RoleInfo roleSet$Value : this.roleSet) {
                 roleSet$Value.encode(buffer.getTemp());
@@ -317,7 +317,7 @@ public class UserInfo extends Bean {
         }
 
         if (!this.roleMap.isEmpty()) {
-            buffer.writeTag(43);
+            writeTag(buffer, 43);
             buffer.getTemp().writeInt(this.roleMap.size());
             for (Integer roleMap$Key : this.roleMap.keySet()) {
                 buffer.getTemp().writeInt(roleMap$Key);
@@ -327,53 +327,53 @@ public class UserInfo extends Bean {
         }
 
         if (this.f11.length > 0) {
-            buffer.writeTag(47);
+            writeTag(buffer, 47);
             buffer.writeBytes(this.f11);
         }
 
         if (this.f12) {
-            buffer.writeTag(48);
+            writeTag(buffer, 48);
             buffer.writeBool(this.f12);
         }
 
         if (this.f13) {
-            buffer.writeTag(52);
+            writeTag(buffer, 52);
             buffer.writeBool(this.f13);
         }
 
         if (this.f14 != 0) {
-            buffer.writeTag(56);
+            writeTag(buffer, 56);
             buffer.writeShort(this.f14);
         }
 
         if (this.f15 != 0) {
-            buffer.writeTag(61);
+            writeTag(buffer, 61);
             buffer.writeFloat(this.f15);
         }
 
         if (this.f16 != 0) {
-            buffer.writeTag(64);
+            writeTag(buffer, 64);
             buffer.writeFloat(this.f16, 2);
         }
 
         if (this.f17 != 0) {
-            buffer.writeTag(70);
+            writeTag(buffer, 70);
             buffer.writeDouble(this.f17);
         }
 
         if (this.f18 != 0) {
-            buffer.writeTag(72);
+            writeTag(buffer, 72);
             buffer.writeDouble(this.f18, 2);
         }
 
-        buffer.writeTag(0);
+        writeTag(buffer, 0);
     }
 
     @Override
-    public void decode(Buffer buffer) {
+    public void decode(CodedBuffer buffer) {
         super.decode(buffer);
 
-        for (int tag = buffer.readTag(); tag != 0; tag = buffer.readTag()) {
+        for (int tag = readTag(buffer); tag != 0; tag = readTag(buffer)) {
             switch (tag) {
                 case 4:
                     this.id = buffer.readInt();

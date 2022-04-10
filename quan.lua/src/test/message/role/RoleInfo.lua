@@ -3,7 +3,7 @@
 ---代码自动生成，请勿手动修改
 ---
 
-local _Buffer = require("quan.message.Buffer")
+local _CodedBuffer = require("quan.message.CodedBuffer")
 local _Message = require("quan.message.Message")
 
 ---
@@ -70,14 +70,14 @@ setmetatable(RoleInfo, { __call = RoleInfo.new })
 
 ---
 ---[角色信息].编码
----@param buffer quan.message.Buffer 可以为空
----@return quan.message.Buffer
+---@param buffer quan.message.CodedBuffer 可以为空
+---@return quan.message.CodedBuffer
 ---
 function RoleInfo:encode(buffer)
     assert(type(self) == "table" and self.class == RoleInfo.class, "参数[self]类型错误")
-    assert(buffer == nil or type(buffer) == "table" and buffer.class == _Buffer.class, "参数[buffer]类型错误")
+    assert(buffer == nil or type(buffer) == "table" and buffer.class == _CodedBuffer.class, "参数[buffer]类型错误")
 
-    buffer = buffer or _Buffer.new()
+    buffer = buffer or _CodedBuffer.new()
 
     buffer:writeInt(self.id)
     buffer:writeString(self.name)
@@ -103,12 +103,12 @@ end
 
 ---
 ---[角色信息].解码
----@param buffer quan.message.Buffer 不能为空
+---@param buffer quan.message.CodedBuffer 不能为空
 ---@param self test.message.role.RoleInfo 可以为空
 ---@return test.message.role.RoleInfo
 ---
 function RoleInfo.decode(buffer, self)
-    assert(type(buffer) == "table" and buffer.class == _Buffer.class, "参数[buffer]类型错误")
+    assert(type(buffer) == "table" and buffer.class == _CodedBuffer.class, "参数[buffer]类型错误")
     assert(self == nil or type(self) == "table" and self.class == RoleInfo.class, "参数[self]类型错误")
 
     self = self or RoleInfo.new()

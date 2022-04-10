@@ -1,6 +1,5 @@
 using Quan.Utils;
 using Quan.Message;
-using Buffer = Quan.Message.Buffer;
 <#list imports?keys as import>
 using ${import};
 </#list>
@@ -80,7 +79,7 @@ namespace ${getFullPackageName("cs")}
             get => _${field.name};
             set
             {
-                Buffer.CheckScale(value, ${field.scale});
+                CodedBuffer.CheckScale(value, ${field.scale});
                 _${field.name} = value;
             }
         }
@@ -125,7 +124,7 @@ namespace ${getFullPackageName("cs")}
         }
 
 </#if>
-        public override void Encode(Buffer buffer)
+        public override void Encode(CodedBuffer buffer)
         {
             base.Encode(buffer);
 
@@ -137,8 +136,8 @@ namespace ${getFullPackageName("cs")}
         <#if field.type=="set" || field.type=="list">
             if (${field.name}.Count > 0)
             {
-                buffer.WriteTag(${field.tag});
-                var ${field.name}Buffer = new Buffer();
+                WriteTag(buffer, ${field.tag});
+                var ${field.name}Buffer = new CodedBuffer();
                 ${field.name}Buffer.WriteInt(${field.name}.Count);
                 foreach (var ${field.name}Value in ${field.name})
                 {
@@ -153,8 +152,8 @@ namespace ${getFullPackageName("cs")}
         <#elseif field.type=="map">
             if (${field.name}.Count > 0)
             {
-                buffer.WriteTag(${field.tag});
-                var ${field.name}Buffer = new Buffer();
+                WriteTag(buffer, ${field.tag});
+                var ${field.name}Buffer = new CodedBuffer();
                 ${field.name}Buffer.WriteInt(${field.name}.Count);
                 foreach (var ${field.name}Key in ${field.name}.Keys)
                 {
@@ -170,50 +169,50 @@ namespace ${getFullPackageName("cs")}
         <#elseif field.type=="float"||field.type=="double">
             if (${field.name} != 0)
             {
-                buffer.WriteTag(${field.tag});
+                WriteTag(buffer, ${field.tag});
                 buffer.Write${field.type?cap_first}(${field.name}<#if field.scale gt 0>, ${field.scale}</#if>);
             }
         <#elseif field.numberType>
             if (${field.name} != 0)
             {
-                buffer.WriteTag(${field.tag});
+                WriteTag(buffer, ${field.tag});
                 buffer.Write${field.type?cap_first}(${field.name});
             }
         <#elseif field.type=="bool">
             if (${field.name})
             {
-                buffer.WriteTag(${field.tag});
+                WriteTag(buffer, ${field.tag});
                 buffer.Write${field.type?cap_first}(${field.name});
             }
         <#elseif field.type=="string">
             if (${field.name}.Length > 0)
             {
-                buffer.WriteTag(${field.tag});
+                WriteTag(buffer, ${field.tag});
                 buffer.Write${field.type?cap_first}(${field.name});
             }
         <#elseif field.type=="bytes">
             if (${field.name}.Length > 0)
             {
-                buffer.WriteTag(${field.tag});
+                WriteTag(buffer, ${field.tag});
                 buffer.Write${field.type?cap_first}(${field.name});
             }
         <#elseif field.enumType>
             if (${field.name} != 0)
             {
-                buffer.WriteTag(${field.tag});
+                WriteTag(buffer, ${field.tag});
                 buffer.WriteInt((int) ${field.name});
             }
         <#elseif field.optional>
             if (${field.name} != null)
             {
-                buffer.WriteTag(${field.tag});
-                var ${field.name}Buffer = new Buffer();
+                WriteTag(buffer, ${field.tag});
+                var ${field.name}Buffer = new CodedBuffer();
                 ${field.name}.Encode(${field.name}Buffer);
                 buffer.WriteBuffer(${field.name}Buffer);
             }
         <#else>
-            buffer.WriteTag(${field.tag});
-            var ${field.name}Buffer = new Buffer();
+            WriteTag(buffer, ${field.tag});
+            var ${field.name}Buffer = new CodedBuffer();
             ${field.name}.Encode(${field.name}Buffer);
             buffer.WriteBuffer(${field.name}Buffer);
         </#if>
@@ -273,16 +272,16 @@ namespace ${getFullPackageName("cs")}
     </#if>
 </#list>
 <#if definedFieldId>
-            buffer.WriteTag(0);
+            WriteTag(buffer,0);
 </#if>
         }
 
-        public override void Decode(Buffer buffer)
+        public override void Decode(CodedBuffer buffer)
         {
             base.Decode(buffer);
 
 <#if definedFieldId>
-            for (var tag = buffer.ReadTag(); tag != 0; tag = buffer.ReadTag())
+            for (var tag = ReadTag(buffer); tag != 0; tag = ReadTag(buffer))
             {
                 switch (tag)
                 {

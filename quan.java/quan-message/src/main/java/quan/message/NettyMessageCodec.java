@@ -26,12 +26,12 @@ public class NettyMessageCodec extends ByteToMessageCodec<Message> {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, Message msg, ByteBuf byteBuf) {
-        msg.encode(new NettyBuffer(byteBuf));
+        msg.encode(new NettyCodedBuffer(byteBuf));
     }
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) {
-        Buffer buffer = new NettyBuffer(byteBuf);
+        CodedBuffer buffer = new NettyCodedBuffer(byteBuf);
         int msgId = buffer.readInt();
         buffer.reset();
         Message message = messageRegistry.create(msgId);

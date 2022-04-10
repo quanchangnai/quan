@@ -3,14 +3,14 @@ package quan.message;
 import io.netty.buffer.ByteBuf;
 
 /**
- * 使用Netty的ByteBuf实现的字节缓冲区
+ * 使用Netty的ByteBuf实现的{@link CodedBuffer}
  * Created by quanchangnai on 2020/3/27.
  */
-public class NettyBuffer extends Buffer {
+public class NettyCodedBuffer extends CodedBuffer {
 
     private ByteBuf buf;
 
-    public NettyBuffer(ByteBuf buf) {
+    public NettyCodedBuffer(ByteBuf buf) {
         this.buf = buf;
     }
 

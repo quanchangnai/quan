@@ -3,7 +3,7 @@
 ---代码自动生成，请勿手动修改
 ---
 
-local _Buffer = require("quan.message.Buffer")
+local _CodedBuffer = require("quan.message.CodedBuffer")
 local _Message = require("quan.message.Message")
 local test_message_role_RoleInfo = require("test.message.role.RoleInfo")
 local RoleInfo = require("test.message.user.RoleInfo")
@@ -94,55 +94,55 @@ setmetatable(UserInfo, { __call = UserInfo.new })
 
 ---
 ---[用户信息].编码
----@param buffer quan.message.Buffer 可以为空
----@return quan.message.Buffer
+---@param buffer quan.message.CodedBuffer 可以为空
+---@return quan.message.CodedBuffer
 ---
 function UserInfo:encode(buffer)
     assert(type(self) == "table" and self.class == UserInfo.class, "参数[self]类型错误")
-    assert(buffer == nil or type(buffer) == "table" and buffer.class == _Buffer.class, "参数[buffer]类型错误")
+    assert(buffer == nil or type(buffer) == "table" and buffer.class == _CodedBuffer.class, "参数[buffer]类型错误")
 
-    buffer = buffer or _Buffer.new()
+    buffer = buffer or _CodedBuffer.new()
 
     if self.id ~= 0 then
-        buffer:writeTag(4)
+        _Message.writeTag(buffer, 4)
         buffer:writeInt(self.id)
     end
 
     if #self.name > 0 then
-        buffer:writeTag(11)
+        _Message.writeTag(buffer, 11)
         buffer:writeString(self.name)
     end
 
     if self.level ~= 0 then
-        buffer:writeTag(12)
+        _Message.writeTag(buffer, 12)
         buffer:writeInt(self.level)
     end
 
     if self.type ~= nil and self.type ~= 0 then
-        buffer:writeTag(16)
+        _Message.writeTag(buffer, 16)
         buffer:writeInt(self.type)
     end
 
     if self.roleInfo1 ~= nil then
-        buffer:writeTag(23)
-        local roleInfo1Buffer = _Buffer.new()
+        _Message.writeTag(buffer, 23)
+        local roleInfo1Buffer = _CodedBuffer.new()
         test_message_role_RoleInfo.encode(self.roleInfo1, roleInfo1Buffer)
         buffer:writeBuffer(roleInfo1Buffer)
     end
 
-    buffer:writeTag(27)
-    local roleInfo2Buffer = _Buffer.new()
+    _Message.writeTag(buffer, 27)
+    local roleInfo2Buffer = _CodedBuffer.new()
     RoleInfo.encode(self.roleInfo2, roleInfo2Buffer)
     buffer:writeBuffer(roleInfo2Buffer)
 
-    buffer:writeTag(31)
-    local roleInfo3Buffer = _Buffer.new()
+    _Message.writeTag(buffer, 31)
+    local roleInfo3Buffer = _CodedBuffer.new()
     RoleInfo.encode(self.roleInfo3, roleInfo3Buffer)
     buffer:writeBuffer(roleInfo3Buffer)
 
     if #self.roleList > 0 then
-        buffer:writeTag(35)
-        local roleListBuffer = _Buffer.new()
+        _Message.writeTag(buffer, 35)
+        local roleListBuffer = _CodedBuffer.new()
         roleListBuffer:writeInt(#self.roleList)
         for i, value in ipairs(self.roleList) do
             test_message_role_RoleInfo.encode(value, roleListBuffer)
@@ -151,8 +151,8 @@ function UserInfo:encode(buffer)
     end
 
     if #self.roleSet > 0 then
-        buffer:writeTag(39)
-        local roleSetBuffer = _Buffer.new()
+        _Message.writeTag(buffer, 39)
+        local roleSetBuffer = _CodedBuffer.new()
         roleSetBuffer:writeInt(#self.roleSet)
         for i, value in ipairs(self.roleSet) do
             test_message_role_RoleInfo.encode(value, roleSetBuffer)
@@ -162,8 +162,8 @@ function UserInfo:encode(buffer)
 
     local roleMapSize = table.size(self.roleMap)
     if roleMapSize > 0 then
-        buffer:writeTag(43)
-        local roleMapBuffer = _Buffer.new()
+        _Message.writeTag(buffer, 43)
+        local roleMapBuffer = _CodedBuffer.new()
         roleMapBuffer:writeInt(roleMapSize)
         for key, value in pairs(self.roleMap) do
             roleMapBuffer:writeInt(key)
@@ -173,64 +173,64 @@ function UserInfo:encode(buffer)
     end
 
     if #self.f11 > 0 then
-        buffer:writeTag(47)
+        _Message.writeTag(buffer, 47)
         buffer:writeBytes(self.f11)
     end
 
     if self.f12 then
-        buffer:writeTag(48)
+        _Message.writeTag(buffer, 48)
         buffer:writeBool(self.f12)
     end
 
     if self.f13 then
-        buffer:writeTag(52)
+        _Message.writeTag(buffer, 52)
         buffer:writeBool(self.f13)
     end
 
     if self.f14 ~= 0 then
-        buffer:writeTag(56)
+        _Message.writeTag(buffer, 56)
         buffer:writeShort(self.f14)
     end
 
     if self.f15 ~= 0 then
-        buffer:writeTag(61)
+        _Message.writeTag(buffer, 61)
         buffer:writeFloat(self.f15)
     end
 
     if self.f16 ~= 0 then
-        buffer:writeTag(64)
+        _Message.writeTag(buffer, 64)
         buffer:writeFloat(self.f16, 2)
     end
 
     if self.f17 ~= 0 then
-        buffer:writeTag(70)
+        _Message.writeTag(buffer, 70)
         buffer:writeDouble(self.f17)
     end
 
     if self.f18 ~= 0 then
-        buffer:writeTag(72)
+        _Message.writeTag(buffer, 72)
         buffer:writeDouble(self.f18, 2)
     end
 
-    buffer:writeTag(0);
+    _Message.writeTag(buffer, 0);
 
     return buffer
 end
 
 ---
 ---[用户信息].解码
----@param buffer quan.message.Buffer 不能为空
+---@param buffer quan.message.CodedBuffer 不能为空
 ---@param self test.message.user.UserInfo 可以为空
 ---@return test.message.user.UserInfo
 ---
 function UserInfo.decode(buffer, self)
-    assert(type(buffer) == "table" and buffer.class == _Buffer.class, "参数[buffer]类型错误")
+    assert(type(buffer) == "table" and buffer.class == _CodedBuffer.class, "参数[buffer]类型错误")
     assert(self == nil or type(self) == "table" and self.class == UserInfo.class, "参数[self]类型错误")
 
     self = self or UserInfo.new()
 
     while true do
-        local tag = buffer:readTag()
+        local tag = _Message.readTag(buffer)
         if tag == 0 then
             break
         elseif tag == 4 then

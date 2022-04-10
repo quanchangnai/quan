@@ -6,9 +6,9 @@ import java.nio.charset.StandardCharsets;
  * 采用VarInt和ZigZag编码的字节缓冲区，字节顺序采用小端模式<br/>
  * Created by quanchangnai on 2020/3/27.
  */
-public abstract class Buffer {
+public abstract class CodedBuffer {
 
-    private Buffer temp;
+    private CodedBuffer temp;
 
     /**
      * 容量
@@ -36,7 +36,7 @@ public abstract class Buffer {
     public abstract int readableCount();
 
     /**
-     * 读取当前剩余的字节数组
+     * 读取当前剩余的数据
      */
     public abstract byte[] remainingBytes();
 
@@ -193,7 +193,7 @@ public abstract class Buffer {
     /**
      * 写数据之前的回调
      *
-     * @param writeCount 未压缩之前要写入的字节数量
+     * @param writeCount 未编码之前要写入的字节数量
      */
     protected void onWrite(int writeCount) {
     }
@@ -272,7 +272,7 @@ public abstract class Buffer {
 
     public abstract void writeBytes(byte[] bytes);
 
-    public void writeBuffer(Buffer buffer) {
+    public void writeBuffer(CodedBuffer buffer) {
         writeBytes(buffer.remainingBytes());
     }
 
@@ -280,17 +280,9 @@ public abstract class Buffer {
         writeBytes(s.getBytes(StandardCharsets.UTF_8));
     }
 
-    public void writeTag(int tag) {
-        writeByte((byte) tag);
-    }
-
-    public int readTag() {
-        return readByte() & 0xFF;
-    }
-
-    public Buffer getTemp() {
+    public CodedBuffer getTemp() {
         if (temp == null) {
-            temp = new SimpleBuffer();
+            temp = new DefaultCodedBuffer();
         }
         return temp;
     }

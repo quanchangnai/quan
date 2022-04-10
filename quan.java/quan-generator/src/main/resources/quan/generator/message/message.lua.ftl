@@ -5,7 +5,7 @@
 ---代码自动生成，请勿手动修改
 ---
 
-local _Buffer = require("quan.message.Buffer")
+local _CodedBuffer = require("quan.message.CodedBuffer")
 local _Message = require("quan.message.Message")
 <#list imports?keys as import>
 local ${imports[import]?replace('.','_')} = require("${import}")
@@ -91,7 +91,7 @@ setmetatable(${name}, { __call = ${name}.new })
 <#if kind ==3>
 ---
 ---<#if comment !="">[${comment}]<#else>${name}</#if>.编码
----@return quan.message.Buffer
+---@return quan.message.CodedBuffer
 ---
 function ${name}:encode()
     assert(type(self) == "table" and self.class == ${name}.class, "参数[self]类型错误")
@@ -100,16 +100,16 @@ function ${name}:encode()
 <#else>
 ---
 ---<#if comment !="">[${comment}]<#else>${name}</#if>.编码
----@param buffer quan.message.Buffer 可以为空
----@return quan.message.Buffer
+---@param buffer quan.message.CodedBuffer 可以为空
+---@return quan.message.CodedBuffer
 ---
 function ${name}:encode(buffer)
     <#if kind ==2>
     assert(type(self) == "table" and self.class == ${name}.class, "参数[self]类型错误")
     </#if>
-    assert(buffer == nil or type(buffer) == "table" and buffer.class == _Buffer.class, "参数[buffer]类型错误")
+    assert(buffer == nil or type(buffer) == "table" and buffer.class == _CodedBuffer.class, "参数[buffer]类型错误")
 
-    buffer = buffer or _Buffer.new()
+    buffer = buffer or _CodedBuffer.new()
 
 </#if>
 <#list fields as field>
@@ -119,8 +119,8 @@ function ${name}:encode(buffer)
     <#if definedFieldId>
         <#if field.type=="set" || field.type=="list">
     if #self.${field.name} > 0 then
-        buffer:writeTag(${field.tag})
-        local ${field.name}Buffer = _Buffer.new()
+        _Message.writeTag(buffer, ${field.tag})
+        local ${field.name}Buffer = _CodedBuffer.new()
         ${field.name}Buffer:writeInt(#self.${field.name})
         for i, value in ipairs(self.${field.name}) do
         <#if field.builtinValueType>
@@ -134,8 +134,8 @@ function ${name}:encode(buffer)
         <#elseif field.type=="map">
     local ${field.name}Size = table.size(self.${field.name})
     if ${field.name}Size > 0 then
-        buffer:writeTag(${field.tag})
-        local ${field.name}Buffer = _Buffer.new()
+        _Message.writeTag(buffer, ${field.tag})
+        local ${field.name}Buffer = _CodedBuffer.new()
         ${field.name}Buffer:writeInt(${field.name}Size)
         for key, value in pairs(self.${field.name}) do
             ${field.name}Buffer:write${field.keyType?cap_first}(key)
@@ -149,39 +149,39 @@ function ${name}:encode(buffer)
     end
         <#elseif field.type=="float"||field.type=="double">
     if self.${field.name} ~= 0 then
-        buffer:writeTag(${field.tag})
+        _Message.writeTag(buffer, ${field.tag})
         buffer:write${field.type?cap_first}(self.${field.name}<#if field.scale gt 0>, ${field.scale}</#if>)
     end
         <#elseif field.numberType>
     if self.${field.name} ~= 0 then
-        buffer:writeTag(${field.tag})
+        _Message.writeTag(buffer, ${field.tag})
         buffer:write${field.type?cap_first}(self.${field.name})
     end
         <#elseif field.type=="bool">
     if self.${field.name} then
-        buffer:writeTag(${field.tag})
+        _Message.writeTag(buffer, ${field.tag})
         buffer:write${field.type?cap_first}(self.${field.name})
     end
         <#elseif field.type=="string" || field.type=="bytes">
     if #self.${field.name} > 0 then
-        buffer:writeTag(${field.tag})
+        _Message.writeTag(buffer, ${field.tag})
         buffer:write${field.type?cap_first}(self.${field.name})
     end
         <#elseif field.enumType>
     if self.${field.name} ~= nil and self.${field.name} ~= 0 then
-        buffer:writeTag(${field.tag})
+        _Message.writeTag(buffer, ${field.tag})
         buffer:writeInt(self.${field.name})
     end
         <#elseif field.optional>
     if self.${field.name} ~= nil then
-        buffer:writeTag(${field.tag})
-        local ${field.name}Buffer = _Buffer.new()
+        _Message.writeTag(buffer, ${field.tag})
+        local ${field.name}Buffer = _CodedBuffer.new()
         ${field.classType?replace('.','_')}.encode(self.${field.name}, ${field.name}Buffer)
         buffer:writeBuffer(${field.name}Buffer)
     end
     <#else>
-    buffer:writeTag(${field.tag})
-    local ${field.name}Buffer = _Buffer.new()
+    _Message.writeTag(buffer, ${field.tag})
+    local ${field.name}Buffer = _CodedBuffer.new()
     ${field.classType?replace('.','_')}.encode(self.${field.name}, ${field.name}Buffer)
     buffer:writeBuffer(${field.name}Buffer)
     </#if>
@@ -241,7 +241,7 @@ function ${name}:encode(buffer)
     </#if>
 </#list>
 <#if definedFieldId>
-    buffer:writeTag(0);
+    _Message.writeTag(buffer, 0);
 </#if>
 
     return buffer
@@ -250,11 +250,11 @@ end
 <#if kind ==3>
 ---
 ---<#if comment !="">[${comment}]<#else>${name}</#if>.解码
----@param buffer quan.message.Buffer 不能为空
+---@param buffer quan.message.CodedBuffer 不能为空
 ---@return ${getFullName("lua")}
 ---
 function ${name}.decode(buffer)
-    assert(type(buffer) == "table" and buffer.class == _Buffer.class, "参数[buffer]类型错误")
+    assert(type(buffer) == "table" and buffer.class == _CodedBuffer.class, "参数[buffer]类型错误")
 
     local self = ${name}.new()
 
@@ -262,12 +262,12 @@ function ${name}.decode(buffer)
 <#else>
 ---
 ---<#if comment !="">[${comment}]<#else>${name}</#if>.解码
----@param buffer quan.message.Buffer 不能为空
+---@param buffer quan.message.CodedBuffer 不能为空
 ---@param self ${getFullName("lua")} 可以为空
 ---@return ${getFullName("lua")}
 ---
 function ${name}.decode(buffer, self)
-    assert(type(buffer) == "table" and buffer.class == _Buffer.class, "参数[buffer]类型错误")
+    assert(type(buffer) == "table" and buffer.class == _CodedBuffer.class, "参数[buffer]类型错误")
     <#if kind ==2>
     assert(self == nil or type(self) == "table" and self.class == ${name}.class, "参数[self]类型错误")
     </#if>
@@ -277,7 +277,7 @@ function ${name}.decode(buffer, self)
 </#if>
 <#if definedFieldId>
     while true do
-        local tag = buffer:readTag()
+        local tag = _Message.readTag(buffer)
         if tag == 0 then
             break
     <#list fields as field>

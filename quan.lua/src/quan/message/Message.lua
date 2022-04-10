@@ -4,7 +4,7 @@
 --- DateTime: 2019/9/4 16:14
 ---
 
-local Buffer = require("quan.message.Buffer")
+local CodedBuffer = require("quan.message.CodedBuffer")
 
 local Message = {}
 
@@ -12,7 +12,7 @@ function Message.encode(msg, buffer)
     if buffer then
         buffer:reset()
     else
-        buffer = Buffer.new()
+        buffer = CodedBuffer.new()
     end
     buffer:writeInt(msg.id);
     return buffer
@@ -32,6 +32,15 @@ if _VERSION == "Lua 5.3" or _VERSION == "Lua 5.4" then
     band = require("quan.message.bits").band
 else
     band = require("bit").band
+end
+
+function Message.writeTag(buffer,tag)
+    assert(tag >= 0 and tag <= 255, "参数[tag]超出限定范围0-255")
+    buffer:writeByte(tag)
+end
+
+function Message.readTag(buffer)
+    return buffer:readByte()
 end
 
 function Message.skipField(tag, buffer)

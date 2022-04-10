@@ -6,7 +6,7 @@ namespace Quan.Message
     /// <summary>
     /// 基于VarInt和ZigZag编码的字节缓冲区，字节顺序采用小端模式
     /// </summary>
-    public class Buffer
+    public class CodedBuffer
     {
         //内部字节数组
         private byte[] _bytes;
@@ -20,16 +20,16 @@ namespace Quan.Message
         //标记的读位置
         private int _markedIndex;
 
-        public Buffer() : this(128)
+        public CodedBuffer() : this(128)
         {
         }
 
-        public Buffer(int capacity)
+        public CodedBuffer(int capacity)
         {
             _bytes = new byte[capacity];
         }
 
-        public Buffer(byte[] bytes)
+        public CodedBuffer(byte[] bytes)
         {
             _bytes = bytes;
             _writeIndex = bytes.Length;
@@ -373,7 +373,7 @@ namespace Quan.Message
             _writeIndex += bytes.Length;
         }
 
-        public void WriteBuffer(Buffer buffer)
+        public void WriteBuffer(CodedBuffer buffer)
         {
             var readableCount = buffer.ReadableCount;
 
@@ -390,15 +390,25 @@ namespace Quan.Message
         {
             WriteBytes(System.Text.Encoding.UTF8.GetBytes(s));
         }
+        
+        public void WriteByte(byte b)
+        {
+            _bytes[_writeIndex++] = b;
+        }
+
+        public byte ReadByte()
+        {
+            return _bytes[_readIndex++];
+        }
 
         public void WriteTag(int tag)
         {
-            _bytes[_writeIndex++] = (byte) tag;
+            WriteByte((byte) tag) ;
         }
 
         public int ReadTag()
         {
-            return _bytes[_readIndex++];
+            return ReadByte();
         }
     }
 }

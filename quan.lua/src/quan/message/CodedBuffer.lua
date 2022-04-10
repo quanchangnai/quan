@@ -25,17 +25,17 @@ local readVarInt = VarInt.readVarInt;
 local writeVarInt = VarInt.writeVarInt;
 
 ---
----@class quan.message.Buffer
+---@class quan.message.CodedBuffer
 ---基于VarInt和ZigZag编码的字节缓冲区，字节顺序采用小端模式
 ---
-local Buffer = {
+local CodedBuffer = {
     ---类名
-    class = "quan.message.Buffer"
+    class = "quan.message.CodedBuffer"
 }
 
----构造Buffer
+---构造CodedBuffer
 ---@param bytes 字节串，可以为空
-function Buffer.new(bytes)
+function CodedBuffer.new(bytes)
     assert(bytes == nil or type(bytes) == "string", "参数[bytes]类型错误")
     local instance = {
         ---字节缓冲区
@@ -45,67 +45,67 @@ function Buffer.new(bytes)
         ---标记的读位置
         markedIndex = 1
     }
-    setmetatable(instance, { __index = Buffer })
+    setmetatable(instance, { __index = CodedBuffer })
     return instance
 end
 
-setmetatable(Buffer, { __call = Buffer.new })
+setmetatable(CodedBuffer, { __call = CodedBuffer.new })
 
-function Buffer:size()
+function CodedBuffer:size()
     return self.bytes:len()
 end
 
-function Buffer:mark()
+function CodedBuffer:mark()
     self.markedIndex = self.readIndex
 end
 
-function Buffer:reset()
+function CodedBuffer:reset()
     self.readIndex = self.markedIndex
 end
 
-function Buffer:clear()
+function CodedBuffer:clear()
     self.readIndex = 1
     self.bytes = ""
 end
 
-function Buffer:readableCount()
+function CodedBuffer:readableCount()
     return self:size() - self.readIndex + 1;
 end
 
-function Buffer:remainingBytes()
+function CodedBuffer:remainingBytes()
     local remainingBytes = self.bytes:sub(self.readIndex)
     self.readIndex = self.readIndex + remainingBytes:len()
     return remainingBytes
 end
 
-function Buffer:discardReadBytes()
+function CodedBuffer:discardReadBytes()
     self.bytes = self.bytes:sub(self.readIndex)
     self.readIndex = 1;
 end
 
-function Buffer:readByte()
+function CodedBuffer:readByte()
     local b = self.bytes:byte(self.readIndex)
     self.readIndex = self.readIndex + 1
     return b
 end
 
-function Buffer:readBool()
+function CodedBuffer:readBool()
     return self:readInt() ~= 0
 end
 
-function Buffer:readShort()
+function CodedBuffer:readShort()
     return readVarInt(self, 3)
 end
 
-function Buffer:readInt()
+function CodedBuffer:readInt()
     return readVarInt(self, 5)
 end
 
-function Buffer:readLong()
+function CodedBuffer:readLong()
     return readVarInt(self, 10)
 end
 
-function Buffer:readFloat(scale)
+function CodedBuffer:readFloat(scale)
     scale = scale or -1
     --assert(math.type(scale) == "integer", "参数[scale]类型错误")
 
@@ -121,7 +121,7 @@ function Buffer:readFloat(scale)
     end
 end
 
-function Buffer:readDouble(scale)
+function CodedBuffer:readDouble(scale)
     scale = scale or -1
     --assert(math.type(scale) == "integer", "参数[scale]类型错误")
 
@@ -137,7 +137,7 @@ function Buffer:readDouble(scale)
     end
 end
 
-function Buffer:readBytes()
+function CodedBuffer:readBytes()
     local length = self:readInt()
     local readableCount = self:readableCount()
     if length > readableCount then
@@ -149,7 +149,7 @@ function Buffer:readBytes()
     return bytes
 end
 
-function Buffer:skipBytes()
+function CodedBuffer:skipBytes()
     local length = self:readInt()
     local readableCount = self:readableCount()
     if length > readableCount then
@@ -159,32 +159,32 @@ function Buffer:skipBytes()
     self.readIndex = self.readIndex + length
 end
 
-function Buffer:readString()
+function CodedBuffer:readString()
     return self:readBytes()
 end
 
-function Buffer:writeByte(b)
+function CodedBuffer:writeByte(b)
     self.bytes = self.bytes .. string.char(b)
 end
 
-function Buffer:writeBool(b)
+function CodedBuffer:writeBool(b)
     assert(type(b) == "boolean", "参数[b]类型错误")
     self:writeInt(b and 1 or 0)
 end
 
-function Buffer:writeShort(n)
+function CodedBuffer:writeShort(n)
     writeVarInt(self, n, 3)
 end
 
-function Buffer:writeInt(n)
+function CodedBuffer:writeInt(n)
     writeVarInt(self, n, 5)
 end
 
-function Buffer:writeLong(n)
+function CodedBuffer:writeLong(n)
     writeVarInt(self, n, 10)
 end
 
-function Buffer:writeFloat(n, scale)
+function CodedBuffer:writeFloat(n, scale)
     scale = scale or -1
     assert(type(n) == "number", "参数[n]类型错误")
     --assert(math.type(scale) == "integer", "参数[scale]类型错误")
@@ -196,7 +196,7 @@ function Buffer:writeFloat(n, scale)
     end
 end
 
-function Buffer:writeDouble(n, scale)
+function CodedBuffer:writeDouble(n, scale)
     scale = scale or -1
     assert(type(n) == "number", "参数[n]类型错误")
     --assert(math.type(scale) == "integer", "参数[scale]类型错误")
@@ -208,7 +208,7 @@ function Buffer:writeDouble(n, scale)
     end
 end
 
-function Buffer:writeFixed(n, scale)
+function CodedBuffer:writeFixed(n, scale)
     local times = 10 ^ scale
     local minValue = -0x80000000 * times;
     local maxValue = 0x7FFFFFFF * times;
@@ -221,28 +221,19 @@ function Buffer:writeFixed(n, scale)
     end
 end
 
-function Buffer:writeBytes(bytes)
+function CodedBuffer:writeBytes(bytes)
     assert(type(bytes) == "string", "参数[bytes]类型错误")
     self:writeInt(string.len(bytes))
     self.bytes = self.bytes .. bytes
 end
 
-function Buffer:writeBuffer(buffer)
+function CodedBuffer:writeBuffer(buffer)
     self:writeBytes(buffer:remainingBytes());
 end
 
-function Buffer:writeString(s)
+function CodedBuffer:writeString(s)
     self:writeBytes(s)
 end
 
-function Buffer:writeTag(tag)
-    assert(tag >= 0 and tag <= 255, "参数[tag]超出限定范围0-255")
-    self:writeByte(tag)
-end
-
-function Buffer:readTag()
-    return self:readByte()
-end
-
-Buffer = table.readOnly(Buffer)
-return Buffer
+CodedBuffer = table.readOnly(CodedBuffer)
+return CodedBuffer

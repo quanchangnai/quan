@@ -134,7 +134,7 @@ public class SRoleLogin extends Message {
     }
 
     @Override
-    public void encode(Buffer buffer) {
+    public void encode(CodedBuffer buffer) {
         super.encode(buffer);
 
         buffer.writeInt(this.roleId);
@@ -164,7 +164,7 @@ public class SRoleLogin extends Message {
     }
 
     @Override
-    public void decode(Buffer buffer) {
+    public void decode(CodedBuffer buffer) {
         super.decode(buffer);
 
         this.roleId = buffer.readInt();

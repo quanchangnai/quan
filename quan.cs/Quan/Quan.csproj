@@ -73,7 +73,7 @@
         <Compile Include="Config\ConfigLoader.cs" />
         <Compile Include="Config\ConfigReader.cs" />
         <Compile Include="Message\Bean.cs" />
-        <Compile Include="Message\Buffer.cs" />
+        <Compile Include="Message\CodedBuffer.cs" />
         <Compile Include="Message\MessageBase.cs" />
         <Compile Include="Message\MessageRegistry.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />

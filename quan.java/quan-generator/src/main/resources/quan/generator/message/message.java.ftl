@@ -116,7 +116,7 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
         <#if field.type == "string" || field.type == "bytes">
         Objects.requireNonNull(${field.name});
         <#elseif (field.type=="float"||field.type=="double") && field.scale gt 0>
-        Buffer.checkScale(${field.name}, ${field.scale});
+        CodedBuffer.checkScale(${field.name}, ${field.scale});
         </#if>
         this.${field.name} = ${field.name};
         return this;
@@ -150,7 +150,7 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
 
 </#if>
     @Override
-    public void encode(Buffer buffer) {
+    public void encode(CodedBuffer buffer) {
         super.encode(buffer);
 
 <#list selfFields as field>
@@ -160,7 +160,7 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
     <#if definedFieldId>
         <#if field.type=="set" || field.type=="list">
         if (!this.${field.name}.isEmpty()) {
-            buffer.writeTag(${field.tag});
+            writeTag(buffer, ${field.tag});
             buffer.getTemp().writeInt(this.${field.name}.size());
             for (${field.classValueType} ${field.name}$Value : this.${field.name}) {
                 <#if field.builtinValueType>
@@ -173,7 +173,7 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
         }
         <#elseif field.type=="map">
         if (!this.${field.name}.isEmpty()) {
-            buffer.writeTag(${field.tag});
+            writeTag(buffer, ${field.tag});
             buffer.getTemp().writeInt(this.${field.name}.size());
             for (${field.classKeyType} ${field.name}$Key : this.${field.name}.keySet()) {
                 buffer.getTemp().write${field.keyType?cap_first}(${field.name}$Key);
@@ -187,42 +187,42 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
         }
         <#elseif field.type=="float"||field.type=="double">
         if (this.${field.name} != 0) {
-            buffer.writeTag(${field.tag});
+            writeTag(buffer, ${field.tag});
             buffer.write${field.type?cap_first}(this.${field.name}<#if field.scale gt 0>, ${field.scale}</#if>);
         }
         <#elseif field.numberType>
         if (this.${field.name} != 0) {
-            buffer.writeTag(${field.tag});
+            writeTag(buffer, ${field.tag});
             buffer.write${field.type?cap_first}(this.${field.name});
         }
         <#elseif field.type=="bool">
         if (this.${field.name}) {
-            buffer.writeTag(${field.tag});
+            writeTag(buffer, ${field.tag});
             buffer.write${field.type?cap_first}(this.${field.name});
         }
         <#elseif field.type=="string">
         if (!this.${field.name}.isEmpty()) {
-            buffer.writeTag(${field.tag});
+            writeTag(buffer, ${field.tag});
             buffer.write${field.type?cap_first}(this.${field.name});
         }
         <#elseif field.type=="bytes">
         if (this.${field.name}.length > 0) {
-            buffer.writeTag(${field.tag});
+            writeTag(buffer, ${field.tag});
             buffer.write${field.type?cap_first}(this.${field.name});
         }
         <#elseif field.enumType>
         if (this.${field.name} != null) {
-            buffer.writeTag(${field.tag});
+            writeTag(buffer, ${field.tag});
             buffer.writeInt(this.${field.name}.value());
         }
         <#elseif field.optional>
         if (this.${field.name} != null) {
-            buffer.writeTag(${field.tag});
+            writeTag(buffer, ${field.tag});
             this.${field.name}.encode(buffer.getTemp());
             buffer.writeTemp();
         }
         <#else>
-        buffer.writeTag(${field.tag});
+        writeTag(buffer, ${field.tag});
         this.${field.name}.encode(buffer.getTemp());
         buffer.writeTemp();
         </#if>
@@ -282,16 +282,16 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
     </#if>
 </#list>
 <#if definedFieldId>
-        buffer.writeTag(0);
+        writeTag(buffer, 0);
 </#if>
     }
 
     @Override
-    public void decode(Buffer buffer) {
+    public void decode(CodedBuffer buffer) {
         super.decode(buffer);
 
 <#if definedFieldId>
-        for (int tag = buffer.readTag(); tag != 0; tag = buffer.readTag()) {
+        for (int tag = readTag(buffer); tag != 0; tag = readTag(buffer)) {
             switch (tag) {
             <#list selfFields as field>
                 <#if field.ignore><#continue/></#if>

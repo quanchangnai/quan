@@ -3,14 +3,11 @@ package quan.message;
 import java.nio.ByteBuffer;
 
 /**
- * 直接使用字节数组实现的字节缓冲区
+ * 直接使用字节数组实现的{@link CodedBuffer}
  * Created by quanchangnai on 2018/7/2.
  */
-public class SimpleBuffer extends Buffer {
+public class DefaultCodedBuffer extends CodedBuffer {
 
-    /**
-     * 字节缓冲区
-     */
     private byte[] bytes;
 
     /**
@@ -28,20 +25,20 @@ public class SimpleBuffer extends Buffer {
      */
     private int markedIndex;
 
-    public SimpleBuffer() {
+    public DefaultCodedBuffer() {
         this(128);
     }
 
-    public SimpleBuffer(int capacity) {
+    public DefaultCodedBuffer(int capacity) {
         this.bytes = new byte[capacity];
     }
 
-    public SimpleBuffer(byte[] bytes) {
+    public DefaultCodedBuffer(byte[] bytes) {
         this.bytes = bytes;
         this.writeIndex = bytes.length;
     }
 
-    public SimpleBuffer(ByteBuffer buffer) {
+    public DefaultCodedBuffer(ByteBuffer buffer) {
         this(buffer.array());
     }
 
@@ -142,21 +139,21 @@ public class SimpleBuffer extends Buffer {
     }
 
     @Override
-    public void writeBuffer(Buffer buffer) {
-        if (!(buffer instanceof SimpleBuffer)) {
+    public void writeBuffer(CodedBuffer buffer) {
+        if (!(buffer instanceof DefaultCodedBuffer)) {
             super.writeBuffer(buffer);
             return;
         }
 
-        SimpleBuffer simpleBuffer = (SimpleBuffer) buffer;
-        int readableCount = simpleBuffer.readableCount();
+        DefaultCodedBuffer _buffer = (DefaultCodedBuffer) buffer;
+        int readableCount = _buffer.readableCount();
 
         onWrite(10 + readableCount);
 
         writeInt(readableCount);
-        System.arraycopy(simpleBuffer.bytes, simpleBuffer.readIndex, this.bytes, this.writeIndex, readableCount);
+        System.arraycopy(_buffer.bytes, _buffer.readIndex, this.bytes, this.writeIndex, readableCount);
 
-        simpleBuffer.readIndex += readableCount;
+        _buffer.readIndex += readableCount;
         this.writeIndex += readableCount;
     }
 

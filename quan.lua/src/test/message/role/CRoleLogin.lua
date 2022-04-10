@@ -3,7 +3,7 @@
 ---代码自动生成，请勿手动修改
 ---
 
-local _Buffer = require("quan.message.Buffer")
+local _CodedBuffer = require("quan.message.CodedBuffer")
 local _Message = require("quan.message.Message")
 local RoleInfo = require("test.message.role.RoleInfo")
 local UserInfo = require("test.message.user.UserInfo")
@@ -71,7 +71,7 @@ setmetatable(CRoleLogin, { __call = CRoleLogin.new })
 
 ---
 ---[角色登录，自定义ID].编码
----@return quan.message.Buffer
+---@return quan.message.CodedBuffer
 ---
 function CRoleLogin:encode()
     assert(type(self) == "table" and self.class == CRoleLogin.class, "参数[self]类型错误")
@@ -107,11 +107,11 @@ end
 
 ---
 ---[角色登录，自定义ID].解码
----@param buffer quan.message.Buffer 不能为空
+---@param buffer quan.message.CodedBuffer 不能为空
 ---@return test.message.role.CRoleLogin
 ---
 function CRoleLogin.decode(buffer)
-    assert(type(buffer) == "table" and buffer.class == _Buffer.class, "参数[buffer]类型错误")
+    assert(type(buffer) == "table" and buffer.class == _CodedBuffer.class, "参数[buffer]类型错误")
 
     local self = CRoleLogin.new()
 

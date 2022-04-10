@@ -31,7 +31,7 @@ public class MessageRegistry {
 
     public void register(Message message) {
         Objects.requireNonNull(message, "参数[message]不能为空");
-        if (idMessages.put(message.getId(), message) != null) {
+        if (idMessages.putIfAbsent(message.getId(), message) != null) {
             throw new IllegalArgumentException("消息ID[" + message.getId() + "]不能重复");
         }
         classMessages.put(message.getClass(), message);

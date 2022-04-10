@@ -1,6 +1,5 @@
 using Quan.Utils;
 using Quan.Message;
-using Buffer = Quan.Message.Buffer;
 using System;
 using System.Collections.Generic;
 using Test.Message.User;
@@ -71,7 +70,7 @@ namespace Test.Message.Role
             return new CRoleLogin();
         }
 
-        public override void Encode(Buffer buffer)
+        public override void Encode(CodedBuffer buffer)
         {
             base.Encode(buffer);
 
@@ -102,7 +101,7 @@ namespace Test.Message.Role
             userInfo?.Encode(buffer);
         }
 
-        public override void Decode(Buffer buffer)
+        public override void Decode(CodedBuffer buffer)
         {
             base.Decode(buffer);
 

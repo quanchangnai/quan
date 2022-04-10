@@ -133,7 +133,7 @@ public class RoleInfo extends Bean {
     }
 
     @Override
-    public void encode(Buffer buffer) {
+    public void encode(CodedBuffer buffer) {
         super.encode(buffer);
 
         buffer.writeInt(this.id);
@@ -157,7 +157,7 @@ public class RoleInfo extends Bean {
     }
 
     @Override
-    public void decode(Buffer buffer) {
+    public void decode(CodedBuffer buffer) {
         super.decode(buffer);
 
         this.id = buffer.readInt();

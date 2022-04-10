@@ -5,7 +5,7 @@
 ---
 package.path = package.path .. ";../../../src/?.lua"
 
-local Buffer = require("quan.message.Buffer")
+local CodedBuffer = require("quan.message.CodedBuffer")
 local Message = require("quan.message.Message")
 local MessageRegistry = require("test.message.MessageRegistry")
 local SRoleLogin = require("test.message.role.SRoleLogin")
@@ -26,7 +26,7 @@ local function testBuffer()
 
     print()
 
-    local buffer = Buffer.new()
+    local buffer = CodedBuffer.new()
     buffer:writeBool(false)
     buffer:writeInt(-70)
     buffer:writeInt(2423)
@@ -43,10 +43,8 @@ local function testBuffer()
         buffer:writeLong(-9223372036854775808)
     end
 
-    buffer:writeTag(253)
-
     --local file = io.open("D:\\buffer", "r")
-    --buffer = Buffer.new(file:read())
+    --buffer = CodedBuffer.new(file:read())
 
     print("buffer:readableCount()", buffer:readableCount())
 
@@ -63,7 +61,6 @@ local function testBuffer()
     print(buffer:readString())
     print(buffer:readLong())
     print(buffer:readLong())
-    print(buffer:readTag())
 
 end
 
@@ -112,7 +109,7 @@ local function testMessage1()
     local file1 = io.open("D:\\SRoleLogin", "r")
     local bytes = file1:read("*a")
     print("bytes length",#bytes)
-    local buffer = Buffer.new(bytes);
+    local buffer = CodedBuffer.new(bytes);
     local sRoleLogin3 = SRoleLogin.decode(buffer)
     print("buffer:readableCount()",buffer:readableCount())
 

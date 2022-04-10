@@ -35,7 +35,7 @@ public class MessageTest {
     public void test1() throws Exception {
         System.err.println("test1=============================");
 
-        Buffer buffer = new SimpleBuffer();
+        CodedBuffer buffer = new DefaultCodedBuffer();
 //        buffer = new NettyBuffer(Unpooled.buffer());
 
         buffer.writeBool(true);
@@ -49,7 +49,6 @@ public class MessageTest {
         buffer.writeLong(424234);
         buffer.writeLong(Long.MAX_VALUE);
         buffer.writeLong(Long.MIN_VALUE);
-        buffer.writeTag(253);
 
         System.err.println("buffer.readableCount()=" + buffer.readableCount());
 
@@ -73,7 +72,6 @@ public class MessageTest {
         System.err.println(buffer.readLong());
         System.err.println(Long.MAX_VALUE + ":" + buffer.readLong());
         System.err.println(buffer.readLong() == Long.MIN_VALUE);
-        System.err.println(buffer.readTag());
 
 //        buffer.reset();
 //        buffer.writeInt(45);
@@ -142,7 +140,7 @@ public class MessageTest {
 
         System.err.println("sRoleLogin2:" + sRoleLogin2);
 
-        Buffer buffer = new SimpleBuffer();
+        CodedBuffer buffer = new DefaultCodedBuffer();
         sRoleLogin1.encode(buffer);
         SRoleLogin sRoleLogin3 = new SRoleLogin();
         sRoleLogin3.decode(buffer);
