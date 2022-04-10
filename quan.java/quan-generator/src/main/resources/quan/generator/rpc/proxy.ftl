@@ -12,7 +12,7 @@ import ${imports[importKey]};
 </#list>
  * @see ${name}
  */
-public final class ${name}Proxy${typeParametersStr}{
+public class ${name}Proxy${typeParametersStr}{
 
     public final int serverId;
 
@@ -34,7 +34,7 @@ public final class ${name}Proxy${typeParametersStr}{
     </#list>
      * @see ${name}#${method.name}
      */
-    public ${method.typeParametersStr}Promise<${method.optimizedReturnType}> ${method.name}(<#rt>
+    public final ${method.typeParametersStr}Promise<${method.optimizedReturnType}> ${method.name}(<#rt>
     <#list method.optimizedParameters?keys as paramName>
         ${method.optimizedParameters[paramName]} ${paramName}<#if paramName?has_next>, </#if><#t>
     </#list>

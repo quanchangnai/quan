@@ -21,7 +21,9 @@ public class Worker {
 
     private static ThreadLocal<Worker> threadLocal = new ThreadLocal<>();
 
-    private int id;
+    private static int nextId = 1;
+
+    private int id = nextId++;
 
     private boolean running;
 
@@ -36,8 +38,7 @@ public class Worker {
 
     private Map<Long, Promise<?>> promises = new HashMap<>();
 
-    protected Worker(int id, RpcServer server) {
-        this.id = id;
+    protected Worker(RpcServer server) {
         this.server = server;
     }
 
@@ -47,11 +48,8 @@ public class Worker {
 
     protected static void check(int id) {
         Worker current = current();
-        if (current == null) {
-            throw new RuntimeException("当前不在RPC工作线程中");
-        }
-        if (id > 0 && current.id != id) {
-            throw new RuntimeException("当前RPC工作线程[" + current.id + "]不是期望值:" + id);
+        if (current == null || current.id != id) {
+            throw new IllegalStateException("当前所处线程不合法");
         }
     }
 
@@ -139,7 +137,7 @@ public class Worker {
         long callId = response.getCallId();
         Promise<?> promise = promises.remove(callId);
         if (promise == null) {
-            logger.error("处理RPC响应，调用[{}]不存在", callId);
+            logger.error("处理RPC响应，不存在该调用:{}", callId);
             return;
         }
 

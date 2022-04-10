@@ -131,6 +131,8 @@ public class RpcClass extends RpcElement {
         imports.clear();
         imports.put("Promise", "quan.rpc.Promise");
         imports.put("Worker", "quan.rpc.Worker");
+        imports.put(name, "-" + fullName);
+        imports.put(name + "Proxy", "-" + fullName + "Proxy");
 
         super.optimizeImport4Proxy();
         methods.forEach(RpcMethod::optimizeImport4Proxy);
@@ -140,6 +142,8 @@ public class RpcClass extends RpcElement {
         imports.clear();
         imports.put("Caller", "quan.rpc.Caller");
         imports.put("Service", "quan.rpc.Service");
+        imports.put(name, "-" + fullName);
+        imports.put(name + "Caller", "-" + fullName + "Caller");
 
         methods.forEach(RpcMethod::optimizeImport4Caller);
     }

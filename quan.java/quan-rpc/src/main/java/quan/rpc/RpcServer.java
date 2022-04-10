@@ -3,9 +3,7 @@ package quan.rpc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -25,6 +23,8 @@ public class RpcServer {
     //管理的所有服务，key:服务ID
     private Map<Object, Service> services = new HashMap<>();
 
+    private int workerIndex;
+
     private ScheduledExecutorService scheduler;
 
     public RpcServer(int id, int workerNum) {
@@ -32,8 +32,9 @@ public class RpcServer {
         if (workerNum <= 0) {
             workerNum = Runtime.getRuntime().availableProcessors();
         }
-        for (int i = 1; i <= workerNum; i++) {
-            workers.put(i, new Worker(i, this));
+        for (int i = 0; i < workerNum; i++) {
+            Worker worker = new Worker(this);
+            workers.put(worker.getId(), worker);
         }
     }
 
@@ -74,19 +75,24 @@ public class RpcServer {
             logger.error("RPC服务[{}]已存在", serviceId);
             return;
         }
-        randomThread().addService(service);
+        nextWorker().addService(service);
     }
 
     public synchronized void removeService(Service service) {
         Object serviceId = service.getId();
         if (!services.remove(serviceId, service)) {
             logger.error("RPC服务[{}]不存在", serviceId);
+            return;
         }
         service.getWorker().removeService(service);
     }
 
-    protected Worker randomThread() {
-        int workerId = new Random().nextInt(workers.size()) + 1;
+    private Worker nextWorker() {
+        List<Integer> workerIds = new ArrayList<>(workers.keySet());
+        int workerId = workerIds.get(workerIndex++);
+        if (workerIndex >= workerIds.size()) {
+            workerIndex = 0;
+        }
         return workers.get(workerId);
     }
 

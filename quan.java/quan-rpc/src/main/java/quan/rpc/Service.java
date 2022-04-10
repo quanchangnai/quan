@@ -22,7 +22,7 @@ public abstract class Service {
     private Caller caller;
 
     /**
-     * 服务ID，在同一个RPC服务器内必需保证唯一性
+     * 服务ID，在同一个{@link RpcServer}内必需保证唯一性
      */
     public abstract Object getId();
 
