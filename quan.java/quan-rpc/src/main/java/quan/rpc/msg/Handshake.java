@@ -1,0 +1,44 @@
+package quan.rpc.msg;
+
+import quan.rpc.ObjectReader;
+import quan.rpc.ObjectWriter;
+import quan.rpc.Transferable;
+
+/**
+ * @author quanchangnai
+ */
+public class Handshake implements Transferable {
+
+    private int serverId;
+
+    private String serverIp;
+
+    private int serverPort;
+
+    public int getServerId() {
+        return serverId;
+    }
+
+    public String getServerIp() {
+        return serverIp;
+    }
+
+    public int getServerPort() {
+        return serverPort;
+    }
+
+    @Override
+    public void transferTo(ObjectWriter writer) {
+        writer.write(serverId);
+        writer.write(serverIp);
+        writer.write(serverPort);
+    }
+
+    @Override
+    public void transferFrom(ObjectReader reader) {
+        serverId = reader.read();
+        serverIp = reader.read();
+        serverPort = reader.read();
+    }
+
+}

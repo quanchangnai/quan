@@ -7,5 +7,6 @@ apply plugin: 'java-library'
 dependencies {
     api project(':quan-common')
     api project(':quan-message')
+    api 'io.netty:netty-all:4.1.42.Final'
     testAnnotationProcessor project(':quan-generator')
 }

@@ -3,9 +3,10 @@ package quan.rpc.test;
 import org.junit.Test;
 import quan.message.CodedBuffer;
 import quan.message.DefaultCodedBuffer;
+import quan.rpc.LocalServer;
+import quan.rpc.NettyLocalServer;
 import quan.rpc.ObjectReader;
 import quan.rpc.ObjectWriter;
-import quan.rpc.RpcServer;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -17,10 +18,10 @@ import java.util.TreeMap;
 public class RpcTest {
 
     public static void main(String[] args) {
-        RpcServer rpcServer = new RpcServer(1, 5);
-        rpcServer.addService(new TestService(1));
-        rpcServer.addService(new TestService(2));
-        rpcServer.start();
+        LocalServer localServer = new NettyLocalServer(1, 9999, 5);
+        localServer.addService(new TestService(1));
+        localServer.addService(new TestService(2));
+        localServer.start();
 
     }
 

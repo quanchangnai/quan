@@ -2,6 +2,8 @@ package quan.rpc;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import quan.rpc.msg.Request;
+import quan.rpc.msg.Response;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,7 +29,7 @@ public class Worker {
 
     private boolean running;
 
-    private RpcServer server;
+    private LocalServer server;
 
     private BlockingQueue<Runnable> taskQueue = new LinkedBlockingQueue<>();
 
@@ -38,7 +40,7 @@ public class Worker {
 
     private Map<Long, Promise<?>> promises = new HashMap<>();
 
-    protected Worker(RpcServer server) {
+    protected Worker(LocalServer server) {
         this.server = server;
     }
 
@@ -127,7 +129,12 @@ public class Worker {
 
     protected void handleRequest(int originServerId, Request request) {
         Service service = services.get(request.getServiceId());
-        Object result = service.call(request.getMethodId(), request.getParams());
+        Object result = null;
+        try {
+            result = service.call(request.getMethodId(), request.getParams());
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
 
         Response response = new Response(request.getCallId(), result);
         server.sendResponse(originServerId, response);

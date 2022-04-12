@@ -1,4 +1,8 @@
-package quan.rpc;
+package quan.rpc.msg;
+
+import quan.rpc.ObjectReader;
+import quan.rpc.ObjectWriter;
+import quan.rpc.Transferable;
 
 /**
  * RPC调用请求
@@ -37,7 +41,7 @@ public class Request implements Transferable {
         return callId;
     }
 
-    protected void setCallId(long callId) {
+    public void setCallId(long callId) {
         this.callId = callId;
     }
 
