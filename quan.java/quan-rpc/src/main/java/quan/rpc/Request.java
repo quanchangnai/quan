@@ -5,7 +5,7 @@ package quan.rpc;
  *
  * @author quanchangnai
  */
-public class Request {
+public class Request implements Transferable {
 
     /**
      * 调用ID
@@ -60,6 +60,22 @@ public class Request {
      */
     public Object[] getParams() {
         return params;
+    }
+
+    @Override
+    public void transferTo(ObjectWriter writer) {
+        writer.write(callId);
+        writer.write(serviceId);
+        writer.write(methodId);
+        writer.write(params);
+    }
+
+    @Override
+    public void transferFrom(ObjectReader reader) {
+        this.callId = reader.read();
+        this.serviceId = reader.read();
+        this.methodId = reader.read();
+        this.params = reader.read();
     }
 
 }
