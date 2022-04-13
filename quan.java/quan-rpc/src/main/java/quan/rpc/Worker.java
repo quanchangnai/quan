@@ -19,7 +19,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class Worker {
 
-    private static Logger logger = LoggerFactory.getLogger(Worker.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private static ThreadLocal<Worker> threadLocal = new ThreadLocal<>();
 

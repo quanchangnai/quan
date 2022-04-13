@@ -21,6 +21,9 @@ public class Response implements Transferable {
      */
     private Object result;
 
+    public Response() {
+    }
+
     public Response(long callId, Object result) {
         this.callId = callId;
         this.result = result;

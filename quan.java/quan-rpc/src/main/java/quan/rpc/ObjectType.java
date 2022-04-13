@@ -50,7 +50,7 @@ interface ObjectType {
     int ENUM = 20;
 
     /**
-     * 除了ArrayList本身之外，没有明确指明的集合类型都会转化为ArrayList
+     * 除了ArrayList本身之外，没有明确指明的集合类型也会被标记
      */
     int ARRAY_LIST = 21;
 
@@ -63,7 +63,7 @@ interface ObjectType {
     int ARRAY_DEQUE = 25;
 
     /**
-     * 除了HashMap本身之外，没有明确指明的Map类型都会转化为HashMap
+     * 除了HashMap本身之外，没有明确指明的Map类型也会被标记
      */
     int HASH_MAP = 35;
 

@@ -10,7 +10,7 @@ import java.util.function.Consumer;
  */
 public class Promise<R> {
 
-    private static Logger logger = LoggerFactory.getLogger(Promise.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private R result;
 

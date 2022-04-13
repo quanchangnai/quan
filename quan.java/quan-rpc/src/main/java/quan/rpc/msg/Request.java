@@ -31,6 +31,9 @@ public class Request implements Transferable {
      */
     private Object[] params;
 
+    public Request() {
+    }
+
     public Request(Object serviceId, int methodId, Object... params) {
         this.serviceId = serviceId;
         this.methodId = methodId;

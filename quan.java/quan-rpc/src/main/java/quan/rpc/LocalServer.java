@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -19,7 +20,7 @@ import java.util.concurrent.TimeUnit;
  */
 public abstract class LocalServer {
 
-    protected final static Logger logger = LoggerFactory.getLogger(LocalServer.class);
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final int id;
 
@@ -36,11 +37,11 @@ public abstract class LocalServer {
     private final Map<Object, Service> services = new HashMap<>();
 
     //管理的所有远程服务器，key:服务器ID
-    private final Map<Integer, RemoteServer> remotes = new HashMap<>();
+    private final Map<Integer, RemoteServer> remotes = new ConcurrentHashMap<>();
 
     private ScheduledExecutorService scheduler;
 
-    public LocalServer(int id, String ip, int port, int workerNum) {
+    protected LocalServer(int id, String ip, int port, int workerNum) {
         this.id = id;
         this.ip = ip;
         this.port = port;
@@ -54,41 +55,40 @@ public abstract class LocalServer {
         }
     }
 
-    public int getId() {
+    public final int getId() {
         return id;
     }
 
-    public String getIp() {
+    public final String getIp() {
         return ip;
     }
 
-    public int getPort() {
+    public final int getPort() {
         return port;
     }
 
-    public int getWorkerNum() {
+    public final int getWorkerNum() {
         return workers.size();
     }
 
-    public void start() {
-        logger.info("RpcServer.start()");
-
+    public synchronized void start() {
+        logger.info("LocalServer.start()");
         workers.values().forEach(Worker::start);
         scheduler = Executors.newScheduledThreadPool(1);
         scheduler.scheduleAtFixedRate(this::update, 50, 50, TimeUnit.MILLISECONDS);
         startNetwork();
+        remotes.values().forEach(RemoteServer::start);
     }
 
     protected abstract void startNetwork();
 
-    public void stop() {
-        logger.info("RpcServer.stop()");
-
+    public synchronized void stop() {
+        logger.info("LocalServer.stop()");
         remotes.values().forEach(RemoteServer::stop);
         stopNetwork();
         scheduler.shutdown();
+        scheduler = null;
         workers.values().forEach(Worker::stop);
-
     }
 
     protected abstract void stopNetwork();
@@ -126,31 +126,27 @@ public abstract class LocalServer {
         service.getWorker().removeService(service);
     }
 
-    protected void handleMsg(Object msg) {
-        if (msg instanceof Handshake) {
-            handshake((Handshake) msg);
-        } else if (msg instanceof Request) {
-            handleRequest(1, (Request) msg);
-        } else if (msg instanceof Response) {
-            handleResponse((Response) msg);
-        } else {
-            logger.error("非法数据:{}", msg);
-        }
-    }
-
     protected void handshake(Handshake handshake) {
         int remoteId = handshake.getServerId();
-        RemoteServer remoteServer = remotes.get(remoteId);
-        if (remoteServer == null) {
-            remoteServer = new RemoteServer(remoteId, handshake.getServerIp(), handshake.getServerPort());
-            addRemote(remoteServer);
+        if (!remotes.containsKey(remoteId)) {
+            addRemote(remoteId, handshake.getServerIp(), handshake.getServerPort());
         }
     }
 
-    public void addRemote(RemoteServer remoteServer) {
+    public synchronized void addRemote(int remoteId, String remoteIp, int remotePort) {
+        if (remotes.containsKey(remoteId)) {
+            logger.error("添加的远程服务器[{}]已存在", remoteId);
+            return;
+        }
+        RemoteServer remoteServer = newRemote(remoteId, remoteIp, remotePort);
+        remoteServer.setLocalServer(this);
         remotes.put(remoteServer.getId(), remoteServer);
-        remoteServer.start();
+        if (scheduler != null) {
+            remoteServer.start();
+        }
     }
+
+    public abstract RemoteServer newRemote(int remoteId, String remoteIp, int remotePort);
 
     /**
      * 发送RPC请求
@@ -162,7 +158,7 @@ public abstract class LocalServer {
         } else {
             RemoteServer remoteServer = remotes.get(targetServerId);
             if (remoteServer != null) {
-                remoteServer.sendRequest(request);
+                remoteServer.sendMsg(request);
             } else {
                 logger.error("发送RPC请求,目标服务器[{}]不存在", targetServerId);
             }
@@ -192,7 +188,7 @@ public abstract class LocalServer {
         } else {
             RemoteServer remoteServer = remotes.get(originServerId);
             if (remoteServer != null) {
-                remoteServer.sendResponse(response);
+                remoteServer.sendMsg(response);
             } else {
                 logger.error("发送RPC响应，来源服务器[{}]不存在", originServerId);
             }
@@ -211,6 +207,5 @@ public abstract class LocalServer {
             worker.execute(() -> worker.handleResponse(response));
         }
     }
-
 
 }

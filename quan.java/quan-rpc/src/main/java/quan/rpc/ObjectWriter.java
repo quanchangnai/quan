@@ -76,7 +76,7 @@ public class ObjectWriter {
             write((Map<?, ?>) value);
         } else if (value instanceof Transferable) {
             buffer.writeInt(TRANSFERABLE);
-            buffer.writeInt(clazz.hashCode());
+            buffer.writeInt(clazz.getName().hashCode());
             ((Transferable) value).transferTo(this);
         } else if (value instanceof Message) {
             buffer.writeInt(MESSAGE);

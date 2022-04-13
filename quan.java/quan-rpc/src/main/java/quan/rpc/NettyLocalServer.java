@@ -10,8 +10,12 @@ import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.util.AttributeKey;
 import quan.message.CodedBuffer;
 import quan.message.NettyCodedBuffer;
+import quan.rpc.msg.Handshake;
+import quan.rpc.msg.Request;
+import quan.rpc.msg.Response;
 
 /**
  * @author quanchangnai
@@ -24,12 +28,13 @@ public class NettyLocalServer extends LocalServer {
         super(id, ip, port, workerNum);
     }
 
-    public NettyLocalServer(int id, int port, int workerNum) {
-        this(id, null, port, workerNum);
+    public NettyLocalServer(int id, String ip, int port) {
+        this(id, ip, port,0);
     }
 
-    public NettyLocalServer(int id, int port) {
-        this(id, null, port, 0);
+    @Override
+    public RemoteServer newRemote(int remoteId, String remoteIp, int remotePort) {
+        return new NettyRemoteServer(remoteId, remoteIp, remotePort);
     }
 
     @Override
@@ -53,11 +58,7 @@ public class NettyLocalServer extends LocalServer {
                     }
                 });
 
-        if (getIp() != null) {
-            serverBootstrap.bind(getIp(), getPort());
-        } else {
-            serverBootstrap.bind(getPort());
-        }
+        serverBootstrap.bind(getIp(), getPort());
     }
 
     @Override
@@ -70,11 +71,25 @@ public class NettyLocalServer extends LocalServer {
 
     private class ChannelHandler extends ChannelDuplexHandler {
 
+        private final AttributeKey<Integer> key = AttributeKey.valueOf("originServerId");
+
         @Override
         public void channelRead(ChannelHandlerContext context, Object msg) {
             CodedBuffer buffer = new NettyCodedBuffer((ByteBuf) msg);
             ObjectReader reader = new ObjectReader(buffer);
-            NettyLocalServer.this.handleMsg(reader.read());
+            msg = reader.read();
+
+            if (msg instanceof Handshake) {
+                Handshake handshake = (Handshake) msg;
+                context.channel().attr(key).setIfAbsent(handshake.getServerId());
+                handshake(handshake);
+            } else if (msg instanceof Request) {
+                handleRequest(context.channel().attr(key).get(), (Request) msg);
+            } else if (msg instanceof Response) {
+                handleResponse((Response) msg);
+            } else {
+                logger.error("收到非法RPC消息:{}", msg);
+            }
         }
 
         @Override

@@ -3,8 +3,6 @@ package quan.rpc.test;
 import org.junit.Test;
 import quan.message.CodedBuffer;
 import quan.message.DefaultCodedBuffer;
-import quan.rpc.LocalServer;
-import quan.rpc.NettyLocalServer;
 import quan.rpc.ObjectReader;
 import quan.rpc.ObjectWriter;
 
@@ -16,14 +14,6 @@ import java.util.TreeMap;
  * @author quanchangnai
  */
 public class RpcTest {
-
-    public static void main(String[] args) {
-        LocalServer localServer = new NettyLocalServer(1, 9999, 5);
-        localServer.addService(new TestService(1));
-        localServer.addService(new TestService(2));
-        localServer.start();
-
-    }
 
     @Test
     public void test() {

@@ -8,10 +8,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
-import quan.message.CodedBuffer;
 import quan.message.NettyCodedBuffer;
-import quan.rpc.msg.Request;
-import quan.rpc.msg.Response;
 
 import java.util.concurrent.TimeUnit;
 
@@ -29,8 +26,7 @@ public class NettyRemoteServer extends RemoteServer {
     }
 
     @Override
-    public void start() {
-        super.start();
+    protected void start() {
         EventLoopGroup group = new NioEventLoopGroup();
         bootstrap = new Bootstrap();
         bootstrap.group(group)
@@ -51,10 +47,10 @@ public class NettyRemoteServer extends RemoteServer {
     }
 
     @Override
-    public void stop() {
-        super.stop();
+    protected void stop() {
         if (bootstrap != null) {
             bootstrap.config().group().shutdownGracefully();
+            bootstrap = null;
         }
     }
 
@@ -68,18 +64,22 @@ public class NettyRemoteServer extends RemoteServer {
     }
 
     private void reconnect() {
-        bootstrap.config().group().schedule(this::connect, 5, TimeUnit.SECONDS);
-    }
-
-
-    @Override
-    protected void sendRequest(Request request) {
-        context.write(request);
+        if (bootstrap != null) {
+            bootstrap.config().group().schedule(this::connect, 5, TimeUnit.SECONDS);
+        }
     }
 
     @Override
-    protected void sendResponse(Response response) {
-        context.write(response);
+    protected void sendMsg(Object msg) {
+        if (context == null) {
+            logger.error("连接还未建立，不能发送RPC消息");
+            return;
+        }
+        ByteBuf byteBuf = context.alloc().buffer();
+        ObjectWriter objectWriter = new ObjectWriter(new NettyCodedBuffer(byteBuf));
+        objectWriter.write(msg);
+        // TODO 刷新会执行系统调用，需要优化
+        context.writeAndFlush(byteBuf);
     }
 
     private class ChannelHandler extends ChannelDuplexHandler {
@@ -87,21 +87,13 @@ public class NettyRemoteServer extends RemoteServer {
         @Override
         public void channelActive(ChannelHandlerContext context) {
             NettyRemoteServer.this.context = context;
+            handshake();
         }
 
         @Override
         public void channelInactive(ChannelHandlerContext context) {
             NettyRemoteServer.this.context = null;
-            NettyRemoteServer.this.reconnect();
-        }
-
-        @Override
-        public void write(ChannelHandlerContext context, Object msg, ChannelPromise promise) {
-            ByteBuf byteBuf = context.alloc().buffer();
-            CodedBuffer buffer = new NettyCodedBuffer(byteBuf);
-            ObjectWriter writer = new ObjectWriter(buffer);
-            writer.write(msg);
-            context.write(byteBuf, promise);
+            reconnect();
         }
 
         @Override

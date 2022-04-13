@@ -2,15 +2,14 @@ package quan.rpc;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import quan.rpc.msg.Request;
-import quan.rpc.msg.Response;
+import quan.rpc.msg.Handshake;
 
 /**
  * @author quanchangnai
  */
-public class RemoteServer {
+public abstract class RemoteServer {
 
-    protected static final Logger logger = LoggerFactory.getLogger(RemoteServer.class);
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     private int id;
 
@@ -18,36 +17,39 @@ public class RemoteServer {
 
     private int port;
 
-    public RemoteServer(int id, String ip, int port) {
+    private LocalServer localServer;
+
+    protected RemoteServer(int id, String ip, int port) {
         this.id = id;
         this.ip = ip;
         this.port = port;
     }
 
-    public int getId() {
+    public final int getId() {
         return id;
     }
 
-    public String getIp() {
+    public final String getIp() {
         return ip;
     }
 
-    public int getPort() {
+    public final int getPort() {
         return port;
     }
 
-    public void start() {
-
+    protected void setLocalServer(LocalServer localServer) {
+        this.localServer = localServer;
     }
 
-    public void stop() {
+    protected abstract void start();
 
-    }
+    protected abstract void stop();
 
-    protected void sendRequest(Request request) {
-    }
+    protected abstract void sendMsg(Object msg);
 
-    protected void sendResponse(Response response) {
+    protected void handshake() {
+        Handshake handshake = new Handshake(localServer.getId(), localServer.getIp(), localServer.getPort());
+        sendMsg(handshake);
     }
 
 }

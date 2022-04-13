@@ -27,6 +27,15 @@ public class Handshake implements Transferable {
         return serverPort;
     }
 
+    public Handshake() {
+    }
+
+    public Handshake(int serverId, String serverIp, int serverPort) {
+        this.serverId = serverId;
+        this.serverIp = serverIp;
+        this.serverPort = serverPort;
+    }
+
     @Override
     public void transferTo(ObjectWriter writer) {
         writer.write(serverId);
