@@ -2,9 +2,13 @@ package quan.rpc;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import quan.message.CodedBuffer;
+import quan.message.Message;
 import quan.rpc.msg.Handshake;
 import quan.rpc.msg.Request;
 import quan.rpc.msg.Response;
+import quan.rpc.serialize.ObjectReader;
+import quan.rpc.serialize.Transferable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 /**
  * @author quanchangnai
@@ -28,6 +33,10 @@ public abstract class LocalServer {
 
     private final int port;
 
+    protected Function<Integer, Transferable> transferableFactory;
+
+    protected Function<Integer, Message> messageFactory;
+
     //管理的所有工作线程，key:工作线程ID
     private final Map<Integer, Worker> workers = new HashMap<>();
 
@@ -38,6 +47,11 @@ public abstract class LocalServer {
 
     //管理的所有远程服务器，key:服务器ID
     private final Map<Integer, RemoteServer> remotes = new ConcurrentHashMap<>();
+
+    /**
+     * 远程服务器断线重连的等待实现
+     */
+    private int reconnectTime;
 
     private ScheduledExecutorService scheduler;
 
@@ -71,6 +85,39 @@ public abstract class LocalServer {
         return workers.size();
     }
 
+    /**
+     * 设置{@link Transferable}工厂，{@link ObjectReader}反序列化时需要用到
+     */
+    public final void setTransferableFactory(Function<Integer, Transferable> transferableFactory) {
+        this.transferableFactory = transferableFactory;
+    }
+
+    /**
+     * 设置{@link Message}工厂，{@link ObjectReader}反序列化时需要用到
+     */
+    public final void setMessageFactory(Function<Integer, Message> messageFactory) {
+        this.messageFactory = messageFactory;
+    }
+
+    /**
+     * @see #reconnectTime
+     */
+    public void setReconnectTime(int reconnectTime) {
+        this.reconnectTime = reconnectTime;
+    }
+
+    public Function<Integer, Transferable> getTransferableFactory() {
+        return transferableFactory;
+    }
+
+    public Function<Integer, Message> getMessageFactory() {
+        return messageFactory;
+    }
+
+    public int getReconnectTime() {
+        return reconnectTime;
+    }
+
     public synchronized void start() {
         logger.info("LocalServer.start()");
         workers.values().forEach(Worker::start);
@@ -80,8 +127,6 @@ public abstract class LocalServer {
         remotes.values().forEach(RemoteServer::start);
     }
 
-    protected abstract void startNetwork();
-
     public synchronized void stop() {
         logger.info("LocalServer.stop()");
         remotes.values().forEach(RemoteServer::stop);
@@ -90,6 +135,8 @@ public abstract class LocalServer {
         scheduler = null;
         workers.values().forEach(Worker::stop);
     }
+
+    protected abstract void startNetwork();
 
     protected abstract void stopNetwork();
 
@@ -126,13 +173,6 @@ public abstract class LocalServer {
         service.getWorker().removeService(service);
     }
 
-    protected void handshake(Handshake handshake) {
-        int remoteId = handshake.getServerId();
-        if (!remotes.containsKey(remoteId)) {
-            addRemote(remoteId, handshake.getServerIp(), handshake.getServerPort());
-        }
-    }
-
     public synchronized void addRemote(int remoteId, String remoteIp, int remotePort) {
         if (remotes.containsKey(remoteId)) {
             logger.error("添加的远程服务器[{}]已存在", remoteId);
@@ -146,7 +186,24 @@ public abstract class LocalServer {
         }
     }
 
-    public abstract RemoteServer newRemote(int remoteId, String remoteIp, int remotePort);
+    protected abstract RemoteServer newRemote(int remoteId, String remoteIp, int remotePort);
+
+    protected ObjectReader newReader(CodedBuffer buffer) {
+        ObjectReader reader = new ObjectReader(buffer);
+        reader.setTransferableFactory(transferableFactory);
+        reader.setMessageFactory(messageFactory);
+        return reader;
+    }
+
+    /**
+     * 握手
+     */
+    protected void handshake(Handshake handshake) {
+        int remoteId = handshake.getServerId();
+        if (!remotes.containsKey(remoteId)) {
+            addRemote(remoteId, handshake.getServerIp(), handshake.getServerPort());
+        }
+    }
 
     /**
      * 发送RPC请求
@@ -160,7 +217,7 @@ public abstract class LocalServer {
             if (remoteServer != null) {
                 remoteServer.sendMsg(request);
             } else {
-                logger.error("发送RPC请求,目标服务器[{}]不存在", targetServerId);
+                logger.error("发送RPC请求,远程服务器[{}]不存在", targetServerId);
             }
         }
     }
@@ -190,7 +247,7 @@ public abstract class LocalServer {
             if (remoteServer != null) {
                 remoteServer.sendMsg(response);
             } else {
-                logger.error("发送RPC响应，来源服务器[{}]不存在", originServerId);
+                logger.error("发送RPC响应，远程服务器[{}]不存在", originServerId);
             }
         }
     }

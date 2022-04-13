@@ -1,9 +1,9 @@
 package quan.rpc.test;
 
-import quan.rpc.Transferable;
 import quan.rpc.msg.Handshake;
 import quan.rpc.msg.Request;
 import quan.rpc.msg.Response;
+import quan.rpc.serialize.Transferable;
 
 import java.util.function.Function;
 

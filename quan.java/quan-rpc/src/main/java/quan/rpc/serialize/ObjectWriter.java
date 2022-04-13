@@ -1,11 +1,15 @@
-package quan.rpc;
+package quan.rpc.serialize;
 
 import quan.message.CodedBuffer;
 import quan.message.Message;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.*;
 
-import static quan.rpc.ObjectType.*;
+import static quan.rpc.serialize.ObjectType.*;
 
 /**
  * @author quanchangnai
@@ -81,6 +85,9 @@ public class ObjectWriter {
         } else if (value instanceof Message) {
             buffer.writeInt(MESSAGE);
             ((Message) value).encode(buffer);
+        } else if (value instanceof Serializable) {
+            //对象流序列化优先级最低
+            write((Serializable) value);
         } else {
             throw new RuntimeException("不支持的数据类型:" + clazz);
         }
@@ -193,6 +200,18 @@ public class ObjectWriter {
             write(k);
             write(v);
         });
+    }
+
+    private void write(Serializable serializable) {
+        buffer.writeInt(SERIALIZABLE);
+        try {
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+            objectOutputStream.writeObject(serializable);
+            buffer.writeBytes(byteArrayOutputStream.toByteArray());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

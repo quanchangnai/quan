@@ -17,6 +17,8 @@ public abstract class RemoteServer {
 
     private int port;
 
+    private int reconnectTime = 5;
+
     private LocalServer localServer;
 
     protected RemoteServer(int id, String ip, int port) {
@@ -37,8 +39,15 @@ public abstract class RemoteServer {
         return port;
     }
 
-    protected void setLocalServer(LocalServer localServer) {
+    public final int getReconnectTime() {
+        return reconnectTime;
+    }
+
+    final void setLocalServer(LocalServer localServer) {
         this.localServer = localServer;
+        if (localServer.getReconnectTime() > 0) {
+            this.reconnectTime = localServer.getReconnectTime();
+        }
     }
 
     protected abstract void start();

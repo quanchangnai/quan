@@ -1,9 +1,9 @@
-package quan.rpc;
+package quan.rpc.serialize;
 
 /**
  * @author quanchangnai
  */
-interface ObjectType {
+public interface ObjectType {
 
     int NULL = 0;
 
@@ -78,5 +78,11 @@ interface ObjectType {
      * 消息：{@link quan.message.Message}
      */
     int MESSAGE = 41;
+
+    /**
+     * 通过对象流序列化对象消耗的时间和占用的空间都很大，尽量不要使用<br/>
+     * {@link java.io.Serializable}
+     */
+    int SERIALIZABLE = 42;
 
 }

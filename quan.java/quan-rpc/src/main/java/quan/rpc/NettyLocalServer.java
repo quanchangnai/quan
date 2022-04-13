@@ -29,11 +29,11 @@ public class NettyLocalServer extends LocalServer {
     }
 
     public NettyLocalServer(int id, String ip, int port) {
-        this(id, ip, port,0);
+        this(id, ip, port, 0);
     }
 
     @Override
-    public RemoteServer newRemote(int remoteId, String remoteIp, int remotePort) {
+    protected RemoteServer newRemote(int remoteId, String remoteIp, int remotePort) {
         return new NettyRemoteServer(remoteId, remoteIp, remotePort);
     }
 
@@ -76,8 +76,7 @@ public class NettyLocalServer extends LocalServer {
         @Override
         public void channelRead(ChannelHandlerContext context, Object msg) {
             CodedBuffer buffer = new NettyCodedBuffer((ByteBuf) msg);
-            ObjectReader reader = new ObjectReader(buffer);
-            msg = reader.read();
+            msg = newReader(buffer).read();
 
             if (msg instanceof Handshake) {
                 Handshake handshake = (Handshake) msg;

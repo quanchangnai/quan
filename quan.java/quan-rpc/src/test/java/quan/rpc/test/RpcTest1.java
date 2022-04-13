@@ -3,8 +3,10 @@ package quan.rpc.test;
 import org.junit.Test;
 import quan.message.CodedBuffer;
 import quan.message.DefaultCodedBuffer;
-import quan.rpc.ObjectReader;
-import quan.rpc.ObjectWriter;
+import quan.rpc.LocalServer;
+import quan.rpc.NettyLocalServer;
+import quan.rpc.serialize.ObjectReader;
+import quan.rpc.serialize.ObjectWriter;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -13,7 +15,15 @@ import java.util.TreeMap;
 /**
  * @author quanchangnai
  */
-public class RpcTest {
+public class RpcTest1 {
+
+    public static void main(String[] args) {
+        LocalServer localServer = new NettyLocalServer(1, "127.0.0.1", 8888, 5);
+        localServer.setTransferableFactory( new TransferableFactory());
+        localServer.addService(new TestService1(1));
+        localServer.addService(new RoleService1<>(2));
+        localServer.start();
+    }
 
     @Test
     public void test() {

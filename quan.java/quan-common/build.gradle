@@ -17,4 +17,5 @@ dependencies {
     implementation 'org.apache.poi:poi:4.1.0'
     implementation 'org.apache.poi:poi-ooxml:4.1.0'
     implementation 'org.apache.commons:commons-csv:1.7'
+    testImplementation 'io.lettuce:lettuce-core:6.1.8.RELEASE'
 }

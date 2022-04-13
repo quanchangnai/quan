@@ -1,32 +1,36 @@
-package quan.rpc;
+package quan.rpc.serialize;
 
 import quan.message.CodedBuffer;
 import quan.message.Message;
 
+import java.io.ByteArrayInputStream;
+import java.io.ObjectInputStream;
 import java.util.*;
 import java.util.function.Function;
 
-import static quan.rpc.ObjectType.*;
+import static quan.rpc.serialize.ObjectType.*;
 
 /**
  * @author quanchangnai
  */
 public class ObjectReader {
 
-    /**
-     * {@link Transferable}工厂
-     */
-    public static Function<Integer, Transferable> transferableFactory;
-
-    /**
-     * {@link Message}工厂
-     */
-    public static Function<Integer, Message> messageFactory;
-
     private CodedBuffer buffer;
+
+    private Function<Integer, Transferable> transferableFactory;
+
+    private Function<Integer, Message> messageFactory;
 
     public ObjectReader(CodedBuffer buffer) {
         this.buffer = Objects.requireNonNull(buffer);
+    }
+
+    public void setTransferableFactory(Function<Integer, Transferable> transferableFactory) {
+        this.transferableFactory = transferableFactory;
+    }
+
+    public void setMessageFactory(Function<Integer, Message> messageFactory) {
+        this.messageFactory = messageFactory;
     }
 
     @SuppressWarnings("unchecked")
@@ -93,6 +97,8 @@ public class ObjectReader {
                 return readTransferable();
             case MESSAGE:
                 return readMessage();
+            case SERIALIZABLE:
+                return readSerializable();
             default:
                 throw new RuntimeException("不支持的数据类型:" + type);
         }
@@ -203,6 +209,16 @@ public class ObjectReader {
         Message message = messageFactory.apply(id);
         message.decode(buffer);
         return message;
+    }
+
+    private Object readSerializable() {
+        try {
+            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(buffer.readBytes());
+            ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
+            return objectInputStream.readObject();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

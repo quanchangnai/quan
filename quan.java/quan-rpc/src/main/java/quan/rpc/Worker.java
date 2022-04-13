@@ -121,22 +121,26 @@ public class Worker {
         request.setCallId(callId);
         server.sendRequest(targetServerId, request);
 
-        Promise<R> promise = new Promise<>();
+        Promise<R> promise = new Promise<>(callId);
         promises.put(callId, promise);
 
         return promise;
     }
 
     protected void handleRequest(int originServerId, Request request) {
-        Service service = services.get(request.getServiceId());
+        long callId = request.getCallId();
         Object result = null;
+        boolean error = false;
+        Service service = services.get(request.getServiceId());
+
         try {
             result = service.call(request.getMethodId(), request.getParams());
         } catch (Throwable e) {
-            e.printStackTrace();
+            error = true;
+            logger.error("处理RPC请求，调用[{}]-[{}]执行异常", originServerId, callId, e);
         }
 
-        Response response = new Response(request.getCallId(), result);
+        Response response = new Response(callId, result, error);
         server.sendResponse(originServerId, response);
     }
 
@@ -148,7 +152,7 @@ public class Worker {
             return;
         }
 
-        promise.setResult(response.getResult());
+        promise.setResult(response.getResult(), response.isError());
     }
 
 }

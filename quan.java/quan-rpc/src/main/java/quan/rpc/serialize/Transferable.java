@@ -1,4 +1,4 @@
-package quan.rpc;
+package quan.rpc.serialize;
 
 /**
  * 实现了此接口的对象可以通过{@link ObjectWriter}和{@link ObjectReader}进行序列化和反序列化
