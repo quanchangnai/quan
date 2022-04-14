@@ -19,7 +19,6 @@ public class RpcTest1 {
 
     public static void main(String[] args) {
         LocalServer localServer = new NettyLocalServer(1, "127.0.0.1", 8888, 5);
-        localServer.setTransferableFactory( new TransferableFactory());
         localServer.addService(new TestService1(1));
         localServer.addService(new RoleService1<>(2));
         localServer.start();

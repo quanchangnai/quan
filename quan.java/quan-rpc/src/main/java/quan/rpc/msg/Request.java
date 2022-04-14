@@ -5,7 +5,7 @@ import quan.rpc.serialize.ObjectWriter;
 import quan.rpc.serialize.Transferable;
 
 /**
- * RPC调用请求
+ * 调用请求消息
  *
  * @author quanchangnai
  */

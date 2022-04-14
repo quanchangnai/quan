@@ -6,5 +6,5 @@ apply plugin: 'java-library'
 
 dependencies {
     api project(':quan-common')
-    implementation 'io.netty:netty-all:4.1.42.Final'
+    implementation 'io.netty:netty-all:4.1.75.Final'
 }

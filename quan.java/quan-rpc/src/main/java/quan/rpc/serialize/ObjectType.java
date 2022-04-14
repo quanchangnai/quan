@@ -43,18 +43,21 @@ public interface ObjectType {
     int OBJECT = 18;
 
     /**
-     * 对象数组，包含Integer[]、String[]、Object[]等
+     * 除了原生类型数组之外的任意可序列化的对象数组
      */
     int OBJECT_ARRAY = 19;
 
     int ENUM = 20;
 
     /**
-     * 除了ArrayList本身之外，没有明确指明的集合类型也会被标记
+     * 除了ArrayList本身之外，没有特殊处理的集合子类型也会被反序列化成ArrayList
      */
     int ARRAY_LIST = 21;
 
-    int TREE_SET = 22;
+    /**
+     * SortedSet反序列化时使用TreeSet实现
+     */
+    int SORTED_SET = 22;
 
     int HASH_SET = 23;
 
@@ -63,26 +66,49 @@ public interface ObjectType {
     int ARRAY_DEQUE = 25;
 
     /**
-     * 除了HashMap本身之外，没有明确指明的Map类型也会被标记
+     * 除了HashMap本身之外，没有特殊处理的Map子类型也会被反序列化成HashMap
      */
     int HASH_MAP = 35;
 
-    int TREE_MAP = 36;
+    /**
+     * SortedMap反序列化时使用TreeMap实现
+     */
+    int SORTED_MAP = 36;
 
     /**
-     * {@link Transferable}
+     * {@link quan.rpc.msg.Handshake}
      */
-    int TRANSFERABLE = 40;
+    int HANDSHAKE = 40;
+
+    /**
+     * {@link quan.rpc.msg.PingPong}
+     */
+    int PING_PONG = 41;
+
+    /**
+     * {@link quan.rpc.msg.Request}
+     */
+    int REQUEST = 42;
+
+    /**
+     * {@link quan.rpc.msg.Response}
+     */
+    int RESPONSE = 43;
+
+    /**
+     * 不包含特殊处理的{@link Transferable}对象
+     */
+    int TRANSFERABLE = 44;
 
     /**
      * 消息：{@link quan.message.Message}
      */
-    int MESSAGE = 41;
+    int MESSAGE = 50;
 
     /**
      * 通过对象流序列化对象消耗的时间和占用的空间都很大，尽量不要使用<br/>
      * {@link java.io.Serializable}
      */
-    int SERIALIZABLE = 42;
+    int SERIALIZABLE = 51;
 
 }

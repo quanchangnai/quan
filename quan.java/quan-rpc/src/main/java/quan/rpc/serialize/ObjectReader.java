@@ -2,6 +2,10 @@ package quan.rpc.serialize;
 
 import quan.message.CodedBuffer;
 import quan.message.Message;
+import quan.rpc.msg.Handshake;
+import quan.rpc.msg.PingPong;
+import quan.rpc.msg.Request;
+import quan.rpc.msg.Response;
 
 import java.io.ByteArrayInputStream;
 import java.io.ObjectInputStream;
@@ -15,11 +19,11 @@ import static quan.rpc.serialize.ObjectType.*;
  */
 public class ObjectReader {
 
-    private CodedBuffer buffer;
+    protected CodedBuffer buffer;
 
-    private Function<Integer, Transferable> transferableFactory;
+    protected Function<Integer, Transferable> transferableFactory;
 
-    private Function<Integer, Message> messageFactory;
+    protected Function<Integer, Message> messageFactory;
 
     public ObjectReader(CodedBuffer buffer) {
         this.buffer = Objects.requireNonNull(buffer);
@@ -81,7 +85,7 @@ public class ObjectReader {
                 return readEnum();
             case ARRAY_LIST:
                 return readCollection(new ArrayList<>());
-            case TREE_SET:
+            case SORTED_SET:
                 return readCollection(new TreeSet<>());
             case HASH_SET:
                 return readCollection(new HashSet<>());
@@ -91,18 +95,23 @@ public class ObjectReader {
                 return readCollection(new ArrayDeque<>());
             case HASH_MAP:
                 return readMap(new HashMap<>());
-            case TREE_MAP:
+            case SORTED_MAP:
                 return readMap(new TreeMap<>());
+            case HANDSHAKE:
+            case PING_PONG:
+            case REQUEST:
+            case RESPONSE:
             case TRANSFERABLE:
-                return readTransferable();
+                return readTransferable(type);
             case MESSAGE:
                 return readMessage();
             case SERIALIZABLE:
                 return readSerializable();
             default:
-                throw new RuntimeException("不支持的数据类型:" + type);
+                return readOther(type);
         }
     }
+
 
     private boolean[] readBooleanArray() {
         int length = buffer.readInt();
@@ -168,7 +177,7 @@ public class ObjectReader {
     }
 
     @SuppressWarnings("unchecked")
-    private Enum readEnum() {
+    protected Enum readEnum() {
         Class enumClass;
         try {
             enumClass = Class.forName(buffer.readString());
@@ -179,7 +188,7 @@ public class ObjectReader {
     }
 
 
-    private Collection<Object> readCollection(Collection<Object> collection) {
+    protected Collection<Object> readCollection(Collection<Object> collection) {
         int size = buffer.readInt();
         for (int i = 0; i < size; i++) {
             collection.add(readObject());
@@ -187,7 +196,7 @@ public class ObjectReader {
         return collection;
     }
 
-    private Map<Object, Object> readMap(Map<Object, Object> map) {
+    protected Map<Object, Object> readMap(Map<Object, Object> map) {
         int size = buffer.readInt();
         for (int i = 0; i < size; i++) {
             map.put(readObject(), readObject());
@@ -195,14 +204,30 @@ public class ObjectReader {
         return map;
     }
 
-    private Transferable readTransferable() {
-        int id = buffer.readInt();
-        Transferable transferable = transferableFactory.apply(id);
+    protected Transferable readTransferable(int type) {
+        Transferable transferable;
+        switch (type) {
+            case HANDSHAKE:
+                transferable = new Handshake();
+                break;
+            case PING_PONG:
+                transferable = new PingPong();
+                break;
+            case REQUEST:
+                transferable = new Request();
+                break;
+            case RESPONSE:
+                transferable = new Response();
+                break;
+            default:
+                int id = buffer.readInt();
+                transferable = transferableFactory.apply(id);
+        }
         transferable.transferFrom(this);
         return transferable;
     }
 
-    private Message readMessage() {
+    protected Message readMessage() {
         buffer.mark();
         int id = buffer.readInt();
         buffer.reset();
@@ -211,7 +236,7 @@ public class ObjectReader {
         return message;
     }
 
-    private Object readSerializable() {
+    protected Object readSerializable() {
         try {
             ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(buffer.readBytes());
             ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
@@ -219,6 +244,10 @@ public class ObjectReader {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    protected Object readOther(int type) {
+        throw new RuntimeException("不支持的数据类型:" + type);
     }
 
 }

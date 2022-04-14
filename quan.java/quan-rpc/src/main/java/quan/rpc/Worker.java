@@ -8,6 +8,7 @@ import quan.rpc.msg.Response;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.TreeSet;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -40,6 +41,9 @@ public class Worker {
 
     private Map<Long, Promise<?>> promises = new HashMap<>();
 
+    //按调用时间排序的Promise
+    private TreeSet<Promise<?>> sortedPromises = new TreeSet<>();
+
     protected Worker(LocalServer server) {
         this.server = server;
     }
@@ -70,12 +74,10 @@ public class Worker {
     }
 
     protected void start() {
-        logger.info("Worker.start():" + id);
         new Thread(this::run).start();
     }
 
     protected void stop() {
-        logger.info("Worker.stop():" + id);
         running = false;
     }
 
@@ -105,8 +107,23 @@ public class Worker {
 
     protected void update() {
         for (Service service : services.values()) {
-            service.update();
+            try {
+                service.update();
+            } catch (Throwable e) {
+                logger.error("", e);
+            }
         }
+
+        while (!sortedPromises.isEmpty()) {
+            Promise<?> promise = sortedPromises.first();
+            if (!promise.isTimeout()) {
+                break;
+            }
+            sortedPromises.pollFirst();
+            this.promises.remove(promise.getCallId());
+            promise.handleTimeout();
+        }
+
     }
 
     public <R> Promise<R> sendRequest(int targetServerId, Object serviceId, int methodId, Object... params) {
@@ -123,6 +140,7 @@ public class Worker {
 
         Promise<R> promise = new Promise<>(callId);
         promises.put(callId, promise);
+        sortedPromises.add(promise);
 
         return promise;
     }
@@ -130,14 +148,14 @@ public class Worker {
     protected void handleRequest(int originServerId, Request request) {
         long callId = request.getCallId();
         Object result = null;
-        boolean error = false;
+        String error = null;
         Service service = services.get(request.getServiceId());
 
         try {
             result = service.call(request.getMethodId(), request.getParams());
         } catch (Throwable e) {
-            error = true;
-            logger.error("处理RPC请求，调用[{}]-[{}]执行异常", originServerId, callId, e);
+            error = e.toString();
+            logger.error("处理RPC请求，调用[{}][{}]执行异常", originServerId, callId, e);
         }
 
         Response response = new Response(callId, result, error);
@@ -148,11 +166,17 @@ public class Worker {
         long callId = response.getCallId();
         Promise<?> promise = promises.remove(callId);
         if (promise == null) {
-            logger.error("处理RPC响应，不存在该调用:{}", callId);
+            logger.error("处理RPC响应，调用[{}]不存在或者已超时", callId);
             return;
         }
+        sortedPromises.remove(promise);
 
-        promise.setResult(response.getResult(), response.isError());
+        String error = response.getError();
+        if (error != null) {
+            promise.handleError(error);
+        } else {
+            promise.handleResult(response.getResult());
+        }
     }
 
 }

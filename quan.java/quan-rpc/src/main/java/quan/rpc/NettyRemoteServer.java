@@ -1,15 +1,12 @@
 package quan.rpc;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
-import quan.message.NettyCodedBuffer;
-import quan.rpc.serialize.ObjectWriter;
 
 import java.util.concurrent.TimeUnit;
 
@@ -28,7 +25,7 @@ public class NettyRemoteServer extends RemoteServer {
 
     @Override
     protected void start() {
-        EventLoopGroup group = new NioEventLoopGroup();
+        EventLoopGroup group = new NioEventLoopGroup(1);
         bootstrap = new Bootstrap();
         bootstrap.group(group)
                 .channel(NioSocketChannel.class)
@@ -75,13 +72,9 @@ public class NettyRemoteServer extends RemoteServer {
     protected void sendMsg(Object msg) {
         if (context == null) {
             logger.error("连接还未建立，不能发送RPC消息");
-            return;
+        } else {
+            ((NettyLocalServer) localServer).sendMsg(context, msg);
         }
-        ByteBuf byteBuf = context.alloc().buffer();
-        ObjectWriter objectWriter = new ObjectWriter(new NettyCodedBuffer(byteBuf));
-        objectWriter.write(msg);
-        // TODO 刷新会执行系统调用，需要优化
-        context.writeAndFlush(byteBuf);
     }
 
     private class ChannelHandler extends ChannelDuplexHandler {
@@ -89,12 +82,13 @@ public class NettyRemoteServer extends RemoteServer {
         @Override
         public void channelActive(ChannelHandlerContext context) {
             NettyRemoteServer.this.context = context;
-            handshake();
+            setActivated(true);
         }
 
         @Override
         public void channelInactive(ChannelHandlerContext context) {
             NettyRemoteServer.this.context = null;
+            setActivated(false);
             logger.error("连接断开，将在{}秒后尝试重连: {}", getReconnectTime(), context.channel().remoteAddress());
             reconnect();
         }

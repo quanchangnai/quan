@@ -3,12 +3,12 @@ package quan.rpc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.message.CodedBuffer;
-import quan.message.Message;
 import quan.rpc.msg.Handshake;
+import quan.rpc.msg.PingPong;
 import quan.rpc.msg.Request;
 import quan.rpc.msg.Response;
 import quan.rpc.serialize.ObjectReader;
-import quan.rpc.serialize.Transferable;
+import quan.rpc.serialize.ObjectWriter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,12 +33,16 @@ public abstract class LocalServer {
 
     private final int port;
 
-    protected Function<Integer, Transferable> transferableFactory;
+    private int reconnectTime;
 
-    protected Function<Integer, Message> messageFactory;
+    private Function<CodedBuffer, ObjectReader> readerFactory = ObjectReader::new;
+
+    private Function<CodedBuffer, ObjectWriter> writerFactory = ObjectWriter::new;
 
     //管理的所有工作线程，key:工作线程ID
     private final Map<Integer, Worker> workers = new HashMap<>();
+
+    private final List<Integer> workerIds = new ArrayList<>();
 
     private int workerIndex;
 
@@ -48,25 +52,13 @@ public abstract class LocalServer {
     //管理的所有远程服务器，key:服务器ID
     private final Map<Integer, RemoteServer> remotes = new ConcurrentHashMap<>();
 
-    /**
-     * 远程服务器断线重连的等待实现
-     */
-    private int reconnectTime;
-
     private ScheduledExecutorService scheduler;
 
     protected LocalServer(int id, String ip, int port, int workerNum) {
         this.id = id;
         this.ip = ip;
         this.port = port;
-
-        if (workerNum <= 0) {
-            workerNum = Runtime.getRuntime().availableProcessors();
-        }
-        for (int i = 0; i < workerNum; i++) {
-            Worker worker = new Worker(this);
-            workers.put(worker.getId(), worker);
-        }
+        this.initWorkers(workerNum);
     }
 
     public final int getId() {
@@ -86,53 +78,51 @@ public abstract class LocalServer {
     }
 
     /**
-     * 设置{@link Transferable}工厂，{@link ObjectReader}反序列化时需要用到
-     */
-    public final void setTransferableFactory(Function<Integer, Transferable> transferableFactory) {
-        this.transferableFactory = transferableFactory;
-    }
-
-    /**
-     * 设置{@link Message}工厂，{@link ObjectReader}反序列化时需要用到
-     */
-    public final void setMessageFactory(Function<Integer, Message> messageFactory) {
-        this.messageFactory = messageFactory;
-    }
-
-    /**
-     * @see #reconnectTime
+     * 远程服务器断线重连的等待时间
      */
     public void setReconnectTime(int reconnectTime) {
         this.reconnectTime = reconnectTime;
     }
 
-    public Function<Integer, Transferable> getTransferableFactory() {
-        return transferableFactory;
+    /**
+     * 设置{@link ObjectReader}工厂，用于扩展对象序列化
+     */
+    public void setReaderFactory(Function<CodedBuffer, ObjectReader> readerFactory) {
+        this.readerFactory = readerFactory;
     }
 
-    public Function<Integer, Message> getMessageFactory() {
-        return messageFactory;
+    /**
+     * 设置{@link ObjectWriter}工厂，用于扩展对象序列化
+     */
+    public void setWriterFactory(Function<CodedBuffer, ObjectWriter> writerFactory) {
+        this.writerFactory = writerFactory;
     }
 
     public int getReconnectTime() {
         return reconnectTime;
     }
 
+    public Function<CodedBuffer, ObjectReader> getReaderFactory() {
+        return readerFactory;
+    }
+
+    public Function<CodedBuffer, ObjectWriter> getWriterFactory() {
+        return writerFactory;
+    }
+
     public synchronized void start() {
-        logger.info("LocalServer.start()");
         workers.values().forEach(Worker::start);
-        scheduler = Executors.newScheduledThreadPool(1);
-        scheduler.scheduleAtFixedRate(this::update, 50, 50, TimeUnit.MILLISECONDS);
         startNetwork();
         remotes.values().forEach(RemoteServer::start);
+        scheduler = Executors.newScheduledThreadPool(1);
+        scheduler.scheduleAtFixedRate(this::update, 50, 50, TimeUnit.MILLISECONDS);
     }
 
     public synchronized void stop() {
-        logger.info("LocalServer.stop()");
-        remotes.values().forEach(RemoteServer::stop);
-        stopNetwork();
         scheduler.shutdown();
         scheduler = null;
+        remotes.values().forEach(RemoteServer::stop);
+        stopNetwork();
         workers.values().forEach(Worker::stop);
     }
 
@@ -141,13 +131,24 @@ public abstract class LocalServer {
     protected abstract void stopNetwork();
 
     protected void update() {
+        remotes.values().forEach(RemoteServer::update);
         for (Worker worker : workers.values()) {
             worker.execute(worker::update);
         }
     }
 
+    private void initWorkers(int workerNum) {
+        if (workerNum <= 0) {
+            workerNum = Runtime.getRuntime().availableProcessors();
+        }
+        for (int i = 0; i < workerNum; i++) {
+            Worker worker = new Worker(this);
+            workers.put(worker.getId(), worker);
+        }
+        workerIds.addAll(workers.keySet());
+    }
+
     private Worker nextWorker() {
-        List<Integer> workerIds = new ArrayList<>(workers.keySet());
         int workerId = workerIds.get(workerIndex++);
         if (workerIndex >= workerIds.size()) {
             workerIndex = 0;
@@ -188,20 +189,20 @@ public abstract class LocalServer {
 
     protected abstract RemoteServer newRemote(int remoteId, String remoteIp, int remotePort);
 
-    protected ObjectReader newReader(CodedBuffer buffer) {
-        ObjectReader reader = new ObjectReader(buffer);
-        reader.setTransferableFactory(transferableFactory);
-        reader.setMessageFactory(messageFactory);
-        return reader;
-    }
-
     /**
-     * 握手
+     * 处理RPC握手逻辑
      */
     protected void handshake(Handshake handshake) {
         int remoteId = handshake.getServerId();
         if (!remotes.containsKey(remoteId)) {
             addRemote(remoteId, handshake.getServerIp(), handshake.getServerPort());
+        }
+    }
+
+    protected void handlePingPong(int originServerId, PingPong pingPong) {
+        RemoteServer remoteServer = remotes.get(originServerId);
+        if (remoteServer != null) {
+            remoteServer.handlePingPong(pingPong);
         }
     }
 

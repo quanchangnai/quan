@@ -5,7 +5,7 @@ import quan.rpc.serialize.ObjectWriter;
 import quan.rpc.serialize.Transferable;
 
 /**
- * RPC调用响应
+ * 调用响应消息
  *
  * @author quanchangnai
  */
@@ -21,12 +21,12 @@ public class Response implements Transferable {
      */
     private Object result;
 
-    private boolean error;
+    private String error;
 
     public Response() {
     }
 
-    public Response(long callId, Object result, boolean error) {
+    public Response(long callId, Object result, String error) {
         this.callId = callId;
         this.result = result;
         this.error = error;
@@ -43,7 +43,7 @@ public class Response implements Transferable {
         return result;
     }
 
-    public boolean isError() {
+    public String getError() {
         return error;
     }
 

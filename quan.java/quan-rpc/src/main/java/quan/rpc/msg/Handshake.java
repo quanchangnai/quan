@@ -5,6 +5,8 @@ import quan.rpc.serialize.ObjectWriter;
 import quan.rpc.serialize.Transferable;
 
 /**
+ * 握手消息
+ *
  * @author quanchangnai
  */
 public class Handshake implements Transferable {

@@ -2,6 +2,10 @@ package quan.rpc.serialize;
 
 import quan.message.CodedBuffer;
 import quan.message.Message;
+import quan.rpc.msg.Handshake;
+import quan.rpc.msg.PingPong;
+import quan.rpc.msg.Request;
+import quan.rpc.msg.Response;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -79,17 +83,14 @@ public class ObjectWriter {
         } else if (value instanceof Map) {
             write((Map<?, ?>) value);
         } else if (value instanceof Transferable) {
-            buffer.writeInt(TRANSFERABLE);
-            buffer.writeInt(clazz.getName().hashCode());
-            ((Transferable) value).transferTo(this);
+            write((Transferable) value);
         } else if (value instanceof Message) {
-            buffer.writeInt(MESSAGE);
-            ((Message) value).encode(buffer);
+            write(((Message) value));
         } else if (value instanceof Serializable) {
             //对象流序列化优先级最低
             write((Serializable) value);
         } else {
-            throw new RuntimeException("不支持的数据类型:" + clazz);
+            writeOther(value);
         }
     }
 
@@ -149,19 +150,19 @@ public class ObjectWriter {
         }
     }
 
-    private void write(Enum<?> value) {
+    protected void write(Enum<?> value) {
         buffer.writeInt(ENUM);
         write(value.getDeclaringClass().getName());
         write(value.name());
     }
 
-    private void write(Collection<?> collection) {
+    protected void write(Collection<?> collection) {
         int type;
-        if (collection instanceof TreeSet) {
-            type = TREE_SET;
-            Object first = ((TreeSet<?>) collection).first();
-            if (first != null && !(first instanceof Comparable)) {
-                //TreeSet的元素没有实现Comparable时当做HashSet处理
+        if (collection instanceof SortedSet) {
+            if (collection.isEmpty() || ((SortedSet<?>) collection).first() instanceof Comparable) {
+                type = SORTED_SET;
+            } else {
+                //SortedSet的元素没有实现Comparable时当做HashSet处理
                 type = HASH_SET;
             }
         } else if (collection instanceof Set) {
@@ -180,13 +181,13 @@ public class ObjectWriter {
         collection.forEach(this::write);
     }
 
-    private void write(Map<?, ?> map) {
+    protected void write(Map<?, ?> map) {
         int type;
-        if (map instanceof TreeMap) {
-            type = TREE_MAP;
-            Object firstKey = ((TreeMap<?, ?>) map).firstKey();
-            if (firstKey != null && !(firstKey instanceof Comparable)) {
-                //TreeMap的key没有实现Comparable时当做HashMap处理
+        if (map instanceof SortedMap) {
+            if (map.isEmpty() || ((SortedMap<?, ?>) map).firstKey() instanceof Comparable) {
+                type = SORTED_MAP;
+            } else {
+                //SortedMap的key没有实现Comparable时当做HashMap处理
                 type = HASH_MAP;
             }
         } else {
@@ -202,7 +203,29 @@ public class ObjectWriter {
         });
     }
 
-    private void write(Serializable serializable) {
+    protected void write(Transferable transferable) {
+        if (transferable instanceof Handshake) {
+            buffer.writeInt(HANDSHAKE);
+        } else if (transferable instanceof PingPong) {
+            buffer.writeInt(PING_PONG);
+        } else if (transferable instanceof Request) {
+            buffer.writeInt(REQUEST);
+        } else if (transferable instanceof Response) {
+            buffer.writeInt(RESPONSE);
+        } else {
+            buffer.writeInt(TRANSFERABLE);
+            buffer.writeInt(transferable.getClass().getName().hashCode());
+        }
+
+        transferable.transferTo(this);
+    }
+
+    protected void write(Message message) {
+        buffer.writeInt(MESSAGE);
+        message.encode(buffer);
+    }
+
+    protected void write(Serializable serializable) {
         buffer.writeInt(SERIALIZABLE);
         try {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -212,6 +235,10 @@ public class ObjectWriter {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    protected void writeOther(Object other) {
+        throw new RuntimeException("不支持的数据类型:" + other.getClass());
     }
 
 }
