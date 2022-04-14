@@ -10,6 +10,4 @@ include 'quan-message'
 include 'quan-rpc'
 include 'quan-generator'
 include 'quan-network'
-include 'quan-editor'
-
 
