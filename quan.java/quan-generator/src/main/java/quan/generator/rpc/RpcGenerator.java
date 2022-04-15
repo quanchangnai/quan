@@ -6,6 +6,7 @@ import freemarker.template.Template;
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.*;
+import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
@@ -31,6 +32,8 @@ public class RpcGenerator extends AbstractProcessor {
 
     private TypeMirror serviceType;
 
+    private TypeMirror asyncResultType;
+
     private Template proxyTemplate;
 
     private Template callerTemplate;
@@ -43,6 +46,7 @@ public class RpcGenerator extends AbstractProcessor {
         typeUtils = processingEnv.getTypeUtils();
         elementUtils = processingEnv.getElementUtils();
         serviceType = elementUtils.getTypeElement("quan.rpc.Service").asType();
+        asyncResultType = typeUtils.erasure(elementUtils.getTypeElement("quan.rpc.AsyncResult").asType());
 
         try {
             Configuration freemarkerCfg = new Configuration(Configuration.VERSION_2_3_23);
@@ -135,13 +139,17 @@ public class RpcGenerator extends AbstractProcessor {
         }
 
         TypeMirror returnType = executableElement.getReturnType();
+
         if (returnType.getKind().isPrimitive()) {
             rpcMethod.setOriginalReturnType(typeUtils.boxedClass((PrimitiveType) returnType).asType().toString());
         } else if (returnType.getKind() == TypeKind.VOID) {
             rpcMethod.setOriginalReturnType(Void.class.getSimpleName());
+        } else if (typeUtils.isSameType(typeUtils.erasure(returnType), asyncResultType)) {
+            rpcMethod.setOriginalReturnType(((DeclaredType) returnType).getTypeArguments().get(0).toString());
         } else {
             rpcMethod.setOriginalReturnType(returnType.toString());
         }
+
 
         return rpcMethod;
     }

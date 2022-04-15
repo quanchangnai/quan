@@ -2,6 +2,7 @@ package quan.rpc.test;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import quan.rpc.AsyncResult;
 import quan.rpc.Endpoint;
 import quan.rpc.Promise;
 import quan.rpc.Service;
@@ -49,6 +50,18 @@ public class TestService2 extends Service {
     }
 
     @Endpoint
+    public AsyncResult<Integer> add3(Integer a, Integer b) {
+        int r = a + b;
+        logger.info("Execute TestService2:{}.add3({},{})={} at Worker:{}", id, a, b, r, this.getWorker().getId());
+        AsyncResult<Integer> asyncResult = newAsyncResult();
+        execute(() -> {
+            asyncResult.setResult(r);
+        });
+        return asyncResult;
+    }
+
+
+    @Endpoint
     public void remove(Map<Integer, String> map, int a) {
         map.remove(a);
         logger.info("Execute TestService2:{}.remove({}) at Worker:{}", id, a, this.getWorker().getId());
@@ -67,7 +80,7 @@ public class TestService2 extends Service {
         }
         lastTime = now;
 
-        logger.info("TestService2:{} call TestService1:{}  at Worker:{}", this.id, testService1Proxy.serviceId, this.getWorker().getId());
+        logger.info("TestService2:{} call RemoteServer:{} TestService1:{}  at Worker:{}", this.id, testService1Proxy.serverId, testService1Proxy.serviceId, this.getWorker().getId());
 
         int a = (int) (now % 3);
         int b = (int) (now % 10);
@@ -75,7 +88,7 @@ public class TestService2 extends Service {
         Promise<Integer> promise = testService1Proxy.add1(a, b);
         promise.then(result -> {
             double costTime = (System.nanoTime() - startTime) / 1000000D;
-            logger.info("TestService2:{} call TestService1:{}.add1({},{})={},costTime:{}", this.id, testService1Proxy.serviceId, a, b, result, costTime);
+            logger.info("TestService2:{} call RemoteServer:{} TestService1:{}.add1({},{})={},costTime:{}", this.id, testService1Proxy.serverId, testService1Proxy.serviceId, a, b, result, costTime);
             System.err.println();
         });
     }

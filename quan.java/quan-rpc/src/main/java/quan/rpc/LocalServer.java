@@ -10,10 +10,7 @@ import quan.rpc.msg.Response;
 import quan.rpc.serialize.ObjectReader;
 import quan.rpc.serialize.ObjectWriter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -88,14 +85,14 @@ public abstract class LocalServer {
      * 设置{@link ObjectReader}工厂，用于扩展对象序列化
      */
     public void setReaderFactory(Function<CodedBuffer, ObjectReader> readerFactory) {
-        this.readerFactory = readerFactory;
+        this.readerFactory = Objects.requireNonNull(readerFactory);
     }
 
     /**
      * 设置{@link ObjectWriter}工厂，用于扩展对象序列化
      */
     public void setWriterFactory(Function<CodedBuffer, ObjectWriter> writerFactory) {
-        this.writerFactory = writerFactory;
+        this.writerFactory = Objects.requireNonNull(writerFactory);
     }
 
     public int getReconnectTime() {

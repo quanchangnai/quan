@@ -104,7 +104,7 @@ public abstract class RemoteServer {
 
     protected void handlePingPong(PingPong pingPong) {
         lastReceivedPingPongTime = System.currentTimeMillis();
-        logger.debug("远程服务器[{}]的网络延迟时间为：{}ms", localServer.getId(), lastReceivedPingPongTime - pingPong.getTime());
+        logger.debug("远程服务器[{}]的延迟时间为：{}ms", this.id, lastReceivedPingPongTime - pingPong.getTime());
     }
 
 }

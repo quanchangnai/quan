@@ -41,7 +41,7 @@ public class Worker {
 
     private Map<Long, Promise<?>> promises = new HashMap<>();
 
-    //按调用时间排序的Promise
+    //按调用时间排序
     private TreeSet<Promise<?>> sortedPromises = new TreeSet<>();
 
     protected Worker(LocalServer server) {
@@ -119,7 +119,7 @@ public class Worker {
             if (!promise.isTimeout()) {
                 break;
             }
-            sortedPromises.pollFirst();
+            sortedPromises.remove(promise);
             this.promises.remove(promise.getCallId());
             promise.handleTimeout();
         }
@@ -158,8 +158,24 @@ public class Worker {
             logger.error("处理RPC请求，调用[{}][{}]执行异常", originServerId, callId, e);
         }
 
+        if (result instanceof AsyncResult) {
+            AsyncResult<?> asyncResult = (AsyncResult<?>) result;
+            if (!asyncResult.isFinished()) {
+                asyncResult.setCallId(callId);
+                asyncResult.setOriginServerId(originServerId);
+                return;
+            } else {
+                result = asyncResult.getResult();
+            }
+        }
+
         Response response = new Response(callId, result, error);
         server.sendResponse(originServerId, response);
+    }
+
+    protected void handleAsyncResult(AsyncResult asyncResult) {
+        Response response = new Response(asyncResult.getCallId(), asyncResult.getResult(), null);
+        server.sendResponse(asyncResult.getOriginServerId(), response);
     }
 
     protected void handleResponse(Response response) {
@@ -177,6 +193,10 @@ public class Worker {
         } else {
             promise.handleResult(response.getResult());
         }
+    }
+
+    public <R> AsyncResult<R> newAsyncResult() {
+        return new AsyncResult<>(this);
     }
 
 }

@@ -8,13 +8,13 @@ import java.util.function.Consumer;
 /**
  * @author quanchangnai
  */
-public class Promise<R> implements Comparable<Promise<R>> {
+public class Promise<R> implements Comparable<Promise<?>> {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private long callId;
 
-    private long callTime = System.currentTimeMillis();
+    private long time = System.currentTimeMillis();
 
     private Consumer<R> resultHandler;
 
@@ -33,36 +33,29 @@ public class Promise<R> implements Comparable<Promise<R>> {
     @SuppressWarnings("unchecked")
     void handleResult(Object result) {
         if (resultHandler != null) {
-            try {
-                resultHandler.accept((R) result);
-            } catch (Throwable e) {
-                logger.error("", e);
-            }
+            resultHandler.accept((R) result);
         }
     }
 
     void handleError(String error) {
+        // TODO 调用的方法信息
         logger.error("调用[{}]在远程服务器上执行异常，{}", callId, error);
         if (errorHandler != null) {
-            try {
-                errorHandler.run();
-            } catch (Throwable e) {
-                logger.error("", e);
-            }
+            errorHandler.run();
         }
     }
 
     boolean isTimeout() {
-        //暂定30秒超时
-        return System.currentTimeMillis() - callTime > 30000;
+        //暂定10秒超时
+        return System.currentTimeMillis() - time > 10000;
     }
 
     void handleTimeout() {
         if (timeoutHandler == null) {
+            // TODO 调用的方法信息
             logger.error("调用[{}]等待响应超时", callId);
             return;
         }
-
         try {
             timeoutHandler.run();
         } catch (Throwable e) {
@@ -92,8 +85,8 @@ public class Promise<R> implements Comparable<Promise<R>> {
     }
 
     @Override
-    public int compareTo(Promise<R> other) {
-        return Long.compare(this.callTime, other.callTime);
+    public int compareTo(Promise<?> other) {
+        return Long.compare(this.time, other.time);
     }
 
 }

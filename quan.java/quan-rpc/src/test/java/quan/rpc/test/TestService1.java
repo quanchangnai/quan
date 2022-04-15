@@ -41,7 +41,10 @@ public class TestService1 extends Service {
     public int add1(Integer a, Integer b) {
         int r = a + b;
         logger.info("Execute TestService1:{}.add1({},{})={} at Worker:{}", id, a, b, r, this.getWorker().getId());
-        testService2Proxy.add1(r, a);
+        Promise<Integer> promise = testService2Proxy.add3(r, a);
+        promise.then(r3 -> {
+            logger.info("TestService1:{} call RemoteServer:{} TestService2:{}.add3({},{})={}", id, testService2Proxy.serverId, testService2Proxy.serviceId, a, b, r3);
+        });
         return r;
     }
 

@@ -46,9 +46,20 @@ public abstract class Service {
     }
 
     /**
+     * 在服务当前所属的工作线程中执行任务
+     */
+    public final void execute(Runnable task) {
+        worker.execute(task);
+    }
+
+    /**
      * 刷帧
      */
     protected void update() {
+    }
+
+    public final <R> AsyncResult<R> newAsyncResult() {
+        return worker.newAsyncResult();
     }
 
 }
