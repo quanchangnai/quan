@@ -22,9 +22,23 @@ public class RoleService1<T extends Object & Runnable> extends Service {
     }
 
     @Endpoint
-    public int login0(Integer a, Integer b) {
+    public int login1(Integer a, Integer b) {
         int r = a + b;
-        logger.info("Execute RoleService1:{}.login0({},{})={} at Worker:{}", id, a, b, r, this.getWorker().getId());
+        logger.info("Execute RoleService1:{}.login1({},{})={} at Worker:{}", id, a, b, r, this.getWorker().getId());
+        return r;
+    }
+
+    @Endpoint
+    public int login2(Integer a, Integer b) {
+        int r = a + b;
+        logger.info("Execute RoleService1:{}.login2({},{})={} at Worker:{}", id, a, b, r, this.getWorker().getId());
+        return r;
+    }
+
+    @Endpoint
+    public int login3(Integer a, Integer b) {
+        int r = a + b;
+        logger.info("Execute RoleService1:{}.login3({},{})={} at Worker:{}", id, a, b, r, this.getWorker().getId());
         return r;
     }
 
@@ -32,20 +46,20 @@ public class RoleService1<T extends Object & Runnable> extends Service {
      * 角色登陆1
      */
     @Endpoint
-    public void login1(T t) {
+    public void logout1(T t) {
         this.t = t;
-        logger.info("login1:{}", t);
+        logger.info("logout1:{}", t);
     }
 
     @Endpoint
-    public <T> void login2(T t) {
-        logger.info("login2:{}", t);
+    public <T> void logout2(T t) {
+        logger.info("logout2:{}", t);
     }
 
     @Endpoint
-    public <R extends Runnable> R login3(T t) {
+    public <R extends Runnable> R logout3(T t) {
         this.t = t;
-        logger.info("login3:{}", t);
+        logger.info("logout3:{}", t);
         return null;
     }
 

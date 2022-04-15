@@ -1,5 +1,8 @@
 package quan.rpc;
 
+import java.util.Objects;
+import java.util.function.Consumer;
+
 /**
  * 异步(延迟)结果
  *
@@ -14,6 +17,8 @@ public final class AsyncResult<R> {
     private Worker worker;
 
     private R result;
+
+    private Consumer<R> resultHandler;
 
     private boolean finished;
 
@@ -50,11 +55,26 @@ public final class AsyncResult<R> {
 
         this.result = result;
         this.finished = true;
-        this.worker.handleAsyncResult(this);
+        if (originServerId > 0) {
+            this.worker.handleAsyncResult(this);
+        } else if (resultHandler != null) {
+            resultHandler.accept(result);
+        }
     }
 
     public R getResult() {
         return result;
+    }
+
+    /**
+     * 设置不通过RPC而是通过正常途径调用时的结果处理器
+     */
+    public void then(Consumer<R> handler) {
+        Objects.requireNonNull(handler, "参数[handler]不能为空");
+        if (resultHandler != null) {
+            throw new IllegalStateException("参数[handler]不能重复设置");
+        }
+        this.resultHandler = handler;
     }
 
     public boolean isFinished() {
