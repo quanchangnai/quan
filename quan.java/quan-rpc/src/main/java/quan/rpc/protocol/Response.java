@@ -1,15 +1,14 @@
-package quan.rpc.msg;
+package quan.rpc.protocol;
 
 import quan.rpc.serialize.ObjectReader;
 import quan.rpc.serialize.ObjectWriter;
-import quan.rpc.serialize.Transferable;
 
 /**
- * 调用响应消息
+ * 调用响应协议
  *
  * @author quanchangnai
  */
-public class Response implements Transferable {
+public class Response extends Protocol {
 
     /**
      * 调用ID
@@ -23,13 +22,18 @@ public class Response implements Transferable {
 
     private String error;
 
-    public Response() {
+    protected Response() {
     }
 
     public Response(long callId, Object result, String error) {
         this.callId = callId;
         this.result = result;
         this.error = error;
+    }
+
+    @Override
+    public int getType() {
+        return 4;
     }
 
     public long getCallId() {

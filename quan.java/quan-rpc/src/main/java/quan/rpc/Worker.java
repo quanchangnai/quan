@@ -2,8 +2,8 @@ package quan.rpc;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import quan.rpc.msg.Request;
-import quan.rpc.msg.Response;
+import quan.rpc.protocol.Request;
+import quan.rpc.protocol.Response;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -2,8 +2,9 @@ package quan.rpc;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import quan.rpc.msg.Handshake;
-import quan.rpc.msg.PingPong;
+import quan.rpc.protocol.Handshake;
+import quan.rpc.protocol.PingPong;
+import quan.rpc.protocol.Protocol;
 
 /**
  * @author quanchangnai
@@ -63,13 +64,13 @@ public abstract class RemoteServer {
 
     protected abstract void stop();
 
-    protected abstract void sendMsg(Object msg);
+    protected abstract void send(Protocol protocol);
 
     protected void setActivated(boolean activated) {
         this.activated = activated;
         if (activated) {
             Handshake handshake = new Handshake(localServer.getId(), localServer.getIp(), localServer.getPort());
-            sendMsg(handshake);
+            send(handshake);
         }
     }
 
@@ -97,7 +98,7 @@ public abstract class RemoteServer {
 
         long currentTime = System.currentTimeMillis();
         if (lastSendPingPongTime + 5000 < currentTime) {
-            sendMsg(new PingPong(currentTime));
+            send(new PingPong(currentTime));
             lastSendPingPongTime = currentTime;
         }
     }

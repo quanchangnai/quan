@@ -76,39 +76,24 @@ public interface ObjectType {
     int SORTED_MAP = 36;
 
     /**
-     * {@link quan.rpc.msg.Handshake}
+     * RPC协议：{@link quan.rpc.protocol.Protocol}
      */
-    int HANDSHAKE = 40;
+    int PROTOCOL = 40;
 
     /**
-     * {@link quan.rpc.msg.PingPong}
+     * 除了RPC协议之外的{@link Transferable}对象
      */
-    int PING_PONG = 41;
-
-    /**
-     * {@link quan.rpc.msg.Request}
-     */
-    int REQUEST = 42;
-
-    /**
-     * {@link quan.rpc.msg.Response}
-     */
-    int RESPONSE = 43;
-
-    /**
-     * 不包含特殊处理的{@link Transferable}对象
-     */
-    int TRANSFERABLE = 44;
+    int TRANSFERABLE = 41;
 
     /**
      * 消息：{@link quan.message.Message}
      */
-    int MESSAGE = 50;
+    int MESSAGE = 52;
 
     /**
      * 通过对象流序列化对象消耗的时间和占用的空间都很大，尽量不要使用<br/>
      * {@link java.io.Serializable}
      */
-    int SERIALIZABLE = 51;
+    int SERIALIZABLE = 43;
 
 }

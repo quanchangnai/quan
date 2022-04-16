@@ -7,6 +7,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
+import quan.rpc.protocol.Protocol;
 
 import java.util.concurrent.TimeUnit;
 
@@ -69,11 +70,11 @@ public class NettyRemoteServer extends RemoteServer {
     }
 
     @Override
-    protected void sendMsg(Object msg) {
+    protected void send(Protocol protocol) {
         if (context == null) {
-            logger.error("连接还未建立，不能发送RPC消息");
+            logger.error("连接还未建立，不能发送RPC协议");
         } else {
-            ((NettyLocalServer) localServer).sendMsg(context, msg);
+            ((NettyLocalServer) localServer).send(context, protocol);
         }
     }
 

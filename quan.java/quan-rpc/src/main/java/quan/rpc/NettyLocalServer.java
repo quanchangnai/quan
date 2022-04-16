@@ -12,10 +12,7 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import quan.message.CodedBuffer;
 import quan.message.NettyCodedBuffer;
-import quan.rpc.msg.Handshake;
-import quan.rpc.msg.PingPong;
-import quan.rpc.msg.Request;
-import quan.rpc.msg.Response;
+import quan.rpc.protocol.*;
 import quan.rpc.serialize.ObjectWriter;
 
 /**
@@ -70,11 +67,11 @@ public class NettyLocalServer extends LocalServer {
         return new NettyRemoteServer(remoteId, remoteIp, remotePort);
     }
 
-    protected void sendMsg(ChannelHandlerContext context, Object msg) {
+    protected void send(ChannelHandlerContext context, Protocol protocol) {
         ByteBuf byteBuf = context.alloc().buffer();
         try {
             ObjectWriter objectWriter = getWriterFactory().apply(new NettyCodedBuffer(byteBuf));
-            objectWriter.write(msg);
+            objectWriter.write(protocol);
             // TODO 刷新会执行系统调用，需要优化
             context.writeAndFlush(byteBuf);
         } catch (Throwable e) {
@@ -90,23 +87,23 @@ public class NettyLocalServer extends LocalServer {
         @Override
         public void channelRead(ChannelHandlerContext context, Object msg) {
             CodedBuffer buffer = new NettyCodedBuffer((ByteBuf) msg);
-            msg = getReaderFactory().apply(buffer).read();
+            Protocol protocol = getReaderFactory().apply(buffer).read();
 
-            if (msg instanceof Handshake) {
-                Handshake handshake = (Handshake) msg;
+            if (protocol instanceof Handshake) {
+                Handshake handshake = (Handshake) protocol;
                 remoteServerId = handshake.getServerId();
                 handshake(handshake);
-            } else if (msg instanceof PingPong) {
-                PingPong pingPong = (PingPong) msg;
+            } else if (protocol instanceof PingPong) {
+                PingPong pingPong = (PingPong) protocol;
                 handlePingPong(remoteServerId, pingPong);
                 pingPong.setTime(System.currentTimeMillis());
-                sendMsg(context, msg);
-            } else if (msg instanceof Request) {
-                handleRequest(remoteServerId, (Request) msg);
-            } else if (msg instanceof Response) {
-                handleResponse((Response) msg);
+                send(context, protocol);
+            } else if (protocol instanceof Request) {
+                handleRequest(remoteServerId, (Request) protocol);
+            } else if (protocol instanceof Response) {
+                handleResponse((Response) protocol);
             } else {
-                logger.error("收到非法RPC消息:{}", msg);
+                logger.error("收到非法RPC协议:{}", protocol);
             }
         }
 

@@ -2,10 +2,7 @@ package quan.rpc.serialize;
 
 import quan.message.CodedBuffer;
 import quan.message.Message;
-import quan.rpc.msg.Handshake;
-import quan.rpc.msg.PingPong;
-import quan.rpc.msg.Request;
-import quan.rpc.msg.Response;
+import quan.rpc.protocol.Protocol;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -82,6 +79,8 @@ public class ObjectWriter {
             write((Collection<?>) value);
         } else if (value instanceof Map) {
             write((Map<?, ?>) value);
+        } else if (value instanceof Protocol) {
+            write((Protocol) value);
         } else if (value instanceof Transferable) {
             write((Transferable) value);
         } else if (value instanceof Message) {
@@ -203,20 +202,15 @@ public class ObjectWriter {
         });
     }
 
-    protected void write(Transferable transferable) {
-        if (transferable instanceof Handshake) {
-            buffer.writeInt(HANDSHAKE);
-        } else if (transferable instanceof PingPong) {
-            buffer.writeInt(PING_PONG);
-        } else if (transferable instanceof Request) {
-            buffer.writeInt(REQUEST);
-        } else if (transferable instanceof Response) {
-            buffer.writeInt(RESPONSE);
-        } else {
-            buffer.writeInt(TRANSFERABLE);
-            buffer.writeInt(transferable.getClass().getName().hashCode());
-        }
+    protected void write(Protocol protocol) {
+        buffer.writeInt(PROTOCOL);
+        buffer.writeInt(protocol.getType());
+        protocol.transferTo(this);
+    }
 
+    protected void write(Transferable transferable) {
+        buffer.writeInt(TRANSFERABLE);
+        buffer.writeInt(transferable.getClass().getName().hashCode());
         transferable.transferTo(this);
     }
 

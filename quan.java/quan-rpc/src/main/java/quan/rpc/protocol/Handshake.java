@@ -1,15 +1,14 @@
-package quan.rpc.msg;
+package quan.rpc.protocol;
 
 import quan.rpc.serialize.ObjectReader;
 import quan.rpc.serialize.ObjectWriter;
-import quan.rpc.serialize.Transferable;
 
 /**
- * 握手消息
+ * 握手协议
  *
  * @author quanchangnai
  */
-public class Handshake implements Transferable {
+public class Handshake extends Protocol {
 
     private int serverId;
 
@@ -29,13 +28,18 @@ public class Handshake implements Transferable {
         return serverPort;
     }
 
-    public Handshake() {
+    protected Handshake() {
     }
 
     public Handshake(int serverId, String serverIp, int serverPort) {
         this.serverId = serverId;
         this.serverIp = serverIp;
         this.serverPort = serverPort;
+    }
+
+    @Override
+    public int getType() {
+        return 1;
     }
 
     @Override

@@ -1,17 +1,16 @@
-package quan.rpc.msg;
+package quan.rpc.protocol;
 
 import quan.rpc.serialize.ObjectReader;
 import quan.rpc.serialize.ObjectWriter;
-import quan.rpc.serialize.Transferable;
 
 /**
  * @author quanchangnai
  */
-public class PingPong implements Transferable {
+public class PingPong extends Protocol {
 
     private long time;
 
-    public PingPong() {
+    protected PingPong() {
     }
 
     public PingPong(long time) {
@@ -24,6 +23,11 @@ public class PingPong implements Transferable {
 
     public void setTime(long time) {
         this.time = time;
+    }
+
+    @Override
+    public int getType() {
+        return 2;
     }
 
     @Override

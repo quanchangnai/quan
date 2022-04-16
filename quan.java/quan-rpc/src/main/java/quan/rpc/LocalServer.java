@@ -3,10 +3,10 @@ package quan.rpc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.message.CodedBuffer;
-import quan.rpc.msg.Handshake;
-import quan.rpc.msg.PingPong;
-import quan.rpc.msg.Request;
-import quan.rpc.msg.Response;
+import quan.rpc.protocol.Handshake;
+import quan.rpc.protocol.PingPong;
+import quan.rpc.protocol.Request;
+import quan.rpc.protocol.Response;
 import quan.rpc.serialize.ObjectReader;
 import quan.rpc.serialize.ObjectWriter;
 
@@ -213,7 +213,7 @@ public abstract class LocalServer {
         } else {
             RemoteServer remoteServer = remotes.get(targetServerId);
             if (remoteServer != null) {
-                remoteServer.sendMsg(request);
+                remoteServer.send(request);
             } else {
                 logger.error("发送RPC请求,远程服务器[{}]不存在", targetServerId);
             }
@@ -243,7 +243,7 @@ public abstract class LocalServer {
         } else {
             RemoteServer remoteServer = remotes.get(originServerId);
             if (remoteServer != null) {
-                remoteServer.sendMsg(response);
+                remoteServer.send(response);
             } else {
                 logger.error("发送RPC响应，远程服务器[{}]不存在", originServerId);
             }

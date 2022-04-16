@@ -2,10 +2,7 @@ package quan.rpc.serialize;
 
 import quan.message.CodedBuffer;
 import quan.message.Message;
-import quan.rpc.msg.Handshake;
-import quan.rpc.msg.PingPong;
-import quan.rpc.msg.Request;
-import quan.rpc.msg.Response;
+import quan.rpc.protocol.Protocol;
 
 import java.io.ByteArrayInputStream;
 import java.io.ObjectInputStream;
@@ -97,12 +94,10 @@ public class ObjectReader {
                 return readMap(new HashMap<>());
             case SORTED_MAP:
                 return readMap(new TreeMap<>());
-            case HANDSHAKE:
-            case PING_PONG:
-            case REQUEST:
-            case RESPONSE:
+            case PROTOCOL:
+                return readProtocol();
             case TRANSFERABLE:
-                return readTransferable(type);
+                return readTransferable();
             case MESSAGE:
                 return readMessage();
             case SERIALIZABLE:
@@ -204,25 +199,15 @@ public class ObjectReader {
         return map;
     }
 
-    protected Transferable readTransferable(int type) {
-        Transferable transferable;
-        switch (type) {
-            case HANDSHAKE:
-                transferable = new Handshake();
-                break;
-            case PING_PONG:
-                transferable = new PingPong();
-                break;
-            case REQUEST:
-                transferable = new Request();
-                break;
-            case RESPONSE:
-                transferable = new Response();
-                break;
-            default:
-                int id = buffer.readInt();
-                transferable = transferableFactory.apply(id);
-        }
+    protected Protocol readProtocol() {
+        Protocol protocol = Protocol.create(buffer.readInt());
+        protocol.transferFrom(this);
+        return protocol;
+    }
+
+    protected Transferable readTransferable() {
+        int id = buffer.readInt();
+        Transferable transferable = transferableFactory.apply(id);
         transferable.transferFrom(this);
         return transferable;
     }
