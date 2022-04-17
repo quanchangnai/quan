@@ -31,17 +31,11 @@ public abstract class Service {
         return worker;
     }
 
-    final Object call(int methodId, Object... params) {
+    final Object call(int methodId, Object... params) throws Exception {
         if (caller == null) {
-            try {
-                Class<?> callerClass = Class.forName(getClass().getName() + "Caller");
-                this.caller = (Caller) callerClass.getField("instance").get(callerClass);
-            } catch (Exception e) {
-                logger.error("", e);
-                return null;
-            }
+            Class<?> callerClass = Class.forName(getClass().getName() + "Caller");
+            this.caller = (Caller) callerClass.getField("instance").get(callerClass);
         }
-
         return caller.call(this, methodId, params);
     }
 

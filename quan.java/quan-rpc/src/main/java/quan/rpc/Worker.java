@@ -126,7 +126,7 @@ public class Worker {
 
     }
 
-    public <R> Promise<R> sendRequest(int targetServerId, Object serviceId, int methodId, Object... params) {
+    public <R> Promise<R> sendRequest(int targetServerId, Object serviceId, String methodSignature, int methodId, Object... params) {
         check(this.id);
 
         long callId = (long) this.id << 32 | nextCallId++;
@@ -138,7 +138,7 @@ public class Worker {
         request.setCallId(callId);
         server.sendRequest(targetServerId, request);
 
-        Promise<R> promise = new Promise<>(callId);
+        Promise<R> promise = new Promise<>(callId, methodSignature);
         promises.put(callId, promise);
         sortedPromises.add(promise);
 
@@ -147,15 +147,20 @@ public class Worker {
 
     protected void handleRequest(int originServerId, Request request) {
         long callId = request.getCallId();
+        Object serviceId = request.getServiceId();
         Object result = null;
         String error = null;
-        Service service = services.get(request.getServiceId());
+        Service service = services.get(serviceId);
+        if (service == null) {
+            logger.error("处理RPC请求，服务[{}]不存在，originServerId:{}，callId:{}", serviceId, originServerId, callId);
+            return;
+        }
 
         try {
             result = service.call(request.getMethodId(), request.getParams());
         } catch (Throwable e) {
             error = e.toString();
-            logger.error("处理RPC请求，调用[{}][{}]执行异常", originServerId, callId, e);
+            logger.error("处理RPC请求，方法执行异常，originServerId:{}，callId:{}", originServerId, callId, e);
         }
 
         if (result instanceof DelayedResult) {

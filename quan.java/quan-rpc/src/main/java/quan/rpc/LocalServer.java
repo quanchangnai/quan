@@ -1,5 +1,6 @@
 package quan.rpc;
 
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.message.CodedBuffer;
@@ -52,6 +53,7 @@ public abstract class LocalServer {
     private ScheduledExecutorService scheduler;
 
     protected LocalServer(int id, String ip, int port, int workerNum) {
+        Validate.isTrue(id > 0, "服务器ID必须是正整数");
         this.id = id;
         this.ip = ip;
         this.port = port;
@@ -207,7 +209,7 @@ public abstract class LocalServer {
      * 发送RPC请求
      */
     protected void sendRequest(int targetServerId, Request request) {
-        if (targetServerId == this.id) {
+        if (targetServerId == this.id || targetServerId <= 0) {
             //本地服务器直接处理
             handleRequest(this.id, request);
         } else {

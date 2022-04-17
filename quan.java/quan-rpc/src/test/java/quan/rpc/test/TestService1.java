@@ -20,7 +20,7 @@ public class TestService1 extends Service {
 
     private long lastTime;
 
-    private RoleService1Proxy<?> roleService1Proxy = new RoleService1Proxy<>(1, 2L);
+    private RoleService1Proxy<?> roleService1Proxy = new RoleService1Proxy<>(2L);
 
     private TestService2Proxy testService2Proxy = new TestService2Proxy(2, 2);
 

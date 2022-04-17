@@ -46,7 +46,7 @@ public class RoleService1<T extends Object & Runnable> extends Service {
      * 角色登陆1
      */
     @Endpoint
-    public void logout1(T t) {
+    public void logout1(T t){
         this.t = t;
         logger.info("logout1:{}", t);
     }

@@ -20,6 +20,8 @@ public class Promise<R> implements Comparable<Promise<?>> {
 
     private long callId;
 
+    private String methodSignature;
+
     private long time = System.currentTimeMillis();
 
     private Object resultHandler;
@@ -33,8 +35,9 @@ public class Promise<R> implements Comparable<Promise<?>> {
     protected Promise() {
     }
 
-    protected Promise(long callId) {
+    protected Promise(long callId, String methodSignature) {
         this.callId = callId;
+        this.methodSignature = methodSignature;
     }
 
     protected long getCallId() {
@@ -66,8 +69,7 @@ public class Promise<R> implements Comparable<Promise<?>> {
 
     void handleError(String error) {
         if (errorHandler == null) {
-            // TODO 调用的方法信息
-            logger.error("调用[{}]在远程服务器上执行异常，{}", callId, error);
+            logger.error("调用[{}]方法[{}]返回异常，{}", callId, methodSignature, error);
             return;
         }
 
@@ -81,15 +83,19 @@ public class Promise<R> implements Comparable<Promise<?>> {
         }
     }
 
-    public boolean isTimeout() {
-        //暂定10秒超时
-        return System.currentTimeMillis() - time > 10000;
+    boolean isTimeout() {
+        if (callId <= 0) {
+            //helpPromise
+            return false;
+        } else {
+            //暂定10秒超时
+            return System.currentTimeMillis() - time > 10000;
+        }
     }
 
     void handleTimeout() {
         if (timeoutHandler == null) {
-            // TODO 调用的方法信息
-            logger.error("调用[{}]等待响应超时", callId);
+            logger.error("调用[{}]方法[{}]等待超时", callId, methodSignature);
             return;
         }
 
@@ -108,6 +114,9 @@ public class Promise<R> implements Comparable<Promise<?>> {
     }
 
     private void delegate(Promise<?> promise) {
+        promise.callId = this.callId;
+        promise.methodSignature = this.methodSignature;
+        promise.time = this.time;
         this.then(promise::handleResult);
         this.error(promise::handleError);
         this.timeout(promise::handleTimeout);

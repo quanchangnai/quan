@@ -65,8 +65,12 @@ public final class DelayedResult<R> {
         }
     }
 
-    public R getResult() {
+    R getResult() {
         return result;
+    }
+
+    boolean isFinished() {
+        return finished;
     }
 
     /**
@@ -88,10 +92,6 @@ public final class DelayedResult<R> {
             }
         }
 
-    }
-
-    public boolean isFinished() {
-        return finished;
     }
 
 }

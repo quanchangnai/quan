@@ -47,6 +47,21 @@ public class RpcMethod extends RpcElement {
         return optimizedParameters;
     }
 
+    public String getSignature() {
+        StringBuilder signature = new StringBuilder();
+        signature.append(name);
+        signature.append("(");
+        int i = 0;
+        for (String parameterType : optimizedParameters.values()) {
+            if (i++ > 0) {
+                signature.append(", ");
+            }
+            signature.append(eraseParameterType(parameterType));
+        }
+        signature.append(")");
+        return signature.toString();
+    }
+
     //擦除方法参数的泛型
     public String eraseParameterType(String type) {
         int index = type.indexOf("<");

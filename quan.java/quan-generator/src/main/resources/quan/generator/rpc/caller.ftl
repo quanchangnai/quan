@@ -6,6 +6,9 @@ package ${packageName};
 import ${imports[importKey]};
 </#list>
 
+/**
+ * @see ${name}
+ */
 public final class ${name}Caller implements Caller {
 
     public static final ${name}Caller instance = new ${name}Caller();
@@ -14,7 +17,7 @@ public final class ${name}Caller implements Caller {
     }
 
     @Override
-    public Object call(Service service, int methodId, Object... params) {
+    public Object call(Service service, int methodId, Object... params) throws Exception{
         ${name} ${name?uncap_first} = (${name}) service;
         switch (methodId) {
         <#list methods as method>
@@ -33,7 +36,7 @@ public final class ${name}Caller implements Caller {
             </#if>
         </#list>
             default:
-                return null;
+                throw new IllegalArgumentException(String.format("${name}不存在方法:%d", methodId));
         }
     }
 
