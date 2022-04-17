@@ -5,10 +5,7 @@ import org.slf4j.LoggerFactory;
 import quan.rpc.protocol.Request;
 import quan.rpc.protocol.Response;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -39,10 +36,10 @@ public class Worker {
 
     private int nextCallId = 1;
 
-    private Map<Long, Promise<?>> promises = new HashMap<>();
+    private Map<Long, Promise<Object>> promises = new HashMap<>();
 
     //按调用时间排序
-    private TreeSet<Promise<?>> sortedPromises = new TreeSet<>();
+    private TreeSet<Promise<Object>> sortedPromises = new TreeSet<>(Comparator.comparingLong(Promise::getTime));
 
     protected Worker(LocalServer server) {
         this.server = server;
@@ -115,13 +112,13 @@ public class Worker {
         }
 
         while (!sortedPromises.isEmpty()) {
-            Promise<?> promise = sortedPromises.first();
-            if (!promise.isTimeout()) {
+            Promise<Object> promise = sortedPromises.first();
+            if (!promise.isExpired()) {
                 break;
             }
             sortedPromises.remove(promise);
             this.promises.remove(promise.getCallId());
-            promise.handleTimeout();
+            promise.setTimeout();
         }
 
     }
@@ -138,11 +135,12 @@ public class Worker {
         request.setCallId(callId);
         server.sendRequest(targetServerId, request);
 
-        Promise<R> promise = new Promise<>(callId, methodSignature);
+        Promise<Object> promise = new Promise<>(callId, methodSignature);
         promises.put(callId, promise);
         sortedPromises.add(promise);
 
-        return promise;
+        //noinspection unchecked
+        return (Promise<R>) promise;
     }
 
     protected void handleRequest(int originServerId, Request request) {
@@ -185,7 +183,7 @@ public class Worker {
 
     protected void handleResponse(Response response) {
         long callId = response.getCallId();
-        Promise<?> promise = promises.remove(callId);
+        Promise<Object> promise = promises.remove(callId);
         if (promise == null) {
             logger.error("处理RPC响应，调用[{}]不存在或者已超时", callId);
             return;
@@ -194,9 +192,9 @@ public class Worker {
 
         String error = response.getError();
         if (error != null) {
-            promise.handleError(error);
+            promise.setError(error);
         } else {
-            promise.handleResult(response.getResult());
+            promise.setResult(response.getResult());
         }
     }
 

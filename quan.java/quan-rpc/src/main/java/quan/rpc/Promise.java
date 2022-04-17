@@ -9,12 +9,12 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
- * 用于监听远程方法的调用结果、异常、超时
+ * 用于监听远程方法的调用结果等
  *
  * @author quanchangnai
  */
 @SuppressWarnings("unchecked")
-public class Promise<R> implements Comparable<Promise<?>> {
+public class Promise<R> {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -24,6 +24,8 @@ public class Promise<R> implements Comparable<Promise<?>> {
 
     private long time = System.currentTimeMillis();
 
+    protected R result;
+
     private Object resultHandler;
 
     private Object errorHandler;
@@ -31,6 +33,8 @@ public class Promise<R> implements Comparable<Promise<?>> {
     private Object timeoutHandler;
 
     private Promise helpPromise;
+
+    private boolean finished;
 
     protected Promise() {
     }
@@ -44,6 +48,17 @@ public class Promise<R> implements Comparable<Promise<?>> {
         return callId;
     }
 
+    protected void setCallId(long callId) {
+        this.callId = callId;
+    }
+
+    protected long getTime() {
+        return time;
+    }
+
+    protected boolean isFinished() {
+        return finished;
+    }
 
     protected Promise getHelpPromise() {
         if (helpPromise == null) {
@@ -52,7 +67,10 @@ public class Promise<R> implements Comparable<Promise<?>> {
         return helpPromise;
     }
 
-    void handleResult(Object result) {
+    protected void setResult(R result) {
+        finished = true;
+        this.result = result;
+
         if (resultHandler == null) {
             return;
         }
@@ -67,7 +85,12 @@ public class Promise<R> implements Comparable<Promise<?>> {
         }
     }
 
-    void handleError(String error) {
+    protected R getResult() {
+        return result;
+    }
+
+    protected void setError(String error) {
+        finished = true;
         if (errorHandler == null) {
             logger.error("调用[{}]方法[{}]返回异常，{}", callId, methodSignature, error);
             return;
@@ -83,17 +106,13 @@ public class Promise<R> implements Comparable<Promise<?>> {
         }
     }
 
-    boolean isTimeout() {
-        if (callId <= 0) {
-            //helpPromise
-            return false;
-        } else {
-            //暂定10秒超时
-            return System.currentTimeMillis() - time > 10000;
-        }
+    protected boolean isExpired() {
+        //暂定10秒过期
+        return System.currentTimeMillis() - time > 10000;
     }
 
-    void handleTimeout() {
+    protected void setTimeout() {
+        finished = true;
         if (timeoutHandler == null) {
             logger.error("调用[{}]方法[{}]等待超时", callId, methodSignature);
             return;
@@ -113,13 +132,13 @@ public class Promise<R> implements Comparable<Promise<?>> {
         }
     }
 
-    private void delegate(Promise<?> promise) {
+    private void delegate(Promise promise) {
         promise.callId = this.callId;
         promise.methodSignature = this.methodSignature;
         promise.time = this.time;
-        this.then(promise::handleResult);
-        this.error(promise::handleError);
-        this.timeout(promise::handleTimeout);
+        this.then(promise::setResult);
+        this.error(promise::setError);
+        this.timeout(promise::setTimeout);
     }
 
     private void checkHandler(Object oldHandler, Object newHandler) {
@@ -186,11 +205,6 @@ public class Promise<R> implements Comparable<Promise<?>> {
         checkHandler(this.timeoutHandler, handler);
         this.timeoutHandler = handler;
         return getHelpPromise();
-    }
-
-    @Override
-    public int compareTo(Promise<?> other) {
-        return Long.compare(this.time, other.time);
     }
 
 }

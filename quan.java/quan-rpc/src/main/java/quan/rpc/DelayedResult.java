@@ -1,26 +1,15 @@
 package quan.rpc;
 
-import java.util.Objects;
-import java.util.function.Consumer;
-
 /**
  * 服务方法可以先返回延迟结果，过一段时间后再使用它设置真实返回值
  *
  * @author quanchangnai
  */
-public final class DelayedResult<R> {
-
-    private long callId;
+public final class DelayedResult<R> extends Promise<R> {
 
     private int originServerId;
 
     private Worker worker;
-
-    private R result;
-
-    private Consumer<R> resultHandler;
-
-    private boolean finished;
 
     DelayedResult(Worker worker) {
         this.worker = worker;
@@ -34,16 +23,9 @@ public final class DelayedResult<R> {
         this.originServerId = originServerId;
     }
 
-    void setCallId(long callId) {
-        this.callId = callId;
-    }
-
-    long getCallId() {
-        return callId;
-    }
-
+    @Override
     public void setResult(R result) {
-        if (this.finished) {
+        if (this.isFinished()) {
             throw new IllegalStateException("不能重复设置延迟结果");
         }
 
@@ -53,45 +35,11 @@ public final class DelayedResult<R> {
             return;
         }
 
-        this.result = result;
-        this.finished = true;
+        super.setResult(result);
 
         if (originServerId > 0) {
             this.worker.handleDelayedResult(this);
         }
-
-        if (resultHandler != null) {
-            resultHandler.accept(result);
-        }
-    }
-
-    R getResult() {
-        return result;
-    }
-
-    boolean isFinished() {
-        return finished;
-    }
-
-    /**
-     * 设置不通过RPC而是通过正常途径调用时的结果处理器
-     */
-    public void then(Consumer<R> handler) {
-        Objects.requireNonNull(handler, "参数[handler]不能为空");
-        if (resultHandler != null) {
-            throw new IllegalStateException("参数[handler]不能重复设置");
-        }
-
-        resultHandler = handler;
-
-        if (finished) {
-            if (worker == Worker.current()) {
-                resultHandler.accept(result);
-            } else {
-                worker.execute(() -> resultHandler.accept(result));
-            }
-        }
-
     }
 
 }
