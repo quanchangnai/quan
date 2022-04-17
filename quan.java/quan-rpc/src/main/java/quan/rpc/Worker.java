@@ -158,14 +158,14 @@ public class Worker {
             logger.error("处理RPC请求，调用[{}][{}]执行异常", originServerId, callId, e);
         }
 
-        if (result instanceof AsyncResult) {
-            AsyncResult<?> asyncResult = (AsyncResult<?>) result;
-            if (!asyncResult.isFinished()) {
-                asyncResult.setCallId(callId);
-                asyncResult.setOriginServerId(originServerId);
+        if (result instanceof DelayedResult) {
+            DelayedResult<?> delayedResult = (DelayedResult<?>) result;
+            if (!delayedResult.isFinished()) {
+                delayedResult.setCallId(callId);
+                delayedResult.setOriginServerId(originServerId);
                 return;
             } else {
-                result = asyncResult.getResult();
+                result = delayedResult.getResult();
             }
         }
 
@@ -173,9 +173,9 @@ public class Worker {
         server.sendResponse(originServerId, response);
     }
 
-    protected void handleAsyncResult(AsyncResult asyncResult) {
-        Response response = new Response(asyncResult.getCallId(), asyncResult.getResult(), null);
-        server.sendResponse(asyncResult.getOriginServerId(), response);
+    protected void handleDelayedResult(DelayedResult delayedResult) {
+        Response response = new Response(delayedResult.getCallId(), delayedResult.getResult(), null);
+        server.sendResponse(delayedResult.getOriginServerId(), response);
     }
 
     protected void handleResponse(Response response) {
@@ -195,8 +195,8 @@ public class Worker {
         }
     }
 
-    public <R> AsyncResult<R> newAsyncResult() {
-        return new AsyncResult<>(this);
+    public <R> DelayedResult<R> newDelayedResult() {
+        return new DelayedResult<>(this);
     }
 
 }

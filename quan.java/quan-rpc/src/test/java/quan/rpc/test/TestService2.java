@@ -2,7 +2,7 @@ package quan.rpc.test;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import quan.rpc.AsyncResult;
+import quan.rpc.DelayedResult;
 import quan.rpc.Endpoint;
 import quan.rpc.Promise;
 import quan.rpc.Service;
@@ -50,14 +50,14 @@ public class TestService2 extends Service {
     }
 
     @Endpoint
-    public AsyncResult<Integer> add3(Integer a, Integer b) {
+    public DelayedResult<Integer> add3(Integer a, Integer b) {
         int r = a + b;
         logger.info("Execute TestService2:{}.add3({},{})={} at Worker:{}", id, a, b, r, this.getWorker().getId());
-        AsyncResult<Integer> asyncResult = newAsyncResult();
+        DelayedResult<Integer> delayedResult = newDelayedResult();
         execute(() -> {
-            asyncResult.setResult(r);
+            delayedResult.setResult(r);
         });
-        return asyncResult;
+        return delayedResult;
     }
 
 

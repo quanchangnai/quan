@@ -32,7 +32,7 @@ public class RpcGenerator extends AbstractProcessor {
 
     private TypeMirror serviceType;
 
-    private TypeMirror asyncResultType;
+    private TypeMirror delayedResultType;
 
     private Template proxyTemplate;
 
@@ -46,7 +46,7 @@ public class RpcGenerator extends AbstractProcessor {
         typeUtils = processingEnv.getTypeUtils();
         elementUtils = processingEnv.getElementUtils();
         serviceType = elementUtils.getTypeElement("quan.rpc.Service").asType();
-        asyncResultType = typeUtils.erasure(elementUtils.getTypeElement("quan.rpc.AsyncResult").asType());
+        delayedResultType = typeUtils.erasure(elementUtils.getTypeElement("quan.rpc.DelayedResult").asType());
 
         try {
             Configuration freemarkerCfg = new Configuration(Configuration.VERSION_2_3_23);
@@ -144,7 +144,7 @@ public class RpcGenerator extends AbstractProcessor {
             rpcMethod.setOriginalReturnType(typeUtils.boxedClass((PrimitiveType) returnType).asType().toString());
         } else if (returnType.getKind() == TypeKind.VOID) {
             rpcMethod.setOriginalReturnType(Void.class.getSimpleName());
-        } else if (typeUtils.isSameType(typeUtils.erasure(returnType), asyncResultType)) {
+        } else if (typeUtils.isSameType(typeUtils.erasure(returnType), delayedResultType)) {
             rpcMethod.setOriginalReturnType(((DeclaredType) returnType).getTypeArguments().get(0).toString());
         } else {
             rpcMethod.setOriginalReturnType(returnType.toString());

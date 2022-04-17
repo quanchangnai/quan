@@ -4,11 +4,11 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
- * 异步(延迟)结果
+ * 服务方法可以先返回延迟结果，过一段时间后再使用它设置真实返回值
  *
  * @author quanchangnai
  */
-public final class AsyncResult<R> {
+public final class DelayedResult<R> {
 
     private long callId;
 
@@ -22,7 +22,7 @@ public final class AsyncResult<R> {
 
     private boolean finished;
 
-    AsyncResult(Worker worker) {
+    DelayedResult(Worker worker) {
         this.worker = worker;
     }
 
@@ -44,7 +44,7 @@ public final class AsyncResult<R> {
 
     public void setResult(R result) {
         if (this.finished) {
-            throw new IllegalStateException("不能重复设置异步结果");
+            throw new IllegalStateException("不能重复设置延迟结果");
         }
 
         Worker current = Worker.current();
@@ -55,9 +55,12 @@ public final class AsyncResult<R> {
 
         this.result = result;
         this.finished = true;
+
         if (originServerId > 0) {
-            this.worker.handleAsyncResult(this);
-        } else if (resultHandler != null) {
+            this.worker.handleDelayedResult(this);
+        }
+
+        if (resultHandler != null) {
             resultHandler.accept(result);
         }
     }
@@ -74,7 +77,17 @@ public final class AsyncResult<R> {
         if (resultHandler != null) {
             throw new IllegalStateException("参数[handler]不能重复设置");
         }
-        this.resultHandler = handler;
+
+        resultHandler = handler;
+
+        if (finished) {
+            if (worker == Worker.current()) {
+                resultHandler.accept(result);
+            } else {
+                worker.execute(() -> resultHandler.accept(result));
+            }
+        }
+
     }
 
     public boolean isFinished() {

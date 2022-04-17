@@ -9,7 +9,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
- * 可以用于监听远程方法的调用结果等
+ * 用于监听远程方法的调用结果、异常、超时
  *
  * @author quanchangnai
  */
@@ -41,6 +41,14 @@ public class Promise<R> implements Comparable<Promise<?>> {
         return callId;
     }
 
+
+    protected Promise getHelpPromise() {
+        if (helpPromise == null) {
+            helpPromise = new Promise();
+        }
+        return helpPromise;
+    }
+
     void handleResult(Object result) {
         if (resultHandler == null) {
             return;
@@ -49,9 +57,9 @@ public class Promise<R> implements Comparable<Promise<?>> {
         if (resultHandler instanceof Consumer) {
             ((Consumer) resultHandler).accept(result);
         } else {
-            Promise<?> resultPromise = (Promise<?>) ((Function) resultHandler).apply(result);
-            if (resultPromise != null) {
-                resultPromise.delegate(helpPromise);
+            Promise<?> handlerPromise = (Promise<?>) ((Function) resultHandler).apply(result);
+            if (handlerPromise != null) {
+                handlerPromise.delegate(helpPromise);
             }
         }
     }
@@ -66,14 +74,14 @@ public class Promise<R> implements Comparable<Promise<?>> {
         if (errorHandler instanceof Consumer) {
             ((Consumer) errorHandler).accept(error);
         } else {
-            Promise<?> errorPromise = (Promise<?>) ((Supplier) errorHandler).get();
-            if (errorPromise != null) {
-                errorPromise.delegate(helpPromise);
+            Promise<?> handlerPromise = (Promise<?>) ((Supplier) errorHandler).get();
+            if (handlerPromise != null) {
+                handlerPromise.delegate(helpPromise);
             }
         }
     }
 
-    boolean isTimeout() {
+    public boolean isTimeout() {
         //暂定10秒超时
         return System.currentTimeMillis() - time > 10000;
     }
@@ -92,9 +100,9 @@ public class Promise<R> implements Comparable<Promise<?>> {
                 logger.error("", e);
             }
         } else {
-            Promise<?> timeoutPromise = (Promise<?>) ((Supplier) timeoutHandler).get();
-            if (timeoutPromise != null) {
-                timeoutPromise.delegate(helpPromise);
+            Promise<?> handlerPromise = (Promise<?>) ((Supplier) timeoutHandler).get();
+            if (handlerPromise != null) {
+                handlerPromise.delegate(helpPromise);
             }
         }
     }
@@ -130,8 +138,7 @@ public class Promise<R> implements Comparable<Promise<?>> {
     public <R2> Promise<R2> then(Function<R, Promise<R2>> handler) {
         checkHandler(this.resultHandler, handler);
         this.resultHandler = handler;
-        helpPromise = new Promise<>();
-        return helpPromise;
+        return getHelpPromise();
     }
 
     /**
@@ -150,8 +157,7 @@ public class Promise<R> implements Comparable<Promise<?>> {
     public <R2> Promise<R2> error(Function<String, Promise<R2>> handler) {
         checkHandler(this.errorHandler, handler);
         this.errorHandler = handler;
-        helpPromise = new Promise<>();
-        return helpPromise;
+        return getHelpPromise();
     }
 
     /**
@@ -170,8 +176,7 @@ public class Promise<R> implements Comparable<Promise<?>> {
     public <R2> Promise<R2> timeout(Supplier<Promise<R2>> handler) {
         checkHandler(this.timeoutHandler, handler);
         this.timeoutHandler = handler;
-        helpPromise = new Promise<>();
-        return helpPromise;
+        return getHelpPromise();
     }
 
     @Override

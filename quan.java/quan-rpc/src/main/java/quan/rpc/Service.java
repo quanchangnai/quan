@@ -58,8 +58,8 @@ public abstract class Service {
     protected void update() {
     }
 
-    public final <R> AsyncResult<R> newAsyncResult() {
-        return worker.newAsyncResult();
+    public final <R> DelayedResult<R> newDelayedResult() {
+        return worker.newDelayedResult();
     }
 
 }
