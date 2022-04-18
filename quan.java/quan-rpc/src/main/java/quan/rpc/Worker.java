@@ -36,10 +36,12 @@ public class Worker {
 
     private int nextCallId = 1;
 
-    private Map<Long, Promise<Object>> promises = new HashMap<>();
+    private Map<Long, Promise<Object>> mappedPromises = new HashMap<>();
 
-    //按调用时间排序
+    //按时间排序
     private TreeSet<Promise<Object>> sortedPromises = new TreeSet<>(Comparator.comparingLong(Promise::getTime));
+
+    private TreeSet<DelayedResult<Object>> delayedResults = new TreeSet<>(Comparator.comparingLong(DelayedResult::getTime));
 
     protected Worker(LocalServer server) {
         this.server = server;
@@ -117,13 +119,22 @@ public class Worker {
                 break;
             }
             sortedPromises.remove(promise);
-            this.promises.remove(promise.getCallId());
+            this.mappedPromises.remove(promise.getCallId());
             promise.setTimeout();
+        }
+
+        while (!delayedResults.isEmpty()) {
+            DelayedResult<Object> delayedResult = delayedResults.first();
+            if (!delayedResult.isExpired()) {
+                break;
+            }
+            delayedResults.remove(delayedResult);
+            delayedResult.setTimeout();
         }
 
     }
 
-    public <R> Promise<R> sendRequest(int targetServerId, Object serviceId, String methodSignature, int methodId, Object... params) {
+    public <R> Promise<R> sendRequest(int targetServerId, Object serviceId, String callee, int methodId, Object... params) {
         check(this.id);
 
         long callId = (long) this.id << 32 | nextCallId++;
@@ -135,8 +146,8 @@ public class Worker {
         request.setCallId(callId);
         server.sendRequest(targetServerId, request);
 
-        Promise<Object> promise = new Promise<>(callId, methodSignature);
-        promises.put(callId, promise);
+        Promise<Object> promise = new Promise<>(callId, callee);
+        mappedPromises.put(callId, promise);
         sortedPromises.add(promise);
 
         //noinspection unchecked
@@ -147,7 +158,7 @@ public class Worker {
         long callId = request.getCallId();
         Object serviceId = request.getServiceId();
         Object result = null;
-        String error = null;
+        String exception = null;
         Service service = services.get(serviceId);
         if (service == null) {
             logger.error("处理RPC请求，服务[{}]不存在，originServerId:{}，callId:{}", serviceId, originServerId, callId);
@@ -157,7 +168,7 @@ public class Worker {
         try {
             result = service.call(request.getMethodId(), request.getParams());
         } catch (Throwable e) {
-            error = e.toString();
+            exception = e.toString();
             logger.error("处理RPC请求，方法执行异常，originServerId:{}，callId:{}", originServerId, callId, e);
         }
 
@@ -172,27 +183,27 @@ public class Worker {
             }
         }
 
-        Response response = new Response(callId, result, error);
+        Response response = new Response(callId, result, exception);
         server.sendResponse(originServerId, response);
     }
 
     protected void handleDelayedResult(DelayedResult delayedResult) {
-        Response response = new Response(delayedResult.getCallId(), delayedResult.getResult(), null);
+        Response response = new Response(delayedResult.getCallId(), delayedResult.getResult(), delayedResult.getExceptionStr());
         server.sendResponse(delayedResult.getOriginServerId(), response);
     }
 
     protected void handleResponse(Response response) {
         long callId = response.getCallId();
-        Promise<Object> promise = promises.remove(callId);
+        Promise<Object> promise = mappedPromises.remove(callId);
         if (promise == null) {
             logger.error("处理RPC响应，调用[{}]不存在或者已超时", callId);
             return;
         }
         sortedPromises.remove(promise);
 
-        String error = response.getError();
+        String error = response.getException();
         if (error != null) {
-            promise.setError(error);
+            promise.setException(new CallException(error));
         } else {
             promise.setResult(response.getResult());
         }

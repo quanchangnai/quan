@@ -80,7 +80,7 @@ public class TestService1 extends Service {
         int b = (int) (now % 10);
         long startTime = System.nanoTime();
 
-        Promise<Integer> promise = roleService1Proxy.login1(a, b);//result1
+        Promise<Integer> promise = roleService1Proxy.login1(a, b);//result1 fs.promises.readFile(configFile))
         promise.then(result1 -> {
             double costTime = (System.nanoTime() - startTime) / 1000000D;
             logger.info("TestService1:{} call RoleService1:{}.login1({},{})={},costTime:{}", this.id, roleService1Proxy.serviceId, a, b, result1, costTime);

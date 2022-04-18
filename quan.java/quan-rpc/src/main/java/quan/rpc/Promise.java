@@ -16,19 +16,21 @@ import java.util.function.Supplier;
 @SuppressWarnings("unchecked")
 public class Promise<R> {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     private long callId;
 
-    private String methodSignature;
+    private String callee;
 
     private long time = System.currentTimeMillis();
 
-    protected R result;
+    private R result;
+
+    private Exception exception;
 
     private Object resultHandler;
 
-    private Object errorHandler;
+    private Object exceptionHandler;
 
     private Object timeoutHandler;
 
@@ -39,9 +41,9 @@ public class Promise<R> {
     protected Promise() {
     }
 
-    protected Promise(long callId, String methodSignature) {
+    protected Promise(long callId, String callee) {
         this.callId = callId;
-        this.methodSignature = methodSignature;
+        this.callee = callee;
     }
 
     protected long getCallId() {
@@ -68,7 +70,7 @@ public class Promise<R> {
     }
 
     protected void setResult(R result) {
-        finished = true;
+        this.finished = true;
         this.result = result;
 
         if (resultHandler == null) {
@@ -89,20 +91,35 @@ public class Promise<R> {
         return result;
     }
 
-    protected void setError(String error) {
-        finished = true;
-        if (errorHandler == null) {
-            logger.error("调用[{}]方法[{}]返回异常，{}", callId, methodSignature, error);
+    protected void setException(Exception exception) {
+        this.finished = true;
+        this.exception = exception;
+        if (exception instanceof CallException) {
+            CallException callException = (CallException) exception;
+            callException.setCallId(callId);
+            callException.setCallee(callee);
+        }
+
+        if (exceptionHandler == null) {
+            logger.error("", exception);
             return;
         }
 
-        if (errorHandler instanceof Consumer) {
-            ((Consumer) errorHandler).accept(error);
+        if (exceptionHandler instanceof Consumer) {
+            ((Consumer) exceptionHandler).accept(exception);
         } else {
-            Promise<?> handlerPromise = (Promise<?>) ((Supplier) errorHandler).get();
+            Promise<?> handlerPromise = (Promise<?>) ((Supplier) exceptionHandler).get();
             if (handlerPromise != null) {
                 handlerPromise.delegate(helpPromise);
             }
+        }
+    }
+
+    protected String getExceptionStr() {
+        if (exception == null) {
+            return null;
+        } else {
+            return exception.toString();
         }
     }
 
@@ -112,9 +129,13 @@ public class Promise<R> {
     }
 
     protected void setTimeout() {
-        finished = true;
+        this.finished = true;
         if (timeoutHandler == null) {
-            logger.error("调用[{}]方法[{}]等待超时", callId, methodSignature);
+            if (callId > 0 && callee != null) {
+                logger.error("调用[{}]方法[{}]等待超时", callId, callee);
+            } else {
+                logger.error("{}等待超时", getClass().getSimpleName());
+            }
             return;
         }
 
@@ -134,10 +155,10 @@ public class Promise<R> {
 
     private void delegate(Promise promise) {
         promise.callId = this.callId;
-        promise.methodSignature = this.methodSignature;
+        promise.callee = this.callee;
         promise.time = this.time;
         this.then(promise::setResult);
-        this.error(promise::setError);
+        this.except(promise::setException);
         this.timeout(promise::setTimeout);
     }
 
@@ -172,9 +193,9 @@ public class Promise<R> {
     /**
      * 设置异步调用异常返回时的处理器
      */
-    public void error(Consumer<String> handler) {
-        checkHandler(this.errorHandler, handler);
-        this.errorHandler = handler;
+    public void except(Consumer<Exception> handler) {
+        checkHandler(this.exceptionHandler, handler);
+        this.exceptionHandler = handler;
     }
 
     /**
@@ -182,9 +203,9 @@ public class Promise<R> {
      *
      * @see #then(Function)
      */
-    public <R2> Promise<R2> error(Function<String, Promise<R2>> handler) {
-        checkHandler(this.errorHandler, handler);
-        this.errorHandler = handler;
+    public <R2> Promise<R2> except(Function<String, Promise<R2>> handler) {
+        checkHandler(this.exceptionHandler, handler);
+        this.exceptionHandler = handler;
         return getHelpPromise();
     }
 

@@ -49,8 +49,8 @@ public class ${name}Proxy${typeParametersStr}{
         ${method.optimizedParameters[paramName]} ${paramName}<#if paramName?has_next>, </#if><#t>
     </#list>
     <#lt>) {
-        String methodSignature = "${name}.${method.signature}";
-        return Worker.current().sendRequest(serverId, serviceId, methodSignature, ${method?index+1}<#if method.optimizedParameters?keys?size gt 0>, ${ method.optimizedParameters?keys?join(', ')}</#if>);
+        String callee = "${name}.${method.signature}";
+        return Worker.current().sendRequest(serverId, serviceId, callee, ${method?index+1}<#if method.optimizedParameters?keys?size gt 0>, ${ method.optimizedParameters?keys?join(', ')}</#if>);
     }
 
 </#list>

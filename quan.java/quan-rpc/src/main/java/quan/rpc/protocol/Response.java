@@ -20,15 +20,15 @@ public class Response extends Protocol {
      */
     private Object result;
 
-    private String error;
+    private String exception;
 
     protected Response() {
     }
 
-    public Response(long callId, Object result, String error) {
+    public Response(long callId, Object result, String exception) {
         this.callId = callId;
         this.result = result;
-        this.error = error;
+        this.exception = exception;
     }
 
     @Override
@@ -47,22 +47,22 @@ public class Response extends Protocol {
         return result;
     }
 
-    public String getError() {
-        return error;
+    public String getException() {
+        return exception;
     }
 
     @Override
     public void transferTo(ObjectWriter writer) {
         writer.write(callId);
         writer.write(result);
-        writer.write(error);
+        writer.write(exception);
     }
 
     @Override
     public void transferFrom(ObjectReader reader) {
         callId = reader.read();
         result = reader.read();
-        error = reader.read();
+        exception = reader.read();
     }
 
 }
