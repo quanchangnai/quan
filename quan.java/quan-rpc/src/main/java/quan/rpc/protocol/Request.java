@@ -39,11 +39,6 @@ public class Request extends Protocol {
         this.params = params;
     }
 
-    @Override
-    public int getType() {
-        return 3;
-    }
-
     public long getCallId() {
         return callId;
     }

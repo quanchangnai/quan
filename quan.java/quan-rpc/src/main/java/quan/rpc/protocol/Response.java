@@ -31,11 +31,6 @@ public class Response extends Protocol {
         this.exception = exception;
     }
 
-    @Override
-    public int getType() {
-        return 4;
-    }
-
     public long getCallId() {
         return callId;
     }

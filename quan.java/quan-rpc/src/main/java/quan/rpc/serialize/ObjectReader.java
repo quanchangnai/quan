@@ -18,7 +18,7 @@ public class ObjectReader {
 
     protected CodedBuffer buffer;
 
-    protected Function<Integer, Transferable> transferableFactory;
+    protected TransferableRegistry transferableRegistry;
 
     protected Function<Integer, Message> messageFactory;
 
@@ -26,8 +26,8 @@ public class ObjectReader {
         this.buffer = Objects.requireNonNull(buffer);
     }
 
-    public void setTransferableFactory(Function<Integer, Transferable> transferableFactory) {
-        this.transferableFactory = transferableFactory;
+    public void setTransferableRegistry(TransferableRegistry transferableRegistry) {
+        this.transferableRegistry = transferableRegistry;
     }
 
     public void setMessageFactory(Function<Integer, Message> messageFactory) {
@@ -200,14 +200,14 @@ public class ObjectReader {
     }
 
     protected Protocol readProtocol() {
-        Protocol protocol = Protocol.create(buffer.readInt());
+        Protocol protocol = (Protocol) Protocol.getRegistry().create(buffer.readInt());
         protocol.transferFrom(this);
         return protocol;
     }
 
     protected Transferable readTransferable() {
         int id = buffer.readInt();
-        Transferable transferable = transferableFactory.apply(id);
+        Transferable transferable = transferableRegistry.create(id);
         transferable.transferFrom(this);
         return transferable;
     }

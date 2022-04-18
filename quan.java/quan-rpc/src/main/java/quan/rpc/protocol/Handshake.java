@@ -38,11 +38,6 @@ public class Handshake extends Protocol {
     }
 
     @Override
-    public int getType() {
-        return 1;
-    }
-
-    @Override
     public void transferTo(ObjectWriter writer) {
         writer.write(serverId);
         writer.write(serverIp);

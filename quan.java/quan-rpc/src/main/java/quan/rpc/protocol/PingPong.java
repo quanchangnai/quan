@@ -26,11 +26,6 @@ public class PingPong extends Protocol {
     }
 
     @Override
-    public int getType() {
-        return 2;
-    }
-
-    @Override
     public void transferTo(ObjectWriter writer) {
         writer.write(time);
     }

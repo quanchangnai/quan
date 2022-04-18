@@ -17,10 +17,16 @@ import static quan.rpc.serialize.ObjectType.*;
  */
 public class ObjectWriter {
 
+    protected TransferableRegistry transferableRegistry;
+
     private CodedBuffer buffer;
 
     public ObjectWriter(CodedBuffer buffer) {
         this.buffer = Objects.requireNonNull(buffer);
+    }
+
+    public void setTransferableRegistry(TransferableRegistry transferableRegistry) {
+        this.transferableRegistry = transferableRegistry;
     }
 
     public void write(Object value) {
@@ -204,13 +210,13 @@ public class ObjectWriter {
 
     protected void write(Protocol protocol) {
         buffer.writeInt(PROTOCOL);
-        buffer.writeInt(protocol.getType());
+        buffer.writeInt(Protocol.getRegistry().getId(protocol.getClass()));
         protocol.transferTo(this);
     }
 
     protected void write(Transferable transferable) {
         buffer.writeInt(TRANSFERABLE);
-        buffer.writeInt(transferable.getClass().getName().hashCode());
+        buffer.writeInt(transferableRegistry.getId(transferable.getClass()));
         transferable.transferTo(this);
     }
 
