@@ -8,6 +8,7 @@ import quan.rpc.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author quanchangnai
@@ -64,6 +65,11 @@ public class TestService1 extends Service {
     @Endpoint
     public <E> Integer size(List<? super Runnable> list) {
         return list.size();
+    }
+
+    @Endpoint
+    public Integer size(Set<?> set) {
+        return set.size();
     }
 
     @Override

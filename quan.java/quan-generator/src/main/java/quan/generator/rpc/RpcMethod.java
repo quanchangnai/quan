@@ -50,6 +50,10 @@ public class RpcMethod extends RpcElement {
     public String getSignature() {
         StringBuilder signature = new StringBuilder();
         signature.append(name);
+        if (rpcClass.getMethodNameNums().get(name) == 1) {
+            return signature.toString();
+        }
+
         signature.append("(");
         int i = 0;
         for (String parameterType : optimizedParameters.values()) {

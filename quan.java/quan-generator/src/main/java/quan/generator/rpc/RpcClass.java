@@ -13,6 +13,9 @@ public class RpcClass extends RpcElement {
 
     private List<RpcMethod> methods = new ArrayList<>();
 
+    //方法名:方法数量
+    private Map<String, Integer> methodNameNums = new HashMap<>();
+
     //简单类名：全类名(可以省略导入的类以-开头)
     private Map<String, String> imports = new HashMap<>();
 
@@ -38,6 +41,15 @@ public class RpcClass extends RpcElement {
 
     public List<RpcMethod> getMethods() {
         return methods;
+    }
+
+    public Map<String, Integer> getMethodNameNums() {
+        if (methodNameNums.isEmpty()) {
+            for (RpcMethod method : methods) {
+                methodNameNums.merge(method.name, 1, Integer::sum);
+            }
+        }
+        return methodNameNums;
     }
 
     @Override
