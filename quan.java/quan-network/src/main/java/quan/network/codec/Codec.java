@@ -32,7 +32,7 @@ public abstract class Codec implements Handler<Object> {
     @Override
     public void onSendMsg(HandlerContext handlerContext, Object msg) throws Exception {
         if (encodeTypes.stream().anyMatch(t -> t.isAssignableFrom(msg.getClass()))) {
-            handlerContext.sendMsg(encode(msg));
+            encode(msg).forEach(handlerContext::sendMsg);
         } else {
             handlerContext.sendMsg(msg);
         }
@@ -40,6 +40,6 @@ public abstract class Codec implements Handler<Object> {
 
     protected abstract List<Object> decode(Object msg) throws Exception;
 
-    protected abstract Object encode(Object msg) throws Exception;
+    protected abstract List<Object> encode(Object msg) throws Exception;
 
 }

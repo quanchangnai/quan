@@ -45,8 +45,9 @@ public class StringCodec extends Codec {
     }
 
     @Override
-    protected Object encode(Object msg) {
-        return ByteBuffer.wrap(((String) msg).getBytes(charset));
+    protected List<Object> encode(Object msg) {
+        byte[] bytes = ((String) msg).getBytes(charset);
+        return Collections.singletonList(ByteBuffer.wrap(bytes));
     }
 
 }

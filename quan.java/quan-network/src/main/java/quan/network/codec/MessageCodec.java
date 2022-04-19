@@ -3,9 +3,9 @@ package quan.network.codec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.message.CodedBuffer;
+import quan.message.DefaultCodedBuffer;
 import quan.message.Message;
 import quan.message.MessageRegistry;
-import quan.message.DefaultCodedBuffer;
 
 import java.nio.ByteBuffer;
 import java.util.Collections;
@@ -54,8 +54,8 @@ public class MessageCodec extends Codec {
     }
 
     @Override
-    protected Object encode(Object msg) {
-        return ((Message) msg).encode();
+    protected List<Object> encode(Object msg) {
+        return Collections.singletonList(((Message) msg).encode());
     }
 
 }

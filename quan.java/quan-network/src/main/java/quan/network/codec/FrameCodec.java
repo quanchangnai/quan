@@ -90,18 +90,16 @@ public class FrameCodec extends Codec {
     }
 
     @Override
-    protected Object encode(Object msg) {
+    protected List<Object> encode(Object msg) {
         ByteBuffer srcMsgBuffer = (ByteBuffer) msg;
         int length = srcMsgBuffer.remaining();
-        ByteBuffer encodedMsgBuffer = ByteBuffer.allocate(lengthFieldLength + length);
+        ByteBuffer lengthFieldBuffer = ByteBuffer.allocate(lengthFieldLength);
         if (includeLengthField) {
             length += lengthFieldLength;
         }
-        putLengthField(encodedMsgBuffer, length);
-
-        encodedMsgBuffer.put(srcMsgBuffer);
-        encodedMsgBuffer.flip();
-        return encodedMsgBuffer;
+        putLengthField(lengthFieldBuffer, length);
+        lengthFieldBuffer.flip();
+        return Arrays.asList(lengthFieldBuffer, srcMsgBuffer);
     }
 
     private void validateLengthFieldLength() {
