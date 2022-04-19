@@ -4,6 +4,10 @@
 
 apply plugin: 'java-library'
 
+compileTestJava {
+//    options.compilerArgs.add("-ArpcProxyPath=quan-rpc/src/test/java")
+}
+
 dependencies {
     api project(':quan-common')
     api project(':quan-message')

@@ -19,6 +19,8 @@ public class RpcClass extends RpcElement {
     //简单类名：全类名(可以省略导入的类以-开头)
     private Map<String, String> imports = new HashMap<>();
 
+    private boolean customPath;
+
     public RpcClass(String fullName) {
         this.fullName = fullName;
         int index = fullName.lastIndexOf(".");
@@ -66,6 +68,14 @@ public class RpcClass extends RpcElement {
             }
         }
         return imports;
+    }
+
+    public boolean isCustomPath() {
+        return customPath;
+    }
+
+    public void setCustomPath(boolean customPath) {
+        this.customPath = customPath;
     }
 
     /**

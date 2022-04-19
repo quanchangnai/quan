@@ -10,7 +10,7 @@ import ${imports[importKey]};
 <#list comments as comment>
  *${comment}
 </#list>
- * @see ${name}
+ *<#if !customPath> @see<#elseif comments?size gt 0> <br/></#if> ${name}
  */
 public class ${name}Proxy${typeParametersStr}{
 
@@ -42,7 +42,7 @@ public class ${name}Proxy${typeParametersStr}{
     <#list method.comments as comment>
      *${comment}
     </#list>
-     * @see ${name}#${method.signature}
+     *<#if !customPath> @see<#elseif  method.comments?size gt 0> <br/></#if> ${name}#${method.signature}
      */
     public final ${method.typeParametersStr}Promise<${method.optimizedReturnType}> ${method.name}(<#rt>
     <#list method.optimizedParameters?keys as paramName>

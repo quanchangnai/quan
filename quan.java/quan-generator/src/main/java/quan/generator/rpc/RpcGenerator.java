@@ -14,11 +14,14 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
 
 @SupportedAnnotationTypes("quan.rpc.Endpoint")
+@SupportedOptions("rpcProxyPath")
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class RpcGenerator extends AbstractProcessor {
 
@@ -34,6 +37,11 @@ public class RpcGenerator extends AbstractProcessor {
 
     private TypeMirror promiseType;
 
+    /**
+     * 自定义代理类的生成路径
+     */
+    private String proxyPath;
+
     private Template proxyTemplate;
 
     private Template callerTemplate;
@@ -47,7 +55,7 @@ public class RpcGenerator extends AbstractProcessor {
         elementUtils = processingEnv.getElementUtils();
         serviceType = elementUtils.getTypeElement("quan.rpc.Service").asType();
         promiseType = typeUtils.erasure(elementUtils.getTypeElement("quan.rpc.Promise").asType());
-
+        proxyPath = processingEnv.getOptions().get("rpcProxyPath");
         try {
             Configuration freemarkerCfg = new Configuration(Configuration.VERSION_2_3_23);
             freemarkerCfg.setClassForTemplateLoading(getClass(), "");
@@ -55,13 +63,17 @@ public class RpcGenerator extends AbstractProcessor {
             proxyTemplate = freemarkerCfg.getTemplate("proxy.ftl");
             callerTemplate = freemarkerCfg.getTemplate("caller.ftl");
         } catch (IOException e) {
-            error(e.toString());
-            e.printStackTrace();
+            error(e);
         }
     }
 
     private void error(String msg) {
         messager.printMessage(Diagnostic.Kind.ERROR, msg);
+    }
+
+    private void error(Exception e) {
+        messager.printMessage(Diagnostic.Kind.ERROR, e.toString());
+        e.printStackTrace();
     }
 
     @Override
@@ -110,8 +122,7 @@ public class RpcGenerator extends AbstractProcessor {
         try {
             generate(rpcClass);
         } catch (IOException e) {
-            error(e.toString());
-            e.printStackTrace();
+            error(e);
         }
     }
 
@@ -154,24 +165,51 @@ public class RpcGenerator extends AbstractProcessor {
         return rpcMethod;
     }
 
+    /**
+     * 自定义递归创建目录，因为使用gradle编译时，File.mkdirs的路径不对
+     */
+    private boolean mkdirs(File path) {
+        if (path.exists()) {
+            return false;
+        }
+        if (path.mkdir()) {
+            return true;
+        }
+        File parent = path.getParentFile();
+        return parent != null && mkdirs(parent);
+    }
 
     private void generate(RpcClass rpcClass) throws IOException {
+        rpcClass.setCustomPath(proxyPath != null);
         rpcClass.optimizeImport4Proxy();
-        JavaFileObject proxyFile = filer.createSourceFile(rpcClass.getFullName() + "Proxy");
-        try (Writer proxyWriter = proxyFile.openWriter()) {
-            proxyTemplate.process(rpcClass, proxyWriter);
-        } catch (Exception e) {
-            error(e.toString());
-            e.printStackTrace();
+        Writer proxyWriter;
+
+        if (proxyPath == null) {
+            JavaFileObject proxyFile = filer.createSourceFile(rpcClass.getFullName() + "Proxy");
+            proxyWriter = proxyFile.openWriter();
+        } else {
+            File path = new File(proxyPath, rpcClass.getPackageName().replace(".", "/"));
+            mkdirs(path);
+            File file = new File(path, rpcClass.getName() + "Proxy.java");
+            proxyWriter = new FileWriter(file);
         }
 
+        try {
+            proxyTemplate.process(rpcClass, proxyWriter);
+        } catch (Exception e) {
+            error(e);
+        } finally {
+            proxyWriter.close();
+        }
+
+        rpcClass.setCustomPath(false);
         rpcClass.optimizeImport4Caller();
         JavaFileObject callerFile = filer.createSourceFile(rpcClass.getFullName() + "Caller");
+
         try (Writer callerWriter = callerFile.openWriter()) {
             callerTemplate.process(rpcClass, callerWriter);
         } catch (Exception e) {
-            error(e.toString());
-            e.printStackTrace();
+            error(e);
         }
     }
 
