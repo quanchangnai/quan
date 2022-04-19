@@ -36,7 +36,7 @@ public class NettyServerTest {
                 protected void initChannel(NioSocketChannel ch) {
                     ch.pipeline().addLast(new LengthFieldPrepender(4));
                     ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(100000, 0, 4, 0, 4));
-                    ch.pipeline().addLast(new NettyMessageCodec(MessageTest.messageRegistry));
+                    ch.pipeline().addLast(new NettyMessageCodec(MessageTest.messageRegistry::create));
                     ch.pipeline().addLast(new NettyServerHandler());
                 }
             });
