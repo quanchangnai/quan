@@ -14,27 +14,55 @@ import ${imports[importKey]};
  */
 public class ${name}Proxy${typeParametersStr}{
 
-    public final int serverId;
-
-    public final Object serviceId;
+    /**
+     * 服务类名
+     */
+    private static final String SERVICE_NAME = "${fullName}";
 
     /**
-     * 构造一个${name}Proxy
-     * @param serverId 目标服务器ID
-     * @param serviceId 目标服务ID
+     * 目标服务器ID
      */
+    private int serverId = -1;
+
+    /**
+     * 目标服务ID
+     */
+    private final Object serviceId;
+
+<#if !serviceId??>
     public ${name}Proxy(int serverId, Object serviceId) {
+        if (serverId < 0) {
+            throw new IllegalArgumentException("服务器ID不能小于0");
+        }
         this.serverId = serverId;
         this.serviceId = serviceId;
     }
 
-    /**
-     * 构造一个目标服务器为本地服务器的${name}Proxy
-     * @param serviceId 目标服务ID
-     */
     public ${name}Proxy(Object serviceId) {
-        this.serverId = 0;
         this.serviceId = serviceId;
+    }
+
+<#else>
+    public ${name}Proxy(int serverId) {
+        if (serverId < 0) {
+            throw new IllegalArgumentException("服务器ID不能小于0");
+        }
+        this.serverId = serverId;
+        this.serviceId = "${serviceId}";
+    }
+
+    public ${name}Proxy() {
+        this.serviceId = "${serviceId}";
+    }
+
+    public static final ${name}Proxy instance = new ${name}Proxy();
+
+</#if>
+    private int getServerId() {
+        if (serverId < 0) {
+            serverId = Worker.current().resolveTargetServerId(SERVICE_NAME);
+        }
+        return serverId;
     }
 
 <#list methods as method>
@@ -49,8 +77,8 @@ public class ${name}Proxy${typeParametersStr}{
         ${method.optimizedParameters[paramName]} ${paramName}<#if paramName?has_next>, </#if><#t>
     </#list>
     <#lt>) {
-        String callee = "${fullName}.${method.signature}";
-        return Worker.current().sendRequest(serverId, serviceId, callee, ${method?index+1}<#if method.optimizedParameters?keys?size gt 0>, ${ method.optimizedParameters?keys?join(', ')}</#if>);
+        String callee = SERVICE_NAME + ".${method.signature}";
+        return Worker.current().sendRequest(getServerId(), serviceId, callee, ${method?index+1}<#if method.optimizedParameters?keys?size gt 0>, ${ method.optimizedParameters?keys?join(', ')}</#if>);
     }
 
 </#list>

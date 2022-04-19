@@ -26,7 +26,7 @@ public class ObjectWriter {
     }
 
     public void setTransferableRegistry(TransferableRegistry transferableRegistry) {
-        this.transferableRegistry = transferableRegistry;
+        this.transferableRegistry = Objects.requireNonNull(transferableRegistry);
     }
 
     public void write(Object value) {

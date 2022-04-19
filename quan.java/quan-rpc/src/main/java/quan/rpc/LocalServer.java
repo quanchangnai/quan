@@ -37,6 +37,11 @@ public abstract class LocalServer {
 
     private Function<CodedBuffer, ObjectWriter> writerFactory = ObjectWriter::new;
 
+    /**
+     * 使用服务名作为参数，调用后返回服务的目标服务器ID，多次调用返回要一致
+     */
+    private Function<String, Integer> targetServerIdResolver;
+
     //管理的所有工作线程，key:工作线程ID
     private final Map<Integer, Worker> workers = new HashMap<>();
 
@@ -97,6 +102,15 @@ public abstract class LocalServer {
         this.writerFactory = Objects.requireNonNull(writerFactory);
     }
 
+    /**
+     * 如果目标服务器是单进程的，该Resolver用来查找目标服务器ID，可以省去每次构造服务代理都必需要传参的麻烦
+     *
+     * @see #targetServerIdResolver
+     */
+    public void setTargetServerIdResolver(Function<String, Integer> targetServerIdResolver) {
+        this.targetServerIdResolver = targetServerIdResolver;
+    }
+
     public int getReconnectTime() {
         return reconnectTime;
     }
@@ -107,6 +121,10 @@ public abstract class LocalServer {
 
     public Function<CodedBuffer, ObjectWriter> getWriterFactory() {
         return writerFactory;
+    }
+
+    public Function<String, Integer> getTargetServerIdResolver() {
+        return targetServerIdResolver;
     }
 
     public synchronized void start() {

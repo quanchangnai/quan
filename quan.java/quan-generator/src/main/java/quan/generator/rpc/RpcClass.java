@@ -11,6 +11,9 @@ public class RpcClass extends RpcElement {
 
     private String packageName;
 
+    //单例服务的ID
+    private String serviceId;
+
     private List<RpcMethod> methods = new ArrayList<>();
 
     //方法名:方法数量
@@ -39,6 +42,14 @@ public class RpcClass extends RpcElement {
 
     public String getPackageName() {
         return packageName;
+    }
+
+    public String getServiceId() {
+        return serviceId;
+    }
+
+    public void setServiceId(String serviceId) {
+        this.serviceId = serviceId;
     }
 
     public List<RpcMethod> getMethods() {

@@ -2,6 +2,10 @@ package quan.generator.rpc;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
+import quan.rpc.Endpoint;
+import quan.rpc.Promise;
+import quan.rpc.Service;
+import quan.rpc.SingletonService;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
@@ -20,7 +24,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
 
-@SupportedAnnotationTypes("quan.rpc.Endpoint")
+@SupportedAnnotationTypes({"quan.rpc.Endpoint", "quan.rpc.SingletonService"})
 @SupportedOptions("rpcProxyPath")
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class RpcGenerator extends AbstractProcessor {
@@ -53,8 +57,8 @@ public class RpcGenerator extends AbstractProcessor {
         filer = processingEnv.getFiler();
         typeUtils = processingEnv.getTypeUtils();
         elementUtils = processingEnv.getElementUtils();
-        serviceType = elementUtils.getTypeElement("quan.rpc.Service").asType();
-        promiseType = typeUtils.erasure(elementUtils.getTypeElement("quan.rpc.Promise").asType());
+        serviceType = elementUtils.getTypeElement(Service.class.getName()).asType();
+        promiseType = typeUtils.erasure(elementUtils.getTypeElement(Promise.class.getName()).asType());
         proxyPath = processingEnv.getOptions().get("rpcProxyPath");
         try {
             Configuration freemarkerCfg = new Configuration(Configuration.VERSION_2_3_23);
@@ -79,11 +83,17 @@ public class RpcGenerator extends AbstractProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         Map<TypeElement, List<ExecutableElement>> elements = new HashMap<>();
+
         for (TypeElement annotation : annotations) {
+            boolean endpoint = annotation.getQualifiedName().contentEquals(Endpoint.class.getName());
             for (Element element : roundEnv.getElementsAnnotatedWith(annotation)) {
-                ExecutableElement executableElement = (ExecutableElement) element;
-                TypeElement typeElement = (TypeElement) executableElement.getEnclosingElement();
-                elements.computeIfAbsent(typeElement, k -> new ArrayList<>()).add(executableElement);
+                if (endpoint) {
+                    ExecutableElement executableElement = (ExecutableElement) element;
+                    TypeElement typeElement = (TypeElement) executableElement.getEnclosingElement();
+                    elements.computeIfAbsent(typeElement, k -> new ArrayList<>()).add(executableElement);
+                } else {
+                    processSingletonService((TypeElement) element);
+                }
             }
         }
 
@@ -92,6 +102,23 @@ public class RpcGenerator extends AbstractProcessor {
         }
 
         return true;
+    }
+
+    private void processSingletonService(TypeElement typeElement) {
+        if (!typeUtils.isSubtype(typeElement.asType(), serviceType)) {
+            error(typeElement + " cannot declare an SingletonService annotation, because it is not a subtype of " + serviceType);
+            return;
+        }
+
+        for (Element enclosedElement : typeElement.getEnclosedElements()) {
+            if (enclosedElement instanceof ExecutableElement) {
+                ExecutableElement executableElement = (ExecutableElement) enclosedElement;
+                if (executableElement.getSimpleName().contentEquals("getId") && executableElement.getParameters().isEmpty()) {
+                    error(typeElement + " cannot override getId() method, because it is SingletonService");
+                    break;
+                }
+            }
+        }
     }
 
     private void processClass(TypeElement typeElement, List<ExecutableElement> executableElements) {
@@ -108,6 +135,11 @@ public class RpcGenerator extends AbstractProcessor {
         RpcClass rpcClass = new RpcClass(typeElement.getQualifiedName().toString());
         rpcClass.setComment(elementUtils.getDocComment(typeElement));
         rpcClass.setOriginalTypeParameters(processTypeParameters(typeElement.getTypeParameters()));
+
+        SingletonService singletonService = typeElement.getAnnotation(SingletonService.class);
+        if (singletonService != null) {
+            rpcClass.setServiceId(singletonService.id());
+        }
 
         for (ExecutableElement executableElement : executableElements) {
             if (executableElement.getModifiers().contains(Modifier.PRIVATE)) {

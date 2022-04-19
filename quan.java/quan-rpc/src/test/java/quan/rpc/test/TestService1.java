@@ -44,7 +44,7 @@ public class TestService1 extends Service {
         logger.info("Execute TestService1:{}.add1({},{})={} at Worker:{}", id, a, b, r, this.getWorker().getId());
         Promise<Integer> promise = testService2Proxy.add3(r, a);
         promise.then(r3 -> {
-            logger.info("TestService1:{} call RemoteServer:{} TestService2:{}.add3({},{})={}", id, testService2Proxy.serverId, testService2Proxy.serviceId, a, b, r3);
+            logger.info("TestService1:{} call TestService2.add3({},{})={}", id, a, b, r3);
         });
         return r;
     }
@@ -80,7 +80,7 @@ public class TestService1 extends Service {
         }
         lastTime = now;
 
-        logger.info("TestService1:{} call RoleService1:{}  at worker{}", this.id, roleService1Proxy.serviceId, this.getWorker().getId());
+        logger.info("TestService1:{} call RoleService1 at worker{}", this.id, this.getWorker().getId());
 
         int a = (int) (now % 3);
         int b = (int) (now % 10);
@@ -89,7 +89,7 @@ public class TestService1 extends Service {
         Promise<Integer> promise = roleService1Proxy.login1(a, b);//result1 fs.promises.readFile(configFile))
         promise.then(result1 -> {
             double costTime = (System.nanoTime() - startTime) / 1000000D;
-            logger.info("TestService1:{} call RoleService1:{}.login1({},{})={},costTime:{}", this.id, roleService1Proxy.serviceId, a, b, result1, costTime);
+            logger.info("TestService1:{} call RoleService1.login1({},{})={},costTime:{}", this.id,  a, b, result1, costTime);
             return roleService1Proxy.login2(a, b + 1);//result2
         }).then(result2 -> {
             logger.info("TestService1 call RoleService1.login2,result2:{}", result2);

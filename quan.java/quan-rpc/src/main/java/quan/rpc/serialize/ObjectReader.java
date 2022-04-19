@@ -27,11 +27,11 @@ public class ObjectReader {
     }
 
     public void setTransferableRegistry(TransferableRegistry transferableRegistry) {
-        this.transferableRegistry = transferableRegistry;
+        this.transferableRegistry = Objects.requireNonNull(transferableRegistry);
     }
 
     public void setMessageFactory(Function<Integer, Message> messageFactory) {
-        this.messageFactory = messageFactory;
+        this.messageFactory = Objects.requireNonNull(messageFactory);
     }
 
     @SuppressWarnings("unchecked")

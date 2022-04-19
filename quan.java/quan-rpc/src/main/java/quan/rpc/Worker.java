@@ -9,6 +9,7 @@ import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.function.Function;
 
 /**
  * RPC工作线程
@@ -134,6 +135,15 @@ public class Worker {
 
     }
 
+    public int resolveTargetServerId(String serviceName) {
+        Function<String, Integer> targetServerIdResolver = server.getTargetServerIdResolver();
+        if (targetServerIdResolver != null) {
+            return targetServerIdResolver.apply(serviceName);
+        } else {
+            return 0;
+        }
+    }
+
     public <R> Promise<R> sendRequest(int targetServerId, Object serviceId, String callee, int methodId, Object... params) {
         check(this.id);
 
@@ -201,9 +211,9 @@ public class Worker {
         }
         sortedPromises.remove(promise);
 
-        String error = response.getException();
-        if (error != null) {
-            promise.setException(new CallException(error));
+        String exception = response.getException();
+        if (exception != null) {
+            promise.setException(new CallException(exception));
         } else {
             promise.setResult(response.getResult());
         }
