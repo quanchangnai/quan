@@ -98,7 +98,7 @@ public class RpcGenerator extends AbstractProcessor {
         }
 
         for (TypeElement typeElement : elements.keySet()) {
-            processClass(typeElement, elements.get(typeElement));
+            processServiceClass(typeElement, elements.get(typeElement));
         }
 
         return true;
@@ -121,7 +121,7 @@ public class RpcGenerator extends AbstractProcessor {
         }
     }
 
-    private void processClass(TypeElement typeElement, List<ExecutableElement> executableElements) {
+    private void processServiceClass(TypeElement typeElement, List<ExecutableElement> executableElements) {
         if (!typeUtils.isSubtype(typeElement.asType(), serviceType)) {
             error(typeElement + " cannot declare an endpoint method, because it is not a subtype of " + serviceType);
             return;
@@ -132,13 +132,13 @@ public class RpcGenerator extends AbstractProcessor {
             return;
         }
 
-        RpcClass rpcClass = new RpcClass(typeElement.getQualifiedName().toString());
-        rpcClass.setComment(elementUtils.getDocComment(typeElement));
-        rpcClass.setOriginalTypeParameters(processTypeParameters(typeElement.getTypeParameters()));
+        ServiceClass serviceClass = new ServiceClass(typeElement.getQualifiedName().toString());
+        serviceClass.setComment(elementUtils.getDocComment(typeElement));
+        serviceClass.setOriginalTypeParameters(processTypeParameters(typeElement.getTypeParameters()));
 
         SingletonService singletonService = typeElement.getAnnotation(SingletonService.class);
         if (singletonService != null) {
-            rpcClass.setServiceId(singletonService.id());
+            serviceClass.setServiceId(singletonService.id());
         }
 
         for (ExecutableElement executableElement : executableElements) {
@@ -146,13 +146,14 @@ public class RpcGenerator extends AbstractProcessor {
                 error(typeElement + "." + executableElement + " cannot be declared as endpoint method, because it is private");
                 continue;
             }
-            RpcMethod rpcMethod = processMethod(executableElement);
-            rpcMethod.setRpcClass(rpcClass);
-            rpcClass.getMethods().add(rpcMethod);
+            ServiceMethod serviceMethod = processServiceMethod(executableElement);
+            serviceMethod.setRpcClass(serviceClass);
+            serviceClass.getMethods().add(serviceMethod);
         }
 
         try {
-            generate(rpcClass);
+            generateProxy(serviceClass);
+            generateCaller(serviceClass);
         } catch (IOException e) {
             error(e);
         }
@@ -172,29 +173,29 @@ public class RpcGenerator extends AbstractProcessor {
         return typeParameters;
     }
 
-    private RpcMethod processMethod(ExecutableElement executableElement) {
-        RpcMethod rpcMethod = new RpcMethod(executableElement.getSimpleName());
-        rpcMethod.setComment(elementUtils.getDocComment(executableElement));
-        rpcMethod.setOriginalTypeParameters(processTypeParameters(executableElement.getTypeParameters()));
+    private ServiceMethod processServiceMethod(ExecutableElement executableElement) {
+        ServiceMethod serviceMethod = new ServiceMethod(executableElement.getSimpleName());
+        serviceMethod.setComment(elementUtils.getDocComment(executableElement));
+        serviceMethod.setOriginalTypeParameters(processTypeParameters(executableElement.getTypeParameters()));
 
         for (VariableElement parameter : executableElement.getParameters()) {
-            rpcMethod.addParameter(parameter.getSimpleName(), parameter.asType().toString());
+            serviceMethod.addParameter(parameter.getSimpleName(), parameter.asType().toString());
         }
 
         TypeMirror returnType = executableElement.getReturnType();
 
         if (returnType.getKind().isPrimitive()) {
-            rpcMethod.setOriginalReturnType(typeUtils.boxedClass((PrimitiveType) returnType).asType().toString());
+            serviceMethod.setOriginalReturnType(typeUtils.boxedClass((PrimitiveType) returnType).asType().toString());
         } else if (returnType.getKind() == TypeKind.VOID) {
-            rpcMethod.setOriginalReturnType(Void.class.getSimpleName());
+            serviceMethod.setOriginalReturnType(Void.class.getSimpleName());
         } else if (typeUtils.isSubtype(typeUtils.erasure(returnType), promiseType)) {
-            rpcMethod.setOriginalReturnType(((DeclaredType) returnType).getTypeArguments().get(0).toString());
+            serviceMethod.setOriginalReturnType(((DeclaredType) returnType).getTypeArguments().get(0).toString());
         } else {
-            rpcMethod.setOriginalReturnType(returnType.toString());
+            serviceMethod.setOriginalReturnType(returnType.toString());
         }
 
 
-        return rpcMethod;
+        return serviceMethod;
     }
 
     /**
@@ -211,35 +212,38 @@ public class RpcGenerator extends AbstractProcessor {
         return parent != null && mkdirs(parent);
     }
 
-    private void generate(RpcClass rpcClass) throws IOException {
-        rpcClass.setCustomPath(proxyPath != null);
-        rpcClass.optimizeImport4Proxy();
+    private void generateProxy(ServiceClass serviceClass) throws IOException {
+        serviceClass.setCustomPath(proxyPath != null);
+        serviceClass.optimizeImport4Proxy();
         Writer proxyWriter;
 
         if (proxyPath == null) {
-            JavaFileObject proxyFile = filer.createSourceFile(rpcClass.getFullName() + "Proxy");
+            JavaFileObject proxyFile = filer.createSourceFile(serviceClass.getFullName() + "Proxy");
             proxyWriter = proxyFile.openWriter();
         } else {
-            File path = new File(proxyPath, rpcClass.getPackageName().replace(".", "/"));
+            File path = new File(proxyPath, serviceClass.getPackageName().replace(".", "/"));
             mkdirs(path);
-            File file = new File(path, rpcClass.getName() + "Proxy.java");
+            File file = new File(path, serviceClass.getName() + "Proxy.java");
             proxyWriter = new FileWriter(file);
         }
 
         try {
-            proxyTemplate.process(rpcClass, proxyWriter);
+            proxyTemplate.process(serviceClass, proxyWriter);
         } catch (Exception e) {
             error(e);
         } finally {
             proxyWriter.close();
         }
 
-        rpcClass.setCustomPath(false);
-        rpcClass.optimizeImport4Caller();
-        JavaFileObject callerFile = filer.createSourceFile(rpcClass.getFullName() + "Caller");
+    }
+
+    private void generateCaller(ServiceClass serviceClass) throws IOException {
+        serviceClass.setCustomPath(false);
+        serviceClass.optimizeImport4Caller();
+        JavaFileObject callerFile = filer.createSourceFile(serviceClass.getFullName() + "Caller");
 
         try (Writer callerWriter = callerFile.openWriter()) {
-            callerTemplate.process(rpcClass, callerWriter);
+            callerTemplate.process(serviceClass, callerWriter);
         } catch (Exception e) {
             error(e);
         }

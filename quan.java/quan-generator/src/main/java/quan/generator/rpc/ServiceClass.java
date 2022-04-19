@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class RpcClass extends RpcElement {
+public class ServiceClass extends ServiceElement {
 
     private String fullName;
 
@@ -14,7 +14,7 @@ public class RpcClass extends RpcElement {
     //单例服务的ID
     private String serviceId;
 
-    private List<RpcMethod> methods = new ArrayList<>();
+    private List<ServiceMethod> methods = new ArrayList<>();
 
     //方法名:方法数量
     private Map<String, Integer> methodNameNums = new HashMap<>();
@@ -24,7 +24,7 @@ public class RpcClass extends RpcElement {
 
     private boolean customPath;
 
-    public RpcClass(String fullName) {
+    public ServiceClass(String fullName) {
         this.fullName = fullName;
         int index = fullName.lastIndexOf(".");
         if (index > 0) {
@@ -33,7 +33,7 @@ public class RpcClass extends RpcElement {
         } else {
             this.name = fullName;
         }
-        this.rpcClass = this;
+        this.serviceClass = this;
     }
 
     public String getFullName() {
@@ -52,13 +52,13 @@ public class RpcClass extends RpcElement {
         this.serviceId = serviceId;
     }
 
-    public List<RpcMethod> getMethods() {
+    public List<ServiceMethod> getMethods() {
         return methods;
     }
 
     public Map<String, Integer> getMethodNameNums() {
         if (methodNameNums.isEmpty()) {
-            for (RpcMethod method : methods) {
+            for (ServiceMethod method : methods) {
                 methodNameNums.merge(method.name, 1, Integer::sum);
             }
         }
@@ -66,7 +66,7 @@ public class RpcClass extends RpcElement {
     }
 
     @Override
-    public void setRpcClass(RpcClass rpcClass) {
+    public void setRpcClass(ServiceClass serviceClass) {
         throw new UnsupportedOperationException();
     }
 
@@ -169,7 +169,7 @@ public class RpcClass extends RpcElement {
         imports.put(name + "Proxy", "-" + fullName + "Proxy");
 
         super.optimizeImport4Proxy();
-        methods.forEach(RpcMethod::optimizeImport4Proxy);
+        methods.forEach(ServiceMethod::optimizeImport4Proxy);
     }
 
     public void optimizeImport4Caller() {
@@ -180,7 +180,7 @@ public class RpcClass extends RpcElement {
         imports.put(name, "-" + fullName);
         imports.put(name + "Caller", "-" + fullName + "Caller");
 
-        methods.forEach(RpcMethod::optimizeImport4Caller);
+        methods.forEach(ServiceMethod::optimizeImport4Caller);
     }
 
     @Override

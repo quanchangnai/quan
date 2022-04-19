@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * @author quanchangnai
  */
-public abstract class RpcElement {
+public abstract class ServiceElement {
 
     protected String name;
 
@@ -19,7 +19,7 @@ public abstract class RpcElement {
     //原始数据的类型都是全类名，这里的类型名都是优化导入之后的类型名，大部分会变成简单类名
     protected LinkedHashMap<String, List<String>> optimizedTypeParameters = new LinkedHashMap<>();
 
-    protected RpcClass rpcClass;
+    protected ServiceClass serviceClass;
 
     public String getName() {
         return name;
@@ -76,12 +76,12 @@ public abstract class RpcElement {
         return sb.toString();
     }
 
-    public RpcClass getRpcClass() {
-        return rpcClass;
+    public ServiceClass getRpcClass() {
+        return serviceClass;
     }
 
-    public void setRpcClass(RpcClass rpcClass) {
-        this.rpcClass = rpcClass;
+    public void setRpcClass(ServiceClass serviceClass) {
+        this.serviceClass = serviceClass;
     }
 
     public String getGeneratorName() {
@@ -92,7 +92,7 @@ public abstract class RpcElement {
         optimizedTypeParameters.clear();
         for (String name : originalTypeParameters.keySet()) {
             for (String bound : originalTypeParameters.get(name)) {
-                optimizedTypeParameters.computeIfAbsent(name, k -> new ArrayList<>()).add(rpcClass.optimizeImport(bound));
+                optimizedTypeParameters.computeIfAbsent(name, k -> new ArrayList<>()).add(serviceClass.optimizeImport(bound));
             }
         }
     }

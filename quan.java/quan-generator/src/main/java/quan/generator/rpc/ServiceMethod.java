@@ -3,7 +3,7 @@ package quan.generator.rpc;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-public class RpcMethod extends RpcElement {
+public class ServiceMethod extends ServiceElement {
 
     public String originalReturnType;
 
@@ -15,7 +15,7 @@ public class RpcMethod extends RpcElement {
     //参数名:优化导入后的参数类型
     private LinkedHashMap<String, String> optimizedParameters = new LinkedHashMap<>();
 
-    public RpcMethod(CharSequence name) {
+    public ServiceMethod(CharSequence name) {
         this.name = name.toString();
     }
 
@@ -50,7 +50,7 @@ public class RpcMethod extends RpcElement {
     public String getSignature() {
         StringBuilder signature = new StringBuilder();
         signature.append(name);
-        if (rpcClass.getMethodNameNums().get(name) == 1) {
+        if (serviceClass.getMethodNameNums().get(name) == 1) {
             return signature.toString();
         }
 
@@ -75,7 +75,7 @@ public class RpcMethod extends RpcElement {
 
         List<String> typeBounds = originalTypeParameters.get(type);
         if (typeBounds == null || typeBounds.isEmpty()) {
-            typeBounds = rpcClass.originalTypeParameters.get(type);
+            typeBounds = serviceClass.originalTypeParameters.get(type);
         }
 
         if (typeBounds != null && !typeBounds.isEmpty()) {
@@ -91,12 +91,12 @@ public class RpcMethod extends RpcElement {
 
     public void optimizeImport4Proxy() {
         super.optimizeImport4Proxy();
-        optimizedReturnType = rpcClass.optimizeImport(originalReturnType);
+        optimizedReturnType = serviceClass.optimizeImport(originalReturnType);
 
         optimizedParameters.clear();
         for (String name : originalParameters.keySet()) {
             String parameterType = originalParameters.get(name);//全类名还可能会带泛型
-            optimizedParameters.put(name, rpcClass.optimizeImport(parameterType));
+            optimizedParameters.put(name, serviceClass.optimizeImport(parameterType));
         }
     }
 
@@ -105,7 +105,7 @@ public class RpcMethod extends RpcElement {
         for (String name : originalParameters.keySet()) {
             String parameterType = originalParameters.get(name);
             parameterType = eraseParameterType(parameterType);
-            optimizedParameters.put(name, rpcClass.optimizeImport(parameterType));
+            optimizedParameters.put(name, serviceClass.optimizeImport(parameterType));
         }
     }
 
