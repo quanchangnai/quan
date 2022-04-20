@@ -66,7 +66,7 @@ public class ServiceClass extends ServiceElement {
     }
 
     @Override
-    public void setRpcClass(ServiceClass serviceClass) {
+    public void setServiceClass(ServiceClass serviceClass) {
         throw new UnsupportedOperationException();
     }
 

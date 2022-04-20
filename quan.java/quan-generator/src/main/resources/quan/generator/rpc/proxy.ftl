@@ -32,7 +32,7 @@ public class ${name}Proxy${typeParametersStr}{
 <#if !serviceId??>
     public ${name}Proxy(int serverId, Object serviceId) {
         if (serverId < 0) {
-            throw new IllegalArgumentException("服务器ID不能小于0");
+            throw new IllegalArgumentException("目标服务器ID不能小于0");
         }
         this.serverId = serverId;
         this.serviceId = serviceId;
@@ -45,7 +45,7 @@ public class ${name}Proxy${typeParametersStr}{
 <#else>
     public ${name}Proxy(int serverId) {
         if (serverId < 0) {
-            throw new IllegalArgumentException("服务器ID不能小于0");
+            throw new IllegalArgumentException("目标服务器ID不能小于0");
         }
         this.serverId = serverId;
         this.serviceId = "${serviceId}";

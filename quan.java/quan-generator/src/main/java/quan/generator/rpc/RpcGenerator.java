@@ -97,6 +97,16 @@ public class RpcGenerator extends AbstractProcessor {
             }
         }
 
+        for (Element rootElement : roundEnv.getRootElements()) {
+            if (rootElement instanceof TypeElement && typeUtils.isSubtype(rootElement.asType(), serviceType)) {
+                TypeElement typeElement = (TypeElement) rootElement;
+                if (!elements.containsKey(typeElement)) {
+                    //可能会有继承下来的Endpoint方法
+                    elements.put(typeElement, new ArrayList<>());
+                }
+            }
+        }
+
         for (TypeElement typeElement : elements.keySet()) {
             processServiceClass(typeElement, elements.get(typeElement));
         }
@@ -132,6 +142,10 @@ public class RpcGenerator extends AbstractProcessor {
             return;
         }
 
+        if (typeElement.getModifiers().contains(Modifier.ABSTRACT)) {
+            return;
+        }
+
         ServiceClass serviceClass = new ServiceClass(typeElement.getQualifiedName().toString());
         serviceClass.setComment(elementUtils.getDocComment(typeElement));
         serviceClass.setOriginalTypeParameters(processTypeParameters(typeElement.getTypeParameters()));
@@ -141,14 +155,27 @@ public class RpcGenerator extends AbstractProcessor {
             serviceClass.setServiceId(singletonService.id());
         }
 
+        if (!typeUtils.isSameType(typeElement.getSuperclass(), serviceType)) {
+            executableElements = new ArrayList<>();
+            for (Element memberElement : elementUtils.getAllMembers(typeElement)) {
+                if (memberElement instanceof ExecutableElement && memberElement.getAnnotation(Endpoint.class) != null) {
+                    executableElements.add((ExecutableElement) memberElement);
+                }
+            }
+        }
+
         for (ExecutableElement executableElement : executableElements) {
             if (executableElement.getModifiers().contains(Modifier.PRIVATE)) {
                 error(typeElement + "." + executableElement + " cannot be declared as endpoint method, because it is private");
                 continue;
             }
             ServiceMethod serviceMethod = processServiceMethod(executableElement);
-            serviceMethod.setRpcClass(serviceClass);
+            serviceMethod.setServiceClass(serviceClass);
             serviceClass.getMethods().add(serviceMethod);
+        }
+
+        if (serviceClass.getMethods().isEmpty()) {
+            return;
         }
 
         try {

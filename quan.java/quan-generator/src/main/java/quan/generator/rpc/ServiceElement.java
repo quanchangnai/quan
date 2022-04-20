@@ -76,11 +76,11 @@ public abstract class ServiceElement {
         return sb.toString();
     }
 
-    public ServiceClass getRpcClass() {
+    public ServiceClass getServiceClass() {
         return serviceClass;
     }
 
-    public void setRpcClass(ServiceClass serviceClass) {
+    public void setServiceClass(ServiceClass serviceClass) {
         this.serviceClass = serviceClass;
     }
 
