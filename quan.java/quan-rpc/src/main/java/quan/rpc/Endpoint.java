@@ -11,4 +11,17 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.CLASS)
 public @interface Endpoint {
+
+    /**
+     * 参数是否有可能被修改<br/>
+     * 如果所有参数都是基本类型等不可变类型，则此值无效
+     */
+    boolean paramMutable() default true;
+
+    /**
+     * 返回结果是否有可能被修改<br/>
+     * 如果返回结果是基本类型等不可变类型，则此值无效
+     */
+    boolean resultMutable() default false;
+
 }

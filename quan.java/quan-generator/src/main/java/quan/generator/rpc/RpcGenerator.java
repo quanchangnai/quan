@@ -6,6 +6,7 @@ import quan.rpc.Endpoint;
 import quan.rpc.Promise;
 import quan.rpc.Service;
 import quan.rpc.SingletonService;
+import quan.util.CommonUtils;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
@@ -205,8 +206,15 @@ public class RpcGenerator extends AbstractProcessor {
         serviceMethod.setComment(elementUtils.getDocComment(executableElement));
         serviceMethod.setOriginalTypeParameters(processTypeParameters(executableElement.getTypeParameters()));
 
+        Endpoint endpoint = executableElement.getAnnotation(Endpoint.class);
+        boolean paramMutable = false;
+
         for (VariableElement parameter : executableElement.getParameters()) {
-            serviceMethod.addParameter(parameter.getSimpleName(), parameter.asType().toString());
+            TypeMirror parameterType = parameter.asType();
+            serviceMethod.addParameter(parameter.getSimpleName(), parameterType.toString());
+            if (!CommonUtils.isConstantType(parameterType)) {
+                paramMutable = true;
+            }
         }
 
         TypeMirror returnType = executableElement.getReturnType();
@@ -221,6 +229,17 @@ public class RpcGenerator extends AbstractProcessor {
             serviceMethod.setOriginalReturnType(returnType.toString());
         }
 
+        if (paramMutable) {
+            paramMutable = endpoint.paramMutable();
+        }
+
+        boolean resultMutable = !CommonUtils.isConstantType(returnType);
+        if (resultMutable) {
+            resultMutable = endpoint.resultMutable();
+        }
+
+        serviceMethod.setParamMutable(paramMutable);
+        serviceMethod.setResultMutable(resultMutable);
 
         return serviceMethod;
     }

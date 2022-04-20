@@ -6,9 +6,7 @@ import quan.rpc.Endpoint;
 import quan.rpc.Promise;
 import quan.rpc.Service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author quanchangnai
@@ -89,7 +87,7 @@ public class TestService1 extends Service {
         Promise<Integer> promise = roleService1Proxy.login1(a, b);//result1 fs.promises.readFile(configFile))
         promise.then(result1 -> {
             double costTime = (System.nanoTime() - startTime) / 1000000D;
-            logger.info("TestService1:{} call RoleService1.login1({},{})={},costTime:{}", this.id,  a, b, result1, costTime);
+            logger.info("TestService1:{} call RoleService1.login1({},{})={},costTime:{}", this.id, a, b, result1, costTime);
             return roleService1Proxy.login2(a, b + 1);//result2
         }).then(result2 -> {
             logger.info("TestService1 call RoleService1.login2,result2:{}", result2);
@@ -97,6 +95,12 @@ public class TestService1 extends Service {
         }).then(result3 -> {
             logger.info("TestService1 call RoleService1.login3,result3:{}", result3);
         });
+
+        Promise<Integer> count = roleService1Proxy.count(new HashSet<>(Arrays.asList(2334, 664)));
+        count.then(c -> {
+            logger.info("roleService1Proxy.count()={}", count);
+        });
+
     }
 
 }

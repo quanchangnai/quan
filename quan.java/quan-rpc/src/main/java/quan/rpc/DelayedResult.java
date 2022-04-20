@@ -11,6 +11,8 @@ public final class DelayedResult<R> extends Promise<R> {
 
     private int originServerId;
 
+    private int mutable;
+
     private Worker worker;
 
     DelayedResult(Worker worker) {
@@ -23,6 +25,14 @@ public final class DelayedResult<R> extends Promise<R> {
 
     void setOriginServerId(int originServerId) {
         this.originServerId = originServerId;
+    }
+
+    int getMutable() {
+        return mutable;
+    }
+
+    void setMutable(int mutable) {
+        this.mutable = mutable;
     }
 
     @Override

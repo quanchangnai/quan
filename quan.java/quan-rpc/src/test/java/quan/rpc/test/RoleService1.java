@@ -3,6 +3,8 @@ package quan.rpc.test;
 import quan.rpc.Endpoint;
 import quan.rpc.Service;
 
+import java.util.Set;
+
 /**
  * 角色服务
  */
@@ -61,6 +63,11 @@ public class RoleService1<T extends Object & Runnable> extends Service {
         this.t = t;
         logger.info("logout3:{}", t);
         return null;
+    }
+
+    @Endpoint(paramMutable = false)
+    public int count(Set<Integer> set) {
+        return set.size();
     }
 
 }

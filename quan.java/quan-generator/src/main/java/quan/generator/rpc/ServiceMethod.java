@@ -5,6 +5,10 @@ import java.util.List;
 
 public class ServiceMethod extends ServiceElement {
 
+    private boolean paramMutable;
+
+    private boolean resultMutable;
+
     public String originalReturnType;
 
     //参数名:参数类型
@@ -17,6 +21,33 @@ public class ServiceMethod extends ServiceElement {
 
     public ServiceMethod(CharSequence name) {
         this.name = name.toString();
+    }
+
+    public boolean isParamMutable() {
+        return paramMutable;
+    }
+
+    public void setParamMutable(boolean paramMutable) {
+        this.paramMutable = paramMutable;
+    }
+
+    public boolean isResultMutable() {
+        return resultMutable;
+    }
+
+    public void setResultMutable(boolean resultMutable) {
+        this.resultMutable = resultMutable;
+    }
+
+    public int getMutable() {
+        int mutable = 0;
+        if (paramMutable) {
+            mutable |= 1;
+        }
+        if (resultMutable) {
+            mutable |= 2;
+        }
+        return mutable;
     }
 
     public String getOriginalReturnType() {

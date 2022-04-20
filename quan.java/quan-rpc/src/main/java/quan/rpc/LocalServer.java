@@ -226,16 +226,16 @@ public abstract class LocalServer {
     /**
      * 发送RPC请求
      */
-    protected void sendRequest(int targetServerId, Request request) {
-        if (targetServerId == this.id || targetServerId <= 0) {
+    protected void sendRequest(int targetServerId, Request request, int mutable) {
+        if (targetServerId == this.id || targetServerId == 0) {
             //本地服务器直接处理
-            handleRequest(this.id, request);
+            handleRequest(this.id, request, mutable);
         } else {
             RemoteServer remoteServer = remotes.get(targetServerId);
             if (remoteServer != null) {
                 remoteServer.send(request);
             } else {
-                logger.error("发送RPC请求,远程服务器[{}]不存在", targetServerId);
+                logger.error("发送RPC请求，远程服务器[{}]不存在", targetServerId);
             }
         }
     }
@@ -243,14 +243,19 @@ public abstract class LocalServer {
     /**
      * 处理RPC请求
      */
-    protected void handleRequest(int originServerId, Request request) {
+    protected void handleRequest(int originServerId, Request request, int mutable) {
         Service service = services.get(request.getServiceId());
         if (service == null) {
-            logger.error("处理RPC请求,服务[{}]不存在", request.getServiceId());
+            logger.error("处理RPC请求，服务[{}]不存在", request.getServiceId());
         } else {
             Worker worker = service.getWorker();
-            worker.execute(() -> worker.handleRequest(originServerId, request));
+            worker.execute(() -> worker.handleRequest(originServerId, request, mutable));
         }
+    }
+
+
+    protected void handleRequest(int originServerId, Request request) {
+        handleRequest(originServerId, request, 0);
     }
 
     /**
@@ -282,5 +287,6 @@ public abstract class LocalServer {
             worker.execute(() -> worker.handleResponse(response));
         }
     }
+
 
 }

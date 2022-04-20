@@ -2,8 +2,13 @@ package quan.rpc;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import quan.message.CodedBuffer;
+import quan.message.DefaultCodedBuffer;
 import quan.rpc.protocol.Request;
 import quan.rpc.protocol.Response;
+import quan.rpc.serialize.ObjectReader;
+import quan.rpc.serialize.ObjectWriter;
+import quan.util.CommonUtils;
 
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
@@ -144,7 +149,7 @@ public class Worker {
         }
     }
 
-    public <R> Promise<R> sendRequest(int targetServerId, Object serviceId, String callee, int methodId, Object... params) {
+    public <R> Promise<R> sendRequest(int targetServerId, Object serviceId, String callee, int mutable, int methodId, Object... params) {
         check(this.id);
 
         long callId = (long) this.id << 32 | nextCallId++;
@@ -152,9 +157,11 @@ public class Worker {
             nextCallId = 1;
         }
 
+        checkParamsMutable(targetServerId, mutable, params);
+
         Request request = new Request(serviceId, methodId, params);
         request.setCallId(callId);
-        server.sendRequest(targetServerId, request);
+        server.sendRequest(targetServerId, request, mutable);
 
         Promise<Object> promise = new Promise<>(callId, callee);
         mappedPromises.put(callId, promise);
@@ -164,7 +171,59 @@ public class Worker {
         return (Promise<R>) promise;
     }
 
-    protected void handleRequest(int originServerId, Request request) {
+    /**
+     * 如果参数有可能被修改,则需要复制对应参数以保证安全
+     *
+     * @param mutable 1:参数是有可能被修改，参考 {@link Endpoint#paramMutable()}
+     */
+    protected void checkParamsMutable(int targetServerId, int mutable, Object[] params) {
+        if (targetServerId != 0 && targetServerId != this.server.getId()) {
+            return;
+        }
+        if (params == null || (mutable & 1) == 0) {
+            return;
+        }
+
+        CodedBuffer buffer = null;
+        ObjectWriter writer = null;
+        ObjectReader reader = null;
+
+        for (int i = 0; i < params.length; i++) {
+            Object param = params[i];
+            if (CommonUtils.isConstant(param)) {
+                continue;
+            }
+            if (buffer == null) {
+                buffer = new DefaultCodedBuffer();
+                writer = server.getWriterFactory().apply(buffer);
+                reader = server.getReaderFactory().apply(buffer);
+            }
+            writer.write(param);
+            params[i] = reader.read();
+            buffer.clear();
+        }
+    }
+
+    /**
+     * 如果返回结果有可能被修改，则需要复制返回结果以保证安全
+     *
+     * @param mutable 2:返回结果有可能被修改，参考 {@link Endpoint#resultMutable()}
+     */
+    protected Object checkResultMutable(int originServerId, int mutable, Object result) {
+        if (originServerId != this.server.getId()) {
+            return result;
+        }
+        if (CommonUtils.isConstant(result) || (mutable & 2) == 0) {
+            return result;
+        }
+
+        CodedBuffer buffer = new DefaultCodedBuffer();
+        ObjectWriter writer = server.getWriterFactory().apply(buffer);
+        writer.write(result);
+        return server.getReaderFactory().apply(buffer).read();
+    }
+
+    protected void handleRequest(int originServerId, Request request, int mutable) {
         long callId = request.getCallId();
         Object serviceId = request.getServiceId();
         Object result = null;
@@ -187,9 +246,13 @@ public class Worker {
             if (!delayedResult.isFinished()) {
                 delayedResult.setCallId(callId);
                 delayedResult.setOriginServerId(originServerId);
+                delayedResult.setMutable(mutable);
                 return;
             } else {
-                result = delayedResult.getResult();
+                exception = delayedResult.getExceptionStr();
+                if (exception == null) {
+                    result = checkResultMutable(originServerId, mutable, delayedResult.getResult());
+                }
             }
         }
 
@@ -198,8 +261,11 @@ public class Worker {
     }
 
     protected void handleDelayedResult(DelayedResult delayedResult) {
-        Response response = new Response(delayedResult.getCallId(), delayedResult.getResult(), delayedResult.getExceptionStr());
-        server.sendResponse(delayedResult.getOriginServerId(), response);
+        int originServerId = delayedResult.getOriginServerId();
+        Object result = checkResultMutable(originServerId, delayedResult.getMutable(), delayedResult.getResult());
+
+        Response response = new Response(delayedResult.getCallId(), result, delayedResult.getExceptionStr());
+        server.sendResponse(originServerId, response);
     }
 
     protected void handleResponse(Response response) {

@@ -78,7 +78,7 @@ public class ${name}Proxy${typeParametersStr}{
     </#list>
     <#lt>) {
         String callee = SERVICE_NAME + ".${method.signature}";
-        return Worker.current().sendRequest(getServerId(), serviceId, callee, ${method?index+1}<#if method.optimizedParameters?keys?size gt 0>, ${ method.optimizedParameters?keys?join(', ')}</#if>);
+        return Worker.current().sendRequest(getServerId(), serviceId, callee, ${method.mutable?c}, ${method?index+1}<#if method.optimizedParameters?keys?size gt 0>, ${ method.optimizedParameters?keys?join(', ')}</#if>);
     }
 
 </#list>
