@@ -39,6 +39,11 @@ public class NettyCodedBuffer extends CodedBuffer {
     }
 
     @Override
+    public void close() {
+        buf.release();
+    }
+
+    @Override
     public int readableCount() {
         return buf.readableBytes();
     }
@@ -65,6 +70,11 @@ public class NettyCodedBuffer extends CodedBuffer {
         byte[] bytes = new byte[length];
         buf.readBytes(bytes);
         return bytes;
+    }
+
+    @Override
+    protected void readBytes(byte[] bytes, int startPos, int length) {
+        buf.readBytes(bytes, startPos, length);
     }
 
     @Override

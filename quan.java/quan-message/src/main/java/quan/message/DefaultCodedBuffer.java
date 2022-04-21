@@ -89,13 +89,6 @@ public class DefaultCodedBuffer extends CodedBuffer {
     }
 
     @Override
-    protected void onRead() {
-        if (readableCount() < 1) {
-            throw new RuntimeException("读数据出错，剩余字节数不够");
-        }
-    }
-
-    @Override
     public byte readByte() {
         return bytes[readIndex++];
     }
@@ -108,24 +101,29 @@ public class DefaultCodedBuffer extends CodedBuffer {
         return bytes;
     }
 
+    protected void readBytes(byte[] bytes, int startPos, int length) {
+        System.arraycopy(this.bytes, readIndex, bytes, startPos, length);
+        readIndex += length;
+    }
+
     @Override
     protected void skipBytes(int length) {
         readIndex += length;
     }
 
     @Override
-    protected void onWrite(int writeCount) {
-        if (writeIndex + writeCount < capacity()) {
+    protected void onWrite(int minCount) {
+        if (writeIndex + minCount < capacity()) {
             return;
         }
 
-        //当缓冲区容量不够时进行扩容
+        //当缓冲区容量不够时需要进行扩容
         int capacity = capacity();
         int newCapacity = capacity;
 
-        while (writeCount > 0) {
+        while (minCount > 0) {
             newCapacity += capacity;
-            writeCount -= capacity;
+            minCount -= capacity;
         }
 
         byte[] newBytes = new byte[newCapacity];

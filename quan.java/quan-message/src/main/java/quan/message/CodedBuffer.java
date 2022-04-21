@@ -1,5 +1,6 @@
 package quan.message;
 
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -31,6 +32,12 @@ public abstract class CodedBuffer {
     public abstract void clear();
 
     /**
+     * 关闭，默认什么都不做，具体实现有可能需要做一些清理工作
+     */
+    public void close() {
+    }
+
+    /**
      * 当前剩余可读的字节数
      */
     public abstract int readableCount();
@@ -48,16 +55,16 @@ public abstract class CodedBuffer {
     /**
      * 读取变长整数
      *
-     * @param maxBytes 最多读几个字节，short:3，int:5，long:10
+     * @param maxCount 最多读几个字节，short:3，int:5，long:10
      */
-    protected long readVarInt(int maxBytes) {
-        onRead();
+    protected long readVarInt(int maxCount) {
+        onRead(1);
 
         long temp = 0;
         int shift = 0;
         int count = 0;
 
-        while (count < maxBytes) {
+        while (count < maxCount) {
             final byte b = readByte();
             temp |= (b & 0x7FL) << shift;
             shift += 7;
@@ -74,8 +81,14 @@ public abstract class CodedBuffer {
 
     /**
      * 读数据之前的回调
+     *
+     * @param minCount 预估要读取的最小字节数量
      */
-    protected void onRead() {
+    protected void onRead(int minCount) {
+        int readableCount = readableCount();
+        if (readableCount() < minCount) {
+            throw new RuntimeException(String.format("读数据出错，希望读取%d字节,实际剩余%d字节", minCount, readableCount));
+        }
     }
 
     /**
@@ -100,7 +113,7 @@ public abstract class CodedBuffer {
     }
 
     public float readFloat() {
-        onRead();
+        onRead(4);
 
         int shift = 0;
         int temp = 0;
@@ -123,7 +136,7 @@ public abstract class CodedBuffer {
     }
 
     public double readDouble() {
-        onRead();
+        onRead(8);
 
         int shift = 0;
         long temp = 0;
@@ -147,23 +160,23 @@ public abstract class CodedBuffer {
 
     public byte[] readBytes() {
         int length = readInt();
-        int readableCount = readableCount();
-        if (length > readableCount) {
-            throw new RuntimeException(String.format("读数据出错，希望读取%d字节,实际剩余%d字节", length, readableCount));
-        }
-
+        onRead(length);
         return readBytes(length);
     }
 
     protected abstract byte[] readBytes(int length);
 
+    public void readBytes(byte[] bytes, int startPos) {
+        int length = readInt();
+        onRead(length);
+        readBytes(bytes, startPos, length);
+    }
+
+    protected abstract void readBytes(byte[] bytes, int startPos, int length);
+
     public void skipBytes() {
         int length = readInt();
-        int readableCount = readableCount();
-        if (length > readableCount) {
-            throw new RuntimeException(String.format("读数据出错，希望跳过%d字节,实际剩余%d字节", length, readableCount));
-        }
-
+        onRead(length);
         skipBytes(length);
     }
 
@@ -171,6 +184,14 @@ public abstract class CodedBuffer {
 
     public String readString() {
         return new String(readBytes(), StandardCharsets.UTF_8);
+    }
+
+    public String readString(String charset) {
+        try {
+            return new String(readBytes(), charset);
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalArgumentException("不支持字符集编码：" + charset);
+        }
     }
 
     protected void writeVarInt(long n) {
@@ -193,9 +214,9 @@ public abstract class CodedBuffer {
     /**
      * 写数据之前的回调
      *
-     * @param writeCount 未编码之前要写入的字节数量
+     * @param minCount 预估要写入的最大字节数量
      */
-    protected void onWrite(int writeCount) {
+    protected void onWrite(int minCount) {
     }
 
     /**
@@ -278,6 +299,14 @@ public abstract class CodedBuffer {
 
     public void writeString(String s) {
         writeBytes(s.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public void writeString(String s, String charset) {
+        try {
+            writeBytes(s.getBytes(charset));
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalArgumentException("不支持字符集编码：" + charset);
+        }
     }
 
     public CodedBuffer getTemp() {
