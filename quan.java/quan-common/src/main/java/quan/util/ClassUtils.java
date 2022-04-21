@@ -3,6 +3,7 @@ package quan.util;
 import aj.org.objectweb.asm.ClassReader;
 import net.bytebuddy.agent.ByteBuddyAgent;
 import org.apache.commons.lang3.StringUtils;
+import org.aspectj.weaver.loadtime.ClassPreProcessorAgentAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +32,23 @@ public class ClassUtils {
             instrumentation = ByteBuddyAgent.install();
         }
         return instrumentation;
+    }
+
+    private static boolean aopInit;
+
+    /**
+     * 初始化AOP
+     */
+    public synchronized static void initAop() {
+        if (!aopInit) {
+            aopInit = true;
+            getInstrumentation().addTransformer(new ClassPreProcessorAgentAdapter());
+            try {
+                //环绕通知内联支持
+                Class.forName("quan.data.TransactionAspect");
+            } catch (Exception ignored) {
+            }
+        }
     }
 
     /**

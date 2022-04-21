@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import quan.data.Data;
 import quan.data.DataWriter;
 import quan.data.Index;
-import quan.util.AopUtils;
 import quan.util.ClassUtils;
 
 import java.util.*;
@@ -50,7 +49,7 @@ public class Database implements DataWriter, MongoDatabase {
     private final Map<Class, MongoCollection> collections = new HashMap<>();
 
     static {
-        AopUtils.enable();
+        ClassUtils.initAop();
     }
 
     /**

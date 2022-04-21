@@ -99,12 +99,15 @@ public class CommonUtils {
     }
 
     /**
-     * 判断给的类对应的对象是不是常量
+     * 判断给的类是不是常量类型
      */
     public static boolean isConstantClass(Class<?> clazz) {
         return isPrimitiveOrWrapper(clazz)
                 || clazz == String.class
                 || clazz == Object.class
+                || clazz == OptionalInt.class
+                || clazz == OptionalLong.class
+                || clazz == OptionalDouble.class
                 || clazz.isEnum()
                 || constantClasses.contains(clazz);
     }
