@@ -4,6 +4,7 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.message.CodedBuffer;
+import quan.message.DefaultCodedBuffer;
 import quan.rpc.protocol.Handshake;
 import quan.rpc.protocol.PingPong;
 import quan.rpc.protocol.Request;
@@ -17,6 +18,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * @author quanchangnai
@@ -32,6 +34,8 @@ public abstract class LocalServer {
     private final int port;
 
     private int reconnectTime;
+
+    private Supplier<CodedBuffer> bufferFactory = DefaultCodedBuffer::new;
 
     private Function<CodedBuffer, ObjectReader> readerFactory = ObjectReader::new;
 
@@ -88,6 +92,10 @@ public abstract class LocalServer {
         this.reconnectTime = reconnectTime;
     }
 
+    public void setBufferFactory(Supplier<CodedBuffer> bufferFactory) {
+        this.bufferFactory = Objects.requireNonNull(bufferFactory);
+    }
+
     /**
      * 设置{@link ObjectReader}工厂，用于扩展对象序列化
      */
@@ -113,6 +121,10 @@ public abstract class LocalServer {
 
     public int getReconnectTime() {
         return reconnectTime;
+    }
+
+    public Supplier<CodedBuffer> getBufferFactory() {
+        return bufferFactory;
     }
 
     public Function<CodedBuffer, ObjectReader> getReaderFactory() {

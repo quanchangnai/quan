@@ -34,6 +34,10 @@ public class ObjectReader {
         this.messageFactory = Objects.requireNonNull(messageFactory);
     }
 
+    public CodedBuffer getBuffer() {
+        return buffer;
+    }
+
     @SuppressWarnings("unchecked")
     public <T> T read() {
         return (T) readObject();

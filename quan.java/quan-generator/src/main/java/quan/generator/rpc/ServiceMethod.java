@@ -21,14 +21,14 @@ public class ServiceMethod extends ServiceElement {
         this.name = name.toString();
     }
 
-    public void setSafeParam(boolean safeParam) {
-        if (safeParam) {
+    public void setParamSafe(boolean paramSafe) {
+        if (paramSafe) {
             securityModifier |= 0b01;
         }
     }
 
-    public void setSafeResult(boolean safeResult) {
-        if (safeResult) {
+    public void setResultSafe(boolean resultSafe) {
+        if (resultSafe) {
             securityModifier |= 0b10;
         }
     }

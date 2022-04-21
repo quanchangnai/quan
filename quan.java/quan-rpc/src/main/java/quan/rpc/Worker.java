@@ -3,7 +3,6 @@ package quan.rpc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.message.CodedBuffer;
-import quan.message.DefaultCodedBuffer;
 import quan.rpc.protocol.Request;
 import quan.rpc.protocol.Response;
 import quan.rpc.serialize.ObjectReader;
@@ -48,6 +47,10 @@ public class Worker {
     private TreeSet<Promise<Object>> sortedPromises = new TreeSet<>(Comparator.comparingLong(Promise::getTime));
 
     private TreeSet<DelayedResult<Object>> delayedResults = new TreeSet<>(Comparator.comparingLong(DelayedResult::getTime));
+
+    private ObjectWriter writer;
+
+    private ObjectReader reader;
 
     protected Worker(LocalServer server) {
         this.server = server;
@@ -162,10 +165,22 @@ public class Worker {
         return (Promise<R>) promise;
     }
 
+    protected Object clone(Object object) {
+        if (writer == null) {
+            CodedBuffer buffer = server.getBufferFactory().get();
+            writer = server.getWriterFactory().apply(buffer);
+            reader = server.getReaderFactory().apply(buffer);
+        } else {
+            writer.getBuffer().clear();
+        }
+        writer.write(object);
+        return reader.read();
+    }
+
     /**
      * 如果有参数是不安全的,则需要复制它以保证安全
      *
-     * @param securityModifier 1:所有参数都是安全的，参考 {@link Endpoint#safeParam()}
+     * @param securityModifier 1:所有参数都是安全的，参考 {@link Endpoint#paramSafe()}
      */
     protected void makeParamSafe(int targetServerId, int securityModifier, Object[] params) {
         if (targetServerId != 0 && targetServerId != this.server.getId()) {
@@ -175,30 +190,18 @@ public class Worker {
             return;
         }
 
-        CodedBuffer buffer = null;
-        ObjectWriter writer = null;
-        ObjectReader reader = null;
-
         for (int i = 0; i < params.length; i++) {
             Object param = params[i];
-            if (CommonUtils.isConstant(param)) {
-                continue;
+            if (!CommonUtils.isConstant(param)) {
+                params[i] = clone(param);
             }
-            if (buffer == null) {
-                buffer = new DefaultCodedBuffer();
-                writer = server.getWriterFactory().apply(buffer);
-                reader = server.getReaderFactory().apply(buffer);
-            }
-            writer.write(param);
-            params[i] = reader.read();
-            buffer.clear();
         }
     }
 
     /**
      * 如果返回结果是不安全的，则需要复它以保证安全
      *
-     * @param securityModifier 2:返回结果是安全的，参考 {@link Endpoint#safeResult()}
+     * @param securityModifier 2:返回结果是安全的，参考 {@link Endpoint#resultSafe()}
      */
     protected Object makeResultSafe(int originServerId, int securityModifier, Object result) {
         if (originServerId != this.server.getId()) {
@@ -206,12 +209,9 @@ public class Worker {
         }
         if (CommonUtils.isConstant(result) || (securityModifier & 0b10) == 0b10) {
             return result;
+        } else {
+            return clone(result);
         }
-
-        CodedBuffer buffer = new DefaultCodedBuffer();
-        ObjectWriter writer = server.getWriterFactory().apply(buffer);
-        writer.write(result);
-        return server.getReaderFactory().apply(buffer).read();
     }
 
     protected void handleRequest(int originServerId, Request request, int securityModifier) {

@@ -13,16 +13,16 @@ import java.lang.annotation.Target;
 public @interface Endpoint {
 
     /**
-     * 安全参数是指在方法执行时不会被修改<br/>
+     * 不会被修改的引用类型参数是安全的<br/>
      * 原生类型及其包装类型等不可变类型一定是安全的<br/>
      * {@link quan.util.CommonUtils#isConstantClass(Class)}
      */
-    boolean safeParam() default false;
+    boolean paramSafe() default false;
 
     /**
-     * 安全结果指在方法返回后不会被修改<br/>
+     * 不会被修改的引用类型返回结果是安全的<br/>
      * 正常情况下一般不会修改返回结果
      */
-    boolean safeResult() default true;
+    boolean resultSafe() default true;
 
 }

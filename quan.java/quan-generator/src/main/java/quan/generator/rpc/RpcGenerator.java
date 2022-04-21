@@ -214,13 +214,13 @@ public class RpcGenerator extends AbstractProcessor {
         serviceMethod.setOriginalTypeParameters(processTypeParameters(executableElement.getTypeParameters()));
 
         Endpoint endpoint = executableElement.getAnnotation(Endpoint.class);
-        boolean safeParam = true;
+        boolean paramSafe = true;
 
         for (VariableElement parameter : executableElement.getParameters()) {
             TypeMirror parameterType = parameter.asType();
             serviceMethod.addParameter(parameter.getSimpleName(), parameterType.toString());
             if (!CommonUtils.isConstantType(parameterType)) {
-                safeParam = false;
+                paramSafe = false;
             }
         }
 
@@ -236,17 +236,17 @@ public class RpcGenerator extends AbstractProcessor {
             serviceMethod.setOriginalReturnType(returnType.toString());
         }
 
-        if (!safeParam) {
-            safeParam = endpoint.safeParam();
+        if (!paramSafe) {
+            paramSafe = endpoint.paramSafe();
         }
 
-        boolean safeResult = CommonUtils.isConstantType(returnType);
-        if (!safeResult) {
-            safeResult = endpoint.safeResult();
+        boolean resultSafe = CommonUtils.isConstantType(returnType);
+        if (!resultSafe) {
+            resultSafe = endpoint.resultSafe();
         }
 
-        serviceMethod.setSafeParam(safeParam);
-        serviceMethod.setSafeResult(safeResult);
+        serviceMethod.setParamSafe(paramSafe);
+        serviceMethod.setResultSafe(resultSafe);
 
         return serviceMethod;
     }

@@ -29,6 +29,10 @@ public class ObjectWriter {
         this.transferableRegistry = Objects.requireNonNull(transferableRegistry);
     }
 
+    public CodedBuffer getBuffer() {
+        return buffer;
+    }
+
     public void write(Object value) {
         if (value == null) {
             buffer.writeInt(NULL);
