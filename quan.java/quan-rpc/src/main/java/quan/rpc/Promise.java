@@ -20,7 +20,10 @@ public class Promise<R> {
 
     private long callId;
 
-    private String callee;
+    /**
+     * 用于日志的被调用方法的签名字符串
+     */
+    private String signature;
 
     private long time = System.currentTimeMillis();
 
@@ -41,9 +44,9 @@ public class Promise<R> {
     protected Promise() {
     }
 
-    protected Promise(long callId, String callee) {
+    protected Promise(long callId, String signature) {
         this.callId = callId;
-        this.callee = callee;
+        this.signature = signature;
     }
 
     protected long getCallId() {
@@ -97,7 +100,7 @@ public class Promise<R> {
         if (exception instanceof CallException) {
             CallException callException = (CallException) exception;
             callException.setCallId(callId);
-            callException.setCallee(callee);
+            callException.setSignature(signature);
         }
 
         if (exceptionHandler == null) {
@@ -116,11 +119,7 @@ public class Promise<R> {
     }
 
     protected String getExceptionStr() {
-        if (exception == null) {
-            return null;
-        } else {
-            return exception.toString();
-        }
+        return exception == null ? null : exception.toString();
     }
 
     protected boolean isExpired() {
@@ -131,8 +130,8 @@ public class Promise<R> {
     protected void setTimeout() {
         this.finished = true;
         if (timeoutHandler == null) {
-            if (callId > 0 && callee != null) {
-                logger.error("调用[{}]方法[{}]等待超时", callId, callee);
+            if (callId > 0 && signature != null) {
+                logger.error("调用[{}]方法[{}]等待超时", callId, signature);
             } else {
                 logger.error("{}等待超时", getClass().getSimpleName());
             }
@@ -155,7 +154,7 @@ public class Promise<R> {
 
     private void delegate(Promise promise) {
         promise.callId = this.callId;
-        promise.callee = this.callee;
+        promise.signature = this.signature;
         promise.time = this.time;
         this.then(promise::setResult);
         this.except(promise::setException);

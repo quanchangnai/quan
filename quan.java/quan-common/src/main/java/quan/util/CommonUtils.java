@@ -95,12 +95,12 @@ public class CommonUtils {
      * 判断给的值是不是常量
      */
     public static boolean isConstant(Object value) {
-        if (value == null) {
-            return true;
-        }
-        return isConstantClass(value.getClass());
+        return value == null || isConstantClass(value.getClass());
     }
 
+    /**
+     * 判断给的类对应的对象是不是常量
+     */
     public static boolean isConstantClass(Class<?> clazz) {
         return isPrimitiveOrWrapper(clazz)
                 || clazz == String.class

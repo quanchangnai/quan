@@ -7,7 +7,7 @@ public class CallException extends Exception {
 
     private long callId;
 
-    private String callee;
+    private String signature;
 
     private String message = "";
 
@@ -19,14 +19,14 @@ public class CallException extends Exception {
         this.callId = callId;
     }
 
-    protected void setCallee(String callee) {
-        this.callee = callee;
+    protected void setSignature(String signature) {
+        this.signature = signature;
     }
 
     @Override
     public String getMessage() {
-        if (callId > 0 && callee != null && message.isEmpty()) {
-            message = String.format("调用[%s]方法[%s]返回异常：", callId, callee);
+        if (callId > 0 && signature != null && message.isEmpty()) {
+            message = String.format("调用[%s]方法[%s]返回异常：", callId, signature);
         }
         return message + super.getMessage();
     }

@@ -57,13 +57,6 @@ public class Worker {
         return threadLocal.get();
     }
 
-    protected static void check(int id) {
-        Worker current = current();
-        if (current == null || current.id != id) {
-            throw new IllegalStateException("当前所处线程不合法");
-        }
-    }
-
     public int getId() {
         return id;
     }
@@ -125,7 +118,7 @@ public class Worker {
                 break;
             }
             sortedPromises.remove(promise);
-            this.mappedPromises.remove(promise.getCallId());
+            mappedPromises.remove(promise.getCallId());
             promise.setTimeout();
         }
 
@@ -140,7 +133,7 @@ public class Worker {
 
     }
 
-    public int resolveTargetServerId(String serviceName) {
+    protected int resolveTargetServerId(String serviceName) {
         Function<String, Integer> targetServerIdResolver = server.getTargetServerIdResolver();
         if (targetServerIdResolver != null) {
             return targetServerIdResolver.apply(serviceName);
@@ -149,21 +142,19 @@ public class Worker {
         }
     }
 
-    public <R> Promise<R> sendRequest(int targetServerId, Object serviceId, String callee, int mutable, int methodId, Object... params) {
-        check(this.id);
-
+    protected <R> Promise<R> sendRequest(int targetServerId, Object serviceId, String signature, int securityModifier, int methodId, Object... params) {
         long callId = (long) this.id << 32 | nextCallId++;
         if (nextCallId < 0) {
             nextCallId = 1;
         }
 
-        checkParamsMutable(targetServerId, mutable, params);
+        makeParamSafe(targetServerId, securityModifier, params);
 
         Request request = new Request(serviceId, methodId, params);
         request.setCallId(callId);
-        server.sendRequest(targetServerId, request, mutable);
+        server.sendRequest(targetServerId, request, securityModifier);
 
-        Promise<Object> promise = new Promise<>(callId, callee);
+        Promise<Object> promise = new Promise<>(callId, signature);
         mappedPromises.put(callId, promise);
         sortedPromises.add(promise);
 
@@ -172,15 +163,15 @@ public class Worker {
     }
 
     /**
-     * 如果参数有可能被修改,则需要复制对应参数以保证安全
+     * 如果有参数是不安全的,则需要复制它以保证安全
      *
-     * @param mutable 1:参数是有可能被修改，参考 {@link Endpoint#paramMutable()}
+     * @param securityModifier 1:所有参数都是安全的，参考 {@link Endpoint#safeParam()}
      */
-    protected void checkParamsMutable(int targetServerId, int mutable, Object[] params) {
+    protected void makeParamSafe(int targetServerId, int securityModifier, Object[] params) {
         if (targetServerId != 0 && targetServerId != this.server.getId()) {
             return;
         }
-        if (params == null || (mutable & 1) == 0) {
+        if (params == null || (securityModifier & 0b01) == 0b01) {
             return;
         }
 
@@ -205,15 +196,15 @@ public class Worker {
     }
 
     /**
-     * 如果返回结果有可能被修改，则需要复制返回结果以保证安全
+     * 如果返回结果是不安全的，则需要复它以保证安全
      *
-     * @param mutable 2:返回结果有可能被修改，参考 {@link Endpoint#resultMutable()}
+     * @param securityModifier 2:返回结果是安全的，参考 {@link Endpoint#safeResult()}
      */
-    protected Object checkResultMutable(int originServerId, int mutable, Object result) {
+    protected Object makeResultSafe(int originServerId, int securityModifier, Object result) {
         if (originServerId != this.server.getId()) {
             return result;
         }
-        if (CommonUtils.isConstant(result) || (mutable & 2) == 0) {
+        if (CommonUtils.isConstant(result) || (securityModifier & 0b10) == 0b10) {
             return result;
         }
 
@@ -223,11 +214,12 @@ public class Worker {
         return server.getReaderFactory().apply(buffer).read();
     }
 
-    protected void handleRequest(int originServerId, Request request, int mutable) {
+    protected void handleRequest(int originServerId, Request request, int securityModifier) {
         long callId = request.getCallId();
         Object serviceId = request.getServiceId();
         Object result = null;
         String exception = null;
+
         Service service = services.get(serviceId);
         if (service == null) {
             logger.error("处理RPC请求，服务[{}]不存在，originServerId:{}，callId:{}", serviceId, originServerId, callId);
@@ -246,12 +238,12 @@ public class Worker {
             if (!delayedResult.isFinished()) {
                 delayedResult.setCallId(callId);
                 delayedResult.setOriginServerId(originServerId);
-                delayedResult.setMutable(mutable);
+                delayedResult.setSecurityModifier(securityModifier);
                 return;
             } else {
                 exception = delayedResult.getExceptionStr();
                 if (exception == null) {
-                    result = checkResultMutable(originServerId, mutable, delayedResult.getResult());
+                    result = makeResultSafe(originServerId, securityModifier, delayedResult.getResult());
                 }
             }
         }
@@ -262,7 +254,7 @@ public class Worker {
 
     protected void handleDelayedResult(DelayedResult delayedResult) {
         int originServerId = delayedResult.getOriginServerId();
-        Object result = checkResultMutable(originServerId, delayedResult.getMutable(), delayedResult.getResult());
+        Object result = makeResultSafe(originServerId, delayedResult.getSecurityModifier(), delayedResult.getResult());
 
         Response response = new Response(delayedResult.getCallId(), result, delayedResult.getExceptionStr());
         server.sendResponse(originServerId, response);

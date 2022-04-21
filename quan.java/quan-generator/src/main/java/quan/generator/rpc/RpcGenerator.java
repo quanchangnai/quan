@@ -24,6 +24,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
+import java.util.regex.Pattern;
 
 @SupportedAnnotationTypes({"quan.rpc.Endpoint", "quan.rpc.SingletonService"})
 @SupportedOptions("rpcProxyPath")
@@ -46,6 +47,8 @@ public class RpcGenerator extends AbstractProcessor {
      * 自定义代理类的生成路径
      */
     private String proxyPath;
+
+    private static Pattern illegalMethodPattern = Pattern.compile("_.*\\$");
 
     private Template proxyTemplate;
 
@@ -170,6 +173,10 @@ public class RpcGenerator extends AbstractProcessor {
                 error(typeElement + "." + executableElement + " cannot be declared as endpoint method, because it is private");
                 continue;
             }
+            if (illegalMethodPattern.matcher(executableElement.getSimpleName()).matches()) {
+                error(typeElement + "." + executableElement + " name is illegal");
+                continue;
+            }
             ServiceMethod serviceMethod = processServiceMethod(executableElement);
             serviceMethod.setServiceClass(serviceClass);
             serviceClass.getMethods().add(serviceMethod);
@@ -207,13 +214,13 @@ public class RpcGenerator extends AbstractProcessor {
         serviceMethod.setOriginalTypeParameters(processTypeParameters(executableElement.getTypeParameters()));
 
         Endpoint endpoint = executableElement.getAnnotation(Endpoint.class);
-        boolean paramMutable = false;
+        boolean safeParam = true;
 
         for (VariableElement parameter : executableElement.getParameters()) {
             TypeMirror parameterType = parameter.asType();
             serviceMethod.addParameter(parameter.getSimpleName(), parameterType.toString());
             if (!CommonUtils.isConstantType(parameterType)) {
-                paramMutable = true;
+                safeParam = false;
             }
         }
 
@@ -229,17 +236,17 @@ public class RpcGenerator extends AbstractProcessor {
             serviceMethod.setOriginalReturnType(returnType.toString());
         }
 
-        if (paramMutable) {
-            paramMutable = endpoint.paramMutable();
+        if (!safeParam) {
+            safeParam = endpoint.safeParam();
         }
 
-        boolean resultMutable = !CommonUtils.isConstantType(returnType);
-        if (resultMutable) {
-            resultMutable = endpoint.resultMutable();
+        boolean safeResult = CommonUtils.isConstantType(returnType);
+        if (!safeResult) {
+            safeResult = endpoint.safeResult();
         }
 
-        serviceMethod.setParamMutable(paramMutable);
-        serviceMethod.setResultMutable(resultMutable);
+        serviceMethod.setSafeParam(safeParam);
+        serviceMethod.setSafeResult(safeResult);
 
         return serviceMethod;
     }

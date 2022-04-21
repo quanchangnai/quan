@@ -13,15 +13,16 @@ import java.lang.annotation.Target;
 public @interface Endpoint {
 
     /**
-     * 参数是否有可能被修改<br/>
-     * 如果所有参数都是基本类型等不可变类型，则此值无效
+     * 安全参数是指在方法执行时不会被修改<br/>
+     * 原生类型及其包装类型等不可变类型一定是安全的<br/>
+     * {@link quan.util.CommonUtils#isConstantClass(Class)}
      */
-    boolean paramMutable() default true;
+    boolean safeParam() default false;
 
     /**
-     * 返回结果是否有可能被修改<br/>
-     * 如果返回结果是基本类型等不可变类型，则此值无效
+     * 安全结果指在方法返回后不会被修改<br/>
+     * 正常情况下一般不会修改返回结果
      */
-    boolean resultMutable() default false;
+    boolean safeResult() default true;
 
 }

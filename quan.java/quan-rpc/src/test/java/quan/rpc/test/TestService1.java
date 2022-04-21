@@ -98,7 +98,7 @@ public class TestService1 extends Service {
 
         Promise<Integer> count = roleService1Proxy.count(new HashSet<>(Arrays.asList(2334, 664)));
         count.then(c -> {
-            logger.info("roleService1Proxy.count()={}", count);
+            logger.info("roleService1Proxy.count()={}", c);
         });
 
     }

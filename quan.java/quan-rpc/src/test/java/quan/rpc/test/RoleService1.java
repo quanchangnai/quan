@@ -65,7 +65,7 @@ public class RoleService1<T extends Object & Runnable> extends Service {
         return null;
     }
 
-    @Endpoint(paramMutable = false)
+    @Endpoint(safeParam = true)
     public int count(Set<Integer> set) {
         return set.size();
     }

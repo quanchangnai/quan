@@ -5,9 +5,7 @@ import java.util.List;
 
 public class ServiceMethod extends ServiceElement {
 
-    private boolean paramMutable;
-
-    private boolean resultMutable;
+    private int securityModifier;
 
     public String originalReturnType;
 
@@ -23,31 +21,20 @@ public class ServiceMethod extends ServiceElement {
         this.name = name.toString();
     }
 
-    public boolean isParamMutable() {
-        return paramMutable;
-    }
-
-    public void setParamMutable(boolean paramMutable) {
-        this.paramMutable = paramMutable;
-    }
-
-    public boolean isResultMutable() {
-        return resultMutable;
-    }
-
-    public void setResultMutable(boolean resultMutable) {
-        this.resultMutable = resultMutable;
-    }
-
-    public int getMutable() {
-        int mutable = 0;
-        if (paramMutable) {
-            mutable |= 1;
+    public void setSafeParam(boolean safeParam) {
+        if (safeParam) {
+            securityModifier |= 0b01;
         }
-        if (resultMutable) {
-            mutable |= 2;
+    }
+
+    public void setSafeResult(boolean safeResult) {
+        if (safeResult) {
+            securityModifier |= 0b10;
         }
-        return mutable;
+    }
+
+    public int getSecurityModifier() {
+        return securityModifier;
     }
 
     public String getOriginalReturnType() {

@@ -11,7 +11,8 @@ public final class DelayedResult<R> extends Promise<R> {
 
     private int originServerId;
 
-    private int mutable;
+    //服务方法参数或返回结果的安全修饰符
+    private int securityModifier;
 
     private Worker worker;
 
@@ -27,12 +28,12 @@ public final class DelayedResult<R> extends Promise<R> {
         this.originServerId = originServerId;
     }
 
-    int getMutable() {
-        return mutable;
+    int getSecurityModifier() {
+        return securityModifier;
     }
 
-    void setMutable(int mutable) {
-        this.mutable = mutable;
+    void setSecurityModifier(int securityModifier) {
+        this.securityModifier = securityModifier;
     }
 
     @Override
