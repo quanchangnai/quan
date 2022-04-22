@@ -15,7 +15,11 @@ import static org.apache.commons.lang3.ClassUtils.isPrimitiveOrWrapper;
  */
 public class CommonUtils {
 
-    private static Set<Class<?>> constantClasses = new HashSet<>();
+    private static Set<Class<?>> extraConstantClasses = new HashSet<>();
+
+    static {
+
+    }
 
     @SafeVarargs
     public static <E> Set<E> asSet(E... elements) {
@@ -56,7 +60,7 @@ public class CommonUtils {
      */
     public static String toPlatPath(String path) {
         if (StringUtils.isBlank(path)) {
-            return "";
+            return path;
         }
         return path.replace("/", File.separator).replace("\\", File.separator);
     }
@@ -88,18 +92,18 @@ public class CommonUtils {
     }
 
     public static void addConstantClass(Class<?> clazz) {
-        constantClasses.add(clazz);
+        extraConstantClasses.add(clazz);
     }
 
     /**
-     * 判断给的值是不是常量
+     * 判断对象是不是常量
      */
     public static boolean isConstant(Object value) {
         return value == null || isConstantClass(value.getClass());
     }
 
     /**
-     * 判断给的类是不是常量类型
+     * 判断类是不是常量类型
      */
     public static boolean isConstantClass(Class<?> clazz) {
         return isPrimitiveOrWrapper(clazz)
@@ -109,7 +113,7 @@ public class CommonUtils {
                 || clazz == OptionalLong.class
                 || clazz == OptionalDouble.class
                 || clazz.isEnum()
-                || constantClasses.contains(clazz);
+                || extraConstantClasses.contains(clazz);
     }
 
     public static boolean isConstantType(TypeMirror type) {

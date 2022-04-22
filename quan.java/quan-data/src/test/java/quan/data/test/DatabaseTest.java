@@ -22,7 +22,7 @@ import quan.data.mongo.CodecsRegistry;
 import quan.data.mongo.Database;
 import quan.data.role.RoleData;
 import quan.data.role.RoleData2;
-import quan.util.AopUtils;
+import quan.util.ClassUtils;
 
 import java.io.File;
 import java.io.FileReader;
@@ -35,7 +35,7 @@ import java.util.*;
 public class DatabaseTest {
 
     static {
-        AopUtils.enable();
+        ClassUtils.initAop();
     }
 
     @Test
