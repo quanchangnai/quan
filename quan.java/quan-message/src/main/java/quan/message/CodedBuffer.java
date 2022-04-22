@@ -32,9 +32,9 @@ public abstract class CodedBuffer {
     public abstract void clear();
 
     /**
-     * 关闭，默认什么都不做，具体实现有可能需要做一些清理工作
+     * 释放资源
      */
-    public void close() {
+    public void release() {
     }
 
     /**

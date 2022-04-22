@@ -39,7 +39,7 @@ public class NettyCodedBuffer extends CodedBuffer {
     }
 
     @Override
-    public void close() {
+    public void release() {
         buf.release();
     }
 
