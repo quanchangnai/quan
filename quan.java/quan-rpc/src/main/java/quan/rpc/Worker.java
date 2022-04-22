@@ -3,6 +3,7 @@ package quan.rpc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.message.CodedBuffer;
+import quan.message.DefaultCodedBuffer;
 import quan.rpc.protocol.Request;
 import quan.rpc.protocol.Response;
 import quan.rpc.serialize.ObjectReader;
@@ -11,7 +12,6 @@ import quan.util.CommonUtils;
 
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Function;
 
@@ -37,7 +37,7 @@ public class Worker {
     private BlockingQueue<Runnable> taskQueue = new LinkedBlockingQueue<>();
 
     //管理的所有服务，key:服务ID
-    private Map<Object, Service> services = new ConcurrentHashMap<>();
+    private Map<Object, Service> services = new HashMap<>();
 
     private int nextCallId = 1;
 
@@ -72,6 +72,10 @@ public class Worker {
     protected void removeService(Service service) {
         service.worker = null;
         services.remove(service.getId());
+    }
+
+    public void removeService(Object serviceId) {
+        server.removeService(serviceId);
     }
 
     protected void start() {
@@ -167,7 +171,7 @@ public class Worker {
 
     protected Object clone(Object object) {
         if (writer == null) {
-            CodedBuffer buffer = server.getBufferFactory().get();
+            CodedBuffer buffer = new DefaultCodedBuffer();
             writer = server.getWriterFactory().apply(buffer);
             reader = server.getReaderFactory().apply(buffer);
         } else {
@@ -255,7 +259,6 @@ public class Worker {
     protected void handleDelayedResult(DelayedResult delayedResult) {
         int originServerId = delayedResult.getOriginServerId();
         Object result = makeResultSafe(originServerId, delayedResult.getSecurityModifier(), delayedResult.getResult());
-
         Response response = new Response(delayedResult.getCallId(), result, delayedResult.getExceptionStr());
         server.sendResponse(originServerId, response);
     }

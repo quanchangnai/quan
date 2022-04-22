@@ -16,7 +16,7 @@ public class ServiceClass extends ServiceElement {
 
     private List<ServiceMethod> methods = new ArrayList<>();
 
-    //方法名:方法数量
+    //同名方法的数量
     private Map<String, Integer> methodNameNums = new HashMap<>();
 
     //简单类名：全类名(可以省略导入的类以-开头)

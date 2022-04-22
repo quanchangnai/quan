@@ -62,10 +62,14 @@ public class ObjectReader {
                 return readShortArray();
             case INTEGER:
                 return buffer.readInt();
+            case OPTIONAL_INT:
+                return readOptionalInt();
             case INT_ARRAY:
                 return readIntArray();
             case LONG:
                 return buffer.readLong();
+            case OPTIONAL_LONG:
+                return readOptionalLong();
             case LONG_ARRAY:
                 return readLongArray();
             case FLOAT:
@@ -74,6 +78,8 @@ public class ObjectReader {
                 return readFloatArray();
             case DOUBLE:
                 return buffer.readDouble();
+            case OPTIONAL_DOUBLE:
+                return readOptionalDouble();
             case DOUBLE_ARRAY:
                 return readDoubleArray();
             case STRING:
@@ -130,6 +136,14 @@ public class ObjectReader {
         return array;
     }
 
+    private OptionalInt readOptionalInt() {
+        if (buffer.readBool()) {
+            return OptionalInt.of(buffer.readInt());
+        } else {
+            return OptionalInt.empty();
+        }
+    }
+
     private int[] readIntArray() {
         int length = buffer.readInt();
         int[] array = new int[length];
@@ -137,6 +151,14 @@ public class ObjectReader {
             array[i] = buffer.readInt();
         }
         return array;
+    }
+
+    private OptionalLong readOptionalLong() {
+        if (buffer.readBool()) {
+            return OptionalLong.of(buffer.readLong());
+        } else {
+            return OptionalLong.empty();
+        }
     }
 
     private long[] readLongArray() {
@@ -155,6 +177,14 @@ public class ObjectReader {
             array[i] = buffer.readFloat();
         }
         return array;
+    }
+
+    private OptionalDouble readOptionalDouble() {
+        if (buffer.readBool()) {
+            return OptionalDouble.of(buffer.readDouble());
+        } else {
+            return OptionalDouble.empty();
+        }
     }
 
     private double[] readDoubleArray() {

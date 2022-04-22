@@ -15,6 +15,7 @@ import static quan.rpc.serialize.ObjectType.*;
 /**
  * @author quanchangnai
  */
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class ObjectWriter {
 
     protected TransferableRegistry transferableRegistry;
@@ -59,11 +60,15 @@ public class ObjectWriter {
         } else if (clazz == Integer.class) {
             buffer.writeInt(INTEGER);
             buffer.writeInt((Integer) value);
+        } else if (clazz == OptionalInt.class) {
+            write((OptionalInt) value);
         } else if (clazz == int[].class) {
             write((int[]) value);
         } else if (clazz == Long.class) {
             buffer.writeInt(LONG);
             buffer.writeLong((Long) value);
+        } else if (clazz == OptionalLong.class) {
+            write((OptionalLong) value);
         } else if (clazz == long[].class) {
             write((long[]) value);
         } else if (clazz == Float.class) {
@@ -74,6 +79,8 @@ public class ObjectWriter {
         } else if (clazz == Double.class) {
             buffer.writeInt(DOUBLE);
             buffer.writeDouble((Double) value);
+        } else if (clazz == OptionalDouble.class) {
+            write((OptionalDouble) value);
         } else if (clazz == double[].class) {
             write((double[]) value);
         } else if (clazz == String.class) {
@@ -119,11 +126,31 @@ public class ObjectWriter {
         }
     }
 
+    private void write(OptionalInt value) {
+        buffer.writeInt(OPTIONAL_INT);
+        if (value.isPresent()) {
+            buffer.writeBool(true);
+            buffer.writeInt(value.getAsInt());
+        } else {
+            buffer.writeBool(false);
+        }
+    }
+
     private void write(int[] array) {
         buffer.writeInt(INT_ARRAY);
         buffer.writeInt(array.length);
         for (int v : array) {
             buffer.writeInt(v);
+        }
+    }
+
+    private void write(OptionalLong value) {
+        buffer.writeInt(OPTIONAL_LONG);
+        if (value.isPresent()) {
+            buffer.writeBool(true);
+            buffer.writeLong(value.getAsLong());
+        } else {
+            buffer.writeBool(false);
         }
     }
 
@@ -140,6 +167,16 @@ public class ObjectWriter {
         buffer.writeInt(array.length);
         for (float v : array) {
             buffer.writeFloat(v);
+        }
+    }
+
+    private void write(OptionalDouble value) {
+        buffer.writeInt(OPTIONAL_DOUBLE);
+        if (value.isPresent()) {
+            buffer.writeBool(true);
+            buffer.writeDouble(value.getAsDouble());
+        } else {
+            buffer.writeBool(false);
         }
     }
 

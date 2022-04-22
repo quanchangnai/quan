@@ -4,7 +4,6 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.message.CodedBuffer;
-import quan.message.DefaultCodedBuffer;
 import quan.rpc.protocol.Handshake;
 import quan.rpc.protocol.PingPong;
 import quan.rpc.protocol.Request;
@@ -18,7 +17,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * @author quanchangnai
@@ -35,14 +33,12 @@ public abstract class LocalServer {
 
     private int reconnectTime;
 
-    private Supplier<CodedBuffer> bufferFactory = DefaultCodedBuffer::new;
-
     private Function<CodedBuffer, ObjectReader> readerFactory = ObjectReader::new;
 
     private Function<CodedBuffer, ObjectWriter> writerFactory = ObjectWriter::new;
 
     /**
-     * 使用服务名作为参数，调用后返回服务的目标服务器ID，多次调用返回要一致
+     * 使用服务名作为参数，调用后返回目标服务器ID
      */
     private Function<String, Integer> targetServerIdResolver;
 
@@ -54,10 +50,10 @@ public abstract class LocalServer {
     private int workerIndex;
 
     //管理的所有服务，key:服务ID
-    private final Map<Object, Service> services = new HashMap<>();
+    private final Map<Object, Service> services = new ConcurrentHashMap<>();
 
     //管理的所有远程服务器，key:服务器ID
-    private final Map<Integer, RemoteServer> remotes = new ConcurrentHashMap<>();
+    private final Map<Integer, RemoteServer> remotes = new HashMap<>();
 
     private ScheduledExecutorService scheduler;
 
@@ -86,14 +82,10 @@ public abstract class LocalServer {
     }
 
     /**
-     * 远程服务器断线重连的等待时间
+     * 设置远程服务器断线重连的间隔时间
      */
     public void setReconnectTime(int reconnectTime) {
         this.reconnectTime = reconnectTime;
-    }
-
-    public void setBufferFactory(Supplier<CodedBuffer> bufferFactory) {
-        this.bufferFactory = Objects.requireNonNull(bufferFactory);
     }
 
     /**
@@ -111,7 +103,7 @@ public abstract class LocalServer {
     }
 
     /**
-     * 如果目标服务器是单进程的，该Resolver用来查找目标服务器ID，可以省去每次构造服务代理都必需要传参的麻烦
+     * 设置用来查找目标服务器ID的Resolver，如果服务的目标服务器是单进程的，可以省去每次构造服务代理都必需要传参的麻烦
      *
      * @see #targetServerIdResolver
      */
@@ -121,10 +113,6 @@ public abstract class LocalServer {
 
     public int getReconnectTime() {
         return reconnectTime;
-    }
-
-    public Supplier<CodedBuffer> getBufferFactory() {
-        return bufferFactory;
     }
 
     public Function<CodedBuffer, ObjectReader> getReaderFactory() {
@@ -185,22 +173,25 @@ public abstract class LocalServer {
         return workers.get(workerId);
     }
 
-    public synchronized void addService(Service service) {
+    public void addService(Service service) {
         Object serviceId = service.getId();
-        if (services.putIfAbsent(serviceId, service) != null) {
+        if (services.putIfAbsent(serviceId, service) == null) {
+            Worker worker = nextWorker();
+            service.worker = worker;
+            worker.execute(() -> worker.addService(service));
+        } else {
             logger.error("RPC服务[{}]已存在", serviceId);
-            return;
         }
-        nextWorker().addService(service);
     }
 
-    public synchronized void removeService(Service service) {
-        Object serviceId = service.getId();
-        if (!services.remove(serviceId, service)) {
+    public void removeService(Object serviceId) {
+        Service service = services.remove(serviceId);
+        if (service != null) {
+            Worker worker = service.getWorker();
+            worker.execute(() -> worker.removeService(service));
+        } else {
             logger.error("RPC服务[{}]不存在", serviceId);
-            return;
         }
-        service.getWorker().removeService(service);
     }
 
     public synchronized void addRemote(int remoteId, String remoteIp, int remotePort) {
