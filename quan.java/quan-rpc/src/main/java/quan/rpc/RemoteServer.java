@@ -30,7 +30,7 @@ public abstract class RemoteServer {
 
     private long lastReceivedPingPongTime = System.currentTimeMillis();
 
-    private long lastReportConnectionSuspendedTime;
+    private long lastReportSuspendedTime;
 
     protected RemoteServer(int id, String ip, int port) {
         Validate.isTrue(id > 0, "服务器ID必须是正整数");
@@ -81,15 +81,15 @@ public abstract class RemoteServer {
     }
 
     protected void update() {
-        checkConnectionSuspended();
+        checkSuspended();
         sendPingPong();
     }
 
-    private void checkConnectionSuspended() {
+    private void checkSuspended() {
         long currentTime = System.currentTimeMillis();
-        if (currentTime - lastReceivedPingPongTime > 30000 && currentTime - lastReportConnectionSuspendedTime > 60000) {
+        if (currentTime - lastReceivedPingPongTime > 30000 && currentTime - lastReportSuspendedTime > 60000) {
             logger.error("远程服务器[{}]的连接可能已经进入假死状态了", localServer.getId());
-            lastReportConnectionSuspendedTime = currentTime;
+            lastReportSuspendedTime = currentTime;
         }
     }
 
@@ -107,7 +107,9 @@ public abstract class RemoteServer {
 
     protected void handlePingPong(PingPong pingPong) {
         lastReceivedPingPongTime = System.currentTimeMillis();
-        logger.debug("远程服务器[{}]的延迟时间为：{}ms", this.id, lastReceivedPingPongTime - pingPong.getTime());
+        if (logger.isDebugEnabled()) {
+            logger.debug("远程服务器[{}]的延迟时间为：{}ms", this.id, lastReceivedPingPongTime - pingPong.getTime());
+        }
     }
 
 }

@@ -55,7 +55,7 @@ public abstract class LocalServer {
     //管理的所有远程服务器，key:服务器ID
     private final Map<Integer, RemoteServer> remotes = new HashMap<>();
 
-    private ScheduledExecutorService scheduler;
+    private ScheduledExecutorService executor;
 
     protected LocalServer(int id, String ip, int port, int workerNum) {
         Validate.isTrue(id > 0, "服务器ID必须是正整数");
@@ -131,13 +131,13 @@ public abstract class LocalServer {
         workers.values().forEach(Worker::start);
         startNetwork();
         remotes.values().forEach(RemoteServer::start);
-        scheduler = Executors.newScheduledThreadPool(1);
-        scheduler.scheduleAtFixedRate(this::update, 50, 50, TimeUnit.MILLISECONDS);
+        executor = Executors.newScheduledThreadPool(1);
+        executor.scheduleAtFixedRate(this::update, 50, 50, TimeUnit.MILLISECONDS);
     }
 
     public synchronized void stop() {
-        scheduler.shutdown();
-        scheduler = null;
+        executor.shutdown();
+        executor = null;
         remotes.values().forEach(RemoteServer::stop);
         stopNetwork();
         workers.values().forEach(Worker::stop);
@@ -174,24 +174,28 @@ public abstract class LocalServer {
     }
 
     public void addService(Service service) {
+        addService(nextWorker(), service);
+    }
+
+    public void addService(Worker worker, Service service) {
         Object serviceId = service.getId();
-        if (services.putIfAbsent(serviceId, service) == null) {
-            Worker worker = nextWorker();
-            service.worker = worker;
-            worker.execute(() -> worker.addService(service));
-        } else {
-            logger.error("RPC服务[{}]已存在", serviceId);
+        if (services.putIfAbsent(serviceId, service) != null) {
+            logger.error("服务[{}]已存在", serviceId);
+            return;
         }
+
+        worker.execute(() -> worker._addService(service));
     }
 
     public void removeService(Object serviceId) {
         Service service = services.remove(serviceId);
-        if (service != null) {
-            Worker worker = service.getWorker();
-            worker.execute(() -> worker.removeService(service));
-        } else {
-            logger.error("RPC服务[{}]不存在", serviceId);
+        if (service == null) {
+            logger.error("服务[{}]不存在", serviceId);
+            return;
         }
+
+        Worker worker = service.getWorker();
+        worker.execute(() -> worker._removeService(service));
     }
 
     public synchronized void addRemote(int remoteId, String remoteIp, int remotePort) {
@@ -199,10 +203,12 @@ public abstract class LocalServer {
             logger.error("添加的远程服务器[{}]已存在", remoteId);
             return;
         }
+
         RemoteServer remoteServer = newRemote(remoteId, remoteIp, remotePort);
         remoteServer.setLocalServer(this);
         remotes.put(remoteServer.getId(), remoteServer);
-        if (scheduler != null) {
+
+        if (executor != null) {
             remoteServer.start();
         }
     }

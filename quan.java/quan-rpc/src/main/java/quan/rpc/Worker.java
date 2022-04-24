@@ -30,14 +30,14 @@ public class Worker {
 
     private int id = nextId++;
 
-    private boolean running;
+    private volatile boolean running;
 
     private LocalServer server;
 
     private BlockingQueue<Runnable> taskQueue = new LinkedBlockingQueue<>();
 
     //管理的所有服务，key:服务ID
-    private Map<Object, Service> services = new HashMap<>();
+    private final Map<Object, Service> services = new HashMap<>();
 
     private int nextCallId = 1;
 
@@ -64,26 +64,65 @@ public class Worker {
         return id;
     }
 
-    protected void addService(Service service) {
-        service.worker = this;
-        services.put(service.getId(), service);
+    public LocalServer getServer() {
+        return server;
     }
 
-    protected void removeService(Service service) {
-        service.worker = null;
-        services.remove(service.getId());
+    public void addService(Service service) {
+        server.addService(this, service);
+    }
+
+    protected void _addService(Service service) {
+        service.worker = this;
+        services.put(service.getId(), service);
+        if (running) {
+            initService(service);
+        }
+    }
+
+    private void initService(Service service) {
+        try {
+            service.init();
+        } catch (Exception e) {
+            logger.error("服务[{}]初始化异常", service.getId(), e);
+        }
     }
 
     public void removeService(Object serviceId) {
-        server.removeService(serviceId);
+        if (!services.containsKey(serviceId)) {
+            logger.error("服务[{}]不存在", serviceId);
+        } else {
+            server.removeService(serviceId);
+        }
+    }
+
+    protected void _removeService(Service service) {
+        Object serviceId = service.getId();
+        if (running) {
+            destroyService(service);
+        }
+        service.worker = null;
+        services.remove(serviceId);
+    }
+
+    private void destroyService(Service service) {
+        try {
+            service.destroy();
+        } catch (Exception e) {
+            logger.error("服务[{}]销毁异常", service.getId(), e);
+        }
     }
 
     protected void start() {
         new Thread(this::run).start();
+        execute(() -> services.values().forEach(this::initService));
     }
 
     protected void stop() {
-        running = false;
+        execute(() -> {
+            services.values().forEach(this::destroyService);
+            running = false;
+        });
     }
 
     protected void run() {
@@ -99,6 +138,7 @@ public class Worker {
         }
 
         taskQueue.clear();
+        threadLocal.set(null);
     }
 
     public void execute(Runnable task) {

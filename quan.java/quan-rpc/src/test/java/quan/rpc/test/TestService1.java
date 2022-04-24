@@ -70,6 +70,17 @@ public class TestService1 extends Service {
         return set.size();
     }
 
+
+    @Override
+    protected void init() {
+        logger.info("TestService1:{} init at worker{}", this.id, this.getWorker().getId());
+    }
+
+    @Override
+    protected void destroy() {
+        logger.info("TestService1:{} destroy at worker{}", this.id, this.getWorker().getId());
+    }
+
     @Override
     protected void update() {
         long now = System.currentTimeMillis();

@@ -70,10 +70,20 @@ public abstract class Service {
     }
 
     /**
-     * 在服务当前所属的工作线程中执行任务
+     * 在服务所属的工作线程中执行任务
      */
     public final void execute(Runnable task) {
         worker.execute(task);
+    }
+
+    public final <R> DelayedResult<R> newDelayedResult() {
+        return worker.newDelayedResult();
+    }
+
+    /**
+     * 初始化
+     */
+    protected void init() {
     }
 
     /**
@@ -82,8 +92,10 @@ public abstract class Service {
     protected void update() {
     }
 
-    public final <R> DelayedResult<R> newDelayedResult() {
-        return worker.newDelayedResult();
+    /**
+     * 销毁
+     */
+    protected void destroy() {
     }
 
 }
