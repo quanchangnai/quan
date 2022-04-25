@@ -80,6 +80,13 @@ public class DefaultCodedBuffer extends CodedBuffer {
     }
 
     @Override
+    public void remainingBytes(byte[] bytes, int startPos) {
+        int readableCount = readableCount();
+        System.arraycopy(this.bytes, readIndex, bytes, startPos, readableCount);
+        readIndex += readableCount;
+    }
+
+    @Override
     public void discardReadBytes() {
         byte[] newBytes = new byte[capacity() - readIndex];
         System.arraycopy(bytes, readIndex, newBytes, 0, newBytes.length);
@@ -101,6 +108,7 @@ public class DefaultCodedBuffer extends CodedBuffer {
         return bytes;
     }
 
+    @Override
     protected void readBytes(byte[] bytes, int startPos, int length) {
         System.arraycopy(this.bytes, readIndex, bytes, startPos, length);
         readIndex += length;
@@ -137,6 +145,14 @@ public class DefaultCodedBuffer extends CodedBuffer {
     }
 
     @Override
+    public void writeBytes(byte[] bytes) {
+        onWrite(10 + bytes.length);
+        writeInt(bytes.length);
+        System.arraycopy(bytes, 0, this.bytes, writeIndex, bytes.length);
+        writeIndex += bytes.length;
+    }
+
+    @Override
     public void writeBuffer(CodedBuffer buffer) {
         if (!(buffer instanceof DefaultCodedBuffer)) {
             super.writeBuffer(buffer);
@@ -153,14 +169,6 @@ public class DefaultCodedBuffer extends CodedBuffer {
 
         _buffer.readIndex += readableCount;
         this.writeIndex += readableCount;
-    }
-
-    @Override
-    public void writeBytes(byte[] bytes) {
-        onWrite(10 + bytes.length);
-        writeInt(bytes.length);
-        System.arraycopy(bytes, 0, this.bytes, writeIndex, bytes.length);
-        writeIndex += bytes.length;
     }
 
 }

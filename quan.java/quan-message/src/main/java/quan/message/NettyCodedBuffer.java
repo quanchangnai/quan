@@ -41,6 +41,9 @@ public class NettyCodedBuffer extends CodedBuffer {
     @Override
     public void release() {
         buf.release();
+        if (temp != null) {
+            temp.release();
+        }
     }
 
     @Override
@@ -53,6 +56,11 @@ public class NettyCodedBuffer extends CodedBuffer {
         byte[] remainingBytes = new byte[buf.readableBytes()];
         buf.readBytes(remainingBytes);
         return remainingBytes;
+    }
+
+    @Override
+    public void remainingBytes(byte[] bytes, int startPos) {
+        buf.readBytes(bytes, startPos, buf.readableBytes());
     }
 
     @Override
@@ -91,6 +99,28 @@ public class NettyCodedBuffer extends CodedBuffer {
     public void writeBytes(byte[] bytes) {
         writeInt(bytes.length);
         buf.writeBytes(bytes);
+    }
+
+    @Override
+    public void writeBuffer(CodedBuffer buffer) {
+        if (!(buffer instanceof NettyCodedBuffer)) {
+            super.writeBuffer(buffer);
+            return;
+        }
+
+        NettyCodedBuffer _buffer = (NettyCodedBuffer) buffer;
+        int readableCount = _buffer.readableCount();
+
+        writeInt(readableCount);
+        buf.writeBytes(_buffer.buf, readableCount);
+    }
+
+    @Override
+    public CodedBuffer getTemp() {
+        if (temp == null) {
+            temp = new NettyCodedBuffer(buf.alloc().buffer());
+        }
+        return temp;
     }
 
 }

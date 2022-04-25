@@ -9,7 +9,7 @@ import java.nio.charset.StandardCharsets;
  */
 public abstract class CodedBuffer {
 
-    private CodedBuffer temp;
+    protected CodedBuffer temp;
 
     /**
      * 容量
@@ -38,14 +38,19 @@ public abstract class CodedBuffer {
     }
 
     /**
-     * 当前剩余可读的字节数
+     * 剩余可读的字节数
      */
     public abstract int readableCount();
 
     /**
-     * 读取当前剩余的数据
+     * 读取剩余的数据
      */
     public abstract byte[] remainingBytes();
+
+    /**
+     * 读取剩余的数据然后填充到参数中
+     */
+    public abstract void remainingBytes(byte[] bytes, int startPos);
 
     /**
      * 丢弃已经读过的数据
