@@ -3,9 +3,6 @@ package quan.rpc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 /**
  * 服务
  *
@@ -15,10 +12,8 @@ public abstract class Service {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private static final Map<Class<? extends Service>, Service> singletonServices = new ConcurrentHashMap<>();
-
     //单例服务ID
-    private final Object id;
+    private Object id;
 
     /**
      * 服务所属的工作线程
@@ -27,31 +22,19 @@ public abstract class Service {
 
     private Caller caller;
 
-    {
-        id = checkSingleton();
-    }
-
     /**
      * 服务ID，在同一个{@link LocalServer}内必需保证唯一性，非单例服务应该覆盖此方法
      */
     public Object getId() {
         if (id != null) {
             return id;
-        } else {
-            throw new IllegalStateException("服务ID不存在");
         }
-    }
-
-    private Object checkSingleton() {
-        Class<? extends Service> clazz = getClass();
-        SingletonService singletonService = clazz.getAnnotation(SingletonService.class);
-        if (singletonService == null) {
-            return null;
+        SingletonService singletonService = getClass().getAnnotation(SingletonService.class);
+        if (singletonService != null) {
+            id = singletonService.id();
+            return id;
         }
-        if (singletonServices.putIfAbsent(clazz, this) != null) {
-            throw new IllegalStateException("单例服务不能重复构造");
-        }
-        return singletonService.id();
+        throw new IllegalStateException("服务ID不存在");
     }
 
     /**

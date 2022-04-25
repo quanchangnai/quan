@@ -3,6 +3,7 @@ package quan.rpc.test;
 import quan.rpc.Endpoint;
 import quan.rpc.Service;
 
+import java.util.Date;
 import java.util.Set;
 
 /**
@@ -24,7 +25,7 @@ public class RoleService1<T extends Object & Runnable> extends Service {
     }
 
     @Endpoint
-    public int login1(Integer a, Integer b) {
+    public int login1(Integer a, Integer b, Date... dates) {
         int r = a + b;
         logger.info("Execute RoleService1:{}.login1({},{})={} at Worker:{}", id, a, b, r, this.getWorker().getId());
         return r;

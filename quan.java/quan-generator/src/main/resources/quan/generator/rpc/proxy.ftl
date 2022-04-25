@@ -19,6 +19,8 @@ public class ${name}Proxy${typeParametersStr} extends Proxy{
      */
     private static final String SERVICE_NAME = "${fullName}";
 
+    private static final String[] signatures = new String[${methods?size}];
+
 <#if !serviceId??>
     public ${name}Proxy(int serverId, Object serviceId) {
         super(serverId, serviceId);
@@ -57,8 +59,10 @@ public class ${name}Proxy${typeParametersStr} extends Proxy{
         ${method.optimizedParameters[paramName]} ${paramName}<#if paramName?has_next>, </#if><#t>
     </#list>
     <#lt>) {
-        String signature = SERVICE_NAME + ".${method.signature}";
-        return _sendRequest$(signature, ${method.securityModifier}, ${method?index+1}<#if method.optimizedParameters?keys?size gt 0>, ${ method.optimizedParameters?keys?join(', ')}</#if>);
+        if (signatures[${method?index}] == null) {
+            signatures[${method?index}] = SERVICE_NAME + ".${method.signature}";
+        }
+        return _sendRequest$(signatures[${method?index}], ${method.securityModifier}, ${method?index+1}<#if method.optimizedParameters?keys?size gt 0>, ${ method.optimizedParameters?keys?join(', ')}</#if>);
     }
 
 </#list>

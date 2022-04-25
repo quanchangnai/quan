@@ -9,6 +9,8 @@ public class ServiceMethod extends ServiceElement {
 
     public String originalReturnType;
 
+    private boolean varArgs;
+
     //参数名:参数类型
     private LinkedHashMap<String, String> originalParameters = new LinkedHashMap<>();
 
@@ -51,6 +53,14 @@ public class ServiceMethod extends ServiceElement {
 
     public boolean isReturnVoid() {
         return Void.class.getSimpleName().equals(optimizedReturnType);
+    }
+
+    public boolean isVarArgs() {
+        return varArgs;
+    }
+
+    public void setVarArgs(boolean varArgs) {
+        this.varArgs = varArgs;
     }
 
     public void addParameter(CharSequence name, String type) {
@@ -112,9 +122,14 @@ public class ServiceMethod extends ServiceElement {
         optimizedReturnType = serviceClass.optimizeImport(originalReturnType);
 
         optimizedParameters.clear();
+        int i = 0;
+
         for (String name : originalParameters.keySet()) {
-            String parameterType = originalParameters.get(name);//全类名还可能会带泛型
-            optimizedParameters.put(name, serviceClass.optimizeImport(parameterType));
+            String parameterType = serviceClass.optimizeImport(originalParameters.get(name));
+            if (varArgs && ++i == originalParameters.size()) {
+                parameterType = parameterType.replace("[]", "...");
+            }
+            optimizedParameters.put(name, parameterType);
         }
     }
 

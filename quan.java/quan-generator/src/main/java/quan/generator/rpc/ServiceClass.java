@@ -92,7 +92,7 @@ public class ServiceClass extends ServiceElement {
     /**
      * 优化导入
      *
-     * @param genericFullName 全类名，可能会带泛型
+     * @param genericFullName 全类名，可能会带泛型，也可能会是数组
      * @return 实际使用的类名，简单类名冲突的使用全类名，不冲突的使用简单类名
      */
     public String optimizeImport(String genericFullName) {
@@ -120,7 +120,7 @@ public class ServiceClass extends ServiceElement {
                     usedGenericName.append(typeParamFullType, 0, index + 1);
                     typeParamFullType = typeParamFullType.substring(index + 1);
                 }
-                usedGenericName.append(optimizeUsedName(typeParamFullType));
+                usedGenericName.append(optimizeImport(typeParamFullType));
             }
             usedGenericName.append(">");
         }
@@ -131,7 +131,7 @@ public class ServiceClass extends ServiceElement {
     /**
      * 优化导入
      *
-     * @param fullName 全类名，不带泛型
+     * @param fullName 全类名，不带泛型，但可能会是数组
      */
     private String optimizeUsedName(String fullName) {
         int index = fullName.lastIndexOf(".");
@@ -141,20 +141,28 @@ public class ServiceClass extends ServiceElement {
 
         String enclosingName = fullName.substring(0, index);
         String simpleName = fullName.substring(index + 1);
+        String realFullName = fullName;
+        String realSimpleName = simpleName;
 
-        String importValue = imports.get(simpleName);
+        if (fullName.contains("[]")) {
+            //去掉数组符号后的实际类型名
+            realFullName = fullName.substring(0, fullName.length() - 2);
+            realSimpleName = fullName.substring(index + 1, fullName.length() - 2);
+        }
+
+        String importValue = imports.get(realSimpleName);
         if (importValue != null) {
-            if (importValue.equals("-" + fullName) || importValue.equals(fullName)) {
+            if (importValue.equals("-" + realFullName) || importValue.equals(realFullName)) {
                 return simpleName;
             } else {
                 return fullName;
             }
         }
 
-        if (enclosingName.equals("java.lang") || enclosingName.equals(packageName)) {
-            imports.put(simpleName, "-" + fullName);
+        if (enclosingName.equals("java.lang") || enclosingName.equals(this.packageName)) {
+            imports.put(realSimpleName, "-" + realFullName);
         } else {
-            imports.put(simpleName, fullName);
+            imports.put(realSimpleName, realFullName);
         }
 
         return simpleName;

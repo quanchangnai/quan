@@ -212,6 +212,7 @@ public class RpcGenerator extends AbstractProcessor {
         ServiceMethod serviceMethod = new ServiceMethod(executableElement.getSimpleName());
         serviceMethod.setComment(elementUtils.getDocComment(executableElement));
         serviceMethod.setOriginalTypeParameters(processTypeParameters(executableElement.getTypeParameters()));
+        serviceMethod.setVarArgs(executableElement.isVarArgs());
 
         Endpoint endpoint = executableElement.getAnnotation(Endpoint.class);
         boolean paramSafe = true;
