@@ -43,10 +43,9 @@ public class Worker {
 
     private Map<Long, Promise<Object>> mappedPromises = new HashMap<>();
 
-    //按时间排序
-    private TreeSet<Promise<Object>> sortedPromises = new TreeSet<>(Comparator.comparingLong(Promise::getTime));
+    private Queue<Promise<Object>> queuedPromises = new LinkedList<>();
 
-    private TreeSet<DelayedResult<Object>> delayedResults = new TreeSet<>(Comparator.comparingLong(DelayedResult::getTime));
+    private Queue<DelayedResult<Object>> delayedResults = new LinkedList<>();
 
     private ObjectWriter writer;
 
@@ -159,22 +158,22 @@ public class Worker {
             }
         }
 
-        while (!sortedPromises.isEmpty()) {
-            Promise<Object> promise = sortedPromises.first();
+        while (!queuedPromises.isEmpty()) {
+            Promise<Object> promise = queuedPromises.peek();
             if (!promise.isExpired()) {
                 break;
             }
-            sortedPromises.remove(promise);
+            queuedPromises.remove();
             mappedPromises.remove(promise.getCallId());
             promise.setTimeout();
         }
 
         while (!delayedResults.isEmpty()) {
-            DelayedResult<Object> delayedResult = delayedResults.first();
+            DelayedResult<Object> delayedResult = delayedResults.peek();
             if (!delayedResult.isExpired()) {
                 break;
             }
-            delayedResults.remove(delayedResult);
+            delayedResults.remove();
             delayedResult.setTimeout();
         }
 
@@ -203,7 +202,7 @@ public class Worker {
 
         Promise<Object> promise = new Promise<>(callId, signature);
         mappedPromises.put(callId, promise);
-        sortedPromises.add(promise);
+        queuedPromises.add(promise);
 
         //noinspection unchecked
         return (Promise<R>) promise;
@@ -310,7 +309,7 @@ public class Worker {
             logger.error("处理RPC响应，调用[{}]不存在或者已超时", callId);
             return;
         }
-        sortedPromises.remove(promise);
+        queuedPromises.remove(promise);
 
         String exception = response.getException();
         if (exception != null) {
