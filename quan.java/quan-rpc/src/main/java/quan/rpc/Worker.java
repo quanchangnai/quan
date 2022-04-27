@@ -159,25 +159,42 @@ public class Worker {
             }
         }
 
-        while (!sortedPromises.isEmpty()) {
-            Promise<Object> promise = sortedPromises.first();
+        expirePromises();
+        expireDelayedResults();
+    }
+
+    private void expirePromises() {
+        if (sortedPromises.isEmpty()) {
+            return;
+        }
+
+        Iterator<Promise<Object>> iterator = sortedPromises.iterator();
+        while (iterator.hasNext()) {
+            Promise<Object> promise = iterator.next();
             if (!promise.isExpired()) {
-                break;
+                return;
             }
-            sortedPromises.remove(promise);
+            iterator.remove();
             mappedPromises.remove(promise.getCallId());
             promise.setTimeout();
         }
+    }
 
-        while (!delayedResults.isEmpty()) {
-            DelayedResult<Object> delayedResult = delayedResults.first();
+    private void expireDelayedResults() {
+        if (delayedResults.isEmpty()) {
+            return;
+        }
+
+        Iterator<DelayedResult<Object>> iterator = delayedResults.iterator();
+        while (iterator.hasNext()) {
+            DelayedResult<Object> delayedResult = iterator.next();
             if (!delayedResult.isExpired()) {
-                break;
+                return;
             }
+            iterator.remove();
             delayedResults.remove(delayedResult);
             delayedResult.setTimeout();
         }
-
     }
 
     protected int resolveTargetServerId(String serviceName) {
