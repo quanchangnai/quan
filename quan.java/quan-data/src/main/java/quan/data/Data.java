@@ -120,7 +120,7 @@ public abstract class Data<I> {
         }
     }
 
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings("unchecked")
     public String toJson() {
         StringWriter stringWriter = new StringWriter();
         JsonWriter jsonWriter = new JsonStringWriter(stringWriter);

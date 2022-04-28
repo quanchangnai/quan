@@ -1,11 +1,11 @@
 package quan.data;
 
-import quan.util.AopUtils;
+import quan.util.ClassUtils;
 
 import java.lang.annotation.*;
 
 /**
- * 声明式事务注解，需要先调用{@link AopUtils#enable()} ()}初始化AOP
+ * 声明式事务注解，需要先调用{@link ClassUtils#initAop()} ()}初始化AOP
  */
 @Documented
 @Inherited
