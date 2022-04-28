@@ -411,9 +411,12 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
     @Override
     public String toString() {
         return "${name}{" +
+        <#if kind ==3>
+                "_id=" + ID +
+        </#if>
         <#list fields as field>
                 "<#rt>
-            <#if field?index gt 0>
+            <#if field?index gt 0 || kind ==3>
                 <#lt>,<#rt>
             </#if>
             <#if field.type == "string">

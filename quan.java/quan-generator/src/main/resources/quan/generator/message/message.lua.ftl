@@ -33,9 +33,12 @@ end
 
 local function toString(self)
     return "${name}{" ..
+    <#if kind ==3>
+            "_id=" .. tostring(self.id) ..
+    </#if>
     <#list fields as field>
             "<#rt>
-        <#if field?index gt 0>
+        <#if field?index gt 0 || kind ==3>
              <#lt>,<#rt>
         </#if>
         <#if field.type == "string">

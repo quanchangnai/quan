@@ -144,7 +144,8 @@ namespace Test.Message.Role
         public override string ToString()
         {
             return "SRoleLogin{" +
-                   "roleId=" + roleId.ToString2() +
+                   "_id=" + Id +
+                   ",roleId=" + roleId.ToString2() +
                    ",roleName='" + roleName + '\'' +
                    ",roleInfo=" + roleInfo.ToString2() +
                    ",roleInfoList=" + roleInfoList.ToString2() +

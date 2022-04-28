@@ -25,7 +25,8 @@ end
 
 local function toString(self)
     return "SRoleLogin{" ..
-            "roleId=" .. tostring(self.roleId) ..
+            "_id=" .. tostring(self.id) ..
+            ",roleId=" .. tostring(self.roleId) ..
             ",roleName='" .. tostring(self.roleName) .. '\'' ..
             ",roleInfo=" .. tostring(self.roleInfo) ..
             ",roleInfoList=" .. table.toString(self.roleInfoList) ..

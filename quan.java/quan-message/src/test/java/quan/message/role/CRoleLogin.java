@@ -1,8 +1,10 @@
 package quan.message.role;
 
-import quan.message.*;
-import java.util.*;
+import quan.message.CodedBuffer;
+import quan.message.Message;
 import quan.message.user.UserInfo;
+
+import java.util.*;
 
 /**
  * 角色登录，自定义ID<br/>
@@ -204,7 +206,8 @@ public class CRoleLogin extends Message {
     @Override
     public String toString() {
         return "CRoleLogin{" +
-                "roleId=" + roleId +
+                "_id=" + ID +
+                ",roleId=" + roleId +
                 ",roleName='" + roleName + '\'' +
                 ",roleInfo=" + roleInfo +
                 ",roleInfoList=" + roleInfoList +
