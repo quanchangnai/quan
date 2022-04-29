@@ -52,33 +52,35 @@ public interface ObjectType {
 
     int STRING = 18;
 
+    int STRING_ARRAY = 19;
+
     /**
      * Object本身，不包含其子类
      */
-    int OBJECT = 19;
+    int OBJECT = 20;
 
     /**
      * 除了原生类型数组之外的任意可序列化的对象数组
      */
-    int OBJECT_ARRAY = 20;
+    int OBJECT_ARRAY = 21;
 
-    int ENUM = 21;
+    int ENUM = 22;
 
     /**
      * 除了ArrayList本身之外，没有特殊处理的集合子类型也会被反序列化成ArrayList
      */
-    int ARRAY_LIST = 22;
+    int ARRAY_LIST = 23;
 
     /**
      * SortedSet反序列化时使用TreeSet实现
      */
-    int SORTED_SET = 23;
+    int SORTED_SET = 24;
 
-    int HASH_SET = 24;
+    int HASH_SET = 25;
 
-    int LINKED_LIST = 25;
+    int LINKED_LIST = 26;
 
-    int ARRAY_DEQUE = 26;
+    int ARRAY_DEQUE = 27;
 
     /**
      * 除了HashMap本身之外，没有特殊处理的Map子类型也会被反序列化成HashMap

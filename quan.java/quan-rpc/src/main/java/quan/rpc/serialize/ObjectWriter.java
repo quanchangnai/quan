@@ -86,6 +86,8 @@ public class ObjectWriter {
         } else if (clazz == String.class) {
             buffer.writeInt(STRING);
             buffer.writeString((String) value);
+        } else if (clazz == String[].class) {
+            write((String[]) value);
         } else if (clazz == Object.class) {
             buffer.writeInt(OBJECT);
         } else if (value instanceof Object[]) {
@@ -185,6 +187,14 @@ public class ObjectWriter {
         buffer.writeInt(array.length);
         for (double v : array) {
             buffer.writeDouble(v);
+        }
+    }
+
+    private void write(String[] array) {
+        buffer.writeInt(STRING_ARRAY);
+        buffer.writeInt(array.length);
+        for (String v : array) {
+            buffer.writeString(v);
         }
     }
 

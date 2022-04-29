@@ -84,6 +84,8 @@ public class ObjectReader {
                 return readDoubleArray();
             case STRING:
                 return buffer.readString();
+            case STRING_ARRAY:
+                return readStringArray();
             case OBJECT:
                 return new Object();
             case OBJECT_ARRAY:
@@ -192,6 +194,15 @@ public class ObjectReader {
         double[] array = new double[length];
         for (int i = 0; i < length; i++) {
             array[i] = buffer.readDouble();
+        }
+        return array;
+    }
+
+    private String[] readStringArray() {
+        int length = buffer.readInt();
+        String[] array = new String[length];
+        for (int i = 0; i < length; i++) {
+            array[i] = buffer.readString();
         }
         return array;
     }

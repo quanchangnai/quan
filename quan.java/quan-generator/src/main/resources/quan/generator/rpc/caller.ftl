@@ -17,7 +17,7 @@ public final class ${name}Caller implements Caller {
     }
 
     @Override
-    public Object call(Service service, int methodId, Object... params) throws Exception{
+    public Object call(Service service, int methodId, Object... params) throws Exception {
         ${name} ${name?uncap_first} = (${name}) service;
         switch (methodId) {
         <#list methods as method>
@@ -28,7 +28,13 @@ public final class ${name}Caller implements Caller {
                 return ${name?uncap_first}.${method.name}(<#rt>
             </#if>
             <#list method.optimizedParameters?keys as paramName>
-                (${method.optimizedParameters[paramName]}) params[${paramName?index}]<#if paramName?has_next>, </#if><#t>
+                <#assign paramType=method.optimizedParameters[paramName]/>
+                <#if method.isNeedCastArray(paramName)>
+                cast(params[${paramName?index}], ${paramType?substring(0,paramType?length-2)}.class)<#t>
+                <#else>
+                (${paramType}) params[${paramName?index}]<#t>
+                </#if>
+                <#if paramName?has_next>, </#if><#t>
             </#list>
             <#lt>);
             <#if method.returnVoid>

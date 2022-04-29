@@ -67,6 +67,22 @@ public class ServiceMethod extends ServiceElement {
         originalParameters.put(name.toString(), type);
     }
 
+    public boolean isNeedCastArray(String parameterName) {
+        String parameterType = originalParameters.get(parameterName);
+        if (!parameterType.endsWith("[]")) {
+            return false;
+        }
+        String componentType = parameterType.substring(0, parameterType.length() - 2);
+        if (componentType.equals(String.class.getName())) {
+            return false;
+        }
+        try {
+            return !Class.forName(componentType).isPrimitive();
+        } catch (ClassNotFoundException ignored) {
+            return true;
+        }
+    }
+
     public LinkedHashMap<String, String> getOriginalParameters() {
         return originalParameters;
     }

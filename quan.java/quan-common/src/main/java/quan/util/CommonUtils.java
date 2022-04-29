@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.lang.model.type.TypeMirror;
 import java.io.File;
+import java.lang.reflect.Array;
 import java.util.*;
 
 import static org.apache.commons.lang3.ClassUtils.isPrimitiveOrWrapper;
@@ -15,10 +16,14 @@ import static org.apache.commons.lang3.ClassUtils.isPrimitiveOrWrapper;
  */
 public class CommonUtils {
 
-    private static Set<Class<?>> extraConstantClasses = new HashSet<>();
+    private static Set<Class<?>> constantClasses = new HashSet<>();
 
     static {
-
+        constantClasses.add(Object.class);
+        constantClasses.add(String.class);
+        constantClasses.add(OptionalInt.class);
+        constantClasses.add(OptionalLong.class);
+        constantClasses.add(OptionalDouble.class);
     }
 
     @SafeVarargs
@@ -92,14 +97,23 @@ public class CommonUtils {
     }
 
     public static void addConstantClass(Class<?> clazz) {
-        extraConstantClasses.add(clazz);
+        constantClasses.add(clazz);
     }
 
     /**
      * 判断对象是不是常量
      */
     public static boolean isConstant(Object value) {
-        return value == null || isConstantClass(value.getClass());
+        if (value == null) {
+            return true;
+        }
+
+        Class<?> clazz = value.getClass();
+        if (clazz.isArray() && Array.getLength(value) == 0) {
+            return true;
+        } else {
+            return isConstantClass(clazz);
+        }
     }
 
     /**
@@ -107,13 +121,8 @@ public class CommonUtils {
      */
     public static boolean isConstantClass(Class<?> clazz) {
         return isPrimitiveOrWrapper(clazz)
-                || clazz == String.class
-                || clazz == Object.class
-                || clazz == OptionalInt.class
-                || clazz == OptionalLong.class
-                || clazz == OptionalDouble.class
                 || clazz.isEnum()
-                || extraConstantClasses.contains(clazz);
+                || constantClasses.contains(clazz);
     }
 
     public static boolean isConstantType(TypeMirror type) {

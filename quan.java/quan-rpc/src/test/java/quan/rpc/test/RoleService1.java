@@ -1,9 +1,10 @@
 package quan.rpc.test;
 
+import quan.message.Message;
 import quan.rpc.Endpoint;
 import quan.rpc.Service;
 
-import java.util.Date;
+import java.util.Arrays;
 import java.util.Set;
 
 /**
@@ -25,21 +26,21 @@ public class RoleService1<T extends Object & Runnable> extends Service {
     }
 
     @Endpoint
-    public int login1(Integer a, Integer b, Date... dates) {
+    public int login1(Integer a, Integer b, Long... ll) {
         int r = a + b;
-        logger.info("Execute RoleService1:{}.login1({},{})={} at Worker:{}", id, a, b, r, this.getWorker().getId());
+        logger.info("Execute RoleService1:{}.login1({},{},{})={} at Worker:{}", id, a, b, Arrays.toString(ll), r, this.getWorker().getId());
         return r;
     }
 
     @Endpoint
-    public int login2(Integer a, Integer b) {
+    public int login2(Integer a, Integer b, Message... messages) {
         int r = a + b;
         logger.info("Execute RoleService1:{}.login2({},{})={} at Worker:{}", id, a, b, r, this.getWorker().getId());
         return r;
     }
 
     @Endpoint
-    public int login3(Integer a, Integer b) {
+    public int login3(Integer a, Integer b, String... ss) {
         int r = a + b;
         logger.info("Execute RoleService1:{}.login3({},{})={} at Worker:{}", id, a, b, r, this.getWorker().getId());
         return r;
