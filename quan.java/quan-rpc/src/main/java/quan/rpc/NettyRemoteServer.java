@@ -57,7 +57,7 @@ public class NettyRemoteServer extends RemoteServer {
         ChannelFuture channelFuture = bootstrap.connect(getIp(), getPort());
         channelFuture.addListener(future -> {
             if (!future.isSuccess()) {
-                logger.error("连接失败，将在{}秒后尝试重连，失败原因：{}", getReconnectTime(), future.cause().getMessage());
+                logger.error("连接失败，将在{}秒后尝试重连，失败原因：{}", getReconnectInterval(), future.cause().getMessage());
                 reconnect();
             }
         });
@@ -65,7 +65,7 @@ public class NettyRemoteServer extends RemoteServer {
 
     private void reconnect() {
         if (bootstrap != null) {
-            bootstrap.config().group().schedule(this::connect, getReconnectTime(), TimeUnit.SECONDS);
+            bootstrap.config().group().schedule(this::connect, getReconnectInterval(), TimeUnit.SECONDS);
         }
     }
 
@@ -90,7 +90,7 @@ public class NettyRemoteServer extends RemoteServer {
         public void channelInactive(ChannelHandlerContext context) {
             NettyRemoteServer.this.context = null;
             setActivated(false);
-            logger.error("连接断开，将在{}秒后尝试重连: {}", getReconnectTime(), context.channel().remoteAddress());
+            logger.error("连接断开，将在{}秒后尝试重连: {}", getReconnectInterval(), context.channel().remoteAddress());
             reconnect();
         }
 

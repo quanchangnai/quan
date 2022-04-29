@@ -20,7 +20,7 @@ public abstract class RemoteServer {
 
     private int port;
 
-    private int reconnectTime = 5;
+    private int reconnectInterval = 5;
 
     protected LocalServer localServer;
 
@@ -51,14 +51,14 @@ public abstract class RemoteServer {
         return port;
     }
 
-    public final int getReconnectTime() {
-        return reconnectTime;
+    public final int getReconnectInterval() {
+        return reconnectInterval;
     }
 
     final void setLocalServer(LocalServer localServer) {
         this.localServer = localServer;
-        if (localServer.getReconnectTime() > 0) {
-            this.reconnectTime = localServer.getReconnectTime();
+        if (localServer.getReconnectInterval() > 0) {
+            this.reconnectInterval = localServer.getReconnectInterval();
         }
     }
 

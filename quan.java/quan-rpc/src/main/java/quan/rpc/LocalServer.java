@@ -31,7 +31,9 @@ public abstract class LocalServer {
 
     private final int port;
 
-    private int reconnectTime;
+    private int reconnectInterval;
+
+    private int updateInterval = 50;
 
     private Function<CodedBuffer, ObjectReader> readerFactory = ObjectReader::new;
 
@@ -82,10 +84,19 @@ public abstract class LocalServer {
     }
 
     /**
-     * 设置远程服务器断线重连的间隔时间
+     * 设置远程服务器断线重连的间隔时间(s)
      */
-    public void setReconnectTime(int reconnectTime) {
-        this.reconnectTime = reconnectTime;
+    public void setReconnectInterval(int reconnectInterval) {
+        this.reconnectInterval = reconnectInterval;
+    }
+
+    /**
+     * 设置刷帧的间隔时间(ms)
+     */
+    public void setUpdateInterval(int updateInterval) {
+        if (updateInterval > 0) {
+            this.updateInterval = updateInterval;
+        }
     }
 
     /**
@@ -111,8 +122,12 @@ public abstract class LocalServer {
         this.targetServerIdResolver = targetServerIdResolver;
     }
 
-    public int getReconnectTime() {
-        return reconnectTime;
+    public int getReconnectInterval() {
+        return reconnectInterval;
+    }
+
+    public int getUpdateInterval() {
+        return updateInterval;
     }
 
     public Function<CodedBuffer, ObjectReader> getReaderFactory() {
@@ -132,7 +147,7 @@ public abstract class LocalServer {
         startNetwork();
         remotes.values().forEach(RemoteServer::start);
         executor = Executors.newScheduledThreadPool(1);
-        executor.scheduleAtFixedRate(this::update, 50, 50, TimeUnit.MILLISECONDS);
+        executor.scheduleAtFixedRate(this::update, updateInterval, updateInterval, TimeUnit.MILLISECONDS);
     }
 
     public synchronized void stop() {
@@ -150,7 +165,7 @@ public abstract class LocalServer {
     protected void update() {
         remotes.values().forEach(RemoteServer::update);
         for (Worker worker : workers.values()) {
-            worker.execute(worker::update);
+            worker.driveUpdate();
         }
     }
 

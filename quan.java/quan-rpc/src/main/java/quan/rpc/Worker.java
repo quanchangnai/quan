@@ -34,7 +34,16 @@ public class Worker {
 
     private LocalServer server;
 
+    private Thread thread;
+
     private BlockingQueue<Runnable> taskQueue = new LinkedBlockingQueue<>();
+
+    //刷帧开始时间
+    private volatile long updateTime;
+
+    private volatile boolean updateFinished = true;
+
+    private long stackTraceTime;
 
     //管理的所有服务，key:服务ID
     private final Map<Object, Service> services = new HashMap<>();
@@ -114,7 +123,8 @@ public class Worker {
     }
 
     protected void start() {
-        new Thread(this::run).start();
+        thread = new Thread(this::run);
+        thread.start();
         execute(() -> services.values().forEach(this::initService));
     }
 
@@ -139,6 +149,7 @@ public class Worker {
 
         taskQueue.clear();
         threadLocal.set(null);
+        thread = null;
     }
 
     public void execute(Runnable task) {
@@ -150,7 +161,30 @@ public class Worker {
         }
     }
 
+    /**
+     * 驱动刷帧并检测帧率，不在当前线程中执行
+     */
+    protected void driveUpdate() {
+        if (updateFinished) {
+            updateFinished = false;
+            execute(this::update);
+        }
+
+        long currentTime = System.currentTimeMillis();
+        long intervalTime = currentTime - updateTime;
+        if (intervalTime > getServer().getUpdateInterval() * 2 && currentTime - stackTraceTime > 10000 && updateTime > 0) {
+            stackTraceTime = currentTime;
+            StringBuilder stackTrace = new StringBuilder();
+            for (StackTraceElement traceElement : thread.getStackTrace()) {
+                stackTrace.append("\tat ").append(traceElement).append("\n");
+            }
+            logger.error("工作线程[{}]帧率过低，距离上次刷帧已经过了{}ms，线程可能在执行耗时任务\n{}", id, intervalTime, stackTrace);
+        }
+    }
+
     protected void update() {
+        updateTime = System.currentTimeMillis();
+
         for (Service service : services.values()) {
             try {
                 service.update();
@@ -161,6 +195,12 @@ public class Worker {
 
         expirePromises();
         expireDelayedResults();
+
+        long costTime = System.currentTimeMillis() - updateTime;
+        if (costTime > getServer().getUpdateInterval()) {
+            logger.error("工作线程[{}]帧率过低，本次刷帧消耗时间{}ms", id, costTime);
+        }
+        updateFinished = true;
     }
 
     private void expirePromises() {
