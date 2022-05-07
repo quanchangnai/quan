@@ -45,15 +45,15 @@ public class RpcTest1 {
 
 
         ObjectReader objectReader = new ObjectReader(buffer);
-        System.err.println(objectReader.readObject());
-        System.err.println(objectReader.readObject());
-        System.err.println(objectReader.readObject());
-        System.err.println(objectReader.readObject());
-        System.err.println(objectReader.readObject());
-        System.err.println(objectReader.readObject());
-        System.err.println(objectReader.readObject());
-        System.err.println(objectReader.readObject());
-        System.err.println(objectReader.readObject());
+        System.err.println(objectReader.readAny());
+        System.err.println(objectReader.readAny());
+        System.err.println(objectReader.readAny());
+        System.err.println(objectReader.readAny());
+        System.err.println(objectReader.readAny());
+        System.err.println(objectReader.readAny());
+        System.err.println(objectReader.readAny());
+        System.err.println(objectReader.readAny());
+        System.err.println(objectReader.readAny());
 
     }
 

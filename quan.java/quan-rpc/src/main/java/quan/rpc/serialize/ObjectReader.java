@@ -6,6 +6,7 @@ import quan.rpc.protocol.Protocol;
 
 import java.io.ByteArrayInputStream;
 import java.io.ObjectInputStream;
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.function.Function;
 
@@ -40,10 +41,10 @@ public class ObjectReader {
 
     @SuppressWarnings("unchecked")
     public <T> T read() {
-        return (T) readObject();
+        return (T) readAny();
     }
 
-    public Object readObject() {
+    public Object readAny() {
         int type = buffer.readInt();
         switch (type) {
             case NULL:
@@ -211,7 +212,17 @@ public class ObjectReader {
         int length = buffer.readInt();
         Object[] array = new Object[length];
         for (int i = 0; i < length; i++) {
-            array[i] = readObject();
+            array[i] = readAny();
+        }
+        return array;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T[] readArray(Class<T> componentType) {
+        int length = buffer.readInt();
+        T[] array = (T[]) Array.newInstance(componentType, length);
+        for (int i = 0; i < length; i++) {
+            array[i] = (T) readAny();
         }
         return array;
     }
@@ -231,7 +242,7 @@ public class ObjectReader {
     protected Collection<Object> readCollection(Collection<Object> collection) {
         int size = buffer.readInt();
         for (int i = 0; i < size; i++) {
-            collection.add(readObject());
+            collection.add(readAny());
         }
         return collection;
     }
@@ -239,7 +250,7 @@ public class ObjectReader {
     protected Map<Object, Object> readMap(Map<Object, Object> map) {
         int size = buffer.readInt();
         for (int i = 0; i < size; i++) {
-            map.put(readObject(), readObject());
+            map.put(readAny(), readAny());
         }
         return map;
     }

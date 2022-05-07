@@ -1,25 +1,23 @@
 package quan.rpc;
 
 import java.lang.reflect.Array;
+import java.util.Objects;
 
 public interface Caller {
 
     @SuppressWarnings("unchecked")
-    default <T> T[] cast(Object objectArray, Class<T> componentType) {
-        if (objectArray == null) {
+    default <T> T[] cast(Object srcArray, Class<T> componentType) {
+        if (srcArray == null) {
             return null;
         }
 
-        if (objectArray.getClass().getComponentType() == componentType) {
-            return (T[]) objectArray;
+        if (Objects.requireNonNull(componentType) == srcArray.getClass().getComponentType()) {
+            return (T[]) srcArray;
         }
 
-        Object[] tempArray = (Object[]) objectArray;
+        Object[] tempArray = (Object[]) srcArray;
         T[] resultArray = (T[]) Array.newInstance(componentType, tempArray.length);
-
-        for (int i = 0; i < tempArray.length; i++) {
-            resultArray[i] = (T) tempArray[i];
-        }
+        System.arraycopy(tempArray, 0, resultArray, 0, tempArray.length);
 
         return resultArray;
     }
