@@ -3,7 +3,8 @@
  */
 
 dependencies {
+    api project(':quan-common')
     implementation project(':quan-config')
     implementation project(':quan-rpc')
-    implementation 'org.freemarker:freemarker:2.3.29'
+    api 'org.freemarker:freemarker:2.3.29'
 }

@@ -6,6 +6,8 @@ group 'quan'
 
 subprojects {
     apply plugin: 'java'
+    apply plugin: 'java-library'
+    apply plugin: 'maven-publish'
     apply plugin: 'idea'
 
     version 1.0
@@ -40,9 +42,11 @@ subprojects {
         }
     }
 
-    uploadArchives {
-        repositories {
-            mavenLocal()
+    publishing {
+        publications {
+            maven(MavenPublication) {
+                from components.java
+            }
         }
     }
 
