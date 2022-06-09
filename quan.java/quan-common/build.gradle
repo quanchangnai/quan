@@ -7,7 +7,7 @@ dependencies {
     api 'org.apache.logging.log4j:log4j-core:2.17.2'
     api 'org.apache.logging.log4j:log4j-slf4j-impl:2.17.2'
     api 'org.apache.commons:commons-lang3:3.9'
-    api 'com.alibaba:fastjson:1.2.58'
+    api 'com.alibaba:fastjson:1.2.83'
     api 'com.google.guava:guava:28.0-jre'
     api 'org.aspectj:aspectjweaver:1.9.4'
     api 'net.bytebuddy:byte-buddy-agent:1.9.13'

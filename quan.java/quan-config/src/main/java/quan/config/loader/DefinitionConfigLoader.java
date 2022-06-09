@@ -196,6 +196,9 @@ public class DefinitionConfigLoader extends ConfigLoader {
         Set<ConfigDefinition> configDefinitions = new HashSet<>(parser.getTableConfigs().values());
 
         for (ConfigDefinition configDefinition : configDefinitions) {
+            if (!configDefinition.isSupportLanguage(language)) {
+                continue;
+            }
             JSONArray rows = new JSONArray();
             for (String table : configDefinition.getTables()) {
                 ConfigReader reader = readers.get(table);
@@ -204,7 +207,19 @@ public class DefinitionConfigLoader extends ConfigLoader {
                     continue;
                 }
                 List<JSONObject> jsons = reader.getJsons();
-                rows.addAll(jsons);
+                JSONObject row = new JSONObject();
+                for (JSONObject json : jsons) {
+                    json.forEach((fieldName, fieldValue) -> {
+                        FieldDefinition fieldDefinition = configDefinition.getField(fieldName);
+                        if (fieldDefinition == null) {
+                            fieldDefinition = configDefinition.getField(fieldName.substring(0, fieldName.length() - 1));
+                        }
+                        if (fieldDefinition.isSupportLanguage(language)) {
+                            row.put(fieldName, fieldValue);
+                        }
+                    });
+                    rows.add(row);
+                }
             }
 
             String jsonFileName = configDefinition.getPackageName(language) + "." + configDefinition.getName() + ".json";

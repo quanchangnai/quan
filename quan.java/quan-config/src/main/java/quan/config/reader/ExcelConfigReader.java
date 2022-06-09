@@ -28,7 +28,7 @@ public class ExcelConfigReader extends ConfigReader {
             //只解析第一个工作表
             Sheet sheet = workbook.getSheetAt(0);
             //总行数
-            int totalTowNum = sheet.getPhysicalNumberOfRows();
+            int totalTowNum = sheet.getLastRowNum() + 1;
             if (totalTowNum < 1) {
                 return;
             }
