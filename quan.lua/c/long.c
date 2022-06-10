@@ -215,7 +215,7 @@ static void create_cache(lua_State *L){
 
   luaL_newmetatable(L, "__long_cache");
   lua_pushliteral(L,"__mode");  // weak table
-  lua_pushliteral(L,"kv");
+  lua_pushliteral(L,"v");
   lua_rawset(L, -3);
   lua_setmetatable(L, -2);      
 
