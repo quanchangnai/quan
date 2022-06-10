@@ -83,13 +83,13 @@ public class NettyRemoteServer extends RemoteServer {
         @Override
         public void channelActive(ChannelHandlerContext context) {
             NettyRemoteServer.this.context = context;
-            setActivated(true);
+            setConnected(true);
         }
 
         @Override
         public void channelInactive(ChannelHandlerContext context) {
             NettyRemoteServer.this.context = null;
-            setActivated(false);
+            setConnected(false);
             logger.error("连接断开，将在{}秒后尝试重连: {}", getReconnectInterval(), context.channel().remoteAddress());
             reconnect();
         }

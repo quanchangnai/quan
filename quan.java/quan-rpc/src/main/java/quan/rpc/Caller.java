@@ -5,13 +5,14 @@ import java.util.Objects;
 
 public interface Caller {
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "SuspiciousSystemArraycopy"})
     default <T> T[] cast(Object srcArray, Class<T> componentType) {
+        Objects.requireNonNull(componentType);
         if (srcArray == null) {
             return null;
         }
 
-        if (Objects.requireNonNull(componentType) == srcArray.getClass().getComponentType()) {
+        if (componentType == srcArray.getClass().getComponentType()) {
             return (T[]) srcArray;
         }
 

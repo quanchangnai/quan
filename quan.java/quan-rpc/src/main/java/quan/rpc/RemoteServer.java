@@ -24,11 +24,11 @@ public abstract class RemoteServer {
 
     protected LocalServer localServer;
 
-    private boolean activated;
+    private boolean connected;
 
     private long lastSendPingPongTime;
 
-    private long lastReceivedPingPongTime = System.currentTimeMillis();
+    private long lastHandlePingPongTime = System.currentTimeMillis();
 
     private long lastReportSuspendedTime;
 
@@ -68,16 +68,16 @@ public abstract class RemoteServer {
 
     protected abstract void send(Protocol protocol);
 
-    protected void setActivated(boolean activated) {
-        this.activated = activated;
-        if (activated) {
+    protected void setConnected(boolean connected) {
+        this.connected = connected;
+        if (connected) {
             Handshake handshake = new Handshake(localServer.getId(), localServer.getIp(), localServer.getPort());
             send(handshake);
         }
     }
 
-    public boolean isActivated() {
-        return activated;
+    public boolean isConnected() {
+        return connected;
     }
 
     protected void update() {
@@ -87,14 +87,14 @@ public abstract class RemoteServer {
 
     private void checkSuspended() {
         long currentTime = System.currentTimeMillis();
-        if (currentTime - lastReceivedPingPongTime > 30000 && currentTime - lastReportSuspendedTime > 60000) {
+        if (currentTime - lastHandlePingPongTime > 30000 && currentTime - lastReportSuspendedTime > 60000) {
             logger.error("远程服务器[{}]的连接可能已经进入假死状态了", localServer.getId());
             lastReportSuspendedTime = currentTime;
         }
     }
 
     protected void sendPingPong() {
-        if (!activated) {
+        if (!connected) {
             return;
         }
 
@@ -106,9 +106,9 @@ public abstract class RemoteServer {
     }
 
     protected void handlePingPong(PingPong pingPong) {
-        lastReceivedPingPongTime = System.currentTimeMillis();
+        lastHandlePingPongTime = System.currentTimeMillis();
         if (logger.isDebugEnabled()) {
-            logger.debug("远程服务器[{}]的延迟时间为：{}ms", this.id, lastReceivedPingPongTime - pingPong.getTime());
+            logger.debug("远程服务器[{}]的延迟时间为：{}ms", this.id, lastHandlePingPongTime - pingPong.getTime());
         }
     }
 
