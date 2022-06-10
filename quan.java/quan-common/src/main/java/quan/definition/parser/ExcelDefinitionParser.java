@@ -53,8 +53,8 @@ public class ExcelDefinitionParser extends TableDefinitionParser {
             for (Cell cell : sheet.getRow(0)) {
                 String columnName = dataFormatter.formatCellValue(cell).trim();
                 String fieldName = dataFormatter.formatCellValue(sheet.getRow(1).getCell(c)).trim();
-                String constraint = dataFormatter.formatCellValue(sheet.getRow(2).getCell(c)).trim();
-                addField(configDefinition, columnName, fieldName, constraint);
+                String fieldConstraint = dataFormatter.formatCellValue(sheet.getRow(2).getCell(c)).trim();
+                addField(configDefinition, columnName, fieldName, fieldConstraint);
                 c++;
             }
             return true;

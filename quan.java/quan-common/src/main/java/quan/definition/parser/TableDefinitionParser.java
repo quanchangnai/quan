@@ -35,7 +35,7 @@ public abstract class TableDefinitionParser extends DefinitionParser {
 
     protected abstract boolean parseTable(ConfigDefinition configDefinition, File definitionFile);
 
-    protected void addField(ConfigDefinition configDefinition, String columnName, String fieldName, String constraint) {
+    protected void addField(ConfigDefinition configDefinition, String columnName, String fieldName, String fieldConstraint) {
         FieldDefinition fieldDefinition = new FieldDefinition();
         fieldDefinition.setParser(this);
         fieldDefinition.setCategory(getCategory());
@@ -43,36 +43,62 @@ public abstract class TableDefinitionParser extends DefinitionParser {
         fieldDefinition.setColumn(columnName);
         configDefinition.addField(fieldDefinition);
 
-        if (StringUtils.isBlank(constraint)) {
+        if (StringUtils.isBlank(fieldConstraint)) {
             addValidatedError(configDefinition.getValidatedName() + "的列[" + columnName + "]约束不能为空");
             return;
         }
 
-        String[] constraints = constraint.split(";", -1);
+        String[] constraints = fieldConstraint.split(";", -1);
 
         fieldDefinition.setTypes(constraints[0]);
-        Set<String> constraintNames = new HashSet<>();
+        Set<String> constraintTypes = new HashSet<>();
 
         for (int i = 1; i < constraints.length; i++) {
-            String[] constraintNameAndValue = constraints[i].split("=", -1);
-            if (constraintNameAndValue.length != 2) {
+            String constraint = constraints[i].trim();
+            String constraintType;
+            String constraintValue;
+
+            switch (constraint) {
+                case "index":
+                    constraintType = "index";
+                    constraintValue = "normal";
+                    break;
+                case "unique":
+                    constraintType = "index";
+                    constraintValue = "unique";
+                    break;
+                case "optional":
+                    constraintType = "optional";
+                    constraintValue = "true";
+                    break;
+                default:
+                    try {
+                        String[] constraintTypeAndValue = constraint.split("=", -1);
+                        constraintType = constraintTypeAndValue[0].trim();
+                        constraintValue = constraintTypeAndValue[1].trim();
+                    } catch (Exception ignored) {
+                        addValidatedError(configDefinition.getValidatedName() + "的列[" + columnName + "]约束[" + constraint + "]格式错误");
+                        continue;
+                    }
+                    break;
+            }
+
+            if (constraintType.isEmpty()) {
                 addValidatedError(configDefinition.getValidatedName() + "的列[" + columnName + "]约束[" + constraint + "]格式错误");
-                break;
+                continue;
             }
 
-            String constraintName = constraintNameAndValue[0].trim();
-            String constraintValue = constraintNameAndValue[1].trim();
-
-            if (constraintNames.contains(constraintName)) {
-                addValidatedError(configDefinition.getValidatedName() + "的列[" + columnName + "]有重复约束类型:" + constraintName);
+            if (constraintTypes.contains(constraintType)) {
+                addValidatedError(configDefinition.getValidatedName() + "的列[" + columnName + "]有重复约束类型:" + constraintType);
             } else {
-                constraintNames.add(constraintName);
-            }
-            if (constraintValue.isEmpty()) {
-                addValidatedError(configDefinition.getValidatedName() + "的列[" + columnName + "]约束[" + constraint + "]不能为空值");
+                constraintTypes.add(constraintType);
             }
 
-            switch (constraintName) {
+            if (constraintValue.isEmpty()) {
+                addValidatedError(configDefinition.getValidatedName() + "的列[" + columnName + "]约束[" + constraintType + "]不能为空值");
+            }
+
+            switch (constraintType) {
                 case "ref":
                     fieldDefinition.setRef(constraintValue);
                     break;
@@ -85,7 +111,7 @@ public abstract class TableDefinitionParser extends DefinitionParser {
                 case "lang":
                     fieldDefinition.setLanguage(constraintValue);
                 default:
-                    addValidatedError(configDefinition.getValidatedName() + "的列[" + columnName + "]不支持该约束类型:" + constraintName);
+                    addValidatedError(configDefinition.getValidatedName() + "的列[" + columnName + "]不支持该约束类型:" + constraintType);
                     break;
             }
         }

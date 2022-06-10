@@ -42,8 +42,8 @@ public class CSVDefinitionParser extends TableDefinitionParser {
         for (int i = 0; i < records.get(0).size(); i++) {
             String columnName = records.get(0).get(i);
             String fieldName = records.get(1).get(i);
-            String constraint = records.get(2).get(i);
-            addField(configDefinition, columnName, fieldName, constraint);
+            String fieldConstraint = records.get(2).get(i);
+            addField(configDefinition, columnName, fieldName, fieldConstraint);
         }
 
         return true;
