@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import quan.rpc.DelayedResult;
 import quan.rpc.Endpoint;
 import quan.rpc.Promise;
-import quan.rpc.Service;
+import quan.rpc.UpdatableService;
 
 import java.util.List;
 import java.util.Map;
@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * @author quanchangnai
  */
-public class TestService2 extends Service {
+public class TestService2 extends UpdatableService {
 
     private static Logger logger = LoggerFactory.getLogger(TestService2.class);
 

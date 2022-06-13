@@ -70,12 +70,6 @@ public abstract class Service {
     }
 
     /**
-     * 刷帧
-     */
-    protected void update() {
-    }
-
-    /**
      * 销毁
      */
     protected void destroy() {

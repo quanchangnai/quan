@@ -46,7 +46,9 @@ public class Worker {
     private long stackTraceTime;
 
     //管理的所有服务，key:服务ID
-    private final Map<Object, Service> services = new HashMap<>();
+    private final Map<Object, Service> allServices = new HashMap<>();
+
+    private Set<UpdatableService> updatableServices = new HashSet<>();
 
     private int nextCallId = 1;
 
@@ -83,7 +85,10 @@ public class Worker {
 
     protected void _addService(Service service) {
         service.worker = this;
-        services.put(service.getId(), service);
+        allServices.put(service.getId(), service);
+        if (service instanceof UpdatableService) {
+            updatableServices.add((UpdatableService) service);
+        }
         if (running) {
             initService(service);
         }
@@ -98,7 +103,7 @@ public class Worker {
     }
 
     public void removeService(Object serviceId) {
-        if (!services.containsKey(serviceId)) {
+        if (!allServices.containsKey(serviceId)) {
             logger.error("服务[{}]不存在", serviceId);
         } else {
             server.removeService(serviceId);
@@ -111,7 +116,11 @@ public class Worker {
             destroyService(service);
         }
         service.worker = null;
-        services.remove(serviceId);
+        allServices.remove(serviceId);
+        if (service instanceof UpdatableService) {
+            updatableServices.remove(service);
+        }
+
     }
 
     private void destroyService(Service service) {
@@ -125,12 +134,12 @@ public class Worker {
     protected void start() {
         thread = new Thread(this::run);
         thread.start();
-        execute(() -> services.values().forEach(this::initService));
+        execute(() -> allServices.values().forEach(this::initService));
     }
 
     protected void stop() {
         execute(() -> {
-            services.values().forEach(this::destroyService);
+            allServices.values().forEach(this::destroyService);
             running = false;
         });
     }
@@ -185,7 +194,7 @@ public class Worker {
     protected void update() {
         updateTime = System.currentTimeMillis();
 
-        for (Service service : services.values()) {
+        for (UpdatableService service : updatableServices) {
             try {
                 service.update();
             } catch (Throwable e) {
@@ -321,7 +330,7 @@ public class Worker {
         Object result = null;
         String exception = null;
 
-        Service service = services.get(serviceId);
+        Service service = allServices.get(serviceId);
         if (service == null) {
             logger.error("处理RPC请求，服务[{}]不存在，originServerId:{}，callId:{}", serviceId, originServerId, callId);
             return;
