@@ -5,6 +5,9 @@
 dependencies {
     api project(':quan-common')
     implementation project(':quan-config')
-    implementation project(':quan-rpc')
+    api(project(':quan-rpc')) {
+        exclude group: 'io.netty', module: 'netty-all'
+        exclude group: 'quan', module: 'quan-message'
+    }
     api 'org.freemarker:freemarker:2.3.29'
 }
