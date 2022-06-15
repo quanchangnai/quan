@@ -1,13 +1,21 @@
 package quan.rpc;
 
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.*;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldPrepender;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.message.CodedBuffer;
-import quan.rpc.protocol.Handshake;
-import quan.rpc.protocol.PingPong;
-import quan.rpc.protocol.Request;
-import quan.rpc.protocol.Response;
+import quan.message.NettyCodedBuffer;
+import quan.rpc.protocol.*;
 import quan.rpc.serialize.ObjectReader;
 import quan.rpc.serialize.ObjectWriter;
 
@@ -21,7 +29,7 @@ import java.util.function.Function;
 /**
  * @author quanchangnai
  */
-public abstract class LocalServer {
+public class LocalServer {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -59,12 +67,18 @@ public abstract class LocalServer {
 
     private ScheduledExecutorService executor;
 
-    protected LocalServer(int id, String ip, int port, int workerNum) {
+    private ServerBootstrap serverBootstrap;
+
+    public LocalServer(int id, String ip, int port, int workerNum) {
         Validate.isTrue(id > 0, "服务器ID必须是正整数");
         this.id = id;
         this.ip = ip;
         this.port = port;
         this.initWorkers(workerNum);
+    }
+
+    public LocalServer(int id, String ip, int port) {
+        this(id, ip, port, 0);
     }
 
     public final int getId() {
@@ -142,33 +156,6 @@ public abstract class LocalServer {
         return targetServerIdResolver;
     }
 
-    public synchronized void start() {
-        workers.values().forEach(Worker::start);
-        startNetwork();
-        remotes.values().forEach(RemoteServer::start);
-        executor = Executors.newScheduledThreadPool(1);
-        executor.scheduleAtFixedRate(this::update, updateInterval, updateInterval, TimeUnit.MILLISECONDS);
-    }
-
-    public synchronized void stop() {
-        executor.shutdown();
-        executor = null;
-        remotes.values().forEach(RemoteServer::stop);
-        stopNetwork();
-        workers.values().forEach(Worker::stop);
-    }
-
-    protected abstract void startNetwork();
-
-    protected abstract void stopNetwork();
-
-    protected void update() {
-        remotes.values().forEach(RemoteServer::update);
-        for (Worker worker : workers.values()) {
-            worker.driveUpdate();
-        }
-    }
-
     private void initWorkers(int workerNum) {
         if (workerNum <= 0) {
             workerNum = Runtime.getRuntime().availableProcessors();
@@ -188,18 +175,72 @@ public abstract class LocalServer {
         return workers.get(workerId);
     }
 
+    public synchronized void start() {
+        workers.values().forEach(Worker::start);
+        startNetwork();
+        remotes.values().forEach(RemoteServer::start);
+        executor = Executors.newScheduledThreadPool(1);
+        executor.scheduleAtFixedRate(this::update, updateInterval, updateInterval, TimeUnit.MILLISECONDS);
+    }
+
+    public synchronized void stop() {
+        executor.shutdown();
+        executor = null;
+        remotes.values().forEach(RemoteServer::stop);
+        stopNetwork();
+        workers.values().forEach(Worker::stop);
+    }
+
+    protected void startNetwork() {
+        EventLoopGroup bossGroup = new NioEventLoopGroup(1);
+        EventLoopGroup workerGroup = new NioEventLoopGroup();
+        serverBootstrap = new ServerBootstrap();
+        serverBootstrap.group(bossGroup, workerGroup);
+        serverBootstrap.channel(NioServerSocketChannel.class);
+        serverBootstrap.option(ChannelOption.SO_BACKLOG, 1024);
+        serverBootstrap.handler(new LoggingHandler(LogLevel.INFO));
+        serverBootstrap.childOption(ChannelOption.TCP_NODELAY, true);
+        serverBootstrap.childOption(ChannelOption.SO_KEEPALIVE, true);
+        serverBootstrap.childHandler(new ChannelInitializer<SocketChannel>() {
+
+            @Override
+            @SuppressWarnings("NullableProblems")
+            public void initChannel(SocketChannel ch) {
+                ChannelPipeline p = ch.pipeline();
+                p.addLast(new LengthFieldPrepender(4));
+                p.addLast(new LengthFieldBasedFrameDecoder(100000, 0, 4, 0, 4));
+                p.addLast(new ChannelHandler());
+            }
+        });
+
+        serverBootstrap.bind(ip, port);
+    }
+
+    protected void stopNetwork() {
+        if (serverBootstrap != null) {
+            serverBootstrap.config().group().shutdownGracefully();
+            serverBootstrap.config().childGroup().shutdownGracefully();
+        }
+    }
+
+    protected void update() {
+        remotes.values().forEach(RemoteServer::update);
+        for (Worker worker : workers.values()) {
+            worker.driveUpdate();
+        }
+    }
+
     public void addService(Service service) {
         addService(nextWorker(), service);
     }
 
     public void addService(Worker worker, Service service) {
         Object serviceId = service.getId();
-        if (services.putIfAbsent(serviceId, service) != null) {
+        if (services.putIfAbsent(serviceId, service) == null) {
+            worker.execute(() -> worker._addService(service));
+        } else {
             logger.error("服务[{}]已存在", serviceId);
-            return;
         }
-
-        worker.execute(() -> worker._addService(service));
     }
 
     public void removeService(Object serviceId) {
@@ -219,7 +260,7 @@ public abstract class LocalServer {
             return;
         }
 
-        RemoteServer remoteServer = newRemote(remoteId, remoteIp, remotePort);
+        RemoteServer remoteServer = new RemoteServer(remoteId, remoteIp, remotePort);
         remoteServer.setLocalServer(this);
         remotes.put(remoteServer.getId(), remoteServer);
 
@@ -228,12 +269,10 @@ public abstract class LocalServer {
         }
     }
 
-    protected abstract RemoteServer newRemote(int remoteId, String remoteIp, int remotePort);
-
     /**
      * 处理RPC握手逻辑
      */
-    protected void handshake(Handshake handshake) {
+    protected void handleHandshake(Handshake handshake) {
         int remoteId = handshake.getServerId();
         if (!remotes.containsKey(remoteId)) {
             addRemote(remoteId, handshake.getServerIp(), handshake.getServerPort());
@@ -257,7 +296,7 @@ public abstract class LocalServer {
         } else {
             RemoteServer remoteServer = remotes.get(targetServerId);
             if (remoteServer != null) {
-                remoteServer.send(request);
+                remoteServer.sendProtocol(request);
             } else {
                 logger.error("发送RPC请求，远程服务器[{}]不存在", targetServerId);
             }
@@ -292,7 +331,7 @@ public abstract class LocalServer {
         } else {
             RemoteServer remoteServer = remotes.get(originServerId);
             if (remoteServer != null) {
-                remoteServer.send(response);
+                remoteServer.sendProtocol(response);
             } else {
                 logger.error("发送RPC响应，远程服务器[{}]不存在", originServerId);
             }
@@ -312,5 +351,52 @@ public abstract class LocalServer {
         }
     }
 
+    protected void sendProtocol(ChannelHandlerContext context, Protocol protocol) {
+        ByteBuf byteBuf = context.alloc().buffer();
+        try {
+            ObjectWriter objectWriter = writerFactory.apply(new NettyCodedBuffer(byteBuf));
+            objectWriter.write(protocol);
+            // TODO 刷新会执行系统调用，需要优化
+            context.writeAndFlush(byteBuf);
+        } catch (Throwable e) {
+            byteBuf.release();
+            logger.error("", e);
+        }
+    }
+
+    private class ChannelHandler extends ChannelInboundHandlerAdapter {
+
+        private int remoteServerId;
+
+        @Override
+        @SuppressWarnings("NullableProblems")
+        public void channelRead(ChannelHandlerContext context, Object msg) {
+            CodedBuffer buffer = new NettyCodedBuffer((ByteBuf) msg);
+            Protocol protocol = readerFactory.apply(buffer).read();
+
+            if (protocol instanceof Handshake) {
+                Handshake handshake = (Handshake) protocol;
+                remoteServerId = handshake.getServerId();
+                handleHandshake(handshake);
+            } else if (protocol instanceof PingPong) {
+                PingPong pingPong = (PingPong) protocol;
+                handlePingPong(remoteServerId, pingPong);
+                pingPong.setTime(System.currentTimeMillis());
+                sendProtocol(context, protocol);
+            } else if (protocol instanceof Request) {
+                handleRequest(remoteServerId, (Request) protocol);
+            } else if (protocol instanceof Response) {
+                handleResponse((Response) protocol);
+            } else {
+                logger.error("收到非法RPC协议:{}", protocol);
+            }
+        }
+
+        @Override
+        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+            logger.error("", cause);
+        }
+
+    }
 
 }
