@@ -9,7 +9,7 @@ import ${imports[importKey]};
 /**
  * @see ${name}
  */
-public final class ${name}Caller implements Caller {
+public final class ${name}Caller extends Caller {
 
     public static final ${name}Caller instance = new ${name}Caller();
 
@@ -30,7 +30,7 @@ public final class ${name}Caller implements Caller {
             <#list method.optimizedParameters?keys as paramName>
                 <#assign paramType=method.optimizedParameters[paramName]/>
                 <#if method.isNeedCastArray(paramName)>
-                cast(params[${paramName?index}], ${paramType?substring(0,paramType?length-2)}.class)<#t>
+                    toArray(params[${paramName?index}], ${paramType?substring(0,paramType?length-2)}.class)<#t>
                 <#else>
                 (${paramType}) params[${paramName?index}]<#t>
                 </#if>

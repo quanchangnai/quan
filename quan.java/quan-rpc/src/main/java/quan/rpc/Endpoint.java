@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  * 用于标记{@link Service}的方法可被远程调用
  */
-@Target({ElementType.METHOD})
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.CLASS)
 public @interface Endpoint {
 

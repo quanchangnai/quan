@@ -3,15 +3,15 @@ package quan.rpc;
 import java.lang.reflect.Array;
 import java.util.Objects;
 
-public interface Caller {
+public abstract class Caller {
 
     @SuppressWarnings({"unchecked", "SuspiciousSystemArraycopy"})
-    default <T> T[] cast(Object srcArray, Class<T> componentType) {
-        Objects.requireNonNull(componentType);
+    protected static <T> T[] toArray(Object srcArray, Class<T> componentType) {
         if (srcArray == null) {
             return null;
         }
 
+        Objects.requireNonNull(componentType);
         if (componentType == srcArray.getClass().getComponentType()) {
             return (T[]) srcArray;
         }
@@ -23,6 +23,6 @@ public interface Caller {
         return resultArray;
     }
 
-    Object call(Service service, int methodId, Object... params) throws Exception;
+    public abstract Object call(Service service, int methodId, Object... params) throws Exception;
 
 }

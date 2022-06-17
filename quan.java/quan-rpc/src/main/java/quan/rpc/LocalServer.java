@@ -39,9 +39,9 @@ public class LocalServer {
 
     private final int port;
 
-    private int reconnectInterval;
-
     private int updateInterval = 50;
+
+    private int reconnectInterval;
 
     private Function<CodedBuffer, ObjectReader> readerFactory = ObjectReader::new;
 
@@ -81,6 +81,10 @@ public class LocalServer {
         this(id, ip, port, 0);
     }
 
+    public LocalServer(int id, int port) {
+        this(id, "0.0.0.0", port, 0);
+    }
+
     public final int getId() {
         return id;
     }
@@ -98,19 +102,27 @@ public class LocalServer {
     }
 
     /**
-     * 设置远程服务器断线重连的间隔时间(s)
-     */
-    public void setReconnectInterval(int reconnectInterval) {
-        this.reconnectInterval = reconnectInterval;
-    }
-
-    /**
      * 设置刷帧的间隔时间(ms)
      */
     public void setUpdateInterval(int updateInterval) {
         if (updateInterval > 0) {
             this.updateInterval = updateInterval;
         }
+    }
+
+    public int getUpdateInterval() {
+        return updateInterval;
+    }
+
+    /**
+     * 设置远程服务器断线重连的间隔时间(s)
+     */
+    public void setReconnectInterval(int reconnectInterval) {
+        this.reconnectInterval = reconnectInterval;
+    }
+
+    public int getReconnectInterval() {
+        return reconnectInterval;
     }
 
     /**
@@ -120,11 +132,19 @@ public class LocalServer {
         this.readerFactory = Objects.requireNonNull(readerFactory);
     }
 
+    public Function<CodedBuffer, ObjectReader> getReaderFactory() {
+        return readerFactory;
+    }
+
     /**
      * 设置{@link ObjectWriter}工厂，用于扩展对象序列化
      */
     public void setWriterFactory(Function<CodedBuffer, ObjectWriter> writerFactory) {
         this.writerFactory = Objects.requireNonNull(writerFactory);
+    }
+
+    public Function<CodedBuffer, ObjectWriter> getWriterFactory() {
+        return writerFactory;
     }
 
     /**
@@ -134,22 +154,6 @@ public class LocalServer {
      */
     public void setTargetServerIdResolver(Function<String, Integer> targetServerIdResolver) {
         this.targetServerIdResolver = targetServerIdResolver;
-    }
-
-    public int getReconnectInterval() {
-        return reconnectInterval;
-    }
-
-    public int getUpdateInterval() {
-        return updateInterval;
-    }
-
-    public Function<CodedBuffer, ObjectReader> getReaderFactory() {
-        return readerFactory;
-    }
-
-    public Function<CodedBuffer, ObjectWriter> getWriterFactory() {
-        return writerFactory;
     }
 
     public Function<String, Integer> getTargetServerIdResolver() {
