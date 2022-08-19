@@ -5,6 +5,7 @@ import com.mongodb.assertions.Assertions;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.*;
 import com.mongodb.client.model.*;
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistries;
@@ -18,12 +19,15 @@ import quan.data.Index;
 import quan.util.ClassUtils;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * 数据库<br/>
+ * MongoDB数据库封装<br/>
  * Created by quanchangnai on 2020/4/13.
  */
 @SuppressWarnings({"unchecked", "rawtypes", "NullableProblems"})
@@ -31,9 +35,11 @@ public class Database implements DataWriter, MongoDatabase {
 
     private static final Logger logger = LoggerFactory.getLogger(Database.class);
 
-    static Map<MongoClient, Map<String/*databaseName*/, Database>> databases = new HashMap<>();
+    private static final Map<MongoClient, Map<String/*databaseName*/, Database>> databases = new HashMap<>();
 
-    static Map<MongoClient, List<ExecutorService>> executors = new HashMap<>();
+    private static final ReadWriteLock databasesLock = new ReentrantReadWriteLock();
+
+    static final Map<MongoClient, List<ExecutorService>> clientsExecutors = new ConcurrentHashMap<>();
 
     private static final ReplaceOptions replaceOptions = new ReplaceOptions().upsert(true);
 
@@ -44,9 +50,11 @@ public class Database implements DataWriter, MongoDatabase {
 
     private MongoClient client;
 
-    private MongoDatabase database;
+    private MongoDatabase db;
 
     private final Map<Class, MongoCollection> collections = new HashMap<>();
+
+    private final List<ExecutorService> executors = new ArrayList<>();
 
     static {
         ClassUtils.initAop();
@@ -55,7 +63,7 @@ public class Database implements DataWriter, MongoDatabase {
     /**
      * 简单的数据库对象构造方法
      *
-     * @param connectionString 连接字符串
+     * @param connectionString 连接字符串，参考{@link ConnectionString}
      * @param databaseName     数据库名
      * @param dataPackage      数据类所在的包名
      */
@@ -79,10 +87,7 @@ public class Database implements DataWriter, MongoDatabase {
         this.dataPackage = Assertions.notNull("dataPackage", dataPackage);
         Assertions.notNull("databaseName", databaseName);
 
-        if (!executors.containsKey(client)) {
-            initExecutors();
-        }
-
+        initExecutors();
         initDatabase(databaseName);
     }
 
@@ -91,31 +96,54 @@ public class Database implements DataWriter, MongoDatabase {
         CodecRegistry codecRegistry = new CodecsRegistry(dataPackage);
         clientSettings.codecRegistry(CodecRegistries.fromRegistries(codecRegistry, MongoClientSettings.getDefaultCodecRegistry()));
         client = MongoClients.create(clientSettings.build());
-        databases.put(client, new HashMap<>());
 
         initExecutors();
         initDatabase(databaseName);
     }
 
     private void initExecutors() {
-        List<ExecutorService> clientExecutors = new ArrayList<>();
-        ThreadFactory threadFactory = new BasicThreadFactory.Builder().namingPattern("database-thread-%d").daemon(true).build();
-        for (int i = 1; i <= Runtime.getRuntime().availableProcessors(); i++) {
-            clientExecutors.add(Executors.newSingleThreadExecutor(threadFactory));
+        if (clientsExecutors.containsKey(client)) {
+            return;
         }
-        executors.put(client, clientExecutors);
+
+        ThreadFactory threadFactory = new BasicThreadFactory.Builder()
+                .wrappedFactory(OperationThread::new)
+                .namingPattern("database-thread-%d")
+                .daemon(true).build();
+
+        for (int i = 1; i <= Runtime.getRuntime().availableProcessors(); i++) {
+            executors.add(Executors.newSingleThreadExecutor(threadFactory));
+        }
+
+        clientsExecutors.put(client, executors);
     }
 
     private void initDatabase(String databaseName) {
-        database = client.getDatabase(databaseName);
-        databases.get(client).put(databaseName, this);
+        db = client.getDatabase(databaseName);
+
+        try {
+            databasesLock.writeLock().lock();
+            databases.computeIfAbsent(client, k -> new HashMap<>()).put(databaseName, this);
+        } finally {
+            databasesLock.writeLock().unlock();
+        }
+
         ClassUtils.loadClasses(dataPackage, Data.class).forEach(this::initCollection);
+    }
+
+    static Database getDatabase(MongoClient client, String databaseName) {
+        databasesLock.readLock().lock();
+        try {
+            return databases.get(client).get(databaseName);
+        } finally {
+            databasesLock.readLock().unlock();
+        }
     }
 
     private void initCollection(Class<?> clazz) {
         String collectionName = Data.name((Class<? extends Data>) clazz);
         if (collectionName == null) {
-            logger.error("{}._NAME未定义", clazz.getSimpleName());
+            logger.error("{}._NAME未定义", clazz.getName());
             return;
         }
 
@@ -127,7 +155,7 @@ public class Database implements DataWriter, MongoDatabase {
             }
         }
 
-        MongoCollection<?> collection = database.getCollection(collectionName, clazz);
+        MongoCollection<?> collection = db.getCollection(collectionName, clazz);
         collections.put(clazz, collection);
 
         Set<String> dropIndexes = new HashSet<>();
@@ -171,12 +199,19 @@ public class Database implements DataWriter, MongoDatabase {
     }
 
     /**
-     * 获取指定的数据类对应的执行器
+     * 随机选择一个线程执行指定的任务
+     */
+    public void execute(Runnable task) {
+        int index = RandomUtils.nextInt(0, executors.size());
+        executors.get(index).execute(task);
+    }
+
+    /**
+     * 获取指定的数据类{@link Data}对应的执行器
      */
     public <D extends Data> ExecutorService getExecutor(Class<D> clazz) {
-        List<ExecutorService> clientExecutors = executors.get(client);
-        int index = (clazz.hashCode() & 0x7FFFFFFF) % clientExecutors.size();
-        return clientExecutors.get(index);
+        int index = (clazz.hashCode() & 0x7FFFFFFF) % executors.size();
+        return executors.get(index);
     }
 
     /**
@@ -235,10 +270,11 @@ public class Database implements DataWriter, MongoDatabase {
             }
         }
 
-        if (!executors.containsKey(client)) {
-            logger.error("MongoClient已经关闭了，数据无法入库");
+        if (!clientsExecutors.containsKey(client)) {
+            logger.error("MongoClient已经关闭了，数据无法写入数据库");
             return;
         }
+
         for (MongoCollection<Data<?>> collection : writeModels.keySet()) {
             getExecutor(collection.getDocumentClass()).execute(() -> collection.bulkWrite(writeModels.get(collection)));
         }
@@ -253,241 +289,241 @@ public class Database implements DataWriter, MongoDatabase {
 
     @Override
     public String getName() {
-        return database.getName();
+        return db.getName();
     }
 
     @Override
     public CodecRegistry getCodecRegistry() {
-        return database.getCodecRegistry();
+        return db.getCodecRegistry();
     }
 
     @Override
     public ReadPreference getReadPreference() {
-        return database.getReadPreference();
+        return db.getReadPreference();
     }
 
     @Override
     public WriteConcern getWriteConcern() {
-        return database.getWriteConcern();
+        return db.getWriteConcern();
     }
 
     @Override
     public ReadConcern getReadConcern() {
-        return database.getReadConcern();
+        return db.getReadConcern();
     }
 
     @Override
     public MongoDatabase withCodecRegistry(CodecRegistry codecRegistry) {
-        return database.withCodecRegistry(codecRegistry);
+        return db.withCodecRegistry(codecRegistry);
     }
 
     @Override
     public MongoDatabase withReadPreference(ReadPreference readPreference) {
-        return database.withReadPreference(readPreference);
+        return db.withReadPreference(readPreference);
     }
 
     @Override
     public MongoDatabase withWriteConcern(WriteConcern writeConcern) {
-        return database.withWriteConcern(writeConcern);
+        return db.withWriteConcern(writeConcern);
     }
 
     @Override
     public MongoDatabase withReadConcern(ReadConcern readConcern) {
-        return database.withReadConcern(readConcern);
+        return db.withReadConcern(readConcern);
     }
 
     @Override
     public MongoCollection<Document> getCollection(String collectionName) {
-        return database.getCollection(collectionName);
+        return db.getCollection(collectionName);
     }
 
     @Override
     public <TDocument> MongoCollection<TDocument> getCollection(String collectionName, Class<TDocument> documentClass) {
-        return database.getCollection(collectionName, documentClass);
+        return db.getCollection(collectionName, documentClass);
     }
 
     @Override
     public Document runCommand(Bson command) {
-        return database.runCommand(command);
+        return db.runCommand(command);
     }
 
     @Override
     public Document runCommand(Bson command, ReadPreference readPreference) {
-        return database.runCommand(command, readPreference);
+        return db.runCommand(command, readPreference);
     }
 
     @Override
     public <TResult> TResult runCommand(Bson command, Class<TResult> resultClass) {
-        return database.runCommand(command, resultClass);
+        return db.runCommand(command, resultClass);
     }
 
     @Override
     public <TResult> TResult runCommand(Bson command, ReadPreference readPreference, Class<TResult> resultClass) {
-        return database.runCommand(command, readPreference, resultClass);
+        return db.runCommand(command, readPreference, resultClass);
     }
 
     @Override
     public Document runCommand(ClientSession clientSession, Bson command) {
-        return database.runCommand(clientSession, command);
+        return db.runCommand(clientSession, command);
     }
 
     @Override
     public Document runCommand(ClientSession clientSession, Bson command, ReadPreference readPreference) {
-        return database.runCommand(clientSession, command, readPreference);
+        return db.runCommand(clientSession, command, readPreference);
     }
 
     @Override
     public <TResult> TResult runCommand(ClientSession clientSession, Bson command, Class<TResult> resultClass) {
-        return database.runCommand(clientSession, command, resultClass);
+        return db.runCommand(clientSession, command, resultClass);
     }
 
     @Override
     public <TResult> TResult runCommand(ClientSession clientSession, Bson command, ReadPreference readPreference,
                                         Class<TResult> resultClass) {
-        return database.runCommand(clientSession, command, readPreference, resultClass);
+        return db.runCommand(clientSession, command, readPreference, resultClass);
     }
 
     @Override
     public void drop() {
-        database.drop();
+        db.drop();
     }
 
     @Override
     public void drop(ClientSession clientSession) {
-        database.drop(clientSession);
+        db.drop(clientSession);
     }
 
     @Override
     public MongoIterable<String> listCollectionNames() {
-        return database.listCollectionNames();
+        return db.listCollectionNames();
     }
 
     @Override
     public ListCollectionsIterable<Document> listCollections() {
-        return database.listCollections();
+        return db.listCollections();
     }
 
     @Override
     public <TResult> ListCollectionsIterable<TResult> listCollections(Class<TResult> resultClass) {
-        return database.listCollections(resultClass);
+        return db.listCollections(resultClass);
     }
 
     @Override
     public MongoIterable<String> listCollectionNames(ClientSession clientSession) {
-        return database.listCollectionNames(clientSession);
+        return db.listCollectionNames(clientSession);
     }
 
     @Override
     public ListCollectionsIterable<Document> listCollections(ClientSession clientSession) {
-        return database.listCollections(clientSession);
+        return db.listCollections(clientSession);
     }
 
     @Override
     public <TResult> ListCollectionsIterable<TResult> listCollections(ClientSession clientSession, Class<TResult> resultClass) {
-        return database.listCollections(clientSession, resultClass);
+        return db.listCollections(clientSession, resultClass);
     }
 
     @Override
     public void createCollection(String collectionName) {
-        database.createCollection(collectionName);
+        db.createCollection(collectionName);
     }
 
     @Override
     public void createCollection(String collectionName, CreateCollectionOptions createCollectionOptions) {
-        database.createCollection(collectionName, createCollectionOptions);
+        db.createCollection(collectionName, createCollectionOptions);
     }
 
     @Override
     public void createCollection(ClientSession clientSession, String collectionName) {
-        database.createCollection(clientSession, collectionName);
+        db.createCollection(clientSession, collectionName);
     }
 
     @Override
     public void createCollection(ClientSession clientSession, String collectionName, CreateCollectionOptions createCollectionOptions) {
-        database.createCollection(clientSession, collectionName, createCollectionOptions);
+        db.createCollection(clientSession, collectionName, createCollectionOptions);
     }
 
     @Override
     public void createView(String viewName, String viewOn, List<? extends Bson> pipeline) {
-        database.createView(viewName, viewOn, pipeline);
+        db.createView(viewName, viewOn, pipeline);
     }
 
     @Override
     public void createView(String viewName, String viewOn, List<? extends Bson> pipeline, CreateViewOptions createViewOptions) {
-        database.createView(viewName, viewOn, pipeline, createViewOptions);
+        db.createView(viewName, viewOn, pipeline, createViewOptions);
     }
 
     @Override
     public void createView(ClientSession clientSession, String viewName, String viewOn, List<? extends Bson> pipeline) {
-        database.createView(clientSession, viewName, viewOn, pipeline);
+        db.createView(clientSession, viewName, viewOn, pipeline);
     }
 
     @Override
     public void createView(ClientSession clientSession, String viewName, String viewOn, List<? extends Bson> pipeline,
                            CreateViewOptions createViewOptions) {
-        database.createView(clientSession, viewName, viewOn, pipeline, createViewOptions);
+        db.createView(clientSession, viewName, viewOn, pipeline, createViewOptions);
     }
 
     @Override
     public ChangeStreamIterable<Document> watch() {
-        return database.watch();
+        return db.watch();
     }
 
     @Override
     public <TResult> ChangeStreamIterable<TResult> watch(Class<TResult> resultClass) {
-        return database.watch(resultClass);
+        return db.watch(resultClass);
     }
 
     @Override
     public ChangeStreamIterable<Document> watch(List<? extends Bson> pipeline) {
-        return database.watch(pipeline);
+        return db.watch(pipeline);
     }
 
     @Override
     public <TResult> ChangeStreamIterable<TResult> watch(List<? extends Bson> pipeline, Class<TResult> resultClass) {
-        return database.watch(pipeline, resultClass);
+        return db.watch(pipeline, resultClass);
     }
 
     @Override
     public ChangeStreamIterable<Document> watch(ClientSession clientSession) {
-        return database.watch(clientSession);
+        return db.watch(clientSession);
     }
 
     @Override
     public <TResult> ChangeStreamIterable<TResult> watch(ClientSession clientSession, Class<TResult> resultClass) {
-        return database.watch(clientSession, resultClass);
+        return db.watch(clientSession, resultClass);
     }
 
     @Override
     public ChangeStreamIterable<Document> watch(ClientSession clientSession, List<? extends Bson> pipeline) {
-        return database.watch(clientSession, pipeline);
+        return db.watch(clientSession, pipeline);
     }
 
     @Override
     public <TResult> ChangeStreamIterable<TResult> watch(ClientSession clientSession, List<? extends Bson> pipeline,
                                                          Class<TResult> resultClass) {
-        return database.watch(clientSession, pipeline, resultClass);
+        return db.watch(clientSession, pipeline, resultClass);
     }
 
     @Override
     public AggregateIterable<Document> aggregate(List<? extends Bson> pipeline) {
-        return database.aggregate(pipeline);
+        return db.aggregate(pipeline);
     }
 
     @Override
     public <TResult> AggregateIterable<TResult> aggregate(List<? extends Bson> pipeline, Class<TResult> resultClass) {
-        return database.aggregate(pipeline, resultClass);
+        return db.aggregate(pipeline, resultClass);
     }
 
     @Override
     public AggregateIterable<Document> aggregate(ClientSession clientSession, List<? extends Bson> pipeline) {
-        return database.aggregate(clientSession, pipeline);
+        return db.aggregate(clientSession, pipeline);
     }
 
     @Override
     public <TResult> AggregateIterable<TResult> aggregate(ClientSession clientSession, List<? extends Bson> pipeline,
                                                           Class<TResult> resultClass) {
-        return database.aggregate(clientSession, pipeline, resultClass);
+        return db.aggregate(clientSession, pipeline, resultClass);
     }
 
 }

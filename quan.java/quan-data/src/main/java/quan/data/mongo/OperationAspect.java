@@ -15,9 +15,9 @@ import org.aspectj.lang.annotation.Pointcut;
 import quan.data.Transaction;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -28,7 +28,7 @@ import java.util.concurrent.ExecutorService;
 public class OperationAspect {
 
     //一般情况只会创建一个MongoClient，这里兼容一下可能有多个数据源的情况
-    private static Map<OperationExecutor, MongoClient> clients = new HashMap<>();
+    private static Map<OperationExecutor, MongoClient> clients = new ConcurrentHashMap<>();
 
     @Pointcut("execution(* com.mongodb.client.internal.MongoClientDelegate.DelegateOperationExecutor.execute(..))")
     private void execute() {
@@ -37,6 +37,10 @@ public class OperationAspect {
     //查询时,设置数据的默认写入器
     @Around("execute() && args(com.mongodb.operation.ReadOperation,..,com.mongodb.client.ClientSession)")
     public Object aroundRead(ProceedingJoinPoint joinPoint) throws Throwable {
+        if (!OperationThread.isInside()) {
+            throw new IllegalStateException("只能在数据库线程里写数据库");
+        }
+
         ReadOperation operation = (ReadOperation) joinPoint.getArgs()[0];
         if (!(operation instanceof FindOperation)) {
             return joinPoint.proceed();
@@ -45,12 +49,8 @@ public class OperationAspect {
         BatchCursor cursor = (BatchCursor) joinPoint.proceed();
         MongoClient client = getMongoClient((OperationExecutor) joinPoint.getThis());
 
-        Database database = null;
-        Map<String, Database> clientDatabases = Database.databases.get(client);
-        if (clientDatabases != null) {
-            String databaseName = ((FindOperation) operation).getNamespace().getDatabaseName();
-            database = clientDatabases.get(databaseName);
-        }
+        String databaseName = ((FindOperation) operation).getNamespace().getDatabaseName();
+        Database database = Database.getDatabase(client, databaseName);
 
         return new Cursor(database, cursor);
     }
@@ -61,13 +61,16 @@ public class OperationAspect {
         if (Transaction.isInside()) {
             throw new IllegalStateException("不能在内存事务中写数据库");
         }
+        if (!OperationThread.isInside()) {
+            throw new IllegalStateException("只能在数据库线程里写数据库");
+        }
     }
 
     //关闭线程池
     @Before("execution(* com.mongodb.client.internal.MongoClientImpl.close())")
     public void beforeClose(JoinPoint joinPoint) {
         MongoClient client = (MongoClient) joinPoint.getThis();
-        List<ExecutorService> clientExecutors = Database.executors.remove(client);
+        List<ExecutorService> clientExecutors = Database.clientsExecutors.remove(client);
         if (clientExecutors != null) {
             clientExecutors.forEach(ExecutorService::shutdown);
         }
