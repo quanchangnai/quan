@@ -34,7 +34,6 @@ public class OperationAspect {
     private void execute() {
     }
 
-    //查询时,设置数据的默认写入器
     @Around("execute() && args(com.mongodb.operation.ReadOperation,..,com.mongodb.client.ClientSession)")
     public Object aroundRead(ProceedingJoinPoint joinPoint) throws Throwable {
         if (!OperationThread.isInside()) {
@@ -55,7 +54,6 @@ public class OperationAspect {
         return new Cursor(database, cursor);
     }
 
-    //禁止在内存事务中写数据库
     @Before("execute() && args(com.mongodb.operation.WriteOperation,..,com.mongodb.client.ClientSession)")
     public void beforeWrite() {
         if (Transaction.isInside()) {
@@ -66,12 +64,12 @@ public class OperationAspect {
         }
     }
 
-    //关闭线程池
     @Before("execution(* com.mongodb.client.internal.MongoClientImpl.close())")
     public void beforeClose(JoinPoint joinPoint) {
         MongoClient client = (MongoClient) joinPoint.getThis();
         List<ExecutorService> clientExecutors = Database.clientsExecutors.remove(client);
         if (clientExecutors != null) {
+            //关闭线程池
             clientExecutors.forEach(ExecutorService::shutdown);
         }
     }
