@@ -13,7 +13,7 @@ import static java.lang.Boolean.FALSE;
 import static quan.data.Validations.validateTransaction;
 
 /**
- * 事务实现，多线程并发时需要自己加锁，否则隔离级别就是读已提交
+ * 事务实现，多线程并发时需要自己加锁，否则隔离级别就是【读已提交】
  */
 public class Transaction {
 
@@ -71,14 +71,14 @@ public class Transaction {
     private int depth = 1;
 
     /**
-     * @see Transaction#globalOptional
+     * @see #globalOptional
      */
     public static void setGlobalOptional(boolean globalOptional) {
         Transaction.globalOptional = globalOptional;
     }
 
     /**
-     * @see Transaction#localOptional
+     * @see #localOptional
      */
     public static void setLocalOptional(boolean localOptional) {
         Transaction.localOptional.set(localOptional);

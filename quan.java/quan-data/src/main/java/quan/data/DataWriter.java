@@ -16,42 +16,42 @@ public interface DataWriter {
 
 
     /**
-     * 标记数据将被插入到数据库
+     * 插入数据被到数据库，参考{@link Data#insert(DataWriter)}
      */
     default void insert(Data<?>... data) {
         Arrays.stream(data).forEach(d -> d.insert(this));
     }
 
     /**
-     * 标记数据将被插入到数据库
+     * 插入数据被到数据库，参考{@link Data#insert(DataWriter)}
      */
     default void insert(Collection<? extends Data<?>> data) {
         data.forEach(d -> d.insert(this));
     }
 
     /**
-     * 标记数据将被更新到数据库
+     * 更新数据到数据库，参考{@link Data#update(DataWriter)}
      */
     default void update(Data<?>... data) {
         Arrays.stream(data).forEach(d -> d.update(this));
     }
 
     /**
-     * 标记数据将被更新到数据库
+     * 更新数据到数据库，参考{@link Data#update(DataWriter)}
      */
     default void update(Collection<? extends Data<?>> data) {
         data.forEach(d -> d.update(this));
     }
 
     /**
-     * 标记数据将从数据库中删除
+     * 从数据库中删除数据，参考{@link Data#delete(DataWriter)}
      */
     default void delete(Data<?>... data) {
         Arrays.stream(data).forEach(d -> d.delete(this));
     }
 
     /**
-     * 标记数据将从数据库中删除
+     * 从数据库中删除数据，参考{@link Data#delete(DataWriter)}
      */
     default void delete(Collection<? extends Data<?>> data) {
         data.forEach(d -> d.delete(this));

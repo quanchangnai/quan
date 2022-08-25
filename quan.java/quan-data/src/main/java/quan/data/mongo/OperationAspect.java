@@ -34,7 +34,7 @@ public class OperationAspect {
     @Around("execute() && args(com.mongodb.operation.ReadOperation,..,com.mongodb.client.ClientSession)")
     public Object aroundRead(ProceedingJoinPoint joinPoint) throws Throwable {
         if (!OperationThread.isInside()) {
-            throw new IllegalStateException("只能在数据库线程里写数据库");
+            throw new IllegalStateException("只能在数据库线程里读数据库");
         }
 
         ReadOperation operation = (ReadOperation) joinPoint.getArgs()[0];
