@@ -16,7 +16,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Function;
 
 /**
- * RPC工作线程
+ * 工作线程
  *
  * @author quanchangnai
  */

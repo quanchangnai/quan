@@ -12,8 +12,7 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 
 /**
- * 数据类对应一张表，每个数据实例对应表中的一行<br/>
- * Created by quanchangnai on 2019/5/16.
+ * 数据类对应一张表，每个数据实例对应表中的一行
  */
 public abstract class Data<I> {
 

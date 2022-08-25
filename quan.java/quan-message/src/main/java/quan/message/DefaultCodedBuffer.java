@@ -4,7 +4,6 @@ import java.nio.ByteBuffer;
 
 /**
  * 直接使用字节数组实现的{@link CodedBuffer}
- * Created by quanchangnai on 2018/7/2.
  */
 public class DefaultCodedBuffer extends CodedBuffer {
 

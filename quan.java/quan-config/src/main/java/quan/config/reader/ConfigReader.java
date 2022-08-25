@@ -9,13 +9,12 @@ import quan.definition.BeanDefinition;
 import quan.definition.FieldDefinition;
 import quan.definition.Language;
 import quan.definition.config.ConfigDefinition;
-import quan.definition.parser.TableDefinitionParser;
 
 import java.io.File;
 import java.util.*;
 
 /**
- * Created by quanchangnai on 2019/7/11.
+ * 配置读取器
  */
 @SuppressWarnings({"unchecked"})
 public abstract class ConfigReader {
@@ -88,7 +87,7 @@ public abstract class ConfigReader {
     }
 
     public static int getMinTableBodyStartRow(String definitionType) {
-        return  definitionType.equals("xml") ? 2 : 4;
+        return definitionType.equals("xml") ? 2 : 4;
     }
 
     public ConfigDefinition getConfigDefinition() {

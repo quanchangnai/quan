@@ -9,7 +9,7 @@ import java.io.FileInputStream;
 import java.util.Objects;
 
 /**
- * 基于Excel表格的定义文件解析器，在表格中直接定义配置，不支持定义复杂结构
+ * 基于Excel表格的【定义】解析器，在表格中直接定义配置，不支持定义复杂结构
  */
 public class ExcelDefinitionParser extends TableDefinitionParser {
 

@@ -12,7 +12,6 @@ import java.util.Set;
 
 /**
  * 消息注册表
- * Created by quanchangnai on 2019/6/20.
  */
 public class MessageRegistry {
 

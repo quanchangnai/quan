@@ -21,7 +21,7 @@ import java.util.Properties;
 import static quan.config.reader.ConfigReader.getMinTableBodyStartRow;
 
 /**
- * Created by quanchangnai on 2019/7/11.
+ * 配置生成器
  */
 public abstract class ConfigGenerator extends Generator {
 

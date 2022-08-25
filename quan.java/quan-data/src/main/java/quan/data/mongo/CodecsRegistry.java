@@ -4,9 +4,9 @@ import org.bson.codecs.Codec;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import quan.util.ClassUtils;
-import quan.data.Data;
 import quan.data.Bean;
+import quan.data.Data;
+import quan.util.ClassUtils;
 
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
@@ -15,8 +15,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * 编解码器注册表，支持注册指定包名下面所有的编解码器<br/>
- * Created by quanchangnai on 2020/4/1.
+ * 编解码器注册表，支持注册指定包名下面所有的编解码器
  */
 @SuppressWarnings("unchecked")
 public class CodecsRegistry implements CodecRegistry {

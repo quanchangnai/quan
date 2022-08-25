@@ -5,8 +5,7 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 
 /**
- * 配置校验异常
- * Created by quanchangnai on 2019/7/31.
+ * 配置校验出来的异常
  */
 public class ValidatedException extends RuntimeException {
 

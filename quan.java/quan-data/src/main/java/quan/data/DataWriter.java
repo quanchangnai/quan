@@ -5,8 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * 负责把数据的插入、更新和删除操作写到到数据库<br/>
- * Created by quanchangnai on 2020/4/17.
+ * 负责把数据的插入、更新和删除操作写到到数据库
  */
 public interface DataWriter {
 

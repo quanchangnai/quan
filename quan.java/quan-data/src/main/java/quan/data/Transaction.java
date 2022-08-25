@@ -13,8 +13,7 @@ import static java.lang.Boolean.FALSE;
 import static quan.data.Validations.validateTransaction;
 
 /**
- * 事务实现，多线程并发时需要自己加锁，否则隔离级别就是读已提交<br/>
- * Created by quanchangnai on 2019/5/16.
+ * 事务实现，多线程并发时需要自己加锁，否则隔离级别就是读已提交
  */
 public class Transaction {
 

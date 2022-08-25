@@ -13,6 +13,8 @@ import java.util.function.Function;
 import static quan.rpc.serialize.ObjectType.*;
 
 /**
+ * 用于对象反序列化
+ *
  * @author quanchangnai
  */
 public class ObjectReader {

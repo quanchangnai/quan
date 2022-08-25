@@ -17,6 +17,8 @@ import quan.rpc.protocol.Protocol;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * 远程服务器
+ *
  * @author quanchangnai
  */
 public class RemoteServer {

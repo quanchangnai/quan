@@ -4,7 +4,6 @@ import io.netty.buffer.ByteBuf;
 
 /**
  * 使用Netty的{@link ByteBuf}实现的{@link CodedBuffer}
- * Created by quanchangnai on 2020/3/27.
  */
 public class NettyCodedBuffer extends CodedBuffer {
 

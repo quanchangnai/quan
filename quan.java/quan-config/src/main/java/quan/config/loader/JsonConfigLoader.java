@@ -12,8 +12,7 @@ import java.util.*;
 
 /**
  * 直接加载JSON格式配置的加载器<br/>
- * 配置文件名必须是[不含前缀的配置包名.类名.json]<br/>
- * Created by quanchangnai on 2019/8/23.
+ * 配置文件名必须是[不含前缀的配置包名.类名.json]
  */
 public class JsonConfigLoader extends ConfigLoader {
 

@@ -6,7 +6,7 @@ import quan.definition.parser.DefinitionParser;
 import java.util.regex.Pattern;
 
 /**
- * Created by quanchangnai on 2017/7/6.
+ * 各种【定义】的抽象类
  */
 public abstract class Definition {
 

@@ -9,8 +9,7 @@ import java.lang.reflect.Method;
 
 /**
  * 实现声明式事务的切面<br/>
- * 加载时间必须早于被切类，否则会导致环绕通知不能内联<br/>
- * Created by quanchangnai on 2020/4/28.
+ * 加载时间必须早于被切类，否则会导致环绕通知不能内联
  */
 @Aspect
 public class TransactionAspect {

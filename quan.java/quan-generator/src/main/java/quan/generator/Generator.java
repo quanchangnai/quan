@@ -26,8 +26,7 @@ import java.util.*;
 import static quan.definition.parser.DefinitionParser.createParser;
 
 /**
- * 代码生成器<br/>
- * Created by quanchangnai on 2019/6/23.
+ * 代码生成器
  */
 public abstract class Generator {
 
@@ -301,7 +300,7 @@ public abstract class Generator {
                     } else if (dependentSource.getType() == DependentType.PARENT) {
                         ((BeanDefinition) dependentSource.getOwnerDefinition()).setParentClassName(dependentClassFullName);
                     } else if (dependentSource.getType() == DependentType.CHILD) {
-                        ((BeanDefinition) dependentSource.getOwnerDefinition()).getDependentChildren().put(dependentClassDefinition.getLongName(),dependentClassFullName);
+                        ((BeanDefinition) dependentSource.getOwnerDefinition()).getDependentChildren().put(dependentClassDefinition.getLongName(), dependentClassFullName);
                     }
                 }
             }
@@ -331,12 +330,12 @@ public abstract class Generator {
             ClassDefinition packagedClassDefinition = packagesClasses.get(packageName).get(dependentClassDefinition.getName());
             if (ownerClassDefinition.getName().equals(dependentClassDefinition.getName())) {
                 return Pair.of(true, false);
-            }else if (simpleNameClassDefinition == null) {
+            } else if (simpleNameClassDefinition == null) {
                 if (packagedClassDefinition == null) {
                     return Pair.of(false, true);
                 }
                 return packagedClassDefinition == dependentClassDefinition ? Pair.of(false, false) : Pair.of(true, false);
-            }else {
+            } else {
                 return dependentClassDefinition == simpleNameClassDefinition ? Pair.of(false, false) : Pair.of(true, false);
             }
         } else {

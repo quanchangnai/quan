@@ -18,8 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 基于XML的定义文件解析器
- * Created by quanchangnai on 2017/7/10.
+ * 基于XML的【定义】解析器
  */
 public class XmlDefinitionParser extends DefinitionParser {
 

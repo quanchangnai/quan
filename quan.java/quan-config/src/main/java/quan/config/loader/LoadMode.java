@@ -1,8 +1,7 @@
 package quan.config.loader;
 
 /**
- * 加载模式
- * Created by quanchangnai on 2019/8/7.
+ * 配置的加载模式
  */
 public enum LoadMode {
 

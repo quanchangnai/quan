@@ -17,7 +17,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Created by quanchangnai on 2019/8/7.
+ * 配置转换器
  */
 public class ConfigConverter {
 

@@ -1,6 +1,8 @@
 package quan.rpc.serialize;
 
 /**
+ * 序列化和反序列化时的对象类型
+ *
  * @author quanchangnai
  */
 public interface ObjectType {

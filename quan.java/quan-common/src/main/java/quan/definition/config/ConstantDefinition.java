@@ -3,8 +3,10 @@ package quan.definition.config;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import quan.definition.*;
+import quan.definition.ClassDefinition;
 import quan.definition.DependentSource.DependentType;
+import quan.definition.FieldDefinition;
+import quan.definition.IndexDefinition;
 
 import java.util.List;
 import java.util.Map;
@@ -12,7 +14,6 @@ import java.util.TreeMap;
 
 /**
  * 常量定义，支持动态读取常量值
- * Created by quanchangnai on 2019/9/6.
  */
 public class ConstantDefinition extends ClassDefinition {
 

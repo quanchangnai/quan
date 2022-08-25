@@ -9,7 +9,7 @@ import java.io.FileInputStream;
 import java.util.List;
 
 /**
- * Created by quanchangnai on 2019/8/4.
+ * JSON配置读取器
  */
 @SuppressWarnings({"unchecked"})
 public class JsonConfigReader extends ConfigReader {

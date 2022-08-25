@@ -27,6 +27,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 /**
+ * 本地服务器
+ *
  * @author quanchangnai
  */
 public class LocalServer {

@@ -1,8 +1,5 @@
 package quan.data.mongo;
 
-/**
- * @author quanchangnai
- */
 class OperationThread extends Thread {
 
     public OperationThread(Runnable target) {

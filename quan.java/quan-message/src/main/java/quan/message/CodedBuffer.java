@@ -4,8 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
 /**
- * 采用VarInt和ZigZag编码的字节缓冲区，字节顺序采用小端模式<br/>
- * Created by quanchangnai on 2020/3/27.
+ * 采用VarInt和ZigZag编码的字节缓冲区，字节顺序采用小端模式
  */
 public abstract class CodedBuffer {
 

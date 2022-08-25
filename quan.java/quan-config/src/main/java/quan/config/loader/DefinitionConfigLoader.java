@@ -25,8 +25,7 @@ import java.util.*;
 import static quan.config.reader.ConfigReader.getMinTableBodyStartRow;
 
 /**
- * 使用配置定义的配置加载器，根据配置定义实现了索引、引用校验等<br/>
- * Created by quanchangnai on 2019/8/23.
+ * 使用配置定义的配置加载器，根据配置定义实现了索引、引用校验等
  */
 @SuppressWarnings({"unchecked"})
 public class DefinitionConfigLoader extends ConfigLoader {

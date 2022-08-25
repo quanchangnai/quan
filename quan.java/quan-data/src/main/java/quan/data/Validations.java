@@ -3,8 +3,7 @@ package quan.data;
 import java.util.Objects;
 
 /**
- * 校验工具类<br/>
- * Created by quanchangnai on 2019/6/22.
+ * 校验工具类
  */
 public class Validations {
 

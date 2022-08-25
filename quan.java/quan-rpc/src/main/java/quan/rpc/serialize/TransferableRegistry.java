@@ -9,6 +9,8 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 /**
+ * 可序列化对象注册表，参考{@link Transferable}
+ *
  * @author quanchangnai
  */
 public class TransferableRegistry {

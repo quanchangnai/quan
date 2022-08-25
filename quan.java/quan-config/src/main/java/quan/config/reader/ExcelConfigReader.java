@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by quanchangnai on 2019/8/3.
+ * Excel配置读取器
  */
 public class ExcelConfigReader extends ConfigReader {
 

@@ -2,9 +2,6 @@ package quan.data;
 
 import quan.data.field.Field;
 
-/**
- * Created by quanchangnai on 2020/4/8.
- */
 public abstract class Loggable {
 
     protected static void _setFieldLog(Transaction transaction, Field field, Object log, Data<?> data) {

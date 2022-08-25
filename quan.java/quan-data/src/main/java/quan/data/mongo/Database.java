@@ -27,8 +27,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * MongoDB数据库封装<br/>
- * Created by quanchangnai on 2020/4/13.
+ * MongoDB数据库封装
  */
 @SuppressWarnings({"unchecked", "rawtypes", "NullableProblems"})
 public class Database implements DataWriter, MongoDatabase {

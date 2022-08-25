@@ -11,8 +11,9 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+
 /**
- * Created by quanchangnai on 2017/7/6.
+ * 消息生成器
  */
 public abstract class MessageGenerator extends Generator {
 

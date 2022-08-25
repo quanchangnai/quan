@@ -9,7 +9,7 @@ import quan.definition.config.ConfigDefinition;
 import java.util.Properties;
 
 /**
- * Created by quanchangnai on 2019/7/11.
+ * 生成C#代码的配置生成器
  */
 public class CSharpConfigGenerator extends ConfigGenerator {
 

@@ -8,7 +8,6 @@ import java.util.*;
 
 /**
  * Bean定义，被数据、消息和配置共用
- * Created by quanchangnai on 2017/7/6.
  */
 public class BeanDefinition extends ClassDefinition {
 

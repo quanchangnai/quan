@@ -9,7 +9,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
- * Created by quanchangnai on 2019/7/27.
+ * 支持的语言枚举
  */
 public enum Language {
 

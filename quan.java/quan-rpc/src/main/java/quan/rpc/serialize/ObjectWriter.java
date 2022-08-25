@@ -13,6 +13,8 @@ import java.util.*;
 import static quan.rpc.serialize.ObjectType.*;
 
 /**
+ * 用于对象序列化
+ *
  * @author quanchangnai
  */
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")

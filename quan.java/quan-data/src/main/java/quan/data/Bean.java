@@ -8,9 +8,6 @@ import quan.data.mongo.JsonStringWriter;
 
 import java.io.StringWriter;
 
-/**
- * Created by quanchangnai on 2019/5/16.
- */
 public abstract class Bean extends Node {
 
     @SuppressWarnings({"unchecked"})

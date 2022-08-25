@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
- * Created by quanchangnai on 2019/9/5.
+ * 生成Lua代码的消息生成器
  */
 public class LuaMessageGenerator extends MessageGenerator {
 

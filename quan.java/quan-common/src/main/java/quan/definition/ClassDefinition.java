@@ -10,7 +10,6 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
  * 类定义
- * Created by quanchangnai on 2019/6/21.
  */
 public abstract class ClassDefinition extends Definition {
 

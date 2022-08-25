@@ -8,7 +8,6 @@ import java.util.regex.Pattern;
 
 /**
  * 索引定义
- * Created by quanchangnai on 2019/7/14.
  */
 public class IndexDefinition extends Definition implements Cloneable {
 

@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * 基于表格的定义文件解析器，在表格中直接定义配置，不支持定义复杂结构
+ * 基于表格的【定义】解析器，在表格中直接定义配置，不支持定义复杂结构
  */
 public abstract class TableDefinitionParser extends DefinitionParser {
 

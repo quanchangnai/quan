@@ -6,7 +6,7 @@ import java.util.Set;
 import static quan.util.CommonUtils.asSet;
 
 /**
- * Created by quanchangnai on 2019/8/3.
+ * 常量
  */
 public final class Constants {
 

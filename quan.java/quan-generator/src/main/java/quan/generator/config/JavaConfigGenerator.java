@@ -8,7 +8,7 @@ import quan.definition.config.ConfigDefinition;
 import java.util.Properties;
 
 /**
- * Created by quanchangnai on 2019/7/11.
+ * 生成Java代码的配置生成器
  */
 public class JavaConfigGenerator extends ConfigGenerator {
 

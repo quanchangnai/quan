@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 /**
- * Created by quanchangnai on 2017/7/6.
+ * 数据生成器
  */
 public class DataGenerator extends Generator {
 

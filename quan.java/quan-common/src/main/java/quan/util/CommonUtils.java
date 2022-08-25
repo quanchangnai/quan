@@ -11,8 +11,6 @@ import static org.apache.commons.lang3.ClassUtils.isPrimitiveOrWrapper;
 
 /**
  * 通用工具类
- *
- * @author quanchangnai
  */
 public class CommonUtils {
 

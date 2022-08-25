@@ -9,7 +9,6 @@ import java.util.*;
 
 /**
  * 配置定义
- * Created by quanchangnai on 2019/7/11.
  */
 public class ConfigDefinition extends BeanDefinition {
 

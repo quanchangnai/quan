@@ -1,8 +1,7 @@
 package quan.data;
 
 /**
- * 数据节点<br/>
- * Created by quanchangnai on 2019/6/24.
+ * 数据节点
  */
 public abstract class Node extends Loggable {
 

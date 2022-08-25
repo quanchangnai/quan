@@ -11,7 +11,7 @@ import java.io.InputStreamReader;
 import java.util.List;
 
 /**
- * 基于CSV表格的定义文件解析器，在表格中直接定义配置，不支持定义复杂结构
+ * 基于CSV表格的【定义】解析器，在表格中直接定义配置，不支持定义复杂结构
  */
 public class CSVDefinitionParser extends TableDefinitionParser {
 

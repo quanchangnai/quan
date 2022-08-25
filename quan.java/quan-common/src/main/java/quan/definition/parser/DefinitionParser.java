@@ -13,7 +13,7 @@ import java.io.File;
 import java.util.*;
 
 /**
- * Created by quanchangnai on 2019/7/9.
+ * 【定义】解析器
  */
 public abstract class DefinitionParser {
 

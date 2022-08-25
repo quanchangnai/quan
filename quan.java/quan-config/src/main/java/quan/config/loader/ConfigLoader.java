@@ -15,8 +15,7 @@ import java.util.*;
 import java.util.function.Function;
 
 /**
- * 配置加载器<br/>
- * Created by quanchangnai on 2019/7/30.
+ * 配置加载器
  */
 @SuppressWarnings({"unchecked"})
 public abstract class ConfigLoader {

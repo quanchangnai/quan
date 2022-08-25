@@ -16,7 +16,7 @@ import java.util.Properties;
 
 
 /**
- * Created by quanchangnai on 2020/3/15.
+ * 生成Lua代码的配置生成器
  */
 public class LuaConfigGenerator extends ConfigGenerator {
 

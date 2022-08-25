@@ -3,9 +3,6 @@ package quan.message;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 
-/**
- * Created by quanchangnai on 2017/7/6.
- */
 public abstract class Bean {
 
     public final byte[] encode() {

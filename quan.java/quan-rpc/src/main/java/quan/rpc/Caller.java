@@ -3,6 +3,9 @@ package quan.rpc;
 import java.lang.reflect.Array;
 import java.util.Objects;
 
+/**
+ * 收到远程调用请求后用来执行实际调用的辅助类
+ */
 public abstract class Caller {
 
     @SuppressWarnings({"unchecked", "SuspiciousSystemArraycopy"})

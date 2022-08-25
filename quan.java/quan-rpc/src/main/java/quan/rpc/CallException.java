@@ -1,6 +1,8 @@
 package quan.rpc;
 
 /**
+ * 远程调用异常
+ *
  * @author quanchangnai
  */
 public class CallException extends Exception {

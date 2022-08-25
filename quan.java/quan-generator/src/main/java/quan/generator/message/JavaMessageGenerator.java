@@ -6,7 +6,7 @@ import quan.definition.Language;
 import java.util.Properties;
 
 /**
- * Created by quanchangnai on 2017/7/6.
+ * 生成Java代码的消息生成器
  */
 public class JavaMessageGenerator extends MessageGenerator {
 

@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by quanchangnai on 2019/7/14.
+ * CSV配置读取器
  */
 public class CSVConfigReader extends ConfigReader {
 

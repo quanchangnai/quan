@@ -5,9 +5,6 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 
 import java.util.Objects;
 
-/**
- * Created by quanchangnai on 2019/7/11.
- */
 public abstract class Bean {
 
     private final JSONObject json;

@@ -20,9 +20,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 
-/**
- * Created by quanchangnai on 2020/5/5.
- */
 @Aspect
 @SuppressWarnings("deprecation")
 public class OperationAspect {
