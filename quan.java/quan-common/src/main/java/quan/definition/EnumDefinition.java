@@ -2,6 +2,7 @@ package quan.definition;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Created by quanchangnai on 2017/7/6.
@@ -19,6 +20,15 @@ public class EnumDefinition extends ClassDefinition {
     public EnumDefinition setCategory(Category category) {
         this.category = category;
         return this;
+    }
+
+    @Override
+    public Pattern getNamePattern() {
+        Pattern namePattern = parser.getEnumNamePattern();
+        if (namePattern == null) {
+            namePattern = super.getNamePattern();
+        }
+        return namePattern;
     }
 
     @Override

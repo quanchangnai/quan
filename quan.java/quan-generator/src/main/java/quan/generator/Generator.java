@@ -32,6 +32,9 @@ public abstract class Generator {
 
     protected static final Logger logger = LoggerFactory.getLogger(Generator.class);
 
+    //生成器选项
+    protected Properties options;
+
     protected Map<String, String> basicTypes = new HashMap<>();
 
     protected Map<String, String> classTypes = new HashMap<>();
@@ -90,6 +93,7 @@ public abstract class Generator {
         parser = new XmlDefinitionParser();
         parser.setCategory(category());
         parser.setDefinitionPaths(definitionPaths);
+        parseOptions(options);
     }
 
     public void useXmlParser(String definitionPath) {
@@ -102,6 +106,10 @@ public abstract class Generator {
             return;
         }
 
+        this.parser = parser;
+
+        parseOptions(options);
+
         parser.setDefinitionFileEncoding(definitionFileEncoding);
         parser.setCategory(category());
 
@@ -110,8 +118,6 @@ public abstract class Generator {
         } else {
             parser.setDefinitionPaths(definitionPaths);
         }
-
-        this.parser = parser;
     }
 
     public DefinitionParser getParser() {
@@ -127,6 +133,8 @@ public abstract class Generator {
     }
 
     protected void parseOptions(Properties options) {
+        this.options = options;
+
         String enable = options.getProperty(category() + ".enable");
         if (enable == null || !enable.equals("true")) {
             this.enable = false;
@@ -147,6 +155,11 @@ public abstract class Generator {
             this.definitionFileEncoding = definitionFileEncoding;
         }
 
+        if (parser != null) {
+            parser.setBeanNamePattern(options.getProperty(category() + ".beanNamePattern"));
+            parser.setEnumNamePattern(options.getProperty(category() + ".enumNamePattern"));
+        }
+
         String codePath = options.getProperty(category() + "." + language() + ".codePath");
         if (!StringUtils.isBlank(codePath)) {
             setCodePath(codePath);
@@ -155,7 +168,6 @@ public abstract class Generator {
         packagePrefix = options.getProperty(category() + "." + language() + ".packagePrefix");
         enumPackagePrefix = options.getProperty(category() + "." + language() + ".enumPackagePrefix");
     }
-
 
     /**
      * 检查生成器必须要设置的选项
@@ -378,7 +390,7 @@ public abstract class Generator {
             return;
         }
 
-        logger.error("生成{}代码失败，解析目录{}下的定义文件共发现{}条错误", category().alias(), parser.getDefinitionPaths(), parser.getValidatedErrors());
+        logger.error("生成{}代码失败，解析目录{}下的定义文件共发现{}条错误", category().alias(), parser.getDefinitionPaths(), parser.getValidatedErrors().size());
         parser.getValidatedErrors().forEach(logger::error);
     }
 

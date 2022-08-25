@@ -6,6 +6,7 @@ import quan.util.CommonUtils;
 
 import java.io.File;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * 配置定义
@@ -74,6 +75,15 @@ public class ConfigDefinition extends BeanDefinition {
         if (table == null) {
             table = getName();
         }
+    }
+
+    @Override
+    public Pattern getNamePattern() {
+        Pattern namePattern = parser.getConfigNamePattern();
+        if (namePattern == null) {
+            namePattern = super.getNamePattern();
+        }
+        return namePattern;
     }
 
     @Override

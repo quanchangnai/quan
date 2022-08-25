@@ -4,6 +4,8 @@ import org.apache.commons.lang3.StringUtils;
 import quan.definition.BeanDefinition;
 import quan.definition.Category;
 
+import java.util.regex.Pattern;
+
 /**
  * 消息定义
  */
@@ -40,6 +42,15 @@ public class MessageDefinition extends BeanDefinition {
     @Override
     public String getKindName() {
         return "消息";
+    }
+
+    @Override
+    public Pattern getNamePattern() {
+        Pattern namePattern = parser.getMessageNamePattern();
+        if (namePattern == null) {
+            namePattern = super.getNamePattern();
+        }
+        return namePattern;
     }
 
     public int getId() {

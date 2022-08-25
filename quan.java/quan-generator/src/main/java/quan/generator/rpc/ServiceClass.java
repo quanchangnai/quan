@@ -194,7 +194,7 @@ public class ServiceClass extends ServiceElement {
 
     @Override
     public String toString() {
-        return "RpcClass{" +
+        return "ServiceClass{" +
                 "name='" + name + '\'' +
                 ", packageName='" + packageName + '\'' +
                 ", typeParameters=" + originalTypeParameters +

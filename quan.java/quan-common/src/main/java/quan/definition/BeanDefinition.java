@@ -5,6 +5,7 @@ import quan.definition.DependentSource.DependentType;
 import quan.definition.config.ConfigDefinition;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Bean定义，被数据、消息和配置共用
@@ -66,6 +67,15 @@ public class BeanDefinition extends ClassDefinition {
     @Override
     public String getKindName() {
         return super.getKindName();
+    }
+
+    @Override
+    public Pattern getNamePattern() {
+        Pattern namePattern = parser.getBeanNamePattern();
+        if (namePattern == null) {
+            namePattern = super.getNamePattern();
+        }
+        return namePattern;
     }
 
     public List<FieldDefinition> getSelfFields() {

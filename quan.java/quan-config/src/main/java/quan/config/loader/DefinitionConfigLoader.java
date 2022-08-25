@@ -48,6 +48,9 @@ public class DefinitionConfigLoader extends ConfigLoader {
      * 设置表格正文起始行号
      */
     public void setTableBodyStartRow(int tableBodyStartRow) {
+        if (tableBodyStartRow == 0) {
+            return;
+        }
         int minTableBodyStartRow = getMinTableBodyStartRow(parser.getDefinitionType());
         if (tableBodyStartRow < minTableBodyStartRow) {
             throw new IllegalArgumentException("表格正文起始行号不能小于" + minTableBodyStartRow);

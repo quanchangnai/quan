@@ -160,7 +160,7 @@ public class ServiceMethod extends ServiceElement {
 
     @Override
     public String toString() {
-        return "RpcMethod{" +
+        return "ServiceMethod{" +
                 "name='" + name + '\'' +
                 ", comment='" + comment + '\'' +
                 ", typeParameters=" + originalTypeParameters +

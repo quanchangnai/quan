@@ -53,6 +53,20 @@ public class DataGenerator extends Generator {
         return Language.java;
     }
 
+
+    @Override
+    protected void parseOptions(Properties options) {
+        super.parseOptions(options);
+
+        if (!enable) {
+            return;
+        }
+
+        if (parser != null) {
+            parser.setDataNamePattern(options.getProperty(category() + ".namePattern"));
+        }
+    }
+
     @Override
     protected boolean support(ClassDefinition classDefinition) {
         if (classDefinition instanceof DataDefinition) {

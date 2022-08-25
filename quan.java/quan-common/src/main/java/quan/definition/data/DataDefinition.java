@@ -9,6 +9,7 @@ import quan.definition.IndexDefinition;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * 数据定义
@@ -58,6 +59,15 @@ public class DataDefinition extends BeanDefinition {
     public void setName(String name) {
         super.setName(name);
         underscoreName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, getName());
+    }
+
+    @Override
+    public Pattern getNamePattern() {
+        Pattern namePattern = parser.getDataNamePattern();
+        if (namePattern == null) {
+            namePattern = super.getNamePattern();
+        }
+        return namePattern;
     }
 
     public String getIdName() {

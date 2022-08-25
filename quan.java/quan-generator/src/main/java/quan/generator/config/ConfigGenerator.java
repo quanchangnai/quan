@@ -60,14 +60,21 @@ public abstract class ConfigGenerator extends Generator {
     @Override
     protected void parseOptions(Properties options) {
         super.parseOptions(options);
+
         if (!enable) {
             return;
+        }
+
+        if (parser != null) {
+            parser.setConfigNamePattern(options.getProperty(category() + ".namePattern"));
+            parser.setConstantNamePattern(options.getProperty(category() + ".constantNamePattern"));
         }
 
         definitionType = options.getProperty(category() + ".definitionType");
         if (StringUtils.isBlank(definitionType)) {
             definitionType = "xml";
         }
+
         tableType = options.getProperty(category() + ".tableType");
         tablePath = options.getProperty(category() + ".tablePath");
         tableBodyStartRow = options.getProperty(category() + ".tableBodyStartRow");

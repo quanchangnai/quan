@@ -11,6 +11,7 @@ import quan.util.CommonUtils;
 
 import java.io.File;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * 【定义】解析器
@@ -31,6 +32,19 @@ public abstract class DefinitionParser {
     private LinkedHashSet<String> definitionPaths = new LinkedHashSet<>();
 
     protected LinkedHashSet<File> definitionFiles = new LinkedHashSet<>();
+
+    private Pattern enumNamePattern;
+
+    private Pattern beanNamePattern;
+
+    private Pattern messageNamePattern;
+
+    private Pattern dataNamePattern;
+
+    private Pattern configNamePattern;
+
+    //配置常量类名格式
+    private Pattern constantNamePattern;
 
     //解析出来的类定义
     protected List<ClassDefinition> parsedClasses = new ArrayList<>();
@@ -95,6 +109,67 @@ public abstract class DefinitionParser {
 
     public String getEnumPackagePrefix() {
         return enumPackagePrefix;
+    }
+
+
+    public Pattern getEnumNamePattern() {
+        return enumNamePattern;
+    }
+
+    public Pattern getBeanNamePattern() {
+        return beanNamePattern;
+    }
+
+    public Pattern getMessageNamePattern() {
+        return messageNamePattern;
+    }
+
+    public Pattern getDataNamePattern() {
+        return dataNamePattern;
+    }
+
+    public Pattern getConfigNamePattern() {
+        return configNamePattern;
+    }
+
+    public Pattern getConstantNamePattern() {
+        return constantNamePattern;
+    }
+
+    public void setEnumNamePattern(String enumNamePattern) {
+        if (!StringUtils.isBlank(enumNamePattern)) {
+            this.enumNamePattern = Pattern.compile(enumNamePattern);
+        }
+    }
+
+    public void setBeanNamePattern(String beanNamePattern) {
+        if (!StringUtils.isBlank(beanNamePattern)) {
+            this.beanNamePattern = Pattern.compile(beanNamePattern);
+        }
+    }
+
+    public void setMessageNamePattern(String messageNamePattern) {
+        if (!StringUtils.isBlank(messageNamePattern)) {
+            this.messageNamePattern = Pattern.compile(messageNamePattern);
+        }
+    }
+
+    public void setDataNamePattern(String dataNamePattern) {
+        if (!StringUtils.isBlank(dataNamePattern)) {
+            this.dataNamePattern = Pattern.compile(dataNamePattern);
+        }
+    }
+
+    public void setConfigNamePattern(String configNamePattern) {
+        if (!StringUtils.isBlank(configNamePattern)) {
+            this.configNamePattern = Pattern.compile(configNamePattern);
+        }
+    }
+
+    public void setConstantNamePattern(String constantNamePattern) {
+        if (!StringUtils.isBlank(constantNamePattern)) {
+            this.constantNamePattern = Pattern.compile(constantNamePattern);
+        }
     }
 
     public Map<String, ClassDefinition> getClasses() {

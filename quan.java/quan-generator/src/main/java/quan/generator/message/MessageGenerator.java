@@ -27,10 +27,17 @@ public abstract class MessageGenerator extends Generator {
     @Override
     protected void parseOptions(Properties options) {
         super.parseOptions(options);
-        if (enable) {
-            String rehashId = options.getProperty(category() + ".rehashId");
-            this.setRehashId(rehashId != null && rehashId.trim().equals("true"));
+
+        if (!enable) {
+            return;
         }
+
+        if (parser != null) {
+            parser.setMessageNamePattern(options.getProperty(category() + ".namePattern"));
+        }
+
+        String rehashId = options.getProperty(category() + ".rehashId");
+        this.setRehashId(rehashId != null && rehashId.trim().equals("true"));
     }
 
     @Override
