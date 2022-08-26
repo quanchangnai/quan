@@ -29,18 +29,18 @@ public class CodecsRegistry implements CodecRegistry {
     public CodecsRegistry() {
     }
 
-    public CodecsRegistry(String codecPackage) {
-        register(codecPackage);
+    public CodecsRegistry(String codecsPackage) {
+        register(codecsPackage);
     }
 
     /**
      * 注册指定包名下面所有的编解码器
      *
-     * @param codecPackage 编解码器所在的包
+     * @param codecsPackage 编解码器所在的包
      */
-    public void register(String codecPackage) {
-        Objects.requireNonNull(codecPackage, "编解码器所在包[codecPackage]不能为空");
-        Set<Class<?>> codecClasses = ClassUtils.loadClasses(codecPackage, Codec.class);
+    public void register(String codecsPackage) {
+        Objects.requireNonNull(codecsPackage, "编解码器所在包[codecPackage]不能为空");
+        Set<Class<?>> codecClasses = ClassUtils.loadClasses(codecsPackage, Codec.class);
         for (Class<?> codecClass : codecClasses) {
             if (Modifier.isAbstract(codecClass.getModifiers())) {
                 continue;

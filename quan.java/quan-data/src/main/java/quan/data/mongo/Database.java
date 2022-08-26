@@ -19,18 +19,17 @@ import quan.data.Index;
 import quan.util.ClassUtils;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.*;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * MongoDB数据库封装
  */
 @SuppressWarnings({"unchecked", "rawtypes", "NullableProblems"})
-public class Database implements DataWriter, MongoDatabase {
+public class Database implements DataWriter, MongoDatabase, Executor {
 
     private static final Logger logger = LoggerFactory.getLogger(Database.class);
 
@@ -200,9 +199,28 @@ public class Database implements DataWriter, MongoDatabase {
     /**
      * 随机选择一个线程执行指定的任务
      */
+    @Override
     public void execute(Runnable task) {
         int index = RandomUtils.nextInt(0, executors.size());
         executors.get(index).execute(task);
+    }
+
+    /**
+     * 随机选择一个线程执行指定的任务，并且通过外部指定的执行器消费结果
+     *
+     * @param supplier 需要执行的带结果的任务，一般来说是数据库查询任务
+     * @param consumer 接收结果的消费者
+     * @param executor 接收结果的执行器
+     * @param <R>      结果泛型
+     */
+    public <R> void execute(Supplier<R> supplier, Consumer<R> consumer, Executor executor) {
+        if (supplier == null || consumer == null || executor == null) {
+            throw new NullPointerException("参数不能为空");
+        }
+        execute(() -> {
+            R r = supplier.get();
+            executor.execute(() -> consumer.accept(r));
+        });
     }
 
     /**
