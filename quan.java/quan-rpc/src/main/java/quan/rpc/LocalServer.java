@@ -243,7 +243,7 @@ public class LocalServer {
     public void addService(Worker worker, Service service) {
         Object serviceId = service.getId();
         if (services.putIfAbsent(serviceId, service) == null) {
-            worker.execute(() -> worker._addService(service));
+            worker.execute(() -> worker.doAddService(service));
         } else {
             logger.error("服务[{}]已存在", serviceId);
         }
@@ -257,7 +257,7 @@ public class LocalServer {
         }
 
         Worker worker = service.getWorker();
-        worker.execute(() -> worker._removeService(service));
+        worker.execute(() -> worker.doRemoveService(service));
     }
 
     public synchronized void addRemote(int remoteId, String remoteIp, int remotePort) {

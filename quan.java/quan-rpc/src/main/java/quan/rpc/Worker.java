@@ -12,6 +12,7 @@ import quan.util.CommonUtils;
 
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Function;
 
@@ -20,7 +21,7 @@ import java.util.function.Function;
  *
  * @author quanchangnai
  */
-public class Worker {
+public class Worker implements Executor {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -83,7 +84,7 @@ public class Worker {
         server.addService(this, service);
     }
 
-    protected void _addService(Service service) {
+    protected void doAddService(Service service) {
         service.worker = this;
         allServices.put(service.getId(), service);
         if (service instanceof UpdatableService) {
@@ -110,7 +111,7 @@ public class Worker {
         }
     }
 
-    protected void _removeService(Service service) {
+    protected void doRemoveService(Service service) {
         Object serviceId = service.getId();
         if (running) {
             destroyService(service);
@@ -161,6 +162,7 @@ public class Worker {
         thread = null;
     }
 
+    @Override
     public void execute(Runnable task) {
         Objects.requireNonNull(task, "参数[task]不能为空");
         try {
@@ -209,6 +211,7 @@ public class Worker {
         if (costTime > getServer().getUpdateInterval()) {
             logger.error("工作线程[{}]帧率过低，本次刷帧消耗时间{}ms", id, costTime);
         }
+
         updateFinished = true;
     }
 
