@@ -3,12 +3,14 @@ package quan.config.loader;
 import org.apache.commons.lang3.StringUtils;
 import quan.config.Config;
 import quan.config.TableType;
+import quan.config.ValidatedException;
 import quan.config.reader.ConfigReader;
 import quan.config.reader.JsonConfigReader;
 import quan.util.CommonUtils;
 
 import java.io.File;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 直接加载JSON格式配置的加载器<br/>
@@ -87,7 +89,7 @@ public class JsonConfigLoader extends ConfigLoader {
     }
 
     @Override
-    public void reloadByConfigName(Collection<String> configNames) {
+    public Set<Class<? extends Config>> reloadByConfigName(Collection<String> configNames) {
         checkReload();
         validatedErrors.clear();
 
@@ -96,12 +98,12 @@ public class JsonConfigLoader extends ConfigLoader {
         for (String configName : configNames) {
             File jsonFile = new File(tablePath, configName + ".json");
             if (!jsonFile.exists()) {
-                logger.error("重加载[{}]失败，不存在该配置文件", configName);
+                validatedErrors.add(String.format("重加载[%s]失败，不存在该配置文件", configName));
                 continue;
             }
             ConfigReader configReader = readers.get(configName);
             if (configReader == null) {
-                logger.error("重加载[{}]失败，对应配置从未被加载", configName);
+                validatedErrors.add(String.format("重加载[%s]失败，对应配置从未被加载", configName));
                 continue;
             }
 
@@ -114,10 +116,16 @@ public class JsonConfigLoader extends ConfigLoader {
 
         for (ConfigReader reloadReader : reloadReaders.values()) {
             List<String> errors = reloadReader.getValidatedErrors();
-            if (needValidate()) {
+            if (supportValidate()) {
                 this.validatedErrors.addAll(errors);
             }
         }
+
+        if (!validatedErrors.isEmpty()) {
+            throw new ValidatedException(validatedErrors);
+        }
+
+        return reloadReaders.values().stream().map(r -> r.getPrototype().getClass()).collect(Collectors.toSet());
     }
 
     @Override

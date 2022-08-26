@@ -64,11 +64,11 @@ public abstract class ConfigLoader {
         return tableType;
     }
 
-    public boolean needValidate() {
+    public boolean supportValidate() {
         return loadMode == LoadMode.ONLY_VALIDATE || loadMode == LoadMode.VALIDATE_AND_LOAD;
     }
 
-    public boolean needLoad() {
+    public boolean supportLoad() {
         return loadMode == LoadMode.ONLY_LOAD || loadMode == LoadMode.VALIDATE_AND_LOAD;
     }
 
@@ -110,7 +110,7 @@ public abstract class ConfigLoader {
 
         doLoadAll();
 
-        if (needValidate()) {
+        if (supportValidate()) {
             List<String> errors = new ArrayList<>();
             for (ConfigValidator validator : validators) {
                 try {
@@ -120,9 +120,9 @@ public abstract class ConfigLoader {
                 } catch (ValidatedException e) {
                     validatedErrors.addAll(e.getErrors());
                 } catch (Exception e) {
-                    String error = String.format("配置错误:%s", e.getMessage());
+                    String error = String.format("配置校验报错:%s", e.getMessage());
                     validatedErrors.add(error);
-                    logger.error("", e);
+                    logger.error(error, e);
                 }
             }
         }
@@ -138,9 +138,10 @@ public abstract class ConfigLoader {
      * 加载配置到类索引
      */
     protected void load(String configFullName, Collection<String> configTables, boolean validate) {
-        if (!needLoad()) {
+        if (!supportLoad()) {
             return;
         }
+
         String configName = configFullName.substring(configFullName.lastIndexOf(".") + 1);
         List<Config> configs = new ArrayList<>();
         for (String table : configTables) {
@@ -163,7 +164,7 @@ public abstract class ConfigLoader {
 
         try {
             List<String> loadErrors = (List<String>) loadFunction.apply(configs);
-            if (needValidate() && validate) {
+            if (supportValidate() && validate) {
                 validatedErrors.addAll(loadErrors);
             }
         } catch (Exception e) {
@@ -186,18 +187,20 @@ public abstract class ConfigLoader {
     }
 
     protected void checkReload() {
-        if (!needLoad()) {
-            throw new IllegalStateException("配置加载器仅支持校验，不能重加载");
+        if (!supportLoad()) {
+            throw new UnsupportedOperationException("配置加载器仅支持校验配置，不支持重加载");
         }
         if (!loaded) {
-            throw new IllegalStateException("配置没有加载过，不能重加载");
+            throw new IllegalStateException("配置加载器还没有加载过配置，不能重加载");
         }
     }
 
     /**
      * 通过配置的[不含前缀的包名.类名]重加载
+     *
+     * @return 重加载配置成功的配置类
      */
-    public abstract void reloadByConfigName(Collection<String> configNames);
+    public abstract Set<Class<? extends Config>> reloadByConfigName(Collection<String> configNames);
 
     /**
      * @see #reloadByConfigName(Collection)

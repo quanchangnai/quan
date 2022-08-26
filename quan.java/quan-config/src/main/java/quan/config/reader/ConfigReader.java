@@ -36,6 +36,8 @@ public abstract class ConfigReader {
 
     protected List<JSONObject> jsons = new ArrayList<>();
 
+    protected LinkedHashSet<String> initErrors = new LinkedHashSet<>();
+
     protected LinkedHashSet<String> validatedErrors = new LinkedHashSet<>();
 
     private List<Config> configs = new ArrayList<>();
@@ -56,18 +58,19 @@ public abstract class ConfigReader {
         }
 
         if (!tableFile.exists()) {
-            validatedErrors.add(String.format("配置[%s]不存在", tableFile.getName()));
+            initErrors.add(String.format("配置[%s]不存在", tableFile.getName()));
         }
 
         initPrototype();
     }
 
     protected void initPrototype() {
+        String configName = configDefinition.getFullName(Language.java);
         try {
-            Class<Config> configClass = (Class<Config>) Class.forName(configDefinition.getFullName(Language.java));
+            Class<Config> configClass = (Class<Config>) Class.forName(configName);
             prototype = configClass.getDeclaredConstructor(JSONObject.class).newInstance(new JSONObject());
         } catch (Exception e) {
-//            logger.error("实例化配置类[{}]失败", configDefinition.getFullName(Language.java), e);
+            initErrors.add(String.format("实例化配置类[%s]失败，%s", configName, e.getMessage()));
         }
     }
 
@@ -117,7 +120,10 @@ public abstract class ConfigReader {
     }
 
     public List<String> getValidatedErrors() {
-        return new ArrayList<>(validatedErrors);
+        List<String> errors = new ArrayList<>();
+        errors.addAll(initErrors);
+        errors.addAll(validatedErrors);
+        return errors;
     }
 
     protected abstract void read();

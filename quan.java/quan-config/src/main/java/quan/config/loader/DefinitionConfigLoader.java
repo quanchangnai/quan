@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.apache.commons.lang3.tuple.Triple;
+import quan.config.Config;
 import quan.config.TableType;
 import quan.config.ValidatedException;
 import quan.config.reader.CSVConfigReader;
@@ -21,6 +22,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static quan.config.reader.ConfigReader.getMinTableBodyStartRow;
 
@@ -135,14 +137,14 @@ public class DefinitionConfigLoader extends ConfigLoader {
 
         for (ConfigDefinition configDefinition : configDefinitions) {
             //索引校验
-            if (needValidate()) {
+            if (supportValidate()) {
                 allConfigIndexedJsons.put(configDefinition, validateIndex(configDefinition));
             }
             //needLoad():加载配置
             load(configDefinition.getFullName(Language.java), getConfigTables(configDefinition), false);
         }
 
-        if (needValidate()) {
+        if (supportValidate()) {
             //格式错误
             for (ConfigReader reader : readers.values()) {
                 validatedErrors.addAll(reader.getValidatedErrors());
@@ -447,7 +449,7 @@ public class DefinitionConfigLoader extends ConfigLoader {
     }
 
     @Override
-    public void reloadByConfigName(Collection<String> configNames) {
+    public Set<Class<? extends Config>> reloadByConfigName(Collection<String> configNames) {
         checkReload();
         validatedErrors.clear();
 
@@ -461,15 +463,16 @@ public class DefinitionConfigLoader extends ConfigLoader {
         for (String configName : configNames) {
             ConfigDefinition configDefinition = configDefinitions.get(configName);
             if (configDefinition == null) {
-                logger.error("重加载[{}]失败，不存在该配置", configName);
+                validatedErrors.add(String.format("重加载[%s]失败，不存在该配置", configName));
                 continue;
             }
             readerNames.addAll(getConfigTables(configDefinition));
         }
-        reloadByReaderName(readerNames);
+
+        return reloadByReaderName(readerNames);
     }
 
-    private void reloadByReaderName(Collection<String> readerNames) {
+    private Set<Class<? extends Config>> reloadByReaderName(Collection<String> readerNames) {
         checkReload();
         validatedErrors.clear();
 
@@ -479,7 +482,7 @@ public class DefinitionConfigLoader extends ConfigLoader {
         for (String readerName : readerNames) {
             ConfigReader configReader = readers.get(readerName);
             if (configReader == null) {
-                logger.error("重加载[{}]失败，对应配置从未被加载", readerName);
+                validatedErrors.add(String.format("重加载[%s]失败，对应配置从未被加载", readerName));
                 continue;
             }
             configReader.clear();
@@ -498,7 +501,7 @@ public class DefinitionConfigLoader extends ConfigLoader {
 
         for (ConfigReader reloadReader : reloadReaders) {
             List<String> errors = reloadReader.getValidatedErrors();
-            if (needValidate()) {
+            if (supportValidate()) {
                 this.validatedErrors.addAll(errors);
             }
         }
@@ -506,6 +509,8 @@ public class DefinitionConfigLoader extends ConfigLoader {
         if (!validatedErrors.isEmpty()) {
             throw new ValidatedException(validatedErrors);
         }
+
+        return reloadReaders.stream().map(r -> r.getPrototype().getClass()).collect(Collectors.toSet());
     }
 
     /**
@@ -518,7 +523,7 @@ public class DefinitionConfigLoader extends ConfigLoader {
         for (String tableName : tableNames) {
             ConfigDefinition configDefinition = parser.getTableConfigs().get(tableName);
             if (configDefinition == null) {
-                logger.error("重加载[{}]失败，不存在该配置", tableName);
+                validatedErrors.add(String.format("重加载[%s]失败，不存在该配置", tableName));
                 continue;
             }
             if (tableType == TableType.json) {
