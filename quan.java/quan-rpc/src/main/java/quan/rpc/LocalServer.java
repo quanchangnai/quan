@@ -232,7 +232,7 @@ public class LocalServer {
     protected void update() {
         remotes.values().forEach(RemoteServer::update);
         for (Worker worker : workers.values()) {
-            worker.driveUpdate();
+            worker.tryUpdate();
         }
     }
 
@@ -262,7 +262,7 @@ public class LocalServer {
 
     public synchronized void addRemote(int remoteId, String remoteIp, int remotePort) {
         if (remotes.containsKey(remoteId)) {
-            logger.error("添加的远程服务器[{}]已存在", remoteId);
+            logger.error("远程服务器[{}]已存在", remoteId);
             return;
         }
 

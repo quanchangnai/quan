@@ -173,9 +173,9 @@ public class Worker implements Executor {
     }
 
     /**
-     * 驱动刷帧并检测帧率，不在当前线程中执行
+     * 执行刷帧并检测帧率，上一次刷帧还没有结束则不执行新的刷帧
      */
-    protected void driveUpdate() {
+    protected void tryUpdate() {
         if (updateFinished) {
             updateFinished = false;
             execute(this::update);
@@ -189,7 +189,7 @@ public class Worker implements Executor {
             for (StackTraceElement traceElement : thread.getStackTrace()) {
                 stackTrace.append("\tat ").append(traceElement).append("\n");
             }
-            logger.error("工作线程[{}]帧率过低，距离上次刷帧已经过了{}ms，线程可能在执行耗时任务\n{}", id, intervalTime, stackTrace);
+            logger.error("工作线程[{}]帧率过低，距离上次刷帧已经过了{}ms，线程[{}]可能在执行耗时任务\n{}", id, intervalTime, thread.getId(), stackTrace);
         }
     }
 
@@ -293,12 +293,13 @@ public class Worker implements Executor {
     /**
      * 如果有参数是不安全的,则需要复制它以保证安全
      *
-     * @param securityModifier 1:所有参数都是安全的，参考 {@link Endpoint#paramSafe()}
+     * @param securityModifier 1:标记所有参数都是安全的，参考 {@link Endpoint#paramSafe()}
      */
     protected void makeParamSafe(int targetServerId, int securityModifier, Object[] params) {
         if (targetServerId != 0 && targetServerId != this.server.getId()) {
             return;
         }
+
         if (params == null || (securityModifier & 0b01) == 0b01) {
             return;
         }
@@ -312,14 +313,15 @@ public class Worker implements Executor {
     }
 
     /**
-     * 如果返回结果是不安全的，则需要复它以保证安全
+     * 如果返回结果是不安全的，则需要复制它以保证安全
      *
-     * @param securityModifier 2:返回结果是安全的，参考 {@link Endpoint#resultSafe()}
+     * @param securityModifier 2:标记返回结果是安全的，参考 {@link Endpoint#resultSafe()}
      */
     protected Object makeResultSafe(int originServerId, int securityModifier, Object result) {
         if (originServerId != this.server.getId()) {
             return result;
         }
+
         if (CommonUtils.isConstant(result) || (securityModifier & 0b10) == 0b10) {
             return result;
         } else {

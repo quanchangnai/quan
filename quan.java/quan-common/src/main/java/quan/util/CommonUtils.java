@@ -99,7 +99,7 @@ public class CommonUtils {
     }
 
     /**
-     * 判断对象是不是常量
+     * 判断对象是不是常量，包含原生类型及其包装类型等不可变类型
      */
     public static boolean isConstant(Object value) {
         if (value == null) {

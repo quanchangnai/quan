@@ -83,4 +83,8 @@ public final class DelayedResult<R> extends Promise<R> {
         }
     }
 
+    protected String getExceptionStr() {
+        return exception == null ? null : exception.toString();
+    }
+
 }

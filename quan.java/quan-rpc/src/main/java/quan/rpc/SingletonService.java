@@ -7,7 +7,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 标记服务为单例服务
+ * 单例服务标记
  *
  * @author quanchangnai
  */

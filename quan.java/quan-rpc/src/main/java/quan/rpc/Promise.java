@@ -29,7 +29,7 @@ public class Promise<R> {
 
     private R result;
 
-    private Exception exception;
+    protected Exception exception;
 
     private Object resultHandler;
 
@@ -111,15 +111,11 @@ public class Promise<R> {
         if (exceptionHandler instanceof Consumer) {
             ((Consumer) exceptionHandler).accept(exception);
         } else {
-            Promise<?> handlerPromise = (Promise<?>) ((Supplier) exceptionHandler).get();
+            Promise<?> handlerPromise = (Promise<?>) ((Function) exceptionHandler).apply(exception);
             if (handlerPromise != null) {
                 handlerPromise.delegate(helpPromise);
             }
         }
-    }
-
-    protected String getExceptionStr() {
-        return exception == null ? null : exception.toString();
     }
 
     protected boolean isExpired() {
@@ -202,7 +198,7 @@ public class Promise<R> {
      *
      * @see #then(Function)
      */
-    public <R2> Promise<R2> except(Function<String, Promise<R2>> handler) {
+    public <R2> Promise<R2> except(Function<Exception, Promise<R2>> handler) {
         checkHandler(this.exceptionHandler, handler);
         this.exceptionHandler = handler;
         return getHelpPromise();
