@@ -20,9 +20,9 @@ import quan.message.NettyCodedBuffer;
 import quan.rpc.protocol.*;
 import quan.rpc.serialize.ObjectWriter;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -41,7 +41,7 @@ public class NettyConnector extends Connector {
 
     private Receiver receiver;
 
-    private final Map<Integer, Sender> senders = new HashMap<>();
+    private final Map<Integer, Sender> senders = new ConcurrentHashMap<>();
 
     public NettyConnector(String ip, int port) {
         receiver = new Receiver(ip, port, this);
@@ -76,10 +76,10 @@ public class NettyConnector extends Connector {
         senders.values().forEach(Sender::update);
     }
 
-    public void addRemote(int remoteId, String remoteIp, int remotePort) {
+    public boolean addRemote(int remoteId, String remoteIp, int remotePort) {
         if (senders.containsKey(remoteId) || localServer != null && localServer.hasRemote(remoteId)) {
             logger.error("远程服务器[{}]已存在", remoteId);
-            return;
+            return false;
         }
 
         Sender sender = new Sender(remoteId, remoteIp, remotePort, this);
@@ -88,6 +88,16 @@ public class NettyConnector extends Connector {
         if (localServer != null && localServer.isRunning()) {
             sender.start();
         }
+
+        return true;
+    }
+
+    public boolean removeRemote(int remoteId) {
+        Sender sender = senders.remove(remoteId);
+        if (sender != null) {
+            sender.stop();
+        }
+        return sender != null;
     }
 
     public Set<Integer> getRemoteIds() {

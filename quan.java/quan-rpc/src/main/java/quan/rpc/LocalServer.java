@@ -36,7 +36,7 @@ public class LocalServer {
     private Set<Connector> connectors = new HashSet<>();
 
     /**
-     * 使用服务名作为参数，调用后返回目标服务器ID，如果服务的目标服务器是单进程的，可以省去每次构造服务代理都必需要传参的麻烦
+     * 如果服务的目标服务器只有一个，使用服务名作为参数调用后返回目标服务器ID，可以省去每次构造服务代理都必需要传参的麻烦
      */
     private Function<String, Integer> targetServerIdResolver;
 
@@ -57,6 +57,10 @@ public class LocalServer {
         this.id = id;
         this.initWorkers(workerNum);
         this.initConnectors(connectors);
+    }
+
+    public LocalServer(int id, Connector... connectors) {
+        this(id, 0, connectors);
     }
 
     public final int getId() {
@@ -202,7 +206,11 @@ public class LocalServer {
     }
 
     public void addService(Worker worker, Service service) {
-        Object serviceId = service.getId();
+        if (workers.get(worker.getId()) != worker) {
+            throw new IllegalArgumentException(String.format("参数[worker]不合法，它不是服务器[%s]管理的工作线程", this.id));
+        }
+
+        Object serviceId = Objects.requireNonNull(service.getId(), "服务ID不能为空");
         if (services.putIfAbsent(serviceId, service) == null) {
             worker.execute(() -> worker.doAddService(service));
         } else {
