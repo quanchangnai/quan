@@ -3,12 +3,14 @@ package quan.rpc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.Executor;
+
 /**
  * 支持远程方法调用的服务，被{@link Endpoint}标记的方法可以被远程调用
  *
  * @author quanchangnai
  */
-public abstract class Service {
+public abstract class Service implements Executor {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -55,6 +57,7 @@ public abstract class Service {
     /**
      * 在服务所属的工作线程中执行任务
      */
+    @Override
     public final void execute(Runnable task) {
         worker.execute(task);
     }
