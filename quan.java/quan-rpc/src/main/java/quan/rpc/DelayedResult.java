@@ -14,10 +14,8 @@ public final class DelayedResult<R> extends Promise<R> {
     //服务方法参数或返回结果的安全修饰符
     private int securityModifier;
 
-    private Worker worker;
-
     DelayedResult(Worker worker) {
-        this.worker = worker;
+       super(worker);
     }
 
     int getOriginServerId() {
@@ -42,8 +40,7 @@ public final class DelayedResult<R> extends Promise<R> {
             throw new IllegalStateException("不能重复设置延迟结果");
         }
 
-        Worker current = Worker.current();
-        if (current != this.worker) {
+        if (Worker.current() != this.worker) {
             this.worker.execute(() -> setResult(result));
             return;
         }
@@ -66,8 +63,7 @@ public final class DelayedResult<R> extends Promise<R> {
             throw new IllegalStateException("不能重复设置延迟结果");
         }
 
-        Worker current = Worker.current();
-        if (current != this.worker) {
+        if (Worker.current() != this.worker) {
             this.worker.execute(() -> setException(exception));
             return;
         }

@@ -25,7 +25,8 @@ public class Response extends Protocol {
     protected Response() {
     }
 
-    public Response(long callId, Object result, String exception) {
+    public Response(int serverId,long callId, Object result, String exception) {
+        super(serverId);
         this.callId = callId;
         this.result = result;
         this.exception = exception;
@@ -48,6 +49,7 @@ public class Response extends Protocol {
 
     @Override
     public void transferTo(ObjectWriter writer) {
+        super.transferTo(writer);
         writer.write(callId);
         writer.write(result);
         writer.write(exception);
@@ -55,9 +57,19 @@ public class Response extends Protocol {
 
     @Override
     public void transferFrom(ObjectReader reader) {
+        super.transferFrom(reader);
         callId = reader.read();
         result = reader.read();
         exception = reader.read();
+    }
+
+    @Override
+    public String toString() {
+        return "Response{" +
+                "callId=" + callId +
+                ", result=" + result +
+                ", exception='" + exception + '\'' +
+                '}';
     }
 
 }

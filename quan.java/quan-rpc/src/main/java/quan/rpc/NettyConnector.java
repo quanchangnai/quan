@@ -13,13 +13,12 @@ import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import org.apache.commons.lang3.Validate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import quan.message.CodedBuffer;
 import quan.message.NettyCodedBuffer;
 import quan.rpc.protocol.*;
 import quan.rpc.serialize.ObjectWriter;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,31 +31,14 @@ import java.util.concurrent.TimeUnit;
  */
 public class NettyConnector extends Connector {
 
-    protected final static Logger logger = LoggerFactory.getLogger(NettyConnector.class);
-
-    /**
-     * 重连时间间隔(秒)
-     */
-    private int reconnectInterval = 5;
-
     private Receiver receiver;
 
     private final Map<Integer, Sender> senders = new ConcurrentHashMap<>();
 
+    private Set<Integer> remoteIds = Collections.unmodifiableSet(senders.keySet());
+
     public NettyConnector(String ip, int port) {
         receiver = new Receiver(ip, port, this);
-    }
-
-    public void setReconnectInterval(int reconnectInterval) {
-        this.reconnectInterval = reconnectInterval;
-    }
-
-    public int getReconnectInterval() {
-        return reconnectInterval;
-    }
-
-    public LocalServer getLocalServer() {
-        return localServer;
     }
 
     @Override
@@ -69,6 +51,7 @@ public class NettyConnector extends Connector {
     protected void stop() {
         receiver.stop();
         senders.values().forEach(Sender::stop);
+        senders.clear();
     }
 
     @Override
@@ -101,12 +84,22 @@ public class NettyConnector extends Connector {
     }
 
     public Set<Integer> getRemoteIds() {
-        return senders.keySet();
+        return remoteIds;
+    }
+
+    @Override
+    public boolean isRemoteActivated(int remoteId) {
+        Sender sender = senders.remove(remoteId);
+        return sender != null && sender.context != null;
     }
 
     @Override
     protected void sendProtocol(int remoteId, Protocol protocol) {
-        senders.get(remoteId).sendProtocol(protocol);
+        Sender sender = senders.get(remoteId);
+        if (sender == null) {
+            throw new IllegalArgumentException(String.format("远程服务器[%s]不存在", remoteId));
+        }
+        sender.sendProtocol(protocol);
     }
 
     protected void sendProtocol(ChannelHandlerContext context, Protocol protocol) {
@@ -118,22 +111,26 @@ public class NettyConnector extends Connector {
             context.writeAndFlush(byteBuf);
         } catch (Throwable e) {
             byteBuf.release();
-            logger.error("", e);
+            throw new RuntimeException("发送协议出错", e);
         }
     }
 
     /**
      * 处理RPC握手逻辑
      */
-    protected void handleHandshake(Handshake handshake) {
+    protected boolean handleHandshake(Handshake handshake) {
         int remoteId = handshake.getServerId();
         if (!senders.containsKey(remoteId)) {
-            addRemote(remoteId, handshake.getServerIp(), handshake.getServerPort());
+            if (!addRemote(remoteId, handshake.getParam(0), handshake.getParam(1))) {
+                return false;
+            }
+            senders.get(remoteId).passive = true;
         }
+        return true;
     }
 
-    protected void handlePingPong(int originServerId, PingPong pingPong) {
-        Sender sender = senders.get(originServerId);
+    protected void handlePingPong(PingPong pingPong) {
+        Sender sender = senders.get(pingPong.getServerId());
         if (sender != null) {
             sender.handlePingPong(pingPong);
         }
@@ -161,7 +158,7 @@ public class NettyConnector extends Connector {
 
         public void start() {
             EventLoopGroup bossGroup = new NioEventLoopGroup(1);
-            EventLoopGroup workerGroup = new NioEventLoopGroup();
+            EventLoopGroup workerGroup = new NioEventLoopGroup(connector.getLocalServer().getWorkerNum());
 
             serverBootstrap = new ServerBootstrap();
             serverBootstrap.group(bossGroup, workerGroup)
@@ -179,23 +176,20 @@ public class NettyConnector extends Connector {
                             p.addLast(new LengthFieldBasedFrameDecoder(100000, 0, 4, 0, 4));
                             p.addLast(new ChannelInboundHandlerAdapter() {
 
-                                private int remoteServerId;
-
                                 @Override
                                 public void channelRead(ChannelHandlerContext context, Object msg) {
                                     CodedBuffer buffer = new NettyCodedBuffer((ByteBuf) msg);
                                     Protocol protocol = connector.localServer.getReaderFactory().apply(buffer).read();
 
                                     if (protocol instanceof Handshake) {
-                                        Handshake handshake = (Handshake) protocol;
-                                        remoteServerId = handshake.getServerId();
-                                        connector.handleHandshake(handshake);
+                                        if (!connector.handleHandshake((Handshake) protocol)) {
+                                            context.close();
+                                        }
                                     } else if (protocol instanceof PingPong) {
-                                        PingPong pingPong = (PingPong) protocol;
-                                        connector.handlePingPong(remoteServerId, pingPong);
+                                        connector.handlePingPong((PingPong) protocol);
                                         connector.sendProtocol(context, protocol);
                                     } else if (protocol instanceof Request) {
-                                        connector.localServer.handleRequest(remoteServerId, (Request) protocol);
+                                        connector.localServer.handleRequest((Request) protocol);
                                     } else if (protocol instanceof Response) {
                                         connector.localServer.handleResponse((Response) protocol);
                                     } else {
@@ -229,8 +223,6 @@ public class NettyConnector extends Connector {
      */
     private static class Sender {
 
-        protected static final Logger logger = LoggerFactory.getLogger(Sender.class);
-
         //远程服务器ID
         private int id;
 
@@ -239,6 +231,9 @@ public class NettyConnector extends Connector {
         private int port;
 
         protected NettyConnector connector;
+
+        //被动添加的
+        private boolean passive;
 
         private long lastSendPingPongTime;
 
@@ -276,14 +271,18 @@ public class NettyConnector extends Connector {
                                 @Override
                                 public void channelActive(ChannelHandlerContext context) {
                                     Sender.this.context = context;
-                                    sendHandshake();
+                                    Handshake handshake = new Handshake(connector.getLocalServer().getId(), connector.receiver.ip, connector.receiver.port);
+                                    sendProtocol(handshake);
                                 }
 
                                 @Override
                                 public void channelInactive(ChannelHandlerContext context) {
                                     Sender.this.context = null;
-                                    if (bootstrap != null) {
-                                        logger.error("连接断开，将在{}秒后尝试重连: {}", connector.reconnectInterval, context.channel().remoteAddress());
+                                    if (passive) {
+                                        logger.error("远程服务器[{}]连接已断开：{}", id, context.channel().remoteAddress());
+                                        connector.removeRemote(id);
+                                    } else if (bootstrap != null) {
+                                        logger.error("远程服务器[{}]连接已断开，将在{}秒后尝试重连: {}", id, connector.getReconnectInterval(), context.channel().remoteAddress());
                                         reconnect();
                                     }
                                 }
@@ -311,7 +310,7 @@ public class NettyConnector extends Connector {
             ChannelFuture channelFuture = bootstrap.connect(ip, port);
             channelFuture.addListener(future -> {
                 if (!future.isSuccess()) {
-                    logger.error("连接失败，将在{}秒后尝试重连，失败原因：{}", connector.reconnectInterval, future.cause().getMessage());
+                    logger.error("连接远程服务器[{}]失败，将在{}秒后尝试重连，失败原因：{}", id, connector.getReconnectInterval(), future.cause().getMessage());
                     reconnect();
                 }
             });
@@ -319,26 +318,29 @@ public class NettyConnector extends Connector {
 
         protected void reconnect() {
             if (bootstrap != null) {
-                bootstrap.config().group().schedule(this::connect, connector.reconnectInterval, TimeUnit.SECONDS);
+                bootstrap.config().group().schedule(this::connect, connector.getReconnectInterval(), TimeUnit.SECONDS);
             }
         }
 
         protected void sendProtocol(Protocol protocol) {
             if (context == null) {
-                logger.error("连接还未建立，不能发送RPC协议");
+                throw new IllegalStateException(String.format("远程服务器[%s]的连接还未建立", id));
             } else {
-                connector.sendProtocol(context, protocol);
+                try {
+                    connector.sendProtocol(context, protocol);
+                } catch (Exception e) {
+                    throw new RuntimeException(String.format("发送协议到远程服务器[%s]出错", id), e.getCause());
+                }
             }
         }
 
-        protected void sendHandshake() {
-            Handshake handshake = new Handshake(connector.getLocalServer().getId(), connector.receiver.ip, connector.receiver.port);
-            sendProtocol(handshake);
-        }
-
         protected void update() {
-            checkSuspended();
-            sendPingPong();
+            try {
+                checkSuspended();
+                sendPingPong();
+            } catch (Exception e) {
+                logger.error("", e);
+            }
         }
 
         protected void checkSuspended() {
@@ -350,21 +352,19 @@ public class NettyConnector extends Connector {
         }
 
         protected void sendPingPong() {
-            if (context == null) {
-                return;
-            }
-
-            long currentTime = System.currentTimeMillis();
-            if (lastSendPingPongTime + 5000 < currentTime) {
-                sendProtocol(new PingPong(currentTime));
-                lastSendPingPongTime = currentTime;
+            if (context != null) {
+                long currentTime = System.currentTimeMillis();
+                if (lastSendPingPongTime + 5000 < currentTime) {
+                    sendProtocol(new PingPong(connector.localServer.getId(), currentTime));
+                    lastSendPingPongTime = currentTime;
+                }
             }
         }
 
         protected void handlePingPong(PingPong pingPong) {
             lastHandlePingPongTime = System.currentTimeMillis();
             if (logger.isDebugEnabled()) {
-                logger.debug("远程服务器[{}]的延迟时间为：{}ms", id, lastHandlePingPongTime - pingPong.getTime());
+                logger.debug("远程服务器[{}]的延迟时间为:{}ms", id, lastHandlePingPongTime - pingPong.getTime());
             }
         }
 

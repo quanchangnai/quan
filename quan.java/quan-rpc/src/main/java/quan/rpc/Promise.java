@@ -25,7 +25,9 @@ public class Promise<R> {
      */
     private String signature;
 
-    private long time = System.currentTimeMillis();
+    protected final Worker worker;
+
+    private long expiredTime;
 
     private R result;
 
@@ -41,12 +43,15 @@ public class Promise<R> {
 
     private boolean finished;
 
-    protected Promise() {
+    protected Promise(Worker worker) {
+        this(0, null, worker);
     }
 
-    protected Promise(long callId, String signature) {
+    protected Promise(long callId, String signature, Worker worker) {
         this.callId = callId;
         this.signature = signature;
+        this.worker = worker;
+        this.expiredTime = System.currentTimeMillis() + worker.getServer().getCallTtl() * 1000L;
     }
 
     protected long getCallId() {
@@ -57,8 +62,12 @@ public class Promise<R> {
         this.callId = callId;
     }
 
-    protected long getTime() {
-        return time;
+    public Worker getWorker() {
+        return worker;
+    }
+
+    public long getExpiredTime() {
+        return expiredTime;
     }
 
     protected boolean isFinished() {
@@ -67,7 +76,7 @@ public class Promise<R> {
 
     protected Promise getHelpPromise() {
         if (helpPromise == null) {
-            helpPromise = new Promise();
+            helpPromise = new Promise(worker);
         }
         return helpPromise;
     }
@@ -97,6 +106,7 @@ public class Promise<R> {
     protected void setException(Exception exception) {
         this.finished = true;
         this.exception = exception;
+
         if (exception instanceof CallException) {
             CallException callException = (CallException) exception;
             callException.setCallId(callId);
@@ -118,9 +128,11 @@ public class Promise<R> {
         }
     }
 
+    /**
+     * 是否过期
+     */
     protected boolean isExpired() {
-        //暂定10秒过期
-        return System.currentTimeMillis() - time > 10000;
+        return System.currentTimeMillis() > expiredTime;
     }
 
     protected void setTimeout() {
@@ -151,7 +163,7 @@ public class Promise<R> {
     private void delegate(Promise promise) {
         promise.callId = this.callId;
         promise.signature = this.signature;
-        promise.time = this.time;
+        promise.expiredTime = this.expiredTime;
         this.then(promise::setResult);
         this.except(promise::setException);
         this.timeout(promise::setTimeout);

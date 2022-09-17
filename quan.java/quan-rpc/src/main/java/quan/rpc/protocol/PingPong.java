@@ -13,7 +13,8 @@ public class PingPong extends Protocol {
     protected PingPong() {
     }
 
-    public PingPong(long time) {
+    public PingPong(int serverId,long time) {
+        super(serverId);
         this.time = time;
     }
 
@@ -27,12 +28,21 @@ public class PingPong extends Protocol {
 
     @Override
     public void transferTo(ObjectWriter writer) {
+        super.transferTo(writer);
         writer.write(time);
     }
 
     @Override
     public void transferFrom(ObjectReader reader) {
+        super.transferFrom(reader);
         time = reader.read();
+    }
+
+    @Override
+    public String toString() {
+        return "PingPong{" +
+                "time=" + time +
+                '}';
     }
 
 }

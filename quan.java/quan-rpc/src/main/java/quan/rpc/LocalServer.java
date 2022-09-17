@@ -4,6 +4,7 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.message.CodedBuffer;
+import quan.rpc.protocol.Protocol;
 import quan.rpc.protocol.Request;
 import quan.rpc.protocol.Response;
 import quan.rpc.serialize.ObjectReader;
@@ -29,6 +30,8 @@ public class LocalServer {
 
     private int updateInterval = 50;
 
+    private int callTtl = 10;
+
     private Function<CodedBuffer, ObjectReader> readerFactory = ObjectReader::new;
 
     private Function<CodedBuffer, ObjectWriter> writerFactory = ObjectWriter::new;
@@ -41,7 +44,7 @@ public class LocalServer {
     private Function<String, Integer> targetServerIdResolver;
 
     //管理的所有工作线程，key:工作线程ID
-    private final Map<Integer, Worker> workers = new HashMap<>();
+    private Map<Integer, Worker> workers = new HashMap<>();
 
     private final List<Integer> workerIds = new ArrayList<>();
 
@@ -51,6 +54,8 @@ public class LocalServer {
     private final Map<Object, Service> services = new ConcurrentHashMap<>();
 
     private ScheduledExecutorService executor;
+
+    private boolean running;
 
     public LocalServer(int id, int workerNum, Connector... connectors) {
         Validate.isTrue(id > 0, "服务器ID必须是正整数");
@@ -65,6 +70,10 @@ public class LocalServer {
 
     public final int getId() {
         return id;
+    }
+
+    public final Map<Integer, Worker> getWorkers() {
+        return workers;
     }
 
     public final int getWorkerNum() {
@@ -82,6 +91,19 @@ public class LocalServer {
 
     public int getUpdateInterval() {
         return updateInterval;
+    }
+
+    public int getCallTtl() {
+        return callTtl;
+    }
+
+    /**
+     * 设置调用超时时间(秒)
+     */
+    public void setCallTtl(int callTtl) {
+        if (callTtl > 0) {
+            this.callTtl = callTtl;
+        }
     }
 
     /**
@@ -110,6 +132,15 @@ public class LocalServer {
         return connectors;
     }
 
+    public Connector getConnector(int remoteId) {
+        for (Connector connector : connectors) {
+            if (connector.getRemoteIds().contains(remoteId)) {
+                return connector;
+            }
+        }
+        return null;
+    }
+
     /**
      * @see #targetServerIdResolver
      */
@@ -121,15 +152,17 @@ public class LocalServer {
         return targetServerIdResolver;
     }
 
-
     private void initWorkers(int workerNum) {
         if (workerNum <= 0) {
             workerNum = Runtime.getRuntime().availableProcessors();
         }
+
         for (int i = 0; i < workerNum; i++) {
             Worker worker = new Worker(this);
             workers.put(worker.getId(), worker);
         }
+
+        workers = Collections.unmodifiableMap(workers);
         workerIds.addAll(workers.keySet());
     }
 
@@ -168,37 +201,40 @@ public class LocalServer {
     }
 
     public synchronized void start() {
-        workers.values().forEach(Worker::start);
-        connectors.forEach(Connector::start);
         executor = Executors.newScheduledThreadPool(1);
         executor.scheduleAtFixedRate(this::update, updateInterval, updateInterval, TimeUnit.MILLISECONDS);
+        workers.values().forEach(Worker::start);
+        connectors.forEach(Connector::start);
+        running = true;
     }
 
     public synchronized void stop() {
+        running = false;
         executor.shutdown();
         executor = null;
         connectors.forEach(Connector::stop);
         workers.values().forEach(Worker::stop);
+        workers = new HashMap<>();
+        workerIds.clear();
     }
 
     public boolean isRunning() {
-        return executor != null;
+        return running;
     }
 
-
     protected void update() {
-        connectors.forEach(Connector::update);
-        workers.values().forEach(Worker::tryUpdate);
+        if (running) {
+            try {
+                connectors.forEach(Connector::update);
+                workers.values().forEach(Worker::tryUpdate);
+            } catch (Exception e) {
+                logger.error("", e);
+            }
+        }
     }
 
     public boolean hasRemote(int remoteId) {
-        for (Connector connector : connectors) {
-            if (connector.getRemoteIds().contains(remoteId)) {
-                return true;
-            }
-        }
-
-        return false;
+        return getConnector(remoteId) != null;
     }
 
     public void addService(Service service) {
@@ -207,7 +243,7 @@ public class LocalServer {
 
     public void addService(Worker worker, Service service) {
         if (workers.get(worker.getId()) != worker) {
-            throw new IllegalArgumentException(String.format("参数[worker]不合法，它不是服务器[%s]管理的工作线程", this.id));
+            throw new IllegalArgumentException(String.format("参数[worker]不是服务器[%s]管理的工作线程", this.id));
         }
 
         Object serviceId = Objects.requireNonNull(service.getId(), "服务ID不能为空");
@@ -229,56 +265,53 @@ public class LocalServer {
         worker.execute(() -> worker.doRemoveService(service));
     }
 
+    protected void sendProtocol(int targetServerId, Protocol protocol) {
+        Connector connector = getConnector(targetServerId);
+        if (connector != null) {
+            connector.sendProtocol(targetServerId, protocol);
+        } else {
+            throw new IllegalArgumentException(String.format("远程服务器[%s]不存在", targetServerId));
+        }
+    }
+
     /**
      * 发送RPC请求
      */
     protected void sendRequest(int targetServerId, Request request, int securityModifier) {
         if (targetServerId == this.id || targetServerId == 0) {
             //本地服务器直接处理
-            handleRequest(this.id, request, securityModifier);
+            handleRequest(request, securityModifier);
         } else {
-            for (Connector connector : connectors) {
-                if (connector.getRemoteIds().contains(targetServerId)) {
-                    connector.sendProtocol(targetServerId, request);
-                    return;
-                }
-            }
-            logger.error("发送RPC请求，远程服务器[{}]不存在", targetServerId);
+            sendProtocol(targetServerId, request);
         }
     }
 
     /**
      * 处理RPC请求
      */
-    protected void handleRequest(int originServerId, Request request, int securityModifier) {
+    protected void handleRequest(Request request, int securityModifier) {
         Service service = services.get(request.getServiceId());
         if (service == null) {
             logger.error("处理RPC请求，服务[{}]不存在", request.getServiceId());
         } else {
             Worker worker = service.getWorker();
-            worker.execute(() -> worker.handleRequest(originServerId, request, securityModifier));
+            worker.execute(() -> worker.handleRequest(request, securityModifier));
         }
     }
 
-    protected void handleRequest(int originServerId, Request request) {
-        handleRequest(originServerId, request, 0b11);
+    protected void handleRequest(Request request) {
+        handleRequest(request, 0b11);
     }
 
     /**
      * 发送RPC响应
      */
-    protected void sendResponse(int originServerId, Response response) {
-        if (originServerId == this.id) {
+    protected void sendResponse(int targetServerId, Response response) {
+        if (targetServerId == this.id) {
             //本地服务器直接处理
             handleResponse(response);
         } else {
-            for (Connector connector : connectors) {
-                if (connector.getRemoteIds().contains(originServerId)) {
-                    connector.sendProtocol(originServerId, response);
-                    return;
-                }
-            }
-            logger.error("发送RPC响应，远程服务器[{}]不存在", originServerId);
+            sendProtocol(targetServerId, response);
         }
     }
 
@@ -286,10 +319,11 @@ public class LocalServer {
      * 处理RPC响应
      */
     protected void handleResponse(Response response) {
-        int workerId = (int) (response.getCallId() >> 32);
+        long callId = response.getCallId();
+        int workerId = (int) (callId >> 32);
         Worker worker = workers.get(workerId);
         if (worker == null) {
-            logger.error("处理RPC响应，工作线程[{}]不存在", workerId);
+            logger.error("处理RPC响应，工作线程[{}]不存在，originServerId:{}，callId:{}", workerId, response.getServerId(), callId);
         } else {
             worker.execute(() -> worker.handleResponse(response));
         }

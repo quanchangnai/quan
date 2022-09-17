@@ -1,5 +1,7 @@
 package quan.rpc;
 
+import quan.rpc.protocol.Response;
+
 /**
  * 远程调用异常
  *
@@ -31,6 +33,14 @@ public class CallException extends Exception {
             message = String.format("调用[%s]方法[%s]返回异常：", callId, signature);
         }
         return message + super.getMessage();
+    }
+
+    public static CallException create(Response response) {
+        if (response.getException() != null) {
+            return new CallException(response.getException());
+        } else {
+            return null;
+        }
     }
 
 }

@@ -1,5 +1,7 @@
 package quan.rpc.protocol;
 
+import quan.rpc.serialize.ObjectReader;
+import quan.rpc.serialize.ObjectWriter;
 import quan.rpc.serialize.Transferable;
 import quan.rpc.serialize.TransferableRegistry;
 
@@ -8,7 +10,19 @@ import quan.rpc.serialize.TransferableRegistry;
  */
 public abstract class Protocol implements Transferable {
 
+    /**
+     * 来源服务器ID
+     */
+    private int serverId;
+
     private static volatile TransferableRegistry registry;
+
+    public Protocol() {
+    }
+
+    public Protocol(int serverId) {
+        this.serverId = serverId;
+    }
 
     public static TransferableRegistry getRegistry() {
         if (registry == null) {
@@ -23,6 +37,23 @@ public abstract class Protocol implements Transferable {
             }
         }
         return registry;
+    }
+
+    /**
+     * @see #serverId
+     */
+    public int getServerId() {
+        return serverId;
+    }
+
+    @Override
+    public void transferTo(ObjectWriter writer) {
+        writer.write(serverId);
+    }
+
+    @Override
+    public void transferFrom(ObjectReader reader) {
+        serverId = reader.read();
     }
 
 }

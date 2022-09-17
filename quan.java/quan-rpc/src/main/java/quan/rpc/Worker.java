@@ -56,9 +56,9 @@ public class Worker implements Executor {
     private Map<Long, Promise<Object>> mappedPromises = new HashMap<>();
 
     //按时间排序
-    private TreeSet<Promise<Object>> sortedPromises = new TreeSet<>(Comparator.comparingLong(Promise::getTime));
+    private TreeSet<Promise<Object>> sortedPromises = new TreeSet<>(Comparator.comparingLong(Promise::getExpiredTime));
 
-    private TreeSet<DelayedResult<Object>> delayedResults = new TreeSet<>(Comparator.comparingLong(DelayedResult::getTime));
+    private TreeSet<DelayedResult<Object>> delayedResults = new TreeSet<>(Comparator.comparingLong(DelayedResult::getExpiredTime));
 
     private ObjectWriter writer;
 
@@ -200,7 +200,7 @@ public class Worker implements Executor {
             try {
                 service.update();
             } catch (Throwable e) {
-                logger.error("", e);
+                logger.error("服务[{}]刷帧出错", service.getId(), e);
             }
         }
 
@@ -266,13 +266,23 @@ public class Worker implements Executor {
 
         makeParamSafe(targetServerId, securityModifier, params);
 
-        Request request = new Request(serviceId, methodId, params);
+        Request request = new Request(server.getId(), serviceId, methodId, params);
         request.setCallId(callId);
-        server.sendRequest(targetServerId, request, securityModifier);
 
-        Promise<Object> promise = new Promise<>(callId, signature);
-        mappedPromises.put(callId, promise);
-        sortedPromises.add(promise);
+        Promise<Object> promise = new Promise<>(callId, signature, this);
+        boolean sendError = false;
+
+        try {
+            server.sendRequest(targetServerId, request, securityModifier);
+        } catch (Exception e) {
+            sendError = true;
+            execute(() -> promise.setException(e));
+        }
+
+        if (!sendError) {
+            mappedPromises.put(callId, promise);
+            sortedPromises.add(promise);
+        }
 
         //noinspection unchecked
         return (Promise<R>) promise;
@@ -329,7 +339,8 @@ public class Worker implements Executor {
         }
     }
 
-    protected void handleRequest(int originServerId, Request request, int securityModifier) {
+    protected void handleRequest(Request request, int securityModifier) {
+        int originServerId = request.getServerId();
         long callId = request.getCallId();
         Object serviceId = request.getServiceId();
         Object result = null;
@@ -363,31 +374,37 @@ public class Worker implements Executor {
             }
         }
 
-        Response response = new Response(callId, result, exception);
+        Response response = new Response(server.getId(), callId, result, exception);
         server.sendResponse(originServerId, response);
     }
 
     protected void handleDelayedResult(DelayedResult delayedResult) {
         int originServerId = delayedResult.getOriginServerId();
         Object result = makeResultSafe(originServerId, delayedResult.getSecurityModifier(), delayedResult.getResult());
-        Response response = new Response(delayedResult.getCallId(), result, delayedResult.getExceptionStr());
+        Response response = new Response(server.getId(), delayedResult.getCallId(), result, delayedResult.getExceptionStr());
         server.sendResponse(originServerId, response);
     }
 
     protected void handleResponse(Response response) {
         long callId = response.getCallId();
+        if (!mappedPromises.containsKey(callId)) {
+            logger.error("处理RPC响应，调用[{}]不存在或者已超时", callId);
+        } else {
+            handlePromise(callId, CallException.create(response), response.getResult());
+        }
+    }
+
+    protected void handlePromise(long callId, Exception exception, Object result) {
         Promise<Object> promise = mappedPromises.remove(callId);
         if (promise == null) {
-            logger.error("处理RPC响应，调用[{}]不存在或者已超时", callId);
             return;
         }
         sortedPromises.remove(promise);
 
-        String exception = response.getException();
         if (exception != null) {
-            promise.setException(new CallException(exception));
+            promise.setException(exception);
         } else {
-            promise.setResult(response.getResult());
+            promise.setResult(result);
         }
     }
 

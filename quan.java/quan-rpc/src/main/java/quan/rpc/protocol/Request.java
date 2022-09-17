@@ -3,6 +3,8 @@ package quan.rpc.protocol;
 import quan.rpc.serialize.ObjectReader;
 import quan.rpc.serialize.ObjectWriter;
 
+import java.util.Arrays;
+
 /**
  * 调用请求协议
  *
@@ -33,7 +35,8 @@ public class Request extends Protocol {
     protected Request() {
     }
 
-    public Request(Object serviceId, int methodId, Object... params) {
+    public Request(int serverId,Object serviceId, int methodId, Object... params) {
+        super(serverId);
         this.serviceId = serviceId;
         this.methodId = methodId;
         this.params = params;
@@ -70,6 +73,7 @@ public class Request extends Protocol {
 
     @Override
     public void transferTo(ObjectWriter writer) {
+        super.transferTo(writer);
         writer.write(callId);
         writer.write(serviceId);
         writer.write(methodId);
@@ -78,10 +82,21 @@ public class Request extends Protocol {
 
     @Override
     public void transferFrom(ObjectReader reader) {
+        super.transferFrom(reader);
         this.callId = reader.read();
         this.serviceId = reader.read();
         this.methodId = reader.read();
         this.params = reader.read();
+    }
+
+    @Override
+    public String toString() {
+        return "Request{" +
+                "callId=" + callId +
+                ", serviceId=" + serviceId +
+                ", methodId=" + methodId +
+                ", params=" + Arrays.toString(params) +
+                '}';
     }
 
 }
