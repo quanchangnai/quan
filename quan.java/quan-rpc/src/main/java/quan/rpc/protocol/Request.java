@@ -35,7 +35,7 @@ public class Request extends Protocol {
     protected Request() {
     }
 
-    public Request(int serverId,Object serviceId, int methodId, Object... params) {
+    public Request(int serverId, Object serviceId, int methodId, Object... params) {
         super(serverId);
         this.serviceId = serviceId;
         this.methodId = methodId;
@@ -50,23 +50,14 @@ public class Request extends Protocol {
         this.callId = callId;
     }
 
-    /**
-     * @see #serviceId
-     */
     public Object getServiceId() {
         return serviceId;
     }
 
-    /**
-     * @see #methodId
-     */
     public int getMethodId() {
         return methodId;
     }
 
-    /**
-     * @see #params
-     */
     public Object[] getParams() {
         return params;
     }

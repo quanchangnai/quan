@@ -14,7 +14,9 @@ public abstract class Service implements Executor {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    //单例服务ID
+    /**
+     * 单例服务ID
+     */
     private Object id;
 
     /**
@@ -39,9 +41,6 @@ public abstract class Service implements Executor {
         throw new IllegalStateException("服务ID不存在");
     }
 
-    /**
-     * @see #worker
-     */
     public final Worker getWorker() {
         return worker;
     }

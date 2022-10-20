@@ -41,7 +41,7 @@ public class RabbitConnector extends Connector {
      * 构造基于基于RabbitMQ的网络连接器
      *
      * @param connectionFactory RabbitMQ连接工厂
-     * @param namePrefix        RabbitMQ交换机和队列的名称前缀，需要互联的服务器一定要保持一致
+     * @param namePrefix        RabbitMQ交换机和队列的名称前缀，需要互连的服务器一定要保持一致
      */
     public RabbitConnector(ConnectionFactory connectionFactory, String namePrefix) {
         connectionFactory.useNio();
@@ -51,6 +51,9 @@ public class RabbitConnector extends Connector {
         }
     }
 
+    /**
+     * @see #RabbitConnector(ConnectionFactory, String)
+     */
     public RabbitConnector(ConnectionFactory connectionFactory) {
         this(connectionFactory, null);
     }
@@ -165,6 +168,7 @@ public class RabbitConnector extends Connector {
     @Override
     protected void sendProtocol(int remoteId, Protocol protocol) {
         checkRemote(remoteId, protocol);
+        Worker worker = Worker.current();
 
         executor.execute(() -> {
             try {
@@ -173,8 +177,6 @@ public class RabbitConnector extends Connector {
             } catch (Exception e) {
                 if (protocol instanceof Request) {
                     long callId = ((Request) protocol).getCallId();
-                    int workerId = (int) (callId >> 32);
-                    Worker worker = localServer.getWorkers().get(workerId);
                     worker.execute(() -> worker.handlePromise(callId, e, null));
                 } else {
                     logger.error("发送协议出错，{}", protocol, e);
@@ -314,7 +316,7 @@ public class RabbitConnector extends Connector {
             }
 
             if (throwable != null) {
-                logger.error("连接远程服务器[{}]失败，将在{}秒后尝试重连，失败原因：{}", id, connector.getReconnectInterval(), throwable.getMessage());
+                logger.error("连接远程服务器[{}]失败，将在{}毫秒后尝试重连，失败原因：{}", id, connector.getReconnectInterval(), throwable.getMessage());
                 connector.channel.remove();
             }
 
@@ -353,7 +355,7 @@ public class RabbitConnector extends Connector {
 
         protected void checkActivated() {
             long currentTime = System.currentTimeMillis();
-            if (lastHandlePingPongTime == 0 || currentTime - lastHandlePingPongTime < 6000) {
+            if (lastHandlePingPongTime == 0 || currentTime - lastHandlePingPongTime < connector.getPingPongInterval() * 2) {
                 return;
             }
 
@@ -363,14 +365,14 @@ public class RabbitConnector extends Connector {
                 logger.info("远程服务器[{}]连接已断开", id);
                 connector.removeRemote(id);
             } else {
-                logger.error("远程服务器[{}]连接已断开，将在{}秒后尝试重连", id, connector.getReconnectInterval());
-                connector.executor.schedule(this::restart, connector.getReconnectInterval(), TimeUnit.SECONDS);
+                logger.error("远程服务器[{}]连接已断开，将在{}毫秒后尝试重连", id, connector.getReconnectInterval());
+                connector.executor.schedule(this::restart, connector.getReconnectInterval(), TimeUnit.MILLISECONDS);
             }
         }
 
         protected void sendPingPong() {
             long currentTime = System.currentTimeMillis();
-            if (lastSendPingPongTime + 2000 < currentTime) {
+            if (lastSendPingPongTime + connector.getPingPongInterval() < currentTime) {
                 PingPong pingPong = new PingPong(connector.localServer.getId(), currentTime);
                 connector.checkRemote(id, pingPong);
                 connector.publishProtocol(id, pingPong);
@@ -381,7 +383,7 @@ public class RabbitConnector extends Connector {
         protected void handlePingPong(PingPong pingPong) {
             lastHandlePingPongTime = System.currentTimeMillis();
             if (logger.isDebugEnabled()) {
-                logger.debug("远程服务器[{}]的延迟时间为:{}ms", id, lastHandlePingPongTime - pingPong.getTime());
+                logger.debug("远程服务器[{}]的延迟时间为{}毫秒", id, lastHandlePingPongTime - pingPong.getTime());
             }
         }
 

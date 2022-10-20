@@ -21,7 +21,7 @@ public class Promise<R> {
     private long callId;
 
     /**
-     * 用于日志的被调用方法的签名字符串
+     * 被调用方法的签名字符串
      */
     private String signature;
 

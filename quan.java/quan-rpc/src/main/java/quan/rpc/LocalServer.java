@@ -233,8 +233,13 @@ public class LocalServer {
         }
     }
 
-    public boolean hasRemote(int remoteId) {
+    public final boolean hasRemote(int remoteId) {
         return getConnector(remoteId) != null;
+    }
+
+    public final boolean isRemoteActivated(int remoteId) {
+        Connector connector = getConnector(remoteId);
+        return connector != null && connector.isRemoteActivated(remoteId);
     }
 
     public void addService(Service service) {

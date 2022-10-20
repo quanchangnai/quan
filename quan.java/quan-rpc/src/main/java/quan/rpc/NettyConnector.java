@@ -241,6 +241,8 @@ public class NettyConnector extends Connector {
 
         private long lastReportSuspendedTime;
 
+        private int reportSuspendedInterval;
+
         private Bootstrap bootstrap;
 
         private ChannelHandlerContext context;
@@ -251,6 +253,7 @@ public class NettyConnector extends Connector {
             this.ip = ip;
             this.port = port;
             this.connector = connector;
+            this.reportSuspendedInterval = connector.getPingPongInterval() * 2;
         }
 
         protected void start() {
@@ -282,7 +285,7 @@ public class NettyConnector extends Connector {
                                         logger.error("远程服务器[{}]连接已断开：{}", id, context.channel().remoteAddress());
                                         connector.removeRemote(id);
                                     } else if (bootstrap != null) {
-                                        logger.error("远程服务器[{}]连接已断开，将在{}秒后尝试重连: {}", id, connector.getReconnectInterval(), context.channel().remoteAddress());
+                                        logger.error("远程服务器[{}]连接已断开，将在{}毫秒后尝试重连: {}", id, connector.getReconnectInterval(), context.channel().remoteAddress());
                                         reconnect();
                                     }
                                 }
@@ -310,7 +313,7 @@ public class NettyConnector extends Connector {
             ChannelFuture channelFuture = bootstrap.connect(ip, port);
             channelFuture.addListener(future -> {
                 if (!future.isSuccess()) {
-                    logger.error("连接远程服务器[{}]失败，将在{}秒后尝试重连，失败原因：{}", id, connector.getReconnectInterval(), future.cause().getMessage());
+                    logger.error("连接远程服务器[{}]失败，将在{}毫秒后尝试重连，失败原因：{}", id, connector.getReconnectInterval(), future.cause().getMessage());
                     reconnect();
                 }
             });
@@ -318,7 +321,7 @@ public class NettyConnector extends Connector {
 
         protected void reconnect() {
             if (bootstrap != null) {
-                bootstrap.config().group().schedule(this::connect, connector.getReconnectInterval(), TimeUnit.SECONDS);
+                bootstrap.config().group().schedule(this::connect, connector.getReconnectInterval(), TimeUnit.MILLISECONDS);
             }
         }
 
@@ -345,8 +348,8 @@ public class NettyConnector extends Connector {
 
         protected void checkSuspended() {
             long currentTime = System.currentTimeMillis();
-            if (currentTime - lastHandlePingPongTime > 30000 && currentTime - lastReportSuspendedTime > 60000) {
-                logger.error("远程服务器[{}]的连接可能已经进入假死状态了", connector.getLocalServer().getId());
+            if (currentTime - lastHandlePingPongTime > reportSuspendedInterval && currentTime - lastReportSuspendedTime > reportSuspendedInterval) {
+                logger.error("远程服务器[{}]的连接可能已经进入假死状态了", this.id);
                 lastReportSuspendedTime = currentTime;
             }
         }
@@ -354,7 +357,7 @@ public class NettyConnector extends Connector {
         protected void sendPingPong() {
             if (context != null) {
                 long currentTime = System.currentTimeMillis();
-                if (lastSendPingPongTime + 5000 < currentTime) {
+                if (lastSendPingPongTime + connector.getPingPongInterval() < currentTime) {
                     sendProtocol(new PingPong(connector.localServer.getId(), currentTime));
                     lastSendPingPongTime = currentTime;
                 }
@@ -364,7 +367,7 @@ public class NettyConnector extends Connector {
         protected void handlePingPong(PingPong pingPong) {
             lastHandlePingPongTime = System.currentTimeMillis();
             if (logger.isDebugEnabled()) {
-                logger.debug("远程服务器[{}]的延迟时间为:{}ms", id, lastHandlePingPongTime - pingPong.getTime());
+                logger.debug("远程服务器[{}]的延迟时间为{}毫秒", id, lastHandlePingPongTime - pingPong.getTime());
             }
         }
 

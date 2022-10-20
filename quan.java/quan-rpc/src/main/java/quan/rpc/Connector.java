@@ -18,23 +18,36 @@ public abstract class Connector {
     protected LocalServer localServer;
 
     /**
-     * 重连时间间隔(秒)
+     * 重连间隔时间(ms)
      */
-    private int reconnectInterval = 5;
+    private int reconnectInterval = 5000;
+
+    private int pingPongInterval = 5000;
 
     public final LocalServer getLocalServer() {
         return localServer;
     }
 
     public void setReconnectInterval(int reconnectInterval) {
-        if (reconnectInterval < 1) {
-            throw new IllegalArgumentException("重连时间必需大于1秒");
+        if (reconnectInterval < 1000) {
+            throw new IllegalArgumentException("参数不能小于1000");
         }
         this.reconnectInterval = reconnectInterval;
     }
 
     public int getReconnectInterval() {
         return reconnectInterval;
+    }
+
+    public int getPingPongInterval() {
+        return pingPongInterval;
+    }
+
+    public void setPingPongInterval(int pingPongInterval) {
+        if (pingPongInterval < 1000) {
+            throw new IllegalArgumentException("参数不能小于1000");
+        }
+        this.pingPongInterval = pingPongInterval;
     }
 
     protected void start() {

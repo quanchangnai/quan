@@ -25,7 +25,7 @@ public class Response extends Protocol {
     protected Response() {
     }
 
-    public Response(int serverId,long callId, Object result, String exception) {
+    public Response(int serverId, long callId, Object result, String exception) {
         super(serverId);
         this.callId = callId;
         this.result = result;
@@ -36,9 +36,6 @@ public class Response extends Protocol {
         return callId;
     }
 
-    /**
-     * @see #result
-     */
     public Object getResult() {
         return result;
     }
