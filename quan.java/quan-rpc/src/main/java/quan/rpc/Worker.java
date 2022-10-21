@@ -249,10 +249,10 @@ public class Worker implements Executor {
         }
     }
 
-    protected int resolveTargetServerId(String serviceName) {
-        Function<String, Integer> targetServerIdResolver = server.getTargetServerIdResolver();
+    protected int resolveTargetServerId(Proxy proxy) {
+        Function<Proxy, Integer> targetServerIdResolver = server.getTargetServerIdResolver();
         if (targetServerIdResolver != null) {
-            return targetServerIdResolver.apply(serviceName);
+            return targetServerIdResolver.apply(proxy);
         } else {
             return 0;
         }

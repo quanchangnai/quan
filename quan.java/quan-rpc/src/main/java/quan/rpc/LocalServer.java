@@ -39,9 +39,9 @@ public class LocalServer {
     private Set<Connector> connectors = new HashSet<>();
 
     /**
-     * 如果服务的目标服务器只有一个，使用服务名作为参数调用后返回目标服务器ID，可以省去每次构造服务代理都必需要传参的麻烦
+     * 使用服务代理作为参数调用后返回目标服务器ID，如果目标服务器只有一个，可以省去每次构造服务代理都必需要传参的麻烦
      */
-    private Function<String, Integer> targetServerIdResolver;
+    private Function<Proxy, Integer> targetServerIdResolver;
 
     //管理的所有工作线程，key:工作线程ID
     private Map<Integer, Worker> workers = new HashMap<>();
@@ -144,11 +144,11 @@ public class LocalServer {
     /**
      * @see #targetServerIdResolver
      */
-    public void setTargetServerIdResolver(Function<String, Integer> targetServerIdResolver) {
+    public void setTargetServerIdResolver(Function<Proxy, Integer> targetServerIdResolver) {
         this.targetServerIdResolver = targetServerIdResolver;
     }
 
-    public Function<String, Integer> getTargetServerIdResolver() {
+    public Function<Proxy, Integer> getTargetServerIdResolver() {
         return targetServerIdResolver;
     }
 

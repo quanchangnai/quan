@@ -43,7 +43,7 @@ public class ${name}Proxy${typeParametersStr} extends Proxy{
 
 </#if>
     @Override
-    protected String _getServiceName$() {
+    public String _getServiceName$() {
         return SERVICE_NAME;
     }
 

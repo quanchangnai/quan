@@ -95,7 +95,7 @@ public class TestService1 extends UpdatableService {
         int b = (int) (now % 10);
         long startTime = System.nanoTime();
 
-        Promise<Integer> promise = roleService1Proxy.login1(a, b, 111L, 333L);//result1 fs.promises.readFile(configFile))
+        Promise<Integer> promise = roleService1Proxy.login1(a, b, 111L, 333L);
         promise.then(result1 -> {
             double costTime = (System.nanoTime() - startTime) / 1000000D;
             logger.info("TestService1:{} call RoleService1.login1({},{})={},costTime:{}", this.id, a, b, result1, costTime);
