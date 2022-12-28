@@ -139,7 +139,7 @@ public class ${name} extends <#if kind ==2>Bean<#elseif kind ==5>Data<${idField.
      */
     </#if>
     public ${name} set${field.name?cap_first}(${field.classType} ${field.name}) {
-        this.${field.name}.setValue(${field.name}.value(), ${root});
+        this.${field.name}.setValue(${field.name}.value, ${root});
         return this;
     }
 

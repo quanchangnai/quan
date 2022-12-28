@@ -17,14 +17,10 @@ public enum UserType {
     type2(2);
 
 
-    private final int value;
+    public final int value;
 
     UserType(int value) {
         this.value = value;
-    }
-
-    public int value() {
-        return value;
     }
 
     public static UserType valueOf(int value) {

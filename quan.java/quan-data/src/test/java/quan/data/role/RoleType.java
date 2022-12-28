@@ -17,14 +17,10 @@ public enum RoleType {
     type2(2);
 
 
-    private final int value;
+    public final int value;
 
     RoleType(int value) {
         this.value = value;
-    }
-
-    public int value() {
-        return value;
     }
 
     public static RoleType valueOf(int value) {

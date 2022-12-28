@@ -22,14 +22,10 @@ public enum ${name} {
 
 </#list>
 
-    private final int value;
+    public final int value;
 
     ${name}(int value) {
         this.value = value;
-    }
-
-    public int value() {
-        return value;
     }
 
     public static ${name} valueOf(int value) {

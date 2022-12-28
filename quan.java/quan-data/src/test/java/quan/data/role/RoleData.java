@@ -183,7 +183,7 @@ public class RoleData extends Data<Long> {
      * 角色类型
      */
     public RoleData setRoleType(RoleType roleType) {
-        this.roleType.setValue(roleType.value(), this);
+        this.roleType.setValue(roleType.value, this);
         return this;
     }
 

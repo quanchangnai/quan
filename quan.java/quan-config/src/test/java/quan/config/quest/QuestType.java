@@ -17,14 +17,10 @@ public enum QuestType {
     branch(2);
 
 
-    private final int value;
+    public final int value;
 
     QuestType(int value) {
         this.value = value;
-    }
-
-    public int value() {
-        return value;
     }
 
     public static QuestType valueOf(int value) {

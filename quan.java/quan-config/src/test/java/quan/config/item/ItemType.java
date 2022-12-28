@@ -17,14 +17,10 @@ public enum ItemType {
     type2(2);
 
 
-    private final int value;
+    public final int value;
 
     ItemType(int value) {
         this.value = value;
-    }
-
-    public int value() {
-        return value;
     }
 
     public static ItemType valueOf(int value) {
