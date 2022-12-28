@@ -194,7 +194,7 @@ public class ItemConfig extends Config {
 
         for (ItemConfig config : configs) {
             load(idConfigs, errors, config, true, Collections.singletonList("id"), config.id);
-            if (!config.key.equals("")) {
+            if (!config.key.isEmpty()) {
                 load(keyConfigs, errors, config, true, Collections.singletonList("key"), config.key);
             }
             load(typeConfigs, errors, config, false, Collections.singletonList("type"), config.type);

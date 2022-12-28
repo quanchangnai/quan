@@ -115,7 +115,7 @@ public class ConstantConfig extends Config {
         List<String> errors = new ArrayList<>();
 
         for (ConstantConfig config : configs) {
-            if (!config.key.equals("")) {
+            if (!config.key.isEmpty()) {
                 load(keyConfigs, errors, config, true, Collections.singletonList("key"), config.key);
             }
         }

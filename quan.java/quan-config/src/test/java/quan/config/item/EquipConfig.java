@@ -54,7 +54,7 @@ public class EquipConfig extends ItemConfig {
     }
 
 
-    public static class self {
+    public final static class self {
 
         private self() {
         }
@@ -123,7 +123,7 @@ public class EquipConfig extends ItemConfig {
             for (EquipConfig config : configs) {
                 Config.load(positionConfigs, errors, config, false, Collections.singletonList("position"), config.position);
                 Config.load(idConfigs, errors, config, true, Collections.singletonList("id"), config.id);
-                if (!config.key.equals("")) {
+                if (!config.key.isEmpty()) {
                     Config.load(keyConfigs, errors, config, true, Collections.singletonList("key"), config.key);
                 }
                 Config.load(typeConfigs, errors, config, false, Collections.singletonList("type"), config.type);

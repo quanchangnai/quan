@@ -156,6 +156,7 @@ public abstract class Generator {
         }
 
         if (parser != null) {
+            parser.setDefinitionFileEncoding(definitionFileEncoding);
             parser.setBeanNamePattern(options.getProperty(category() + ".beanNamePattern"));
             parser.setEnumNamePattern(options.getProperty(category() + ".enumNamePattern"));
         }
@@ -352,10 +353,11 @@ public abstract class Generator {
             }
         } else {
             //lua
+            boolean require = !(dependentClassDefinition instanceof EnumDefinition);
             if (simpleNameClassDefinition == null || simpleNameClassDefinition == dependentClassDefinition) {
-                return Pair.of(false, true);
+                return Pair.of(false, require);
             }
-            return Pair.of(true, true);
+            return Pair.of(true, require);
         }
     }
 

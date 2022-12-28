@@ -266,11 +266,10 @@ public abstract class ClassDefinition extends Definition {
     }
 
     public void addDependent(DependentType dependentType, ClassDefinition ownerClass, Definition ownerDefinition, ClassDefinition dependentClass) {
-        if (dependentClass == null) {
-            return;
+        if (dependentClass != null) {
+            DependentSource dependentSource = new DependentSource(dependentType, ownerClass, ownerDefinition, dependentClass);
+            dependentsClasses.computeIfAbsent(dependentClass.getName(), k -> new TreeMap<>()).put(dependentSource, dependentClass);
         }
-        DependentSource dependentSource = new DependentSource(dependentType, ownerClass, ownerDefinition, dependentClass);
-        dependentsClasses.computeIfAbsent(dependentClass.getName(), k -> new TreeMap<>()).put(dependentSource, dependentClass);
     }
 
     public Map<String, TreeMap<DependentSource, ClassDefinition>> getDependentsClasses() {

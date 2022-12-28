@@ -129,7 +129,7 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
     <#elseif field.builtinType>
         this.${field.name} = json.get${field.type?cap_first}Value("${field.name}");
     <#elseif field.enumType>
-        this.${field.name} = ${field.type}.valueOf(json.getIntValue("${field.name}"));
+        this.${field.name} = ${field.classType}.valueOf(json.getIntValue("${field.name}"));
     <#else>
         <#if field_index gt 0 >
 
@@ -342,7 +342,7 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
     <#list indexes as index>
         <#if index.fields?size==1>
             <#if isConstantKeyField("${index.fields[0].name}")>
-            ${tab}if (!config.${index.fields[0].name}.equals("")) {
+            ${tab}if (!config.${index.fields[0].name}.isEmpty()) {
                 ${tab}<#if parent??>Config.</#if>load(${index.name}Configs, errors, config, ${index.unique?c}, Collections.singletonList("${index.fields[0].name}"), config.${index.fields[0].name});
             ${tab}}
             <#else>
@@ -373,7 +373,7 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
  <#if kind ==6>
 
     <#if parent??>
-    public static class self {
+    public final static class self {
 
         private self() {
         }

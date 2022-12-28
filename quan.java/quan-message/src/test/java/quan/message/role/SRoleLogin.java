@@ -1,10 +1,8 @@
 package quan.message.role;
 
-import quan.message.CodedBuffer;
-import quan.message.Message;
-import quan.message.user.UserInfo;
-
+import quan.message.*;
 import java.util.*;
+import quan.message.user.UserInfo;
 
 /**
  * 角色登录，哈希生成ID<br/>

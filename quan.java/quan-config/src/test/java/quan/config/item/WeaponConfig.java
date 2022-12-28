@@ -119,7 +119,7 @@ public class WeaponConfig extends EquipConfig {
     }
 
 
-    public static class self {
+    public final static class self {
 
         private self() {
         }
@@ -217,7 +217,7 @@ public class WeaponConfig extends EquipConfig {
 
             for (WeaponConfig config : configs) {
                 Config.load(idConfigs, errors, config, true, Collections.singletonList("id"), config.id);
-                if (!config.key.equals("")) {
+                if (!config.key.isEmpty()) {
                     Config.load(keyConfigs, errors, config, true, Collections.singletonList("key"), config.key);
                 }
                 Config.load(typeConfigs, errors, config, false, Collections.singletonList("type"), config.type);

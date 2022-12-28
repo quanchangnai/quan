@@ -113,7 +113,7 @@ namespace ${getFullPackageName("cs")}
     <#elseif field.builtinType>
             ${field.name} = json["${field.name}"]?.Value<${field.type}>() ?? default;
     <#elseif field.enumType>
-            ${field.name} = (${field.type}) (json["${field.name}"]?.Value<int>() ?? default);
+            ${field.name} = (${field.classType}) (json["${field.name}"]?.Value<int>() ?? default);
     <#else>
             ${field.name} = json.ContainsKey("${field.name}") ? ${field.classType}.Create(json["${field.name}"].Value<JObject>()) : null;
     </#if>

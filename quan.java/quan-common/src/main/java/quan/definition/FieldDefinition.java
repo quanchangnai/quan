@@ -355,6 +355,9 @@ public class FieldDefinition extends Definition implements Cloneable {
     }
 
     public String getBasicType() {
+        if (isEnumType()) {
+            return getClassType();
+        }
         if (basicType == null) {
             return getType();
         }
