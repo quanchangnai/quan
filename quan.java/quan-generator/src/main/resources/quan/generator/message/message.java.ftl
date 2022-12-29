@@ -213,7 +213,7 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
         <#elseif field.enumType>
         if (this.${field.name} != null) {
             writeTag(buffer, ${field.tag});
-            buffer.writeInt(this.${field.name}.value());
+            buffer.writeInt(this.${field.name}.value);
         }
         <#elseif field.optional>
         if (this.${field.name} != null) {
@@ -264,7 +264,7 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
         <#elseif field.builtinType>
         buffer.write${field.type?cap_first}(this.${field.name});
         <#elseif field.enumType>
-        buffer.writeInt(this.${field.name} == null ? 0 : this.${field.name}.value());
+        buffer.writeInt(this.${field.name} == null ? 0 : this.${field.name}.value);
         <#elseif field.optional>
             <#if field?index gt 0>
 

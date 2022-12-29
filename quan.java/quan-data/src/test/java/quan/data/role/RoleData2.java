@@ -139,7 +139,7 @@ public class RoleData2 {
      * 角色类型
      */
     public RoleData2 setRoleType(RoleType roleType) {
-        this.roleType = roleType.value();
+        this.roleType = roleType.value;
         return this;
     }
 

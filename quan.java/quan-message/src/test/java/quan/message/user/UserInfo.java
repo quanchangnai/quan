@@ -281,7 +281,7 @@ public class UserInfo extends Bean {
 
         if (this.type != null) {
             writeTag(buffer, 16);
-            buffer.writeInt(this.type.value());
+            buffer.writeInt(this.type.value);
         }
 
         if (this.roleInfo1 != null) {
