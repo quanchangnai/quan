@@ -305,12 +305,12 @@ public class QuestConfig extends Config {
         List<String> errors = new ArrayList<>();
 
         for (QuestConfig config : configs) {
-            load(idConfigs, errors, config, true, Collections.singletonList("id"), config.id);
-            load(typeConfigs, errors, config, false, Collections.singletonList("type"), config.type);
-            load(composite1Configs, errors, config, true, Arrays.asList("a1", "a2"), config.a1, config.a2);
-            load(composite2Configs, errors, config, false, Arrays.asList("b1", "b2"), config.b1, config.b2);
-            load(composite3Configs, errors, config, true, Arrays.asList("c1", "c2", "c3"), config.c1, config.c2, config.c3);
-            load(composite4Configs, errors, config, false, Arrays.asList("d1", "d2", "d3"), config.d1, config.d2, config.d3);
+            load(idConfigs, errors, config, true, "id", config.id);
+            load(typeConfigs, errors, config, false, "type", config.type);
+            load(composite1Configs, errors, config, true, "a1,a2", config.a1, config.a2);
+            load(composite2Configs, errors, config, false, "b1,b2", config.b1, config.b2);
+            load(composite3Configs, errors, config, true, "c1,c2,c3", config.c1, config.c2, config.c3);
+            load(composite4Configs, errors, config, false, "d1,d2,d3", config.d1, config.d2, config.d3);
         }
 
         configs = Collections.unmodifiableList(configs);

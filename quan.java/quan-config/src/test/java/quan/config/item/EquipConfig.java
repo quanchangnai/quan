@@ -121,12 +121,12 @@ public class EquipConfig extends ItemConfig {
             List<String> errors = new ArrayList<>();
 
             for (EquipConfig config : configs) {
-                Config.load(positionConfigs, errors, config, false, Collections.singletonList("position"), config.position);
-                Config.load(idConfigs, errors, config, true, Collections.singletonList("id"), config.id);
+                Config.load(positionConfigs, errors, config, false, "position", config.position);
+                Config.load(idConfigs, errors, config, true, "id", config.id);
                 if (!config.key.isEmpty()) {
-                    Config.load(keyConfigs, errors, config, true, Collections.singletonList("key"), config.key);
+                    Config.load(keyConfigs, errors, config, true, "key", config.key);
                 }
-                Config.load(typeConfigs, errors, config, false, Collections.singletonList("type"), config.type);
+                Config.load(typeConfigs, errors, config, false, "type", config.type);
             }
 
             configs = Collections.unmodifiableList(configs);

@@ -154,8 +154,8 @@ public class CardConfig extends Config {
         List<String> errors = new ArrayList<>();
 
         for (CardConfig config : configs) {
-            load(idConfigs, errors, config, true, Collections.singletonList("id"), config.id);
-            load(typeConfigs, errors, config, false, Collections.singletonList("type"), config.type);
+            load(idConfigs, errors, config, true, "id", config.id);
+            load(typeConfigs, errors, config, false, "type", config.type);
         }
 
         configs = Collections.unmodifiableList(configs);

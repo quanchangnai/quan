@@ -216,14 +216,14 @@ public class WeaponConfig extends EquipConfig {
             List<String> errors = new ArrayList<>();
 
             for (WeaponConfig config : configs) {
-                Config.load(idConfigs, errors, config, true, Collections.singletonList("id"), config.id);
+                Config.load(idConfigs, errors, config, true, "id", config.id);
                 if (!config.key.isEmpty()) {
-                    Config.load(keyConfigs, errors, config, true, Collections.singletonList("key"), config.key);
+                    Config.load(keyConfigs, errors, config, true, "key", config.key);
                 }
-                Config.load(typeConfigs, errors, config, false, Collections.singletonList("type"), config.type);
-                Config.load(positionConfigs, errors, config, false, Collections.singletonList("position"), config.position);
-                Config.load(composite1Configs, errors, config, false, Arrays.asList("color", "w1"), config.color, config.w1);
-                Config.load(composite2Configs, errors, config, true, Arrays.asList("w1", "w2"), config.w1, config.w2);
+                Config.load(typeConfigs, errors, config, false, "type", config.type);
+                Config.load(positionConfigs, errors, config, false, "position", config.position);
+                Config.load(composite1Configs, errors, config, false, "color,w1", config.color, config.w1);
+                Config.load(composite2Configs, errors, config, true, "w1,w2", config.w1, config.w2);
             }
 
             configs = Collections.unmodifiableList(configs);

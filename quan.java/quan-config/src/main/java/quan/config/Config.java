@@ -16,7 +16,7 @@ public abstract class Config extends Bean {
 
     public abstract Config create(JSONObject json);
 
-    protected static void load(Map configs, List<String> errors, Object config, boolean unique, List<String> keyNames, Object... keys) {
+    protected static void load(Map configs, List<String> errors, Object config, boolean unique,String keyNames, Object... keys) {
         Map map = configs;
         for (int i = 0; i < keys.length - 1; i++) {
             Object key = keys[i];
@@ -39,24 +39,25 @@ public abstract class Config extends Bean {
             configNames += "," + old.getClass().getSimpleName();
         }
 
+        List<Object> params = new ArrayList<>();
+        params.add(configNames);
+
+        if (keyNames.contains(",")) {
+            params.add("(" + keyNames + ")");
+        } else {
+            params.add(keyNames);
+        }
+
         List<String> keysList = new ArrayList<>();
         for (Object key : keys) {
             keysList.add(key.toString());
         }
 
-        List<Object> params = new ArrayList<>();
-        params.add(configNames);
-        if (keyNames.size() > 1) {
-            params.add("(" + String.join(",", keyNames) + ")");
-        } else {
-            params.addAll(keyNames);
-        }
         if (keysList.size() > 1) {
             params.add("(" + String.join(",", keysList) + ")");
         } else {
             params.addAll(keysList);
         }
-
 
         errors.add(String.format("配置[%s]有重复数据[%s = %s]", params.toArray()));
     }

@@ -193,11 +193,11 @@ public class ItemConfig extends Config {
         List<String> errors = new ArrayList<>();
 
         for (ItemConfig config : configs) {
-            load(idConfigs, errors, config, true, Collections.singletonList("id"), config.id);
+            load(idConfigs, errors, config, true, "id", config.id);
             if (!config.key.isEmpty()) {
-                load(keyConfigs, errors, config, true, Collections.singletonList("key"), config.key);
+                load(keyConfigs, errors, config, true, "key", config.key);
             }
-            load(typeConfigs, errors, config, false, Collections.singletonList("type"), config.type);
+            load(typeConfigs, errors, config, false, "type", config.type);
         }
 
         configs = Collections.unmodifiableList(configs);

@@ -116,7 +116,7 @@ public class ConstantConfig extends Config {
 
         for (ConstantConfig config : configs) {
             if (!config.key.isEmpty()) {
-                load(keyConfigs, errors, config, true, Collections.singletonList("key"), config.key);
+                load(keyConfigs, errors, config, true, "key", config.key);
             }
         }
 
