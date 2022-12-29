@@ -561,9 +561,9 @@ public class FieldDefinition extends Definition implements Cloneable {
     /**
      * 返回字段的引用配置类
      *
-     * @param keyRef true:map类型字段的键引用,false:map list set类型字段的值引用或者原生类型字段的引用
+     * @param isKeyRef true:map类型字段的键引用,false:map list set类型字段的值引用或者原生类型字段的引用
      */
-    public ConfigDefinition getRefConfig(boolean keyRef) {
+    public ConfigDefinition getRefConfig(boolean isKeyRef) {
         if (StringUtils.isBlank(ref)) {
             return null;
         }
@@ -572,19 +572,22 @@ public class FieldDefinition extends Definition implements Cloneable {
             String[] fieldRefs = ref.split(":", -1);
             ConfigDefinition refConfig = null;
 
-            if (keyRef && fieldRefs.length >= 1) {
-                String refConfigName = fieldRefs[0].substring(0, fieldRefs[0].lastIndexOf("."));
+            if (isKeyRef && fieldRefs.length >= 1) {
+                String keyRef = owner.resolveFieldRef(fieldRefs[0]);
+                String refConfigName = keyRef.substring(0, keyRef.lastIndexOf("."));
                 refConfig = parser.getConfig(ClassDefinition.getLongName(owner, refConfigName));
             }
-            if (!keyRef && fieldRefs.length == 2) {
-                String refConfigName = fieldRefs[1].substring(0, fieldRefs[1].lastIndexOf("."));
+            if (!isKeyRef && fieldRefs.length == 2) {
+                String valueRef = owner.resolveFieldRef(fieldRefs[1]);
+                String refConfigName = valueRef.substring(0, valueRef.lastIndexOf("."));
                 refConfig = parser.getConfig(ClassDefinition.getLongName(owner, refConfigName));
             }
             return refConfig;
         }
 
         //list set 原生类型
-        String refConfigName = ref.substring(0, ref.lastIndexOf("."));
+        String fieldRef = owner.resolveFieldRef(ref);
+        String refConfigName = fieldRef.substring(0, fieldRef.lastIndexOf("."));
         return parser.getConfig(ClassDefinition.getLongName(owner, refConfigName));
     }
 
@@ -595,10 +598,10 @@ public class FieldDefinition extends Definition implements Cloneable {
     /**
      * 返回字段的引用字段
      *
-     * @param keyRef true:map类型字段的键引用,false:map list set类型字段的值引用或者原生类型字段的引用
+     * @param isKeyRef true:map类型字段的键引用,false:map list set类型字段的值引用或者原生类型字段的引用
      * @return 字段的引用字段
      */
-    public FieldDefinition getRefField(boolean keyRef) {
+    public FieldDefinition getRefField(boolean isKeyRef) {
         if (StringUtils.isBlank(ref)) {
             return null;
         }
@@ -607,19 +610,21 @@ public class FieldDefinition extends Definition implements Cloneable {
             String[] fieldRefs = ref.split(",", -1);
             ConfigDefinition refConfig;
 
-            if (keyRef && fieldRefs.length >= 1) {
-                String refConfigName = fieldRefs[0].substring(0, fieldRefs[0].lastIndexOf("."));
+            if (isKeyRef && fieldRefs.length >= 1) {
+                String keyRef = owner.resolveFieldRef(fieldRefs[0]);
+                String refConfigName = keyRef.substring(0, keyRef.lastIndexOf("."));
                 refConfig = parser.getConfig(ClassDefinition.getLongName(owner, refConfigName));
                 if (refConfig != null) {
-                    String refFieldName = fieldRefs[0].substring(fieldRefs[0].lastIndexOf(".") + 1);
+                    String refFieldName =keyRef.substring(keyRef.lastIndexOf(".") + 1);
                     return refConfig.getField(refFieldName);
                 }
             }
-            if (!keyRef && fieldRefs.length == 2) {
-                String refConfigName = fieldRefs[1].substring(0, fieldRefs[1].lastIndexOf("."));
+            if (!isKeyRef && fieldRefs.length == 2) {
+                String valueRef = owner.resolveFieldRef(fieldRefs[1]);
+                String refConfigName = valueRef.substring(0,valueRef.lastIndexOf("."));
                 refConfig = parser.getConfig(ClassDefinition.getLongName(owner, refConfigName));
                 if (refConfig != null) {
-                    String refFieldName = fieldRefs[1].substring(fieldRefs[1].lastIndexOf(".") + 1);
+                    String refFieldName = valueRef.substring(valueRef.lastIndexOf(".") + 1);
                     return refConfig.getField(refFieldName);
                 }
             }
@@ -627,11 +632,12 @@ public class FieldDefinition extends Definition implements Cloneable {
         }
 
         //list set 原生类型
-        String refConfigName = ref.substring(0, ref.lastIndexOf("."));
+        String fieldRef = owner.resolveFieldRef(ref);
+        String refConfigName = fieldRef.substring(0, fieldRef.lastIndexOf("."));
         ConfigDefinition refConfig = parser.getConfig(ClassDefinition.getLongName(owner, refConfigName));
 
         if (refConfig != null) {
-            String refFieldName = ref.substring(ref.lastIndexOf(".") + 1);
+            String refFieldName = fieldRef.substring(fieldRef.lastIndexOf(".") + 1);
             return refConfig.getField(refFieldName);
         }
         return null;

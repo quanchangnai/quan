@@ -362,6 +362,10 @@ public abstract class ClassDefinition extends Definition {
         parser.addValidatedError(error);
     }
 
+    public String resolveFieldRef(String fieldRef) {
+        return fieldRef;
+    }
+
     @Override
     public String toString() {
         return getClass().getName() + "{" +

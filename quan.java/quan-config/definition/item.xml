@@ -34,7 +34,7 @@
         <field name="type" type="ItemType" column="类型" index="n"/>
         <field name="useEffect" type="UseEffect" column="使用效果"/>
         <field name="reward" type="Reward" column="奖励" optional="true"/>
-        <field name="list" type="list:int" column="List" ref="ItemConfig.id"/>
+        <field name="list" type="list:int" column="List" ref="id"/>
         <field name="set" type="set:int" column="Set"/>
         <field name="map" type="map:int:int" column="Map" ref="ItemConfig.id"/>
         <field name="effectiveTime" type="datetime" column="生效时间"/>

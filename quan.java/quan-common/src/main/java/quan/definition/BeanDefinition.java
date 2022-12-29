@@ -21,7 +21,7 @@ public class BeanDefinition extends ClassDefinition {
     //配置的所有后代类长类名
     protected TreeSet<String> descendants = new TreeSet<>();
 
-    private TreeSet<String> meAndDescendants = new TreeSet<>();
+    private final TreeSet<String> meAndDescendants = new TreeSet<>();
 
     //配置的所有子类
     protected Set<BeanDefinition> children = new HashSet<>();
@@ -39,7 +39,7 @@ public class BeanDefinition extends ClassDefinition {
     private String escapedDelimiter;
 
     //消息的字段ID
-    private Set<Integer> fieldIds = new HashSet<>();
+    private final Set<Integer> fieldIds = new HashSet<>();
 
     public BeanDefinition() {
     }
@@ -459,12 +459,13 @@ public class BeanDefinition extends ClassDefinition {
         }
 
         if (!field.isMapType()) {
-            int lastDotIndex = field.getRef().lastIndexOf(".");
+            String fieldRef = resolveFieldRef(field.getRef());
+            int lastDotIndex = fieldRef.lastIndexOf(".");
             boolean refError = lastDotIndex < 0;
 
             if (lastDotIndex > 0) {
-                String refConfig = field.getRef().substring(0, lastDotIndex);
-                String refField = field.getRef().substring(lastDotIndex + 1);
+                String refConfig = fieldRef.substring(0, lastDotIndex);
+                String refField = fieldRef.substring(lastDotIndex + 1);
                 if (StringUtils.isBlank(refConfig) || StringUtils.isBlank(refField)) {
                     refError = true;
                 } else {
@@ -481,18 +482,19 @@ public class BeanDefinition extends ClassDefinition {
 
         //map类型字段引用校验
         String[] fieldRefs = field.getRef().split(":", -1);
-        String mapRefErrorMsg = getValidatedName("的") + field.getValidatedName() + "类型[map]的引用格式错误[" + field.getRef() + "]，正确格式:[键引用的配置.字段]或者[键引用配置.字段:值引用的配置.字段]";
+        String mapRefErrorMsg = getValidatedName("的") + field.getValidatedName() + "类型[map]的引用格式错误[" + field.getRef() + "]，正确格式:[键引用配置.字段]或者[键引用配置.字段:值引用配置.字段]";
         if (fieldRefs.length != 1 && fieldRefs.length != 2) {
             addValidatedError(mapRefErrorMsg);
             return;
         }
 
-        int lastKeyDotIndex = fieldRefs[0].lastIndexOf(".");
+        String keyRef = resolveFieldRef(fieldRefs[0]);
+        int lastKeyDotIndex = keyRef.lastIndexOf(".");
         boolean refError = lastKeyDotIndex < 0;
 
         if (lastKeyDotIndex > 0) {
-            String refKeyConfig = fieldRefs[0].substring(0, lastKeyDotIndex);
-            String refKeyField = fieldRefs[0].substring(lastKeyDotIndex + 1);
+            String refKeyConfig = keyRef.substring(0, lastKeyDotIndex);
+            String refKeyField = keyRef.substring(lastKeyDotIndex + 1);
             if (StringUtils.isBlank(refKeyConfig) || StringUtils.isBlank(refKeyField)) {
                 refError = true;
             } else {
@@ -501,10 +503,11 @@ public class BeanDefinition extends ClassDefinition {
         }
 
         if (fieldRefs.length == 2) {
-            int lastValueDotIndex = fieldRefs[1].lastIndexOf(".");
+            String valueRef = resolveFieldRef(fieldRefs[1]);
+            int lastValueDotIndex = valueRef.lastIndexOf(".");
             if (lastValueDotIndex > 0) {
-                String refValueConfig = fieldRefs[1].substring(1, lastValueDotIndex);
-                String refValueField = fieldRefs[1].substring(lastKeyDotIndex + 1);
+                String refValueConfig = valueRef.substring(1, lastValueDotIndex);
+                String refValueField = valueRef.substring(lastValueDotIndex + 1);
                 if (StringUtils.isBlank(refValueConfig) || StringUtils.isBlank(refValueField)) {
                     refError = true;
                 } else {

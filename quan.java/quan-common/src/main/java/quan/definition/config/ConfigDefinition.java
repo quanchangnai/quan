@@ -17,23 +17,23 @@ public class ConfigDefinition extends BeanDefinition {
     private String table;
 
     //配置对应的表，包含分表
-    private TreeSet<String> tables = new TreeSet<>();
+    private final TreeSet<String> tables = new TreeSet<>();
 
     //配置对应的表，包含分表和子表
-    private TreeSet<String> allTables = new TreeSet<>();
+    private final TreeSet<String> allTables = new TreeSet<>();
 
     //所有索引,包含继承下来的索引
-    private List<IndexDefinition> indexes = new LinkedList<>();
+    private final List<IndexDefinition> indexes = new LinkedList<>();
 
     //仅自己的索引
-    private List<IndexDefinition> selfIndexes = new LinkedList<>();
+    private final List<IndexDefinition> selfIndexes = new LinkedList<>();
 
     //列名:字段
-    private Map<String, FieldDefinition> columnFields = new HashMap<>();
+    private final Map<String, FieldDefinition> columnFields = new HashMap<>();
 
     private List<String> rows = new ArrayList<>();
 
-    private Set<ConstantDefinition> constantDefinitions = new HashSet<>();
+    private final Set<ConstantDefinition> constantDefinitions = new HashSet<>();
 
     {
         category = Category.config;
@@ -278,7 +278,7 @@ public class ConfigDefinition extends BeanDefinition {
 
     @Override
     public void validate3() {
-        super.validate3();
+        validateDependents();
         for (FieldDefinition field : selfFields) {
             //校验字段引用
             validateFieldRef(field);
@@ -446,6 +446,17 @@ public class ConfigDefinition extends BeanDefinition {
             escapedDelimiter.append(s);
         }
         return escapedDelimiter.toString();
+    }
+
+    /**
+     * 转换字段引用，因为相同配置类下的引用可以省略类名
+     */
+    @Override
+    public String resolveFieldRef(String fieldRef) {
+        if (!fieldRef.contains(".")) {
+            fieldRef = getName() + "." + fieldRef;
+        }
+        return fieldRef;
     }
 
 }
