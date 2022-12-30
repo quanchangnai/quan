@@ -28,6 +28,10 @@ public class ConfigTest {
             configLoader = definitionConfigLoader();
         }
 
+        configLoader.registerListener(reload -> System.err.println("配置重加载监听器1,reload:" + reload));
+
+        configLoader.registerListener(ItemConfig.class, reload -> System.err.println("配置重加载监听器2,reload:" + reload));
+
         loadConfig(configLoader);
 
         writeJson(configLoader);
@@ -92,7 +96,7 @@ public class ConfigTest {
         System.err.println("writeJson()=============");
         long startTime = System.currentTimeMillis();
 
-        configLoader1.writeJson("quan-config\\json",  Language.cs);
+        configLoader1.writeJson("quan-config\\json", Language.cs);
 
         System.err.println("writeJson()耗时:" + (System.currentTimeMillis() - startTime) / 1000D + "s");
         System.err.println();

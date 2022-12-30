@@ -506,11 +506,15 @@ public class DefinitionConfigLoader extends ConfigLoader {
             }
         }
 
+        Set<Class<? extends Config>> reloadedConfigs = reloadReaders.stream().map(r -> r.getPrototype().getClass()).collect(Collectors.toSet());
+
+        callListeners(reloadedConfigs, true);
+
         if (!validatedErrors.isEmpty()) {
             throw new ValidatedException(validatedErrors);
         }
 
-        return reloadReaders.stream().map(r -> r.getPrototype().getClass()).collect(Collectors.toSet());
+        return reloadedConfigs;
     }
 
     /**

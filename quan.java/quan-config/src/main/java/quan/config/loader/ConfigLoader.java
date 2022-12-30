@@ -42,6 +42,9 @@ public abstract class ConfigLoader {
 
     protected boolean loaded;
 
+    //配置加载监听器
+    protected Map<Class<? extends Config>, Set<ConfigLoadListener>> listeners = new HashMap<>();
+
     public ConfigLoader(String tablePath) {
         Objects.requireNonNull(tablePath, "配置表路径不能为空");
         this.tablePath = CommonUtils.toPlatPath(tablePath);
@@ -98,13 +101,21 @@ public abstract class ConfigLoader {
         }
     }
 
-    /**
-     * 加载所有配置
-     */
-    public void loadAll() {
+
+    protected void loadAll(boolean reload) {
+        if (reload) {
+            checkReload();
+            loaded = false;
+
+            for (ConfigReader reader : readers.values()) {
+                reader.clear();
+            }
+        }
+
         if (loaded) {
             throw new IllegalStateException("配置已经加载了，重加载调用reloadXxx方法");
         }
+
         loaded = true;
         validatedErrors.clear();
 
@@ -127,9 +138,19 @@ public abstract class ConfigLoader {
             }
         }
 
+        callListeners(null, reload);
+
         if (!validatedErrors.isEmpty()) {
             throw new ValidatedException(validatedErrors);
         }
+    }
+
+
+    /**
+     * 加载所有配置
+     */
+    public void loadAll() {
+        loadAll(false);
     }
 
     protected abstract void doLoadAll();
@@ -173,17 +194,10 @@ public abstract class ConfigLoader {
     }
 
     /**
-     * 重加载全部配置，校验依赖
+     * 重加载全部配置，并且会校验依赖
      */
     public void reloadAll() {
-        checkReload();
-        loaded = false;
-
-        for (ConfigReader reader : readers.values()) {
-            reader.clear();
-        }
-
-        loadAll();
+        loadAll(true);
     }
 
     protected void checkReload() {
@@ -220,5 +234,72 @@ public abstract class ConfigLoader {
 
     protected abstract ConfigReader createReader(String table);
 
+
+    /**
+     * 注册加载指定配置的监听器
+     *
+     * @param configs  监听的待加载的配置类
+     * @param listener 配置加载监听器
+     */
+    public void registerListener(Collection<Class<? extends Config>> configs, ConfigLoadListener listener) {
+        Objects.requireNonNull(listener, "配置加载监听器不能为空");
+
+        if (configs == null) {
+            //监听任意配置类
+            listeners.computeIfAbsent(null, k -> new HashSet<>()).add(listener);
+            return;
+        }
+
+        for (Class<? extends Config> config : configs) {
+            if (config != null) {
+                listeners.computeIfAbsent(config, k -> new HashSet<>()).add(listener);
+            }
+        }
+    }
+
+    /**
+     * 注册加载指定配置的监听器
+     *
+     * @see #registerListener(Collection, ConfigLoadListener)
+     */
+    public void registerListener(Class<? extends Config> config, ConfigLoadListener listener) {
+        registerListener(Collections.singleton(config), listener);
+    }
+
+    /**
+     * 注册加载任意配置的监听器
+     *
+     * @see #registerListener(Collection, ConfigLoadListener)
+     */
+    public void registerListener(ConfigLoadListener listener) {
+        registerListener((Collection<Class<? extends Config>>) null, listener);
+    }
+
+    /**
+     * 调用配置加载监听器
+     */
+    protected void callListeners(Set<Class<? extends Config>> configs, boolean reload) {
+        Set<ConfigLoadListener> targetListeners = new HashSet<>();
+
+        if (configs == null) {
+            for (Set<ConfigLoadListener> set : listeners.values()) {
+                targetListeners.addAll(set);
+            }
+        } else {
+            for (Class<? extends Config> config : configs) {
+                if (listeners.containsKey(config)) {
+                    targetListeners.addAll(listeners.get(config));
+                }
+            }
+        }
+
+        for (ConfigLoadListener listener : targetListeners) {
+            try {
+                listener.onLoad(reload);
+            } catch (Exception e) {
+                logger.error("配置加载监听器执行出错", e);
+            }
+        }
+    }
 
 }
