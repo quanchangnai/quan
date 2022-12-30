@@ -27,7 +27,7 @@ public class ConfigConverter {
 
     private static SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
 
-    private DefinitionParser parser;
+    private final DefinitionParser parser;
 
     public static void setDatetimePattern(String pattern) {
         if (!StringUtils.isBlank(pattern)) {

@@ -56,6 +56,7 @@ public abstract class Service implements Executor {
     /**
      * 在服务所属的工作线程中执行任务
      */
+    @SuppressWarnings("NullableProblems")
     @Override
     public final void execute(Runnable task) {
         worker.execute(task);

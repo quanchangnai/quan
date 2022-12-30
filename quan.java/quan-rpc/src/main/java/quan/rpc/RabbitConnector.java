@@ -355,7 +355,7 @@ public class RabbitConnector extends Connector {
 
         protected void checkActivated() {
             long currentTime = System.currentTimeMillis();
-            if (lastHandlePingPongTime == 0 || currentTime - lastHandlePingPongTime < connector.getPingPongInterval() * 2) {
+            if (lastHandlePingPongTime == 0 || currentTime - lastHandlePingPongTime < connector.getPingPongInterval() * 2L) {
                 return;
             }
 

@@ -7,8 +7,8 @@ import org.apache.commons.csv.CSVRecord;
 import quan.definition.config.ConfigDefinition;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +26,7 @@ public class CSVConfigReader extends ConfigReader {
         clear();
 
         List<CSVRecord> records;
-        try (CSVParser parser = new CSVParser(new InputStreamReader(new FileInputStream(tableFile), "GBK"), CSVFormat.DEFAULT)) {
+        try (CSVParser parser = new CSVParser(new InputStreamReader(Files.newInputStream(tableFile.toPath()), "GBK"), CSVFormat.DEFAULT)) {
             records = parser.getRecords();
         } catch (Exception e) {
             logger.error("读取配置[{}]出错", tableFile.getName(), e);

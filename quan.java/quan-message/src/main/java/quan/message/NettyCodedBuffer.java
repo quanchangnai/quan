@@ -7,7 +7,7 @@ import io.netty.buffer.ByteBuf;
  */
 public class NettyCodedBuffer extends CodedBuffer {
 
-    private ByteBuf buf;
+    private final ByteBuf buf;
 
     public NettyCodedBuffer(ByteBuf buf) {
         this.buf = buf;

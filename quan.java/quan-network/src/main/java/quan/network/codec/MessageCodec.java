@@ -19,7 +19,7 @@ public class MessageCodec extends Codec {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private MessageRegistry messageRegistry;
+    private final MessageRegistry messageRegistry;
 
     {
         encodeTypes.add(Message.class);

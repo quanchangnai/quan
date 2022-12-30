@@ -5,7 +5,7 @@ package quan.network.handler;
  *
  * @author quanchangnai
  */
-public abstract class HandlerConfigurer implements Handler {
+public abstract class HandlerConfigurer implements Handler<Object> {
 
     @Override
     public void onConnected(HandlerContext handlerContext) {

@@ -40,7 +40,7 @@ public abstract class ConfigReader {
 
     protected LinkedHashSet<String> validatedErrors = new LinkedHashSet<>();
 
-    private List<Config> configs = new ArrayList<>();
+    private final List<Config> configs = new ArrayList<>();
 
     protected ConfigReader() {
     }
@@ -226,7 +226,7 @@ public abstract class ConfigReader {
                         }
                         columnsStr.append(buildColumnStr(columnNum));
                     }
-                    validatedErrors.add(String.format("配置[%s]的第[%d]行第[%s]列[%s]不能为空", table, row, columnsStr.toString(), columnName));
+                    validatedErrors.add(String.format("配置[%s]的第[%d]行第[%s]列[%s]不能为空", table, row, columnsStr, columnName));
                 }
                 return;
             }
@@ -258,7 +258,7 @@ public abstract class ConfigReader {
             s.append((char) ('A' + b - 1));
         } while (a > 0);
 
-        return c + "(" + s.reverse().toString() + ")";
+        return c + "(" + s.reverse() + ")";
     }
 
     protected void handleConvertException(Exception e, String columnName, String columnValue, int row, String columnStr) {

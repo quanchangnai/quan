@@ -29,7 +29,7 @@ import static quan.config.reader.ConfigReader.getMinTableBodyStartRow;
 /**
  * 使用配置定义的配置加载器，根据配置定义实现了索引、引用校验等
  */
-@SuppressWarnings({"unchecked"})
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class DefinitionConfigLoader extends ConfigLoader {
 
     protected DefinitionParser parser;

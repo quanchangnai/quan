@@ -7,7 +7,7 @@ import java.util.*;
 /**
  * 配置
  */
-@SuppressWarnings({"unchecked"})
+@SuppressWarnings({"unchecked", "rawtypes"})
 public abstract class Config extends Bean {
 
     public Config(JSONObject json) {

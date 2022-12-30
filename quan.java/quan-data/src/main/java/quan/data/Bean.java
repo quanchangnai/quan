@@ -10,7 +10,7 @@ import java.io.StringWriter;
 
 public abstract class Bean extends Node {
 
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public String toJson() {
         StringWriter stringWriter = new StringWriter();
         JsonWriter jsonWriter = new JsonStringWriter(stringWriter);

@@ -20,11 +20,11 @@ public class ItemBean extends Bean {
     public static final String LIST = "list";
 
 
-    private IntField id = new IntField();
+    private final IntField id = new IntField();
 
-    private StringField name = new StringField();
+    private final StringField name = new StringField();
 
-    private ListField<Integer> list = new ListField<>(_getLogRoot());
+    private final ListField<Integer> list = new ListField<>(_getLogRoot());
 
     public ItemBean() {
     }
@@ -75,7 +75,7 @@ public class ItemBean extends Bean {
 
     public static class CodecImpl implements Codec<ItemBean> {
 
-        private CodecRegistry registry;
+        private final CodecRegistry registry;
 
         public CodecImpl(CodecRegistry registry) {
             this.registry = registry;

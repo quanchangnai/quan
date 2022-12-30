@@ -17,7 +17,7 @@ public class NettyMessageCodec extends ByteToMessageCodec<Message> {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private Function<Integer, Message> messageFactory;
+    private final Function<Integer, Message> messageFactory;
 
     public NettyMessageCodec(Function<Integer, Message> messageFactory) {
         super(Message.class);

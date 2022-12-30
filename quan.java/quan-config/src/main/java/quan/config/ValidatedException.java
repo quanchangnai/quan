@@ -7,7 +7,7 @@ import java.util.*;
  */
 public class ValidatedException extends RuntimeException {
 
-    private LinkedHashSet<String> errors = new LinkedHashSet<>();
+    private final LinkedHashSet<String> errors = new LinkedHashSet<>();
 
     private String message;
 

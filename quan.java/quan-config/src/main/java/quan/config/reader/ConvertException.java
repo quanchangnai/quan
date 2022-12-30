@@ -9,9 +9,9 @@ import java.util.List;
  */
 class ConvertException extends RuntimeException {
 
-    private ErrorType errorType;
+    private final ErrorType errorType;
 
-    private List<String> params = new ArrayList<>();
+    private final List<String> params = new ArrayList<>();
 
     public ConvertException(ErrorType errorType, String... params) {
         this.errorType = errorType;

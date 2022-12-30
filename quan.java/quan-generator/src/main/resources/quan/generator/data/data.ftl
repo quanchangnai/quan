@@ -51,15 +51,15 @@ public class ${name} extends <#if kind ==2>Bean<#elseif kind ==5>Data<${idField.
 <#list fields as field>
 
     <#if field.type == "set" || field.type == "list">
-    private ${field.classType}<${field.classValueType}> ${field.name} = new ${field.classType}<>(${root});
+    private final ${field.classType}<${field.classValueType}> ${field.name} = new ${field.classType}<>(${root});
     <#elseif field.type == "map">
-    private ${field.classType}<${field.classKeyType}, ${field.classValueType}> ${field.name} = new ${field.classType}<>(${root});
+    private final ${field.classType}<${field.classKeyType}, ${field.classValueType}> ${field.name} = new ${field.classType}<>(${root});
     <#elseif field.enumType>
-    private IntField ${field.name} = new IntField();
+    private final IntField ${field.name} = new IntField();
     <#elseif field.primitiveType>
-    private ${field.type?cap_first}Field ${field.name} = new ${field.type?cap_first}Field();
+    private final ${field.type?cap_first}Field ${field.name} = new ${field.type?cap_first}Field();
     <#else>
-    private BeanField<${field.classType}> ${field.name} = new BeanField<>();
+    private final BeanField<${field.classType}> ${field.name} = new BeanField<>();
     </#if>
 </#list>
 
@@ -213,7 +213,7 @@ public class ${name} extends <#if kind ==2>Bean<#elseif kind ==5>Data<${idField.
 
     public static class CodecImpl implements Codec<${name}> {
 
-        private CodecRegistry registry;
+        private final CodecRegistry registry;
 
         public CodecImpl(CodecRegistry registry) {
             this.registry = registry;

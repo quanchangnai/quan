@@ -25,13 +25,13 @@ public class CRoleLogin extends Message {
     private RoleInfo roleInfo = new RoleInfo();
 
     //角色信息
-    private List<RoleInfo> roleInfoList = new ArrayList<>();
+    private final List<RoleInfo> roleInfoList = new ArrayList<>();
 
     //角色信息
-    private Set<RoleInfo> roleInfoSet = new HashSet<>();
+    private final Set<RoleInfo> roleInfoSet = new HashSet<>();
 
     //角色信息
-    private Map<Long, RoleInfo> roleInfoMap = new HashMap<>();
+    private final Map<Long, RoleInfo> roleInfoMap = new HashMap<>();
 
     //用户信息
     private UserInfo userInfo;

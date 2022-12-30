@@ -13,15 +13,16 @@ import java.util.Objects;
  *
  * @author quanchangnai
  */
+@SuppressWarnings("rawtypes")
 public class HandlerChain {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     protected Connection connection;
 
-    private HandlerContext head;
+    private final HandlerContext head;
 
-    private HandlerContext tail;
+    private final HandlerContext tail;
 
     public HandlerChain(Connection connection) {
         this.connection = connection;

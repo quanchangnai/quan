@@ -139,7 +139,7 @@ public class Database implements DataWriter, MongoDatabase, Executor {
     }
 
     private void initCollection(Class<?> clazz) {
-        String collectionName = Data.name((Class<? extends Data>) clazz);
+        String collectionName = Data.name((Class<? extends Data<?>>) clazz);
         if (collectionName == null) {
             logger.error("{}._NAME未定义", clazz.getName());
             return;

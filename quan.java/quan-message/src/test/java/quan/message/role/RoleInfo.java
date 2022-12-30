@@ -27,11 +27,11 @@ public class RoleInfo extends Bean {
 
     private byte[] data = new byte[0];
 
-    private List<Integer> list = new ArrayList<>();
+    private final List<Integer> list = new ArrayList<>();
 
-    private Set<Integer> set = new HashSet<>();
+    private final Set<Integer> set = new HashSet<>();
 
-    private Map<Integer, Integer> map = new HashMap<>();
+    private final Map<Integer, Integer> map = new HashMap<>();
 
 
     /**

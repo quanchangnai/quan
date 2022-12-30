@@ -19,7 +19,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  *
  * @author quanchangnai
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class NioServer {
 
     private String ip;

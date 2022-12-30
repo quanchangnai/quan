@@ -14,7 +14,7 @@ import static org.apache.commons.lang3.ClassUtils.isPrimitiveOrWrapper;
  */
 public class CommonUtils {
 
-    private static Set<Class<?>> constantClasses = new HashSet<>();
+    private static final Set<Class<?>> constantClasses = new HashSet<>();
 
     static {
         constantClasses.add(Object.class);

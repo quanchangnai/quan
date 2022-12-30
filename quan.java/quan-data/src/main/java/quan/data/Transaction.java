@@ -27,12 +27,12 @@ public class Transaction {
     /**
      * 在事务外是否能修改数据，仅对线程范围生效
      */
-    private static ThreadLocal<Boolean> localOptional = ThreadLocal.withInitial(FALSE::booleanValue);
+    private static final ThreadLocal<Boolean> localOptional = ThreadLocal.withInitial(FALSE::booleanValue);
 
     /**
      * 保存事务为线程本地变量
      */
-    private static ThreadLocal<Transaction> threadLocal = new ThreadLocal<>();
+    private static final ThreadLocal<Transaction> threadLocal = new ThreadLocal<>();
 
     /**
      * 事务是否已失败
@@ -63,7 +63,7 @@ public class Transaction {
      * @see Savepoint
      */
     @SuppressWarnings("SpellCheckingInspection")
-    private Savepoint[] savepoints = new Savepoint[8];
+    private final Savepoint[] savepoints = new Savepoint[8];
 
     /**
      * 事务深度，开启一个内嵌事务加一
@@ -337,7 +337,7 @@ public class Transaction {
     /**
      * 提交事务
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes"})
     private void commit() {
         for (Node node : rootLogs.keySet()) {
             node.commit(rootLogs.get(node));

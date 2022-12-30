@@ -30,9 +30,9 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
     //${field.comment}
     </#if>
     <#if field.type == "set" || field.type == "list">
-    ${fieldModifier} ${field.basicType}<${field.classValueType}> ${field.name} = new ${field.classType}<>();
+    ${fieldModifier} final ${field.basicType}<${field.classValueType}> ${field.name} = new ${field.classType}<>();
     <#elseif field.type == "map">
-    ${fieldModifier} ${field.basicType}<${field.classKeyType}, ${field.classValueType}> ${field.name} = new ${field.classType}<>();
+    ${fieldModifier} final ${field.basicType}<${field.classKeyType}, ${field.classValueType}> ${field.name} = new ${field.classType}<>();
     <#elseif field.type == "string">
     ${fieldModifier} ${field.basicType} ${field.name} = "";
     <#elseif field.type == "bytes">

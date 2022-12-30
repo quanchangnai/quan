@@ -31,13 +31,13 @@ public class UserInfo extends Bean {
     private RoleInfo roleInfo3 = new RoleInfo();
 
     //角色信息List
-    private List<quan.message.role.RoleInfo> roleList = new ArrayList<>();
+    private final List<quan.message.role.RoleInfo> roleList = new ArrayList<>();
 
     //角色信息Set
-    private Set<quan.message.role.RoleInfo> roleSet = new HashSet<>();
+    private final Set<quan.message.role.RoleInfo> roleSet = new HashSet<>();
 
     //角色信息Map
-    private Map<Integer, quan.message.role.RoleInfo> roleMap = new HashMap<>();
+    private final Map<Integer, quan.message.role.RoleInfo> roleMap = new HashMap<>();
 
     private byte[] f11 = new byte[0];
 

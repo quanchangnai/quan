@@ -2,6 +2,7 @@ package quan.config.reader;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.lang3.Validate;
 import quan.config.Config;
 
 import java.io.File;
@@ -35,8 +36,7 @@ public class JsonConfigReader extends ConfigReader {
     protected void read() {
         try (FileInputStream inputStream = new FileInputStream(tableFile)) {
             byte[] availableBytes = new byte[inputStream.available()];
-            inputStream.read(availableBytes);
-
+            Validate.isTrue(inputStream.read(availableBytes) > 0);
             List<JSONObject> jsons = (List<JSONObject>) JSON.parse(availableBytes);
             this.jsons.addAll(jsons);
         } catch (Exception e) {

@@ -10,7 +10,7 @@ public abstract class Proxy {
     /**
      * 目标服务ID
      */
-    private Object serviceId;
+    private final Object serviceId;
 
     public Proxy(int serverId, Object serviceId) {
         if (serverId < 0) {

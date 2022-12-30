@@ -25,7 +25,7 @@ public abstract class Data<I> {
 
     State state;
 
-    public static String name(Class<? extends Data> clazz) {
+    public static String name(Class<? extends Data<?>> clazz) {
         try {
             return (String) clazz.getField("_NAME").get(clazz);
         } catch (Exception e) {
@@ -42,7 +42,7 @@ public abstract class Data<I> {
      * 不在事务中需要设置写入器时通过反射引用此方法
      */
     @SuppressWarnings("unused")
-    private static BiConsumer<Data<?>, DataWriter> _setWriter = (data, writer) -> {
+    private static final BiConsumer<Data<?>, DataWriter> _setWriter = (data, writer) -> {
         data.writer = writer;
         data.state = State.UPDATE;
     };
@@ -119,7 +119,7 @@ public abstract class Data<I> {
         }
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public String toJson() {
         StringWriter stringWriter = new StringWriter();
         JsonWriter jsonWriter = new JsonStringWriter(stringWriter);

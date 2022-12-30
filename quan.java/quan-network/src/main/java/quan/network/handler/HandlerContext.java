@@ -11,7 +11,7 @@ import java.util.Objects;
  *
  * @author quanchangnai
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class HandlerContext {
 
     private Handler handler;

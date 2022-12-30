@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 /**
  * 类相关工具
  */
-public class ClassUtils {
+public class ClassUtils extends org.apache.commons.lang3.ClassUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(ClassUtils.class);
 
@@ -158,6 +158,7 @@ public class ClassUtils {
             Class<?> clazz;
             try {
                 clazz = classLoader.loadClass(className);
+                //noinspection ResultOfMethodCallIgnored
                 clazz.getSimpleName();//继承的类或实现的接口不在classpath下面会报错，忽略该类
             } catch (Throwable e) {
 //                logger.error("加载类[{}]失败", className, e);

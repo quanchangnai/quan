@@ -229,7 +229,7 @@ public class ObjectReader {
         return array;
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes"})
     protected Enum readEnum() {
         Class enumClass;
         try {

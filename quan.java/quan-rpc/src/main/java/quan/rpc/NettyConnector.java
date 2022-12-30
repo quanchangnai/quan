@@ -140,6 +140,7 @@ public class NettyConnector extends Connector {
     /**
      * 用于接收远程服务器的数据
      */
+    @SuppressWarnings("NullableProblems")
     private static class Receiver {
 
         private NettyConnector connector;
@@ -221,6 +222,7 @@ public class NettyConnector extends Connector {
     /**
      * 用于向远程服务器发送数据
      */
+    @SuppressWarnings("NullableProblems")
     private static class Sender {
 
         //远程服务器ID

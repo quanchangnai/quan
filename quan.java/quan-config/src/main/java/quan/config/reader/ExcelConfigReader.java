@@ -5,7 +5,7 @@ import org.apache.poi.ss.usermodel.*;
 import quan.definition.config.ConfigDefinition;
 
 import java.io.File;
-import java.io.FileInputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +24,7 @@ public class ExcelConfigReader extends ConfigReader {
     protected void read() {
         clear();
 
-        try (Workbook workbook = WorkbookFactory.create(new FileInputStream(tableFile))) {
+        try (Workbook workbook = WorkbookFactory.create(Files.newInputStream(tableFile.toPath()))) {
             //只解析第一个工作表
             Sheet sheet = workbook.getSheetAt(0);
             //总行数

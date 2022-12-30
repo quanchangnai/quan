@@ -17,7 +17,7 @@ import java.util.function.Function;
 /**
  * 配置加载器
  */
-@SuppressWarnings({"unchecked"})
+@SuppressWarnings({"unchecked", "rawtypes"})
 public abstract class ConfigLoader {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());

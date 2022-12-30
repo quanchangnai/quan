@@ -162,6 +162,7 @@ public class Worker implements Executor {
         thread = null;
     }
 
+    @SuppressWarnings("NullableProblems")
     @Override
     public void execute(Runnable task) {
         Objects.requireNonNull(task, "参数[task]不能为空");
@@ -183,7 +184,7 @@ public class Worker implements Executor {
 
         long currentTime = System.currentTimeMillis();
         long intervalTime = currentTime - updateTime;
-        if (intervalTime > getServer().getUpdateInterval() * 2 && currentTime - stackTraceTime > 10000 && updateTime > 0) {
+        if (intervalTime > getServer().getUpdateInterval() * 2L && currentTime - stackTraceTime > 10000 && updateTime > 0) {
             stackTraceTime = currentTime;
             StringBuilder stackTrace = new StringBuilder();
             for (StackTraceElement traceElement : thread.getStackTrace()) {
@@ -378,6 +379,7 @@ public class Worker implements Executor {
         server.sendResponse(originServerId, response);
     }
 
+    @SuppressWarnings("rawtypes")
     protected void handleDelayedResult(DelayedResult delayedResult) {
         int originServerId = delayedResult.getOriginServerId();
         Object result = makeResultSafe(originServerId, delayedResult.getSecurityModifier(), delayedResult.getResult());

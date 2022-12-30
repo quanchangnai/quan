@@ -18,7 +18,7 @@ import java.util.*;
  *
  * @author quanchangnai
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class NioClient {
 
     private static final Logger logger = LoggerFactory.getLogger(NioClient.class);

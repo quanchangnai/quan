@@ -83,45 +83,45 @@ public class RoleData extends Data<Long> {
     public static final String MAP2 = "map2";
 
 
-    private LongField id = new LongField();
+    private final LongField id = new LongField();
 
-    private StringField name = new StringField();
+    private final StringField name = new StringField();
 
-    private StringField name2 = new StringField();
+    private final StringField name2 = new StringField();
 
-    private IntField roleType = new IntField();
+    private final IntField roleType = new IntField();
 
-    private IntField a = new IntField();
+    private final IntField a = new IntField();
 
-    private IntField a2 = new IntField();
+    private final IntField a2 = new IntField();
 
-    private BoolField b = new BoolField();
+    private final BoolField b = new BoolField();
 
-    private IntField b2 = new IntField();
+    private final IntField b2 = new IntField();
 
-    private ShortField s = new ShortField();
+    private final ShortField s = new ShortField();
 
-    private IntField i = new IntField();
+    private final IntField i = new IntField();
 
-    private FloatField f = new FloatField();
+    private final FloatField f = new FloatField();
 
-    private DoubleField d = new DoubleField();
+    private final DoubleField d = new DoubleField();
 
-    private BeanField<ItemBean> item = new BeanField<>();
+    private final BeanField<ItemBean> item = new BeanField<>();
 
-    private MapField<Integer, ItemBean> items = new MapField<>(this);
+    private final MapField<Integer, ItemBean> items = new MapField<>(this);
 
-    private SetField<Boolean> set = new SetField<>(this);
+    private final SetField<Boolean> set = new SetField<>(this);
 
-    private ListField<String> list = new ListField<>(this);
+    private final ListField<String> list = new ListField<>(this);
 
-    private MapField<Integer, Integer> map = new MapField<>(this);
+    private final MapField<Integer, Integer> map = new MapField<>(this);
 
-    private SetField<ItemBean> set2 = new SetField<>(this);
+    private final SetField<ItemBean> set2 = new SetField<>(this);
 
-    private ListField<ItemBean> list2 = new ListField<>(this);
+    private final ListField<ItemBean> list2 = new ListField<>(this);
 
-    private MapField<Integer, ItemBean> map2 = new MapField<>(this);
+    private final MapField<Integer, ItemBean> map2 = new MapField<>(this);
 
     public RoleData() {
     }
@@ -350,7 +350,7 @@ public class RoleData extends Data<Long> {
 
     public static class CodecImpl implements Codec<RoleData> {
 
-        private CodecRegistry registry;
+        private final CodecRegistry registry;
 
         public CodecImpl(CodecRegistry registry) {
             this.registry = registry;

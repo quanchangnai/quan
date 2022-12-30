@@ -13,7 +13,7 @@ import java.util.function.Supplier;
  *
  * @author quanchangnai
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class Promise<R> {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());

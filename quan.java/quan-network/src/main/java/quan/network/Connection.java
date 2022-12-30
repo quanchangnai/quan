@@ -26,32 +26,32 @@ public class Connection {
 
     private boolean connected;
 
-    private SelectionKey selectionKey;
+    private final SelectionKey selectionKey;
 
-    private SocketChannel socketChannel;
+    private final SocketChannel socketChannel;
 
-    private TaskExecutor executor;
+    private final TaskExecutor executor;
 
     protected HandlerChain handlerChain;
 
     /**
      * 读缓冲区里
      */
-    private ByteBuffer readBuffer;
+    private final ByteBuffer readBuffer;
 
     /**
      * 写缓冲区里
      */
-    private ByteBuffer writeBuffer;
+    private final ByteBuffer writeBuffer;
 
     /**
      * 写缓冲区里的数据是否已经全部写进了Socket写缓冲区里
      */
     private boolean writeFinished = true;
 
-    private Queue<ByteBuffer> msgQueue = new LinkedList<>();
+    private final Queue<ByteBuffer> msgQueue = new LinkedList<>();
 
-    private Map<Object, Object> attachments = new ConcurrentHashMap<>();
+    private final Map<Object, Object> attachments = new ConcurrentHashMap<>();
 
     public Connection(SelectionKey selectionKey, TaskExecutor executor, int readBufferSize, int writeBufferSize) {
         this.executor = executor;
