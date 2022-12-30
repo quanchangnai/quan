@@ -2,7 +2,7 @@ package quan.config.item;
 
 import com.alibaba.fastjson.*;
 import quan.config.*;
-import quan.config.loader.ConfigLoader;
+import quan.config.load.ConfigLoader;
 import java.util.*;
 
 /**

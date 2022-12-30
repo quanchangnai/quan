@@ -1,4 +1,4 @@
-package quan.config.reader;
+package quan.config.read;
 
 import com.alibaba.fastjson.JSONObject;
 import org.apache.poi.ss.usermodel.*;

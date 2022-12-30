@@ -3,9 +3,9 @@ package quan.config;
 import quan.config.item.EquipConfig;
 import quan.config.item.ItemConfig;
 import quan.config.item.WeaponConfig;
-import quan.config.loader.ConfigLoader;
-import quan.config.loader.DefinitionConfigLoader;
-import quan.config.loader.JsonConfigLoader;
+import quan.config.load.ConfigLoader;
+import quan.config.load.DefinitionConfigLoader;
+import quan.config.load.JsonConfigLoader;
 import quan.config.quest.QuestConfig;
 import quan.definition.Language;
 

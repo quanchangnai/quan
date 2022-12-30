@@ -4,8 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import freemarker.template.Template;
 import org.apache.commons.lang3.StringUtils;
 import quan.config.TableType;
-import quan.config.loader.DefinitionConfigLoader;
-import quan.config.reader.ConfigConverter;
+import quan.config.load.DefinitionConfigLoader;
+import quan.config.read.ConfigConverter;
 import quan.definition.BeanDefinition;
 import quan.definition.Category;
 import quan.definition.ClassDefinition;
@@ -18,7 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
-import static quan.config.reader.ConfigReader.getMinTableBodyStartRow;
+import static quan.config.read.ConfigReader.getMinTableBodyStartRow;
 
 /**
  * 配置生成器

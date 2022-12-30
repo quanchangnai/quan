@@ -1,4 +1,4 @@
-package quan.config.loader;
+package quan.config.load;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -7,7 +7,7 @@ import quan.config.Config;
 import quan.config.ConfigValidator;
 import quan.config.TableType;
 import quan.config.ValidatedException;
-import quan.config.reader.ConfigReader;
+import quan.config.read.ConfigReader;
 import quan.util.ClassUtils;
 import quan.util.CommonUtils;
 

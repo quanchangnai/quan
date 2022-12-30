@@ -1,11 +1,11 @@
-package quan.config.loader;
+package quan.config.load;
 
 import org.apache.commons.lang3.StringUtils;
 import quan.config.Config;
 import quan.config.TableType;
 import quan.config.ValidatedException;
-import quan.config.reader.ConfigReader;
-import quan.config.reader.JsonConfigReader;
+import quan.config.read.ConfigReader;
+import quan.config.read.JsonConfigReader;
 import quan.util.CommonUtils;
 
 import java.io.File;

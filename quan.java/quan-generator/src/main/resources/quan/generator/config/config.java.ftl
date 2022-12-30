@@ -5,8 +5,8 @@ import com.alibaba.fastjson.*;
     <#if getFullPackageName("java")!="quan.config">
 import quan.config.*;
     </#if>
-    <#if kind == 6 && getFullPackageName("java")!="quan.config.loader">
-import quan.config.loader.ConfigLoader;
+    <#if kind == 6 && getFullPackageName("java")!="quan.config.load">
+import quan.config.load.ConfigLoader;
     </#if>
 </#if>
 <#list imports?keys as import>

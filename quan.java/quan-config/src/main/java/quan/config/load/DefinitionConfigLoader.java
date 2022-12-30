@@ -1,4 +1,4 @@
-package quan.config.loader;
+package quan.config.load;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -8,10 +8,10 @@ import org.apache.commons.lang3.tuple.Triple;
 import quan.config.Config;
 import quan.config.TableType;
 import quan.config.ValidatedException;
-import quan.config.reader.CSVConfigReader;
-import quan.config.reader.ConfigReader;
-import quan.config.reader.ExcelConfigReader;
-import quan.config.reader.JsonConfigReader;
+import quan.config.read.CSVConfigReader;
+import quan.config.read.ConfigReader;
+import quan.config.read.ExcelConfigReader;
+import quan.config.read.JsonConfigReader;
 import quan.definition.*;
 import quan.definition.config.ConfigDefinition;
 import quan.definition.parser.DefinitionParser;
@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static quan.config.reader.ConfigReader.getMinTableBodyStartRow;
+import static quan.config.read.ConfigReader.getMinTableBodyStartRow;
 
 /**
  * 使用配置定义的配置加载器，根据配置定义实现了索引、引用校验等

@@ -1,4 +1,4 @@
-package quan.config.loader;
+package quan.config.load;
 
 /**
  * 配置加载监听器
