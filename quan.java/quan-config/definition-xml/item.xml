@@ -6,8 +6,7 @@
         <field name="itemNum" type="int"/>
     </bean>
 
-    道具类型
-    <enum name="ItemType">
+    <enum name="ItemType">道具类型
         <field name="type1" value="1"/>道具类型1
         <field name="type2" value="2"/>道具类型2
     </enum>

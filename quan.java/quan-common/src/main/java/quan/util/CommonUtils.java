@@ -72,13 +72,22 @@ public class CommonUtils {
      * 递归列出子文件
      *
      * @param path 目录
-     * @param ext  扩展名
+     * @param ext  扩展名，为空时不限制
      * @return 子文件集合
      */
     public static Set<File> listFiles(File path, String ext) {
         Set<File> children = new HashSet<>();
         listFiles(path, ext, children);
         return children;
+    }
+
+    /**
+     * 递归列出子文件
+     *
+     * @see #listFiles(File, String)
+     */
+    public static Set<File> listFiles(File path) {
+        return listFiles(path, null);
     }
 
     private static void listFiles(File path, String ext, Set<File> children) {
@@ -89,7 +98,7 @@ public class CommonUtils {
                     listFiles(file, ext, children);
                 }
             }
-        } else if (path.getName().endsWith("." + ext)) {
+        } else if (ext == null || path.getName().endsWith("." + ext)) {
             children.add(path);
         }
     }

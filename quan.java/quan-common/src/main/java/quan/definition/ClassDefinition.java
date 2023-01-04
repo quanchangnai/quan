@@ -1,5 +1,6 @@
 package quan.definition;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import quan.definition.DependentSource.DependentType;
 
@@ -163,11 +164,16 @@ public abstract class ClassDefinition extends Definition {
     }
 
     public String getFullName(String lang) {
-        return getFullPackageName(lang) + "." + getName();
+        String fullPackageName = getFullPackageName(lang);
+        if (StringUtils.isBlank(fullPackageName)) {
+            return getName();
+        } else {
+            return fullPackageName + "." + getName();
+        }
     }
 
     public String getFullName(Language lang) {
-        return getFullPackageName(lang) + "." + getName();
+        return getFullName(lang.name());
     }
 
     //其他类使用本类时的导入包

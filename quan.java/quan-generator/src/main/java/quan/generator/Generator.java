@@ -21,6 +21,8 @@ import quan.util.CommonUtils;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 import static quan.definition.parser.DefinitionParser.createParser;
@@ -265,7 +267,7 @@ public abstract class Generator {
             return;
         }
 
-        try (Writer writer = new OutputStreamWriter(new FileOutputStream(new File(filePath, fileName)), StandardCharsets.UTF_8)) {
+        try (Writer writer = new OutputStreamWriter(Files.newOutputStream(new File(filePath, fileName).toPath()), StandardCharsets.UTF_8)) {
             template.process(classDefinition, writer);
         } catch (Exception e) {
             logger.info("生成{}[{}]失败", category().alias(), filePath + File.separator + fileName, e);
@@ -410,7 +412,7 @@ public abstract class Generator {
         }
 
         Properties options = new Properties();
-        try (InputStream inputStream = new FileInputStream(optionsFile.trim())) {
+        try (InputStream inputStream = Files.newInputStream(Paths.get(optionsFile.trim()))) {
             options.load(inputStream);
         } catch (IOException e) {
             logger.info("加载生成器选项配置文件[{}]出错", optionsFile, e);

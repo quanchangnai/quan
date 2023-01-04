@@ -38,11 +38,11 @@ namespace ${getFullPackageName("cs")}
         }
 
     <#if valueField.type=="map">
-        public ${valueField.basicType}<${valueField.keyType},${valueField.classValueType}> Value => ${configDefinition.name}.GetBy${keyField.name?cap_first}(_key).${valueField.name};
+        public ${valueField.basicType}<${valueField.keyType},${valueField.classValueType}> Value => ${ownerDefinition.name}.GetBy${keyField.name?cap_first}(_key).${valueField.name};
     <#elseif valueField.type=="list" || valueField.type=="set">
-        public ${valueField.basicType}<${valueField.classValueType}> Value => ${configDefinition.name}.GetBy${keyField.name?cap_first}(_key).${valueField.name};
+        public ${valueField.basicType}<${valueField.classValueType}> Value => ${ownerDefinition.name}.GetBy${keyField.name?cap_first}(_key).${valueField.name};
     <#else>
-        public ${valueField.classType} Value => ${configDefinition.name}.GetBy${keyField.name?cap_first}(_key).${valueField.name};
+        public ${valueField.classType} Value => ${ownerDefinition.name}.GetBy${keyField.name?cap_first}(_key).${valueField.name};
     </#if>
 
 
@@ -68,11 +68,11 @@ namespace ${getFullPackageName("cs")}
         /// </summary>
         </#if>
         <#if valueField.type=="map">
-        public static ${valueField.basicType}<${valueField.keyType},${valueField.classValueType}> ${key} => ${configDefinition.name}.GetBy${keyField.name?cap_first}("${key}").${valueField.name};
+        public static ${valueField.basicType}<${valueField.keyType},${valueField.classValueType}> ${key} => ${ownerDefinition.name}.GetBy${keyField.name?cap_first}("${key}").${valueField.name};
         <#elseif valueField.type=="list" || valueField.type=="set">
-        public static ${valueField.basicType}<${valueField.classValueType}> ${key} => ${configDefinition.name}.GetBy${keyField.name?cap_first}("${key}").${valueField.name};
+        public static ${valueField.basicType}<${valueField.classValueType}> ${key} => ${ownerDefinition.name}.GetBy${keyField.name?cap_first}("${key}").${valueField.name};
         <#else>
-        public static ${valueField.classType} ${key} => ${configDefinition.name}.GetBy${keyField.name?cap_first}("${key}").${valueField.name};
+        public static ${valueField.classType} ${key} => ${ownerDefinition.name}.GetBy${keyField.name?cap_first}("${key}").${valueField.name};
         </#if>
         <#if key?has_next>
 

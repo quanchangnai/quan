@@ -282,9 +282,7 @@ public abstract class ConfigLoader {
         Set<ConfigLoadListener> targetListeners = new HashSet<>();
 
         if (configs == null) {
-            for (Set<ConfigLoadListener> set : listeners.values()) {
-                targetListeners.addAll(set);
-            }
+            listeners.values().forEach(targetListeners::addAll);
         } else {
             for (Class<? extends Config> config : configs) {
                 if (listeners.containsKey(config)) {

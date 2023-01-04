@@ -48,15 +48,15 @@ public abstract class Config extends Bean {
             params.add(keyNames);
         }
 
-        List<String> keysList = new ArrayList<>();
+        List<String> keyList = new ArrayList<>();
         for (Object key : keys) {
-            keysList.add(key.toString());
+            keyList.add(key.toString());
         }
 
-        if (keysList.size() > 1) {
-            params.add("(" + String.join(",", keysList) + ")");
+        if (keyList.size() > 1) {
+            params.add("(" + String.join(",", keyList) + ")");
         } else {
-            params.addAll(keysList);
+            params.addAll(keyList);
         }
 
         errors.add(String.format("配置[%s]有重复数据[%s = %s]", params.toArray()));

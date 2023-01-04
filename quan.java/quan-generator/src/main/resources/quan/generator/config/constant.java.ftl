@@ -25,20 +25,20 @@ public enum ${name} {
     <#else>
     ;
     </#list>
-<#if valueField.type=="map">
+    <#if valueField.type=="map">
 
     public ${valueField.basicType}<${valueField.keyType},${valueField.classValueType}> value() {
-        return ${configDefinition.name}.getBy${keyField.name?cap_first}(name()").${valueField.name};
+        return ${ownerDefinition.name}.getBy${keyField.name?cap_first}(name()").${valueField.name};
     }
     <#elseif valueField.type=="list" || valueField.type=="set">
 
     public ${valueField.basicType}<${valueField.classValueType}> value() {
-        return ${configDefinition.name}.getBy${keyField.name?cap_first}(name()).${valueField.name};
+        return ${ownerDefinition.name}.getBy${keyField.name?cap_first}(name()).${valueField.name};
     }
     <#else>
 
-    public ${valueField.classType} value() {
-        return ${configDefinition.name}.getBy${keyField.name?cap_first}(name()).${valueField.name};
+    public ${valueField.basicType} value() {
+        return ${ownerDefinition.name}.getBy${keyFieldIndex.name?cap_first}(name()).${valueField.name};
     }
     </#if>
 <#else>
@@ -52,15 +52,15 @@ public class ${name} {
     </#if>
     <#if valueField.type=="map">
     public static ${valueField.basicType}<${valueField.keyType},${valueField.classValueType}> ${key}() {
-        return ${configDefinition.name}.getBy${keyField.name?cap_first}("${key}").${valueField.name};
+        return ${ownerDefinition.name}.getBy${keyField.name?cap_first}("${key}").${valueField.name};
     }
     <#elseif valueField.type=="list" || valueField.type=="set">
     public static ${valueField.basicType}<${valueField.classValueType}> ${key}() {
-        return ${configDefinition.name}.getBy${keyField.name?cap_first}("${key}").${valueField.name};
+        return ${ownerDefinition.name}.getBy${keyField.name?cap_first}("${key}").${valueField.name};
     }
     <#else>
     public static ${valueField.basicType} ${key}() {
-        return ${configDefinition.name}.getBy${keyField.name?cap_first}("${key}").${valueField.name};
+        return ${ownerDefinition.name}.getBy${keyField.name?cap_first}("${key}").${valueField.name};
     }
     </#if>
     </#list>

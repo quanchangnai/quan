@@ -175,7 +175,7 @@ public abstract class ConfigGenerator extends Generator {
             ConstantDefinition constantDefinition = (ConstantDefinition) classDefinition;
             prepareConstant(constantDefinition);
             if (configLoader != null) {
-                List<JSONObject> configJsons = configLoader.loadJsons(constantDefinition.getConfigDefinition(), false);
+                List<JSONObject> configJsons = configLoader.loadJsons(constantDefinition.getOwnerDefinition(), false);
                 constantDefinition.setConfigs(configJsons);
             }
         }

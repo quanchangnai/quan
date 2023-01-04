@@ -28,7 +28,7 @@ public class CardConfig extends Config {
     /**
      * 类型
      */
-    public final int type;
+    public final CardType type;
 
     /**
      * List
@@ -62,7 +62,7 @@ public class CardConfig extends Config {
         this.id = json.getIntValue("id");
         this.key = json.getOrDefault("key", "").toString();
         this.name = json.getOrDefault("name", "").toString();
-        this.type = json.getIntValue("type");
+        this.type = CardType.valueOf(json.getIntValue("type"));
 
         JSONArray list$1 = json.getJSONArray("list");
         List<Integer> list$2 = new ArrayList<>();
@@ -123,7 +123,9 @@ public class CardConfig extends Config {
     private static volatile Map<Integer, CardConfig> _idConfigs = Collections.emptyMap();
 
     //索引:类型
-    private static volatile Map<Integer, List<CardConfig>> _typeConfigs = Collections.emptyMap();
+    private static volatile Map<CardType, List<CardConfig>> _typeConfigs = Collections.emptyMap();
+
+    private static volatile Map<String, CardConfig> _keyConfigs = Collections.emptyMap();
 
     public static List<CardConfig> getAll() {
         return _configs;
@@ -137,34 +139,48 @@ public class CardConfig extends Config {
         return _idConfigs.get(id);
     }
 
-    public static Map<Integer, List<CardConfig>> getTypeAll() {
+    public static Map<CardType, List<CardConfig>> getTypeAll() {
         return _typeConfigs;
     }
 
-    public static List<CardConfig> getByType(int type) {
+    public static List<CardConfig> getByType(CardType type) {
         return _typeConfigs.getOrDefault(type, Collections.emptyList());
+    }
+
+    public static Map<String, CardConfig> getKeyAll() {
+        return _keyConfigs;
+    }
+
+    public static CardConfig getByKey(String key) {
+        return _keyConfigs.get(key);
     }
 
 
     @SuppressWarnings({"unchecked"})
     private static List<String> load(List<CardConfig> configs) {
         Map<Integer, CardConfig> idConfigs = new HashMap<>();
-        Map<Integer, List<CardConfig>> typeConfigs = new HashMap<>();
+        Map<CardType, List<CardConfig>> typeConfigs = new HashMap<>();
+        Map<String, CardConfig> keyConfigs = new HashMap<>();
 
         List<String> errors = new ArrayList<>();
 
         for (CardConfig config : configs) {
             load(idConfigs, errors, config, true, "id", config.id);
             load(typeConfigs, errors, config, false, "type", config.type);
+            if (!config.key.isEmpty()) {
+                load(keyConfigs, errors, config, true, "key", config.key);
+            }
         }
 
         configs = Collections.unmodifiableList(configs);
         idConfigs = unmodifiableMap(idConfigs);
         typeConfigs = unmodifiableMap(typeConfigs);
+        keyConfigs = unmodifiableMap(keyConfigs);
 
         CardConfig._configs = configs;
         CardConfig._idConfigs = idConfigs;
         CardConfig._typeConfigs = typeConfigs;
+        CardConfig._keyConfigs = keyConfigs;
 
         return errors;
     }

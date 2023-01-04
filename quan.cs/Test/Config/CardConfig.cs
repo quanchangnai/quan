@@ -31,7 +31,7 @@ namespace Test.Config
         /// <summary>
         /// 类型
         /// </summary>
-        public readonly int type;
+        public readonly CardType type;
 
         /// <summary>
         /// List
@@ -61,7 +61,7 @@ namespace Test.Config
             id = json["id"]?.Value<int>() ?? default;
             key = json["key"]?.Value<string>() ?? "";
             name = json["name"]?.Value<string>() ?? "";
-            type = json["type"]?.Value<int>() ?? default;
+            type = (CardType) (json["type"]?.Value<int>() ?? default);
 
             var list1 = json["list"]?.Value<JArray>();
             var list2 = ImmutableList<int>.Empty;
@@ -126,7 +126,9 @@ namespace Test.Config
         private static volatile IDictionary<int, CardConfig> _idConfigs = new Dictionary<int, CardConfig>();
 
         // 索引:类型
-        private static volatile IDictionary<int, IList<CardConfig>> _typeConfigs = new Dictionary<int, IList<CardConfig>>();
+        private static volatile IDictionary<CardType, IList<CardConfig>> _typeConfigs = new Dictionary<CardType, IList<CardConfig>>();
+
+        private static volatile IDictionary<string, CardConfig> _keyConfigs = new Dictionary<string, CardConfig>();
 
         public static IList<CardConfig> GetAll()
         {
@@ -144,36 +146,51 @@ namespace Test.Config
             return result;
         }
 
-        public static IDictionary<int, IList<CardConfig>> GetTypeAll()
+        public static IDictionary<CardType, IList<CardConfig>> GetTypeAll()
         {
             return _typeConfigs;
         }
 
-        public static IList<CardConfig> GetByType(int type)
+        public static IList<CardConfig> GetByType(CardType type)
         {
             _typeConfigs.TryGetValue(type, out var result);
             return result ?? ImmutableList<CardConfig>.Empty;
+        }
+
+        public static IDictionary<string, CardConfig> GetKeyAll()
+        {
+            return _keyConfigs;
+        }
+
+        public static CardConfig GetByKey(string key)
+        {
+            _keyConfigs.TryGetValue(key, out var result);
+            return result;
         }
 
 
         public static void Load(IList<CardConfig> configs)
         {
             IDictionary<int, CardConfig> idConfigs = new Dictionary<int, CardConfig>();
-            IDictionary<int, IList<CardConfig>> typeConfigs = new Dictionary<int, IList<CardConfig>>();
+            IDictionary<CardType, IList<CardConfig>> typeConfigs = new Dictionary<CardType, IList<CardConfig>>();
+            IDictionary<string, CardConfig> keyConfigs = new Dictionary<string, CardConfig>();
 
             foreach (var config in configs)
             {
                 Load(idConfigs, config, config.id);
                 Load(typeConfigs, config, config.type);
+                Load(keyConfigs, config, config.key);
             }
 
             configs = configs.ToImmutableList();
             idConfigs = ToImmutableDictionary(idConfigs);
             typeConfigs = ToImmutableDictionary(typeConfigs);
+            keyConfigs = ToImmutableDictionary(keyConfigs);
 
             _configs = configs;
             _idConfigs = idConfigs;
             _typeConfigs = typeConfigs;
+            _keyConfigs = keyConfigs;
         }
     }
 }

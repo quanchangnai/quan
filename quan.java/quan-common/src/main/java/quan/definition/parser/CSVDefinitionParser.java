@@ -6,12 +6,14 @@ import org.apache.commons.csv.CSVRecord;
 import quan.definition.config.ConfigDefinition;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
 import java.util.List;
 
 /**
- * 基于CSV表格的【定义】解析器，在表格中直接定义配置，不支持定义复杂结构
+ * 基于CSV表格的【定义】解析器
+ *
+ * @see TableDefinitionParser
  */
 public class CSVDefinitionParser extends TableDefinitionParser {
 
@@ -27,7 +29,7 @@ public class CSVDefinitionParser extends TableDefinitionParser {
     @Override
     protected boolean parseTable(ConfigDefinition configDefinition, File definitionFile) {
         List<CSVRecord> records;
-        try (CSVParser parser = new CSVParser(new InputStreamReader(new FileInputStream(definitionFile), definitionFileEncoding), CSVFormat.DEFAULT)) {
+        try (CSVParser parser = new CSVParser(new InputStreamReader(Files.newInputStream(definitionFile.toPath()), definitionFileEncoding), CSVFormat.DEFAULT)) {
             records = parser.getRecords();
         } catch (Exception e) {
             logger.error("解析定义文件[{}]错误", definitionFile.getName(), e);

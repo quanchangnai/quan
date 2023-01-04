@@ -78,8 +78,7 @@ public abstract class DefinitionParser {
         for (String path : definitionPaths) {
             path = CommonUtils.toPlatPath(path);
             this.definitionPaths.add(path);
-            Set<File> files = CommonUtils.listFiles(new File(path), getDefinitionType());
-            definitionFiles.addAll(files);
+            definitionFiles.addAll(CommonUtils.listFiles(new File(path)));
         }
     }
 
@@ -219,12 +218,32 @@ public abstract class DefinitionParser {
             return;
         }
 
-        definitionFiles.forEach(this::parseFile);
+
+        for (File definitionFile : definitionFiles) {
+            if (checkFile(definitionFile)) {
+                parseFile(definitionFile);
+            }
+        }
 
         validate();
     }
 
+    protected boolean checkFile(File definitionFile) {
+        return definitionFile.getName().endsWith(getDefinitionType());
+    }
+
+
+    protected abstract void parseFile(File definitionFile);
+
     protected void validate() {
+        validateClassName();
+
+        parsedClasses.forEach(ClassDefinition::validate1);
+        parsedClasses.forEach(ClassDefinition::validate2);
+        parsedClasses.forEach(ClassDefinition::validate3);
+    }
+
+    protected void validateClassName() {
         Map<String, ClassDefinition> dissimilarClasses = new HashMap<>();
 
         for (ClassDefinition classDefinition : parsedClasses) {
@@ -256,10 +275,6 @@ public abstract class DefinitionParser {
                 dissimilarClasses.put(classDefinition.getName().toLowerCase(), classDefinition);
             }
         }
-
-        parsedClasses.forEach(ClassDefinition::validate1);
-        parsedClasses.forEach(ClassDefinition::validate2);
-        parsedClasses.forEach(ClassDefinition::validate3);
     }
 
     public void clear() {
@@ -280,7 +295,5 @@ public abstract class DefinitionParser {
                 return new XmlDefinitionParser();
         }
     }
-
-    protected abstract void parseFile(File definitionFile);
 
 }

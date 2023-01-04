@@ -18,12 +18,16 @@ import java.util.regex.Pattern;
  */
 public class ConstantDefinition extends ClassDefinition {
 
-    private ConfigDefinition configDefinition;
+    private String ownerName;
+
+    private ConfigDefinition ownerDefinition;
 
     //是否使用枚举或者模拟枚举实现，不支持的语言该参数没有意义
     private boolean useEnum = true;
 
     private String keyField;
+
+    private IndexDefinition keyFieldIndex;
 
     private String valueFieldName;
 
@@ -52,17 +56,26 @@ public class ConstantDefinition extends ClassDefinition {
         return namePattern;
     }
 
-    public ConfigDefinition getConfigDefinition() {
-        return configDefinition;
+    public String getOwnerName() {
+        return ownerName;
     }
 
-    public void setConfigDefinition(ConfigDefinition configDefinition) {
-        setParser(configDefinition.getParser());
-        setPackageName(configDefinition.getPackageName());
-        getPackageNames().putAll(configDefinition.getPackageNames());
-        setDefinitionFile(configDefinition.getDefinitionFile());
-        this.configDefinition = configDefinition;
-        configDefinition.getConstantDefinitions().add(this);
+    public void setOwnerName(String ownerName) {
+        this.ownerName = ownerName;
+    }
+
+    public ConfigDefinition getOwnerDefinition() {
+        return ownerDefinition;
+    }
+
+    public void setOwnerDefinition(ConfigDefinition ownerDefinition) {
+        setParser(ownerDefinition.getParser());
+        setPackageName(ownerDefinition.getPackageName());
+        getPackageNames().putAll(ownerDefinition.getPackageNames());
+        setDefinitionFile(ownerDefinition.getDefinitionFile());
+        this.ownerDefinition = ownerDefinition;
+        this.ownerName = ownerDefinition.getName();
+        ownerDefinition.getConstantDefinitions().add(this);
     }
 
     public ConstantDefinition setUseEnum(String useEnum) {
@@ -95,7 +108,7 @@ public class ConstantDefinition extends ClassDefinition {
     }
 
     public FieldDefinition getKeyField() {
-        return configDefinition.getField(keyField);
+        return ownerDefinition.getField(keyField);
     }
 
     public FieldDefinition getValueField() {
@@ -120,23 +133,27 @@ public class ConstantDefinition extends ClassDefinition {
 
     @Override
     public void validate2() {
+        if (ownerDefinition == null) {
+            return;
+        }
+
         validateKeyField();
         validateValueField();
 
-        if (commentField != null && configDefinition.getField(commentField) == null) {
-            addValidatedError(getValidatedName() + "的注释字段[" + commentField + "]不存在");
+        if (commentField != null && ownerDefinition.getField(commentField) == null) {
+            addValidatedError(getValidatedName() + "的注释字段[" + commentField + "]在" + ownerDefinition.getValidatedName() + "中不存在");
         }
     }
 
     public void validateKeyField() {
         if (StringUtils.isBlank(keyField)) {
-            addValidatedError(getValidatedName("的") + "key字段不能为空");
+            addValidatedError(getValidatedName() + "的key字段不能为空");
             return;
         }
 
-        FieldDefinition keyFieldDefinition = configDefinition.getField(keyField);
+        FieldDefinition keyFieldDefinition = ownerDefinition.getField(keyField);
         if (keyFieldDefinition == null) {
-            addValidatedError(getValidatedName() + "的key[" + keyField + "]不是" + configDefinition.getValidatedName() + "的字段");
+            addValidatedError(getValidatedName() + "的key字段[" + keyField + "]在" + ownerDefinition.getValidatedName() + "中不存在");
             return;
         }
 
@@ -144,7 +161,7 @@ public class ConstantDefinition extends ClassDefinition {
             addValidatedError(getValidatedName() + "的key字段[" + keyField + "]必须是字符串类型");
         }
 
-        IndexDefinition keyFieldIndex = configDefinition.getIndexByField1(keyFieldDefinition);
+        keyFieldIndex = ownerDefinition.getIndexByField1(keyFieldDefinition);
         if (keyFieldIndex == null || !keyFieldIndex.isUnique() || keyFieldIndex.getFields().size() > 1) {
             addValidatedError(getValidatedName() + "的key字段[" + keyField + "]必须是单字段唯一索引");
         }
@@ -152,17 +169,21 @@ public class ConstantDefinition extends ClassDefinition {
 
     public void validateValueField() {
         if (StringUtils.isBlank(valueFieldName)) {
-            addValidatedError(getValidatedName("的") + "value字段不能为空");
+            addValidatedError(getValidatedName() + "的value字段不能为空");
             return;
         }
 
-        FieldDefinition valueFieldDefinition = configDefinition.getField(valueFieldName);
+        FieldDefinition valueFieldDefinition = ownerDefinition.getField(valueFieldName);
         if (valueFieldDefinition == null) {
-            addValidatedError(getValidatedName() + "的value[" + valueFieldName + "]不是" + configDefinition.getValidatedName() + "的字段");
+            addValidatedError(getValidatedName() + "的value字段[" + valueFieldName + "]在" + ownerDefinition.getValidatedName() + "中不存在");
             return;
         }
 
         valueField = valueFieldDefinition.clone().setOwner(this);
+    }
+
+    public IndexDefinition getKeyFieldIndex() {
+        return keyFieldIndex;
     }
 
     @Override
@@ -173,9 +194,17 @@ public class ConstantDefinition extends ClassDefinition {
 
     @Override
     protected void validateDependents() {
+        if (ownerDefinition == null) {
+            return;
+        }
+
         super.validateDependents();
-        addDependent(DependentType.FIELD, this, valueField, valueField.getTypeBean());
-        addDependent(DependentType.FIELD_VALUE, this, valueField, valueField.getValueTypeBean());
+
+        if (valueField != null) {
+            addDependent(DependentType.FIELD, this, valueField, valueField.getTypeBean());
+            addDependent(DependentType.FIELD_VALUE, this, valueField, valueField.getValueTypeBean());
+        }
+
     }
 
 }

@@ -16,7 +16,7 @@ public enum ItemIds {
      */
     item2;
 
-    public Integer value() {
+    public int value() {
         return ItemConfig.getByKey(name()).id;
     }
 

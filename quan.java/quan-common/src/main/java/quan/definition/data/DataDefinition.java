@@ -84,7 +84,7 @@ public class DataDefinition extends BeanDefinition {
     }
 
     public void addIndex(IndexDefinition indexDefinition) {
-        indexDefinition.setOwner(this);
+        indexDefinition.setOwnerDefinition(this);
         indexes.add(indexDefinition);
     }
 

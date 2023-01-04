@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package unwrap="true">
+
+    卡片类型-
+    <enum name="CardType">卡片类型--
+        <field name="type1" value="1"/>道具类型1
+        <field name="type2" value="2"/>道具类型2
+    </enum>卡片类型---
+
+    <index name="key" type="u" config="CardConfig" fields="key"/>
+
+    <constant name="CardIds" config="CardConfig" key="key" value="id" comment="name"/>卡片ID
+
+</package>

@@ -145,7 +145,7 @@ public class ConfigDefinition extends BeanDefinition {
     }
 
     public void addIndex(IndexDefinition indexDefinition) {
-        indexDefinition.setOwner(this);
+        indexDefinition.setOwnerDefinition(this);
         indexes.add(indexDefinition);
         selfIndexes.add(indexDefinition);
     }
@@ -309,7 +309,7 @@ public class ConfigDefinition extends BeanDefinition {
 
             for (int i = parent.selfIndexes.size() - 1; i >= 0; i--) {
                 IndexDefinition parentIndex = parent.selfIndexes.get(i).clone();
-                parentIndex.setOwner(this);
+                parentIndex.setOwnerDefinition(this);
                 indexes.add(0, parentIndex);
             }
 

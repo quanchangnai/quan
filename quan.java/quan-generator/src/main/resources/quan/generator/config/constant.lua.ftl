@@ -1,4 +1,4 @@
-local ${configDefinition.name} = require("${configDefinition.getFullName("lua")}")
+local ${ownerDefinition.name} = require("${ownerDefinition.getFullName("lua")}")
 
 ---
 <#if comment !="">
@@ -20,7 +20,7 @@ local ${name} = {}
 ---@return ${valueField.basicType}
     </#if>
 function ${name}.${key}()
-    return ${configDefinition.name}.getBy${keyField.name?cap_first}("${key}").${valueField.name}
+    return ${ownerDefinition.name}.getBy${keyField.name?cap_first}("${key}").${valueField.name}
 end
 
 </#list>

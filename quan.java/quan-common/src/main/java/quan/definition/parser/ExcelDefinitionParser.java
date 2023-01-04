@@ -5,11 +5,13 @@ import quan.definition.Category;
 import quan.definition.config.ConfigDefinition;
 
 import java.io.File;
-import java.io.FileInputStream;
+import java.nio.file.Files;
 import java.util.Objects;
 
 /**
- * 基于Excel表格的【定义】解析器，在表格中直接定义配置，不支持定义复杂结构
+ * 基于Excel表格的【定义】解析器
+ *
+ * @see TableDefinitionParser
  */
 public class ExcelDefinitionParser extends TableDefinitionParser {
 
@@ -40,7 +42,7 @@ public class ExcelDefinitionParser extends TableDefinitionParser {
 
     @Override
     protected boolean parseTable(ConfigDefinition configDefinition, File definitionFile) {
-        try (Workbook workbook = WorkbookFactory.create(new FileInputStream(definitionFile))) {
+        try (Workbook workbook = WorkbookFactory.create(Files.newInputStream(definitionFile.toPath()))) {
             Sheet sheet = workbook.getSheetAt(0);
             configDefinition.setComment(sheet.getSheetName());
             int totalTowNum = sheet.getPhysicalNumberOfRows();
