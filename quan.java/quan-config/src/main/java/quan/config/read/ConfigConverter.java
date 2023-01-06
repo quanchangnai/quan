@@ -3,6 +3,7 @@ package quan.config.read;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
+import quan.config.read.ConvertException.ErrorType;
 import quan.definition.BeanDefinition;
 import quan.definition.ClassDefinition;
 import quan.definition.EnumDefinition;
@@ -11,10 +12,7 @@ import quan.definition.parser.DefinitionParser;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 配置转换器
@@ -103,7 +101,7 @@ public class ConfigConverter {
                     object = new JSONObject();
                     object.put("class", columnValue);
                 } else if (!StringUtils.isBlank(columnValue)) {
-                    throw new ConvertException(ConvertException.ErrorType.TYPE_ERROR, columnValue, beanDefinition.getName());
+                    throw new ConvertException(ErrorType.TYPE_ERROR, columnValue, beanDefinition.getName());
                 }
                 return object;
             } else {
@@ -159,14 +157,14 @@ public class ConfigConverter {
         if (enumValue > 0) {
             enumField = enumDefinition.getField(enumValue);
             if (enumField == null) {
-                throw new ConvertException(ConvertException.ErrorType.ENUM_VALUE, value);
+                throw new ConvertException(ErrorType.ENUM_VALUE, value);
             }
             return enumValue;
         }
 
         enumField = enumDefinition.getField(value);
         if (enumField == null) {
-            throw new ConvertException(ConvertException.ErrorType.ENUM_NAME, value);
+            throw new ConvertException(ErrorType.ENUM_NAME, value);
         }
         enumValue = Integer.parseInt(enumField.getValue());
 
@@ -195,7 +193,7 @@ public class ConfigConverter {
                     return value;
             }
         } catch (Exception e) {
-            throw new ConvertException(ConvertException.ErrorType.TYPE_ERROR, e, value, type);
+            throw new ConvertException(ErrorType.TYPE_ERROR, e, value, type);
         }
     }
 
@@ -215,7 +213,7 @@ public class ConfigConverter {
                 return timeFormat.parse(value);
             }
         } catch (ParseException e) {
-            throw new ConvertException(ConvertException.ErrorType.COMMON, e);
+            throw new ConvertException(ErrorType.COMMON, e);
         }
     }
 
@@ -236,7 +234,7 @@ public class ConfigConverter {
         if (StringUtils.isBlank(value)) {
             return new JSONArray();
         }
-        String[] values = value.split(fieldDefinition.getEscapedDelimiter(), -1);
+        String[] values = value.split(fieldDefinition.getEscapedDelimiters().get(0), -1);
         return convertArray(fieldDefinition, values);
     }
 
@@ -245,7 +243,7 @@ public class ConfigConverter {
             return new JSONArray();
         }
 
-        String[] values = value.split(fieldDefinition.getEscapedDelimiter(), -1);
+        String[] values = value.split(fieldDefinition.getEscapedDelimiters().get(0), -1);
         Set<String> setValues = new HashSet<>();
         Set<String> duplicateValues = new HashSet<>();
 
@@ -257,7 +255,7 @@ public class ConfigConverter {
         }
 
         if (!duplicateValues.isEmpty()) {
-            throw new ConvertException(ConvertException.ErrorType.SET_DUPLICATE_VALUE, new ArrayList<>(duplicateValues));
+            throw new ConvertException(ErrorType.SET_DUPLICATE_VALUE, new ArrayList<>(duplicateValues));
         }
 
         return convertArray(fieldDefinition, setValues.toArray(new String[0]));
@@ -298,7 +296,7 @@ public class ConfigConverter {
             return array;
         }
 
-        String[] values = value.split(fieldDefinition.getEscapedDelimiter(), -1);
+        String[] values = value.split(fieldDefinition.getEscapedDelimiters().get(0), -1);
         Set<Object> set = new HashSet<>(array);
         Set<String> duplicate = new HashSet<>();
         for (int i = 0; i < setArray.size(); i++) {
@@ -310,7 +308,7 @@ public class ConfigConverter {
             }
         }
         if (!duplicate.isEmpty()) {
-            throw new ConvertException(ConvertException.ErrorType.SET_DUPLICATE_VALUE, new ArrayList<>(duplicate));
+            throw new ConvertException(ErrorType.SET_DUPLICATE_VALUE, new ArrayList<>(duplicate));
         }
 
         return array;
@@ -353,9 +351,9 @@ public class ConfigConverter {
             }
             if (objectKey == null) {
                 object.put(null, null);//标记接下来的value作废
-                throw new ConvertException(ConvertException.ErrorType.MAP_INVALID_KEY, value);
+                throw new ConvertException(ErrorType.MAP_INVALID_KEY, value);
             } else if (object.containsKey(objectKey)) {
-                throw new ConvertException(ConvertException.ErrorType.MAP_DUPLICATE_KEY, value);
+                throw new ConvertException(ErrorType.MAP_DUPLICATE_KEY, value);
             }
             object.put(objectKey.toString(), null);
         } else {
@@ -371,7 +369,7 @@ public class ConfigConverter {
             if (objectValue == null) {
                 //value无效删除对应的key
                 object.remove(objectKey);
-                throw new ConvertException(ConvertException.ErrorType.MAP_INVALID_VALUE, value);
+                throw new ConvertException(ErrorType.MAP_INVALID_VALUE, value);
             }
             object.put(objectKey.toString(), objectValue);
         }
@@ -380,39 +378,46 @@ public class ConfigConverter {
     }
 
     @SuppressWarnings("SuspiciousMethodCalls")
-    private JSONObject convertMap(FieldDefinition fieldDefinition, String value) {
+    private JSONObject convertMap(FieldDefinition fieldDefinition, String fieldValue) {
         JSONObject object = new JSONObject();
-        if (StringUtils.isBlank(value)) {
+        if (StringUtils.isBlank(fieldValue)) {
             return object;
         }
 
-        String[] values = value.split(fieldDefinition.getEscapedDelimiter(), -1);
+        List<String> delimiters = fieldDefinition.getEscapedDelimiters();
+        String[] entries = fieldValue.split(delimiters.get(0), -1);
 
-        for (int i = 0; i < values.length; i = i + 2) {
-            String vi = values[i];
+        for (String entry : entries) {
+            String[] pair = entry.split(delimiters.get(1));
+            if (pair.length != 2) {
+                throw new ConvertException(ErrorType.COMMON);
+            }
+
             Object k = null;
             try {
-                k = convertPrimitiveType(fieldDefinition.getKeyType(), vi);
+                k = convertPrimitiveType(fieldDefinition.getKeyType(), pair[0]);
             } catch (Exception ignored) {
             }
+
             if (k == null) {
-                throw new ConvertException(ConvertException.ErrorType.MAP_INVALID_KEY, vi);
+                throw new ConvertException(ErrorType.MAP_INVALID_KEY, pair[0]);
             }
             if (object.containsKey(k)) {
-                throw new ConvertException(ConvertException.ErrorType.MAP_DUPLICATE_KEY, vi);
+                throw new ConvertException(ErrorType.MAP_DUPLICATE_KEY, pair[0]);
             }
 
             Object v = null;
             try {
                 if (fieldDefinition.isPrimitiveValueType()) {
-                    v = convertPrimitiveType(fieldDefinition.getValueType(), values[i + 1]);
+                    v = convertPrimitiveType(fieldDefinition.getValueType(), pair[1]);
                 } else {
-                    v = convertBean(fieldDefinition.getOwner(), fieldDefinition.getValueTypeBean(), values[i + 1]);
+                    v = convertBean(fieldDefinition.getOwner(), fieldDefinition.getValueTypeBean(), pair[1]);
                 }
             } catch (Exception ignored) {
             }
+
             if (v == null) {
-                throw new ConvertException(ConvertException.ErrorType.MAP_INVALID_VALUE, vi);
+                throw new ConvertException(ErrorType.MAP_INVALID_VALUE, pair[1]);
             }
 
             object.put(k.toString(), v);
@@ -441,7 +446,7 @@ public class ConfigConverter {
                 object.put("class", values[0]);
                 beanDefinition = parser.getBean(ClassDefinition.getLongName(owner, className));
             } else {
-                throw new ConvertException(ConvertException.ErrorType.TYPE_ERROR, values[0], beanDefinition.getName());
+                throw new ConvertException(ErrorType.TYPE_ERROR, values[0], beanDefinition.getName());
             }
         }
 

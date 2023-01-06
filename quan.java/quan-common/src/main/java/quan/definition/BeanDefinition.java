@@ -241,7 +241,7 @@ public class BeanDefinition extends ClassDefinition {
             return;
         }
 
-        String[] fieldTypes = field.getTypes().split(":", -1);
+        String[] fieldTypes = field.getTypes().split("[:：]", -1);
         String fieldType = fieldTypes[0];
 
         if (fieldTypes.length == 1 && StringUtils.isBlank(fieldType)) {
@@ -445,6 +445,7 @@ public class BeanDefinition extends ClassDefinition {
         if (delimiter.length() != 1) {
             addValidatedError(getValidatedName() + "的分隔符[" + delimiter + "]长度必须1个字符");
         }
+
         for (int i = 0; i < delimiter.length(); i++) {
             String s = String.valueOf(delimiter.charAt(i));
             if (!Constants.LEGAL_DELIMITERS.contains(s)) {
@@ -481,7 +482,7 @@ public class BeanDefinition extends ClassDefinition {
         }
 
         //map类型字段引用校验
-        String[] fieldRefs = field.getRef().split(":", -1);
+        String[] fieldRefs = field.getRef().split("[:：]", -1);
         String mapRefErrorMsg = getValidatedName("的") + field.getValidatedName() + "类型[map]的引用格式错误[" + field.getRef() + "]，正确格式:[键引用配置.字段]或者[键引用配置.字段:值引用配置.字段]";
         if (fieldRefs.length != 1 && fieldRefs.length != 2) {
             addValidatedError(mapRefErrorMsg);

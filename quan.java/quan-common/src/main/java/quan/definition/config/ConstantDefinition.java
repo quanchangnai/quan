@@ -194,10 +194,6 @@ public class ConstantDefinition extends ClassDefinition {
 
     @Override
     protected void validateDependents() {
-        if (ownerDefinition == null) {
-            return;
-        }
-
         super.validateDependents();
 
         if (valueField != null) {

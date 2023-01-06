@@ -33,11 +33,9 @@ public class ExcelDefinitionParser extends TableDefinitionParser {
     }
 
     @Override
-    protected void parseFile(File definitionFile) {
+    protected boolean checkFile(File definitionFile) {
         //忽略Excel临时文件
-        if (!definitionFile.getName().startsWith("~$")) {
-            super.parseFile(definitionFile);
-        }
+        return super.checkFile(definitionFile) && !definitionFile.getName().startsWith("~$");
     }
 
     @Override
@@ -61,8 +59,7 @@ public class ExcelDefinitionParser extends TableDefinitionParser {
             }
             return true;
         } catch (Exception e) {
-            logger.error("解析定义文件[{}]错误", definitionFile.getName(), e);
-            return false;
+            throw new RuntimeException(e);
         }
     }
 }

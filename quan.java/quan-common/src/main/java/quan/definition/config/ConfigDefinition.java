@@ -121,7 +121,7 @@ public class ConfigDefinition extends BeanDefinition {
             if (configDefinition == null) {
                 continue;
             }
-            allTables.addAll(Arrays.asList(configDefinition.table.split(",", -1)));
+            allTables.addAll(Arrays.asList(configDefinition.table.split("[,，]", -1)));
         }
 
         return allTables;
@@ -224,7 +224,7 @@ public class ConfigDefinition extends BeanDefinition {
         }
 
         //支持分表
-        tables.addAll(Arrays.asList(table.split(",", -1)));
+        tables.addAll(Arrays.asList(table.split("[,，]", -1)));
         for (String t : tables) {
             ConfigDefinition other = parser.getTableConfigs().get(t);
             if (other != null && !getName().equals(other.getName())) {
@@ -400,14 +400,14 @@ public class ConfigDefinition extends BeanDefinition {
         }
 
         int charNumError = 0;
-        if (delimiter.length() != 1 && (field.isBeanType() || field.isListType() || field.isSetType())) {
+        if (delimiter.length() != 1 && (field.isListType() || field.isSetType())) {
             charNumError = 1;
         }
         if (field.isMapType()) {
             if (delimiter.length() != 2) {
                 charNumError = 2;
             } else if (delimiter.charAt(0) == delimiter.charAt(1)) {
-                addValidatedError(getValidatedName("的") + field.getValidatedName() + "类型[map]的分隔符[" + delimiter + "]必须是2个不相同的字符");
+                addValidatedError(getValidatedName("的") + field.getValidatedName() + "类型[map]的分隔符[" + delimiter + "]必须是2个不同的字符");
             }
         }
         if (charNumError > 0) {
@@ -434,18 +434,23 @@ public class ConfigDefinition extends BeanDefinition {
      * 转义分隔符里的正则表达式特殊字符
      */
     public static String escapeDelimiter(String delimiter) {
-        StringBuilder escapedDelimiter = new StringBuilder();
-        for (int i = 0; i < delimiter.length(); i++) {
-            String s = String.valueOf(delimiter.charAt(i));
-            if (i > 0) {
-                escapedDelimiter.append("|");
-            }
-            if (Constants.NEED_ESCAPE_DELIMITERS.contains(s)) {
-                escapedDelimiter.append("\\");
-            }
-            escapedDelimiter.append(s);
+        if (delimiter == null || delimiter.length() != 1) {
+            throw new IllegalArgumentException(delimiter);
         }
-        return escapedDelimiter.toString();
+        if (Constants.NEED_ESCAPE_DELIMITERS.contains(delimiter)) {
+            delimiter = "\\" + delimiter;
+        }
+
+        //兼容中文分隔符
+        if (delimiter.contains(";")) {
+            delimiter += "|" + "；";
+        } else if (delimiter.contains(":")) {
+            delimiter += "|" + "：";
+        } else if (delimiter.contains("?")) {
+            delimiter += "|" + "？";
+        }
+
+        return delimiter;
     }
 
     /**

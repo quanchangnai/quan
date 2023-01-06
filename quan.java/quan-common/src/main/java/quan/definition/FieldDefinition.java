@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import static quan.definition.config.ConfigDefinition.escapeDelimiter;
+
 
 /**
  * 字段定义，被数据、消息和配置共用
@@ -66,8 +68,8 @@ public class FieldDefinition extends Definition implements Cloneable {
     //配置:集合类型字段的分隔符
     private String delimiter;
 
-    //配置:转义后的集合类型字段的分隔符
-    private String escapedDelimiter;
+    //配置:转义后的字段分隔符
+    private List<String> escapedDelimiters = new ArrayList<>();
 
     //配置:引用[配置.字段]
     private String ref;
@@ -486,24 +488,29 @@ public class FieldDefinition extends Definition implements Cloneable {
         if (isListType() || isSetType()) {
             return ";";
         } else if (isMapType()) {
-            return "*;";
+            return ";*";
         }
         return null;
     }
 
-    public String getEscapedDelimiter() {
-        if (StringUtils.isEmpty(escapedDelimiter)) {
-            escapedDelimiter = ConfigDefinition.escapeDelimiter(getDelimiter());
+    public FieldDefinition setDelimiter(String delimiter) {
+        if (!StringUtils.isBlank(delimiter)) {
+            this.delimiter = delimiter.trim();
         }
-        return escapedDelimiter;
+        return this;
     }
 
-    public FieldDefinition setDelimiter(String delimiter) {
-        if (StringUtils.isBlank(delimiter)) {
-            return this;
+    public List<String> getEscapedDelimiters() {
+        if (!escapedDelimiters.isEmpty()) {
+            return escapedDelimiters;
         }
-        this.delimiter = delimiter.trim();
-        return this;
+
+        String _delimiter = getDelimiter();
+        for (int i = 0; i < _delimiter.length(); i++) {
+            escapedDelimiters.add(escapeDelimiter(String.valueOf(_delimiter.charAt(i))));
+        }
+
+        return escapedDelimiters;
     }
 
     public String getRef() {
@@ -511,10 +518,9 @@ public class FieldDefinition extends Definition implements Cloneable {
     }
 
     public FieldDefinition setRef(String ref) {
-        if (StringUtils.isBlank(ref)) {
-            return this;
+        if (!StringUtils.isBlank(ref)) {
+            this.ref = ref.trim();
         }
-        this.ref = ref.trim();
         return this;
     }
 
@@ -569,7 +575,7 @@ public class FieldDefinition extends Definition implements Cloneable {
         }
 
         if (isMapType()) {
-            String[] fieldRefs = ref.split(":", -1);
+            String[] fieldRefs = ref.split("[:：]", -1);
             ConfigDefinition refConfig = null;
 
             if (isKeyRef && fieldRefs.length >= 1) {
@@ -607,7 +613,7 @@ public class FieldDefinition extends Definition implements Cloneable {
         }
 
         if (isMapType()) {
-            String[] fieldRefs = ref.split(",", -1);
+            String[] fieldRefs = ref.split("[,，]", -1);
             ConfigDefinition refConfig;
 
             if (isKeyRef && fieldRefs.length >= 1) {
@@ -615,13 +621,13 @@ public class FieldDefinition extends Definition implements Cloneable {
                 String refConfigName = keyRef.substring(0, keyRef.lastIndexOf("."));
                 refConfig = parser.getConfig(ClassDefinition.getLongName(owner, refConfigName));
                 if (refConfig != null) {
-                    String refFieldName =keyRef.substring(keyRef.lastIndexOf(".") + 1);
+                    String refFieldName = keyRef.substring(keyRef.lastIndexOf(".") + 1);
                     return refConfig.getField(refFieldName);
                 }
             }
             if (!isKeyRef && fieldRefs.length == 2) {
                 String valueRef = owner.resolveFieldRef(fieldRefs[1]);
-                String refConfigName = valueRef.substring(0,valueRef.lastIndexOf("."));
+                String refConfigName = valueRef.substring(0, valueRef.lastIndexOf("."));
                 refConfig = parser.getConfig(ClassDefinition.getLongName(owner, refConfigName));
                 if (refConfig != null) {
                     String refFieldName = valueRef.substring(valueRef.lastIndexOf(".") + 1);

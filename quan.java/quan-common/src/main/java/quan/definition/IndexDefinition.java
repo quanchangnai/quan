@@ -239,7 +239,7 @@ public class IndexDefinition extends Definition implements Cloneable {
             return;
         }
 
-        String[] fieldNameArray = fieldNames.split(",", -1);
+        String[] fieldNameArray = fieldNames.split("[,，]", -1);
 
         boolean fieldNamePatternError = false;
         for (String fieldName : fieldNameArray) {

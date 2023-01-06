@@ -149,7 +149,7 @@ public abstract class Generator {
 
         String definitionPath = options.getProperty(category() + ".definitionPath");
         if (!StringUtils.isBlank(definitionPath)) {
-            definitionPaths.addAll(Arrays.asList(definitionPath.split(",")));
+            definitionPaths.addAll(Arrays.asList(definitionPath.split("[,，]")));
         }
 
         String definitionFileEncoding = options.getProperty(category() + ".definitionFileEncoding");

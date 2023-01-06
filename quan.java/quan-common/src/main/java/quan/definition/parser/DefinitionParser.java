@@ -218,10 +218,14 @@ public abstract class DefinitionParser {
             return;
         }
 
-
         for (File definitionFile : definitionFiles) {
             if (checkFile(definitionFile)) {
-                parseFile(definitionFile);
+                try {
+                    parseFile(definitionFile);
+                } catch (Exception e) {
+                    logger.error("定义文件[{}]解析出错", definitionFile.getName(), e);
+                    addValidatedError(String.format("定义文件[%s]解析出错：%s", definitionFile.getName(), e.getMessage()));
+                }
             }
         }
 

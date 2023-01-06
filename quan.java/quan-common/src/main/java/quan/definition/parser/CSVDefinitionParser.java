@@ -32,8 +32,7 @@ public class CSVDefinitionParser extends TableDefinitionParser {
         try (CSVParser parser = new CSVParser(new InputStreamReader(Files.newInputStream(definitionFile.toPath()), definitionFileEncoding), CSVFormat.DEFAULT)) {
             records = parser.getRecords();
         } catch (Exception e) {
-            logger.error("解析定义文件[{}]错误", definitionFile.getName(), e);
-            return false;
+            throw new RuntimeException(e);
         }
 
         if (records.size() < 3) {

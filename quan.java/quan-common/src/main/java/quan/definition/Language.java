@@ -64,7 +64,7 @@ public enum Language {
             language = language.substring(1);
         }
 
-        for (String lang : language.split(",", -1)) {
+        for (String lang : language.split("[,，]", -1)) {
             if (!lang.isEmpty()) {
                 languages.add(lang.trim());
             }

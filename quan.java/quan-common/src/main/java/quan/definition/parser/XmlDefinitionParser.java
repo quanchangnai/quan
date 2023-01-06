@@ -86,6 +86,7 @@ public class XmlDefinitionParser extends DefinitionParser {
             try {
                 language = Language.valueOf(attrName.substring(0, attrName.indexOf("-name")));
             } catch (IllegalArgumentException e) {
+                addValidatedError("定义文件[" + definitionFile + "]不支持包名属性:" + attrName);
                 continue;
             }
             if (!language.matchPackageName(attrValue)) {
@@ -130,25 +131,28 @@ public class XmlDefinitionParser extends DefinitionParser {
         }
     }
 
+    /**
+     * 提取注释
+     */
     protected String getComment(Element element, int indexInParent) {
-        StringBuilder commentBuilder = new StringBuilder();
+        List<Node> nodes = new ArrayList<>();
+        nodes.add(element.node(0));
+        nodes.add(element.getParent().node(indexInParent + 1));
 
-        List<Node> textNodes = new ArrayList<>();
-        textNodes.add(element.node(0));
-        textNodes.add(element.getParent().node(indexInParent + 1));
+        StringBuilder builder = new StringBuilder();
 
-        for (Node textNode : textNodes) {
-            if (textNode instanceof Text) {
-                String text = textNode.getText();
+        for (Node node : nodes) {
+            if (node instanceof Text) {
+                String text = node.getText();
                 if (!text.startsWith("\n")) {
                     text = text.trim().split("\n")[0] + "，";
-                    commentBuilder.append(text.trim());
+                    builder.append(text.trim());
                 }
             }
         }
 
-        if (commentBuilder.length() > 0) {
-            return commentBuilder.substring(0, commentBuilder.length() - 1);
+        if (builder.length() > 0) {
+            return builder.substring(0, builder.length() - 1);
         } else {
             return "";
         }

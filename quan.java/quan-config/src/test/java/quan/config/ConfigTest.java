@@ -48,7 +48,7 @@ public class ConfigTest {
 
     private static ConfigLoader definitionConfigLoader() {
         List<String> definitionPaths = new ArrayList<>();
-        definitionPaths.add("quan-config\\definition");
+        definitionPaths.add("quan-config\\definition-xml");
 
 //        TableType tableType = TableType.csv;
 //        String tablePath = "config\\csv";

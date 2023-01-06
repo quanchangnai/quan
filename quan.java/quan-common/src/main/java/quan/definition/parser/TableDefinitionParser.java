@@ -1,6 +1,7 @@
 package quan.definition.parser;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.dom4j.Element;
 import quan.definition.ClassDefinition;
 import quan.definition.FieldDefinition;
@@ -23,7 +24,7 @@ public abstract class TableDefinitionParser extends DefinitionParser {
 
     @Override
     protected boolean checkFile(File definitionFile) {
-        if (extDefinitionParser != null && definitionFile.getName().endsWith(extDefinitionParser.getDefinitionType())) {
+        if (extDefinitionParser != null && extDefinitionParser.checkFile(definitionFile)) {
             return true;
         }
         return super.checkFile(definitionFile);
@@ -31,7 +32,7 @@ public abstract class TableDefinitionParser extends DefinitionParser {
 
     @Override
     protected void parseFile(File definitionFile) {
-        if (extDefinitionParser != null && definitionFile.getName().endsWith(extDefinitionParser.getDefinitionType())) {
+        if (extDefinitionParser != null && extDefinitionParser.checkFile(definitionFile)) {
             extDefinitionParser.setCategory(getCategory());
             extDefinitionParser.parseFile(definitionFile);
             return;
@@ -66,13 +67,14 @@ public abstract class TableDefinitionParser extends DefinitionParser {
         configDefinition.addField(fieldDefinition);
 
         if (StringUtils.isBlank(fieldConstraint)) {
-            addValidatedError(configDefinition.getValidatedName() + "的列[" + columnName + "]约束不能为空");
+            addValidatedError(configDefinition.getValidatedName() + "的列[" + columnName + "]约束不能为空，至少要包含字段类型");
             return;
         }
 
-        String[] constraints = fieldConstraint.split(";", -1);
+        String[] constraints = fieldConstraint.split("[;；]", -1);
 
         fieldDefinition.setTypes(constraints[0]);
+
         Set<String> constraintTypes = new HashSet<>();
 
         for (int i = 1; i < constraints.length; i++) {
@@ -81,6 +83,12 @@ public abstract class TableDefinitionParser extends DefinitionParser {
             String constraintValue;
 
             switch (constraint) {
+                case "cs":
+                case "lua":
+                case "java":
+                    constraintType = "lang";
+                    constraintValue = constraint;
+                    break;
                 case "index":
                     constraintType = "index";
                     constraintValue = "normal";
@@ -96,6 +104,7 @@ public abstract class TableDefinitionParser extends DefinitionParser {
                 default:
                     try {
                         String[] constraintTypeAndValue = constraint.split("=", -1);
+                        Validate.isTrue(constraintTypeAndValue.length == 2);
                         constraintType = constraintTypeAndValue[0].trim();
                         constraintValue = constraintTypeAndValue[1].trim();
                     } catch (Exception ignored) {
@@ -132,6 +141,7 @@ public abstract class TableDefinitionParser extends DefinitionParser {
                     break;
                 case "lang":
                     fieldDefinition.setLanguage(constraintValue);
+                    break;
                 default:
                     addValidatedError(configDefinition.getValidatedName() + "的列[" + columnName + "]不支持该约束类型:" + constraintType);
                     break;
@@ -171,8 +181,7 @@ public abstract class TableDefinitionParser extends DefinitionParser {
         for (ConstantDefinition constantDefinition : extDefinitionParser.constants) {
             ClassDefinition ownerDefinition = getClass(constantDefinition.getOwnerName());
             if (ownerDefinition instanceof ConfigDefinition) {
-                ConfigDefinition configDefinition = (ConfigDefinition) ownerDefinition;
-                constantDefinition.setOwnerDefinition(configDefinition);
+                constantDefinition.setOwnerDefinition((ConfigDefinition) ownerDefinition);
             } else if (constantDefinition.getOwnerName() == null) {
                 addValidatedError(String.format("%s的所属配置不能为空", constantDefinition.getValidatedName()));
             } else {
@@ -223,7 +232,6 @@ public abstract class TableDefinitionParser extends DefinitionParser {
                     constants.add(constantDefinition);
                     break;
                 }
-
             }
 
             return super.createClassDefinition(element, index);
