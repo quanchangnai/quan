@@ -7,7 +7,6 @@ include 'quan-common'
 include 'quan-config'
 include 'quan-data'
 include 'quan-message'
-include 'quan-rpc'
 include 'quan-generator'
 include 'quan-network'
 

@@ -13,9 +13,11 @@ subprojects {
     version 1.0
     sourceCompatibility = JavaVersion.VERSION_1_8
 
-    tasks.withType(JavaCompile) {
-        options.encoding = 'UTF-8'
-        options.failOnError = false
+    tasks.withType(JavaCompile).tap {
+        configureEach {
+            options.encoding = 'UTF-8'
+            options.failOnError = false
+        }
     }
 
     javadoc {
@@ -34,14 +36,6 @@ subprojects {
         }
     }
 
-    repositories {
-        mavenLocal()
-        mavenCentral()
-        maven {
-            url = 'https://maven.aliyun.com/repository/central'
-        }
-    }
-
     publishing {
         publications {
             maven(MavenPublication) {
@@ -57,11 +51,20 @@ subprojects {
         includeEmptyDirs false
     }
 
+    test {
+        useJUnit()
+    }
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven {
+            url = 'https://maven.aliyun.com/repository/central'
+        }
+    }
+
     dependencies {
         testImplementation 'junit:junit:4.13'
     }
 
-    test {
-        useJUnit()
-    }
 }
