@@ -3,6 +3,7 @@ package quan.generator.config;
 import com.alibaba.fastjson.JSONObject;
 import freemarker.template.Template;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import quan.config.TableType;
 import quan.config.load.DefinitionConfigLoader;
 import quan.config.read.ConfigConverter;
@@ -11,6 +12,7 @@ import quan.definition.Category;
 import quan.definition.ClassDefinition;
 import quan.definition.config.ConfigDefinition;
 import quan.definition.config.ConstantDefinition;
+import quan.definition.parser.DefinitionParser;
 import quan.generator.Generator;
 
 import java.io.IOException;
@@ -18,7 +20,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
-import static quan.config.read.ConfigReader.getMinTableBodyStartRow;
 
 /**
  * 配置生成器
@@ -55,6 +56,15 @@ public abstract class ConfigGenerator extends Generator {
     @Override
     public final Category category() {
         return Category.config;
+    }
+
+
+    @Override
+    public void setParser(DefinitionParser parser) {
+        super.setParser(parser);
+        if (enable) {
+            checkOptions();
+        }
     }
 
     @Override
@@ -101,18 +111,18 @@ public abstract class ConfigGenerator extends Generator {
             throw new IllegalArgumentException(category().alias() + "的表格文件路径[tablePath]不能为空");
         }
 
-        int minTableBodyStartRow = getMinTableBodyStartRow(definitionType);
-        if (!StringUtils.isBlank(this.tableBodyStartRow)) {
-            try {
-                int tableBodyStartRow = Integer.parseInt(this.tableBodyStartRow);
-                if (tableBodyStartRow < minTableBodyStartRow) {
-                    throw new Exception();
+        if (parser != null) {
+            int minTableBodyStartRow = parser.getMinTableBodyStartRow();
+            if (!StringUtils.isBlank(this.tableBodyStartRow)) {
+                try {
+                    int tableBodyStartRow = Integer.parseInt(this.tableBodyStartRow);
+                    Validate.isTrue(tableBodyStartRow >= minTableBodyStartRow);
+                } catch (Exception e) {
+                    throw new IllegalArgumentException(category().alias() + "的表格正文开始行号[tableBodyStartRow]不合法，合法值为空值或者大于等于" + minTableBodyStartRow + "的整数");
                 }
-            } catch (Exception e) {
-                throw new IllegalArgumentException(category().alias() + "的表格正文开始行号[tableBodyStartRow]不合法，合法值为空值或者大于等于" + minTableBodyStartRow + "的整数");
+            } else {
+                tableBodyStartRow = String.valueOf(minTableBodyStartRow);
             }
-        } else {
-            tableBodyStartRow = String.valueOf(minTableBodyStartRow);
         }
     }
 

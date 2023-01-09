@@ -10,6 +10,9 @@ local configs = {
     { id = 1, key = "card1", name = "卡片1", type = 1, list = { 11 }, set = { 465, 554, 655 }, map = { [122] = 2, [322] = 22, [455] = 33 }, effectiveTime = 1564979635000, effectiveTime_ = "2019-08-05 12:33:55" },
     { id = 2, key = "card2", name = "卡片2", type = 1, list = { 56, 22 }, set = { 244 }, map = { }, effectiveTime = 0, effectiveTime_ = "" },
     { id = 3, key = "", name = "卡片3", type = 2, list = { 44, 223 }, set = {  }, map = { [43] = 45 }, effectiveTime = 0, effectiveTime_ = "" },
+    { id = 4, key = "card4", name = "卡片4", type = 1, list = { 11 }, set = { 465, 554, 655 }, map = { [122] = 2, [322] = 22, [455] = 33 }, effectiveTime = 1564979635000, effectiveTime_ = "2019-08-05 12:33:55" },
+    { id = 5, key = "card5", name = "卡片5", type = 1, list = { 56, 22 }, set = { 244 }, map = { }, effectiveTime = 0, effectiveTime_ = "" },
+    { id = 6, key = "", name = "卡片6", type = 2, list = { 44, 223 }, set = {  }, map = { [43] = 45 }, effectiveTime = 0, effectiveTime_ = "" },
 }
 
 ---索引:ID

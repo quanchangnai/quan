@@ -212,6 +212,11 @@ public abstract class DefinitionParser {
 
     public abstract String getDefinitionType();
 
+    /**
+     * 最小表格正文起始行号
+     */
+    public abstract int getMinTableBodyStartRow();
+
     public void parse() {
         Objects.requireNonNull(category);
         if (!validatedClasses.isEmpty()) {

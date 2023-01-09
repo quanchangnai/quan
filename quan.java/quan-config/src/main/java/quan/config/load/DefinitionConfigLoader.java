@@ -24,8 +24,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static quan.config.read.ConfigReader.getMinTableBodyStartRow;
-
 /**
  * 使用配置定义的配置加载器，根据配置定义实现了索引、引用校验等
  */
@@ -50,10 +48,10 @@ public class DefinitionConfigLoader extends ConfigLoader {
      * 设置表格正文起始行号
      */
     public void setTableBodyStartRow(int tableBodyStartRow) {
-        if (tableBodyStartRow == 0) {
+        if (tableBodyStartRow <= 0) {
             return;
         }
-        int minTableBodyStartRow = getMinTableBodyStartRow(parser.getDefinitionType());
+        int minTableBodyStartRow = parser.getMinTableBodyStartRow();
         if (tableBodyStartRow < minTableBodyStartRow) {
             throw new IllegalArgumentException("表格正文起始行号不能小于" + minTableBodyStartRow);
         }
@@ -94,9 +92,7 @@ public class DefinitionConfigLoader extends ConfigLoader {
         Objects.requireNonNull(parser, "配置解析器不能为空");
         parser.setCategory(Category.config);
         this.parser = parser;
-        if (tableBodyStartRow == 0) {
-            tableBodyStartRow = getMinTableBodyStartRow(parser.getDefinitionType());
-        }
+        tableBodyStartRow = parser.getMinTableBodyStartRow();
     }
 
     public DefinitionParser getParser() {

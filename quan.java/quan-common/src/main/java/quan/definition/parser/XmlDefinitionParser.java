@@ -44,6 +44,11 @@ public class XmlDefinitionParser extends DefinitionParser {
     }
 
     @Override
+    public  int getMinTableBodyStartRow(){
+        return 2;
+    }
+
+    @Override
     protected void parseFile(File definitionFile) {
         Element rootElement;
         try (InputStreamReader definitionReader = new InputStreamReader(Files.newInputStream(definitionFile.toPath()), definitionFileEncoding)) {

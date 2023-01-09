@@ -19,4 +19,18 @@ function CardIds.card2()
     return CardConfig.getByKey("card2").id
 end
 
+---
+---卡片4
+---@return int
+function CardIds.card4()
+    return CardConfig.getByKey("card4").id
+end
+
+---
+---卡片5
+---@return int
+function CardIds.card5()
+    return CardConfig.getByKey("card5").id
+end
+
 return CardIds

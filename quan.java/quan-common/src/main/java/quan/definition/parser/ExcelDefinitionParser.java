@@ -17,7 +17,7 @@ public class ExcelDefinitionParser extends TableDefinitionParser {
 
     private static final DataFormatter dataFormatter = new DataFormatter();
 
-    private String definitionType;
+    private String definitionType = "xlsx";
 
     public ExcelDefinitionParser() {
     }

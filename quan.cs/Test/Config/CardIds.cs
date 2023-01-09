@@ -14,6 +14,16 @@ namespace Test.Config
         /// <summary>
         /// 卡片2
         /// </summary>
-        card2 = 2
+        card2 = 2,
+
+        /// <summary>
+        /// 卡片4
+        /// </summary>
+        card4 = 4,
+
+        /// <summary>
+        /// 卡片5
+        /// </summary>
+        card5 = 5
      }
 }

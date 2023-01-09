@@ -10,10 +10,7 @@ import quan.definition.config.ConfigDefinition;
 import quan.definition.config.ConstantDefinition;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 基于表格的【定义】解析器，在表格中直接定义配置，支持使用xml扩展复杂结构
@@ -21,6 +18,14 @@ import java.util.Set;
 public abstract class TableDefinitionParser extends DefinitionParser {
 
     private ExtDefinitionParser extDefinitionParser = new ExtDefinitionParser(this);
+
+    private Map<String, Set<String>> subtables = new HashMap<>();
+
+
+    @Override
+    public int getMinTableBodyStartRow() {
+        return 4;
+    }
 
     @Override
     protected boolean checkFile(File definitionFile) {
@@ -39,6 +44,14 @@ public abstract class TableDefinitionParser extends DefinitionParser {
         }
 
         String tableName = definitionFile.getName().substring(0, definitionFile.getName().lastIndexOf("."));
+
+        //分表
+        if (tableName.contains("-")) {
+            //主表
+            String mainTableName = tableName.substring(0, tableName.indexOf("-")).trim();
+            subtables.computeIfAbsent(mainTableName, k -> new LinkedHashSet<>()).add(tableName);
+            return;
+        }
 
         ConfigDefinition configDefinition = new ConfigDefinition(tableName, null);
         configDefinition.setParser(this);
@@ -59,6 +72,11 @@ public abstract class TableDefinitionParser extends DefinitionParser {
     protected abstract boolean parseTable(ConfigDefinition configDefinition, File definitionFile);
 
     protected void addField(ConfigDefinition configDefinition, String columnName, String fieldName, String fieldConstraint) {
+        if (columnName.startsWith("#")) {
+            //忽略注释列
+            return;
+        }
+
         FieldDefinition fieldDefinition = new FieldDefinition();
         fieldDefinition.setParser(this);
         fieldDefinition.setCategory(getCategory());
@@ -159,6 +177,10 @@ public abstract class TableDefinitionParser extends DefinitionParser {
 
         if (extDefinitionParser != null) {
             validateExtDefinitions();
+        }
+
+        for (String mainTableName : subtables.keySet()) {
+            getConfig(mainTableName).setTable(mainTableName + "," + String.join(",", subtables.get(mainTableName)));
         }
 
         parsedClasses.forEach(ClassDefinition::validate1);

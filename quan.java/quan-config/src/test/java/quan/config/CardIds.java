@@ -14,7 +14,17 @@ public enum CardIds {
     /**
      * 卡片2
      */
-    card2;
+    card2,
+
+    /**
+     * 卡片4
+     */
+    card4,
+
+    /**
+     * 卡片5
+     */
+    card5;
 
     public int value() {
         return CardConfig.getByKey(name()).id;

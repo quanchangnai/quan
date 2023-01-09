@@ -89,10 +89,6 @@ public abstract class ConfigReader {
         return this;
     }
 
-    public static int getMinTableBodyStartRow(String definitionType) {
-        return definitionType.equals("xml") ? 2 : 4;
-    }
-
     public ConfigDefinition getConfigDefinition() {
         return configDefinition;
     }

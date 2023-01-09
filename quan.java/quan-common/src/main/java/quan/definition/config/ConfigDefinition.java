@@ -225,6 +225,7 @@ public class ConfigDefinition extends BeanDefinition {
 
         //支持分表
         tables.addAll(Arrays.asList(table.split("[,，]", -1)));
+
         for (String t : tables) {
             ConfigDefinition other = parser.getTableConfigs().get(t);
             if (other != null && !getName().equals(other.getName())) {
