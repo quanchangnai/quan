@@ -7,8 +7,9 @@
         <field name="type2" value="2"/>道具类型2
     </enum>卡片类型---
 
-    <index name="key" type="u" config="CardConfig" fields="key"/>
-
-    <constant name="CardIds" config="CardConfig" key="key" value="id" comment="name"/>卡片ID
+    <config name="CardConfig">
+        <index name="key" type="u"  fields="key"/>
+        <constant name="CardIds"  key="key" value="id" comment="name"/>卡片ID
+    </config>
 
 </package>

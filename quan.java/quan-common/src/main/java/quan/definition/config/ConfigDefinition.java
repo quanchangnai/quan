@@ -2,9 +2,7 @@ package quan.definition.config;
 
 import org.apache.commons.lang3.StringUtils;
 import quan.definition.*;
-import quan.util.CommonUtils;
 
-import java.io.File;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -67,14 +65,6 @@ public class ConfigDefinition extends BeanDefinition {
     @Override
     public String getKindName() {
         return "配置";
-    }
-
-    @Override
-    public void setName(String name) {
-        super.setName(name);
-        if (table == null) {
-            table = getName();
-        }
     }
 
     @Override
@@ -223,6 +213,10 @@ public class ConfigDefinition extends BeanDefinition {
             table = getName();
         }
 
+        if (StringUtils.isBlank(getComment())) {
+            setComment(table);
+        }
+
         //支持分表
         tables.addAll(Arrays.asList(table.split("[,，]", -1)));
 
@@ -232,25 +226,6 @@ public class ConfigDefinition extends BeanDefinition {
                 addValidatedError(getValidatedName() + other.getValidatedName() + "和表格[" + t + "]不能多对一");
             }
             parser.getTableConfigs().put(t, this);
-        }
-
-        if (StringUtils.isBlank(getComment())) {
-            StringBuilder comment = new StringBuilder();
-            boolean start = true;
-            for (String t1 : tables) {
-                if (!start) {
-                    comment.append(",");
-                }
-                start = false;
-                String t2 = CommonUtils.toPlatPath(t1);
-                int lastSepIndex = t2.lastIndexOf(File.separator);
-                if (lastSepIndex >= 0) {
-                    comment.append(t2.substring(lastSepIndex + 1));
-                } else {
-                    comment.append(t2);
-                }
-            }
-            setComment(comment.toString());
         }
 
         for (FieldDefinition field : selfFields) {

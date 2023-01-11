@@ -44,7 +44,7 @@ public class XmlDefinitionParser extends DefinitionParser {
     }
 
     @Override
-    public  int getMinTableBodyStartRow(){
+    public int getMinTableBodyStartRow() {
         return 2;
     }
 
@@ -130,8 +130,6 @@ public class XmlDefinitionParser extends DefinitionParser {
                 classDefinition.getPackageNames().putAll(languagePackageNames);
             }
 
-            classDefinition.setComment(getComment(classElement, index));
-
             parseClassChildren(classDefinition, classElement);
         }
     }
@@ -164,20 +162,21 @@ public class XmlDefinitionParser extends DefinitionParser {
     }
 
 
-    private ClassDefinition parseClassDefinition(Element element, int index) {
-        ClassDefinition classDefinition = createClassDefinition(element, index);
+    private ClassDefinition parseClassDefinition(Element element, int indexInParent) {
+        ClassDefinition classDefinition = createClassDefinition(element);
 
         if (classDefinition != null) {
             classDefinition.setParser(getDefinitionParser());
             classDefinition.setCategory(getCategory());
             classDefinition.setName(element.attributeValue("name"));
             classDefinition.setLang(element.attributeValue("lang"));
+            classDefinition.setComment(getComment(element, indexInParent));
         }
 
         return classDefinition;
     }
 
-    protected ClassDefinition createClassDefinition(Element element, int index) {
+    protected ClassDefinition createClassDefinition(Element element) {
         switch (element.getName()) {
             case "enum":
                 return new EnumDefinition();
@@ -207,7 +206,7 @@ public class XmlDefinitionParser extends DefinitionParser {
         return this;
     }
 
-    private void parseClassChildren(ClassDefinition classDefinition, Element classElement) {
+    protected void parseClassChildren(ClassDefinition classDefinition, Element classElement) {
         for (int index = 0; index < classElement.nodeCount(); index++) {
             if (!(classElement.node(index) instanceof Element)) {
                 continue;
@@ -216,25 +215,25 @@ public class XmlDefinitionParser extends DefinitionParser {
             Element childElement = (Element) classElement.node(index);
             String childName = childElement.getName();
 
-            if (childName.equals("field")) {
-                parseField(classDefinition, childElement, index);
+            if (childName.equals("field") && parseField(classDefinition, childElement, index) != null) {
                 continue;
             }
 
             if (classDefinition instanceof ConfigDefinition) {
                 ConfigDefinition configDefinition = (ConfigDefinition) classDefinition;
                 if (childName.equals("index")) {
-                    configDefinition.addIndex(parseIndex(childElement, classElement, index));
+                    configDefinition.addIndex(parseIndex(childElement, index));
+                    continue;
                 }
                 if (childName.equals("constant")) {
-                    parseConstant(childElement, configDefinition, classElement, index);
+                    parseConstant(childElement, index).setOwnerDefinition(configDefinition);
+                    continue;
                 }
-                continue;
             }
 
             if (classDefinition instanceof DataDefinition && childName.equals("index")) {
                 DataDefinition dataDefinition = (DataDefinition) classDefinition;
-                dataDefinition.addIndex(parseIndex(childElement, classElement, index));
+                dataDefinition.addIndex(parseIndex(childElement, index));
                 continue;
             }
 
@@ -249,16 +248,17 @@ public class XmlDefinitionParser extends DefinitionParser {
                 beanDefinition.getPackageNames().putAll(classDefinition.getPackageNames());
                 beanDefinition.setExcludeLanguage(classDefinition.isExcludeLanguage());
                 beanDefinition.getLanguages().addAll(classDefinition.getLanguages());
-                beanDefinition.setComment(getComment(childElement, index));
 
                 parseClassChildren(beanDefinition, childElement);
-            } else {
-                addValidatedError("定义文件[" + classDefinition.getDefinitionFile() + "]不支持定义元素:" + classElement.getName());
+
+                continue;
             }
+
+            addValidatedError("定义文件[" + classDefinition.getDefinitionFile() + "]中的元素[" + classElement.getName() + "]不支持定义子元素:" + childName);
         }
     }
 
-    private void parseField(ClassDefinition classDefinition, Element fieldElement, int index) {
+    protected FieldDefinition parseField(ClassDefinition classDefinition, Element fieldElement, int indexInParent) {
         FieldDefinition fieldDefinition = new FieldDefinition();
         fieldDefinition.setParser(classDefinition.getParser());
         fieldDefinition.setCategory(getCategory());
@@ -273,16 +273,18 @@ public class XmlDefinitionParser extends DefinitionParser {
         fieldDefinition.setIndex(fieldElement.attributeValue("index"));
         fieldDefinition.setDelimiter(fieldElement.attributeValue("delimiter"));
         fieldDefinition.setRef(fieldElement.attributeValue("ref"));
+        fieldDefinition.setComment(getComment(fieldElement, indexInParent));
+
         if (classDefinition instanceof ConfigDefinition) {
             fieldDefinition.setLanguage(fieldElement.attributeValue("lang"));
         }
 
-        fieldDefinition.setComment(getComment(fieldElement, index));
-
         classDefinition.addField(fieldDefinition);
+
+        return fieldDefinition;
     }
 
-    protected IndexDefinition parseIndex(Element indexElement, Element classElement, int index) {
+    protected IndexDefinition parseIndex(Element indexElement, int indexInParent) {
         IndexDefinition indexDefinition = new IndexDefinition();
 
         indexDefinition.setParser(getDefinitionParser());
@@ -292,14 +294,14 @@ public class XmlDefinitionParser extends DefinitionParser {
         indexDefinition.setType(indexElement.attributeValue("type"));
         indexDefinition.setFieldNames(indexElement.attributeValue("fields"));
 
-        if (classElement != null) {
-            indexDefinition.setComment(getComment(indexElement, index));
+        if (indexInParent >= 0) {
+            indexDefinition.setComment(getComment(indexElement, indexInParent));
         }
 
         return indexDefinition;
     }
 
-    protected ConstantDefinition parseConstant(Element constantElement, ConfigDefinition configDefinition, Element classElement, int index) {
+    protected ConstantDefinition parseConstant(Element constantElement, int indexInParent) {
         ConstantDefinition constantDefinition = new ConstantDefinition();
 
         constantDefinition.setParser(getDefinitionParser());
@@ -312,13 +314,8 @@ public class XmlDefinitionParser extends DefinitionParser {
         constantDefinition.setCommentField(constantElement.attributeValue("comment"));
         constantDefinition.setDefinitionText(constantElement.asXML());
 
-
-        if (configDefinition != null) {
-            constantDefinition.setOwnerDefinition(configDefinition);
-        }
-
-        if (classElement != null) {
-            constantDefinition.setComment(getComment(constantElement, index));
+        if (indexInParent >= 0) {
+            constantDefinition.setComment(getComment(constantElement, indexInParent));
         }
 
         parsedClasses.add(constantDefinition);

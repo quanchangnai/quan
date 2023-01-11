@@ -43,8 +43,8 @@ public class ExcelDefinitionParser extends TableDefinitionParser {
         try (Workbook workbook = WorkbookFactory.create(Files.newInputStream(definitionFile.toPath()))) {
             Sheet sheet = workbook.getSheetAt(0);
             configDefinition.setComment(sheet.getSheetName());
-            int totalTowNum = sheet.getPhysicalNumberOfRows();
-            if (totalTowNum < 3) {
+
+            if (sheet.getPhysicalNumberOfRows() < 3) {
                 addValidatedError(configDefinition.getValidatedName() + "的定义文件不完整，表头要求第1行列名、第2行字段名、第3行字段约束");
                 return false;
             }

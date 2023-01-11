@@ -72,9 +72,14 @@ public class ConstantDefinition extends ClassDefinition {
         setParser(ownerDefinition.getParser());
         setPackageName(ownerDefinition.getPackageName());
         getPackageNames().putAll(ownerDefinition.getPackageNames());
-        setDefinitionFile(ownerDefinition.getDefinitionFile());
+
         this.ownerDefinition = ownerDefinition;
         this.ownerName = ownerDefinition.getName();
+
+        if (StringUtils.isBlank(getDefinitionFile())) {
+            setDefinitionFile(ownerDefinition.getDefinitionFile());
+        }
+
         ownerDefinition.getConstantDefinitions().add(this);
     }
 

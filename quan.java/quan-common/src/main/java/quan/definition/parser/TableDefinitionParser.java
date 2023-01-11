@@ -5,7 +5,6 @@ import org.apache.commons.lang3.Validate;
 import org.dom4j.Element;
 import quan.definition.ClassDefinition;
 import quan.definition.FieldDefinition;
-import quan.definition.IndexDefinition;
 import quan.definition.config.ConfigDefinition;
 import quan.definition.config.ConstantDefinition;
 
@@ -20,6 +19,8 @@ public abstract class TableDefinitionParser extends DefinitionParser {
     private ExtDefinitionParser extDefinitionParser = new ExtDefinitionParser(this);
 
     private Map<String, Set<String>> subtables = new HashMap<>();
+
+    private Map<String, ConfigDefinition> extConfigDefinitions = new HashMap<>();
 
 
     @Override
@@ -43,6 +44,7 @@ public abstract class TableDefinitionParser extends DefinitionParser {
             return;
         }
 
+        //TODO 目录暂未处理
         String tableName = definitionFile.getName().substring(0, definitionFile.getName().lastIndexOf("."));
 
         //分表
@@ -53,7 +55,7 @@ public abstract class TableDefinitionParser extends DefinitionParser {
             return;
         }
 
-        ConfigDefinition configDefinition = new ConfigDefinition(tableName, null);
+        ConfigDefinition configDefinition = new ConfigDefinition();
         configDefinition.setParser(this);
         configDefinition.setDefinitionFile(definitionFile.getName());
 
@@ -63,6 +65,8 @@ public abstract class TableDefinitionParser extends DefinitionParser {
         } else {
             configDefinition.setName(tableName);
         }
+
+        configDefinition.setTable(configDefinition.getName());
 
         if (parseTable(configDefinition, definitionFile)) {
             parsedClasses.add(configDefinition);
@@ -170,17 +174,22 @@ public abstract class TableDefinitionParser extends DefinitionParser {
     @Override
     protected void validate() {
         if (extDefinitionParser != null) {
-            parsedClasses.addAll(extDefinitionParser.parsedClasses);
+            getValidatedErrors().addAll(extDefinitionParser.getValidatedErrors());
+            validateExtDefinitions();
         }
 
         validateClassName();
 
-        if (extDefinitionParser != null) {
-            validateExtDefinitions();
-        }
-
         for (String mainTableName : subtables.keySet()) {
-            getConfig(mainTableName).setTable(mainTableName + "," + String.join(",", subtables.get(mainTableName)));
+            ConfigDefinition configDefinition = extConfigDefinitions.get(mainTableName);
+            if (configDefinition != null) {
+                configDefinition = getConfig(configDefinition.getName());
+            } else {
+                configDefinition = getConfig(mainTableName);
+            }
+
+            String table = mainTableName + "," + String.join(",", subtables.get(mainTableName));
+            configDefinition.setTable(table);
         }
 
         parsedClasses.forEach(ClassDefinition::validate1);
@@ -189,25 +198,64 @@ public abstract class TableDefinitionParser extends DefinitionParser {
     }
 
     private void validateExtDefinitions() {
-        for (IndexDefinition indexDefinition : extDefinitionParser.indexes) {
-            ClassDefinition ownerDefinition = getClass(indexDefinition.getOwnerName());
-            if (ownerDefinition instanceof ConfigDefinition) {
-                ((ConfigDefinition) ownerDefinition).addIndex(indexDefinition);
-            } else if (indexDefinition.getOwnerName() == null) {
-                addValidatedError(String.format("%s的所属配置不能为空", indexDefinition.getValidatedName()));
-            } else {
-                addValidatedError(String.format("%s的所属配置[%s]不存在", indexDefinition.getValidatedName(), indexDefinition.getOwnerName()));
+        for (ClassDefinition classDefinition : extDefinitionParser.parsedClasses) {
+            if (!(classDefinition instanceof ConfigDefinition)) {
+                parsedClasses.add(classDefinition);
+                continue;
+            }
+
+            ConfigDefinition extConfigDefinition = (ConfigDefinition) classDefinition;
+
+            String configName = extConfigDefinition.getName();
+            String tableName = extConfigDefinition.getTable();
+
+            if (configName == null) {
+                addValidatedError("定义文件[" + extConfigDefinition.getDefinitionFile() + "]中配置的名字不能为空");
+                continue;
+            }
+
+            if (tableName == null) {
+                tableName = configName;
+            }
+
+            if (extConfigDefinitions.put(tableName, extConfigDefinition) != null) {
+                addValidatedError(String.format("相同表格[%s]不能有多个配置定义", tableName));
             }
         }
 
-        for (ConstantDefinition constantDefinition : extDefinitionParser.constants) {
-            ClassDefinition ownerDefinition = getClass(constantDefinition.getOwnerName());
-            if (ownerDefinition instanceof ConfigDefinition) {
-                constantDefinition.setOwnerDefinition((ConfigDefinition) ownerDefinition);
-            } else if (constantDefinition.getOwnerName() == null) {
-                addValidatedError(String.format("%s的所属配置不能为空", constantDefinition.getValidatedName()));
-            } else {
-                addValidatedError(String.format("%s的所属配置[%s]不存在", constantDefinition.getValidatedName(), constantDefinition.getOwnerName()));
+        if (extConfigDefinitions.isEmpty()) {
+            return;
+        }
+
+        Map<String, ConfigDefinition> _extConfigDefinitions = new HashMap<>(extConfigDefinitions);
+
+        for (ClassDefinition classDefinition : parsedClasses) {
+            if (!(classDefinition instanceof ConfigDefinition)) {
+                continue;
+            }
+
+            ConfigDefinition configDefinition = (ConfigDefinition) classDefinition;
+            ConfigDefinition extConfigDefinition = _extConfigDefinitions.remove(configDefinition.getTable());
+            if (extConfigDefinition == null) {
+                continue;
+            }
+
+            configDefinition.setPackageName(extConfigDefinition.getPackageName());
+            configDefinition.setName(extConfigDefinition.getName());
+            configDefinition.setParentName(extConfigDefinition.getParentName());
+            configDefinition.setComment(extConfigDefinition.getComment());
+
+            extConfigDefinition.getIndexes().forEach(configDefinition::addIndex);
+
+            for (ConstantDefinition constantDefinition : extConfigDefinition.getConstantDefinitions()) {
+                constantDefinition.setOwnerDefinition(configDefinition);
+            }
+        }
+
+        for (String tableName : _extConfigDefinitions.keySet()) {
+            ConfigDefinition extConfigDefinition = _extConfigDefinitions.get(tableName);
+            if (extConfigDefinition.getName() != null) {
+                addValidatedError(String.format("%s对应的的表格[%s]不存在", extConfigDefinition.getValidatedName(), tableName));
             }
         }
     }
@@ -219,10 +267,6 @@ public abstract class TableDefinitionParser extends DefinitionParser {
     private static class ExtDefinitionParser extends XmlDefinitionParser {
 
         private DefinitionParser definitionParser;
-
-        private List<IndexDefinition> indexes = new ArrayList<>();
-
-        private List<ConstantDefinition> constants = new ArrayList<>();
 
 
         public ExtDefinitionParser(DefinitionParser definitionParser) {
@@ -236,27 +280,13 @@ public abstract class TableDefinitionParser extends DefinitionParser {
         }
 
         @Override
-        protected ClassDefinition createClassDefinition(Element element, int index) {
-            switch (element.getName()) {
-                case "config":
-                    throw new IllegalArgumentException();
-                case "index": {
-                    IndexDefinition indexDefinition = parseIndex(element, null, 0);
-                    indexDefinition.setOwnerName(element.attributeValue("config"));
-                    indexDefinition.setComment(getComment(element, index));
-                    indexes.add(indexDefinition);
-                    break;
-                }
-                case "constant": {
-                    ConstantDefinition constantDefinition = parseConstant(element, null, null, 0);
-                    constantDefinition.setOwnerName(element.attributeValue("config"));
-                    constantDefinition.setComment(getComment(element, index));
-                    constants.add(constantDefinition);
-                    break;
-                }
+        protected FieldDefinition parseField(ClassDefinition classDefinition, Element fieldElement, int indexInParent) {
+            if (classDefinition instanceof ConfigDefinition) {
+                //不支持定义字段
+                return null;
+            } else {
+                return super.parseField(classDefinition, fieldElement, indexInParent);
             }
-
-            return super.createClassDefinition(element, index);
         }
 
     }

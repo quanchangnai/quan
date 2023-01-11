@@ -305,9 +305,9 @@ public abstract class ClassDefinition extends Definition {
 
     protected void validateNameAndLanguage() {
         if (getName() == null) {
-            addValidatedError(getKindName() + "名不能为空");
+            addValidatedError("定义文件[" + getDefinitionFile() + "]中" + getKindName() + "的名字不能为空");
         } else if (!getNamePattern().matcher(getName()).matches()) {
-            addValidatedError(getKindName() + "[" + getName() + "]名字格式错误,正确格式:" + getNamePattern());
+            addValidatedError(getValidatedName() + "的名字格式错误,正确格式:" + getNamePattern());
         }
 
         if (!languages.isEmpty() && !Language.names().containsAll(languages)) {
@@ -322,18 +322,18 @@ public abstract class ClassDefinition extends Definition {
 
     protected void validateFieldName(FieldDefinition fieldDefinition) {
         if (fieldDefinition.getName() == null) {
-            addValidatedError(getValidatedName("的") + "字段名不能为空");
+            addValidatedError(getValidatedName() + "的字段名不能为空");
             return;
         }
 
         //校验字段名格式
         if (!fieldDefinition.getNamePattern().matcher(fieldDefinition.getName()).matches()) {
-            addValidatedError(getValidatedName("的") + "字段名[" + fieldDefinition.getName() + "]格式错误,正确格式:" + fieldDefinition.getNamePattern());
+            addValidatedError(getValidatedName() + "的字段名[" + fieldDefinition.getName() + "]格式错误,正确格式:" + fieldDefinition.getNamePattern());
             return;
         }
 
         if (isReservedWord(fieldDefinition.getName())) {
-            addValidatedError(getValidatedName("的") + "字段名[" + fieldDefinition.getName() + "]不合法，不能使用保留字");
+            addValidatedError(getValidatedName() + "的字段名[" + fieldDefinition.getName() + "]不合法，不能使用保留字");
         }
     }
 
@@ -355,7 +355,7 @@ public abstract class ClassDefinition extends Definition {
             return;
         }
         if (nameFields.containsKey(fieldDefinition.getName())) {
-            addValidatedError(getValidatedName("的") + "字段名[" + fieldDefinition.getName() + "]不能重复");
+            addValidatedError(getValidatedName() + "的字段名[" + fieldDefinition.getName() + "]不能重复");
         } else {
             nameFields.put(fieldDefinition.getName(), fieldDefinition);
         }
