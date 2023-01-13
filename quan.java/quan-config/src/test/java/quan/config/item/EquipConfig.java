@@ -6,7 +6,7 @@ import quan.config.load.ConfigLoader;
 import java.util.*;
 
 /**
- * 装备1,装备2<br/>
+ * 道具/装备1,道具/装备2<br/>
  * 代码自动生成，请勿手动修改
  */
 public class EquipConfig extends ItemConfig {

@@ -78,7 +78,7 @@ public class ConfigDefinition extends BeanDefinition {
 
     @Override
     public ConfigDefinition getParent() {
-        return parser.getConfig(getParentLongName());
+        return parser.getConfig(this, parentName);
     }
 
     public ConfigDefinition setTable(String table) {

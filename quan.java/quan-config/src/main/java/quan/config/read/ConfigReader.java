@@ -51,14 +51,13 @@ public abstract class ConfigReader {
 
     protected void init(File tableFile, ConfigDefinition configDefinition) {
         this.tableFile = tableFile;
-        this.table = tableFile.getName();
         this.configDefinition = configDefinition;
         if (configDefinition != null) {
             converter = new ConfigConverter(configDefinition.getParser());
         }
 
         if (!tableFile.exists()) {
-            initErrors.add(String.format("配置[%s]不存在", tableFile.getName()));
+            initErrors.add(String.format("配置[%s]不存在", tableFile));
         }
 
         initPrototype();

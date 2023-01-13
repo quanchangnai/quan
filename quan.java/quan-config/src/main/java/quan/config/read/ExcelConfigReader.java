@@ -66,7 +66,7 @@ public class ExcelConfigReader extends ConfigReader {
                 }
             }
         } catch (Exception e) {
-            logger.error("读取配置[{}]出错", tableFile.getName(), e);
+            logger.error("读取配置[{}]出错", tableFile, e);
         }
 
     }

@@ -29,7 +29,7 @@ public class CSVConfigReader extends ConfigReader {
         try (CSVParser parser = new CSVParser(new InputStreamReader(Files.newInputStream(tableFile.toPath()), "GBK"), CSVFormat.DEFAULT)) {
             records = parser.getRecords();
         } catch (Exception e) {
-            logger.error("读取配置[{}]出错", tableFile.getName(), e);
+            logger.error("读取配置[{}]出错", tableFile, e);
             return;
         }
 

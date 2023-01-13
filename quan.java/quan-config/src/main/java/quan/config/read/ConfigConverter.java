@@ -93,10 +93,8 @@ public class ConfigConverter {
         if (columnNum == fieldDefinition.getColumnNums().get(0)) {
             if (beanDefinition.hasChild()) {
                 //第1列是类名
-                String className = columnValue;
-                if (!columnValue.contains(".")) {
-                    className = ClassDefinition.getLongName(beanDefinition, columnValue);
-                }
+                String className = parser.getLongName(beanDefinition, columnValue);
+
                 if (beanDefinition.getMeAndDescendants().contains(className)) {
                     object = new JSONObject();
                     object.put("class", columnValue);
@@ -116,7 +114,7 @@ public class ConfigConverter {
         if (beanDefinition.hasChild()) {
             String className = object.getString("class");
             if (!className.contains(".")) {
-                className = ClassDefinition.getLongName(fieldDefinition.getOwner(), className);
+                className = parser.getLongName(fieldDefinition.getOwner(), className);
             }
             beanDefinition = parser.getBean(className);
         }
@@ -438,13 +436,11 @@ public class ConfigConverter {
         //有子类，按具体类型转换
         boolean beanHasChild = beanDefinition.hasChild();
         if (beanHasChild) {
-            String className = values[0];
-            if (!values[0].contains(".")) {
-                className = ClassDefinition.getLongName(beanDefinition, values[0]);
-            }
+            String className = parser.getLongName(beanDefinition, values[0]);
+
             if (beanDefinition.getMeAndDescendants().contains(className)) {
                 object.put("class", values[0]);
-                beanDefinition = parser.getBean(ClassDefinition.getLongName(owner, className));
+                beanDefinition = parser.getBean(owner, className);
             } else {
                 throw new ConvertException(ErrorType.TYPE_ERROR, values[0], beanDefinition.getName());
             }

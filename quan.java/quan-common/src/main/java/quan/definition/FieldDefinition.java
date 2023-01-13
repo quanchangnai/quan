@@ -192,7 +192,7 @@ public class FieldDefinition extends Definition implements Cloneable {
     }
 
     public ClassDefinition getClassDefinition() {
-        return parser.getClass(ClassDefinition.getLongName(owner, type));
+        return parser.getClass(owner, type);
     }
 
     public BeanDefinition getTypeBean() {
@@ -342,7 +342,7 @@ public class FieldDefinition extends Definition implements Cloneable {
         if (!isCollectionType()) {
             return null;
         }
-        ClassDefinition classDefinition = parser.getClass(ClassDefinition.getLongName(owner, getValueType()));
+        ClassDefinition classDefinition = parser.getClass(owner, getValueType());
         if (classDefinition != null && classDefinition.getClass() == BeanDefinition.class) {
             return (BeanDefinition) classDefinition;
         }
@@ -581,12 +581,12 @@ public class FieldDefinition extends Definition implements Cloneable {
             if (isKeyRef && fieldRefs.length >= 1) {
                 String keyRef = owner.resolveFieldRef(fieldRefs[0]);
                 String refConfigName = keyRef.substring(0, keyRef.lastIndexOf("."));
-                refConfig = parser.getConfig(ClassDefinition.getLongName(owner, refConfigName));
+                refConfig = parser.getConfig(owner, refConfigName);
             }
             if (!isKeyRef && fieldRefs.length == 2) {
                 String valueRef = owner.resolveFieldRef(fieldRefs[1]);
                 String refConfigName = valueRef.substring(0, valueRef.lastIndexOf("."));
-                refConfig = parser.getConfig(ClassDefinition.getLongName(owner, refConfigName));
+                refConfig = parser.getConfig(owner, refConfigName);
             }
             return refConfig;
         }
@@ -594,7 +594,7 @@ public class FieldDefinition extends Definition implements Cloneable {
         //list set 原生类型
         String fieldRef = owner.resolveFieldRef(ref);
         String refConfigName = fieldRef.substring(0, fieldRef.lastIndexOf("."));
-        return parser.getConfig(ClassDefinition.getLongName(owner, refConfigName));
+        return parser.getConfig(owner, refConfigName);
     }
 
     public FieldDefinition getRefField() {
@@ -619,7 +619,7 @@ public class FieldDefinition extends Definition implements Cloneable {
             if (isKeyRef && fieldRefs.length >= 1) {
                 String keyRef = owner.resolveFieldRef(fieldRefs[0]);
                 String refConfigName = keyRef.substring(0, keyRef.lastIndexOf("."));
-                refConfig = parser.getConfig(ClassDefinition.getLongName(owner, refConfigName));
+                refConfig = parser.getConfig(owner, refConfigName);
                 if (refConfig != null) {
                     String refFieldName = keyRef.substring(keyRef.lastIndexOf(".") + 1);
                     return refConfig.getField(refFieldName);
@@ -628,7 +628,7 @@ public class FieldDefinition extends Definition implements Cloneable {
             if (!isKeyRef && fieldRefs.length == 2) {
                 String valueRef = owner.resolveFieldRef(fieldRefs[1]);
                 String refConfigName = valueRef.substring(0, valueRef.lastIndexOf("."));
-                refConfig = parser.getConfig(ClassDefinition.getLongName(owner, refConfigName));
+                refConfig = parser.getConfig(owner, refConfigName);
                 if (refConfig != null) {
                     String refFieldName = valueRef.substring(valueRef.lastIndexOf(".") + 1);
                     return refConfig.getField(refFieldName);
@@ -640,7 +640,7 @@ public class FieldDefinition extends Definition implements Cloneable {
         //list set 原生类型
         String fieldRef = owner.resolveFieldRef(ref);
         String refConfigName = fieldRef.substring(0, fieldRef.lastIndexOf("."));
-        ConfigDefinition refConfig = parser.getConfig(ClassDefinition.getLongName(owner, refConfigName));
+        ConfigDefinition refConfig = parser.getConfig(owner, refConfigName);
 
         if (refConfig != null) {
             String refFieldName = fieldRef.substring(fieldRef.lastIndexOf(".") + 1);

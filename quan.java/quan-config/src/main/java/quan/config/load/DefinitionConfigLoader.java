@@ -20,7 +20,6 @@ import quan.util.CommonUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -547,13 +546,6 @@ public class DefinitionConfigLoader extends ConfigLoader {
     @Override
     protected ConfigReader createReader(String table) {
         File tableFile = new File(tablePath, table + "." + tableType);
-        try {
-            String canonicalName = tableFile.getCanonicalFile().getName();
-            if (!canonicalName.equals(tableFile.getName())) {
-                validatedErrors.add(String.format("配置[%s]和实际表格文件[%s]的名字大小写必须保持一致", tableFile.getName(), canonicalName));
-            }
-        } catch (IOException ignored) {
-        }
 
         ConfigReader configReader = null;
         ConfigDefinition configDefinition = getConfigByTable(table);

@@ -111,12 +111,8 @@ public class BeanDefinition extends ClassDefinition {
         return parentClassName;
     }
 
-    public String getParentLongName() {
-        return getLongName(this, parentName);
-    }
-
     public BeanDefinition getParent() {
-        return parser.getBean(getParentLongName());
+        return parser.getBean(this, parentName);
     }
 
     public Set<BeanDefinition> getChildren() {
@@ -524,17 +520,10 @@ public class BeanDefinition extends ClassDefinition {
         }
     }
 
-    protected String getRefConfigName(String refConfigName) {
-        if (!refConfigName.contains(".")) {
-            return getLongName(this, refConfigName);
-        }
-        return refConfigName;
-    }
-
     protected void validateFieldRef(FieldDefinition field, boolean keyType, String refConfigName, String refFiledName) {
         String refConfigAndField = refConfigName + "." + refFiledName;
 
-        ConfigDefinition refConfig = parser.getConfig(getRefConfigName(refConfigName));
+        ConfigDefinition refConfig = parser.getConfig(this, refConfigName);
         if (refConfig == null) {
             addValidatedError(getValidatedName() + field.getValidatedName() + "的引用配置[" + refConfigName + "]不存在");
             return;

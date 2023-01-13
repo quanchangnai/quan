@@ -40,7 +40,7 @@ public class JsonConfigReader extends ConfigReader {
             List<JSONObject> jsons = (List<JSONObject>) JSON.parse(availableBytes);
             this.jsons.addAll(jsons);
         } catch (Exception e) {
-            logger.error("读取配置[{}]出错", tableFile.getName(), e);
+            logger.error("读取配置[{}]出错", tableFile, e);
         }
     }
 }

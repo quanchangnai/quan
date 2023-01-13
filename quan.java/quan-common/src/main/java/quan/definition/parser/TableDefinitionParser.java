@@ -5,8 +5,10 @@ import org.apache.commons.lang3.Validate;
 import org.dom4j.Element;
 import quan.definition.ClassDefinition;
 import quan.definition.FieldDefinition;
+import quan.definition.Language;
 import quan.definition.config.ConfigDefinition;
 import quan.definition.config.ConstantDefinition;
+import quan.util.CommonUtils;
 
 import java.io.File;
 import java.util.*;
@@ -18,8 +20,13 @@ public abstract class TableDefinitionParser extends DefinitionParser {
 
     private ExtDefinitionParser extDefinitionParser = new ExtDefinitionParser(this);
 
+    //主表路径对应分表路径
     private Map<String, Set<String>> subtables = new HashMap<>();
 
+    //表名(相对根路径):配置定义
+    private Map<String, ConfigDefinition> configDefinitions = new HashMap<>();
+
+    //表名(相对根路径):配置定义
     private Map<String, ConfigDefinition> extConfigDefinitions = new HashMap<>();
 
 
@@ -30,7 +37,7 @@ public abstract class TableDefinitionParser extends DefinitionParser {
 
     @Override
     protected boolean checkFile(File definitionFile) {
-        if (extDefinitionParser != null && extDefinitionParser.checkFile(definitionFile)) {
+        if (extDefinitionParser.checkFile(definitionFile)) {
             return true;
         }
         return super.checkFile(definitionFile);
@@ -38,38 +45,45 @@ public abstract class TableDefinitionParser extends DefinitionParser {
 
     @Override
     protected void parseFile(File definitionFile) {
-        if (extDefinitionParser != null && extDefinitionParser.checkFile(definitionFile)) {
+        if (extDefinitionParser.checkFile(definitionFile)) {
             extDefinitionParser.setCategory(getCategory());
             extDefinitionParser.parseFile(definitionFile);
             return;
         }
 
-        //TODO 目录暂未处理
-        String tableName = definitionFile.getName().substring(0, definitionFile.getName().lastIndexOf("."));
+        //表名相对配置表格根路径
+        String definitionFilePath = definitionFilePaths.get(definitionFile);
+        String definitionFileName = definitionFilePath.substring(0, definitionFilePath.lastIndexOf("."));
 
         //分表
-        if (tableName.contains("-")) {
+        if (definitionFileName.contains("-")) {
             //主表
-            String mainTableName = tableName.substring(0, tableName.indexOf("-")).trim();
-            subtables.computeIfAbsent(mainTableName, k -> new LinkedHashSet<>()).add(tableName);
+            String mainTableName = definitionFileName.substring(0, definitionFileName.indexOf("-")).trim();
+            subtables.computeIfAbsent(mainTableName, k -> new LinkedHashSet<>()).add(definitionFileName);
             return;
         }
 
         ConfigDefinition configDefinition = new ConfigDefinition();
         configDefinition.setParser(this);
-        configDefinition.setDefinitionFile(definitionFile.getName());
+        configDefinition.setDefinitionFile(definitionFilePath);
 
-        if (tableName.contains(".")) {
-            configDefinition.setPackageName(tableName.substring(0, tableName.lastIndexOf(".")));
-            configDefinition.setName(tableName.substring(tableName.lastIndexOf(".") + 1));
+        String s = File.separator;
+        if (definitionFileName.contains(s)) {
+            String packageName = definitionFileName.substring(0, definitionFileName.lastIndexOf(s)).replaceAll(String.format("\\%s", s), ".");
+            configDefinition.setPackageName(packageName);
+            if (!Language.LOWER_PACKAGE_NAME_PATTERN.matcher(packageName).matches()) {
+                addValidatedError("定义文件[" + definitionFilePath + "]的路径名格式错误");
+            }
+            configDefinition.setName(definitionFileName.substring(definitionFileName.lastIndexOf(s) + 1));
         } else {
-            configDefinition.setName(tableName);
+            configDefinition.setName(definitionFileName);
         }
 
-        configDefinition.setTable(configDefinition.getName());
+        configDefinition.setTable(definitionFileName);
 
         if (parseTable(configDefinition, definitionFile)) {
             parsedClasses.add(configDefinition);
+            configDefinitions.put(definitionFileName, configDefinition);
         }
     }
 
@@ -173,23 +187,17 @@ public abstract class TableDefinitionParser extends DefinitionParser {
 
     @Override
     protected void validate() {
-        if (extDefinitionParser != null) {
-            getValidatedErrors().addAll(extDefinitionParser.getValidatedErrors());
-            validateExtDefinitions();
-        }
+        getValidatedErrors().addAll(extDefinitionParser.getValidatedErrors());
+        validateExtDefinitions();
 
         validateClassName();
 
         for (String mainTableName : subtables.keySet()) {
-            ConfigDefinition configDefinition = extConfigDefinitions.get(mainTableName);
+            ConfigDefinition configDefinition = configDefinitions.get(mainTableName);
             if (configDefinition != null) {
-                configDefinition = getConfig(configDefinition.getName());
-            } else {
-                configDefinition = getConfig(mainTableName);
+                String table = mainTableName + "," + String.join(",", subtables.get(mainTableName));
+                configDefinition.setTable(table);
             }
-
-            String table = mainTableName + "," + String.join(",", subtables.get(mainTableName));
-            configDefinition.setTable(table);
         }
 
         parsedClasses.forEach(ClassDefinition::validate1);
@@ -218,6 +226,8 @@ public abstract class TableDefinitionParser extends DefinitionParser {
                 tableName = configName;
             }
 
+            extConfigDefinition.setTable(tableName);
+
             if (extConfigDefinitions.put(tableName, extConfigDefinition) != null) {
                 addValidatedError(String.format("相同表格[%s]不能有多个配置定义", tableName));
             }
@@ -227,16 +237,11 @@ public abstract class TableDefinitionParser extends DefinitionParser {
             return;
         }
 
-        Map<String, ConfigDefinition> _extConfigDefinitions = new HashMap<>(extConfigDefinitions);
-
-        for (ClassDefinition classDefinition : parsedClasses) {
-            if (!(classDefinition instanceof ConfigDefinition)) {
-                continue;
-            }
-
-            ConfigDefinition configDefinition = (ConfigDefinition) classDefinition;
-            ConfigDefinition extConfigDefinition = _extConfigDefinitions.remove(configDefinition.getTable());
-            if (extConfigDefinition == null) {
+        for (ConfigDefinition extConfigDefinition : extConfigDefinitions.values()) {
+            String extTableName = extConfigDefinition.getTable();
+            ConfigDefinition configDefinition = configDefinitions.get(CommonUtils.toPlatPath(extTableName));
+            if (configDefinition == null) {
+                addValidatedError(String.format("%s对应的的表格[%s]不存在", extConfigDefinition.getValidatedName(), extTableName));
                 continue;
             }
 
@@ -252,14 +257,16 @@ public abstract class TableDefinitionParser extends DefinitionParser {
             }
         }
 
-        for (String tableName : _extConfigDefinitions.keySet()) {
-            ConfigDefinition extConfigDefinition = _extConfigDefinitions.get(tableName);
-            if (extConfigDefinition.getName() != null) {
-                addValidatedError(String.format("%s对应的的表格[%s]不存在", extConfigDefinition.getValidatedName(), tableName));
-            }
-        }
     }
 
+    @Override
+    public void clear() {
+        super.clear();
+        extDefinitionParser.clear();
+        this.configDefinitions.clear();
+        this.subtables.clear();
+        this.extConfigDefinitions.clear();
+    }
 
     /**
      * 扩展定义解析器，解析使用XML定义的复杂结构
@@ -267,7 +274,6 @@ public abstract class TableDefinitionParser extends DefinitionParser {
     private static class ExtDefinitionParser extends XmlDefinitionParser {
 
         private DefinitionParser definitionParser;
-
 
         public ExtDefinitionParser(DefinitionParser definitionParser) {
             super(definitionParser.category);

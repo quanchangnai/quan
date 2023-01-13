@@ -7,7 +7,7 @@ using System.Collections.Immutable;
 namespace Test.Config.Item
 {
     /// <summary>
-	/// 武器<br/>
+	/// 道具/武器<br/>
 	/// 代码自动生成，请勿手动修改
 	/// </summary>
     public class WeaponConfig : EquipConfig

@@ -68,15 +68,18 @@ public class XmlDefinitionParser extends DefinitionParser {
             return;
         }
 
-        //默认以定义文件名作为包名
-        String packageName = definitionFile.getName().substring(0, definitionFile.getName().lastIndexOf("."));
-        if (!Language.java.matchPackageName(packageName)) {
-            addValidatedError("定义文件[" + definitionFile.getName() + "]的名字格式错误,正确格式:" + Language.LOWER_PACKAGE_NAME_PATTERN);
+        String definitionFilePath = getDefinitionParser().definitionFilePaths.get(definitionFile);
+        String definitionFileName = definitionFilePath.substring(0, definitionFilePath.lastIndexOf("."));
+
+        //默认以定义文件路径名作为包名
+        String packageName = definitionFileName.replaceAll(String.format("\\%s", File.separator), ".");
+        if (!Language.LOWER_PACKAGE_NAME_PATTERN.matcher(packageName).matches()) {
+            addValidatedError("定义文件[" + definitionFilePath + "]的路径名格式错误");
         }
 
         packageName = rootElement.attributeValue("name", packageName);
-        if (!Language.java.matchPackageName(packageName)) {
-            addValidatedError("定义文件[" + definitionFile.getName() + "]的包名[" + packageName + "]格式错误,正确格式:" + Language.LOWER_PACKAGE_NAME_PATTERN);
+        if (!Language.LOWER_PACKAGE_NAME_PATTERN.matcher(packageName).matches()) {
+            addValidatedError("定义文件[" + definitionFilePath + "]的包名[" + packageName + "]格式错误,正确格式:" + Language.LOWER_PACKAGE_NAME_PATTERN);
         }
 
         //具体语言对应的包名
@@ -112,7 +115,7 @@ public class XmlDefinitionParser extends DefinitionParser {
             try {
                 classDefinition = parseClassDefinition(classElement, index);
             } catch (Exception e) {
-                addValidatedError("定义文件[" + definitionFile.getName() + "]不支持定义元素:" + classElement.getName());
+                addValidatedError("定义文件[" + definitionFile + "]不支持定义元素:" + classElement.getName());
             }
 
             if (classDefinition == null) {
@@ -121,7 +124,7 @@ public class XmlDefinitionParser extends DefinitionParser {
 
             parsedClasses.add(classDefinition);
 
-            classDefinition.setDefinitionFile(definitionFile.getName());
+            classDefinition.setDefinitionFile(definitionFilePath);
             classDefinition.setDefinitionText(classElement.asXML());
 
             boolean packageUnwrap = rootElement.attributeValue("unwrap", packageName).trim().equals("true");
@@ -140,7 +143,9 @@ public class XmlDefinitionParser extends DefinitionParser {
     protected String getComment(Element element, int indexInParent) {
         List<Node> nodes = new ArrayList<>();
         nodes.add(element.node(0));
-        nodes.add(element.getParent().node(indexInParent + 1));
+        if (element.nodeCount() == 0) {
+            nodes.add(element.getParent().node(indexInParent + 1));
+        }
 
         StringBuilder builder = new StringBuilder();
 

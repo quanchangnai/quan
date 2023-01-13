@@ -1,7 +1,7 @@
 namespace Test.Config
 {
     /// <summary>
-    /// 卡片类型--，卡片类型---<br/>
+    /// 卡片类型--<br/>
     /// 代码自动生成，请勿手动修改
     /// </summary>
     public enum CardType {

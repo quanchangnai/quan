@@ -6,7 +6,7 @@ import quan.config.load.ConfigLoader;
 import java.util.*;
 
 /**
- * 道具<br/>
+ * 道具/道具<br/>
  * 代码自动生成，请勿手动修改
  */
 public class ItemConfig extends Config {

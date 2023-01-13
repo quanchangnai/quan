@@ -10,6 +10,8 @@ import quan.definition.config.ConfigDefinition;
 import quan.util.CommonUtils;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -29,9 +31,12 @@ public abstract class DefinitionParser {
 
     protected String definitionFileEncoding;
 
-    private LinkedHashSet<String> definitionPaths = new LinkedHashSet<>();
+    protected LinkedHashSet<String> definitionPaths = new LinkedHashSet<>();
 
     protected LinkedHashSet<File> definitionFiles = new LinkedHashSet<>();
+
+    //定义文件的相对路径名
+    protected Map<File, String> definitionFilePaths = new HashMap<>();
 
     private Pattern enumNamePattern;
 
@@ -78,7 +83,14 @@ public abstract class DefinitionParser {
         for (String path : definitionPaths) {
             path = CommonUtils.toPlatPath(path);
             this.definitionPaths.add(path);
-            definitionFiles.addAll(CommonUtils.listFiles(new File(path)));
+            Path definitionPath = Paths.get(path);
+
+            Set<File> definitionFiles = CommonUtils.listFiles(new File(path));
+            this.definitionFiles.addAll(definitionFiles);
+            for (File definitionFile : definitionFiles) {
+                Path relativizedPath = definitionPath.relativize(Paths.get(definitionFile.getPath()));
+                definitionFilePaths.put(definitionFile, relativizedPath.toString());
+            }
         }
     }
 
@@ -182,12 +194,36 @@ public abstract class DefinitionParser {
         return validatedClasses.get(name);
     }
 
+    public ClassDefinition getClass(ClassDefinition owner, String name) {
+        ClassDefinition classDefinition = getClass(ClassDefinition.getLongName(owner, name));
+        if (classDefinition == null) {
+            classDefinition = getClass(name);
+        }
+        return classDefinition;
+    }
+
+    public String getLongName(ClassDefinition owner, String className) {
+        ClassDefinition classDefinition = getClass(owner, className);
+        if (classDefinition != null) {
+            return classDefinition.getLongName();
+        }
+        return className;
+    }
+
     public ConfigDefinition getConfig(String name) {
         ClassDefinition classDefinition = validatedClasses.get(name);
         if (classDefinition instanceof ConfigDefinition) {
             return (ConfigDefinition) classDefinition;
         }
         return null;
+    }
+
+    public ConfigDefinition getConfig(ClassDefinition owner, String name) {
+        ConfigDefinition configDefinition = getConfig(ClassDefinition.getLongName(owner, name));
+        if (configDefinition == null) {
+            configDefinition = getConfig(name);
+        }
+        return configDefinition;
     }
 
     public Map<String, ConfigDefinition> getTableConfigs() {
@@ -200,6 +236,14 @@ public abstract class DefinitionParser {
             return (BeanDefinition) classDefinition;
         }
         return null;
+    }
+
+    public BeanDefinition getBean(ClassDefinition owner, String name) {
+        BeanDefinition beanDefinition = getBean(ClassDefinition.getLongName(owner, name));
+        if (beanDefinition == null) {
+            beanDefinition = getBean(name);
+        }
+        return beanDefinition;
     }
 
     public void addValidatedError(String error) {
@@ -228,8 +272,8 @@ public abstract class DefinitionParser {
                 try {
                     parseFile(definitionFile);
                 } catch (Exception e) {
-                    logger.error("定义文件[{}]解析出错", definitionFile.getName(), e);
-                    addValidatedError(String.format("定义文件[%s]解析出错：%s", definitionFile.getName(), e.getMessage()));
+                    logger.error("定义文件[{}]解析出错", definitionFile, e);
+                    addValidatedError(String.format("定义文件[%s]解析出错：%s", definitionFile, e.getMessage()));
                 }
             }
         }
@@ -287,6 +331,7 @@ public abstract class DefinitionParser {
     }
 
     public void clear() {
+        definitionFilePaths.clear();
         parsedClasses.clear();
         validatedClasses.clear();
         validatedErrors.clear();
