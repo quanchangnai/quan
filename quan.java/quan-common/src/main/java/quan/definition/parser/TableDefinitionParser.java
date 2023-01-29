@@ -4,8 +4,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.dom4j.Element;
 import quan.definition.ClassDefinition;
+import quan.definition.Constants;
 import quan.definition.FieldDefinition;
-import quan.definition.Language;
 import quan.definition.config.ConfigDefinition;
 import quan.definition.config.ConstantDefinition;
 import quan.util.CommonUtils;
@@ -18,7 +18,7 @@ import java.util.*;
  */
 public abstract class TableDefinitionParser extends DefinitionParser {
 
-    private ExtDefinitionParser extDefinitionParser = new ExtDefinitionParser(this);
+    private ExtDefinitionParser extDefinitionParser = new ExtDefinitionParser();
 
     //主表路径对应分表路径
     private Map<String, Set<String>> subtables = new HashMap<>();
@@ -71,8 +71,8 @@ public abstract class TableDefinitionParser extends DefinitionParser {
         if (definitionFileName.contains(s)) {
             String packageName = definitionFileName.substring(0, definitionFileName.lastIndexOf(s)).replaceAll(String.format("\\%s", s), ".");
             configDefinition.setPackageName(packageName);
-            if (!Language.LOWER_PACKAGE_NAME_PATTERN.matcher(packageName).matches()) {
-                addValidatedError("定义文件[" + definitionFilePath + "]的路径名格式错误");
+            if (!Constants.LOWER_PACKAGE_NAME_PATTERN.matcher(packageName).matches()) {
+                addValidatedError("定义文件[" + definitionFilePath + "]的路径格式错误");
             }
             configDefinition.setName(definitionFileName.substring(definitionFileName.lastIndexOf(s) + 1));
         } else {
@@ -89,9 +89,9 @@ public abstract class TableDefinitionParser extends DefinitionParser {
 
     protected abstract boolean parseTable(ConfigDefinition configDefinition, File definitionFile);
 
-    protected void addField(ConfigDefinition configDefinition, String columnName, String fieldName, String fieldConstraint) {
-        if (columnName.startsWith("#")) {
-            //忽略注释列
+    protected void addField(ConfigDefinition configDefinition, String fieldName, String constraints, String comment) {
+        if (fieldName.startsWith("#")) {
+            //忽略被注释掉的字段
             return;
         }
 
@@ -99,22 +99,27 @@ public abstract class TableDefinitionParser extends DefinitionParser {
         fieldDefinition.setParser(this);
         fieldDefinition.setCategory(getCategory());
         fieldDefinition.setName(fieldName);
-        fieldDefinition.setColumn(columnName);
+        fieldDefinition.setColumn(fieldName);
+        fieldDefinition.setComment(comment);
         configDefinition.addField(fieldDefinition);
 
-        if (StringUtils.isBlank(fieldConstraint)) {
-            addValidatedError(configDefinition.getValidatedName() + "的列[" + columnName + "]约束不能为空，至少要包含字段类型");
+        if (StringUtils.isBlank(constraints)) {
+            if (StringUtils.isBlank(fieldName)) {
+                addValidatedError(configDefinition.getValidatedName() + "的字段约束不能为空，至少要包含字段类型");
+            } else {
+                addValidatedError(configDefinition.getValidatedName() + "的字段[" + fieldName + "]约束不能为空，至少要包含字段类型");
+            }
             return;
         }
 
-        String[] constraints = fieldConstraint.split("[;；]", -1);
+        String[] constraintArray = constraints.split("[;；]", -1);
 
-        fieldDefinition.setTypes(constraints[0]);
+        fieldDefinition.setTypes(constraintArray[0]);
 
         Set<String> constraintTypes = new HashSet<>();
 
-        for (int i = 1; i < constraints.length; i++) {
-            String constraint = constraints[i].trim();
+        for (int i = 1; i < constraintArray.length; i++) {
+            String constraint = constraintArray[i].trim();
             String constraintType;
             String constraintValue;
 
@@ -144,25 +149,25 @@ public abstract class TableDefinitionParser extends DefinitionParser {
                         constraintType = constraintTypeAndValue[0].trim();
                         constraintValue = constraintTypeAndValue[1].trim();
                     } catch (Exception ignored) {
-                        addValidatedError(configDefinition.getValidatedName() + "的列[" + columnName + "]约束[" + constraint + "]格式错误");
+                        addValidatedError(configDefinition.getValidatedName() + "的字段[" + fieldName + "]约束[" + constraint + "]格式错误");
                         continue;
                     }
                     break;
             }
 
             if (constraintType.isEmpty()) {
-                addValidatedError(configDefinition.getValidatedName() + "的列[" + columnName + "]约束[" + constraint + "]格式错误");
+                addValidatedError(configDefinition.getValidatedName() + "的字段[" + fieldName + "]约束[" + constraint + "]格式错误");
                 continue;
             }
 
             if (constraintTypes.contains(constraintType)) {
-                addValidatedError(configDefinition.getValidatedName() + "的列[" + columnName + "]有重复约束类型:" + constraintType);
+                addValidatedError(configDefinition.getValidatedName() + "的字段[" + fieldName + "]有重复约束类型:" + constraintType);
             } else {
                 constraintTypes.add(constraintType);
             }
 
             if (constraintValue.isEmpty()) {
-                addValidatedError(configDefinition.getValidatedName() + "的列[" + columnName + "]约束[" + constraintType + "]不能为空值");
+                addValidatedError(configDefinition.getValidatedName() + "的字段[" + fieldName + "]约束[" + constraintType + "]不能为空值");
             }
 
             switch (constraintType) {
@@ -179,7 +184,7 @@ public abstract class TableDefinitionParser extends DefinitionParser {
                     fieldDefinition.setLanguage(constraintValue);
                     break;
                 default:
-                    addValidatedError(configDefinition.getValidatedName() + "的列[" + columnName + "]不支持该约束类型:" + constraintType);
+                    addValidatedError(configDefinition.getValidatedName() + "的字段[" + fieldName + "]不支持该约束类型:" + constraintType);
                     break;
             }
         }
@@ -271,18 +276,15 @@ public abstract class TableDefinitionParser extends DefinitionParser {
     /**
      * 扩展定义解析器，解析使用XML定义的复杂结构
      */
-    private static class ExtDefinitionParser extends XmlDefinitionParser {
+    private class ExtDefinitionParser extends XmlDefinitionParser {
 
-        private DefinitionParser definitionParser;
-
-        public ExtDefinitionParser(DefinitionParser definitionParser) {
-            super(definitionParser.category);
-            this.definitionParser = definitionParser;
+        public ExtDefinitionParser() {
+            super(TableDefinitionParser.this.category);
         }
 
         @Override
         protected DefinitionParser getDefinitionParser() {
-            return definitionParser;
+            return TableDefinitionParser.this;
         }
 
         @Override

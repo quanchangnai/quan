@@ -45,16 +45,17 @@ public class ExcelDefinitionParser extends TableDefinitionParser {
             configDefinition.setComment(sheet.getSheetName());
 
             if (sheet.getPhysicalNumberOfRows() < 3) {
-                addValidatedError(configDefinition.getValidatedName() + "的定义文件不完整，表头要求第1行列名、第2行字段名、第3行字段约束");
+                addValidatedError(configDefinition.getValidatedName() + "的定义文件不完整，要求表头第1行是是字段名、第2行是字段约束、第3行是字段注释");
                 return false;
             }
 
             int c = 0;
+
             for (Cell cell : sheet.getRow(0)) {
-                String columnName = dataFormatter.formatCellValue(cell).trim();
-                String fieldName = dataFormatter.formatCellValue(sheet.getRow(1).getCell(c)).trim();
-                String fieldConstraint = dataFormatter.formatCellValue(sheet.getRow(2).getCell(c)).trim();
-                addField(configDefinition, columnName, fieldName, fieldConstraint);
+                String fieldName = dataFormatter.formatCellValue(cell).trim();
+                String constraints = dataFormatter.formatCellValue(sheet.getRow(1).getCell(c)).trim();
+                String comment = dataFormatter.formatCellValue(sheet.getRow(2).getCell(c)).trim();
+                addField(configDefinition, fieldName, constraints, comment);
                 c++;
             }
             return true;

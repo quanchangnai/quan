@@ -219,7 +219,7 @@ public class IndexDefinition extends Definition implements Cloneable {
         if (getName() == null) {
             ownerDefinition.addValidatedError(ownerDefinition.getValidatedName() + "的索引名不能为空");
         } else if (!getNamePattern().matcher(getName()).matches()) {
-            ownerDefinition.addValidatedError(ownerDefinition.getValidatedName("的") + "索引名[" + getName() + "]格式错误,正确格式:" + getNamePattern());
+            ownerDefinition.addValidatedError(ownerDefinition.getValidatedName() + "的索引名[" + getName() + "]格式错误,正确格式:" + getNamePattern());
         }
 
 

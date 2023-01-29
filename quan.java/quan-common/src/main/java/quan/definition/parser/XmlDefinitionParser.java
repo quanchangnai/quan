@@ -73,13 +73,13 @@ public class XmlDefinitionParser extends DefinitionParser {
 
         //默认以定义文件路径名作为包名
         String packageName = definitionFileName.replaceAll(String.format("\\%s", File.separator), ".");
-        if (!Language.LOWER_PACKAGE_NAME_PATTERN.matcher(packageName).matches()) {
-            addValidatedError("定义文件[" + definitionFilePath + "]的路径名格式错误");
-        }
-
-        packageName = rootElement.attributeValue("name", packageName);
-        if (!Language.LOWER_PACKAGE_NAME_PATTERN.matcher(packageName).matches()) {
-            addValidatedError("定义文件[" + definitionFilePath + "]的包名[" + packageName + "]格式错误,正确格式:" + Language.LOWER_PACKAGE_NAME_PATTERN);
+        if (!Constants.LOWER_PACKAGE_NAME_PATTERN.matcher(packageName).matches()) {
+            addValidatedError("定义文件[" + definitionFilePath + "]的路径格式错误");
+        }else {
+            packageName = rootElement.attributeValue("name", packageName);
+            if (!Constants.LOWER_PACKAGE_NAME_PATTERN.matcher(packageName).matches()) {
+                addValidatedError("定义文件[" + definitionFilePath + "]的包名[" + packageName + "]格式错误,正确格式:" + Constants.LOWER_PACKAGE_NAME_PATTERN);
+            }
         }
 
         //具体语言对应的包名
