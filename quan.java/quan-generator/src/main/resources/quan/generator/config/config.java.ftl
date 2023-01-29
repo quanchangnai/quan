@@ -35,11 +35,11 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
      */
     </#if>
     <#if field.type=="list">
-    public final ${field.basicType}<${field.classValueType}> ${field.name};
+    public final ${field.basicType}<${field.valueClassType}> ${field.name};
     <#elseif field.type=="set">
-    public final ${field.basicType}<${field.classValueType}> ${field.name};
+    public final ${field.basicType}<${field.valueClassType}> ${field.name};
     <#elseif field.type=="map">
-    public final ${field.basicType}<${field.classKeyType}, ${field.classValueType}> ${field.name};
+    public final ${field.basicType}<${field.keyClassType}, ${field.valueClassType}> ${field.name};
     <#elseif  field.timeType>
     public final ${field.basicType} ${field.name};
 
@@ -91,14 +91,14 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
 
         </#if>
         JSONArray ${field.name}$1 = json.getJSONArray("${field.name}");
-        ${field.basicType}<${field.classValueType}> ${field.name}$2 = new ${field.classType}<>();
+        ${field.basicType}<${field.valueClassType}> ${field.name}$2 = new ${field.classType}<>();
         if (${field.name}$1 != null) {
             for (int i = 0; i < ${field.name}$1.size(); i++) {
                 <#if field.beanValueType>
-                ${field.classValueType} ${field.name}$Value = ${field.classValueType}.create(${field.name}$1.getJSONObject(i));
+                ${field.valueClassType} ${field.name}$Value = ${field.valueClassType}.create(${field.name}$1.getJSONObject(i));
                 ${field.name}$2.add(${field.name}$Value);
                 <#else>
-                ${field.name}$2.add(${field.name}$1.get${field.classValueType}(i));
+                ${field.name}$2.add(${field.name}$1.get${field.valueClassType}(i));
                 </#if>
             }
         }
@@ -111,14 +111,14 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
 
         </#if>
         JSONObject ${field.name}$1 = json.getJSONObject("${field.name}");
-        Map<${field.classKeyType}, ${field.classValueType}> ${field.name}$2 = new HashMap<>();
+        Map<${field.keyClassType}, ${field.valueClassType}> ${field.name}$2 = new HashMap<>();
         if (${field.name}$1 != null) {
             for (String ${field.name}$Key : ${field.name}$1.keySet()) {
                 <#if field.beanValueType>
-                ${field.classValueType} ${field.name}$Value = ${field.classValueType}.create(${field.name}$1.getJSONObject(${field.name}$Key));
-                ${field.name}$2.put(${field.classKeyType}.valueOf(${field.name}$Key), ${field.name}$Value);
+                ${field.valueClassType} ${field.name}$Value = ${field.valueClassType}.create(${field.name}$1.getJSONObject(${field.name}$Key));
+                ${field.name}$2.put(${field.keyClassType}.valueOf(${field.name}$Key), ${field.name}$Value);
                 <#else>
-                ${field.name}$2.put(${field.classKeyType}.valueOf(${field.name}$Key), ${field.name}$1.get${field.classValueType}(${field.name}$Key));
+                ${field.name}$2.put(${field.keyClassType}.valueOf(${field.name}$Key), ${field.name}$1.get${field.valueClassType}(${field.name}$Key));
                 </#if>
             }
         }

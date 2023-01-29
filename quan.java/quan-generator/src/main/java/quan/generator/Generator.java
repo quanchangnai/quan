@@ -309,7 +309,7 @@ public abstract class Generator {
                     if (dependentSource.getType() == DependentType.FIELD) {
                         ((FieldDefinition) dependentSource.getOwnerDefinition()).setClassType(dependentClassFullName);
                     } else if (dependentSource.getType() == DependentType.FIELD_VALUE) {
-                        ((FieldDefinition) dependentSource.getOwnerDefinition()).setClassValueType(dependentClassFullName);
+                        ((FieldDefinition) dependentSource.getOwnerDefinition()).setValueClassType(dependentClassFullName);
                     } else if (dependentSource.getType() == DependentType.FIELD_REF) {
                         ((FieldDefinition) dependentSource.getOwnerDefinition()).setRefType(dependentClassFullName);
                     } else if (dependentSource.getType() == DependentType.PARENT) {
@@ -377,14 +377,14 @@ public abstract class Generator {
         if (fieldDefinition.isCollectionType()) {
             if (fieldType.equals("map") && fieldDefinition.isBuiltinKeyType()) {
                 String fieldKeyType = fieldDefinition.getKeyType();
-                fieldDefinition.setBasicKeyType(basicTypes.get(fieldKeyType));
-                fieldDefinition.setClassKeyType(classTypes.get(fieldKeyType));
+                fieldDefinition.setKeyBasicType(basicTypes.get(fieldKeyType));
+                fieldDefinition.setKeyClassType(classTypes.get(fieldKeyType));
             }
 
             String fieldValueType = fieldDefinition.getValueType();
             if (fieldDefinition.isBuiltinValueType()) {
-                fieldDefinition.setBasicValueType(basicTypes.get(fieldValueType));
-                fieldDefinition.setClassValueType(classTypes.get(fieldValueType));
+                fieldDefinition.setValueBasicType(basicTypes.get(fieldValueType));
+                fieldDefinition.setValueClassType(classTypes.get(fieldValueType));
             }
         }
     }

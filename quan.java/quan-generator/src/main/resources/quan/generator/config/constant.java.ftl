@@ -27,12 +27,12 @@ public enum ${name} {
     </#list>
     <#if valueField.type=="map">
 
-    public ${valueField.basicType}<${valueField.keyType},${valueField.classValueType}> value() {
+    public ${valueField.basicType}<${valueField.keyType},${valueField.valueClassType}> value() {
         return ${ownerDefinition.name}.getBy${keyField.name?cap_first}(name()").${valueField.name};
     }
     <#elseif valueField.type=="list" || valueField.type=="set">
 
-    public ${valueField.basicType}<${valueField.classValueType}> value() {
+    public ${valueField.basicType}<${valueField.valueClassType}> value() {
         return ${ownerDefinition.name}.getBy${keyField.name?cap_first}(name()).${valueField.name};
     }
     <#else>
@@ -51,11 +51,11 @@ public class ${name} {
      */
     </#if>
     <#if valueField.type=="map">
-    public static ${valueField.basicType}<${valueField.keyType},${valueField.classValueType}> ${key}() {
+    public static ${valueField.basicType}<${valueField.keyType},${valueField.valueClassType}> ${key}() {
         return ${ownerDefinition.name}.getBy${keyField.name?cap_first}("${key}").${valueField.name};
     }
     <#elseif valueField.type=="list" || valueField.type=="set">
-    public static ${valueField.basicType}<${valueField.classValueType}> ${key}() {
+    public static ${valueField.basicType}<${valueField.valueClassType}> ${key}() {
         return ${ownerDefinition.name}.getBy${keyField.name?cap_first}("${key}").${valueField.name};
     }
     <#else>

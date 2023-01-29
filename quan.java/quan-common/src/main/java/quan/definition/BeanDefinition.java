@@ -232,12 +232,12 @@ public class BeanDefinition extends ClassDefinition {
     }
 
     protected void validateFieldType(FieldDefinition field) {
-        if (field.getTypes() == null) {
+        if (field.getTypeInfo() == null) {
             addValidatedError(getValidatedName("的") + field.getValidatedName() + "类型不能为空");
             return;
         }
 
-        String[] fieldTypes = field.getTypes().split("[:：]", -1);
+        String[] fieldTypes = field.getTypeInfo().split("[:：]", -1);
         String fieldType = fieldTypes[0];
 
         if (fieldTypes.length == 1 && StringUtils.isBlank(fieldType)) {
@@ -253,7 +253,7 @@ public class BeanDefinition extends ClassDefinition {
         }
 
         if (fieldTypes.length != 1 && !field.isCollectionType() && !(field.category == Category.message && (fieldType.equals("float") || fieldType.equals("double")))) {
-            addValidatedError(getValidatedName("的") + field.getValidatedName() + "类型[" + field.getTypes() + "]格式错误");
+            addValidatedError(getValidatedName("的") + field.getValidatedName() + "类型[" + field.getTypeInfo() + "]格式错误");
             return;
         }
 
@@ -264,7 +264,7 @@ public class BeanDefinition extends ClassDefinition {
                     addValidatedError(getValidatedName("的[") + field.getType() + "]类型" + field.getValidatedName() + "的值类型[" + field.getValueType() + "]不合法");
                 }
             } else {
-                addValidatedError(getValidatedName("的") + field.getValidatedName() + "类型[" + field.getTypes() + "]格式错误，合法格式[" + fieldType + ":值类型]");
+                addValidatedError(getValidatedName("的") + field.getValidatedName() + "类型[" + field.getTypeInfo() + "]格式错误，合法格式[" + fieldType + ":值类型]");
             }
         }
 
@@ -279,7 +279,7 @@ public class BeanDefinition extends ClassDefinition {
                     addValidatedError(getValidatedName("的[") + field.getType() + "]类型" + field.getValidatedName() + "的值类型[" + field.getValueType() + "]不合法");
                 }
             } else {
-                addValidatedError(getValidatedName("的") + field.getValidatedName() + "类型[" + field.getTypes() + "]格式错误，合法格式[" + fieldType + ":键类型:值类型]");
+                addValidatedError(getValidatedName("的") + field.getValidatedName() + "类型[" + field.getTypeInfo() + "]格式错误，合法格式[" + fieldType + ":键类型:值类型]");
             }
         }
 
@@ -300,7 +300,7 @@ public class BeanDefinition extends ClassDefinition {
                 }
             }
             if (patternError) {
-                addValidatedError(getValidatedName("的") + field.getValidatedName() + "类型[" + field.getTypes() + "]格式错误，合法格式[" + fieldType + "]或者[" + fieldType + ":精度(0-15)]");
+                addValidatedError(getValidatedName("的") + field.getValidatedName() + "类型[" + field.getTypeInfo() + "]格式错误，合法格式[" + fieldType + "]或者[" + fieldType + ":精度(0-15)]");
             }
         }
 

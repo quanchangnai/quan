@@ -28,7 +28,7 @@ namespace ${getFullPackageName("cs")}
         /// ${field.comment}
         /// </summary>
         </#if>
-        public ${field.classType}<${field.classValueType}> ${field.name} { get; } = new ${field.classType}<${field.classValueType}>();
+        public ${field.classType}<${field.valueClassType}> ${field.name} { get; } = new ${field.classType}<${field.valueClassType}>();
 
     <#elseif field.type == "map">
         <#if field.comment !="">
@@ -36,7 +36,7 @@ namespace ${getFullPackageName("cs")}
         /// ${field.comment}
         /// </summary>
         </#if>
-        public Dictionary<${field.classKeyType}, ${field.classValueType}> ${field.name} { get; } = new Dictionary<${field.classKeyType}, ${field.classValueType}>();
+        public Dictionary<${field.keyClassType}, ${field.valueClassType}> ${field.name} { get; } = new Dictionary<${field.keyClassType}, ${field.valueClassType}>();
 
     <#elseif field.type == "string">
         private string _${field.name} = "";
@@ -298,7 +298,7 @@ namespace ${getFullPackageName("cs")}
                         <#if field.builtinValueType>
                             ${field.name}.Add(buffer.Read${field.valueType?cap_first}());
                         <#else>
-                            var ${field.name}Value = new ${field.classValueType}();
+                            var ${field.name}Value = new ${field.valueClassType}();
                             ${field.name}Value.Decode(buffer);
                             ${field.name}.Add(${field.name}Value);
                         </#if>
@@ -312,7 +312,7 @@ namespace ${getFullPackageName("cs")}
                             ${field.name}.Add(buffer.Read${field.keyType?cap_first}(), buffer.Read${field.valueType?cap_first}());
                         <#else>
                             var ${field.name}Key = buffer.Read${field.keyType?cap_first}();
-                            var ${field.name}Value = new ${field.classValueType}();
+                            var ${field.name}Value = new ${field.valueClassType}();
                             ${field.name}Value.Decode(buffer);
                             ${field.name}.Add(${field.name}Key, ${field.name}Value);
                         </#if>
@@ -352,7 +352,7 @@ namespace ${getFullPackageName("cs")}
         <#if field.builtinValueType>
                 ${field.name}.Add(buffer.Read${field.valueType?cap_first}());
         <#else>
-                var ${field.name}Value = new ${field.classValueType}();
+                var ${field.name}Value = new ${field.valueClassType}();
                 ${field.name}Value.Decode(buffer);
                 ${field.name}.Add(${field.name}Value);
         </#if>
@@ -371,7 +371,7 @@ namespace ${getFullPackageName("cs")}
                 ${field.name}.Add(buffer.Read${field.keyType?cap_first}(), buffer.Read${field.valueType?cap_first}());
         <#else>
                 var ${field.name}Key = buffer.Read${field.keyType?cap_first}();
-                var ${field.name}Value = new ${field.classValueType}();
+                var ${field.name}Value = new ${field.valueClassType}();
                 ${field.name}Value.Decode(buffer);
                 ${field.name}.Add(${field.name}Key, ${field.name}Value);
         </#if>

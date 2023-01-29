@@ -67,10 +67,10 @@ public abstract class ClassDefinition extends Definition {
     protected void resetField(FieldDefinition fieldDefinition) {
         fieldDefinition.setBasicType(null);
         fieldDefinition.setClassType(null);
-        fieldDefinition.setBasicKeyType(null);
-        fieldDefinition.setClassKeyType(null);
-        fieldDefinition.setBasicValueType(null);
-        fieldDefinition.setClassValueType(null);
+        fieldDefinition.setKeyBasicType(null);
+        fieldDefinition.setKeyClassType(null);
+        fieldDefinition.setValueBasicType(null);
+        fieldDefinition.setValueClassType(null);
         fieldDefinition.setRefType(null);
     }
 

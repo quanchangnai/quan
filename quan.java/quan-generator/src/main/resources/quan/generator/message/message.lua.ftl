@@ -129,7 +129,7 @@ function ${name}:encode(buffer)
         <#if field.builtinValueType>
             ${field.name}Buffer:write${field.valueType?cap_first}(value)
         <#else>
-            ${field.classValueType?replace('.','_')}.encode(value, ${field.name}Buffer)
+            ${field.valueClassType?replace('.','_')}.encode(value, ${field.name}Buffer)
         </#if>
         end
         buffer:writeBuffer(${field.name}Buffer)
@@ -145,7 +145,7 @@ function ${name}:encode(buffer)
         <#if field.builtinValueType>
             ${field.name}Buffer:write${field.valueType?cap_first}(value)
         <#else>
-            ${field.classValueType?replace('.','_')}.encode(value, ${field.name}Buffer)
+            ${field.valueClassType?replace('.','_')}.encode(value, ${field.name}Buffer)
         </#if>
         end
         buffer:writeBuffer(${field.name}Buffer)
@@ -197,7 +197,7 @@ function ${name}:encode(buffer)
     buffer:writeInt(#self.${field.name})
     for i, value in ipairs(self.${field.name}) do
         <#if field.builtinValueType>
-        buffer:write${field.classValueType?replace('.','_')?cap_first}(value)
+        buffer:write${field.valueClassType?replace('.','_')?cap_first}(value)
         <#else>
         ${field.valueType}.encode(value, buffer)
         </#if>
@@ -215,7 +215,7 @@ function ${name}:encode(buffer)
         <#if field.builtinValueType>
         buffer:write${field.valueType?cap_first}(value)
         <#else>
-        ${field.classValueType?replace('.','_')}.encode(value, buffer)
+        ${field.valueClassType?replace('.','_')}.encode(value, buffer)
         </#if>
     end
         <#if field?has_next && !fields[field?index+1].collectionType && (fields[field?index+1].primitiveType || fields[field?index+1].enumType || !fields[field?index+1].optional) >
@@ -292,7 +292,7 @@ function ${name}.decode(buffer, self)
             <#if field.builtinValueType>
                 self.${field.name}[i] = buffer:read${field.valueType?cap_first}()
             <#else>
-                self.${field.name}[i] = ${field.classValueType?replace('.','_')}.decode(buffer)
+                self.${field.name}[i] = ${field.valueClassType?replace('.','_')}.decode(buffer)
             </#if>
             end
         <#elseif field.type=="map">
@@ -301,7 +301,7 @@ function ${name}.decode(buffer, self)
             <#if field.builtinValueType>
                 self.${field.name}[buffer:read${field.keyType?cap_first}()] = buffer:read${field.valueType?cap_first}()
             <#else>
-                self.${field.name}[buffer:read${field.keyType?cap_first}()] = ${field.classValueType?replace('.','_')}.decode(buffer)
+                self.${field.name}[buffer:read${field.keyType?cap_first}()] = ${field.valueClassType?replace('.','_')}.decode(buffer)
             </#if>
             end
         <#elseif field.type=="float"||field.type=="double">
@@ -338,7 +338,7 @@ function ${name}.decode(buffer, self)
         <#if field.builtinValueType>
         self.${field.name}[i] = buffer:read${field.valueType?cap_first}()
         <#else>
-        self.${field.name}[i] = ${field.classValueType?replace('.','_')}.decode(buffer)
+        self.${field.name}[i] = ${field.valueClassType?replace('.','_')}.decode(buffer)
         </#if>
     end
         <#if field?has_next && !fields[field?index+1].collectionType && (fields[field?index+1].primitiveType || fields[field?index+1].enumType || !fields[field?index+1].optional) >
@@ -352,7 +352,7 @@ function ${name}.decode(buffer, self)
         <#if field.builtinValueType>
         self.${field.name}[buffer:read${field.keyType?cap_first}()] = buffer:read${field.valueType?cap_first}()
         <#else>
-        self.${field.name}[buffer:read${field.keyType?cap_first}()] = ${field.classValueType?replace('.','_')}.decode(buffer)
+        self.${field.name}[buffer:read${field.keyType?cap_first}()] = ${field.valueClassType?replace('.','_')}.decode(buffer)
         </#if>
     end
         <#if field?has_next && !fields[field?index+1].collectionType && (fields[field?index+1].primitiveType || fields[field?index+1].enumType || !fields[field?index+1].optional) >

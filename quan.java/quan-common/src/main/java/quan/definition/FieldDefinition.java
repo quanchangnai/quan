@@ -24,7 +24,7 @@ public class FieldDefinition extends Definition implements Cloneable {
     private ClassDefinition owner;
 
     //原始定义的字段类型,集合类型包含其元素类型
-    private String types;
+    private String typeInfo;
 
     //拆分后的字段类型
     private String type;
@@ -33,13 +33,13 @@ public class FieldDefinition extends Definition implements Cloneable {
 
     //内建类型对应的特定语言基本类型，自定义类型保持不变
     private String basicType;
-    private String basicKeyType;
-    private String basicValueType;
+    private String keyBasicType;
+    private String valueBasicType;
 
     //内建类型对应的特定语言具体类型，自定义类型保持不变
     private String classType;
-    private String classKeyType;
-    private String classValueType;
+    private String keyClassType;
+    private String valueClassType;
 
     //字段类型依赖是否有循环
     private boolean cycle;
@@ -118,15 +118,14 @@ public class FieldDefinition extends Definition implements Cloneable {
     }
 
 
-    public String getTypes() {
-        return types;
+    public String getTypeInfo() {
+        return typeInfo;
     }
 
-    public void setTypes(String types) {
-        if (StringUtils.isBlank(types)) {
-            return;
+    public void setTypeInfo(String typeInfo) {
+        if (!StringUtils.isBlank(typeInfo)) {
+            this.typeInfo = typeInfo;
         }
-        this.types = types;
     }
 
     public String getType() {
@@ -370,26 +369,26 @@ public class FieldDefinition extends Definition implements Cloneable {
         this.basicType = basicType;
     }
 
-    public String getBasicKeyType() {
-        if (basicKeyType == null) {
+    public String getKeyBasicType() {
+        if (keyBasicType == null) {
             return getKeyType();
         }
-        return basicKeyType;
+        return keyBasicType;
     }
 
-    public void setBasicKeyType(String basicKeyType) {
-        this.basicKeyType = basicKeyType;
+    public void setKeyBasicType(String keyBasicType) {
+        this.keyBasicType = keyBasicType;
     }
 
-    public String getBasicValueType() {
-        if (basicValueType == null) {
+    public String getValueBasicType() {
+        if (valueBasicType == null) {
             return getValueType();
         }
-        return basicValueType;
+        return valueBasicType;
     }
 
-    public void setBasicValueType(String basicValueType) {
-        this.basicValueType = basicValueType;
+    public void setValueBasicType(String valueBasicType) {
+        this.valueBasicType = valueBasicType;
     }
 
     public String getClassType() {
@@ -403,26 +402,26 @@ public class FieldDefinition extends Definition implements Cloneable {
         this.classType = classType;
     }
 
-    public String getClassKeyType() {
-        if (classKeyType == null) {
+    public String getKeyClassType() {
+        if (keyClassType == null) {
             return getKeyType();
         }
-        return classKeyType;
+        return keyClassType;
     }
 
-    public void setClassKeyType(String classKeyType) {
-        this.classKeyType = classKeyType;
+    public void setKeyClassType(String keyClassType) {
+        this.keyClassType = keyClassType;
     }
 
-    public String getClassValueType() {
-        if (classValueType == null) {
+    public String getValueClassType() {
+        if (valueClassType == null) {
             return ClassDefinition.getShortName(getValueType());
         }
-        return classValueType;
+        return valueClassType;
     }
 
-    public void setClassValueType(String classValueType) {
-        this.classValueType = classValueType;
+    public void setValueClassType(String valueClassType) {
+        this.valueClassType = valueClassType;
     }
 
     public boolean isCycle() {

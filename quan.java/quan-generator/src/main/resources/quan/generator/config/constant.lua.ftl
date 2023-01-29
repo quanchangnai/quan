@@ -13,9 +13,9 @@ local ${name} = {}
 ---${rows[key].right}
     </#if>
     <#if valueField.type=="map">
----@return ${valueField.basicType}<${valueField.keyType},${valueField.classValueType}>
+---@return ${valueField.basicType}<${valueField.keyType},${valueField.valueClassType}>
     <#elseif valueField.type=="list" || valueField.type=="set">
----@return ${valueField.basicType}<${valueField.classValueType}>
+---@return ${valueField.basicType}<${valueField.valueClassType}>
     <#else>
 ---@return ${valueField.basicType}
     </#if>

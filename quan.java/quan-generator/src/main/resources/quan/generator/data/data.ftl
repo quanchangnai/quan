@@ -51,9 +51,9 @@ public class ${name} extends <#if kind ==2>Bean<#elseif kind ==5>Data<${idField.
 <#list fields as field>
 
     <#if field.type == "set" || field.type == "list">
-    private final ${field.classType}<${field.classValueType}> ${field.name} = new ${field.classType}<>(${root});
+    private final ${field.classType}<${field.valueClassType}> ${field.name} = new ${field.classType}<>(${root});
     <#elseif field.type == "map">
-    private final ${field.classType}<${field.classKeyType}, ${field.classValueType}> ${field.name} = new ${field.classType}<>(${root});
+    private final ${field.classType}<${field.keyClassType}, ${field.valueClassType}> ${field.name} = new ${field.classType}<>(${root});
     <#elseif field.enumType>
     private final IntField ${field.name} = new IntField();
     <#elseif field.primitiveType>
@@ -89,9 +89,9 @@ public class ${name} extends <#if kind ==2>Bean<#elseif kind ==5>Data<${idField.
     public ${name}(<#rt/>
     <#list selfFields as field>
         <#if field.type == "set" || field.type == "list">
-        ${field.basicType}<${field.classValueType}> ${field.name}<#t/>
+        ${field.basicType}<${field.valueClassType}> ${field.name}<#t/>
         <#elseif field.type == "map">
-        ${field.basicType}<${field.classKeyType}, ${field.classValueType}> ${field.name}<#t/>
+        ${field.basicType}<${field.keyClassType}, ${field.valueClassType}> ${field.name}<#t/>
         <#elseif field.builtinType>
         ${field.basicType} ${field.name}<#t/>
         <#else>
@@ -119,12 +119,12 @@ public class ${name} extends <#if kind ==2>Bean<#elseif kind ==5>Data<${idField.
      */
     </#if>
     <#if field.type == "list" || field.type == "set">
-    public ${field.basicType}<${field.classValueType}> get${field.name?cap_first}() {
+    public ${field.basicType}<${field.valueClassType}> get${field.name?cap_first}() {
         return ${field.name}.getDelegate();
     }
 
     <#elseif field.type == "map">
-    public ${field.basicType}<${field.classKeyType}, ${field.classValueType}> get${field.name?cap_first}() {
+    public ${field.basicType}<${field.keyClassType}, ${field.valueClassType}> get${field.name?cap_first}() {
         return ${field.name}.getDelegate();
     }
 
@@ -250,7 +250,7 @@ public class ${name} extends <#if kind ==2>Bean<#elseif kind ==5>Data<${idField.
                             <#if field.primitiveValueType>
                             value.${field.name}.plus(<#if convertTypes[field.type]??>(${field.classType}) </#if>reader.read${bsonTypes[field.valueType]}());
                             <#elseif field.beanValueType>
-                            value.${field.name}.plus(decoderContext.decodeWithChildContext(registry.get(${field.classValueType}.class), reader));
+                            value.${field.name}.plus(decoderContext.decodeWithChildContext(registry.get(${field.valueClassType}.class), reader));
                             <#else>
                             value.${field.name}.plus(reader.read${field.valueType?cap_first}());
                             </#if>
@@ -260,9 +260,9 @@ public class ${name} extends <#if kind ==2>Bean<#elseif kind ==5>Data<${idField.
                         reader.readStartDocument();
                         while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
                             <#if field.primitiveValueType>
-                            value.${field.name}.plus(<#if convertTypes[field.keyType]??>(${field.basicValueType}) </#if>${field.classKeyType}.valueOf(reader.readName()), <#if convertTypes[field.valueType]??>(${field.basicValueType})</#if>reader.read${bsonTypes[field.valueType]}());
+                            value.${field.name}.plus(<#if convertTypes[field.keyType]??>(${field.valueBasicType}) </#if>${field.keyClassType}.valueOf(reader.readName()), <#if convertTypes[field.valueType]??>(${field.valueBasicType})</#if>reader.read${bsonTypes[field.valueType]}());
                             <#else>
-                            value.${field.name}.plus(<#if convertTypes[field.keyType]??>(${field.basicValueType}) </#if>${field.classKeyType}.valueOf(reader.readName()), decoderContext.decodeWithChildContext(registry.get(${field.classValueType}.class), reader));
+                            value.${field.name}.plus(<#if convertTypes[field.keyType]??>(${field.valueBasicType}) </#if>${field.keyClassType}.valueOf(reader.readName()), decoderContext.decodeWithChildContext(registry.get(${field.valueClassType}.class), reader));
                             </#if>
                         }
                         reader.readEndDocument();
@@ -316,14 +316,14 @@ public class ${name} extends <#if kind ==2>Bean<#elseif kind ==5>Data<${idField.
                     <#if field_index gt 0 >
 
                     </#if>
-            Collection<${field.classValueType}> $${field.name} = value.${field.name}.getCurrent(transaction);
+            Collection<${field.valueClassType}> $${field.name} = value.${field.name}.getCurrent(transaction);
             if (!$${field.name}.isEmpty()) {
                 writer.writeStartArray(${name}.${field.underscoreName});
-                for (${field.classValueType} ${field.name}Value : $${field.name}) {
+                for (${field.valueClassType} ${field.name}Value : $${field.name}) {
                     <#if field.primitiveValueType>
                     writer.write${bsonTypes[field.valueType]}(${field.name}Value);
                     <#elseif field.beanValueType>
-                    encoderContext.encodeWithChildContext(registry.get(${field.classValueType}.class), writer, ${field.name}Value);
+                    encoderContext.encodeWithChildContext(registry.get(${field.valueClassType}.class), writer, ${field.name}Value);
                     <#else>
                     writer.write${field.valueType?cap_first}(${field.name}Value);
                     </#if>
@@ -337,15 +337,15 @@ public class ${name} extends <#if kind ==2>Bean<#elseif kind ==5>Data<${idField.
                     <#if field_index gt 0 >
 
                     </#if>
-            Map<${field.classKeyType}, ${field.classValueType}> $${field.name} = value.${field.name}.getCurrent(transaction);
+            Map<${field.keyClassType}, ${field.valueClassType}> $${field.name} = value.${field.name}.getCurrent(transaction);
             if (!$${field.name}.isEmpty()) {
                 writer.writeStartDocument(${name}.${field.underscoreName});
-                for (Map.Entry<${field.classKeyType}, ${field.classValueType}> ${field.name}Entry : $${field.name}.entrySet()) {
+                for (Map.Entry<${field.keyClassType}, ${field.valueClassType}> ${field.name}Entry : $${field.name}.entrySet()) {
                     writer.writeName(String.valueOf(${field.name}Entry.getKey()));
                     <#if field.primitiveValueType>
                     writer.write${bsonTypes[field.valueType]}(${field.name}Entry.getValue());
                     <#elseif field.beanValueType>
-                    encoderContext.encodeWithChildContext(registry.get(${field.classValueType}.class), writer, ${field.name}Entry.getValue());
+                    encoderContext.encodeWithChildContext(registry.get(${field.valueClassType}.class), writer, ${field.name}Entry.getValue());
                     <#else>
                     writer.write${field.valueType?cap_first}(${field.name}Value);
                     </#if>

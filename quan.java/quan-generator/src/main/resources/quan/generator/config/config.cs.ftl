@@ -31,11 +31,11 @@ namespace ${getFullPackageName("cs")}
         /// </summary>
     </#if>
     <#if field.type=="list">
-        public readonly ${field.basicType}<${field.classValueType}> ${field.name};
+        public readonly ${field.basicType}<${field.valueClassType}> ${field.name};
     <#elseif field.type=="set">
-        public readonly ${field.basicType}<${field.classValueType}> ${field.name};
+        public readonly ${field.basicType}<${field.valueClassType}> ${field.name};
     <#elseif field.type=="map">
-        public readonly ${field.basicType}<${field.classKeyType}, ${field.classValueType}> ${field.name};
+        public readonly ${field.basicType}<${field.keyClassType}, ${field.valueClassType}> ${field.name};
     <#elseif  field.timeType>
         public readonly ${field.basicType} ${field.name};
 
@@ -68,13 +68,13 @@ namespace ${getFullPackageName("cs")}
 
         </#if>
             var ${field.name}1 = json["${field.name}"]?.Value<JArray>();
-            var ${field.name}2 = Immutable${field.classType}<${field.classValueType}>.Empty;
+            var ${field.name}2 = Immutable${field.classType}<${field.valueClassType}>.Empty;
             if (${field.name}1 != null)
             {
                 foreach (var ${field.name}Value in ${field.name}1)
                 {
                 <#if field.beanValueType>
-                    ${field.name}2 =${field.name}2.Add(${field.classValueType}.Create(${field.name}Value.Value<JObject>()));
+                    ${field.name}2 =${field.name}2.Add(${field.valueClassType}.Create(${field.name}Value.Value<JObject>()));
                 <#else>
                     ${field.name}2 =${field.name}2.Add(${field.name}Value.Value<${field.valueType}>());
                 </#if>
@@ -89,15 +89,15 @@ namespace ${getFullPackageName("cs")}
 
         </#if>
             var ${field.name}1 = json["${field.name}"]?.Value<JObject>();
-            var ${field.name}2 = ImmutableDictionary<${field.classKeyType}, ${field.classValueType}>.Empty;
+            var ${field.name}2 = ImmutableDictionary<${field.keyClassType}, ${field.valueClassType}>.Empty;
             if (${field.name}1 != null)
             {
                 foreach (var ${field.name}KeyValue in ${field.name}1)
                 {
                 <#if field.beanValueType>
-                    ${field.name}2 = ${field.name}2.Add(${field.classKeyType}.Parse(${field.name}KeyValue.Key), ${field.classValueType}.Create(${field.name}KeyValue.Value.Value<JObject>()));
+                    ${field.name}2 = ${field.name}2.Add(${field.keyClassType}.Parse(${field.name}KeyValue.Key), ${field.valueClassType}.Create(${field.name}KeyValue.Value.Value<JObject>()));
                 <#else>
-                    ${field.name}2 = ${field.name}2.Add(${field.classKeyType}.Parse(${field.name}KeyValue.Key), ${field.name}KeyValue.Value.Value<${field.classValueType}>());
+                    ${field.name}2 = ${field.name}2.Add(${field.keyClassType}.Parse(${field.name}KeyValue.Key), ${field.name}KeyValue.Value.Value<${field.valueClassType}>());
                 </#if>
                 }
             }

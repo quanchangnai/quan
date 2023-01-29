@@ -114,7 +114,7 @@ public abstract class TableDefinitionParser extends DefinitionParser {
 
         String[] constraintArray = constraints.split("[;；]", -1);
 
-        fieldDefinition.setTypes(constraintArray[0]);
+        fieldDefinition.setTypeInfo(constraintArray[0]);
 
         Set<String> constraintTypes = new HashSet<>();
 

@@ -30,9 +30,9 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
     //${field.comment}
     </#if>
     <#if field.type == "set" || field.type == "list">
-    ${fieldModifier} final ${field.basicType}<${field.classValueType}> ${field.name} = new ${field.classType}<>();
+    ${fieldModifier} final ${field.basicType}<${field.valueClassType}> ${field.name} = new ${field.classType}<>();
     <#elseif field.type == "map">
-    ${fieldModifier} final ${field.basicType}<${field.classKeyType}, ${field.classValueType}> ${field.name} = new ${field.classType}<>();
+    ${fieldModifier} final ${field.basicType}<${field.keyClassType}, ${field.valueClassType}> ${field.name} = new ${field.classType}<>();
     <#elseif field.type == "string">
     ${fieldModifier} ${field.basicType} ${field.name} = "";
     <#elseif field.type == "bytes">
@@ -53,9 +53,9 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
     public ${name}(<#rt/>
     <#list selfFields as field>
         <#if field.type == "set" || field.type == "list">
-        ${field.basicType}<${field.classValueType}> ${field.name}<#t/>
+        ${field.basicType}<${field.valueClassType}> ${field.name}<#t/>
         <#elseif field.type == "map">
-        ${field.basicType}<${field.classKeyType}, ${field.classValueType}> ${field.name}<#t/>
+        ${field.basicType}<${field.keyClassType}, ${field.valueClassType}> ${field.name}<#t/>
         <#elseif field.builtinType>
         ${field.basicType} ${field.name}<#t/>
         <#else>
@@ -93,12 +93,12 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
      */
     </#if>
     <#if field.type == "list" || field.type == "set">
-    public ${field.basicType}<${field.classValueType}> get${field.name?cap_first}() {
+    public ${field.basicType}<${field.valueClassType}> get${field.name?cap_first}() {
         return ${field.name};
     }
 
     <#elseif field.type == "map">
-    public ${field.basicType}<${field.classKeyType}, ${field.classValueType}> get${field.name?cap_first}() {
+    public ${field.basicType}<${field.keyClassType}, ${field.valueClassType}> get${field.name?cap_first}() {
         return ${field.name};
     }
 
@@ -162,7 +162,7 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
         if (!this.${field.name}.isEmpty()) {
             writeTag(buffer, ${field.tag});
             buffer.getTemp().writeInt(this.${field.name}.size());
-            for (${field.classValueType} ${field.name}$Value : this.${field.name}) {
+            for (${field.valueClassType} ${field.name}$Value : this.${field.name}) {
                 <#if field.builtinValueType>
                 buffer.getTemp().write${field.valueType?cap_first}(${field.name}$Value);
                 <#else>
@@ -175,7 +175,7 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
         if (!this.${field.name}.isEmpty()) {
             writeTag(buffer, ${field.tag});
             buffer.getTemp().writeInt(this.${field.name}.size());
-            for (${field.classKeyType} ${field.name}$Key : this.${field.name}.keySet()) {
+            for (${field.keyClassType} ${field.name}$Key : this.${field.name}.keySet()) {
                 buffer.getTemp().write${field.keyType?cap_first}(${field.name}$Key);
                 <#if field.builtinValueType>
                 buffer.getTemp().write${field.valueType?cap_first}(this.${field.name}.get(${field.name}$Key));
@@ -233,7 +233,7 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
 
             </#if>
         buffer.writeInt(this.${field.name}.size());
-        for (${field.classValueType} ${field.name}$Value : this.${field.name}) {
+        for (${field.valueClassType} ${field.name}$Value : this.${field.name}) {
             <#if field.builtinValueType>
             buffer.write${field.valueType?cap_first}(${field.name}$Value);
             <#else>
@@ -248,7 +248,7 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
 
             </#if>
         buffer.writeInt(this.${field.name}.size());
-        for (${field.classKeyType} ${field.name}$Key : this.${field.name}.keySet()) {
+        for (${field.keyClassType} ${field.name}$Key : this.${field.name}.keySet()) {
             buffer.write${field.keyType?cap_first}(${field.name}$Key);
             <#if field.builtinValueType>
             buffer.write${field.valueType?cap_first}(this.${field.name}.get(${field.name}$Key));
@@ -303,7 +303,7 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
                     <#if field.builtinValueType>
                         this.${field.name}.add(buffer.read${field.valueType?cap_first}());
                     <#else>
-                        ${field.classValueType} ${field.name}$Value = new ${field.classValueType}();
+                        ${field.valueClassType} ${field.name}$Value = new ${field.valueClassType}();
                         ${field.name}$Value.decode(buffer);
                         this.${field.name}.add(${field.name}$Value);
                     </#if>
@@ -315,8 +315,8 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
                     <#if field.builtinValueType>
                         this.${field.name}.put(buffer.read${field.keyType?cap_first}(), buffer.read${field.valueType?cap_first}());
                     <#else>
-                        ${field.classKeyType} ${field.name}$Key = buffer.read${field.keyType?cap_first}();
-                        ${field.classValueType} ${field.name}$Value = new ${field.classValueType}();
+                        ${field.keyClassType} ${field.name}$Key = buffer.read${field.keyType?cap_first}();
+                        ${field.valueClassType} ${field.name}$Value = new ${field.valueClassType}();
                         ${field.name}$Value.decode(buffer);
                         this.${field.name}.put(${field.name}$Key, ${field.name}$Value);
                     </#if>
@@ -356,7 +356,7 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
         <#if field.builtinValueType>
             this.${field.name}.add(buffer.read${field.valueType?cap_first}());
         <#else>
-            ${field.classValueType} ${field.name}$Value = new ${field.classValueType}();
+            ${field.valueClassType} ${field.name}$Value = new ${field.valueClassType}();
             ${field.name}$Value.decode(buffer);
             this.${field.name}.add(${field.name}$Value);
         </#if>
@@ -373,8 +373,8 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
         <#if field.builtinValueType>
             this.${field.name}.put(buffer.read${field.keyType?cap_first}(), buffer.read${field.valueType?cap_first}());
         <#else>
-            ${field.classKeyType} ${field.name}$Key = buffer.read${field.keyType?cap_first}();
-            ${field.classValueType} ${field.name}$Value = new ${field.classValueType}();
+            ${field.keyClassType} ${field.name}$Key = buffer.read${field.keyType?cap_first}();
+            ${field.valueClassType} ${field.name}$Value = new ${field.valueClassType}();
             ${field.name}$Value.decode(buffer);
             this.${field.name}.put(${field.name}$Key, ${field.name}$Value);
         </#if>
