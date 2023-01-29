@@ -36,7 +36,7 @@ public class CSVDefinitionParser extends TableDefinitionParser {
         }
 
         if (records.size() < 3) {
-            addValidatedError(configDefinition.getValidatedName() + "的定义文件不完整，要求表头第1行是是字段名、第2行是字段约束、第3行是字段注释");
+            addValidatedError(configDefinition.getValidatedName() + "的定义文件不完整，要求表头第1行是字段名、第2行是字段约束、第3行是字段注释");
             return false;
         }
 
