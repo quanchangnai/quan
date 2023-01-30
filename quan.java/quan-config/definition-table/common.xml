@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<package unwrap="true">
+<classes>
 
     卡片类型-
     <enum name="CardType">卡片类型--
@@ -12,4 +12,4 @@
         <constant name="CardIds"  key="key" value="id" comment="name"/>卡片ID
     </config>
 
-</package>
+</classes>

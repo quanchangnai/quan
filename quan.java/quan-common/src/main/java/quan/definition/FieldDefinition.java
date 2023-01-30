@@ -109,7 +109,9 @@ public class FieldDefinition extends Definition implements Cloneable {
     @Override
     public void setName(String name) {
         super.setName(name);
-        underscoreName = CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, getName());
+        if (name != null) {
+            underscoreName = CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, getName());
+        }
     }
 
     @Override

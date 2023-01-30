@@ -250,7 +250,7 @@ public abstract class Generator {
         generate(classDefinitions);
         packagesClasses.clear();
 
-        logger.info("生成{}{}完成\n", language(), category().alias());
+        logger.info("生成{}{}代码完成\n", language(), category().alias());
     }
 
     protected void generate(List<ClassDefinition> classDefinitions) {
@@ -394,8 +394,9 @@ public abstract class Generator {
             return;
         }
 
-        logger.error("生成{}代码失败，解析目录{}下的定义文件共发现{}条错误", category().alias(), parser.getDefinitionPaths(), parser.getValidatedErrors().size());
+        logger.error("解析目录{}下的{}定义文件共发现{}条错误", parser.getDefinitionPaths(), category().alias(), parser.getValidatedErrors().size());
         parser.getValidatedErrors().forEach(logger::error);
+        logger.error("生成{}代码失败\n", category().alias());
     }
 
     /**
