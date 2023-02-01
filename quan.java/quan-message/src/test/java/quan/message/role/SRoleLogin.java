@@ -167,7 +167,7 @@ public class SRoleLogin extends Message {
     public void decode(CodedBuffer buffer) {
         super.decode(buffer);
 
-        this.roleId = buffer.readInt();
+        setRoleId(buffer.readInt());
         this.roleName = buffer.readString();
         this.roleInfo.decode(buffer);
 

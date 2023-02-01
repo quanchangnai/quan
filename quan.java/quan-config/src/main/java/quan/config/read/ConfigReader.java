@@ -271,6 +271,9 @@ public abstract class ConfigReader {
             case TYPE_ERROR:
                 validatedErrors.add(String.format(commonError + ",[%s]不匹配期望类型[%s]", e1.getParam(0), e1.getParam(1)));
                 break;
+            case RANGE_ERROR:
+                validatedErrors.add(String.format(commonError + ",不在限制范围(%s)之中", e1.getParam(0)));
+                break;
             case ENUM_NAME:
                 validatedErrors.add(String.format(commonError + ",枚举名[%s]不合法", e1.getParam(0)));
                 break;

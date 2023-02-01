@@ -376,13 +376,13 @@ public class UserInfo extends Bean {
         for (int tag = readTag(buffer); tag != 0; tag = readTag(buffer)) {
             switch (tag) {
                 case 4:
-                    this.id = buffer.readInt();
+                    setId(buffer.readInt());
                     break;
                 case 11:
                     this.name = buffer.readString();
                     break;
                 case 12:
-                    this.level = buffer.readInt();
+                    setLevel(buffer.readInt());
                     break;
                 case 16:
                     this.type = UserType.valueOf(buffer.readInt());
@@ -440,19 +440,19 @@ public class UserInfo extends Bean {
                     this.f13 = buffer.readBool();
                     break;
                 case 56:
-                    this.f14 = buffer.readShort();
+                    setF14(buffer.readShort());
                     break;
                 case 61:
-                    this.f15 = buffer.readFloat();
+                    setF15(buffer.readFloat());
                     break;
                 case 64:
-                    this.f16 = buffer.readFloat(2);
+                    setF16(buffer.readFloat(2));
                     break;
                 case 70:
-                    this.f17 = buffer.readDouble();
+                    setF17(buffer.readDouble());
                     break;
                 case 72:
-                    this.f18 = buffer.readDouble(2);
+                    setF18(buffer.readDouble(2));
                     break;
                 default:
                     skipField(tag, buffer);

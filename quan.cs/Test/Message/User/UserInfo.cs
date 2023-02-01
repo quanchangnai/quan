@@ -291,8 +291,8 @@ namespace Test.Message.User
                         break;
                     case 35:
                         buffer.ReadInt();
-                        var roleListSize = buffer.ReadInt();
-                        for (var i = 0; i < roleListSize; i++) 
+                        var roleList_Size = buffer.ReadInt();
+                        for (var i = 0; i < roleList_Size; i++) 
                         {
                             var roleListValue = new Test.Message.Role.RoleInfo();
                             roleListValue.Decode(buffer);
@@ -301,8 +301,8 @@ namespace Test.Message.User
                         break;
                     case 39:
                         buffer.ReadInt();
-                        var roleSetSize = buffer.ReadInt();
-                        for (var i = 0; i < roleSetSize; i++) 
+                        var roleSet_Size = buffer.ReadInt();
+                        for (var i = 0; i < roleSet_Size; i++) 
                         {
                             var roleSetValue = new Test.Message.Role.RoleInfo();
                             roleSetValue.Decode(buffer);
@@ -311,8 +311,8 @@ namespace Test.Message.User
                         break;
                     case 43:
                         buffer.ReadInt();
-                        var roleMapSize = buffer.ReadInt();
-                        for (var i = 0; i < roleMapSize; i++)
+                        var roleMap_Size = buffer.ReadInt();
+                        for (var i = 0; i < roleMap_Size; i++)
                         {
                             var roleMapKey = buffer.ReadInt();
                             var roleMapValue = new Test.Message.Role.RoleInfo();

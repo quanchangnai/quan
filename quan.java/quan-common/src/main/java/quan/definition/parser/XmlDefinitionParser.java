@@ -307,6 +307,8 @@ public class XmlDefinitionParser extends DefinitionParser {
         fieldDefinition.setName(fieldElement.attributeValue("name"));
         String type = fieldElement.attributeValue("type");
         fieldDefinition.setTypeInfo(type);
+        fieldDefinition.setMin(fieldElement.attributeValue("min"));
+        fieldDefinition.setMax(fieldElement.attributeValue("max"));
         fieldDefinition.setValue(fieldElement.attributeValue("value"));
         fieldDefinition.setColumn(fieldElement.attributeValue("column"));
         fieldDefinition.setOptional(fieldElement.attributeValue("optional"));
@@ -321,12 +323,14 @@ public class XmlDefinitionParser extends DefinitionParser {
         classDefinition.addField(fieldDefinition);
 
         List<Object> illegalAttributes = new ArrayList<>(Collections.singleton("name"));
+        if (type != null && Constants.NUMBER_TYPES.contains(type.split("[:：]")[0])) {
+            illegalAttributes.addAll(Arrays.asList("min", "max"));
+        }
 
         if (classDefinition instanceof EnumDefinition) {
             illegalAttributes.add("value");
         } else if (category == Category.data) {
             illegalAttributes.addAll(Arrays.asList("type", "ignore"));
-            validateElementAttributes(classDefinition.getDefinitionFile(), fieldElement, "name", "type", "ignore");
         } else if (category == Category.config) {
             if (classDefinition instanceof ConfigDefinition) {
                 illegalAttributes.addAll(Arrays.asList("type", "ref", "index", "lang", "optional", "column", "delimiter"));

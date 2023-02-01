@@ -1,12 +1,12 @@
 package quan.definition;
 
-import quan.util.CommonUtils;
+import quan.util.CollectionUtils;
 
 import java.util.Collections;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import static quan.util.CommonUtils.asSet;
+import static quan.util.CollectionUtils.asSet;
 
 /**
  * 常量
@@ -66,7 +66,7 @@ public final class Constants {
     /**
      * Java保留字
      */
-    public static final Set<String> JAVA_RESERVED_WORDS = CommonUtils.asSet(
+    public static final Set<String> JAVA_RESERVED_WORDS = CollectionUtils.asSet(
             "abstract", "assert", "boolean", "break", "throws", "case", "catch", "char", "volatile",
             "const", "continue", "default", "do", "else", "enum", "extends", "finally", "long", "transient",
             "float", "for", "goto", "if", "implements", "import", "instanceof", "int", "interface", "double",
@@ -77,7 +77,7 @@ public final class Constants {
     /**
      * C#保留字
      */
-    public static final Set<String> CS_RESERVED_WORDS = CommonUtils.asSet(
+    public static final Set<String> CS_RESERVED_WORDS = CollectionUtils.asSet(
             "abstract", "as", "base", "bool", "break", "static", "case", "catch", "char", "checked", "class",
             "const", "continue", "decimal", "default", "delegate", "goto", "double", "for", "enum", "event", "ulong",
             "extern", "false", "finally", "fixed", "float", "else", "foreach", "if", "do", "implicit", "in", "sizeof",
@@ -90,7 +90,7 @@ public final class Constants {
     /**
      * Lua保留字
      */
-    public static final Set<String> LUA_RESERVED_WORDS = CommonUtils.asSet(
+    public static final Set<String> LUA_RESERVED_WORDS = CollectionUtils.asSet(
             "and", "break", "do", "else", "elseif", "end", "false", "for", "function", "goto", "if", "in",
             "local", "nil", "not", "or", "repeat", "return", "then", "true", "until", "while"
     );

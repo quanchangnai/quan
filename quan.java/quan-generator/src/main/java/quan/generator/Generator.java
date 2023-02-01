@@ -17,7 +17,7 @@ import quan.generator.data.DataGenerator;
 import quan.generator.message.CSharpMessageGenerator;
 import quan.generator.message.JavaMessageGenerator;
 import quan.generator.message.LuaMessageGenerator;
-import quan.util.CommonUtils;
+import quan.util.FileUtils;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -80,7 +80,7 @@ public abstract class Generator {
     }
 
     public void setCodePath(String codePath) {
-        this.codePath = CommonUtils.toPlatPath(codePath);
+        this.codePath = FileUtils.toPlatPath(codePath);
     }
 
     public void setPackagePrefix(String packagePrefix) {

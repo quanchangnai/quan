@@ -3,46 +3,16 @@ package quan.util;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * 通用工具类
+ * 文件工具
  */
-public class CommonUtils {
-
-    @SafeVarargs
-    public static <E> Set<E> asSet(E... elements) {
-        Set<E> set = new LinkedHashSet<>();
-        Collections.addAll(set, elements);
-        return Collections.unmodifiableSet(set);
-    }
-
-    @SafeVarargs
-    public static <E> Set<E> asSet(Collection<E> collection, E... elements) {
-        Set<E> set = new LinkedHashSet<>(collection);
-        Collections.addAll(set, elements);
-        return Collections.unmodifiableSet(set);
-    }
-
-    @SafeVarargs
-    public static <E> Set<E> asSet(Collection<E>... collections) {
-        Set<E> set = new LinkedHashSet<>();
-        for (Collection<E> collection : collections) {
-            set.addAll(collection);
-        }
-        return Collections.unmodifiableSet(set);
-    }
-
-    public static boolean isEmpty(Collection<?> collection) {
-        return collection == null || collection.isEmpty();
-    }
-
-    public static boolean isEmpty(Map<?, ?> map) {
-        return map == null || map.isEmpty();
-    }
+public class FileUtils {
 
     /**
-     * 把指定路径转换为当前平台路径
+     * 转换为当前平台文件路径
      *
      * @param path 路径分隔符不明确的路径
      * @return 转换后的路径

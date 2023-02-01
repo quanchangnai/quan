@@ -2,6 +2,7 @@ package quan.message.role;
 
 import quan.message.*;
 import java.util.*;
+import quan.util.NumberUtils;
 
 /**
  * 角色信息<br/>
@@ -97,6 +98,7 @@ public class RoleInfo extends Bean {
     }
 
     public RoleInfo setI(int i) {
+        NumberUtils.checkRange(i, 1, 20);
         this.i = i;
         return this;
     }
@@ -160,13 +162,13 @@ public class RoleInfo extends Bean {
     public void decode(CodedBuffer buffer) {
         super.decode(buffer);
 
-        this.id = buffer.readInt();
+        setId(buffer.readInt());
         this.name = buffer.readString();
         this.type = RoleType.valueOf(buffer.readInt());
         this.b = buffer.readBool();
-        this.s = buffer.readShort();
-        this.i = buffer.readInt();
-        this.d = buffer.readDouble();
+        setS(buffer.readShort());
+        setI(buffer.readInt());
+        setD(buffer.readDouble());
         this.data = buffer.readBytes();
 
         int list$Size = buffer.readInt();

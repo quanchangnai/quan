@@ -66,7 +66,7 @@ public class RoleInfo extends Bean {
     public void decode(CodedBuffer buffer) {
         super.decode(buffer);
 
-        this.id = buffer.readInt();
+        setId(buffer.readInt());
         this.name = buffer.readString();
     }
 

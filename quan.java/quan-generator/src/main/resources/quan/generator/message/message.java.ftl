@@ -13,14 +13,14 @@ import ${import};
  */
 public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#else>Message</#if> {
 
-<#if kind ==3>
+<#if kind == 3>
     /**
      * 消息ID
      */
     public static final int ID = ${id?c};
 
 </#if>
-<#if kind ==9>
+<#if kind == 9>
     <#assign fieldModifier = "protected">
 <#else>
     <#assign fieldModifier = "private">
@@ -117,6 +117,13 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
         Objects.requireNonNull(${field.name});
         <#elseif (field.type=="float"||field.type=="double") && field.scale gt 0>
         CodedBuffer.checkScale(${field.name}, ${field.scale});
+        </#if>
+        <#if field.min?? && field.max??>
+        NumberUtils.checkRange(${field.name}, ${field.min}, ${field.max});
+        <#elseif field.min??>
+        NumberUtils.checkMin(${field.name}, ${field.min});
+        <#elseif field.max??>
+        NumberUtils.checkMax(${field.name}, ${field.max});
         </#if>
         this.${field.name} = ${field.name};
         return this;
@@ -322,7 +329,9 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
                     </#if>
                     }
                 <#elseif field.type=="float"||field.type=="double">
-                    this.${field.name} = buffer.read${field.type?cap_first}(<#if field.scale gt 0>${field.scale}</#if>);
+                    set${field.name?cap_first}(buffer.read${field.type?cap_first}(<#if field.scale gt 0>${field.scale}</#if>));
+                <#elseif field.numberType>
+                    set${field.name?cap_first}(buffer.read${field.type?cap_first}());
                 <#elseif field.builtinType>
                     this.${field.name} = buffer.read${field.type?cap_first}();
                 <#elseif field.enumType>
@@ -383,7 +392,9 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
 
         </#if>
     <#elseif field.type=="float"||field.type=="double">
-        this.${field.name} = buffer.read${field.type?cap_first}(<#if field.scale gt 0>${field.scale}</#if>);
+        set${field.name?cap_first}(buffer.read${field.type?cap_first}(<#if field.scale gt 0>${field.scale}</#if>));
+    <#elseif field.numberType>
+        set${field.name?cap_first}(buffer.read${field.type?cap_first}());
     <#elseif field.builtinType>
         this.${field.name} = buffer.read${field.type?cap_first}();
     <#elseif field.enumType>

@@ -44,6 +44,12 @@ public class FieldDefinition extends Definition implements Cloneable {
     //字段类型依赖是否有循环
     private boolean cycle;
 
+    //数字类型限制：最小值
+    private Object min;
+
+    //数字类型限制：最小值
+    private Object max;
+
     //枚举值
     private String value;
 
@@ -234,6 +240,29 @@ public class FieldDefinition extends Definition implements Cloneable {
 
     public boolean isBytesType() {
         return type.equals("bytes");
+    }
+
+
+    public Object getMin() {
+        return min;
+    }
+
+    public void setMin(Object min) {
+        if (min instanceof String) {
+            min = ((String) min).trim();
+        }
+        this.min = min;
+    }
+
+    public Object getMax() {
+        return max;
+    }
+
+    public void setMax(Object max) {
+        if (max instanceof String) {
+            max = ((String) max).trim();
+        }
+        this.max = max;
     }
 
     public String getValue() {

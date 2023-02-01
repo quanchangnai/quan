@@ -64,7 +64,7 @@ public class ConfigConverter {
     public Object convert(FieldDefinition fieldDefinition, String value) {
         String type = fieldDefinition.getType();
         if (fieldDefinition.isPrimitiveType()) {
-            return convertPrimitiveType(fieldDefinition.getType(), value);
+            return convertPrimitiveType(fieldDefinition.getType(), value, (Number) fieldDefinition.getMin(), (Number) fieldDefinition.getMax());
         } else if (fieldDefinition.isTimeType()) {
             return convertTimeType(fieldDefinition.getType(), value);
         } else if (type.equals("list")) {
@@ -169,30 +169,56 @@ public class ConfigConverter {
         return enumValue;
     }
 
-    private Object convertPrimitiveType(String type, String value) {
+    private Object convertPrimitiveType(String type, String value, Number min, Number max) {
         if (StringUtils.isBlank(value)) {
             return null;
         }
+
+        Object result;
+
         try {
             switch (type) {
                 case "bool":
-                    return Boolean.parseBoolean(value.toLowerCase());
+                    result = Boolean.parseBoolean(value.toLowerCase());
+                    break;
                 case "short":
-                    return Short.parseShort(value);
+                    result = Short.parseShort(value);
+                    break;
                 case "int":
-                    return Integer.parseInt(value);
+                    result = Integer.parseInt(value);
+                    break;
                 case "long":
-                    return Long.parseLong(value);
+                    result = Long.parseLong(value);
+                    break;
                 case "float":
-                    return Float.parseFloat(value);
+                    result = Float.parseFloat(value);
+                    break;
                 case "double":
-                    return Double.parseDouble(value);
+                    result = Double.parseDouble(value);
+                    break;
                 default:
-                    return value;
+                    result = value;
             }
         } catch (Exception e) {
             throw new ConvertException(ErrorType.TYPE_ERROR, e, value, type);
         }
+
+        if (result instanceof Number) {
+            Number number = (Number) result;
+            if (min != null && Double.compare(number.doubleValue(), min.doubleValue()) < 0
+                    || max != null && Double.compare(number.doubleValue(), max.doubleValue()) > 0) {
+                String range = min == null ? "" : min.toString();
+                range += ",";
+                range += max == null ? "" : max.toString();
+                throw new ConvertException(ErrorType.RANGE_ERROR, range);
+            }
+        }
+
+        return result;
+    }
+
+    private Object convertPrimitiveType(String type, String value) {
+        return convertPrimitiveType(type, value, null, null);
     }
 
     private Date convertTimeType(String type, String value) {

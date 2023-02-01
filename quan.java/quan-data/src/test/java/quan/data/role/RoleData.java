@@ -8,6 +8,7 @@ import quan.data.*;
 import quan.data.field.*;
 import quan.data.mongo.JsonStringWriter;
 import quan.data.item.ItemBean;
+import quan.util.NumberUtils;
 
 /**
  * 角色<br/>
@@ -219,6 +220,7 @@ public class RoleData extends Data<Long> {
     }
 
     public RoleData setB2(int b2) {
+        NumberUtils.checkRange(b2, 1, 20);
         this.b2.setValue(b2, this);
         return this;
     }
@@ -234,6 +236,7 @@ public class RoleData extends Data<Long> {
      * sssss
      */
     public RoleData setS(short s) {
+        NumberUtils.checkRange(s, 1, 20);
         this.s.setValue(s, this);
         return this;
     }
@@ -273,6 +276,7 @@ public class RoleData extends Data<Long> {
     }
 
     public RoleData setD(double d) {
+        NumberUtils.checkRange(d, 1, 20);
         this.d.setValue(d, this);
         return this;
     }

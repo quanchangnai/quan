@@ -52,6 +52,10 @@ public class JavaMessageGenerator extends MessageGenerator {
                 || fieldDefinition.isCollectionType() || fieldDefinition.isTimeType()
                 || fieldDefinition.isBeanType() && !fieldDefinition.isOptional()) {
             fieldDefinition.getOwner().getImports().put("java.util.*", null);
+
+        }
+        if (fieldDefinition.getMin() != null || fieldDefinition.getMax() != null) {
+            fieldDefinition.getOwner().getImports().put("quan.util.NumberUtils", null);
         }
     }
 

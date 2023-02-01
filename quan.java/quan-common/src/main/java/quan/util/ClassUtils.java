@@ -192,7 +192,7 @@ public class ClassUtils extends org.apache.commons.lang3.ClassUtils {
             rootPath += File.separator;
         }
 
-        Set<File> classFiles = CommonUtils.listFiles(path, "class");
+        Set<File> classFiles = FileUtils.listFiles(path, "class");
 
         for (File classFile : classFiles) {
             String classFilePath = classFile.getCanonicalPath();

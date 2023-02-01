@@ -8,7 +8,7 @@ import quan.definition.Constants;
 import quan.definition.FieldDefinition;
 import quan.definition.config.ConfigDefinition;
 import quan.definition.config.ConstantDefinition;
-import quan.util.CommonUtils;
+import quan.util.FileUtils;
 
 import java.io.File;
 import java.util.*;
@@ -183,6 +183,12 @@ public abstract class TableDefinitionParser extends DefinitionParser {
                 case "lang":
                     fieldDefinition.setLanguage(constraintValue);
                     break;
+                case "min":
+                    fieldDefinition.setMin(constraintValue);
+                    break;
+                case "max":
+                    fieldDefinition.setMax(constraintValue);
+                    break;
                 default:
                     addValidatedError(configDefinition.getValidatedName() + "的字段[" + fieldName + "]不支持该约束类型:" + constraintType);
                     break;
@@ -244,7 +250,7 @@ public abstract class TableDefinitionParser extends DefinitionParser {
 
         for (ConfigDefinition extConfigDefinition : extConfigDefinitions.values()) {
             String extTableName = extConfigDefinition.getTable();
-            ConfigDefinition configDefinition = configDefinitions.get(CommonUtils.toPlatPath(extTableName));
+            ConfigDefinition configDefinition = configDefinitions.get(FileUtils.toPlatPath(extTableName));
             if (configDefinition == null) {
                 addValidatedError(String.format("%s对应的的表格[%s]不存在", extConfigDefinition.getValidatedName(), extTableName));
                 continue;

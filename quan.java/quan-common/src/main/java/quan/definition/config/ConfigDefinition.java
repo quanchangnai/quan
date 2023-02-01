@@ -302,6 +302,9 @@ public class ConfigDefinition extends BeanDefinition {
         //校验字段类型
         validateFieldType(field);
 
+        //校验字段数值范围限制
+        validateFieldRange(field);
+
         //校验字段循环依赖
         validateFieldBeanCycle(field);
 
@@ -319,6 +322,7 @@ public class ConfigDefinition extends BeanDefinition {
 
         //校验字段的分隔符
         validateFieldDelimiter(field);
+
     }
 
     private void validateFieldLanguage(FieldDefinition field) {

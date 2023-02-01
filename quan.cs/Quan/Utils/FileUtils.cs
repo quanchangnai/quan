@@ -3,19 +3,22 @@ using System.IO;
 
 namespace Quan.Utils
 {
-    public static class PathUtils
+    /// <summary>
+    /// 文件工具
+    /// </summary>
+    public static class FileUtils
     {
         /// <summary>
-        /// 把指定路径转换为当前平台路径
+        /// 转换为当前平台文件路径
         /// </summary>
         /// <param name="path">路径分隔符不明确的路径</param>
-        /// <returns></returns>
+        /// <returns>转换后的路径</returns>
         public static string ToPlatPath(string path)
         {
             return path.Replace("/", Path.DirectorySeparatorChar.ToString()).Replace("\\", Path.DirectorySeparatorChar.ToString());
         }
 
-        public static HashSet<FileInfo> ListFiles(this DirectoryInfo directory, string extension)
+        public static HashSet<FileInfo> ListFiles(this DirectoryInfo directory, string extension = null)
         {
             var childrenFiles = new HashSet<FileInfo>();
             if (!directory.Exists)

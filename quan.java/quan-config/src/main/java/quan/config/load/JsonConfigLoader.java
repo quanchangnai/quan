@@ -6,7 +6,7 @@ import quan.config.TableType;
 import quan.config.ValidatedException;
 import quan.config.read.ConfigReader;
 import quan.config.read.JsonConfigReader;
-import quan.util.CommonUtils;
+import quan.util.FileUtils;
 
 import java.io.File;
 import java.util.*;
@@ -57,7 +57,7 @@ public class JsonConfigLoader extends ConfigLoader {
      * 初始化配置类对应的后代子孙类，包含自己
      */
     private void initConfigDescendants() {
-        Set<File> tableFiles = CommonUtils.listFiles(new File(tablePath), tableType.name());
+        Set<File> tableFiles = FileUtils.listFiles(new File(tablePath), tableType.name());
         List<Config> configs = new ArrayList<>();
 
         for (File tableFile : tableFiles) {

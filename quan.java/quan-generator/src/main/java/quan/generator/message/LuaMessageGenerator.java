@@ -7,6 +7,7 @@ import quan.definition.message.MessageDefinition;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.*;
 
 /**
@@ -52,12 +53,12 @@ public class LuaMessageGenerator extends MessageGenerator {
     protected void generateFactory(List<MessageDefinition> messageDefinitions) {
         File filePath = new File(codePath + File.separator + getParser().getPackagePrefix().replace(".", File.separator));
         if (!filePath.exists() && !filePath.mkdirs()) {
-            logger.info("创建目录[{}]失败", filePath);
+            logger.error("创建目录[{}]失败", filePath);
             return;
         }
 
         String fileName = "MessageRegistry." + language();
-        try (Writer writer = new OutputStreamWriter(new FileOutputStream(new File(filePath, fileName)), StandardCharsets.UTF_8)) {
+        try (Writer writer = new OutputStreamWriter(Files.newOutputStream(new File(filePath, fileName).toPath()), StandardCharsets.UTF_8)) {
             Map<String, List<MessageDefinition>> messages = new HashMap<>();
             messages.put("messages", messageDefinitions);
             registryTemplate.process(messages, writer);

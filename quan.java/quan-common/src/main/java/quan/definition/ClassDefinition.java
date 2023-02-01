@@ -40,7 +40,7 @@ public abstract class ClassDefinition extends Definition {
     //依赖的类，Map<依赖的类名, <来源, ClassDefinition>>
     protected Map<String, TreeMap<DependentSource, ClassDefinition>> dependentsClasses = new HashMap<>();
 
-    protected List<FieldDefinition> fields = new ArrayList<>();
+    protected List<FieldDefinition> fields = new LinkedList<>();
 
     //导包，和具体语言相关
     private Map<String, String> imports = new TreeMap<>();

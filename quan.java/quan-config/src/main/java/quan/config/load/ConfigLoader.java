@@ -9,7 +9,7 @@ import quan.config.TableType;
 import quan.config.ValidatedException;
 import quan.config.read.ConfigReader;
 import quan.util.ClassUtils;
-import quan.util.CommonUtils;
+import quan.util.FileUtils;
 
 import java.util.*;
 import java.util.function.Function;
@@ -47,7 +47,7 @@ public abstract class ConfigLoader {
 
     public ConfigLoader(String tablePath) {
         Objects.requireNonNull(tablePath, "配置表路径不能为空");
-        this.tablePath = CommonUtils.toPlatPath(tablePath);
+        this.tablePath = FileUtils.toPlatPath(tablePath);
     }
 
     public static void registerLoadFunction(Class<? extends Config> clazz, Function<List, List> function) {

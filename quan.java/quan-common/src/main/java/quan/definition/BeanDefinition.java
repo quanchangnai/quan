@@ -171,7 +171,7 @@ public class BeanDefinition extends ClassDefinition {
             return;
         }
 
-        if (getParentName() == null) {
+        if (parentName == null) {
             return;
         }
 
@@ -220,6 +220,9 @@ public class BeanDefinition extends ClassDefinition {
 
         //校验字段类型
         validateFieldType(field);
+
+        //校验字段数值范围限制
+        validateFieldRange(field);
 
         //校验字段循环依赖
         validateFieldBeanCycle(field);
@@ -306,6 +309,54 @@ public class BeanDefinition extends ClassDefinition {
 
     }
 
+    protected void validateFieldRange(FieldDefinition field) {
+        Object min = field.getMin();
+        Number minValue = null;
+
+        if (min instanceof String) {
+            if (field.isNumberType()) {
+                try {
+                    minValue = Long.parseLong((String) min);
+                    field.setMin(minValue);
+                } catch (NumberFormatException e1) {
+                    try {
+                        minValue = Double.parseDouble((String) min);
+                        field.setMin(minValue);
+                    } catch (NumberFormatException e2) {
+                        addValidatedError(getValidatedName("的") + field.getValidatedName() + "最小值限制[" + min + "]不能为非数字");
+                    }
+                }
+            } else {
+                addValidatedError(getValidatedName("的") + field.getValidatedName() + "类型[" + field.getType() + "]不支持最小值限制");
+            }
+        }
+
+        Object max = field.getMax();
+        Number maxValue = null;
+
+        if (max instanceof String) {
+            if (field.isNumberType()) {
+                try {
+                    maxValue = Long.parseLong((String) max);
+                    field.setMax(maxValue);
+                } catch (NumberFormatException e1) {
+                    try {
+                        maxValue = Double.parseDouble((String) max);
+                        field.setMax(maxValue);
+                    } catch (NumberFormatException e2) {
+                        addValidatedError(getValidatedName("的") + field.getValidatedName() + "最大值限制[" + min + "]不能为非数字");
+                    }
+                }
+            } else {
+                addValidatedError(getValidatedName("的") + field.getValidatedName() + "类型[" + field.getType() + "]不支持最大值限制");
+            }
+        }
+
+        if (minValue != null && maxValue != null && Double.compare(minValue.doubleValue(), maxValue.doubleValue()) > 0) {
+            addValidatedError(getValidatedName("的") + field.getValidatedName() + "最小值限制[" + minValue + "]不能大于最大值限制[" + maxValue + "]");
+        }
+    }
+
     /**
      * 校验字段循环依赖，字段类型为bean类型或者集合类型字段的值类型为bean
      */
@@ -349,6 +400,7 @@ public class BeanDefinition extends ClassDefinition {
         if (category == Category.data) {
             return;
         }
+
         BeanDefinition fieldBean = null;
         if (field.isBeanType()) {
             fieldBean = field.getTypeBean();
@@ -362,6 +414,7 @@ public class BeanDefinition extends ClassDefinition {
             addValidatedError(getValidatedName() + "支持的语言范围" + supportedLanguages + "必须小于或等于其依赖" + fieldBean.getValidatedName() + "支持的语言范围" + fieldBean.supportedLanguages);
         }
     }
+
 
     @Override
     protected void validateDependents() {
@@ -396,11 +449,11 @@ public class BeanDefinition extends ClassDefinition {
         }
 
         if (fieldId < 1 || fieldId > 63) {
-            addValidatedError(getValidatedName("的") + "字段ID[" + field.getId() + "]必须是[1-63]的整数");
+            addValidatedError(getValidatedName() + "的字段ID[" + field.getId() + "]必须是[1-63]的整数");
         }
 
         if (!fieldIds.add(fieldId)) {
-            addValidatedError(getValidatedName("的") + "字段ID[" + field.getId() + "]必须不能重复");
+            addValidatedError(getValidatedName() + "的字段ID[" + field.getId() + "]必须不能重复");
         }
     }
 

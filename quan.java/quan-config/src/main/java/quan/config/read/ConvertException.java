@@ -50,6 +50,7 @@ class ConvertException extends RuntimeException {
     public enum ErrorType {
         COMMON,
         TYPE_ERROR,
+        RANGE_ERROR,
         ENUM_VALUE,
         ENUM_NAME,
         SET_DUPLICATE_VALUE,

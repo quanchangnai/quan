@@ -16,7 +16,7 @@ import quan.definition.*;
 import quan.definition.config.ConfigDefinition;
 import quan.definition.parser.DefinitionParser;
 import quan.definition.parser.XmlDefinitionParser;
-import quan.util.CommonUtils;
+import quan.util.FileUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -186,7 +186,7 @@ public class DefinitionConfigLoader extends ConfigLoader {
         }
 
         Objects.requireNonNull(path, "输出目录不能为空");
-        File pathFile = new File(CommonUtils.toPlatPath(path));
+        File pathFile = new File(FileUtils.toPlatPath(path));
         if (!pathFile.exists() && !pathFile.mkdirs()) {
             logger.error("输出目录[{}]创建失败", path);
             return;
@@ -223,7 +223,7 @@ public class DefinitionConfigLoader extends ConfigLoader {
 
             String jsonFileName = configDefinition.getPackageName(language) + "." + configDefinition.getName() + ".json";
             try (FileOutputStream fos = new FileOutputStream(new File(pathFile, jsonFileName))) {
-                JSON.writeJSONString(fos, rows, SerializerFeature.PrettyFormat);
+                JSON.writeJSONString(fos, rows, SerializerFeature.PrettyFormat, SerializerFeature.DisableCircularReferenceDetect);
             } catch (Exception e) {
                 logger.error("配置[{}]写到JSON文件出错", configDefinition.getName(), e);
             }

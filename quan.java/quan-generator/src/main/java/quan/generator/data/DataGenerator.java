@@ -96,6 +96,9 @@ public class DataGenerator extends Generator {
                 owner.setIdField(fieldDefinition);
             }
         }
+        if (fieldDefinition.getMin() != null || fieldDefinition.getMax() != null) {
+            fieldDefinition.getOwner().getImports().put("quan.util.NumberUtils", null);
+        }
     }
 
 }

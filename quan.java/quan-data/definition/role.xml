@@ -14,11 +14,11 @@
         <field name="a" type="int"/>
         <field name="a2" type="int"/>
         <field name="b" type="bool"/>
-        <field name="b2" type="int"/>
-        <field name="s" type="short"/>sssss
+        <field name="b2" type="int" min="1" max="20"/>
+        <field name="s" type="short" min="1" max="20"/>sssss
         <field name="i" type="int"/>iiii
         <field name="f" type="float"/>ffff
-        <field name="d" type="double"/>
+        <field name="d" type="double" min="1" max="20"/>
         <field name="item" type="item.ItemBean"/>道具
         <field name="items" type="map:int:item.ItemBean"/>
         <field name="set" type="set:bool"/>

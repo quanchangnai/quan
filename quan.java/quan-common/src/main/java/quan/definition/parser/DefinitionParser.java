@@ -7,7 +7,7 @@ import quan.definition.BeanDefinition;
 import quan.definition.Category;
 import quan.definition.ClassDefinition;
 import quan.definition.config.ConfigDefinition;
-import quan.util.CommonUtils;
+import quan.util.FileUtils;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -81,11 +81,11 @@ public abstract class DefinitionParser {
 
     public void setDefinitionPaths(Collection<String> definitionPaths) {
         for (String path : definitionPaths) {
-            path = CommonUtils.toPlatPath(path);
+            path = FileUtils.toPlatPath(path);
             this.definitionPaths.add(path);
             Path definitionPath = Paths.get(path);
 
-            Set<File> definitionFiles = CommonUtils.listFiles(new File(path));
+            Set<File> definitionFiles = FileUtils.listFiles(new File(path));
             this.definitionFiles.addAll(definitionFiles);
             for (File definitionFile : definitionFiles) {
                 Path relativizedPath = definitionPath.relativize(Paths.get(definitionFile.getPath()));

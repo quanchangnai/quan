@@ -154,6 +154,13 @@ public class ${name} extends <#if kind ==2>Bean<#elseif kind ==5>Data<${idField.
      */
     </#if>
     public ${name} set${field.name?cap_first}(${field.basicType} ${field.name}) {
+        <#if field.min?? && field.max??>
+        NumberUtils.checkRange(${field.name}, ${field.min}, ${field.max});
+        <#elseif field.min??>
+        NumberUtils.checkMin(${field.name}, ${field.min});
+        <#elseif field.max??>
+        NumberUtils.checkMax(${field.name}, ${field.max});
+        </#if>
         this.${field.name}.setValue(${field.name}, ${root});
         return this;
     }

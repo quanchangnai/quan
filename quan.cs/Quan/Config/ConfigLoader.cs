@@ -13,7 +13,7 @@ namespace Quan.Config
 
         public string JsonPath
         {
-            set => _jsonPath = PathUtils.ToPlatPath(value);
+            set => _jsonPath = FileUtils.ToPlatPath(value);
         }
 
         public string NamespacePrefix { get; set; }

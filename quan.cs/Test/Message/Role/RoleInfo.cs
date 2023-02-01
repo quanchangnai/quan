@@ -33,7 +33,17 @@ namespace Test.Message.Role
 
         public short s { get; set; }
 
-        public int i { get; set; }
+        private int _i;
+
+        public int i
+        {
+            get => _i;
+            set
+            {
+                CheckRange(value, 1, 20);
+                _i = value;
+            }
+        }
 
         public double d { get; set; }
 
@@ -91,14 +101,14 @@ namespace Test.Message.Role
             d = buffer.ReadDouble();
             data = buffer.ReadBytes();
 
-            var listSize = buffer.ReadInt();
-            for (var i = 0; i < listSize; i++)
+            var list_Size = buffer.ReadInt();
+            for (var i = 0; i < list_Size; i++)
             {
                 list.Add(buffer.ReadInt());
             }
 
-            var setSize = buffer.ReadInt();
-            for (var i = 0; i < setSize; i++)
+            var set_Size = buffer.ReadInt();
+            for (var i = 0; i < set_Size; i++)
             {
                 set.Add(buffer.ReadInt());
             }

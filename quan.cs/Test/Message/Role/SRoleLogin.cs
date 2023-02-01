@@ -107,26 +107,26 @@ namespace Test.Message.Role
 
             roleId = buffer.ReadInt();
             roleName = buffer.ReadString();
-        roleInfo.Decode(buffer);
+            roleInfo.Decode(buffer);
 
-            var roleInfoListSize = buffer.ReadInt();
-            for (var i = 0; i < roleInfoListSize; i++)
+            var roleInfoList_Size = buffer.ReadInt();
+            for (var i = 0; i < roleInfoList_Size; i++)
             {
                 var roleInfoListValue = new RoleInfo();
                 roleInfoListValue.Decode(buffer);
                 roleInfoList.Add(roleInfoListValue);
             }
 
-            var roleInfoSetSize = buffer.ReadInt();
-            for (var i = 0; i < roleInfoSetSize; i++)
+            var roleInfoSet_Size = buffer.ReadInt();
+            for (var i = 0; i < roleInfoSet_Size; i++)
             {
                 var roleInfoSetValue = new RoleInfo();
                 roleInfoSetValue.Decode(buffer);
                 roleInfoSet.Add(roleInfoSetValue);
             }
 
-            var roleInfoMapSize = buffer.ReadInt();
-            for (var i = 0; i < roleInfoMapSize; i++)
+            var roleInfoMap_Size = buffer.ReadInt();
+            for (var i = 0; i < roleInfoMap_Size; i++)
             {
                 var roleInfoMapKey = buffer.ReadInt();
                 var roleInfoMapValue = new RoleInfo();

@@ -12,7 +12,7 @@
         <field name="type" type="RoleType"/>
         <field name="b" type="bool"/>
         <field name="s" type="short"/>
-        <field name="i" type="int"/>
+        <field name="i" type="int" min="1" max="20"/>
 <!--        <field name="f" type="float:2"/>-->
         <field name="d" type="double"/>
         <field name="data" type="bytes"/>

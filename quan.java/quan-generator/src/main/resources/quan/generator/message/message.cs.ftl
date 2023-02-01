@@ -66,7 +66,7 @@ namespace ${getFullPackageName("cs")}
             set => _${field.name} = value ?? throw new NullReferenceException();
         }
 
-    <#elseif (field.type=="float"||field.type=="double") && field.scale gt 0>
+    <#elseif field.min?? || field.max?? || (field.type=="float"||field.type=="double") && field.scale gt 0 >
         private ${field.basicType} _${field.name};
 
         <#if field.comment !="">
@@ -79,7 +79,16 @@ namespace ${getFullPackageName("cs")}
             get => _${field.name};
             set
             {
+            <#if field.min?? && field.max??>
+                CheckRange(value, ${field.min}, ${field.max});
+            <#elseif field.min??>
+                CheckMin(value, ${field.min});
+            <#elseif field.max??>
+                CheckMax(value, ${field.max});
+            </#if>
+            <#if (field.type=="float"||field.type=="double") && field.scale gt 0>
                 CodedBuffer.CheckScale(value, ${field.scale});
+            </#if>
                 _${field.name} = value;
             }
         }
@@ -292,29 +301,29 @@ namespace ${getFullPackageName("cs")}
                     case ${field.tag}:
                     <#if field.type=="set" || field.type=="list">
                         buffer.ReadInt();
-                        var ${field.name}Size = buffer.ReadInt();
-                        for (var i = 0; i < ${field.name}Size; i++) 
+                        var ${field.name}_Size = buffer.ReadInt();
+                        for (var i = 0; i < ${field.name}_Size; i++) 
                         {
                         <#if field.builtinValueType>
-                            ${field.name}.Add(buffer.Read${field.valueType?cap_first}());
+                            <#if field.name="i">this.</#if>${field.name}.Add(buffer.Read${field.valueType?cap_first}());
                         <#else>
                             var ${field.name}Value = new ${field.valueClassType}();
                             ${field.name}Value.Decode(buffer);
-                            ${field.name}.Add(${field.name}Value);
+                            <#if field.name="i">this.</#if>${field.name}.Add(${field.name}Value);
                         </#if>
                         }
                         <#elseif field.type=="map">
                         buffer.ReadInt();
-                        var ${field.name}Size = buffer.ReadInt();
-                        for (var i = 0; i < ${field.name}Size; i++)
+                        var ${field.name}_Size = buffer.ReadInt();
+                        for (var i = 0; i < ${field.name}_Size; i++)
                         {
                         <#if field.builtinValueType>
-                            ${field.name}.Add(buffer.Read${field.keyType?cap_first}(), buffer.Read${field.valueType?cap_first}());
+                            <#if field.name="i">this.</#if>${field.name}.Add(buffer.Read${field.keyType?cap_first}(), buffer.Read${field.valueType?cap_first}());
                         <#else>
                             var ${field.name}Key = buffer.Read${field.keyType?cap_first}();
                             var ${field.name}Value = new ${field.valueClassType}();
                             ${field.name}Value.Decode(buffer);
-                            ${field.name}.Add(${field.name}Key, ${field.name}Value);
+                            <#if field.name="i">this.</#if>${field.name}.Add(${field.name}Key, ${field.name}Value);
                         </#if>
                         }
                     <#elseif field.type=="float"||field.type=="double">
@@ -346,15 +355,15 @@ namespace ${getFullPackageName("cs")}
         <#if field?index gt 0>
 
         </#if>
-            var ${field.name}Size = buffer.ReadInt();
-            for (var i = 0; i < ${field.name}Size; i++)
+            var ${field.name}_Size = buffer.ReadInt();
+            for (var i = 0; i < ${field.name}_Size; i++)
             {
         <#if field.builtinValueType>
-                ${field.name}.Add(buffer.Read${field.valueType?cap_first}());
+                <#if field.name="i">this.</#if>${field.name}.Add(buffer.Read${field.valueType?cap_first}());
         <#else>
                 var ${field.name}Value = new ${field.valueClassType}();
                 ${field.name}Value.Decode(buffer);
-                ${field.name}.Add(${field.name}Value);
+                <#if field.name="i">this.</#if>${field.name}.Add(${field.name}Value);
         </#if>
             }
         <#if field?has_next && !selfFields[field?index+1].collectionType && (selfFields[field?index+1].primitiveType || !selfFields[field?index+1].optional) >
@@ -364,16 +373,16 @@ namespace ${getFullPackageName("cs")}
         <#if field?index gt 0>
 
         </#if>
-            var ${field.name}Size = buffer.ReadInt();
-            for (var i = 0; i < ${field.name}Size; i++)
+            var ${field.name}_Size = buffer.ReadInt();
+            for (var i = 0; i < ${field.name}_Size; i++)
             {
         <#if field.builtinValueType>
-                ${field.name}.Add(buffer.Read${field.keyType?cap_first}(), buffer.Read${field.valueType?cap_first}());
+                <#if field.name="i">this.</#if>${field.name}.Add(buffer.Read${field.keyType?cap_first}(), buffer.Read${field.valueType?cap_first}());
         <#else>
                 var ${field.name}Key = buffer.Read${field.keyType?cap_first}();
                 var ${field.name}Value = new ${field.valueClassType}();
                 ${field.name}Value.Decode(buffer);
-                ${field.name}.Add(${field.name}Key, ${field.name}Value);
+                <#if field.name="i">this.</#if>${field.name}.Add(${field.name}Key, ${field.name}Value);
         </#if>
             }
         <#if field?has_next && !selfFields[field?index+1].collectionType && (selfFields[field?index+1].primitiveType || !selfFields[field?index+1].optional) >
@@ -398,7 +407,7 @@ namespace ${getFullPackageName("cs")}
 
         </#if>
     <#else>
-        ${field.name}.Decode(buffer);
+            ${field.name}.Decode(buffer);
     </#if>
 </#list>
 </#if>
