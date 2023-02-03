@@ -79,7 +79,7 @@ namespace Test.Message.User
         /// </summary>
         public Dictionary<int, Test.Message.Role.RoleInfo> roleMap { get; } = new Dictionary<int, Test.Message.Role.RoleInfo>();
 
-        private byte[] _f11 = new byte[0];
+        private byte[] _f11 = Array.Empty<byte>();
 
         public byte[] f11
         {
@@ -119,6 +119,14 @@ namespace Test.Message.User
                 CodedBuffer.CheckScale(value, 2);
                 _f18 = value;
             }
+        }
+
+        private string _alias;
+
+        public string alias
+        {
+            get => _alias;
+            set => _alias = value;
         }
 
 
@@ -253,6 +261,12 @@ namespace Test.Message.User
                 buffer.WriteDouble(f18, 2);
             }
 
+            if (alias.Length > 0)
+            {
+                WriteTag(buffer, 79);
+                buffer.WriteString(alias);
+            }
+
             WriteTag(buffer,0);
         }
 
@@ -344,6 +358,9 @@ namespace Test.Message.User
                     case 72:
                         f18 = buffer.ReadDouble(2);
                         break;
+                    case 79:
+                        alias = buffer.ReadString();
+                        break;
                     default:
                         SkipField(tag, buffer);
                         break;
@@ -372,6 +389,7 @@ namespace Test.Message.User
                    ",f16=" + f16.ToString2() +
                    ",f17=" + f17.ToString2() +
                    ",f18=" + f18.ToString2() +
+                   ",alias='" + alias + '\'' +
                    '}';
         }
     }

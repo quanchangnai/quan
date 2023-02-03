@@ -28,7 +28,7 @@ public class MessageDefinition extends BeanDefinition {
 
     @Override
     public int getKind() {
-        return 3;
+        return KIND_MESSAGE;
     }
 
     @Override

@@ -25,7 +25,6 @@ local ${name} = {
 </#if>
 }
 
-<#if kind !=9>
 local function onSet(self, key, value)
     assert(not ${name}[key], "不允许修改只读属性:" .. key)
     rawset(self, key, value)
@@ -73,7 +72,7 @@ function ${name}.new(args)
     <#elseif field.type="bool">
         ${field.name} = args.${field.name} or false,
     <#elseif field.type == "string" || field.type == "bytes">
-        ${field.name} = args.${field.name} or "",
+        ${field.name} = args.${field.name}<#if !field.optional> or ""</#if>,
     <#elseif field.collectionType>
         ${field.name} = args.${field.name} or {},
     <#elseif !field.optional>
@@ -90,8 +89,7 @@ end
 
 setmetatable(${name}, { __call = ${name}.new })
 
-</#if>
-<#if kind ==3>
+<#if kind == 3>
 ---
 ---<#if comment !="">[${comment}]<#else>${name}</#if>.编码
 ---@return quan.message.CodedBuffer
@@ -119,7 +117,7 @@ function ${name}:encode(buffer)
     <#if field.ignore>
         <#continue/>
     </#if>
-    <#if definedFieldId>
+    <#if compatible>
         <#if field.type=="set" || field.type=="list">
     if #self.${field.name} > 0 then
         _Message.writeTag(buffer, ${field.tag})
@@ -166,7 +164,11 @@ function ${name}:encode(buffer)
         buffer:write${field.type?cap_first}(self.${field.name})
     end
         <#elseif field.type=="string" || field.type=="bytes">
+        <#if field.optional>
+    if self.${field.name} ~= nil then
+        <#else>
     if #self.${field.name} > 0 then
+        </#if>
         _Message.writeTag(buffer, ${field.tag})
         buffer:write${field.type?cap_first}(self.${field.name})
     end
@@ -243,7 +245,7 @@ function ${name}:encode(buffer)
         </#if>
     </#if>
 </#list>
-<#if definedFieldId>
+<#if compatible>
     _Message.writeTag(buffer, 0);
 </#if>
 
@@ -278,7 +280,7 @@ function ${name}.decode(buffer, self)
     self = self or ${name}.new()
 
 </#if>
-<#if definedFieldId>
+<#if compatible>
     while true do
         local tag = _Message.readTag(buffer)
         if tag == 0 then

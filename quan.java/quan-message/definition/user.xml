@@ -25,6 +25,7 @@
         <field id="16" name="f16" type="float:2"/>
         <field id="17" name="f17" type="double"/>
         <field id="18" name="f18" type="double:2"/>
+        <field id="19" name="alias" type="string" optional="true"/>
     </bean>
 
     <bean name="RoleInfo">角色信息2

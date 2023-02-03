@@ -10,6 +10,23 @@ import java.util.regex.Pattern;
  */
 public abstract class Definition {
 
+    public static final int KIND_ENUM = 1;
+
+    public static final int KIND_BEAN = 2;
+
+    public static final int KIND_MESSAGE = 3;
+
+    public static final int KIND_FIELD = 4;
+
+    public static final int KIND_DATA = 5;
+
+    public static final int KIND_CONFIG = 6;
+
+    public static final int KIND_INDEX = 7;
+
+    public static final int KIND_CONSTANT = 8;
+
+
     protected Category category;
 
     private String name;
@@ -91,6 +108,7 @@ public abstract class Definition {
                 "name='" + name + '\'' +
                 '}';
     }
+
 
 }
 

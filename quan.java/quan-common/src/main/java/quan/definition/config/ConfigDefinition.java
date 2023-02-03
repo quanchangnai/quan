@@ -59,7 +59,7 @@ public class ConfigDefinition extends BeanDefinition {
 
     @Override
     public int getKind() {
-        return 6;
+        return KIND_CONFIG;
     }
 
     @Override

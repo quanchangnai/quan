@@ -46,7 +46,7 @@ public class IndexDefinition extends Definition implements Cloneable {
 
     @Override
     public int getKind() {
-        return 7;
+        return KIND_INDEX;
     }
 
     @Override

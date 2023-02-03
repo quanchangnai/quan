@@ -16,6 +16,8 @@ public class RoleInfo extends Bean {
     //角色名
     private String name = "";
 
+    private String alias;
+
     private RoleType type;
 
     private boolean b;
@@ -63,6 +65,15 @@ public class RoleInfo extends Bean {
     public RoleInfo setName(String name) {
         Objects.requireNonNull(name);
         this.name = name;
+        return this;
+    }
+
+    public String getAlias() {
+        return alias;
+    }
+
+    public RoleInfo setAlias(String alias) {
+        this.alias = alias;
         return this;
     }
 
@@ -140,6 +151,7 @@ public class RoleInfo extends Bean {
 
         buffer.writeInt(this.id);
         buffer.writeString(this.name);
+        buffer.writeString(this.alias);
         buffer.writeInt(this.type == null ? 0 : this.type.value);
         buffer.writeBool(this.b);
         buffer.writeShort(this.s);
@@ -164,6 +176,7 @@ public class RoleInfo extends Bean {
 
         setId(buffer.readInt());
         this.name = buffer.readString();
+        this.alias = buffer.readString();
         this.type = RoleType.valueOf(buffer.readInt());
         this.b = buffer.readBool();
         setS(buffer.readShort());
@@ -187,6 +200,7 @@ public class RoleInfo extends Bean {
         return "RoleInfo{" +
                 "id=" + id +
                 ",name='" + name + '\'' +
+                ",alias='" + alias + '\'' +
                 ",type=" + type +
                 ",b=" + b +
                 ",s=" + s +

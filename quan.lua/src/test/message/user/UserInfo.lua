@@ -41,6 +41,7 @@ local function toString(self)
             ",f16=" .. tostring(self.f16) ..
             ",f17=" .. tostring(self.f17) ..
             ",f18=" .. tostring(self.f18) ..
+            ",alias='" .. tostring(self.alias) .. '\'' ..
             '}';
 end
 
@@ -84,6 +85,7 @@ function UserInfo.new(args)
         f16 = args.f16 or 0.0,
         f17 = args.f17 or 0.0,
         f18 = args.f18 or 0.0,
+        alias = args.alias,
     }
 
     instance = setmetatable(instance, meta)
@@ -212,6 +214,11 @@ function UserInfo:encode(buffer)
         buffer:writeDouble(self.f18, 2)
     end
 
+    if self.alias ~= nil then
+        _Message.writeTag(buffer, 79)
+        buffer:writeString(self.alias)
+    end
+
     _Message.writeTag(buffer, 0);
 
     return buffer
@@ -281,6 +288,8 @@ function UserInfo.decode(buffer, self)
             self.f17 = buffer:readDouble()
         elseif tag == 72 then
             self.f18 = buffer:readDouble(2)
+        elseif tag == 79 then
+            self.alias = buffer:readString()
         else
             _Message.skipField(tag, buffer)
         end

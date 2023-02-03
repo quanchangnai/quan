@@ -12,7 +12,7 @@ namespace ${getFullPackageName("cs")}
 </#if>
     /// 代码自动生成，请勿手动修改
     /// </summary>
-    public<#if kind ==9> abstract</#if> class ${name} : <#if kind ==2>Bean<#else>MessageBase</#if>
+    public class ${name} : <#if kind ==2>Bean<#else>MessageBase</#if>
     {
 <#if kind ==3>
         /// <summary>
@@ -38,35 +38,25 @@ namespace ${getFullPackageName("cs")}
         </#if>
         public Dictionary<${field.keyClassType}, ${field.valueClassType}> ${field.name} { get; } = new Dictionary<${field.keyClassType}, ${field.valueClassType}>();
 
-    <#elseif field.type == "string">
-        private string _${field.name} = "";
+    <#elseif field.type == "string" || field.type == "bytes">
+        <#if field.type == "string">
+        private string _${field.name}<#if !field.optional> = ""</#if>;
+        <#else>
+        private byte[] _${field.name}<#if !field.optional> = Array.Empty<byte>()</#if>;
+        </#if>
 
         <#if field.comment !="">
         /// <summary>
         /// ${field.comment}
         /// </summary>
         </#if>
-        public string ${field.name}
+        public ${field.basicType} ${field.name}
         {
             get => _${field.name};
-            set => _${field.name} = value ?? throw new NullReferenceException();
+            set => _${field.name} = value<#if !field.optional> ?? throw new NullReferenceException()</#if>;
         }
 
-    <#elseif field.type == "bytes">
-        private byte[] _${field.name} = new byte[0];
-
-        <#if field.comment !="">
-        /// <summary>
-        /// ${field.comment}
-        /// </summary>
-        </#if>
-        public byte[] ${field.name}
-        {
-            get => _${field.name};
-            set => _${field.name} = value ?? throw new NullReferenceException();
-        }
-
-    <#elseif field.min?? || field.max?? || (field.type=="float"||field.type=="double") && field.scale gt 0 >
+    <#elseif field.min?? || field.max?? || field.scale gt 0 >
         private ${field.basicType} _${field.name};
 
         <#if field.comment !="">
@@ -86,7 +76,7 @@ namespace ${getFullPackageName("cs")}
             <#elseif field.max??>
                 CheckMax(value, ${field.max});
             </#if>
-            <#if (field.type=="float"||field.type=="double") && field.scale gt 0>
+            <#if field.scale gt 0>
                 CodedBuffer.CheckScale(value, ${field.scale});
             </#if>
                 _${field.name} = value;
@@ -141,14 +131,19 @@ namespace ${getFullPackageName("cs")}
      <#if field.ignore>
         <#continue/>
     </#if>
-    <#if definedFieldId>
+    <#if field.name=="buffer">
+        <#assign thisField1 = "this.${field.name}">
+    <#else>
+        <#assign thisField1 = field.name>
+    </#if>
+    <#if compatible>
         <#if field.type=="set" || field.type=="list">
-            if (${field.name}.Count > 0)
+            if (${thisField1}.Count > 0)
             {
                 WriteTag(buffer, ${field.tag});
                 var ${field.name}Buffer = new CodedBuffer();
-                ${field.name}Buffer.WriteInt(${field.name}.Count);
-                foreach (var ${field.name}Value in ${field.name})
+                ${field.name}Buffer.WriteInt(${thisField1}.Count);
+                foreach (var ${field.name}Value in ${thisField1})
                 {
                 <#if field.builtinValueType>
                     ${field.name}Buffer.Write${field.valueType?cap_first}(${field.name}Value);
@@ -159,70 +154,70 @@ namespace ${getFullPackageName("cs")}
                 buffer.WriteBuffer(${field.name}Buffer);
             }
         <#elseif field.type=="map">
-            if (${field.name}.Count > 0)
+            if (${thisField1}.Count > 0)
             {
                 WriteTag(buffer, ${field.tag});
                 var ${field.name}Buffer = new CodedBuffer();
-                ${field.name}Buffer.WriteInt(${field.name}.Count);
-                foreach (var ${field.name}Key in ${field.name}.Keys)
+                ${field.name}Buffer.WriteInt(${thisField1}.Count);
+                foreach (var ${field.name}Key in ${thisField1}.Keys)
                 {
                     ${field.name}Buffer.Write${field.keyType?cap_first}(${field.name}Key);
                 <#if field.builtinValueType>
-                    ${field.name}Buffer.Write${field.valueType?cap_first}(${field.name}[${field.name}Key]);
+                    ${field.name}Buffer.Write${field.valueType?cap_first}(${thisField1}[${field.name}Key]);
                 <#else>
-                    ${field.name}[${field.name}Key].Encode(${field.name}Buffer);
+                    ${thisField1}[${field.name}Key].Encode(${field.name}Buffer);
                 </#if>
                 }
                 buffer.WriteBuffer(${field.name}Buffer);
             }
         <#elseif field.type=="float"||field.type=="double">
-            if (${field.name} != 0)
+            if (${thisField1} != 0)
             {
                 WriteTag(buffer, ${field.tag});
-                buffer.Write${field.type?cap_first}(${field.name}<#if field.scale gt 0>, ${field.scale}</#if>);
+                buffer.Write${field.type?cap_first}(${thisField1}<#if field.scale gt 0>, ${field.scale}</#if>);
             }
         <#elseif field.numberType>
-            if (${field.name} != 0)
+            if (${thisField1} != 0)
             {
                 WriteTag(buffer, ${field.tag});
-                buffer.Write${field.type?cap_first}(${field.name});
+                buffer.Write${field.type?cap_first}(${thisField1});
             }
         <#elseif field.type=="bool">
-            if (${field.name})
+            if (${thisField1})
             {
                 WriteTag(buffer, ${field.tag});
-                buffer.Write${field.type?cap_first}(${field.name});
+                buffer.Write${field.type?cap_first}(${thisField1});
             }
         <#elseif field.type=="string">
-            if (${field.name}.Length > 0)
+            if (${thisField1}.Length > 0)
             {
                 WriteTag(buffer, ${field.tag});
-                buffer.Write${field.type?cap_first}(${field.name});
+                buffer.Write${field.type?cap_first}(${thisField1});
             }
         <#elseif field.type=="bytes">
-            if (${field.name}.Length > 0)
+            if (${thisField1}.Length > 0)
             {
                 WriteTag(buffer, ${field.tag});
-                buffer.Write${field.type?cap_first}(${field.name});
+                buffer.Write${field.type?cap_first}(${thisField1});
             }
         <#elseif field.enumType>
-            if (${field.name} != 0)
+            if (${thisField1} != 0)
             {
                 WriteTag(buffer, ${field.tag});
-                buffer.WriteInt((int) ${field.name});
+                buffer.WriteInt((int) ${thisField1});
             }
         <#elseif field.optional>
-            if (${field.name} != null)
+            if (${thisField1} != null)
             {
                 WriteTag(buffer, ${field.tag});
                 var ${field.name}Buffer = new CodedBuffer();
-                ${field.name}.Encode(${field.name}Buffer);
+                ${thisField1}.Encode(${field.name}Buffer);
                 buffer.WriteBuffer(${field.name}Buffer);
             }
         <#else>
             WriteTag(buffer, ${field.tag});
             var ${field.name}Buffer = new CodedBuffer();
-            ${field.name}.Encode(${field.name}Buffer);
+            ${thisField1}.Encode(${field.name}Buffer);
             buffer.WriteBuffer(${field.name}Buffer);
         </#if>
 
@@ -231,8 +226,8 @@ namespace ${getFullPackageName("cs")}
             <#if field?index gt 0>
 
             </#if>
-            buffer.WriteInt(${field.name}.Count);
-            foreach (var ${field.name}Value in ${field.name})
+            buffer.WriteInt(${thisField1}.Count);
+            foreach (var ${field.name}Value in ${thisField1})
             {
             <#if field.builtinValueType>
                 buffer.Write${field.valueType?cap_first}(${field.name}Value);
@@ -247,40 +242,40 @@ namespace ${getFullPackageName("cs")}
             <#if field?index gt 0>
 
             </#if>
-            buffer.WriteInt(${field.name}.Count);
-            foreach (var ${field.name}Key in ${field.name}.Keys)
+            buffer.WriteInt(${thisField1}.Count);
+            foreach (var ${field.name}Key in ${thisField1}.Keys)
             {
                 buffer.Write${field.keyType?cap_first}(${field.name}Key);
             <#if field.builtinValueType>
-                buffer.Write${field.valueType?cap_first}(${field.name}[${field.name}Key]);
+                buffer.Write${field.valueType?cap_first}(${thisField1}[${field.name}Key]);
             <#else>
-                ${field.name}[${field.name}Key].Encode(buffer);
+                ${thisField1}[${field.name}Key].Encode(buffer);
             </#if>
             }
             <#if field?has_next && !selfFields[field?index+1].collectionType && (selfFields[field?index+1].primitiveType || !selfFields[field?index+1].optional) >
 
             </#if>
         <#elseif field.type=="float"||field.type=="double">
-            buffer.Write${field.type?cap_first}(${field.name}<#if field.scale gt 0>, ${field.scale}</#if>);
+            buffer.Write${field.type?cap_first}(${thisField1}<#if field.scale gt 0>, ${field.scale}</#if>);
         <#elseif field.builtinType>
-            buffer.Write${field.type?cap_first}(${field.name});
+            buffer.Write${field.type?cap_first}(${thisField1});
         <#elseif field.enumType>
-            buffer.WriteInt((int) ${field.name});
+            buffer.WriteInt((int) ${thisField1});
         <#elseif field.optional>
             <#if field?index gt 0>
 
             </#if>
-            buffer.WriteBool(${field.name} != null);
-            ${field.name}?.Encode(buffer);
+            buffer.WriteBool(${thisField1} != null);
+            ${thisField1}?.Encode(buffer);
             <#if field?has_next && !selfFields[field?index+1].collectionType && (selfFields[field?index+1].primitiveType || !selfFields[field?index+1].optional) >
 
             </#if>
         <#else>
-            ${field.name}.Encode(buffer);
+            ${thisField1}.Encode(buffer);
         </#if>
     </#if>
 </#list>
-<#if definedFieldId>
+<#if compatible>
             WriteTag(buffer,0);
 </#if>
         }
@@ -289,7 +284,7 @@ namespace ${getFullPackageName("cs")}
         {
             base.Decode(buffer);
 
-<#if definedFieldId>
+<#if compatible>
             for (var tag = ReadTag(buffer); tag != 0; tag = ReadTag(buffer))
             {
                 switch (tag)
@@ -298,6 +293,13 @@ namespace ${getFullPackageName("cs")}
                     <#if field.ignore>
                         <#continue/>
                     </#if>
+                    <#if field.name=="buffer">
+                        <#assign thisField1 = "this.${field.name}" thisField2 = "this.${field.name}">
+                    <#elseif field.name=="i">
+                        <#assign thisField1 = field.name thisField2 = "this.${field.name}">
+                    <#else>
+                        <#assign thisField1 = field.name thisField2 = field.name>
+                    </#if>
                     case ${field.tag}:
                     <#if field.type=="set" || field.type=="list">
                         buffer.ReadInt();
@@ -305,40 +307,40 @@ namespace ${getFullPackageName("cs")}
                         for (var i = 0; i < ${field.name}_Size; i++) 
                         {
                         <#if field.builtinValueType>
-                            <#if field.name="i">this.</#if>${field.name}.Add(buffer.Read${field.valueType?cap_first}());
+                            ${thisField2}.Add(buffer.Read${field.valueType?cap_first}());
                         <#else>
                             var ${field.name}Value = new ${field.valueClassType}();
                             ${field.name}Value.Decode(buffer);
-                            <#if field.name="i">this.</#if>${field.name}.Add(${field.name}Value);
+                            ${thisField2}.Add(${field.name}Value);
                         </#if>
                         }
-                        <#elseif field.type=="map">
+                    <#elseif field.type=="map">
                         buffer.ReadInt();
                         var ${field.name}_Size = buffer.ReadInt();
                         for (var i = 0; i < ${field.name}_Size; i++)
                         {
                         <#if field.builtinValueType>
-                            <#if field.name="i">this.</#if>${field.name}.Add(buffer.Read${field.keyType?cap_first}(), buffer.Read${field.valueType?cap_first}());
+                            ${thisField2}.Add(buffer.Read${field.keyType?cap_first}(), buffer.Read${field.valueType?cap_first}());
                         <#else>
                             var ${field.name}Key = buffer.Read${field.keyType?cap_first}();
                             var ${field.name}Value = new ${field.valueClassType}();
                             ${field.name}Value.Decode(buffer);
-                            <#if field.name="i">this.</#if>${field.name}.Add(${field.name}Key, ${field.name}Value);
+                            ${thisField2}.Add(${field.name}Key, ${field.name}Value);
                         </#if>
                         }
                     <#elseif field.type=="float"||field.type=="double">
-                        ${field.name} = buffer.Read${field.type?cap_first}(<#if field.scale gt 0>${field.scale}</#if>);
+                        ${thisField1} = buffer.Read${field.type?cap_first}(<#if field.scale gt 0>${field.scale}</#if>);
                     <#elseif field.builtinType>
-                        ${field.name} = buffer.Read${field.type?cap_first}();
+                        ${thisField1} = buffer.Read${field.type?cap_first}();
                     <#elseif field.enumType>
-                        ${field.name} = (${field.type}) buffer.ReadInt();
+                        ${thisField1} = (${field.type}) buffer.ReadInt();
                     <#elseif field.optional>
                         buffer.ReadInt();
-                        ${field.name} = ${field.name} ?? new ${field.classType}();
-                        ${field.name}.Decode(buffer);
+                        ${thisField1} = ${thisField1} ?? new ${field.classType}();
+                        ${thisField1}.Decode(buffer);
                         <#else>
                         buffer.ReadInt();
-                        ${field.name}.Decode(buffer);
+                        ${thisField1}.Decode(buffer);
                     </#if>
                         break;
         </#list>
@@ -351,7 +353,15 @@ namespace ${getFullPackageName("cs")}
 <#list selfFields as field>
     <#if field.ignore>
         <#continue/>
-    <#elseif field.type=="set" || field.type=="list">
+    </#if>
+    <#if field.name=="buffer">
+        <#assign thisField1 = "this.${field.name}" thisField2 = "this.${field.name}">
+    <#elseif field.name=="i">
+        <#assign thisField1 = field.name thisField2 = "this.${field.name}">
+    <#else>
+        <#assign thisField1 = field.name thisField2 = field.name>
+    </#if>
+    <#if field.type=="set" || field.type=="list">
         <#if field?index gt 0>
 
         </#if>
@@ -359,11 +369,11 @@ namespace ${getFullPackageName("cs")}
             for (var i = 0; i < ${field.name}_Size; i++)
             {
         <#if field.builtinValueType>
-                <#if field.name="i">this.</#if>${field.name}.Add(buffer.Read${field.valueType?cap_first}());
+                ${thisField2}.Add(buffer.Read${field.valueType?cap_first}());
         <#else>
                 var ${field.name}Value = new ${field.valueClassType}();
                 ${field.name}Value.Decode(buffer);
-                <#if field.name="i">this.</#if>${field.name}.Add(${field.name}Value);
+                ${thisField2}.Add(${field.name}Value);
         </#if>
             }
         <#if field?has_next && !selfFields[field?index+1].collectionType && (selfFields[field?index+1].primitiveType || !selfFields[field?index+1].optional) >
@@ -377,37 +387,37 @@ namespace ${getFullPackageName("cs")}
             for (var i = 0; i < ${field.name}_Size; i++)
             {
         <#if field.builtinValueType>
-                <#if field.name="i">this.</#if>${field.name}.Add(buffer.Read${field.keyType?cap_first}(), buffer.Read${field.valueType?cap_first}());
+                ${thisField2}.Add(buffer.Read${field.keyType?cap_first}(), buffer.Read${field.valueType?cap_first}());
         <#else>
                 var ${field.name}Key = buffer.Read${field.keyType?cap_first}();
                 var ${field.name}Value = new ${field.valueClassType}();
                 ${field.name}Value.Decode(buffer);
-                <#if field.name="i">this.</#if>${field.name}.Add(${field.name}Key, ${field.name}Value);
+                ${thisField2}.Add(${field.name}Key, ${field.name}Value);
         </#if>
             }
         <#if field?has_next && !selfFields[field?index+1].collectionType && (selfFields[field?index+1].primitiveType || !selfFields[field?index+1].optional) >
 
         </#if>
     <#elseif field.type=="float"||field.type=="double">
-            ${field.name} = buffer.Read${field.type?cap_first}(<#if field.scale gt 0>${field.scale}</#if>);
+            ${thisField1} = buffer.Read${field.type?cap_first}(<#if field.scale gt 0>${field.scale}</#if>);
     <#elseif field.builtinType>
-            ${field.name} = buffer.Read${field.type?cap_first}();
+            ${thisField1} = buffer.Read${field.type?cap_first}();
     <#elseif field.enumType>
-            ${field.name} = (${field.type}) buffer.ReadInt();
+            ${thisField1} = (${field.type}) buffer.ReadInt();
     <#elseif field.optional>
         <#if field?index gt 0>
 
         </#if>
             if (buffer.ReadBool()) 
             {
-                ${field.name} = ${field.name} ?? new ${field.classType}();
-                ${field.name}.Decode(buffer);
+                ${thisField1} = ${thisField1} ?? new ${field.classType}();
+                ${thisField1}.Decode(buffer);
             }
         <#if field?has_next && !selfFields[field?index+1].collectionType && (selfFields[field?index+1].primitiveType || !selfFields[field?index+1].optional) >
 
         </#if>
     <#else>
-            ${field.name}.Decode(buffer);
+            ${thisField1}.Decode(buffer);
     </#if>
 </#list>
 </#if>

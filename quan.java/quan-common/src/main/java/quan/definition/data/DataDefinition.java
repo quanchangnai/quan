@@ -47,7 +47,7 @@ public class DataDefinition extends BeanDefinition {
 
     @Override
     public int getKind() {
-        return 5;
+        return KIND_DATA;
     }
 
     @Override

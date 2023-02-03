@@ -13,7 +13,7 @@ public class EnumDefinition extends ClassDefinition {
 
     @Override
     public int getKind() {
-        return 1;
+        return KIND_ENUM;
     }
 
     @Override

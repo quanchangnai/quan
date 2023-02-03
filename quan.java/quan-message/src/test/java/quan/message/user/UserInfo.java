@@ -55,6 +55,8 @@ public class UserInfo extends Bean {
 
     private double f18;
 
+    private String alias;
+
 
     /**
      * ID
@@ -260,6 +262,15 @@ public class UserInfo extends Bean {
         return this;
     }
 
+    public String getAlias() {
+        return alias;
+    }
+
+    public UserInfo setAlias(String alias) {
+        this.alias = alias;
+        return this;
+    }
+
     @Override
     public void encode(CodedBuffer buffer) {
         super.encode(buffer);
@@ -366,6 +377,11 @@ public class UserInfo extends Bean {
             buffer.writeDouble(this.f18, 2);
         }
 
+        if (this.alias != null) {
+            writeTag(buffer, 79);
+            buffer.writeString(this.alias);
+        }
+
         writeTag(buffer, 0);
     }
 
@@ -454,6 +470,9 @@ public class UserInfo extends Bean {
                 case 72:
                     setF18(buffer.readDouble(2));
                     break;
+                case 79:
+                    this.alias = buffer.readString();
+                    break;
                 default:
                     skipField(tag, buffer);
             }
@@ -481,6 +500,7 @@ public class UserInfo extends Bean {
                 ",f16=" + f16 +
                 ",f17=" + f17 +
                 ",f18=" + f18 +
+                ",alias='" + alias + '\'' +
                 '}';
 
     }

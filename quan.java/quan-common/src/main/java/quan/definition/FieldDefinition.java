@@ -95,7 +95,7 @@ public class FieldDefinition extends Definition implements Cloneable {
 
     @Override
     public int getKind() {
-        return 4;
+        return KIND_FIELD;
     }
 
     @Override
@@ -387,7 +387,7 @@ public class FieldDefinition extends Definition implements Cloneable {
     }
 
     public String getBasicType() {
-        if (isEnumType()) {
+        if (isEnumType() || isBeanType()) {
             return getClassType();
         }
         if (basicType == null) {

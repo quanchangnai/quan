@@ -38,7 +38,7 @@ public class BeanDefinition extends ClassDefinition {
 
     private String escapedDelimiter;
 
-    //消息的字段ID
+    //消息的字段ID，用来标记和识别字段，不能识别的字段丢弃掉
     private final Set<Integer> fieldIds = new HashSet<>();
 
     public BeanDefinition() {
@@ -55,7 +55,7 @@ public class BeanDefinition extends ClassDefinition {
 
     @Override
     public int getKind() {
-        return 2;
+        return KIND_BEAN;
     }
 
     @Override
@@ -457,7 +457,10 @@ public class BeanDefinition extends ClassDefinition {
         }
     }
 
-    public boolean isDefinedFieldId() {
+    /**
+     * 消息编解码是否兼容字段不一致的情况
+     */
+    public boolean isCompatible() {
         return !fieldIds.isEmpty();
     }
 

@@ -11,7 +11,7 @@ import ${import};
 </#if>
  * 代码自动生成，请勿手动修改
  */
-public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#else>Message</#if> {
+public class ${name} extends <#if kind ==2>Bean<#else>Message</#if> {
 
 <#if kind == 3>
     /**
@@ -20,33 +20,28 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
     public static final int ID = ${id?c};
 
 </#if>
-<#if kind == 9>
-    <#assign fieldModifier = "protected">
-<#else>
-    <#assign fieldModifier = "private">
-</#if>
 <#list selfFields as field>
     <#if field.comment !="">
     //${field.comment}
     </#if>
     <#if field.type == "set" || field.type == "list">
-    ${fieldModifier} final ${field.basicType}<${field.valueClassType}> ${field.name} = new ${field.classType}<>();
+    private final ${field.basicType}<${field.valueClassType}> ${field.name} = new ${field.classType}<>();
     <#elseif field.type == "map">
-    ${fieldModifier} final ${field.basicType}<${field.keyClassType}, ${field.valueClassType}> ${field.name} = new ${field.classType}<>();
+    private final ${field.basicType}<${field.keyClassType}, ${field.valueClassType}> ${field.name} = new ${field.classType}<>();
     <#elseif field.type == "string">
-    ${fieldModifier} ${field.basicType} ${field.name} = "";
+    private ${field.basicType} ${field.name}<#if !field.optional> = ""</#if>;
     <#elseif field.type == "bytes">
-    ${fieldModifier} ${field.basicType} ${field.name} = new byte[0];
+    private ${field.basicType} ${field.name}<#if !field.optional> = new byte[0]</#if>;
     <#elseif field.builtinType>
-    ${fieldModifier} ${field.basicType} ${field.name};
+    private ${field.basicType} ${field.name};
     <#elseif !field.optional && !field.enumType>
-    ${fieldModifier} ${field.classType} ${field.name} = new ${field.classType}();
+    private ${field.classType} ${field.name} = new ${field.classType}();
     <#else>
-    ${fieldModifier} ${field.classType} ${field.name};
+    private ${field.classType} ${field.name};
     </#if>
 
 </#list>
-<#if kind !=9 && selfFields?size <= 5>
+<#if selfFields?size <= 5>
     public ${name}() {
     }
 
@@ -102,7 +97,7 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
         return ${field.name};
     }
 
-    <#elseif field.builtinType>
+    <#else>
     public ${field.basicType} get${field.name?cap_first}() {
         return ${field.name};
     }
@@ -113,9 +108,7 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
      */
     </#if>
     public ${name} set${field.name?cap_first}(${field.basicType} ${field.name}) {
-        <#if field.type == "string" || field.type == "bytes">
-        Objects.requireNonNull(${field.name});
-        <#elseif (field.type=="float"||field.type=="double") && field.scale gt 0>
+        <#if (field.type=="float"||field.type=="double") && field.scale gt 0>
         CodedBuffer.checkScale(${field.name}, ${field.scale});
         </#if>
         <#if field.min?? && field.max??>
@@ -124,23 +117,7 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
         NumberUtils.checkMin(${field.name}, ${field.min});
         <#elseif field.max??>
         NumberUtils.checkMax(${field.name}, ${field.max});
-        </#if>
-        this.${field.name} = ${field.name};
-        return this;
-    }
-
-    <#else>
-    public ${field.classType} get${field.name?cap_first}() {
-        return ${field.name};
-    }
-
-    <#if field.comment !="">
-    /**
-     * ${field.comment}
-     */
-    </#if>
-    public ${name} set${field.name?cap_first}(${field.classType} ${field.name}) {
-        <#if !field.enumType && !field.optional>
+        <#elseif (field.type == "string" || field.type == "bytes" || field.beanType) && !field.optional>
         Objects.requireNonNull(${field.name});
         </#if>
         this.${field.name} = ${field.name};
@@ -164,7 +141,7 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
     <#if field.ignore>
         <#continue/>
     </#if>
-    <#if definedFieldId>
+    <#if compatible>
         <#if field.type=="set" || field.type=="list">
         if (!this.${field.name}.isEmpty()) {
             writeTag(buffer, ${field.tag});
@@ -208,12 +185,20 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
             buffer.write${field.type?cap_first}(this.${field.name});
         }
         <#elseif field.type=="string">
+        <#if field.optional>
+        if (this.${field.name} != null) {
+        <#else>
         if (!this.${field.name}.isEmpty()) {
+        </#if>
             writeTag(buffer, ${field.tag});
             buffer.write${field.type?cap_first}(this.${field.name});
         }
         <#elseif field.type=="bytes">
+        <#if field.optional>
+        if (this.${field.name} != null) {
+        <#else>
         if (this.${field.name}.length > 0) {
+        </#if>
             writeTag(buffer, ${field.tag});
             buffer.write${field.type?cap_first}(this.${field.name});
         }
@@ -288,7 +273,7 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
         </#if>
     </#if>
 </#list>
-<#if definedFieldId>
+<#if compatible>
         writeTag(buffer, 0);
 </#if>
     }
@@ -297,7 +282,7 @@ public<#if kind ==9> abstract</#if> class ${name} extends <#if kind ==2>Bean<#el
     public void decode(CodedBuffer buffer) {
         super.decode(buffer);
 
-<#if definedFieldId>
+<#if compatible>
         for (int tag = readTag(buffer); tag != 0; tag = readTag(buffer)) {
             switch (tag) {
             <#list selfFields as field>

@@ -23,6 +23,7 @@ local function toString(self)
     return "RoleInfo{" ..
             "id=" .. tostring(self.id) ..
             ",name='" .. tostring(self.name) .. '\'' ..
+            ",alias='" .. tostring(self.alias) .. '\'' ..
             ",type=" .. tostring(self.type) ..
             ",b=" .. tostring(self.b) ..
             ",s=" .. tostring(self.s) ..
@@ -51,6 +52,7 @@ function RoleInfo.new(args)
         id = args.id or 0,
         ---角色名
         name = args.name or "",
+        alias = args.alias,
         type = args.type or 0,
         b = args.b or false,
         s = args.s or 0,
@@ -81,6 +83,7 @@ function RoleInfo:encode(buffer)
 
     buffer:writeInt(self.id)
     buffer:writeString(self.name)
+    buffer:writeString(self.alias)
     buffer:writeInt(self.type or 0)
     buffer:writeBool(self.b)
     buffer:writeShort(self.s)
@@ -115,6 +118,7 @@ function RoleInfo.decode(buffer, self)
 
     self.id = buffer:readInt()
     self.name = buffer:readString()
+    self.alias = buffer:readString()
     self.type = buffer:readInt()
     self.b = buffer:readBool()
     self.s = buffer:readShort()

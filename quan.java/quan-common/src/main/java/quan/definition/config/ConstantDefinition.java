@@ -39,7 +39,7 @@ public class ConstantDefinition extends ClassDefinition {
 
     @Override
     public int getKind() {
-        return 8;
+        return KIND_CONSTANT;
     }
 
     @Override

@@ -27,6 +27,14 @@ namespace Test.Message.Role
             set => _name = value ?? throw new NullReferenceException();
         }
 
+        private string _alias;
+
+        public string alias
+        {
+            get => _alias;
+            set => _alias = value;
+        }
+
         public RoleType type { get; set; }
 
         public bool b { get; set; }
@@ -47,7 +55,7 @@ namespace Test.Message.Role
 
         public double d { get; set; }
 
-        private byte[] _data = new byte[0];
+        private byte[] _data = Array.Empty<byte>();
 
         public byte[] data
         {
@@ -68,6 +76,7 @@ namespace Test.Message.Role
 
             buffer.WriteInt(id);
             buffer.WriteString(name);
+            buffer.WriteString(alias);
             buffer.WriteInt((int) type);
             buffer.WriteBool(b);
             buffer.WriteShort(s);
@@ -94,6 +103,7 @@ namespace Test.Message.Role
 
             id = buffer.ReadInt();
             name = buffer.ReadString();
+            alias = buffer.ReadString();
             type = (RoleType) buffer.ReadInt();
             b = buffer.ReadBool();
             s = buffer.ReadShort();
@@ -119,6 +129,7 @@ namespace Test.Message.Role
             return "RoleInfo{" +
                    "id=" + id.ToString2() +
                    ",name='" + name + '\'' +
+                   ",alias='" + alias + '\'' +
                    ",type=" + type.ToString2() +
                    ",b=" + b.ToString2() +
                    ",s=" + s.ToString2() +
