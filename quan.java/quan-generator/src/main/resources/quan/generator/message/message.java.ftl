@@ -1,6 +1,5 @@
 package ${getFullPackageName("java")};
 
-import quan.message.*;
 <#list imports?keys as import>
 import ${import};
 </#list>
@@ -11,7 +10,7 @@ import ${import};
 </#if>
  * 代码自动生成，请勿手动修改
  */
-public class ${name} extends <#if kind ==2>Bean<#else>Message</#if> {
+public class ${name} extends <#if kind ==2>${getDependentName("Bean")}<#else>${getDependentName("Message")}</#if> {
 
 <#if kind == 3>
     /**
@@ -81,6 +80,7 @@ public class ${name} extends <#if kind ==2>Bean<#else>Message</#if> {
     }
 
 </#if>
+<#assign Objects=getDependentName("Objects") CodedBuffer=getDependentName("CodedBuffer") NumberUtils=getDependentName("NumberUtils")>
 <#list selfFields as field>
     <#if field.comment !="">
     /**
@@ -109,16 +109,16 @@ public class ${name} extends <#if kind ==2>Bean<#else>Message</#if> {
     </#if>
     public ${name} set${field.name?cap_first}(${field.basicType} ${field.name}) {
         <#if (field.type=="float"||field.type=="double") && field.scale gt 0>
-        CodedBuffer.checkScale(${field.name}, ${field.scale});
+        ${CodedBuffer}.checkScale(${field.name}, ${field.scale});
         </#if>
         <#if field.min?? && field.max??>
-        NumberUtils.checkRange(${field.name}, ${field.min}, ${field.max});
+        ${NumberUtils}.checkRange(${field.name}, ${field.min}, ${field.max});
         <#elseif field.min??>
-        NumberUtils.checkMin(${field.name}, ${field.min});
+        ${NumberUtils}.checkMin(${field.name}, ${field.min});
         <#elseif field.max??>
-        NumberUtils.checkMax(${field.name}, ${field.max});
+        ${NumberUtils}.checkMax(${field.name}, ${field.max});
         <#elseif (field.type == "string" || field.type == "bytes" || field.beanType) && !field.optional>
-        Objects.requireNonNull(${field.name});
+        ${Objects}.requireNonNull(${field.name});
         </#if>
         this.${field.name} = ${field.name};
         return this;
@@ -134,7 +134,7 @@ public class ${name} extends <#if kind ==2>Bean<#else>Message</#if> {
 
 </#if>
     @Override
-    public void encode(CodedBuffer buffer) {
+    public void encode(${CodedBuffer} buffer) {
         super.encode(buffer);
 
 <#list selfFields as field>
@@ -278,8 +278,8 @@ public class ${name} extends <#if kind ==2>Bean<#else>Message</#if> {
 </#if>
     }
 
-    @Override
-    public void decode(CodedBuffer buffer) {
+    @${getDependentName("Override")}
+    public void decode(${CodedBuffer} buffer) {
         super.decode(buffer);
 
 <#if compatible>
@@ -405,7 +405,7 @@ public class ${name} extends <#if kind ==2>Bean<#else>Message</#if> {
     }
 
     @Override
-    public String toString() {
+    public ${getDependentName("String")} toString() {
         return "${name}{" +
         <#if kind ==3>
                 "_id=" + ID +

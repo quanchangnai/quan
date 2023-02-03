@@ -53,12 +53,17 @@ public class CSharpConfigGenerator extends ConfigGenerator {
     }
 
     @Override
-    protected void prepareClass(ClassDefinition classDefinition) {
-        super.prepareClass(classDefinition);
-        if (classDefinition instanceof ConfigDefinition) {
-            classDefinition.getImports().put("System.Collections.Generic", null);
-            classDefinition.getImports().put("System.Collections.Immutable", null);
+    protected void prepareBean(BeanDefinition beanDefinition) {
+        super.prepareBean(beanDefinition);
+        if (beanDefinition instanceof ConfigDefinition) {
+            beanDefinition.addImport("System.Collections.Generic");
+            beanDefinition.addImport("System.Collections.Immutable");
         }
+        if (beanDefinition.getParent() == null || beanDefinition instanceof ConfigDefinition) {
+            beanDefinition.addImport("Quan.Config");
+        }
+        beanDefinition.addImport("Newtonsoft.Json.Linq");
+        beanDefinition.addImport("Quan.Utils");
     }
 
     @Override
@@ -67,12 +72,12 @@ public class CSharpConfigGenerator extends ConfigGenerator {
         ClassDefinition classDefinition = fieldDefinition.getOwner();
 
         if (fieldDefinition.isCollectionType() || fieldDefinition.isSimpleRef() && fieldDefinition.getRefIndex().isNormal()) {
-            classDefinition.getImports().put("System.Collections.Generic", null);
+            classDefinition.addImport("System.Collections.Generic");
         }
 
         if (fieldDefinition.isTimeType()) {
             if (!(classDefinition instanceof BeanDefinition) || ((BeanDefinition) classDefinition).getSelfFields().contains(fieldDefinition)) {
-                classDefinition.getImports().put("System", null);
+                classDefinition.addImport("System");
             }
         }
     }

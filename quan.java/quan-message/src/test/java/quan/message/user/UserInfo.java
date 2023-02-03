@@ -1,7 +1,7 @@
 package quan.message.user;
 
-import quan.message.*;
 import java.util.*;
+import quan.message.*;
 
 /**
  * 用户信息<br/>

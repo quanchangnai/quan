@@ -1,14 +1,5 @@
 package ${getFullPackageName("java")};
 
-import java.util.*;
-import org.bson.*;
-import org.bson.codecs.*;
-import org.bson.codecs.configuration.CodecRegistry;
-import quan.data.*;
-import quan.data.field.*;
-<#if kind ==5>
-import quan.data.mongo.JsonStringWriter;
-</#if>
 <#list imports?keys as import>
 import ${import};
 </#list>
@@ -21,20 +12,20 @@ import ${import};
  */
 <#if kind ==5>
 <#list indexes as index>
-@Index(name = "${index.name}", fields = {<#rt/>
+@${getDependentName("Index")}(name = "${index.name}", fields = {<#rt/>
     <#list index.fields as field>
      <#lt/>${name}.${field.underscoreName}<#if field_has_next>, </#if><#rt/>
     </#list>
-    <#lt/>}, type = Index.Type.<#if index.text>TEXT<#elseif index.unique>UNIQUE<#else>NORMAL</#if>)
+    <#lt/>}, type = ${getDependentName("Index")}.Type.<#if index.text>TEXT<#elseif index.unique>UNIQUE<#else>NORMAL</#if>)
 </#list>
 </#if>
-public class ${name} extends <#if kind ==2>Bean<#elseif kind ==5>Data<${idField.classType}></#if> {
+public class ${name} extends <#if kind ==2>${getDependentName("Bean")}<#elseif kind ==5>${getDependentName("Data")}<${idField.classType}></#if> {
 <#if kind ==5>
 
     /**
      * 对应的表名
      */
-    public static final String _NAME = "${underscoreName}";
+    public static final ${getDependentName("String")} _NAME = "${underscoreName}";
 
 </#if>
 <#list fields as field>
@@ -44,10 +35,12 @@ public class ${name} extends <#if kind ==2>Bean<#elseif kind ==5>Data<${idField.
      * ${field.comment}
      */
     </#if>
-    public static final String ${field.underscoreName} = "${field.name}";
+    public static final ${getDependentName("String")} ${field.underscoreName} = "${field.name}";
 </#list>
 
 <#assign root><#if kind ==5>this<#else>_getLogRoot()</#if></#assign>
+<#assign Objects=getDependentName("Objects") NumberUtils=getDependentName("NumberUtils")>
+<#assign IntField=getDependentName("IntField") BeanField=getDependentName("BeanField")>
 <#list fields as field>
 
     <#if field.type == "set" || field.type == "list">
@@ -55,11 +48,11 @@ public class ${name} extends <#if kind ==2>Bean<#elseif kind ==5>Data<${idField.
     <#elseif field.type == "map">
     private final ${field.classType}<${field.keyClassType}, ${field.valueClassType}> ${field.name} = new ${field.classType}<>(${root});
     <#elseif field.enumType>
-    private final IntField ${field.name} = new IntField();
+    private final ${IntField} ${field.name} = new ${IntField}();
     <#elseif field.primitiveType>
-    private final ${field.type?cap_first}Field ${field.name} = new ${field.type?cap_first}Field();
+    private final ${getDependentName(field.type?cap_first+"Field")} ${field.name} = new ${getDependentName(field.type?cap_first+"Field")}();
     <#else>
-    private final BeanField<${field.classType}> ${field.name} = new BeanField<>();
+    private final ${BeanField}<${field.classType}> ${field.name} = new ${BeanField}<>();
     </#if>
 </#list>
 
@@ -69,7 +62,7 @@ public class ${name} extends <#if kind ==2>Bean<#elseif kind ==5>Data<${idField.
 
     public ${name}(${idField.type} ${idName}) {
     <#if idField.type=="string">    
-        Objects.requireNonNull(${idName}, "参数[${idName}]不能为空");
+        ${Objects}.requireNonNull(${idName}, "参数[${idName}]不能为空");
     </#if>
         this.${idName}.setValue(${idName},this);
     }
@@ -155,11 +148,11 @@ public class ${name} extends <#if kind ==2>Bean<#elseif kind ==5>Data<${idField.
     </#if>
     public ${name} set${field.name?cap_first}(${field.basicType} ${field.name}) {
         <#if field.min?? && field.max??>
-        NumberUtils.checkRange(${field.name}, ${field.min}, ${field.max});
+        ${NumberUtils}.checkRange(${field.name}, ${field.min}, ${field.max});
         <#elseif field.min??>
-        NumberUtils.checkMin(${field.name}, ${field.min});
+        ${NumberUtils}.checkMin(${field.name}, ${field.min});
         <#elseif field.max??>
-        NumberUtils.checkMax(${field.name}, ${field.max});
+        ${NumberUtils}.checkMax(${field.name}, ${field.max});
         </#if>
         this.${field.name}.setValue(${field.name}, ${root});
         return this;
@@ -184,8 +177,8 @@ public class ${name} extends <#if kind ==2>Bean<#elseif kind ==5>Data<${idField.
 </#list>
 <#if kind !=5>
 
-    @Override
-    protected void _setChildrenLogRoot(Data<?> root) {
+    @${getDependentName("Override")}
+    protected void _setChildrenLogRoot(${getDependentName("Data")}<?> root) {
     <#list fields as field>
         <#if field.collectionType>
         _setLogRoot(${field.name}, root);
@@ -196,8 +189,8 @@ public class ${name} extends <#if kind ==2>Bean<#elseif kind ==5>Data<${idField.
     }
 </#if>
 
-    @Override
-    public String toString() {
+    @${getDependentName("Override")}
+    public ${getDependentName("String")} toString() {
         return "${name}{" +
         <#list fields as field>
                 "<#rt>
@@ -218,24 +211,24 @@ public class ${name} extends <#if kind ==2>Bean<#elseif kind ==5>Data<${idField.
     <#assign bsonTypes={"byte":"Int32","bool":"Boolean","short":"Int32","int":"Int32","long":"Int64","float":"Double","double":"Double","string":"String"}/>
     <#assign convertTypes={"byte":"byte","short":"short","float":"float"}/>
 
-    public static class CodecImpl implements Codec<${name}> {
+    public static class CodecImpl implements ${getDependentName("Codec")}<${name}> {
 
-        private final CodecRegistry registry;
+        private final ${getDependentName("CodecRegistry")} registry;
 
-        public CodecImpl(CodecRegistry registry) {
+        public CodecImpl(${getDependentName("CodecRegistry")} registry) {
             this.registry = registry;
         }
 
-        public CodecRegistry getRegistry() {
+        public ${getDependentName("CodecRegistry")} getRegistry() {
             return registry;
         }
 
-        @Override
-        public ${name} decode(BsonReader reader, DecoderContext decoderContext) {
+        @${getDependentName("Override")}
+        public ${name} decode(${getDependentName("BsonReader")} reader, ${getDependentName("DecoderContext")} decoderContext) {
             reader.readStartDocument();
             ${name} value = new ${name}(); 
         
-            while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
+            while (reader.readBsonType() != ${getDependentName("BsonType")}.END_OF_DOCUMENT) {
                 switch (reader.readName()) {
                     <#list fields as field>
                         <#if field.ignore>
@@ -253,7 +246,7 @@ public class ${name} extends <#if kind ==2>Bean<#elseif kind ==5>Data<${idField.
                         value.${field.name}.setValue(decoderContext.decodeWithChildContext(registry.get(${field.classType}.class), reader));
                         <#elseif field.type == "list" || field.type == "set">
                         reader.readStartArray();
-                        while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
+                        while (reader.readBsonType() != ${getDependentName("BsonType")}.END_OF_DOCUMENT) {
                             <#if field.primitiveValueType>
                             value.${field.name}.plus(<#if convertTypes[field.type]??>(${field.classType}) </#if>reader.read${bsonTypes[field.valueType]}());
                             <#elseif field.beanValueType>
@@ -265,7 +258,7 @@ public class ${name} extends <#if kind ==2>Bean<#elseif kind ==5>Data<${idField.
                         reader.readEndArray();
                         <#elseif field.type == "map">
                         reader.readStartDocument();
-                        while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
+                        while (reader.readBsonType() != ${getDependentName("BsonType")}.END_OF_DOCUMENT) {
                             <#if field.primitiveValueType>
                             value.${field.name}.plus(<#if convertTypes[field.keyType]??>(${field.valueBasicType}) </#if>${field.keyClassType}.valueOf(reader.readName()), <#if convertTypes[field.valueType]??>(${field.valueBasicType})</#if>reader.read${bsonTypes[field.valueType]}());
                             <#else>
@@ -287,13 +280,13 @@ public class ${name} extends <#if kind ==2>Bean<#elseif kind ==5>Data<${idField.
             return value;
         }
 
-        @Override
-        public void encode(BsonWriter writer, ${name} value, EncoderContext encoderContext) {
-            Transaction transaction = Transaction.get();
+        @${getDependentName("Override")}
+        public void encode(${getDependentName("BsonWriter")} writer, ${name} value, ${getDependentName("EncoderContext")} encoderContext) {
+            ${getDependentName("Transaction")} transaction = ${getDependentName("Transaction")}.get();
             writer.writeStartDocument();
             <#if kind ==5>
 
-            if (writer instanceof JsonStringWriter) {
+            if (writer instanceof ${getDependentName("JsonStringWriter")}) {
                 writer.write${bsonTypes[idField.type]}(${name}.${idField.underscoreName}, value.${idField.name}.getValue(transaction));
             } else {
                 writer.write${bsonTypes[idField.type]}(${name}._ID, value.${idField.name}.getValue(transaction));
@@ -323,7 +316,7 @@ public class ${name} extends <#if kind ==2>Bean<#elseif kind ==5>Data<${idField.
                     <#if field_index gt 0 >
 
                     </#if>
-            Collection<${field.valueClassType}> $${field.name} = value.${field.name}.getCurrent(transaction);
+            ${getDependentName("Collection")}<${field.valueClassType}> $${field.name} = value.${field.name}.getCurrent(transaction);
             if (!$${field.name}.isEmpty()) {
                 writer.writeStartArray(${name}.${field.underscoreName});
                 for (${field.valueClassType} ${field.name}Value : $${field.name}) {
@@ -344,7 +337,7 @@ public class ${name} extends <#if kind ==2>Bean<#elseif kind ==5>Data<${idField.
                     <#if field_index gt 0 >
 
                     </#if>
-            Map<${field.keyClassType}, ${field.valueClassType}> $${field.name} = value.${field.name}.getCurrent(transaction);
+            ${getDependentName("Map")}<${field.keyClassType}, ${field.valueClassType}> $${field.name} = value.${field.name}.getCurrent(transaction);
             if (!$${field.name}.isEmpty()) {
                 writer.writeStartDocument(${name}.${field.underscoreName});
                 for (Map.Entry<${field.keyClassType}, ${field.valueClassType}> ${field.name}Entry : $${field.name}.entrySet()) {
@@ -370,8 +363,8 @@ public class ${name} extends <#if kind ==2>Bean<#elseif kind ==5>Data<${idField.
             writer.writeEndDocument();
         }
 
-        @Override
-        public Class<${name}> getEncoderClass() {
+       @${getDependentName("Override")}
+        public ${getDependentName("Class")}<${name}> getEncoderClass() {
             return ${name}.class;
         }
 

@@ -6,8 +6,8 @@ import org.bson.codecs.*;
 import org.bson.codecs.configuration.CodecRegistry;
 import quan.data.*;
 import quan.data.field.*;
-import quan.data.mongo.JsonStringWriter;
 import quan.data.item.ItemBean;
+import quan.data.mongo.JsonStringWriter;
 import quan.util.NumberUtils;
 
 /**
@@ -550,7 +550,7 @@ public class RoleData extends Data<Long> {
             writer.writeEndDocument();
         }
 
-        @Override
+       @Override
         public Class<RoleData> getEncoderClass() {
             return RoleData.class;
         }

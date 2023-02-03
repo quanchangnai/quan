@@ -1,7 +1,7 @@
 package quan.message.role;
 
-import quan.message.*;
 import java.util.*;
+import quan.message.*;
 import quan.message.user.UserInfo;
 
 /**

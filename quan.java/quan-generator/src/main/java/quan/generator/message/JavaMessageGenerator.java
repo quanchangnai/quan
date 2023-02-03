@@ -1,7 +1,9 @@
 package quan.generator.message;
 
+import quan.definition.BeanDefinition;
 import quan.definition.FieldDefinition;
 import quan.definition.Language;
+import quan.definition.parser.DefinitionParser;
 
 import java.util.Properties;
 
@@ -34,6 +36,27 @@ public class JavaMessageGenerator extends MessageGenerator {
         classTypes.put("list", "ArrayList");
         classTypes.put("map", "HashMap");
         classTypes.put("bytes", "byte[]");
+
+        classNames.put("Boolean", "java.lang.Boolean");
+        classNames.put("Short", "java.lang.Short");
+        classNames.put("Integer", "java.lang.Integer");
+        classNames.put("Long", "java.lang.Long");
+        classNames.put("Float", "java.lang.Float");
+        classNames.put("Double", "java.lang.Double");
+        classNames.put("String", "java.lang.String");
+        classNames.put("Override", "java.lang.Override");
+
+        classNames.put("Set", "java.util.Set");
+        classNames.put("HashSet", "java.util.HashSet");
+        classNames.put("List", "java.util.List");
+        classNames.put("ArrayList", "java.util.ArrayList");
+        classNames.put("Map", "java.util.Map");
+        classNames.put("HashMap", "java.util.HashMap");
+        classNames.put("Objects", "quan.util.Objects");
+        classNames.put("Bean", "quan.message.Bean");
+        classNames.put("Message", "quan.message.Message");
+        classNames.put("CodedBuffer", "quan.message.CodedBuffer");
+        classNames.put("NumberUtils", "quan.util.NumberUtils");
     }
 
     public JavaMessageGenerator(Properties options) {
@@ -45,17 +68,30 @@ public class JavaMessageGenerator extends MessageGenerator {
         return Language.java;
     }
 
+
+    @Override
+    public DefinitionParser getParser() {
+        return super.getParser();
+    }
+
+    @Override
+    protected void prepareBean(BeanDefinition beanDefinition) {
+        beanDefinition.addImport("quan.message.*");
+        super.prepareBean(beanDefinition);
+    }
+
+
     @Override
     protected void prepareField(FieldDefinition fieldDefinition) {
         super.prepareField(fieldDefinition);
         if (fieldDefinition.isBytesType() || fieldDefinition.isStringType()
                 || fieldDefinition.isCollectionType() || fieldDefinition.isTimeType()
                 || fieldDefinition.isBeanType() && !fieldDefinition.isOptional()) {
-            fieldDefinition.getOwner().getImports().put("java.util.*", null);
+            fieldDefinition.getOwner().addImport("java.util.*");
 
         }
         if (fieldDefinition.getMin() != null || fieldDefinition.getMax() != null) {
-            fieldDefinition.getOwner().getImports().put("quan.util.NumberUtils", null);
+            fieldDefinition.getOwner().addImport("quan.util.NumberUtils");
         }
     }
 

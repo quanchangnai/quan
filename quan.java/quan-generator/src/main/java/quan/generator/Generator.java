@@ -41,6 +41,10 @@ public abstract class Generator {
 
     protected Map<String, String> classTypes = new HashMap<>();
 
+
+    //类的简单名对应全名
+    protected Map<String, String> classNames = new HashMap<>();
+
     protected boolean enable = true;
 
     protected String definitionFileEncoding;
@@ -279,6 +283,8 @@ public abstract class Generator {
     }
 
     protected void prepareClass(ClassDefinition classDefinition) {
+        classDefinition.setDependentClassNames(this.classNames);
+
         if (classDefinition instanceof BeanDefinition) {
             prepareBean((BeanDefinition) classDefinition);
         }
@@ -368,23 +374,24 @@ public abstract class Generator {
     }
 
     protected void prepareField(FieldDefinition fieldDefinition) {
+        ClassDefinition owner = fieldDefinition.getOwner();
         String fieldType = fieldDefinition.getType();
         if (fieldDefinition.isBuiltinType()) {
-            fieldDefinition.setBasicType(basicTypes.get(fieldType));
-            fieldDefinition.setClassType(classTypes.get(fieldType));
+            fieldDefinition.setBasicType(owner.getDependentName(basicTypes.get(fieldType)));
+            fieldDefinition.setClassType(owner.getDependentName(classTypes.get(fieldType)));
         }
 
         if (fieldDefinition.isCollectionType()) {
             if (fieldType.equals("map") && fieldDefinition.isBuiltinKeyType()) {
                 String fieldKeyType = fieldDefinition.getKeyType();
-                fieldDefinition.setKeyBasicType(basicTypes.get(fieldKeyType));
-                fieldDefinition.setKeyClassType(classTypes.get(fieldKeyType));
+                fieldDefinition.setKeyBasicType(owner.getDependentName(basicTypes.get(fieldKeyType)));
+                fieldDefinition.setKeyClassType(owner.getDependentName(classTypes.get(fieldKeyType)));
             }
 
             String fieldValueType = fieldDefinition.getValueType();
             if (fieldDefinition.isBuiltinValueType()) {
-                fieldDefinition.setValueBasicType(basicTypes.get(fieldValueType));
-                fieldDefinition.setValueClassType(classTypes.get(fieldValueType));
+                fieldDefinition.setValueBasicType(owner.getDependentName(basicTypes.get(fieldValueType)));
+                fieldDefinition.setValueClassType(owner.getDependentName(classTypes.get(fieldValueType)));
             }
         }
     }

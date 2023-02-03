@@ -1,5 +1,3 @@
-using Quan.Utils;
-using Quan.Message;
 <#list imports?keys as import>
 using ${import};
 </#list>
@@ -12,7 +10,7 @@ namespace ${getFullPackageName("cs")}
 </#if>
     /// 代码自动生成，请勿手动修改
     /// </summary>
-    public class ${name} : <#if kind ==2>Bean<#else>MessageBase</#if>
+    public class ${name} : <#if kind ==2>${getDependentName("Bean")}<#else>${getDependentName("MessageBase")}</#if>
     {
 <#if kind ==3>
         /// <summary>
@@ -21,6 +19,7 @@ namespace ${getFullPackageName("cs")}
         public override int Id => ${id?c};
 
 </#if>
+<#assign Array=getDependentName("Array") NullReferenceException=getDependentName("NullReferenceException") CodedBuffer=getDependentName("CodedBuffer")>
 <#list selfFields as field>
     <#if field.type == "set" || field.type == "list">
         <#if field.comment !="">
@@ -36,13 +35,13 @@ namespace ${getFullPackageName("cs")}
         /// ${field.comment}
         /// </summary>
         </#if>
-        public Dictionary<${field.keyClassType}, ${field.valueClassType}> ${field.name} { get; } = new Dictionary<${field.keyClassType}, ${field.valueClassType}>();
+        public ${field.basicType}<${field.keyClassType}, ${field.valueClassType}> ${field.name} { get; } = new ${field.classType}<${field.keyClassType}, ${field.valueClassType}>();
 
     <#elseif field.type == "string" || field.type == "bytes">
         <#if field.type == "string">
         private string _${field.name}<#if !field.optional> = ""</#if>;
         <#else>
-        private byte[] _${field.name}<#if !field.optional> = Array.Empty<byte>()</#if>;
+        private byte[] _${field.name}<#if !field.optional> = ${Array}.Empty<byte>()</#if>;
         </#if>
 
         <#if field.comment !="">
@@ -53,7 +52,7 @@ namespace ${getFullPackageName("cs")}
         public ${field.basicType} ${field.name}
         {
             get => _${field.name};
-            set => _${field.name} = value<#if !field.optional> ?? throw new NullReferenceException()</#if>;
+            set => _${field.name} = value<#if !field.optional> ?? throw new ${NullReferenceException}()</#if>;
         }
 
     <#elseif field.min?? || field.max?? || field.scale gt 0 >
@@ -77,7 +76,7 @@ namespace ${getFullPackageName("cs")}
                 CheckMax(value, ${field.max});
             </#if>
             <#if field.scale gt 0>
-                CodedBuffer.CheckScale(value, ${field.scale});
+                ${CodedBuffer}.CheckScale(value, ${field.scale});
             </#if>
                 _${field.name} = value;
             }
@@ -102,7 +101,7 @@ namespace ${getFullPackageName("cs")}
         public ${field.classType} ${field.name}
         {
             get => _${field.name};
-            set => _${field.name} = value ?? throw new NullReferenceException();
+            set => _${field.name} = value ?? throw new ${NullReferenceException}();
         }
 
     <#else>
@@ -117,13 +116,13 @@ namespace ${getFullPackageName("cs")}
 </#list>
 
 <#if kind ==3>
-        public override MessageBase Create()
+        public override ${getDependentName("MessageBase")} Create()
         {
             return new ${name}();
         }
 
 </#if>
-        public override void Encode(CodedBuffer buffer)
+        public override void Encode(${CodedBuffer} buffer)
         {
             base.Encode(buffer);
 
@@ -141,7 +140,7 @@ namespace ${getFullPackageName("cs")}
             if (${thisField1}.Count > 0)
             {
                 WriteTag(buffer, ${field.tag});
-                var ${field.name}Buffer = new CodedBuffer();
+                var ${field.name}Buffer = new ${CodedBuffer}();
                 ${field.name}Buffer.WriteInt(${thisField1}.Count);
                 foreach (var ${field.name}Value in ${thisField1})
                 {
@@ -157,7 +156,7 @@ namespace ${getFullPackageName("cs")}
             if (${thisField1}.Count > 0)
             {
                 WriteTag(buffer, ${field.tag});
-                var ${field.name}Buffer = new CodedBuffer();
+                var ${field.name}Buffer = new ${CodedBuffer}();
                 ${field.name}Buffer.WriteInt(${thisField1}.Count);
                 foreach (var ${field.name}Key in ${thisField1}.Keys)
                 {
@@ -280,7 +279,7 @@ namespace ${getFullPackageName("cs")}
 </#if>
         }
 
-        public override void Decode(CodedBuffer buffer)
+        public override void Decode(${CodedBuffer} buffer)
         {
             base.Decode(buffer);
 

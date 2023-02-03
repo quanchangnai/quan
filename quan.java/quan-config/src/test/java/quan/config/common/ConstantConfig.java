@@ -1,10 +1,10 @@
 package quan.config.common;
 
 import com.alibaba.fastjson.*;
-import quan.config.*;
-import quan.config.load.ConfigLoader;
 import java.util.*;
+import quan.config.*;
 import quan.config.item.ItemConfig;
+import quan.config.load.ConfigLoader;
 
 /**
  * 常量<br/>

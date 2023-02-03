@@ -1,5 +1,6 @@
 package quan.generator.message;
 
+import quan.definition.BeanDefinition;
 import quan.definition.FieldDefinition;
 import quan.definition.Language;
 
@@ -34,6 +35,16 @@ public class CSharpMessageGenerator extends MessageGenerator {
         classTypes.put("list", "List");
         classTypes.put("map", "Dictionary");
         classTypes.put("bytes", "byte[]");
+
+        classNames.put("HashSet", "System.Collections.Generic.HashSet");
+        classNames.put("List", "System.Collections.Generic.List");
+        classNames.put("Dictionary", "System.Collections.Generic.Dictionary");
+        classNames.put("Array", "System.Array");
+        classNames.put("NullReferenceException", "System.NullReferenceException");
+        classNames.put("Bean", "Quan.Message.Bean");
+        classNames.put("MessageBase", "Quan.Message.MessageBase");
+        classNames.put("CodedBuffer", "Quan.Message.CodedBuffer");
+
     }
 
     public CSharpMessageGenerator(Properties options) {
@@ -46,13 +57,20 @@ public class CSharpMessageGenerator extends MessageGenerator {
     }
 
     @Override
+    protected void prepareBean(BeanDefinition beanDefinition) {
+        beanDefinition.addImport("Quan.Message");
+        beanDefinition.addImport("Quan.Utils");
+        super.prepareBean(beanDefinition);
+    }
+
+    @Override
     protected void prepareField(FieldDefinition field) {
         super.prepareField(field);
         if (field.isCollectionType()) {
-            field.getOwner().getImports().put("System.Collections.Generic", null);
+            field.getOwner().addImport("System.Collections.Generic");
         }
         if (field.isBytesType() || field.isStringType() || field.isTimeType() || field.isBeanType() && !field.isOptional()) {
-            field.getOwner().getImports().put("System", null);
+            field.getOwner().addImport("System");
         }
     }
 

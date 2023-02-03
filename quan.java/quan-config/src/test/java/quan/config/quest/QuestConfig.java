@@ -1,10 +1,10 @@
 package quan.config.quest;
 
 import com.alibaba.fastjson.*;
-import quan.config.*;
-import quan.config.load.ConfigLoader;
 import java.util.*;
+import quan.config.*;
 import quan.config.item.Reward;
+import quan.config.load.ConfigLoader;
 
 /**
  * 任务<br/>

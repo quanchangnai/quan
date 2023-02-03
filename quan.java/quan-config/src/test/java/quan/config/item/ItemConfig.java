@@ -1,9 +1,9 @@
 package quan.config.item;
 
 import com.alibaba.fastjson.*;
+import java.util.*;
 import quan.config.*;
 import quan.config.load.ConfigLoader;
-import java.util.*;
 
 /**
  * 道具/道具<br/>

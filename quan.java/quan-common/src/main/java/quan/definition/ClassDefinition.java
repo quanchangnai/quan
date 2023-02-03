@@ -45,6 +45,10 @@ public abstract class ClassDefinition extends Definition {
     //导包，和具体语言相关
     private Map<String, String> imports = new TreeMap<>();
 
+
+    //依赖类的简单名对应全名，和具体语言相关
+    private Map<String, String> dependentClassNames;
+
     //字段名:字段定义
     protected Map<String, FieldDefinition> nameFields = new HashMap<>();
 
@@ -61,6 +65,7 @@ public abstract class ClassDefinition extends Definition {
 
     public void reset() {
         imports.clear();
+        dependentClassNames = null;
         fields.forEach(this::resetField);
     }
 
@@ -245,6 +250,10 @@ public abstract class ClassDefinition extends Definition {
         return imports;
     }
 
+    public void addImport(String importName) {
+        imports.put(importName, null);
+    }
+
     public boolean isSupportLanguage(Language language) {
         boolean support = languages.isEmpty() || languages.contains(language.name());
         if (excludeLanguage) {
@@ -370,6 +379,18 @@ public abstract class ClassDefinition extends Definition {
 
     public String resolveFieldRef(String fieldRef) {
         return fieldRef;
+    }
+
+    public void setDependentClassNames(Map<String, String> dependentClassNames) {
+        this.dependentClassNames = dependentClassNames;
+    }
+
+    public String getDependentName(String className) {
+        if (dependentClassNames != null && getName().equals(className) && dependentClassNames.containsKey(className)) {
+            return dependentClassNames.get(className);
+        } else {
+            return className;
+        }
     }
 
     @Override

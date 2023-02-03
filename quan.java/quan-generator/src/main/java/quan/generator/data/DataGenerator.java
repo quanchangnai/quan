@@ -37,6 +37,47 @@ public class DataGenerator extends Generator {
         classTypes.put("set", "SetField");
         classTypes.put("list", "ListField");
         classTypes.put("map", "MapField");
+
+        classNames.put("Boolean", "java.util.Boolean");
+        classNames.put("Short", "java.util.Short");
+        classNames.put("Integer", "java.util.Integer");
+        classNames.put("Long", "java.util.Long");
+        classNames.put("Float", "java.util.Float");
+        classNames.put("Double", "java.util.Double");
+        classNames.put("String", "java.util.String");
+        classNames.put("Set", "java.util.Set");
+        classNames.put("HashSet", "java.util.HashSet");
+        classNames.put("List", "java.util.List");
+        classNames.put("ArrayList", "java.util.ArrayList");
+        classNames.put("Map", "java.util.Map");
+        classNames.put("HashMap", "java.util.HashMap");
+        classNames.put("Collection", "java.util.Collection");
+        classNames.put("Objects", "java.util.Objects");
+        classNames.put("Class", "java.lang.Class");
+
+        classNames.put("NumberUtils", "quan.util.NumberUtils");
+        classNames.put("Index", "java.data.Index");
+        classNames.put("Bean", "java.data.Bean");
+        classNames.put("Data", "java.data.Data");
+        classNames.put("Transaction", "java.data.Transaction");
+        classNames.put("IntField", "java.data.field.IntField");
+        classNames.put("BeanField", "java.data.field.BeanField");
+        classNames.put("BoolField", "java.data.field.BoolField");
+        classNames.put("DoubleField", "java.data.field.DoubleField");
+        classNames.put("FloatField", "java.data.field.FloatField");
+        classNames.put("ListField", "java.data.field.ListField");
+        classNames.put("LongField", "java.data.field.LongField");
+        classNames.put("MapField", "java.data.field.MapField");
+        classNames.put("SetField", "java.data.field.SetField");
+        classNames.put("ShortField", "java.data.field.ShortField");
+        classNames.put("StringField", "java.data.field.StringField");
+
+        classNames.put("Codec", "org.bson.codecs.Codec");
+        classNames.put("CodecRegistry", "org.bson.codecs.configuration.CodecRegistry");
+        classNames.put("BsonReader", "org.bson.BsonReader");
+        classNames.put("BsonWriter", "org.bson.BsonWriter");
+        classNames.put("DecoderContext", "org.bson.codecs.DecoderContext");
+        classNames.put("BsonType", "org.bson.codecs.BsonType");
     }
 
     public DataGenerator(Properties options) {
@@ -88,6 +129,21 @@ public class DataGenerator extends Generator {
     }
 
     @Override
+    protected void prepareBean(BeanDefinition beanDefinition) {
+        beanDefinition.addImport("java.util.*");
+        beanDefinition.addImport("org.bson.*");
+        beanDefinition.addImport("org.bson.codecs.*");
+        beanDefinition.addImport("org.bson.codecs.configuration.CodecRegistry");
+        beanDefinition.addImport("quan.data.*");
+        beanDefinition.addImport("quan.data.field.*");
+        if (beanDefinition instanceof DataDefinition) {
+            beanDefinition.addImport("quan.data.mongo.JsonStringWriter");
+        }
+
+        super.prepareBean(beanDefinition);
+    }
+
+    @Override
     protected void prepareField(FieldDefinition fieldDefinition) {
         super.prepareField(fieldDefinition);
         if (fieldDefinition.getOwner() instanceof DataDefinition) {
@@ -97,7 +153,7 @@ public class DataGenerator extends Generator {
             }
         }
         if (fieldDefinition.getMin() != null || fieldDefinition.getMax() != null) {
-            fieldDefinition.getOwner().getImports().put("quan.util.NumberUtils", null);
+            fieldDefinition.getOwner().addImport("quan.util.NumberUtils");
         }
     }
 

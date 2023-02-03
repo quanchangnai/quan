@@ -1,5 +1,5 @@
-using Quan.Utils;
 using Quan.Message;
+using Quan.Utils;
 using System;
 
 namespace Test.Message.User

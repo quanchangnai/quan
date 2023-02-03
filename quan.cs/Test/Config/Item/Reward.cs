@@ -1,6 +1,6 @@
 using Newtonsoft.Json.Linq;
-using Quan.Utils;
 using Quan.Config;
+using Quan.Utils;
 
 namespace Test.Config.Item
 {
