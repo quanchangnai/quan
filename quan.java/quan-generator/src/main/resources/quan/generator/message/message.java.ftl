@@ -4,13 +4,15 @@ package ${getFullPackageName("java")};
 import ${import};
 </#list>
 
+<#assign String=getDependentName("String") Objects=getDependentName("Objects") Arrays=getDependentName("Arrays") Override=getDependentName("Override")>
+<#assign Bean=getDependentName("Bean") Message=getDependentName("Message") CodedBuffer=getDependentName("CodedBuffer") NumberUtils=getDependentName("NumberUtils")>
 /**
 <#if comment !="">
  * ${comment}<br/>
 </#if>
  * 代码自动生成，请勿手动修改
  */
-public class ${name} extends <#if kind ==2>${getDependentName("Bean")}<#else>${getDependentName("Message")}</#if> {
+public class ${name} extends <#if kind ==2>${Bean}<#else>${Message}</#if> {
 
 <#if kind == 3>
     /**
@@ -74,13 +76,12 @@ public class ${name} extends <#if kind ==2>${getDependentName("Bean")}<#else>${g
     /**
      * 消息ID
      */
-    @Override
+    @${Override}
     public final int getId() {
         return ID;
     }
 
 </#if>
-<#assign Objects=getDependentName("Objects") CodedBuffer=getDependentName("CodedBuffer") NumberUtils=getDependentName("NumberUtils")>
 <#list selfFields as field>
     <#if field.comment !="">
     /**
@@ -127,13 +128,13 @@ public class ${name} extends <#if kind ==2>${getDependentName("Bean")}<#else>${g
     </#if>
 </#list>
 <#if kind ==3>
-    @Override
+    @${Override}
     public ${name} create() {
         return new ${name}();
     }
 
 </#if>
-    @Override
+    @${Override}
     public void encode(${CodedBuffer} buffer) {
         super.encode(buffer);
 
@@ -278,7 +279,7 @@ public class ${name} extends <#if kind ==2>${getDependentName("Bean")}<#else>${g
 </#if>
     }
 
-    @${getDependentName("Override")}
+    @${Override}
     public void decode(${CodedBuffer} buffer) {
         super.decode(buffer);
 
@@ -404,8 +405,8 @@ public class ${name} extends <#if kind ==2>${getDependentName("Bean")}<#else>${g
 </#if>
     }
 
-    @Override
-    public ${getDependentName("String")} toString() {
+    @${Override}
+    public ${String} toString() {
         return "${name}{" +
         <#if kind ==3>
                 "_id=" + ID +
@@ -418,7 +419,7 @@ public class ${name} extends <#if kind ==2>${getDependentName("Bean")}<#else>${g
             <#if field.type == "string">
                 <#lt>${field.name}='" + ${field.name} + '\'' +
             <#elseif field.type == "bytes">
-                <#lt>${field.name}=" + Arrays.toString(${field.name}) +
+                <#lt>${field.name}=" + ${Arrays}.toString(${field.name}) +
             <#else>
                 <#lt>${field.name}=" + ${field.name} +
             </#if>

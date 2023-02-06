@@ -36,11 +36,12 @@ public class CSharpMessageGenerator extends MessageGenerator {
         classTypes.put("map", "Dictionary");
         classTypes.put("bytes", "byte[]");
 
+        classNames.put("Array", "System.Array");
         classNames.put("HashSet", "System.Collections.Generic.HashSet");
         classNames.put("List", "System.Collections.Generic.List");
         classNames.put("Dictionary", "System.Collections.Generic.Dictionary");
-        classNames.put("Array", "System.Array");
         classNames.put("NullReferenceException", "System.NullReferenceException");
+
         classNames.put("Bean", "Quan.Message.Bean");
         classNames.put("MessageBase", "Quan.Message.MessageBase");
         classNames.put("CodedBuffer", "Quan.Message.CodedBuffer");

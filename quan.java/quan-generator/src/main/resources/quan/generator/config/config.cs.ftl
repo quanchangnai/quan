@@ -2,6 +2,10 @@
 using ${import};
 </#list>
 
+<#assign JObject=getDependentName("JObject") JArray=getDependentName("JArray")>
+<#assign IList=getDependentName("IList") List=getDependentName("List") ImmutableList=getDependentName("ImmutableList")>
+<#assign IDictionary=getDependentName("IDictionary") Dictionary=getDependentName("Dictionary") ImmutableDictionary=getDependentName("ImmutableDictionary")>
+<#assign Bean=getDependentName("Bean") ConfigBase=getDependentName("ConfigBase")>
 namespace ${getFullPackageName("cs")}
 {
     /// <summary>
@@ -10,15 +14,12 @@ namespace ${getFullPackageName("cs")}
 </#if>
 	/// 代码自动生成，请勿手动修改
 	/// </summary>
-    public class ${name} : <#if parentClassName??>${parentClassName}<#elseif kind ==2>${getDependentName("Bean")}<#else>${getDependentName("ConfigBase")}</#if>
+    public class ${name} : <#if parentClassName??>${parentClassName}<#elseif kind ==2>${Bean}<#else>${ConfigBase}</#if>
     {
 <#if !selfFields??>
     <#assign selfFields = fields>
 </#if>
 <#assign supportCs = isSupportLanguage("cs")>
-<#assign JObject=getDependentName("JObject") JArray=getDependentName("JArray")>
-<#assign IList=getDependentName("IList") List=getDependentName("List") ImmutableList=getDependentName("ImmutableList")>
-<#assign IDictionary=getDependentName("IDictionary") Dictionary=getDependentName("Dictionary") ImmutableDictionary=getDependentName("ImmutableDictionary")>
 <#list selfFields as field>
     <#if !(supportCs &&field.isSupportLanguage("cs"))>
         <#continue>
@@ -119,7 +120,7 @@ namespace ${getFullPackageName("cs")}
         }
 
  <#if kind ==6>
-        protected override ${getDependentName("ConfigBase")} Create(${JObject} json)
+        protected override ${ConfigBase} Create(${JObject} json)
         {
             return new ${name}(json);
         }

@@ -1,6 +1,6 @@
 using Newtonsoft.Json.Linq;
-using Quan.Utils;
 using Quan.Config;
+using Quan.Utils;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;

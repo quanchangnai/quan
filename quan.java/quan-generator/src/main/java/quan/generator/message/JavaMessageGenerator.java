@@ -52,7 +52,9 @@ public class JavaMessageGenerator extends MessageGenerator {
         classNames.put("ArrayList", "java.util.ArrayList");
         classNames.put("Map", "java.util.Map");
         classNames.put("HashMap", "java.util.HashMap");
-        classNames.put("Objects", "quan.util.Objects");
+        classNames.put("Objects", "java.util.Objects");
+        classNames.put("Arrays", "java.util.Arrays");
+
         classNames.put("Bean", "quan.message.Bean");
         classNames.put("Message", "quan.message.Message");
         classNames.put("CodedBuffer", "quan.message.CodedBuffer");

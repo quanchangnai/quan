@@ -41,6 +41,22 @@ public class CSharpConfigGenerator extends ConfigGenerator {
         classTypes.put("date", "DateTime");
         classTypes.put("time", "DateTime");
         classTypes.put("datetime", "DateTime");
+
+        classNames.put("DateTime", "System.DateTime");
+        classNames.put("ISet", "System.Collections.Generic.ISet");
+        classNames.put("HashSet", "System.Collections.Generic.HashSet");
+        classNames.put("ImmutableSet", "System.Collections.Immutable.ImmutableSet");
+        classNames.put("IList", "System.Collections.Generic.IList");
+        classNames.put("List", "System.Collections.Generic.List");
+        classNames.put("ImmutableList", "System.Collections.Immutable.ImmutableList");
+        classNames.put("IDictionary", "System.Collections.Generic.IDictionary");
+        classNames.put("Dictionary", "System.Collections.Generic.Dictionary");
+        classNames.put("ImmutableDictionary", "System.Collections.Immutable.ImmutableDictionary");
+
+        classNames.put("Bean", "Quan.Config.Bean");
+        classNames.put("ConfigBase", "Quan.Config.ConfigBase");
+        classNames.put("JObject", "Newtonsoft.Json.Linq.JObject");
+        classNames.put("JArray", "Newtonsoft.Json.Linq.JArray");
     }
 
     public CSharpConfigGenerator(Properties options) {

@@ -56,9 +56,11 @@ public class JavaConfigGenerator extends ConfigGenerator {
         classNames.put("ArrayList", "java.util.ArrayList");
         classNames.put("Map", "java.util.Map");
         classNames.put("HashMap", "java.util.HashMap");
+        classNames.put("Collections", "java.util.Collections");
 
         classNames.put("Bean", "quan.config.Bean");
         classNames.put("Config", "quan.config.Config");
+        classNames.put("ConfigLoader", "quan.config.load.ConfigLoader");
         classNames.put("JSONObject", "com.alibaba.fastjson.JSONObject");
         classNames.put("JSONArray", "com.alibaba.fastjson.JSONArray");
     }

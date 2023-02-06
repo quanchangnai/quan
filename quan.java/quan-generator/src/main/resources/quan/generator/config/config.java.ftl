@@ -104,7 +104,7 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
 
         </#if>
         ${JSONObject} ${field.name}$1 = json.getJSONObject("${field.name}");
-        ${getDependentName("Map")}<${field.keyClassType}, ${field.valueClassType}> ${field.name}$2 = new ${getDependentName("HashMap")}<>();
+        ${field.basicType}<${field.keyClassType}, ${field.valueClassType}> ${field.name}$2 = new ${field.classType}<>();
         if (${field.name}$1 != null) {
             for (String ${field.name}$Key : ${field.name}$1.keySet()) {
                 <#if field.beanValueType>
@@ -280,11 +280,11 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
     ${tab}}
 
     ${tab}public static ${Map}<${index.fields[1].classType}, ${Map}<${index.fields[2].classType}, ${name}>> get${index.suffix}(${index.fields[0].basicType} ${index.fields[0].name}) {
-        ${tab}return _${index.name}Configs.getOrDefault(${index.fields[0].name}, Collections.emptyMap());
+        ${tab}return _${index.name}Configs.getOrDefault(${index.fields[0].name}, ${Collections}.emptyMap());
     ${tab}}
 
     ${tab}public static ${Map}<${index.fields[2].classType}, ${name}> get${index.suffix}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name}) {
-        ${tab}return get${index.suffix}(${index.fields[0].name}).getOrDefault(${index.fields[1].name}, Collections.emptyMap());
+        ${tab}return get${index.suffix}(${index.fields[0].name}).getOrDefault(${index.fields[1].name}, ${Collections}.emptyMap());
     ${tab}}
 
     ${tab}public static ${name} get${index.suffix}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name}, ${index.fields[2].basicType} ${index.fields[2].name}) {
@@ -297,11 +297,11 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
     ${tab}}
 
     ${tab}public static ${Map}<${index.fields[1].classType}, ${Map}<${index.fields[2].classType}, ${List}<${name}>>> get${index.suffix}(${index.fields[0].basicType} ${index.fields[0].name}) {
-        ${tab}return _${index.name}Configs.getOrDefault(${index.fields[0].name}, Collections.emptyMap());
+        ${tab}return _${index.name}Configs.getOrDefault(${index.fields[0].name}, ${Collections}.emptyMap());
     ${tab}}
 
     ${tab}public static ${Map}<${index.fields[2].classType}, ${List}<${name}>> get${index.suffix}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name}) {
-        ${tab}return get${index.suffix}(${index.fields[0].name}).getOrDefault(${index.fields[1].name}, Collections.emptyMap());
+        ${tab}return get${index.suffix}(${index.fields[0].name}).getOrDefault(${index.fields[1].name}, ${Collections}.emptyMap());
     ${tab}}
 
     ${tab}public static ${List}<${name}> get${index.suffix}(${index.fields[0].basicType} ${index.fields[0].name}, ${index.fields[1].basicType} ${index.fields[1].name}, ${index.fields[2].basicType} ${index.fields[2].name}) {

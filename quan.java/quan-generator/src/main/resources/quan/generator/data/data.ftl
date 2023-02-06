@@ -39,8 +39,6 @@ public class ${name} extends <#if kind ==2>${getDependentName("Bean")}<#elseif k
 </#list>
 
 <#assign root><#if kind ==5>this<#else>_getLogRoot()</#if></#assign>
-<#assign Objects=getDependentName("Objects") NumberUtils=getDependentName("NumberUtils")>
-<#assign IntField=getDependentName("IntField") BeanField=getDependentName("BeanField")>
 <#list fields as field>
 
     <#if field.type == "set" || field.type == "list">
@@ -48,11 +46,11 @@ public class ${name} extends <#if kind ==2>${getDependentName("Bean")}<#elseif k
     <#elseif field.type == "map">
     private final ${field.classType}<${field.keyClassType}, ${field.valueClassType}> ${field.name} = new ${field.classType}<>(${root});
     <#elseif field.enumType>
-    private final ${IntField} ${field.name} = new ${IntField}();
+    private final ${getDependentName("IntField")} ${field.name} = new ${getDependentName("IntField")}();
     <#elseif field.primitiveType>
     private final ${getDependentName(field.type?cap_first+"Field")} ${field.name} = new ${getDependentName(field.type?cap_first+"Field")}();
     <#else>
-    private final ${BeanField}<${field.classType}> ${field.name} = new ${BeanField}<>();
+    private final ${getDependentName("BeanField")}<${field.classType}> ${field.name} = new ${getDependentName("BeanField")}<>();
     </#if>
 </#list>
 
@@ -62,7 +60,7 @@ public class ${name} extends <#if kind ==2>${getDependentName("Bean")}<#elseif k
 
     public ${name}(${idField.type} ${idName}) {
     <#if idField.type=="string">    
-        ${Objects}.requireNonNull(${idName}, "参数[${idName}]不能为空");
+        ${getDependentName("Objects")}.requireNonNull(${idName}, "参数[${idName}]不能为空");
     </#if>
         this.${idName}.setValue(${idName},this);
     }
@@ -148,11 +146,11 @@ public class ${name} extends <#if kind ==2>${getDependentName("Bean")}<#elseif k
     </#if>
     public ${name} set${field.name?cap_first}(${field.basicType} ${field.name}) {
         <#if field.min?? && field.max??>
-        ${NumberUtils}.checkRange(${field.name}, ${field.min}, ${field.max});
+        ${getDependentName("NumberUtils")}.checkRange(${field.name}, ${field.min}, ${field.max});
         <#elseif field.min??>
-        ${NumberUtils}.checkMin(${field.name}, ${field.min});
+        ${getDependentName("NumberUtils")}.checkMin(${field.name}, ${field.min});
         <#elseif field.max??>
-        ${NumberUtils}.checkMax(${field.name}, ${field.max});
+        ${getDependentName("NumberUtils")}.checkMax(${field.name}, ${field.max});
         </#if>
         this.${field.name}.setValue(${field.name}, ${root});
         return this;

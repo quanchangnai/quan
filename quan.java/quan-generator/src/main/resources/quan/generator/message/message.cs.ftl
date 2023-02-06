@@ -2,6 +2,8 @@
 using ${import};
 </#list>
 
+<#assign Array=getDependentName("Array") NullReferenceException=getDependentName("NullReferenceException")>
+<#assign Bean=getDependentName("Bean") MessageBase=getDependentName("MessageBase") CodedBuffer=getDependentName("CodedBuffer")>
 namespace ${getFullPackageName("cs")}
 {
     /// <summary>
@@ -10,7 +12,7 @@ namespace ${getFullPackageName("cs")}
 </#if>
     /// 代码自动生成，请勿手动修改
     /// </summary>
-    public class ${name} : <#if kind ==2>${getDependentName("Bean")}<#else>${getDependentName("MessageBase")}</#if>
+    public class ${name} : <#if kind ==2>${Bean}<#else>${MessageBase}</#if>
     {
 <#if kind ==3>
         /// <summary>
@@ -19,7 +21,6 @@ namespace ${getFullPackageName("cs")}
         public override int Id => ${id?c};
 
 </#if>
-<#assign Array=getDependentName("Array") NullReferenceException=getDependentName("NullReferenceException") CodedBuffer=getDependentName("CodedBuffer")>
 <#list selfFields as field>
     <#if field.type == "set" || field.type == "list">
         <#if field.comment !="">
@@ -116,7 +117,7 @@ namespace ${getFullPackageName("cs")}
 </#list>
 
 <#if kind ==3>
-        public override ${getDependentName("MessageBase")} Create()
+        public override ${MessageBase} Create()
         {
             return new ${name}();
         }
