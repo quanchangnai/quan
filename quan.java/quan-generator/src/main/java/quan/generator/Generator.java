@@ -292,10 +292,6 @@ public abstract class Generator {
     }
 
     private void readRecords() {
-        if (!increment) {
-            return;
-        }
-
         File recordsFile = new File(".records" + File.separator + getClass().getSimpleName() + ".json");
         if (recordsFile.exists()) {
             try {
@@ -334,7 +330,6 @@ public abstract class Generator {
         } else {
             return true;
         }
-
     }
 
     protected boolean isChange(ClassDefinition classDefinition) {
