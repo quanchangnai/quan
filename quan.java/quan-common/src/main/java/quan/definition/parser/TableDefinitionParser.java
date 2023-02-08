@@ -66,6 +66,7 @@ public abstract class TableDefinitionParser extends DefinitionParser {
         ConfigDefinition configDefinition = new ConfigDefinition();
         configDefinition.setParser(this);
         configDefinition.setDefinitionFile(definitionFilePath);
+        configDefinition.setVersion(definitionFile.lastModified() + "");
 
         String s = File.separator;
         if (definitionFileName.contains(s)) {
@@ -260,6 +261,7 @@ public abstract class TableDefinitionParser extends DefinitionParser {
             configDefinition.setName(extConfigDefinition.getName());
             configDefinition.setParentName(extConfigDefinition.getParentName());
             configDefinition.setComment(extConfigDefinition.getComment());
+            configDefinition.setVersion(extConfigDefinition.getVersion() + ":" + configDefinition.getVersion());
 
             extConfigDefinition.getIndexes().forEach(configDefinition::addIndex);
 

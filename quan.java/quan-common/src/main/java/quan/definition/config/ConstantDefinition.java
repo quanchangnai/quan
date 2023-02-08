@@ -37,6 +37,9 @@ public class ConstantDefinition extends ClassDefinition {
 
     private Map<String, Pair<String, String>> rows = new TreeMap<>();
 
+    //常量数据版本
+    private String version2;
+
     @Override
     public int getKind() {
         return KIND_CONSTANT;
@@ -134,6 +137,15 @@ public class ConstantDefinition extends ClassDefinition {
 
     public Map<String, Pair<String, String>> getRows() {
         return rows;
+    }
+
+
+    public String getVersion2() {
+        return version2;
+    }
+
+    public void setVersion2(String version2) {
+        this.version2 = version2;
     }
 
     @Override

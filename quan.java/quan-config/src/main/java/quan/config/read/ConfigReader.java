@@ -79,6 +79,10 @@ public abstract class ConfigReader {
         }
     }
 
+    public File getTableFile() {
+        return tableFile;
+    }
+
     public Config getPrototype() {
         return prototype;
     }

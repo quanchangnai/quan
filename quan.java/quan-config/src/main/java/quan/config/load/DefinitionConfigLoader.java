@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.tuple.Triple;
 import quan.config.Config;
 import quan.config.TableType;
@@ -159,24 +160,10 @@ public class DefinitionConfigLoader extends ConfigLoader {
      * @return JSON格式配置数据
      */
     public List<JSONObject> loadJsons(ConfigDefinition configDefinition, boolean onlySelf) {
-        TreeSet<String> configTables = new TreeSet<>();
-        if (onlySelf) {
-            if (tableType == TableType.json) {
-                configTables.add(configDefinition.getName());
-            } else {
-                configTables.addAll(configDefinition.getTables());
-            }
-        } else {
-            configTables.addAll(getConfigTables(configDefinition));
-        }
-
         List<JSONObject> jsons = new ArrayList<>();
-
-        for (String configTable : configTables) {
-            ConfigReader configReader = getReader(configTable);
-            jsons.addAll(configReader.getJsons());
+        for (String configTable : getConfigTables(configDefinition, onlySelf)) {
+            jsons.addAll(getReader(configTable).getJsons());
         }
-
         return jsons;
     }
 
@@ -185,10 +172,10 @@ public class DefinitionConfigLoader extends ConfigLoader {
             return;
         }
 
-        Objects.requireNonNull(path, "输出目录不能为空");
+        Objects.requireNonNull(path, "输出路径不能为空");
         File pathFile = new File(FileUtils.toPlatPath(path));
         if (!pathFile.exists() && !pathFile.mkdirs()) {
-            logger.error("输出目录[{}]创建失败", path);
+            logger.error("输出路径[{}]创建失败", path);
             return;
         }
 
@@ -221,7 +208,7 @@ public class DefinitionConfigLoader extends ConfigLoader {
                 }
             }
 
-            String jsonFileName = configDefinition.getPackageName(language) + "." + configDefinition.getName() + ".json";
+            String jsonFileName = configDefinition.getLongName(language) + ".json";
             try (FileOutputStream fos = new FileOutputStream(new File(pathFile, jsonFileName))) {
                 JSON.writeJSONString(fos, rows, SerializerFeature.PrettyFormat, SerializerFeature.DisableCircularReferenceDetect);
             } catch (Exception e) {
@@ -243,6 +230,20 @@ public class DefinitionConfigLoader extends ConfigLoader {
         }
     }
 
+    private TreeSet<String> getConfigTables(ConfigDefinition configDefinition, boolean onlySelf) {
+        TreeSet<String> configTables = new TreeSet<>();
+        if (onlySelf) {
+            if (tableType == TableType.json) {
+                configTables.add(configDefinition.getLongName(Language.java));
+            } else {
+                configTables.addAll(configDefinition.getTables());
+            }
+        } else {
+            configTables.addAll(getConfigTables(configDefinition));
+        }
+        return configTables;
+    }
+
     /**
      * 配置的所有分表和子表
      */
@@ -252,12 +253,21 @@ public class DefinitionConfigLoader extends ConfigLoader {
             List<String> configTables = new ArrayList<>();
             for (String configLongName : configDefinition.getMeAndDescendants()) {
                 ConfigDefinition configDefinition1 = parser.getConfig(configLongName);
-                configTables.add(configDefinition1.getPackageName(Language.java) + "." + configDefinition1.getName());
+                configTables.add(configDefinition1.getLongName(Language.java));
             }
             return configTables;
         } else {
             return configDefinition.getAllTables();
         }
+    }
+
+    public String getConfigVersion(ConfigDefinition configDefinition, boolean onlySelf) {
+        StringBuilder sb = new StringBuilder();
+        for (String configTable : getConfigTables(configDefinition, onlySelf)) {
+            ConfigReader configReader = getReader(configTable);
+            sb.append(configReader.getTableFile().lastModified());
+        }
+        return DigestUtils.md2Hex(sb.toString());
     }
 
     private Map<IndexDefinition, Map> validateIndex(ConfigDefinition configDefinition) {

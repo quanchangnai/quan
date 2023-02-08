@@ -1,5 +1,6 @@
 package quan.generator;
 
+import com.alibaba.fastjson.JSON;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import org.apache.commons.lang3.StringUtils;
@@ -47,6 +48,9 @@ public abstract class Generator {
 
     protected boolean enable = true;
 
+    //是否开启增量生成
+    protected boolean increment;
+
     protected String definitionFileEncoding;
 
     protected Set<String> definitionPaths = new HashSet<>();
@@ -65,6 +69,16 @@ public abstract class Generator {
 
     //具体语言包下的类定义,<包名,<类名,类定义>
     protected Map<String, Map<String, ClassDefinition>> packagesClasses = new HashMap<>();
+
+
+    //生成或删除代码文件数量
+    protected int count;
+
+    //上一次代码生成记录
+    protected Map<String, String> oldRecords = new HashMap<>();
+
+    //当前代码生成记录
+    protected Map<String, String> newRecords = new HashMap<>();
 
     public Generator(Properties options) {
         parseOptions(options);
@@ -142,13 +156,18 @@ public abstract class Generator {
         this.options = options;
 
         String enable = options.getProperty(category() + ".enable");
-        if (enable == null || !enable.equals("true")) {
+        if (enable == null || !enable.trim().equals("true")) {
             this.enable = false;
         }
 
         enable = options.getProperty(category() + "." + language() + ".enable");
-        if (enable == null || !enable.equals("true")) {
+        if (enable == null || !enable.trim().equals("true")) {
             this.enable = false;
+        }
+
+        String increment = options.getProperty(category() + "." + language() + ".increment");
+        if (increment != null && increment.trim().equals("true")) {
+            this.increment = true;
         }
 
         String definitionPath = options.getProperty(category() + ".definitionPath");
@@ -237,48 +256,125 @@ public abstract class Generator {
 
         initFreemarker();
 
+        readRecords();
+
         for (ClassDefinition classDefinition : parser.getClasses().values()) {
             packagesClasses.computeIfAbsent(classDefinition.getPackageName(language()), k -> new HashMap<>()).put(classDefinition.getName(), classDefinition);
         }
 
         List<ClassDefinition> classDefinitions = new ArrayList<>();
         for (ClassDefinition classDefinition : parser.getClasses().values()) {
-            if (!support(classDefinition) || !classDefinition.isSupportLanguage(this.language())) {
-                continue;
+            if (support(classDefinition) && classDefinition.isSupportLanguage(this.language())) {
+                classDefinition.reset();
+                prepareClass(classDefinition);
+                classDefinitions.add(classDefinition);
             }
-            classDefinition.reset();
-            prepareClass(classDefinition);
-            classDefinitions.add(classDefinition);
         }
 
         generate(classDefinitions);
+
         packagesClasses.clear();
 
+        //删除失效的代码文件
+        for (String fullName : oldRecords.keySet()) {
+            count++;
+            File classFile = new File(codePath, fullName.replace(".", File.separator) + "." + language());
+            if (classFile.delete()) {
+                logger.error("删除{}[{}]完成", category().alias(), classFile);
+            } else {
+                logger.error("删除{}[{}]失败", category().alias(), classFile);
+            }
+        }
+
+        writeRecords();
+
         logger.info("生成{}{}代码完成\n", language(), category().alias());
+    }
+
+    private void readRecords() {
+        if (!increment) {
+            return;
+        }
+
+        File recordsFile = new File(".records" + File.separator + getClass().getSimpleName() + ".json");
+        if (recordsFile.exists()) {
+            try {
+                //noinspection unchecked
+                oldRecords = JSON.parseObject(new String(Files.readAllBytes(recordsFile.toPath())), HashMap.class);
+            } catch (IOException e) {
+                logger.error("", e);
+            }
+        }
+    }
+
+    private void writeRecords() {
+        File recordsPath = new File(".records");
+        File recordsFile = new File(recordsPath, getClass().getSimpleName() + ".json");
+        try {
+            if (!recordsPath.exists()) {
+                //noinspection ResultOfMethodCallIgnored
+                recordsPath.mkdirs();
+            }
+            JSON.writeJSONString(new FileWriter(recordsFile), newRecords);
+        } catch (IOException e) {
+            logger.error("", e);
+        }
+
+        oldRecords.clear();
+        newRecords.clear();
     }
 
     protected void generate(List<ClassDefinition> classDefinitions) {
         classDefinitions.forEach(this::generate);
     }
 
+    protected final boolean checkChange(ClassDefinition classDefinition) {
+        if (increment) {
+            return isChange(classDefinition);
+        } else {
+            return true;
+        }
+
+    }
+
+    protected boolean isChange(ClassDefinition classDefinition) {
+        String fullName = classDefinition.getFullName(language());
+        String version = classDefinition.getVersion();
+        return !version.equals(oldRecords.get(fullName));
+    }
+
+    public void record(ClassDefinition classDefinition) {
+        String fullName = classDefinition.getFullName(language());
+        String version = classDefinition.getVersion();
+        oldRecords.remove(fullName);
+        newRecords.put(fullName, version);
+    }
+
     protected void generate(ClassDefinition classDefinition) {
-        Template template = templates.get(classDefinition.getClass());
-        File filePath = new File(codePath + File.separator + classDefinition.getFullPackageName(language()).replace(".", File.separator));
-        String fileName = classDefinition.getName() + "." + language();
-
-        if (!filePath.exists() && !filePath.mkdirs()) {
-            logger.info("生成{}[{}]失败，无法创建目录[{}]", category().alias(), filePath + File.separator + fileName, filePath);
+        if (!checkChange(classDefinition)) {
+            record(classDefinition);
             return;
         }
 
-        try (Writer writer = new OutputStreamWriter(Files.newOutputStream(new File(filePath, fileName).toPath()), StandardCharsets.UTF_8)) {
-            template.process(classDefinition, writer);
+        File packagePath = new File(codePath, classDefinition.getFullPackageName(language()).replace(".", File.separator));
+        File classFile = new File(packagePath, classDefinition.getName() + "." + language());
+
+        if (!packagePath.exists() && !packagePath.mkdirs()) {
+            logger.error("生成{}[{}]失败，无法创建目录[{}]", category().alias(), classFile, packagePath);
+            return;
+        }
+
+        try (Writer writer = new OutputStreamWriter(Files.newOutputStream(classFile.toPath()), StandardCharsets.UTF_8)) {
+            count++;
+            templates.get(classDefinition.getClass()).process(classDefinition, writer);
         } catch (Exception e) {
-            logger.info("生成{}[{}]失败", category().alias(), filePath + File.separator + fileName, e);
+            logger.error("生成{}[{}]失败", category().alias(), classFile, e);
             return;
         }
 
-        logger.info("生成{}[{}]完成", category().alias(), filePath + File.separator + fileName);
+        record(classDefinition);
+
+        logger.info("生成{}[{}]完成", category().alias(), classFile);
 
     }
 

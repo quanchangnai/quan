@@ -31,6 +31,9 @@ public class ConfigDefinition extends BeanDefinition {
 
     private List<String> rows = new ArrayList<>();
 
+    //配置数据版本
+    private String version2;
+
     private final Set<ConstantDefinition> constantDefinitions = new HashSet<>();
 
     {
@@ -203,6 +206,14 @@ public class ConfigDefinition extends BeanDefinition {
     public ConfigDefinition setRows(List<String> rows) {
         this.rows = rows;
         return this;
+    }
+
+    public String getVersion2() {
+        return version2;
+    }
+
+    public void setVersion2(String version2) {
+        this.version2 = version2;
     }
 
     @Override

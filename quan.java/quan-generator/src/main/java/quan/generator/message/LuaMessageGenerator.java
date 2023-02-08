@@ -30,7 +30,7 @@ public class LuaMessageGenerator extends MessageGenerator {
     protected void initFreemarker() {
         super.initFreemarker();
         try {
-            registryTemplate = freemarkerCfg.getTemplate("registry." + language() + ".ftl");
+            registryTemplate = freemarkerCfg.getTemplate("registry.lua.ftl");
         } catch (IOException e) {
             logger.error("", e);
         }
@@ -41,13 +41,15 @@ public class LuaMessageGenerator extends MessageGenerator {
         List<MessageDefinition> messageDefinitions = new ArrayList<>();
 
         for (ClassDefinition classDefinition : classDefinitions) {
+            generate(classDefinition);
             if (classDefinition instanceof MessageDefinition) {
                 messageDefinitions.add((MessageDefinition) classDefinition);
             }
-            generate(classDefinition);
         }
 
-        generateFactory(messageDefinitions);
+        if (!increment || count > 0) {
+            generateFactory(messageDefinitions);
+        }
     }
 
     protected void generateFactory(List<MessageDefinition> messageDefinitions) {
@@ -57,7 +59,7 @@ public class LuaMessageGenerator extends MessageGenerator {
             return;
         }
 
-        String fileName = "MessageRegistry." + language();
+        String fileName = "MessageRegistry.lua";
         try (Writer writer = new OutputStreamWriter(Files.newOutputStream(new File(filePath, fileName).toPath()), StandardCharsets.UTF_8)) {
             Map<String, List<MessageDefinition>> messages = new HashMap<>();
             messages.put("messages", messageDefinitions);

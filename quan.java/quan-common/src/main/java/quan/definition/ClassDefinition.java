@@ -25,8 +25,8 @@ public abstract class ClassDefinition extends Definition {
     //定义文件
     private String definitionFile;
 
-    //定义文本
-    private String definitionText;
+    //定义版本
+    private String version;
 
     //是支持还是排除语言
     protected boolean excludeLanguage;
@@ -114,6 +114,15 @@ public abstract class ClassDefinition extends Definition {
     public String getLongName() {
         return getLongName(this, getName());
     }
+
+    public String getLongName(Language lang) {
+        String packageName = getPackageName(lang);
+        if (StringUtils.isBlank(packageName)) {
+            return getName();
+        }
+        return packageName + "." + getName();
+    }
+
 
     @Override
     public String getValidatedName(String append) {
@@ -216,14 +225,14 @@ public abstract class ClassDefinition extends Definition {
         return this;
     }
 
-    public String getDefinitionText() {
-        return definitionText;
+    public String getVersion() {
+        return version;
     }
 
-    public ClassDefinition setDefinitionText(String definitionText) {
-        this.definitionText = definitionText;
-        return this;
+    public void setVersion(String version) {
+        this.version = version;
     }
+
 
     public void setLang(String language) {
         if (isBlank(language) || category == Category.data) {

@@ -101,6 +101,10 @@ public abstract class ConfigLoader {
         }
     }
 
+    public void addValidator(ConfigValidator validator) {
+        validators.add(validator);
+    }
+
 
     protected void loadAll(boolean reload) {
         if (reload) {

@@ -1,5 +1,6 @@
 package quan.definition.parser;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Attribute;
 import org.dom4j.Element;
@@ -204,7 +205,7 @@ public class XmlDefinitionParser extends DefinitionParser {
             classDefinition.setLang(element.attributeValue("lang"));
             classDefinition.setComment(getComment(element, indexInParent));
             classDefinition.setDefinitionFile(definitionFile);
-            classDefinition.setDefinitionText(element.asXML());
+            classDefinition.setVersion(DigestUtils.md5Hex(element.asXML()).trim());
         }
 
         return classDefinition;
@@ -376,7 +377,7 @@ public class XmlDefinitionParser extends DefinitionParser {
         constantDefinition.setKeyField(constantElement.attributeValue("key"));
         constantDefinition.setValueField(constantElement.attributeValue("value"));
         constantDefinition.setCommentField(constantElement.attributeValue("comment"));
-        constantDefinition.setDefinitionText(constantElement.asXML());
+        constantDefinition.setVersion(DigestUtils.md5Hex(constantElement.asXML().trim()));
 
         if (indexInParent >= 0) {
             constantDefinition.setComment(getComment(constantElement, indexInParent));

@@ -42,12 +42,38 @@ public class LuaConfigGenerator extends ConfigGenerator {
         super.prepareBean(beanDefinition);
         if (configLoader != null && beanDefinition instanceof ConfigDefinition) {
             ConfigDefinition configDefinition = (ConfigDefinition) beanDefinition;
-            List<JSONObject> configJsons = configLoader.loadJsons(configDefinition, true);
-            List<String> rows = new ArrayList<>();
-            for (JSONObject json : configJsons) {
-                rows.add(configLuaString(configDefinition, json));
+            configDefinition.setVersion2(configDefinition.getVersion() + ":" + configLoader.getConfigVersion(configDefinition, false));
+
+            if (checkChange(configDefinition)) {
+                List<JSONObject> configJsons = configLoader.loadJsons(configDefinition, true);
+                List<String> rows = new ArrayList<>();
+                for (JSONObject json : configJsons) {
+                    rows.add(configLuaString(configDefinition, json));
+                }
+                configDefinition.setRows(rows);
             }
-            configDefinition.setRows(rows);
+        }
+    }
+
+    @Override
+    protected boolean isChange(ClassDefinition classDefinition) {
+        if (classDefinition instanceof ConfigDefinition) {
+            String fullName = classDefinition.getFullName(language());
+            String version = ((ConfigDefinition) classDefinition).getVersion2();
+            return !version.equals(oldRecords.get(fullName));
+        }
+        return super.isChange(classDefinition);
+    }
+
+    @Override
+    public void record(ClassDefinition classDefinition) {
+        if (classDefinition instanceof ConfigDefinition) {
+            String fullName = classDefinition.getFullName(language());
+            String version = ((ConfigDefinition) classDefinition).getVersion2();
+            oldRecords.remove(fullName);
+            newRecords.put(fullName, version);
+        } else {
+            super.record(classDefinition);
         }
     }
 

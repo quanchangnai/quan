@@ -182,17 +182,43 @@ public abstract class ConfigGenerator extends Generator {
     protected void prepareClass(ClassDefinition classDefinition) {
         super.prepareClass(classDefinition);
         if (classDefinition instanceof ConstantDefinition) {
-            ConstantDefinition constantDefinition = (ConstantDefinition) classDefinition;
-            prepareConstant(constantDefinition);
-            if (configLoader != null) {
+            prepareConstant((ConstantDefinition) classDefinition);
+
+        }
+    }
+
+    protected void prepareConstant(ConstantDefinition constantDefinition) {
+        prepareField(constantDefinition.getValueField());
+        if (configLoader != null) {
+            constantDefinition.setVersion2(constantDefinition.getVersion() + ":" + configLoader.getConfigVersion(constantDefinition.getOwnerDefinition(), false));
+            if (checkChange(constantDefinition)) {
                 List<JSONObject> configJsons = configLoader.loadJsons(constantDefinition.getOwnerDefinition(), false);
                 constantDefinition.setConfigs(configJsons);
             }
         }
     }
 
-    protected void prepareConstant(ConstantDefinition constantDefinition) {
-        prepareField(constantDefinition.getValueField());
+
+    @Override
+    protected boolean isChange(ClassDefinition classDefinition) {
+        if (classDefinition instanceof ConstantDefinition) {
+            String fullName = classDefinition.getFullName(language());
+            String version = ((ConstantDefinition) classDefinition).getVersion2();
+            return !version.equals(oldRecords.get(fullName));
+        }
+        return super.isChange(classDefinition);
+    }
+
+    @Override
+    public void record(ClassDefinition classDefinition) {
+        if (classDefinition instanceof ConstantDefinition) {
+            String fullName = classDefinition.getFullName(language());
+            String version = ((ConstantDefinition) classDefinition).getVersion2();
+            oldRecords.remove(fullName);
+            newRecords.put(fullName, version);
+        } else {
+            super.record(classDefinition);
+        }
     }
 
 }
