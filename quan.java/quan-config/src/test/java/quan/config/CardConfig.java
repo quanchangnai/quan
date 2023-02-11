@@ -1,8 +1,8 @@
 package quan.config;
 
 import com.alibaba.fastjson.*;
-import quan.config.load.ConfigLoader;
 import java.util.*;
+import quan.config.load.ConfigLoader;
 
 /**
  * 卡片<br/>

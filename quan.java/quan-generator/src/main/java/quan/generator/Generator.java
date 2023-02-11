@@ -155,44 +155,58 @@ public abstract class Generator {
     protected void parseOptions(Properties options) {
         this.options = options;
 
-        String enable = options.getProperty(category() + ".enable");
-        if (enable == null || !enable.trim().equals("true")) {
-            this.enable = false;
+        String optionPrefix1 = optionPrefix(false);
+        String optionPrefix2 = optionPrefix(true);
+
+        String enable = options.getProperty(optionPrefix1 + "enable");
+        if (!StringUtils.isBlank(enable)) {
+            this.enable = enable.trim().equals("true");
+        }
+        enable = options.getProperty(optionPrefix2 + "enable");
+        if (!StringUtils.isBlank(enable)) {
+            this.enable = enable.trim().equals("true");
         }
 
-        enable = options.getProperty(category() + "." + language() + ".enable");
-        if (enable == null || !enable.trim().equals("true")) {
-            this.enable = false;
+        String increment = options.getProperty(optionPrefix1 + "increment");
+        if (!StringUtils.isBlank(increment)) {
+            this.increment = increment.trim().equals("true");
+        }
+        increment = options.getProperty(optionPrefix2 + "increment");
+        if (!StringUtils.isBlank(increment)) {
+            this.increment = increment.trim().equals("true");
         }
 
-        String increment = options.getProperty(category() + "." + language() + ".increment");
-        if (increment != null && increment.trim().equals("true")) {
-            this.increment = true;
-        }
-
-        String definitionPath = options.getProperty(category() + ".definitionPath");
+        String definitionPath = options.getProperty(optionPrefix1 + "definitionPath");
         if (!StringUtils.isBlank(definitionPath)) {
             definitionPaths.addAll(Arrays.asList(definitionPath.split("[,，]")));
         }
 
-        String definitionFileEncoding = options.getProperty(category() + ".definitionFileEncoding");
+        String definitionFileEncoding = options.getProperty(optionPrefix1 + "definitionFileEncoding");
         if (!StringUtils.isBlank(definitionFileEncoding)) {
             this.definitionFileEncoding = definitionFileEncoding;
         }
 
         if (parser != null) {
             parser.setDefinitionFileEncoding(definitionFileEncoding);
-            parser.setBeanNamePattern(options.getProperty(category() + ".beanNamePattern"));
-            parser.setEnumNamePattern(options.getProperty(category() + ".enumNamePattern"));
+            parser.setBeanNamePattern(options.getProperty(optionPrefix1 + "beanNamePattern"));
+            parser.setEnumNamePattern(options.getProperty(optionPrefix1 + "enumNamePattern"));
         }
 
-        String codePath = options.getProperty(category() + "." + language() + ".codePath");
+        String codePath = options.getProperty(optionPrefix2 + "codePath");
         if (!StringUtils.isBlank(codePath)) {
             setCodePath(codePath);
         }
 
-        packagePrefix = options.getProperty(category() + "." + language() + ".packagePrefix");
-        enumPackagePrefix = options.getProperty(category() + "." + language() + ".enumPackagePrefix");
+        packagePrefix = options.getProperty(optionPrefix2 + "packagePrefix");
+        enumPackagePrefix = options.getProperty(optionPrefix2 + "enumPackagePrefix");
+    }
+
+    protected String optionPrefix(boolean useLanguage) {
+        String prefix = category() + ".";
+        if (useLanguage) {
+            prefix += language() + ".";
+        }
+        return prefix;
     }
 
     /**
@@ -374,6 +388,7 @@ public abstract class Generator {
     }
 
     protected void prepareClass(ClassDefinition classDefinition) {
+        classDefinition.setCurrentLanguage(language());
         classDefinition.setDependentClassNames(this.classNames);
 
         if (classDefinition instanceof BeanDefinition) {

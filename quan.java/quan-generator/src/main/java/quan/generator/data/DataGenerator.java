@@ -99,13 +99,14 @@ public class DataGenerator extends Generator {
     protected void parseOptions(Properties options) {
         super.parseOptions(options);
 
-        if (!enable) {
-            return;
+        if (enable && parser != null) {
+            parser.setDataNamePattern(options.getProperty(optionPrefix(false) + "namePattern"));
         }
+    }
 
-        if (parser != null) {
-            parser.setDataNamePattern(options.getProperty(category() + ".namePattern"));
-        }
+    @Override
+    protected String optionPrefix(boolean useLanguage) {
+        return category() + ".";
     }
 
     @Override

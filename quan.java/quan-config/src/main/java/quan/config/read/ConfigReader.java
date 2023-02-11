@@ -97,8 +97,12 @@ public abstract class ConfigReader {
     }
 
     public List<JSONObject> getJsons() {
-        if (jsons.isEmpty() && tableFile.exists()) {
-            read();
+        if (jsons.isEmpty()) {
+            if (tableFile.exists()) {
+                read();
+            } else {
+                logger.error("文件[{}]不存在", tableFile);
+            }
         }
         return jsons;
     }

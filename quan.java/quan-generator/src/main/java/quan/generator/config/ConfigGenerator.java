@@ -75,23 +75,25 @@ public abstract class ConfigGenerator extends Generator {
             return;
         }
 
+        String optionPrefix1 = optionPrefix(false);
+
         if (parser != null) {
-            parser.setConfigNamePattern(options.getProperty(category() + ".namePattern"));
-            parser.setConstantNamePattern(options.getProperty(category() + ".constantNamePattern"));
+            parser.setConfigNamePattern(options.getProperty(optionPrefix1 + "namePattern"));
+            parser.setConstantNamePattern(options.getProperty(optionPrefix1 + "constantNamePattern"));
         }
 
-        definitionType = options.getProperty(category() + ".definitionType");
+        definitionType = options.getProperty(optionPrefix1 + "definitionType");
         if (StringUtils.isBlank(definitionType)) {
             definitionType = "xml";
         }
 
-        tableType = options.getProperty(category() + ".tableType");
-        tablePath = options.getProperty(category() + ".tablePath");
-        tableBodyStartRow = options.getProperty(category() + ".tableBodyStartRow");
+        tableType = options.getProperty(optionPrefix1 + "tableType");
+        tablePath = options.getProperty(optionPrefix1 + "tablePath");
+        tableBodyStartRow = options.getProperty(optionPrefix1 + "tableBodyStartRow");
 
-        ConfigConverter.setDatetimePattern(options.getProperty(category() + ".datetimePattern"));
-        ConfigConverter.setDatePattern(options.getProperty(category() + ".datePattern"));
-        ConfigConverter.setTimePattern(options.getProperty(category() + ".timePattern"));
+        ConfigConverter.setDatetimePattern(options.getProperty(optionPrefix1 + "datetimePattern"));
+        ConfigConverter.setDatePattern(options.getProperty(optionPrefix1 + "datePattern"));
+        ConfigConverter.setTimePattern(options.getProperty(optionPrefix1 + "timePattern"));
 
     }
 

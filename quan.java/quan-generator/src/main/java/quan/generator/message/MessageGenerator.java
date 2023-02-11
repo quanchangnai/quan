@@ -1,6 +1,7 @@
 package quan.generator.message;
 
 import freemarker.template.Template;
+import org.apache.commons.lang3.StringUtils;
 import quan.definition.BeanDefinition;
 import quan.definition.Category;
 import quan.definition.ClassDefinition;
@@ -32,12 +33,16 @@ public abstract class MessageGenerator extends Generator {
             return;
         }
 
+        String optionPrefix1 = optionPrefix(false);
+
         if (parser != null) {
-            parser.setMessageNamePattern(options.getProperty(category() + ".namePattern"));
+            parser.setMessageNamePattern(options.getProperty(optionPrefix1 + "namePattern"));
         }
 
-        String rehashId = options.getProperty(category() + ".rehashId");
-        this.setRehashId(rehashId != null && rehashId.trim().equals("true"));
+        String rehashId = options.getProperty(optionPrefix1 + "rehashId");
+        if (!StringUtils.isBlank(rehashId)) {
+            this.setRehashId(rehashId.trim().equals("true"));
+        }
     }
 
     @Override

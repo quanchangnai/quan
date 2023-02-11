@@ -202,7 +202,7 @@ public class XmlDefinitionParser extends DefinitionParser {
             classDefinition.setParser(getDefinitionParser());
             classDefinition.setCategory(getCategory());
             classDefinition.setName(element.attributeValue("name"));
-            classDefinition.setLang(element.attributeValue("lang"));
+            classDefinition.setLanguage(element.attributeValue("lang"));
             classDefinition.setComment(getComment(element, indexInParent));
             classDefinition.setDefinitionFile(definitionFile);
             classDefinition.setVersion(DigestUtils.md5Hex(element.asXML()).trim());

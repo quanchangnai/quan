@@ -42,16 +42,17 @@ public abstract class ClassDefinition extends Definition {
 
     protected List<FieldDefinition> fields = new LinkedList<>();
 
+    //当前语言
+    protected Language currentLanguage;
+
     //导包，和具体语言相关
     private Map<String, String> imports = new TreeMap<>();
-
 
     //依赖类的简单名对应全名，和具体语言相关
     private Map<String, String> dependentClassNames;
 
     //字段名:字段定义
     protected Map<String, FieldDefinition> nameFields = new HashMap<>();
-
 
     @Override
     public String getKindName() {
@@ -64,6 +65,7 @@ public abstract class ClassDefinition extends Definition {
     }
 
     public void reset() {
+        currentLanguage = null;
         imports.clear();
         dependentClassNames = null;
         fields.forEach(this::resetField);
@@ -234,7 +236,7 @@ public abstract class ClassDefinition extends Definition {
     }
 
 
-    public void setLang(String language) {
+    public void setLanguage(String language) {
         if (isBlank(language) || category == Category.data) {
             return;
         }
@@ -260,6 +262,10 @@ public abstract class ClassDefinition extends Definition {
     }
 
     public void addImport(String importName) {
+        if (currentLanguage == Language.java && importName.equals(getFullPackageName(currentLanguage) + ".*")
+                || currentLanguage == Language.cs && importName.equals(getFullPackageName(currentLanguage))) {
+            return;
+        }
         imports.put(importName, null);
     }
 
@@ -400,6 +406,14 @@ public abstract class ClassDefinition extends Definition {
         } else {
             return className;
         }
+    }
+
+    public Language getCurrentLanguage() {
+        return currentLanguage;
+    }
+
+    public void setCurrentLanguage(Language currentLanguage) {
+        this.currentLanguage = currentLanguage;
     }
 
     @Override

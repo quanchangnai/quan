@@ -154,6 +154,8 @@ public class ConstantDefinition extends ClassDefinition {
             return;
         }
 
+        setVersion(getVersion() + ":" + ownerDefinition.getVersion());
+
         validateKeyField();
         validateValueField();
 
