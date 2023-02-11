@@ -20,6 +20,35 @@ local CRoleLogin = {
 
 local function onSet(self, key, value)
     assert(not CRoleLogin[key], "不允许修改只读属性:" .. key)
+
+    if key == "roleId" then
+        assert(type(value) == "number", string.format("属性%s类型%s错误", key, type(value)))
+    end
+
+    if key == "roleName" then
+        assert(type(value) == "string", string.format("属性%s类型%s错误", key, type(value)))
+    end
+
+    if key == "roleInfo" then
+        assert(type(value) == "table", string.format("属性%s类型%s错误", key, type(value)))
+    end
+
+    if key == "roleInfoList" then
+        assert(type(value) == "table", string.format("属性%s类型%s错误", key, type(value)))
+    end
+
+    if key == "roleInfoSet" then
+        assert(type(value) == "table", string.format("属性%s类型%s错误", key, type(value)))
+    end
+
+    if key == "roleInfoMap" then
+        assert(type(value) == "table", string.format("属性%s类型%s错误", key, type(value)))
+    end
+
+    if key == "userInfo" then
+        assert(value == nil or type(value) == "table" and value.class == UserInfo.class, string.format("属性%s类型%s错误", key, type(value)))
+    end
+
     rawset(self, key, value)
 end
 

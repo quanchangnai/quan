@@ -5,7 +5,7 @@
 ---代码自动生成，请勿手动修改
 ---
 
-local Config = require("quan.config.Config")
+local _Config = require("quan.config.Config")
 
 ---所有${name}
 local configs = {
@@ -25,19 +25,19 @@ local ${index.name}Configs = {}
 local function loadConfigs()
 <#list children as child>
     local ${child.name} = require("${child.getFullName("lua")}")
-    for i, ${child.name?uncap_first} in ipairs(${child.name}.getAll()) do
+    for _, ${child.name?uncap_first} in ipairs(${child.name}.getAll()) do
         table.insert(configs, ${child.name?uncap_first})
     end
 
 </#list>
-    for i, config in ipairs(configs) do
+    for _, config in ipairs(configs) do
 <#list indexes as index>
     <#if index.fields?size==1>
-        Config.load(${index.name}Configs, config, ${index.unique?c}, { "${index.fields[0].name}" }, { config.${index.fields[0].name} })
+        _Config.load(${index.name}Configs, config, ${index.unique?c}, { "${index.fields[0].name}" }, { config.${index.fields[0].name} })
     <#elseif index.fields?size==2>
-        Config.load(${index.name}Configs, config, ${index.unique?c}, { "${index.fields[0].name}", "${index.fields[1].name}" }, { config.${index.fields[0].name}, config.${index.fields[1].name} })
+        _Config.load(${index.name}Configs, config, ${index.unique?c}, { "${index.fields[0].name}", "${index.fields[1].name}" }, { config.${index.fields[0].name}, config.${index.fields[1].name} })
     <#elseif index.fields?size==3>
-        Config.load(${index.name}Configs, config, ${index.unique?c}, { "${index.fields[0].name}", "${index.fields[1].name}", "${index.fields[2].name}" }, { config.${index.fields[0].name}, config.${index.fields[1].name}, config.${index.fields[2].name} })
+        _Config.load(${index.name}Configs, config, ${index.unique?c}, { "${index.fields[0].name}", "${index.fields[1].name}", "${index.fields[2].name}" }, { config.${index.fields[0].name}, config.${index.fields[1].name}, config.${index.fields[2].name} })
     </#if>
 </#list>
     end

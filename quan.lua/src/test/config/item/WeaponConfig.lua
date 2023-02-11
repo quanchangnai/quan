@@ -3,7 +3,7 @@
 ---代码自动生成，请勿手动修改
 ---
 
-local Config = require("quan.config.Config")
+local _Config = require("quan.config.Config")
 
 ---所有WeaponConfig
 local configs = {
@@ -30,13 +30,13 @@ local composite2Configs = {}
 
 ---加载配置，建立索引
 local function loadConfigs()
-    for i, config in ipairs(configs) do
-        Config.load(idConfigs, config, true, { "id" }, { config.id })
-        Config.load(keyConfigs, config, true, { "key" }, { config.key })
-        Config.load(typeConfigs, config, false, { "type" }, { config.type })
-        Config.load(positionConfigs, config, false, { "position" }, { config.position })
-        Config.load(composite1Configs, config, false, { "color", "w1" }, { config.color, config.w1 })
-        Config.load(composite2Configs, config, true, { "w1", "w2" }, { config.w1, config.w2 })
+    for _, config in ipairs(configs) do
+        _Config.load(idConfigs, config, true, { "id" }, { config.id })
+        _Config.load(keyConfigs, config, true, { "key" }, { config.key })
+        _Config.load(typeConfigs, config, false, { "type" }, { config.type })
+        _Config.load(positionConfigs, config, false, { "position" }, { config.position })
+        _Config.load(composite1Configs, config, false, { "color", "w1" }, { config.color, config.w1 })
+        _Config.load(composite2Configs, config, true, { "w1", "w2" }, { config.w1, config.w2 })
     end
 end
 

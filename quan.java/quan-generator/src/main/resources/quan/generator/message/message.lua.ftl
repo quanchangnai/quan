@@ -27,6 +27,29 @@ local ${name} = {
 
 local function onSet(self, key, value)
     assert(not ${name}[key], "不允许修改只读属性:" .. key)
+
+<#list fields as field>
+    if key == "${field.name}" then
+    <#if field.min?? && field.max??>
+        _Message.checkRange(value, ${field.min}, ${field.max});
+    <#elseif field.min??>
+        _Message.checkMin(value, ${field.min});
+    <#elseif field.max??>
+        _Message.checkMax(value, ${field.max});
+    <#elseif field.numberType || field.enumType>
+        assert(type(value) == "number", string.format("属性%s类型%s错误", key, type(value)))
+    <#elseif field.type == "bool">
+        assert(type(value) == "boolean", string.format("属性%s类型%s错误", key, type(value)))
+    <#elseif field.type == "string" || field.type == "bytes">
+        assert(type(value) == "string", string.format("属性%s类型%s错误", key, type(value)))
+    <#elseif field.collectionType || field.beanType && !field.optional>
+        assert(type(value) == "table", string.format("属性%s类型%s错误", key, type(value)))
+    <#else>
+        assert(<#if field.optional>value == nil or </#if>type(value) == "table" and value.class == ${field.classType?replace('.','_')}.class, string.format("属性%s类型%s错误", key, type(value)))
+    </#if>
+    end
+
+</#list>
     rawset(self, key, value)
 end
 
@@ -225,6 +248,17 @@ function ${name}:encode(buffer)
         </#if>
         <#elseif field.type=="float"||field.type=="double">
     buffer:write${field.type?cap_first}(self.${field.name}<#if field.scale gt 0>, ${field.scale}</#if>)
+        <#elseif (field.type=="string" || field.type=="bytes") && field.optional>
+        <#if field?index gt 0>
+
+        </#if>
+    buffer:writeBool(self.${field.name} ~= nil)
+    if self.${field.name} ~= nil then
+        buffer:write${field.type?cap_first}(self.${field.name}) 
+    end
+        <#if field?has_next && !fields[field?index+1].collectionType && (fields[field?index+1].primitiveType || fields[field?index+1].enumType || !fields[field?index+1].optional) >
+
+        </#if>
         <#elseif field.builtinType>
     buffer:write${field.type?cap_first}(self.${field.name})
         <#elseif field.enumType>
@@ -362,6 +396,16 @@ function ${name}.decode(buffer, self)
         </#if>
     <#elseif field.type=="float"||field.type=="double">
     self.${field.name} = buffer:read${field.type?cap_first}(<#if field.scale gt 0>${field.scale}</#if>)
+    <#elseif (field.type=="string" || field.type=="bytes") && field.optional>
+        <#if field?index gt 0>
+
+        </#if>
+    if buffer:readBool() then
+        self.${field.name} = buffer:read${field.type?cap_first}()
+    end
+        <#if field?has_next && !fields[field?index+1].collectionType && (fields[field?index+1].primitiveType || fields[field?index+1].enumType || !fields[field?index+1].optional) >
+
+        </#if>    
     <#elseif field.builtinType>
     self.${field.name} = buffer:read${field.type?cap_first}()
     <#elseif field.enumType>

@@ -3,7 +3,7 @@
 ---代码自动生成，请勿手动修改
 ---
 
-local Config = require("quan.config.Config")
+local _Config = require("quan.config.Config")
 
 ---所有QuestConfig
 local configs = {
@@ -30,13 +30,13 @@ local composite4Configs = {}
 
 ---加载配置，建立索引
 local function loadConfigs()
-    for i, config in ipairs(configs) do
-        Config.load(idConfigs, config, true, { "id" }, { config.id })
-        Config.load(typeConfigs, config, false, { "type" }, { config.type })
-        Config.load(composite1Configs, config, true, { "a1", "a2" }, { config.a1, config.a2 })
-        Config.load(composite2Configs, config, false, { "b1", "b2" }, { config.b1, config.b2 })
-        Config.load(composite3Configs, config, true, { "c1", "c2", "c3" }, { config.c1, config.c2, config.c3 })
-        Config.load(composite4Configs, config, false, { "d1", "d2", "d3" }, { config.d1, config.d2, config.d3 })
+    for _, config in ipairs(configs) do
+        _Config.load(idConfigs, config, true, { "id" }, { config.id })
+        _Config.load(typeConfigs, config, false, { "type" }, { config.type })
+        _Config.load(composite1Configs, config, true, { "a1", "a2" }, { config.a1, config.a2 })
+        _Config.load(composite2Configs, config, false, { "b1", "b2" }, { config.b1, config.b2 })
+        _Config.load(composite3Configs, config, true, { "c1", "c2", "c3" }, { config.c1, config.c2, config.c3 })
+        _Config.load(composite4Configs, config, false, { "d1", "d2", "d3" }, { config.d1, config.d2, config.d3 })
     end
 end
 

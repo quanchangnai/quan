@@ -3,7 +3,7 @@
 ---代码自动生成，请勿手动修改
 ---
 
-local Config = require("quan.config.Config")
+local _Config = require("quan.config.Config")
 
 ---所有CardConfig
 local configs = {
@@ -25,10 +25,10 @@ local keyConfigs = {}
 
 ---加载配置，建立索引
 local function loadConfigs()
-    for i, config in ipairs(configs) do
-        Config.load(idConfigs, config, true, { "id" }, { config.id })
-        Config.load(typeConfigs, config, false, { "type" }, { config.type })
-        Config.load(keyConfigs, config, true, { "key" }, { config.key })
+    for _, config in ipairs(configs) do
+        _Config.load(idConfigs, config, true, { "id" }, { config.id })
+        _Config.load(typeConfigs, config, false, { "type" }, { config.type })
+        _Config.load(keyConfigs, config, true, { "key" }, { config.key })
     end
 end
 

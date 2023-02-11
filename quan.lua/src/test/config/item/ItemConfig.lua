@@ -3,7 +3,7 @@
 ---代码自动生成，请勿手动修改
 ---
 
-local Config = require("quan.config.Config")
+local _Config = require("quan.config.Config")
 
 ---所有ItemConfig
 local configs = {
@@ -66,14 +66,14 @@ local typeConfigs = {}
 ---加载配置，建立索引
 local function loadConfigs()
     local EquipConfig = require("test.config.item.EquipConfig")
-    for i, equipConfig in ipairs(EquipConfig.getAll()) do
+    for _, equipConfig in ipairs(EquipConfig.getAll()) do
         table.insert(configs, equipConfig)
     end
 
-    for i, config in ipairs(configs) do
-        Config.load(idConfigs, config, true, { "id" }, { config.id })
-        Config.load(keyConfigs, config, true, { "key" }, { config.key })
-        Config.load(typeConfigs, config, false, { "type" }, { config.type })
+    for _, config in ipairs(configs) do
+        _Config.load(idConfigs, config, true, { "id" }, { config.id })
+        _Config.load(keyConfigs, config, true, { "key" }, { config.key })
+        _Config.load(typeConfigs, config, false, { "type" }, { config.type })
     end
 end
 

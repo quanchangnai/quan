@@ -21,7 +21,7 @@ namespace ${getFullPackageName("cs")}
         public override int Id => ${id?c};
 
 </#if>
-<#list selfFields as field>
+<#list fields as field>
     <#if field.type == "set" || field.type == "list">
         <#if field.comment !="">
         /// <summary>
@@ -127,7 +127,7 @@ namespace ${getFullPackageName("cs")}
         {
             base.Encode(buffer);
 
-<#list selfFields as field>
+<#list fields as field>
      <#if field.ignore>
         <#continue/>
     </#if>
@@ -235,7 +235,7 @@ namespace ${getFullPackageName("cs")}
                 ${field.name}Value.Encode(buffer);
             </#if>
             }
-            <#if field?has_next && !selfFields[field?index+1].collectionType && (selfFields[field?index+1].primitiveType || !selfFields[field?index+1].optional) >
+            <#if field?has_next && !fields[field?index+1].collectionType && (fields[field?index+1].primitiveType || !fields[field?index+1].optional) >
 
             </#if>
         <#elseif field.type=="map">
@@ -252,7 +252,7 @@ namespace ${getFullPackageName("cs")}
                 ${thisField1}[${field.name}Key].Encode(buffer);
             </#if>
             }
-            <#if field?has_next && !selfFields[field?index+1].collectionType && (selfFields[field?index+1].primitiveType || !selfFields[field?index+1].optional) >
+            <#if field?has_next && !fields[field?index+1].collectionType && (fields[field?index+1].primitiveType || !fields[field?index+1].optional) >
 
             </#if>
         <#elseif field.type=="float"||field.type=="double">
@@ -267,7 +267,7 @@ namespace ${getFullPackageName("cs")}
             </#if>
             buffer.WriteBool(${thisField1} != null);
             ${thisField1}?.Encode(buffer);
-            <#if field?has_next && !selfFields[field?index+1].collectionType && (selfFields[field?index+1].primitiveType || !selfFields[field?index+1].optional) >
+            <#if field?has_next && !fields[field?index+1].collectionType && (fields[field?index+1].primitiveType || !fields[field?index+1].optional) >
 
             </#if>
         <#else>
@@ -289,7 +289,7 @@ namespace ${getFullPackageName("cs")}
             {
                 switch (tag)
                 {
-                    <#list selfFields as field>
+                    <#list fields as field>
                     <#if field.ignore>
                         <#continue/>
                     </#if>
@@ -350,7 +350,7 @@ namespace ${getFullPackageName("cs")}
                 }
             }
 <#else>
-<#list selfFields as field>
+<#list fields as field>
     <#if field.ignore>
         <#continue/>
     </#if>
@@ -376,7 +376,7 @@ namespace ${getFullPackageName("cs")}
                 ${thisField2}.Add(${field.name}Value);
         </#if>
             }
-        <#if field?has_next && !selfFields[field?index+1].collectionType && (selfFields[field?index+1].primitiveType || !selfFields[field?index+1].optional) >
+        <#if field?has_next && !fields[field?index+1].collectionType && (fields[field?index+1].primitiveType || !fields[field?index+1].optional) >
 
         </#if>
     <#elseif field.type=="map">
@@ -395,7 +395,7 @@ namespace ${getFullPackageName("cs")}
                 ${thisField2}.Add(${field.name}Key, ${field.name}Value);
         </#if>
             }
-        <#if field?has_next && !selfFields[field?index+1].collectionType && (selfFields[field?index+1].primitiveType || !selfFields[field?index+1].optional) >
+        <#if field?has_next && !fields[field?index+1].collectionType && (fields[field?index+1].primitiveType || !fields[field?index+1].optional) >
 
         </#if>
     <#elseif field.type=="float"||field.type=="double">
@@ -413,7 +413,7 @@ namespace ${getFullPackageName("cs")}
                 ${thisField1} = ${thisField1} ?? new ${field.classType}();
                 ${thisField1}.Decode(buffer);
             }
-        <#if field?has_next && !selfFields[field?index+1].collectionType && (selfFields[field?index+1].primitiveType || !selfFields[field?index+1].optional) >
+        <#if field?has_next && !fields[field?index+1].collectionType && (fields[field?index+1].primitiveType || !fields[field?index+1].optional) >
 
         </#if>
     <#else>

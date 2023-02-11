@@ -16,6 +16,55 @@ local RoleInfo = {
 
 local function onSet(self, key, value)
     assert(not RoleInfo[key], "不允许修改只读属性:" .. key)
+
+    if key == "id" then
+        assert(type(value) == "number", string.format("属性%s类型%s错误", key, type(value)))
+    end
+
+    if key == "name" then
+        assert(type(value) == "string", string.format("属性%s类型%s错误", key, type(value)))
+    end
+
+    if key == "alias" then
+        assert(type(value) == "string", string.format("属性%s类型%s错误", key, type(value)))
+    end
+
+    if key == "type" then
+        assert(type(value) == "number", string.format("属性%s类型%s错误", key, type(value)))
+    end
+
+    if key == "b" then
+        assert(type(value) == "boolean", string.format("属性%s类型%s错误", key, type(value)))
+    end
+
+    if key == "s" then
+        assert(type(value) == "number", string.format("属性%s类型%s错误", key, type(value)))
+    end
+
+    if key == "i" then
+        _Message.checkRange(value, 1, 20);
+    end
+
+    if key == "d" then
+        assert(type(value) == "number", string.format("属性%s类型%s错误", key, type(value)))
+    end
+
+    if key == "data" then
+        assert(type(value) == "string", string.format("属性%s类型%s错误", key, type(value)))
+    end
+
+    if key == "list" then
+        assert(type(value) == "table", string.format("属性%s类型%s错误", key, type(value)))
+    end
+
+    if key == "set" then
+        assert(type(value) == "table", string.format("属性%s类型%s错误", key, type(value)))
+    end
+
+    if key == "map" then
+        assert(type(value) == "table", string.format("属性%s类型%s错误", key, type(value)))
+    end
+
     rawset(self, key, value)
 end
 
@@ -83,7 +132,12 @@ function RoleInfo:encode(buffer)
 
     buffer:writeInt(self.id)
     buffer:writeString(self.name)
-    buffer:writeString(self.alias)
+
+    buffer:writeBool(self.alias ~= nil)
+    if self.alias ~= nil then
+        buffer:writeString(self.alias) 
+    end
+
     buffer:writeInt(self.type or 0)
     buffer:writeBool(self.b)
     buffer:writeShort(self.s)
@@ -118,7 +172,11 @@ function RoleInfo.decode(buffer, self)
 
     self.id = buffer:readInt()
     self.name = buffer:readString()
-    self.alias = buffer:readString()
+
+    if buffer:readBool() then
+        self.alias = buffer:readString()
+    end
+
     self.type = buffer:readInt()
     self.b = buffer:readBool()
     self.s = buffer:readShort()

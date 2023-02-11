@@ -21,7 +21,7 @@ public class ${name} extends <#if kind ==2>${Bean}<#else>${Message}</#if> {
     public static final int ID = ${id?c};
 
 </#if>
-<#list selfFields as field>
+<#list fields as field>
     <#if field.comment !="">
     //${field.comment}
     </#if>
@@ -42,12 +42,12 @@ public class ${name} extends <#if kind ==2>${Bean}<#else>${Message}</#if> {
     </#if>
 
 </#list>
-<#if selfFields?size <= 5>
+<#if fields?size <= 5>
     public ${name}() {
     }
 
     public ${name}(<#rt/>
-    <#list selfFields as field>
+    <#list fields as field>
         <#if field.type == "set" || field.type == "list">
         ${field.basicType}<${field.valueClassType}> ${field.name}<#t/>
         <#elseif field.type == "map">
@@ -60,7 +60,7 @@ public class ${name} extends <#if kind ==2>${Bean}<#else>${Message}</#if> {
         <#if field?has_next>, </#if><#t/>
     </#list>
     ) {<#lt/>
-    <#list selfFields as field>
+    <#list fields as field>
         <#if field.type == "set" || field.type == "list">
         this.${field.name}.addAll(${field.name});
         <#elseif field.type == "map">
@@ -82,7 +82,7 @@ public class ${name} extends <#if kind ==2>${Bean}<#else>${Message}</#if> {
     }
 
 </#if>
-<#list selfFields as field>
+<#list fields as field>
     <#if field.comment !="">
     /**
      * ${field.comment}
@@ -138,7 +138,7 @@ public class ${name} extends <#if kind ==2>${Bean}<#else>${Message}</#if> {
     public void encode(${CodedBuffer} buffer) {
         super.encode(buffer);
 
-<#list selfFields as field>
+<#list fields as field>
     <#if field.ignore>
         <#continue/>
     </#if>
@@ -233,7 +233,7 @@ public class ${name} extends <#if kind ==2>${Bean}<#else>${Message}</#if> {
             ${field.name}$Value.encode(buffer);
             </#if>
         }
-        <#if field?has_next && !selfFields[field?index+1].collectionType && (selfFields[field?index+1].primitiveType|| selfFields[field?index+1].enumType || !selfFields[field?index+1].optional) >
+        <#if field?has_next && !fields[field?index+1].collectionType && (fields[field?index+1].primitiveType|| fields[field?index+1].enumType || !fields[field?index+1].optional) >
 
         </#if>
         <#elseif field.type=="map">
@@ -249,7 +249,7 @@ public class ${name} extends <#if kind ==2>${Bean}<#else>${Message}</#if> {
             this.${field.name}.get(${field.name}$Key).encode(buffer);
             </#if>
         }
-            <#if field?has_next && !selfFields[field?index+1].collectionType && (selfFields[field?index+1].primitiveType|| selfFields[field?index+1].enumType || !selfFields[field?index+1].optional) >
+            <#if field?has_next && !fields[field?index+1].collectionType && (fields[field?index+1].primitiveType|| fields[field?index+1].enumType || !fields[field?index+1].optional) >
 
             </#if>
         <#elseif field.type=="float"||field.type=="double">
@@ -266,7 +266,7 @@ public class ${name} extends <#if kind ==2>${Bean}<#else>${Message}</#if> {
         if (this.${field.name} != null) {
             this.${field.name}.encode(buffer);
         }
-            <#if field?has_next && !selfFields[field?index+1].collectionType && (selfFields[field?index+1].primitiveType || selfFields[field?index+1].enumType || !selfFields[field?index+1].optional) >
+            <#if field?has_next && !fields[field?index+1].collectionType && (fields[field?index+1].primitiveType || fields[field?index+1].enumType || !fields[field?index+1].optional) >
 
             </#if>
         <#else>
@@ -286,7 +286,7 @@ public class ${name} extends <#if kind ==2>${Bean}<#else>${Message}</#if> {
 <#if compatible>
         for (int tag = readTag(buffer); tag != 0; tag = readTag(buffer)) {
             switch (tag) {
-            <#list selfFields as field>
+            <#list fields as field>
                 <#if field.ignore><#continue/></#if>
                 case ${field.tag}:
                 <#if field.type=="set" || field.type=="list">
@@ -339,7 +339,7 @@ public class ${name} extends <#if kind ==2>${Bean}<#else>${Message}</#if> {
             }
         }
 <#else>
-<#list selfFields as field>
+<#list fields as field>
     <#if field.ignore>
         <#continue/>
     <#elseif field.type=="set" || field.type=="list">
@@ -356,7 +356,7 @@ public class ${name} extends <#if kind ==2>${Bean}<#else>${Message}</#if> {
             this.${field.name}.add(${field.name}$Value);
         </#if>
         }
-        <#if field?has_next && !selfFields[field?index+1].collectionType && (selfFields[field?index+1].primitiveType|| selfFields[field?index+1].enumType || !selfFields[field?index+1].optional) >
+        <#if field?has_next && !fields[field?index+1].collectionType && (fields[field?index+1].primitiveType|| fields[field?index+1].enumType || !fields[field?index+1].optional) >
 
         </#if>
     <#elseif field.type=="map">
@@ -374,7 +374,7 @@ public class ${name} extends <#if kind ==2>${Bean}<#else>${Message}</#if> {
             this.${field.name}.put(${field.name}$Key, ${field.name}$Value);
         </#if>
         }
-        <#if field?has_next && !selfFields[field?index+1].collectionType && (selfFields[field?index+1].primitiveType|| selfFields[field?index+1].enumType || !selfFields[field?index+1].optional) >
+        <#if field?has_next && !fields[field?index+1].collectionType && (fields[field?index+1].primitiveType|| fields[field?index+1].enumType || !fields[field?index+1].optional) >
 
         </#if>
     <#elseif field.type=="float"||field.type=="double">
@@ -395,7 +395,7 @@ public class ${name} extends <#if kind ==2>${Bean}<#else>${Message}</#if> {
             }
             this.${field.name}.decode(buffer);
         }
-        <#if field?has_next && !selfFields[field?index+1].collectionType && (selfFields[field?index+1].primitiveType|| selfFields[field?index+1].enumType || !selfFields[field?index+1].optional) >
+        <#if field?has_next && !fields[field?index+1].collectionType && (fields[field?index+1].primitiveType|| fields[field?index+1].enumType || !fields[field?index+1].optional) >
 
         </#if>
     <#else>
