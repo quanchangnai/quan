@@ -415,7 +415,6 @@ public class BeanDefinition extends ClassDefinition {
         }
     }
 
-
     @Override
     protected void validateDependents() {
         BeanDefinition parent = getParent();
@@ -487,23 +486,6 @@ public class BeanDefinition extends ClassDefinition {
             escapedDelimiter = ConfigDefinition.escapeDelimiter(delimiter_);
         }
         return escapedDelimiter;
-    }
-
-    private void validateDelimiter() {
-        if (category != Category.config || getClass() != BeanDefinition.class) {
-            return;
-        }
-
-        if (delimiter.length() != 1) {
-            addValidatedError(getValidatedName() + "的分隔符[" + delimiter + "]长度必须1个字符");
-        }
-
-        for (int i = 0; i < delimiter.length(); i++) {
-            String s = String.valueOf(delimiter.charAt(i));
-            if (!Constants.LEGAL_DELIMITERS.contains(s)) {
-                addValidatedError(getValidatedName() + "的分隔符[" + delimiter + "]非法,合法分隔符" + Constants.LEGAL_DELIMITERS);
-            }
-        }
     }
 
     protected void validateFieldRef(FieldDefinition field) {
@@ -615,7 +597,69 @@ public class BeanDefinition extends ClassDefinition {
         if (refFieldIndex == null) {
             addValidatedError(getValidatedName() + field.getValidatedName() + "的引用字段[" + refConfigAndField + "]不是一级索引");
         }
+    }
 
+    private void validateDelimiter() {
+        if (category != Category.config || getClass() != BeanDefinition.class) {
+            return;
+        }
+
+
+        if (delimiter.length() != 1) {
+            addValidatedError(getValidatedName() + "的分隔符[" + delimiter + "]长度必须1个字符");
+        } else if (!Constants.LEGAL_DELIMITERS.contains(delimiter)) {
+            addValidatedError(getValidatedName() + "的分隔符[" + delimiter + "]非法,合法分隔符" + Constants.LEGAL_DELIMITERS);
+        } else {
+            List<String> delimiters = new ArrayList<>();
+            delimiters.add(delimiter);
+
+            for (FieldDefinition field : fields) {
+                validateFieldDelimiter(field, delimiters);
+            }
+
+            if (delimiters.size() != new HashSet<>(delimiters).size()) {
+                addValidatedError(getValidatedName() + "关联分隔符有重复[" + String.join("", delimiters) + "]");
+            }
+        }
+    }
+
+    protected void validateFieldDelimiter(FieldDefinition field, List<String> delimiters) {
+        if (field.isCycle() || !field.isCollectionType()) {
+            return;
+        }
+
+        String delimiter = field.getDelimiter();
+
+        for (int i = 0; i < delimiter.length(); i++) {
+            String s = String.valueOf(delimiter.charAt(i));
+            delimiters.add(s);
+            if (!Constants.LEGAL_DELIMITERS.contains(s)) {
+                addValidatedError(getValidatedName("的") + field.getValidatedName() + "的分隔符[" + delimiter + "]非法,合法分隔符" + Constants.LEGAL_DELIMITERS);
+            }
+        }
+
+        int charNumError = 0;
+        if (delimiter.length() != 1 && (field.isListType() || field.isSetType())) {
+            charNumError = 1;
+        }
+        if (field.isMapType()) {
+            if (delimiter.length() != 2) {
+                charNumError = 2;
+            } else if (delimiter.charAt(0) == delimiter.charAt(1)) {
+                addValidatedError(getValidatedName("的") + field.getValidatedName() + "类型[map]的分隔符[" + delimiter + "]必须是2个不同的字符");
+            }
+        }
+        if (charNumError > 0) {
+            addValidatedError(getValidatedName() + "[" + field.getType() + "]类型字段" + field.getValidatedName() + "的分隔符[" + delimiter + "]必须是" + charNumError + "个字符");
+        }
+
+        BeanDefinition fieldValueBean = field.getValueTypeBean();
+        if (fieldValueBean != null) {
+            delimiters.add(fieldValueBean.getDelimiter());
+            for (FieldDefinition beanField : fieldValueBean.getFields()) {
+                validateFieldDelimiter(beanField, delimiters);
+            }
+        }
     }
 
 }

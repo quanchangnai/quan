@@ -78,13 +78,9 @@ public class MessageDefinition extends BeanDefinition {
         }
     }
 
-
     @Override
     protected boolean isReservedWord(String fieldName) {
-        if (super.isReservedWord(fieldName)) {
-            return true;
-        }
-        return fieldName.equals("id");
+        return super.isReservedWord(fieldName) || fieldName.equals("id");
     }
 
 }

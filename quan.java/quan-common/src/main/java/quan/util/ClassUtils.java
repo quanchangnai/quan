@@ -82,36 +82,37 @@ public class ClassUtils extends org.apache.commons.lang3.ClassUtils {
     }
 
     /**
-     * @see #loadClasses(String, Class, String)
+     * @see #loadClasses(String, Class, boolean, String)
      */
     public static Set<Class<?>> loadClasses(String packageName) {
-        return loadClasses(packageName, null, null);
+        return loadClasses(packageName, null, true, null);
     }
 
     /**
-     * @see #loadClasses(String, Class, String)
+     * @see #loadClasses(String, Class, boolean, String)
      */
     public static Set<Class<?>> loadClasses(String packageName, Class<?> superClass) {
-        return loadClasses(packageName, superClass, null);
+        return loadClasses(packageName, superClass, true, null);
     }
 
     /**
-     * @see #loadClasses(String, Class, String)
+     * @see #loadClasses(String, Class, boolean, String)
      */
     public static Set<Class<?>> loadClasses(String packageName, String classNamePattern) {
-        return loadClasses(packageName, null, classNamePattern);
+        return loadClasses(packageName, null, true, classNamePattern);
     }
 
 
     /**
      * 加载符合条件的类
      *
-     * @param packageName      该包以及子包下面的所有类
-     * @param superClass       该类的子孙类
+     * @param packageName      该包及其子包下面的所有类
+     * @param superClass       该类及其子孙类
+     * @param excludeSuper     是否排除该类本身，其子孙类一定会返回
      * @param classNamePattern 类名要求的正则格式
      * @return 符合条件的类
      */
-    public static Set<Class<?>> loadClasses(String packageName, Class<?> superClass, String classNamePattern) {
+    public static Set<Class<?>> loadClasses(String packageName, Class<?> superClass, boolean excludeSuper, String classNamePattern) {
         Objects.requireNonNull(packageName, "包名[packageName]不能为空");
         packageName = packageName.replace(".", "/");
 
@@ -164,7 +165,7 @@ public class ClassUtils extends org.apache.commons.lang3.ClassUtils {
 //                logger.error("加载类[{}]失败", className, e);
                 continue;
             }
-            if (superClass == null || superClass.isAssignableFrom(clazz) && superClass != clazz) {
+            if (superClass == null || superClass.isAssignableFrom(clazz) && (!excludeSuper || superClass != clazz)) {
                 classes.add(clazz);
             }
         }

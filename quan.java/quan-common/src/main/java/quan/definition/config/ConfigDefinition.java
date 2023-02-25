@@ -325,9 +325,7 @@ public class ConfigDefinition extends BeanDefinition {
         if (field.getColumn() == null) {
             addValidatedError(getValidatedName("的") + field.getValidatedName() + "对应的列不能为空");
             return;
-        }
-
-        if (StringUtils.isBlank(field.getComment())) {
+        } else if (StringUtils.isBlank(field.getComment())) {
             field.setComment(field.getColumn());
         }
 
@@ -357,67 +355,15 @@ public class ConfigDefinition extends BeanDefinition {
     }
 
     private void validateFieldDelimiter(FieldDefinition field) {
-        if (field.isCycle()) {
+        if (field.isCycle() || !field.isCollectionType()) {
             return;
         }
 
-        ArrayList<String> delimiterList = new ArrayList<>();
-        validateFieldDelimiter(field, delimiterList);
+        ArrayList<String> delimiters = new ArrayList<>();
+        validateFieldDelimiter(field, delimiters);
 
-        Set<String> delimiterSet = new HashSet<>(delimiterList);
-        if (delimiterList.size() != delimiterSet.size()) {
-            addValidatedError(getValidatedName("的") + field.getValidatedName() + "关联分隔符有重复[" + String.join("", delimiterList) + "]");
-        }
-    }
-
-    private void validateFieldDelimiter(FieldDefinition field, List<String> delimiters) {
-        if (field.isBeanType()) {
-            validateBeanDelimiter(field.getTypeBean(), delimiters);
-            return;
-        }
-
-        if (!field.isCollectionType()) {
-            return;
-        }
-
-        String delimiter = field.getDelimiter();
-
-        for (int i = 0; i < delimiter.length(); i++) {
-            String s = String.valueOf(delimiter.charAt(i));
-            delimiters.add(s);
-            if (!Constants.LEGAL_DELIMITERS.contains(s)) {
-                addValidatedError(getValidatedName("的") + field.getValidatedName() + "的分隔符[" + delimiter + "]非法,合法分隔符" + Constants.LEGAL_DELIMITERS);
-            }
-        }
-
-        int charNumError = 0;
-        if (delimiter.length() != 1 && (field.isListType() || field.isSetType())) {
-            charNumError = 1;
-        }
-        if (field.isMapType()) {
-            if (delimiter.length() != 2) {
-                charNumError = 2;
-            } else if (delimiter.charAt(0) == delimiter.charAt(1)) {
-                addValidatedError(getValidatedName("的") + field.getValidatedName() + "类型[map]的分隔符[" + delimiter + "]必须是2个不同的字符");
-            }
-        }
-        if (charNumError > 0) {
-            addValidatedError(getValidatedName() + "[" + field.getType() + "]类型字段" + field.getValidatedName() + "的分隔符[" + delimiter + "]必须是" + charNumError + "个字符");
-        }
-
-        BeanDefinition fieldValueBean = field.getValueTypeBean();
-        if (fieldValueBean != null) {
-            validateBeanDelimiter(fieldValueBean, delimiters);
-        }
-    }
-
-    private void validateBeanDelimiter(BeanDefinition beanDefinition, List<String> delimiters) {
-        String delimiter = beanDefinition.getDelimiter();
-        for (int i = 0; i < delimiter.length(); i++) {
-            delimiters.add(String.valueOf(delimiter.charAt(i)));
-        }
-        for (FieldDefinition beanField : beanDefinition.getFields()) {
-            validateFieldDelimiter(beanField, delimiters);
+        if (delimiters.size() != new HashSet<>(delimiters).size()) {
+            addValidatedError(getValidatedName("的") + field.getValidatedName() + "关联分隔符有重复[" + String.join("", delimiters) + "]");
         }
     }
 
@@ -449,7 +395,7 @@ public class ConfigDefinition extends BeanDefinition {
      */
     @Override
     public String resolveFieldRef(String fieldRef) {
-        if (!fieldRef.contains(".")) {
+        if (!fieldRef.contains(".") && nameFields.containsKey(fieldRef)) {
             fieldRef = getName() + "." + fieldRef;
         }
         return fieldRef;

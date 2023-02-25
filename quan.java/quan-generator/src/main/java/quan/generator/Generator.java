@@ -11,13 +11,10 @@ import quan.definition.*;
 import quan.definition.DependentSource.DependentType;
 import quan.definition.parser.DefinitionParser;
 import quan.definition.parser.XmlDefinitionParser;
-import quan.generator.config.CSharpConfigGenerator;
-import quan.generator.config.JavaConfigGenerator;
-import quan.generator.config.LuaConfigGenerator;
+import quan.generator.config.ConfigGenerator;
 import quan.generator.data.DataGenerator;
-import quan.generator.message.CSharpMessageGenerator;
-import quan.generator.message.JavaMessageGenerator;
-import quan.generator.message.LuaMessageGenerator;
+import quan.generator.message.MessageGenerator;
+import quan.util.ClassUtils;
 import quan.util.FileUtils;
 
 import java.io.*;
@@ -26,7 +23,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
-import static quan.definition.parser.DefinitionParser.createParser;
 
 /**
  * 代码生成器
@@ -522,7 +518,7 @@ public abstract class Generator {
 
         if (StringUtils.isBlank(optionsFile)) {
             optionsFile = "generator.properties";
-            logger.info("使用默认位置的生成器选项配置文件[{}]\n", optionsFile);
+            logger.info("使用默认位置的生成器选项配置文件：{}\n", optionsFile);
         }
 
         Properties options = new Properties();
@@ -533,40 +529,31 @@ public abstract class Generator {
             return;
         }
 
-        DataGenerator dataGenerator = new DataGenerator(options);
-        dataGenerator.useXmlParser();
-
-        JavaMessageGenerator javaMessageGenerator = new JavaMessageGenerator(options);
-        CSharpMessageGenerator cSharpMessageGenerator = new CSharpMessageGenerator(options);
-        LuaMessageGenerator luaMessageGenerator = new LuaMessageGenerator(options);
-
-        DefinitionParser messageParser = new XmlDefinitionParser();
-        javaMessageGenerator.setParser(messageParser);
-        cSharpMessageGenerator.setParser(messageParser);
-        luaMessageGenerator.setParser(messageParser);
-
-        DefinitionParser configParser = createParser(options.getProperty("config.definitionType").trim());
-        JavaConfigGenerator javaConfigGenerator = new JavaConfigGenerator(options);
-        CSharpConfigGenerator cSharpConfigGenerator = new CSharpConfigGenerator(options);
-        LuaConfigGenerator luaConfigGenerator = new LuaConfigGenerator(options);
-
-        javaConfigGenerator.setParser(configParser);
-        cSharpConfigGenerator.setParser(configParser);
-        luaConfigGenerator.setParser(configParser);
-
-        dataGenerator.generate(true);
-
-        javaMessageGenerator.generate(false);
-        cSharpMessageGenerator.generate(false);
-        luaMessageGenerator.generate(false);
-        javaMessageGenerator.printErrors();
-
-        javaConfigGenerator.generate(false);
-        cSharpConfigGenerator.generate(false);
-        luaConfigGenerator.generate(false);
-        javaConfigGenerator.printErrors();
+        generate(DataGenerator.class, options);
+        generate(MessageGenerator.class, options);
+        generate(ConfigGenerator.class, options);
 
         logger.info("生成完成，耗时{}s", (System.currentTimeMillis() - startTime) / 1000D);
+    }
+
+    private static void generate(Class<? extends Generator> superClass, Properties options) {
+        List<Generator> generators = new ArrayList<>();
+
+        String definitionType = superClass == ConfigGenerator.class ? options.getProperty("config.definitionType") : "xml";
+        DefinitionParser parser = DefinitionParser.createParser(definitionType);
+
+        for (Class<?> clazz : ClassUtils.loadClasses(superClass.getPackage().getName(), superClass, false, null)) {
+            try {
+                Generator generator = (Generator) clazz.getConstructor(Properties.class).newInstance(options);
+                generator.setParser(parser);
+                generators.add(generator);
+            } catch (Exception ignored) {
+            }
+        }
+
+        for (int i = 0; i < generators.size(); i++) {
+            generators.get(i).generate(i == generators.size() - 1);
+        }
     }
 
     public static void main(String[] args) {

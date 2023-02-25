@@ -50,7 +50,6 @@ public class EnumDefinition extends ClassDefinition {
         }
     }
 
-
     @Override
     public String getKindName() {
         return "枚举";

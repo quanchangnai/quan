@@ -339,7 +339,7 @@ public abstract class DefinitionParser {
     }
 
     public static DefinitionParser createParser(String definitionType) {
-        switch (definitionType) {
+        switch (definitionType.trim()) {
             case "csv":
                 return new CSVDefinitionParser();
             case "xls":

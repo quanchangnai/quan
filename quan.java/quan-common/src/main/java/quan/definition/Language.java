@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 /**
  * 支持的语言枚举
  */
-public enum Language {
+public enum Language{
 
     java {
         @Override

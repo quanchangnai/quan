@@ -223,23 +223,23 @@ public class FieldDefinition extends Definition implements Cloneable {
 
 
     public boolean isMapType() {
-        return type.equals("map");
+        return "map".equals(type);
     }
 
     public boolean isListType() {
-        return type.equals("list");
+        return "list".equals(type);
     }
 
     public boolean isSetType() {
-        return type.equals("set");
+        return "set".equals(type);
     }
 
     public boolean isStringType() {
-        return type.equals("string");
+        return "string".equals(type);
     }
 
     public boolean isBytesType() {
-        return type.equals("bytes");
+        return "bytes".equals(type);
     }
 
 
@@ -723,6 +723,7 @@ public class FieldDefinition extends Definition implements Cloneable {
         if (columnNums.size() == 1) {
             return true;
         }
+
         BeanDefinition beanDefinition = getTypeBean();
         if (beanDefinition != null) {
             if (beanDefinition.hasChild()) {
@@ -733,6 +734,7 @@ public class FieldDefinition extends Definition implements Cloneable {
         } else if (isMapType()) {
             return columnNums.size() > 0 && columnNums.size() % 2 == 0;
         }
+
         return true;
     }
 

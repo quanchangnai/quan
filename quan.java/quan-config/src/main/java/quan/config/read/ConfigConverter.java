@@ -113,10 +113,7 @@ public class ConfigConverter {
 
         if (beanDefinition.hasChild()) {
             String className = object.getString("class");
-            if (!className.contains(".")) {
-                className = parser.getLongName(fieldDefinition.getOwner(), className);
-            }
-            beanDefinition = parser.getBean(className);
+            beanDefinition = parser.getBean(fieldDefinition.getOwner(), className);
         }
 
         if (beanDefinition == null) {

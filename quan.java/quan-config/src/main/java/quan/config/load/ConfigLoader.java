@@ -89,14 +89,16 @@ public abstract class ConfigLoader {
         Set<Class<?>> validatorClasses = ClassUtils.loadClasses(packageName, ConfigValidator.class);
 
         for (Class<?> validatorClass : validatorClasses) {
-            if (!validatorClass.isEnum()) {
+            if (validatorClass.isEnum()) {
+                for (Object validator : validatorClass.getEnumConstants()) {
+                    validators.add((ConfigValidator) validator);
+                }
+            } else {
                 try {
                     validators.add((ConfigValidator) validatorClass.getConstructor().newInstance());
                 } catch (Exception e) {
                     logger.error("实例化配置校验器[{}]失败", validatorClass, e);
                 }
-            } else if (validatorClass.getEnumConstants().length > 0) {
-                validators.add((ConfigValidator) validatorClass.getEnumConstants()[0]);
             }
         }
     }

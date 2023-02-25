@@ -306,8 +306,8 @@ public class XmlDefinitionParser extends DefinitionParser {
         fieldDefinition.setCategory(category);
 
         fieldDefinition.setName(fieldElement.attributeValue("name"));
-        String type = fieldElement.attributeValue("type");
-        fieldDefinition.setTypeInfo(type);
+        String typeInfo = fieldElement.attributeValue("type");
+        fieldDefinition.setTypeInfo(typeInfo);
         fieldDefinition.setMin(fieldElement.attributeValue("min"));
         fieldDefinition.setMax(fieldElement.attributeValue("max"));
         fieldDefinition.setValue(fieldElement.attributeValue("value"));
@@ -323,8 +323,11 @@ public class XmlDefinitionParser extends DefinitionParser {
 
         classDefinition.addField(fieldDefinition);
 
+        String type = typeInfo == null ? null : typeInfo.split("[:：]")[0];
+
         List<Object> illegalAttributes = new ArrayList<>(Collections.singleton("name"));
-        if (type != null && Constants.NUMBER_TYPES.contains(type.split("[:：]")[0])) {
+
+        if (classDefinition instanceof BeanDefinition && type != null && Constants.NUMBER_TYPES.contains(type)) {
             illegalAttributes.addAll(Arrays.asList("min", "max"));
         }
 
@@ -334,9 +337,16 @@ public class XmlDefinitionParser extends DefinitionParser {
             illegalAttributes.addAll(Arrays.asList("type", "ignore"));
         } else if (category == Category.config) {
             if (classDefinition instanceof ConfigDefinition) {
-                illegalAttributes.addAll(Arrays.asList("type", "ref", "index", "lang", "optional", "column", "delimiter"));
+                illegalAttributes.addAll(Arrays.asList("type", "ref", "lang", "optional", "column"));
+                if (type != null && !Constants.COLLECTION_TYPES.contains(type) && !Constants.TIME_TYPES.contains(type)) {
+                    //只支持原生类型和枚举类型，但是在这里没法判断是不是枚举类型
+                    illegalAttributes.add("index");
+                }
             } else if (classDefinition instanceof BeanDefinition) {
-                illegalAttributes.addAll(Arrays.asList("type", "ref", "optional", "delimiter"));
+                illegalAttributes.addAll(Arrays.asList("type", "ref", "optional"));
+            }
+            if (type != null && Constants.COLLECTION_TYPES.contains(type)) {
+                illegalAttributes.add("delimiter");
             }
         } else if (category == Category.message) {
             illegalAttributes.addAll(Arrays.asList("id", "type", "ignore", "optional"));
