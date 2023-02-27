@@ -604,22 +604,27 @@ public class BeanDefinition extends ClassDefinition {
             return;
         }
 
-
         if (delimiter.length() != 1) {
             addValidatedError(getValidatedName() + "的分隔符[" + delimiter + "]长度必须1个字符");
         } else if (!Constants.LEGAL_DELIMITERS.contains(delimiter)) {
             addValidatedError(getValidatedName() + "的分隔符[" + delimiter + "]非法,合法分隔符" + Constants.LEGAL_DELIMITERS);
         } else {
             List<String> delimiters = new ArrayList<>();
-            delimiters.add(delimiter);
-
-            for (FieldDefinition field : fields) {
-                validateFieldDelimiter(field, delimiters);
-            }
+            validateDelimiter(this, delimiters);
 
             if (delimiters.size() != new HashSet<>(delimiters).size()) {
                 addValidatedError(getValidatedName() + "关联分隔符有重复[" + String.join("", delimiters) + "]");
             }
+        }
+    }
+
+    private void validateDelimiter(BeanDefinition beanDefinition, List<String> delimiters) {
+        String delimiter = beanDefinition.getDelimiter();
+        for (int i = 0; i < delimiter.length(); i++) {
+            delimiters.add(String.valueOf(delimiter.charAt(i)));
+        }
+        for (FieldDefinition beanField : beanDefinition.getFields()) {
+            validateFieldDelimiter(beanField, delimiters);
         }
     }
 
@@ -655,10 +660,7 @@ public class BeanDefinition extends ClassDefinition {
 
         BeanDefinition fieldValueBean = field.getValueTypeBean();
         if (fieldValueBean != null) {
-            delimiters.add(fieldValueBean.getDelimiter());
-            for (FieldDefinition beanField : fieldValueBean.getFields()) {
-                validateFieldDelimiter(beanField, delimiters);
-            }
+            validateDelimiter(fieldValueBean, delimiters);
         }
     }
 

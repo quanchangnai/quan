@@ -69,22 +69,23 @@ public class XmlDefinitionParser extends DefinitionParser {
 
         String definitionFilePath = getDefinitionParser().definitionFilePaths.get(definitionFile);
 
-        String packageName = null;
+        //默认以定义文件路径名作为包名
+        String packageName = definitionFilePath.substring(0, definitionFilePath.lastIndexOf(".")).replaceAll(String.format("\\%s", File.separator), ".");
+        if (!Constants.LOWER_PACKAGE_NAME_PATTERN.matcher(packageName).matches()) {
+            addValidatedError("定义文件[" + definitionFilePath + "]的路径格式错误");
+        }
+
         //具体语言对应的包名
         Map<String, String> languagePackageNames = new HashMap<>();
 
         if (rootElement.getName().equals("package")) {
             validateElementAttributes(definitionFilePath, rootElement, "name", Pattern.compile("(" + String.join("|", Language.names()) + ")-name"));
 
-            //默认以定义文件路径名作为包名
-            packageName = definitionFilePath.substring(0, definitionFilePath.lastIndexOf(".")).replaceAll(String.format("\\%s", File.separator), ".");
-            if (!Constants.LOWER_PACKAGE_NAME_PATTERN.matcher(packageName).matches()) {
-                addValidatedError("定义文件[" + definitionFilePath + "]的路径格式错误");
-            } else {
-                packageName = rootElement.attributeValue("name", packageName);
-                if (!Constants.LOWER_PACKAGE_NAME_PATTERN.matcher(packageName).matches()) {
-                    addValidatedError("定义文件[" + definitionFilePath + "]的包名[" + packageName + "]格式错误,正确格式:" + Constants.LOWER_PACKAGE_NAME_PATTERN);
-                }
+            String packageName0 = rootElement.attributeValue("name");
+            if (packageName0 != null && Constants.LOWER_PACKAGE_NAME_PATTERN.matcher(packageName0).matches()) {
+                packageName = packageName0;
+            } else if (!StringUtils.isBlank(packageName0)) {
+                addValidatedError("定义文件[" + definitionFilePath + "]的包名[" + packageName0 + "]格式错误,正确格式:" + Constants.LOWER_PACKAGE_NAME_PATTERN);
             }
 
             for (Object attribute : rootElement.attributes()) {
@@ -93,6 +94,7 @@ public class XmlDefinitionParser extends DefinitionParser {
                 if (!attrName.endsWith("-name")) {
                     continue;
                 }
+
                 Language language;
                 try {
                     language = Language.valueOf(attrName.substring(0, attrName.indexOf("-name")));
@@ -103,12 +105,17 @@ public class XmlDefinitionParser extends DefinitionParser {
                     addValidatedError("定义文件[" + definitionFile + "]自定义语言[" + language + "]包名[" + attrValue + "]格式错误,正确格式:" + language.getPackageNamePattern());
                     continue;
                 }
+
                 languagePackageNames.put(language.name(), attrValue);
             }
         } else {
             validateElementAttributes(definitionFilePath, rootElement);
+            if (packageName.contains(".")) {
+                packageName = packageName.substring(0, packageName.lastIndexOf("."));
+            } else {
+                packageName = null;
+            }
         }
-
 
         for (int index = 0; index < rootElement.nodeCount(); index++) {
             if (!(rootElement.node(index) instanceof Element)) {

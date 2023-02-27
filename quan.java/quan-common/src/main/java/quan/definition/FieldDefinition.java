@@ -11,9 +11,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import static quan.definition.config.ConfigDefinition.escapeDelimiter;
-
-
 /**
  * 字段定义，被数据、消息和配置共用
  */
@@ -537,7 +534,7 @@ public class FieldDefinition extends Definition implements Cloneable {
 
         String _delimiter = getDelimiter();
         for (int i = 0; i < _delimiter.length(); i++) {
-            escapedDelimiters.add(escapeDelimiter(String.valueOf(_delimiter.charAt(i))));
+            escapedDelimiters.add(ConfigDefinition.escapeDelimiter(String.valueOf(_delimiter.charAt(i))));
         }
 
         return escapedDelimiters;
