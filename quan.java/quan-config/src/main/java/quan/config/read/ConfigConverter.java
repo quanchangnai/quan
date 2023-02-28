@@ -91,7 +91,7 @@ public class ConfigConverter {
 
         //字段对应多列
         if (columnNum == fieldDefinition.getColumnNums().get(0)) {
-            if (beanDefinition.hasChild()) {
+            if (beanDefinition.hasChildren()) {
                 //第1列是类名
                 String className = parser.getLongName(beanDefinition, columnValue);
 
@@ -111,7 +111,7 @@ public class ConfigConverter {
             return null;
         }
 
-        if (beanDefinition.hasChild()) {
+        if (beanDefinition.hasChildren()) {
             String className = object.getString("class");
             beanDefinition = parser.getBean(fieldDefinition.getOwner(), className);
         }
@@ -457,7 +457,7 @@ public class ConfigConverter {
         JSONObject object = new JSONObject();
 
         //有子类，按具体类型转换
-        boolean beanHasChild = beanDefinition.hasChild();
+        boolean beanHasChild = beanDefinition.hasChildren();
         if (beanHasChild) {
             String className = parser.getLongName(beanDefinition, values[0]);
 

@@ -8,6 +8,7 @@ import quan.definition.config.ConfigDefinition;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -24,6 +25,13 @@ public class CSVDefinitionParser extends TableDefinitionParser {
     @Override
     public String getDefinitionType() {
         return "csv";
+    }
+
+    public CSVDefinitionParser() {
+    }
+
+    public CSVDefinitionParser(Collection<String> definitionPaths) {
+        setDefinitionPaths(definitionPaths);
     }
 
     @Override

@@ -36,7 +36,6 @@ public class XmlDefinitionParser extends DefinitionParser {
         this.category = category;
     }
 
-
     @Override
     public String getDefinitionType() {
         return "xml";
@@ -88,9 +87,9 @@ public class XmlDefinitionParser extends DefinitionParser {
                 addValidatedError("定义文件[" + definitionFilePath + "]的包名[" + packageName0 + "]格式错误,正确格式:" + Constants.LOWER_PACKAGE_NAME_PATTERN);
             }
 
-            for (Object attribute : rootElement.attributes()) {
-                String attrName = ((Attribute) attribute).getName();
-                String attrValue = ((Attribute) attribute).getValue();
+            for (Attribute attribute : rootElement.attributes()) {
+                String attrName = attribute.getName();
+                String attrValue = attribute.getValue();
                 if (!attrName.endsWith("-name")) {
                     continue;
                 }
@@ -225,7 +224,11 @@ public class XmlDefinitionParser extends DefinitionParser {
                 return new EnumDefinition();
             case "bean":
                 if (this.category == Category.config) {
-                    validateElementAttributes(definitionFile, element, "name", "parent", "delimiter");
+                    if (element.attribute("parent") != null) {
+                        validateElementAttributes(definitionFile, element, "name", "parent");
+                    } else {
+                        validateElementAttributes(definitionFile, element, "name", "delimiter");
+                    }
                 } else {
                     validateElementAttributes(definitionFile, element, "name");
                 }

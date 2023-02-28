@@ -6,6 +6,7 @@ import quan.definition.config.ConfigDefinition;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.util.Collection;
 import java.util.Objects;
 
 /**
@@ -25,6 +26,11 @@ public class ExcelDefinitionParser extends TableDefinitionParser {
     public ExcelDefinitionParser(String definitionType) {
         Objects.requireNonNull(definitionType, Category.config.alias() + "的定义文件类型[definitionType]不能为空");
         this.definitionType = definitionType;
+    }
+
+    public ExcelDefinitionParser(String definitionType, Collection<String> definitionPaths) {
+        this(definitionType);
+        setDefinitionPaths(definitionPaths);
     }
 
     @Override

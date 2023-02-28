@@ -271,6 +271,8 @@ public class ConfigDefinition extends BeanDefinition {
             validateFieldRef(field);
             //校验字段支持的语言
             validateFieldLanguage(field);
+            //校验字段的分隔符
+            validateFieldDelimiter(field);
         }
     }
 
@@ -324,13 +326,9 @@ public class ConfigDefinition extends BeanDefinition {
 
         if (field.getColumn() == null) {
             addValidatedError(getValidatedName("的") + field.getValidatedName() + "对应的列不能为空");
-            return;
         } else if (StringUtils.isBlank(field.getComment())) {
             field.setComment(field.getColumn());
         }
-
-        //校验字段的分隔符
-        validateFieldDelimiter(field);
 
     }
 

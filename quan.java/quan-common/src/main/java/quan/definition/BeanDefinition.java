@@ -34,9 +34,7 @@ public class BeanDefinition extends ClassDefinition {
     protected List<FieldDefinition> selfFields = new ArrayList<>();
 
     //配置Bean的字段分隔符
-    private String delimiter = "_";
-
-    private String escapedDelimiter;
+    private String delimiter;
 
     //消息的字段ID，用来标记和识别字段，不能识别的字段丢弃掉
     private final Set<Integer> fieldIds = new HashSet<>();
@@ -45,12 +43,8 @@ public class BeanDefinition extends ClassDefinition {
     }
 
     public BeanDefinition(String parent, String delimiter) {
-        if (!StringUtils.isEmpty(parent)) {
-            this.parentName = parent;
-        }
-        if (!StringUtils.isEmpty(delimiter)) {
-            this.delimiter = delimiter;
-        }
+        this.parentName = parent;
+        this.delimiter = delimiter;
     }
 
     @Override
@@ -119,7 +113,7 @@ public class BeanDefinition extends ClassDefinition {
         return children;
     }
 
-    public boolean hasChild() {
+    public boolean hasChildren() {
         return !children.isEmpty();
     }
 
@@ -143,7 +137,6 @@ public class BeanDefinition extends ClassDefinition {
     @Override
     public void validate1() {
         super.validate1();
-        validateDelimiter();
 
         if (!fieldIds.isEmpty() && fieldIds.size() != fields.size()) {
             addValidatedError(getValidatedName("的") + "所有字段必须要同时定义ID或者同时不定义ID");
@@ -159,6 +152,8 @@ public class BeanDefinition extends ClassDefinition {
     @Override
     public void validate3() {
         super.validate3();
+        validateDelimiter();
+
         for (FieldDefinition field : fields) {
             //校验字段引用
             validateFieldRef(field);
@@ -172,6 +167,9 @@ public class BeanDefinition extends ClassDefinition {
         }
 
         if (parentName == null) {
+            if (delimiter == null) {
+                delimiter = "_";
+            }
             return;
         }
 
@@ -205,13 +203,20 @@ public class BeanDefinition extends ClassDefinition {
             parent = parent.getParent();
         }
 
+        if (delimiter != null) {
+            addValidatedError(getValidatedName() + "的分隔符继承自父类，不支持自定义");
+        }
+
         parent = getParent();
         while (parent != null) {
+            delimiter = parent.delimiter;
             if (fields.size() > parent.descendantMaxFieldCount) {
                 parent.descendantMaxFieldCount = fields.size();
             }
             parent = parent.getParent();
         }
+
+
     }
 
     @Override
@@ -468,24 +473,12 @@ public class BeanDefinition extends ClassDefinition {
     }
 
     public BeanDefinition setDelimiter(String delimiter) {
-        if (StringUtils.isBlank(delimiter)) {
-            return this;
-        }
-        this.delimiter = delimiter.trim();
+        this.delimiter = delimiter;
         return this;
     }
 
     public String getEscapedDelimiter() {
-        if (StringUtils.isEmpty(escapedDelimiter)) {
-            String delimiter_ = this.delimiter;
-            BeanDefinition parentBean = getParent();
-            while (parentBean != null) {
-                delimiter_ = parentBean.delimiter;
-                parentBean = parentBean.getParent();
-            }
-            escapedDelimiter = ConfigDefinition.escapeDelimiter(delimiter_);
-        }
-        return escapedDelimiter;
+        return ConfigDefinition.escapeDelimiter(delimiter);
     }
 
     protected void validateFieldRef(FieldDefinition field) {
@@ -509,7 +502,7 @@ public class BeanDefinition extends ClassDefinition {
             }
 
             if (refError) {
-                addValidatedError(getValidatedName() + field.getValidatedName() + "的引用格式错误[" + field.getRef() + "]，正确格式:[配置.字段]");
+                addValidatedError(getValidatedName() + field.getValidatedName() + "的引用格式错误[" + field.getRef() + "]，正确格式:[(配置.)字段]");
             }
 
             return;
@@ -517,7 +510,7 @@ public class BeanDefinition extends ClassDefinition {
 
         //map类型字段引用校验
         String[] fieldRefs = field.getRef().split("[:：]", -1);
-        String mapRefErrorMsg = getValidatedName("的") + field.getValidatedName() + "类型[map]的引用格式错误[" + field.getRef() + "]，正确格式:[键引用配置.字段]或者[键引用配置.字段:值引用配置.字段]";
+        String mapRefErrorMsg = getValidatedName("的") + field.getValidatedName() + "类型[map]的引用格式错误[" + field.getRef() + "]，正确格式:[(键引用配置.)字段]或者[(键引用配置.)字段:(值引用配置.)字段]";
         if (fieldRefs.length != 1 && fieldRefs.length != 2) {
             addValidatedError(mapRefErrorMsg);
             return;
@@ -619,7 +612,7 @@ public class BeanDefinition extends ClassDefinition {
     }
 
     private void validateDelimiter(BeanDefinition beanDefinition, List<String> delimiters) {
-        String delimiter = beanDefinition.getDelimiter();
+        String delimiter = beanDefinition.delimiter;
         for (int i = 0; i < delimiter.length(); i++) {
             delimiters.add(String.valueOf(delimiter.charAt(i)));
         }

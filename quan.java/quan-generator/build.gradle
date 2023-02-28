@@ -4,6 +4,6 @@
 
 dependencies {
     api project(':quan-common')
-    implementation project(':quan-config')
-    api 'org.freemarker:freemarker:2.3.29'
+    api project(':quan-config')
+    api 'org.freemarker:freemarker:2.3.30'
 }

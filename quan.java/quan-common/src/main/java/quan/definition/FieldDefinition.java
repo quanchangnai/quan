@@ -723,7 +723,7 @@ public class FieldDefinition extends Definition implements Cloneable {
 
         BeanDefinition beanDefinition = getTypeBean();
         if (beanDefinition != null) {
-            if (beanDefinition.hasChild()) {
+            if (beanDefinition.hasChildren()) {
                 return columnNums.size() == beanDefinition.getDescendantMaxFieldCount() + 1;
             } else {
                 return columnNums.size() == beanDefinition.getFields().size();
