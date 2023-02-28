@@ -5,6 +5,7 @@ import quan.definition.ClassDefinition;
 import quan.definition.FieldDefinition;
 import quan.definition.Language;
 import quan.definition.config.ConfigDefinition;
+import quan.generator.CSharpUtils;
 
 import java.util.Properties;
 
@@ -59,6 +60,9 @@ public class CSharpConfigGenerator extends ConfigGenerator {
         classNames.put("JArray", "Newtonsoft.Json.Linq.JArray");
     }
 
+    //csproj文件
+    private String projFile;
+
     public CSharpConfigGenerator(Properties options) {
         super(options);
     }
@@ -66,6 +70,14 @@ public class CSharpConfigGenerator extends ConfigGenerator {
     @Override
     protected Language language() {
         return Language.cs;
+    }
+
+    @Override
+    protected void parseOptions(Properties options) {
+        super.parseOptions(options);
+        if (enable) {
+            projFile = options.getProperty(optionPrefix(true) + "projFile");
+        }
     }
 
     @Override
@@ -96,6 +108,12 @@ public class CSharpConfigGenerator extends ConfigGenerator {
                 classDefinition.addImport("System");
             }
         }
+    }
+
+    @Override
+    protected void writeRecords() {
+        super.writeRecords();
+        CSharpUtils.updateProjFile(codePath, projFile, addClasses, deleteClasses);
     }
 
 }

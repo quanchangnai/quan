@@ -75,6 +75,10 @@ public abstract class Generator {
     //当前代码生成记录
     protected Map<String, String> newRecords = new HashMap<>();
 
+    protected List<String> addClasses = new ArrayList<>();
+
+    protected Set<String> deleteClasses = new HashSet<>();
+
     public Generator(Properties options) {
         parseOptions(options);
         if (enable) {
@@ -284,16 +288,7 @@ public abstract class Generator {
 
         packagesClasses.clear();
 
-        //删除失效的代码文件
-        for (String fullName : oldRecords.keySet()) {
-            count++;
-            File classFile = new File(codePath, fullName.replace(".", File.separator) + "." + language());
-            if (classFile.delete()) {
-                logger.error("删除{}[{}]完成", category().alias(), classFile);
-            } else {
-                logger.error("删除{}[{}]失败", category().alias(), classFile);
-            }
-        }
+        oldRecords.keySet().forEach(this::delete);
 
         writeRecords();
 
@@ -312,7 +307,7 @@ public abstract class Generator {
         }
     }
 
-    private void writeRecords() {
+    protected void writeRecords() {
         File recordsPath = new File(".records");
         File recordsFile = new File(recordsPath, getClass().getSimpleName() + ".json");
         try {
@@ -327,6 +322,30 @@ public abstract class Generator {
 
         oldRecords.clear();
         newRecords.clear();
+    }
+
+    protected void putRecord(ClassDefinition classDefinition) {
+        String fullName = classDefinition.getFullName(language());
+        String version = classDefinition.getVersion();
+        if (oldRecords.remove(fullName)==null) {
+            addClasses.add(fullName);
+        }
+        newRecords.put(fullName, version);
+    }
+
+
+    /**
+     * 删除失效的代码文件
+     */
+    protected void delete(String fullName) {
+        count++;
+        deleteClasses.add(fullName);
+        File classFile = new File(codePath, fullName.replace(".", File.separator) + "." + language());
+        if (classFile.delete()) {
+            logger.error("删除{}[{}]完成", category().alias(), classFile);
+        } else {
+            logger.error("删除{}[{}]失败", category().alias(), classFile);
+        }
     }
 
     protected void generate(List<ClassDefinition> classDefinitions) {
@@ -347,16 +366,9 @@ public abstract class Generator {
         return !version.equals(oldRecords.get(fullName));
     }
 
-    public void record(ClassDefinition classDefinition) {
-        String fullName = classDefinition.getFullName(language());
-        String version = classDefinition.getVersion();
-        oldRecords.remove(fullName);
-        newRecords.put(fullName, version);
-    }
-
     protected void generate(ClassDefinition classDefinition) {
         if (!checkChange(classDefinition)) {
-            record(classDefinition);
+            putRecord(classDefinition);
             return;
         }
 
@@ -376,7 +388,7 @@ public abstract class Generator {
             return;
         }
 
-        record(classDefinition);
+        putRecord(classDefinition);
 
         logger.info("生成{}[{}]完成", category().alias(), classFile);
 
@@ -498,13 +510,21 @@ public abstract class Generator {
     }
 
     protected void printErrors() {
-        if (parser == null || parser.getValidatedErrors().isEmpty()) {
+        if (parser == null) {
             return;
         }
 
-        logger.error("解析目录{}下的{}定义文件共发现{}条错误", parser.getDefinitionPaths(), category().alias(), parser.getValidatedErrors().size());
-        parser.getValidatedErrors().forEach(logger::error);
-        logger.error("生成{}代码失败\n", category().alias());
+        LinkedHashSet<String> errors = parser.getValidatedErrors();
+        if (errors.isEmpty()) {
+            return;
+        }
+
+        logger.error("生成{}代码失败，路径{}下的定义文件共发现{}条错误", category().alias(), parser.getDefinitionPaths(), errors.size());
+
+        int i = 0;
+        for (String error : errors) {
+            logger.error("{}{}", error, ++i == errors.size() ? "\n" : "");
+        }
     }
 
     /**
@@ -524,7 +544,7 @@ public abstract class Generator {
         try (InputStream inputStream = Files.newInputStream(Paths.get(optionsFile.trim()))) {
             options.load(inputStream);
         } catch (IOException e) {
-            logger.info("加载生成器选项配置文件[{}]出错", optionsFile, e);
+            logger.error("加载生成器选项配置文件[{}]出错", optionsFile, e);
             return;
         }
 

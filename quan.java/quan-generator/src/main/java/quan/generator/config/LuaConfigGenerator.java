@@ -66,14 +66,14 @@ public class LuaConfigGenerator extends ConfigGenerator {
     }
 
     @Override
-    public void record(ClassDefinition classDefinition) {
+    public void putRecord(ClassDefinition classDefinition) {
         if (classDefinition instanceof ConfigDefinition) {
             String fullName = classDefinition.getFullName(language());
             String version = ((ConfigDefinition) classDefinition).getVersion2();
             oldRecords.remove(fullName);
             newRecords.put(fullName, version);
         } else {
-            super.record(classDefinition);
+            super.putRecord(classDefinition);
         }
     }
 

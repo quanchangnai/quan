@@ -3,6 +3,7 @@ package quan.generator.message;
 import quan.definition.BeanDefinition;
 import quan.definition.FieldDefinition;
 import quan.definition.Language;
+import quan.generator.CSharpUtils;
 
 import java.util.Properties;
 
@@ -48,6 +49,9 @@ public class CSharpMessageGenerator extends MessageGenerator {
 
     }
 
+    //csproj文件
+    private String projFile;
+
     public CSharpMessageGenerator(Properties options) {
         super(options);
     }
@@ -55,6 +59,15 @@ public class CSharpMessageGenerator extends MessageGenerator {
     @Override
     protected Language language() {
         return Language.cs;
+    }
+
+
+    @Override
+    protected void parseOptions(Properties options) {
+        super.parseOptions(options);
+        if (enable) {
+            projFile = options.getProperty(optionPrefix(true) + "projFile");
+        }
     }
 
     @Override
@@ -73,6 +86,12 @@ public class CSharpMessageGenerator extends MessageGenerator {
         if (field.isBytesType() || field.isStringType() || field.isTimeType() || field.isBeanType() && !field.isOptional()) {
             field.getOwner().addImport("System");
         }
+    }
+
+    @Override
+    protected void writeRecords() {
+        super.writeRecords();
+        CSharpUtils.updateProjFile(codePath, projFile, addClasses, deleteClasses);
     }
 
 }
