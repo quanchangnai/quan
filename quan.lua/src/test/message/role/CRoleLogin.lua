@@ -1,5 +1,5 @@
 ---
----角色登录，自定义ID
+---角色登录，自定义ID，111，角色登录，自定义ID，222
 ---代码自动生成，请勿手动修改
 ---
 
@@ -9,7 +9,7 @@ local RoleInfo = require("test.message.role.RoleInfo")
 local UserInfo = require("test.message.user.UserInfo")
 
 ---
----角色登录，自定义ID
+---角色登录，自定义ID，111，角色登录，自定义ID，222
 ---
 local CRoleLogin = {
     ---类名
@@ -69,7 +69,7 @@ end
 local meta = { __index = CRoleLogin, __newindex = onSet, __tostring = toString }
 
 ---
----[角色登录，自定义ID].构造
+---[角色登录，自定义ID，111，角色登录，自定义ID，222].构造
 ---@param args 参数列表可以为空
 ---
 function CRoleLogin.new(args)
@@ -83,11 +83,11 @@ function CRoleLogin.new(args)
         roleName = args.roleName or "",
         ---角色信息
         roleInfo = args.roleInfo or RoleInfo.new(),
-        ---角色信息
+        ---角色信息2
         roleInfoList = args.roleInfoList or {},
-        ---角色信息
+        ---角色信息3
         roleInfoSet = args.roleInfoSet or {},
-        ---角色信息
+        ---角色信息4
         roleInfoMap = args.roleInfoMap or {},
         ---用户信息
         userInfo = args.userInfo,
@@ -100,7 +100,7 @@ end
 setmetatable(CRoleLogin, { __call = CRoleLogin.new })
 
 ---
----[角色登录，自定义ID].编码
+---[角色登录，自定义ID，111，角色登录，自定义ID，222].编码
 ---@return quan.message.CodedBuffer
 ---
 function CRoleLogin:encode()
@@ -136,7 +136,7 @@ function CRoleLogin:encode()
 end
 
 ---
----[角色登录，自定义ID].解码
+---[角色登录，自定义ID，111，角色登录，自定义ID，222].解码
 ---@param buffer quan.message.CodedBuffer 不能为空
 ---@return test.message.role.CRoleLogin
 ---

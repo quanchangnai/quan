@@ -11,7 +11,8 @@
         <constant name="RewardConstant" enum="true" key="key" value="rewardList"/>
     </config>
 
-    <bean name="Reward" delimiter="_">奖励
+    奖励
+    <bean name="Reward" delimiter="_">
         <field name="itemId" type="int" ref="item.ItemConfig.id"/>
         <field name="itemNum" type="int"/>
     </bean>

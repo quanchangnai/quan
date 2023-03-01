@@ -126,7 +126,7 @@ public class XmlDefinitionParser extends DefinitionParser {
             ClassDefinition classDefinition = null;
             try {
                 classDefinition = parseClassDefinition(definitionFilePath, classElement, index);
-            } catch (Exception e) {
+            } catch (IllegalArgumentException e) {
                 addValidatedError("定义文件[" + definitionFile + "]不支持定义元素:" + classElement.getName());
             }
 
@@ -175,31 +175,62 @@ public class XmlDefinitionParser extends DefinitionParser {
      * 提取注释
      */
     protected String getComment(Element element, int indexInParent) {
-        List<Node> nodes = new ArrayList<>();
-        nodes.add(element.node(0));
-        if (element.nodeCount() == 0) {
-            nodes.add(element.getParent().node(indexInParent + 1));
+        if (!element.isRootElement() && element.getParent().isRootElement()) {
+            List<String> list = new ArrayList<>();
+            for (int i = indexInParent - 1; i >= 0; i--) {
+                Node node = element.getParent().node(i);
+                if (node instanceof Element) {
+                    break;
+                } else {
+                    list.add(node.getText());
+                }
+            }
+
+            StringBuilder builder = new StringBuilder();
+
+            for (int i = list.size() - 1; i >= 0; i--) {
+                builder.append(list.get(i).replaceAll("[\t ]", ""));
+            }
+
+            if (StringUtils.isBlank(builder)) {
+                return null;
+            }
+
+            int start = builder.lastIndexOf("\n\n") + 2;
+            if (start < 2) {
+                start = 0;
+            }
+
+            String comment = builder.substring(start);
+            if (StringUtils.isBlank(comment)) {
+                return null;
+            }
+
+            if (comment.endsWith("\n")) {
+                comment = comment.substring(0, comment.length() - 1);
+            }
+            comment = comment.replace("\n", "，");
+
+            return comment;
         }
 
-        StringBuilder builder = new StringBuilder();
+        Node commentNode = null;
 
-        for (Node node : nodes) {
-            if (node instanceof Text) {
-                String text = node.getText();
-                if (!text.startsWith("\n")) {
-                    text = text.trim().split("\n")[0] + "，";
-                    builder.append(text.trim());
-                }
+        if (element.nodeCount() > 0) {
+            commentNode = element.node(0);
+        } else if (element.getParent().nodeCount() > indexInParent + 1) {
+            commentNode = element.getParent().node(indexInParent + 1);
+        }
+
+        if (commentNode instanceof Text) {
+            String text = commentNode.getText();
+            if (!text.startsWith("\n")) {
+                return text.trim().split("\n")[0];
             }
         }
 
-        if (builder.length() > 0) {
-            return builder.substring(0, builder.length() - 1);
-        } else {
-            return "";
-        }
+        return null;
     }
-
 
     private ClassDefinition parseClassDefinition(String definitionFile, Element element, int indexInParent) {
         ClassDefinition classDefinition = createClassDefinition(definitionFile, element);

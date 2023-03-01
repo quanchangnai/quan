@@ -7,7 +7,7 @@ using Test.Message.User;
 namespace Test.Message.Role
 {
     /// <summary>
-    /// 角色登录，自定义ID<br/>
+    /// 角色登录，自定义ID，111，角色登录，自定义ID，222<br/>
     /// 代码自动生成，请勿手动修改
     /// </summary>
     public class CRoleLogin : MessageBase
@@ -45,17 +45,17 @@ namespace Test.Message.Role
         }
 
         /// <summary>
-        /// 角色信息
+        /// 角色信息2
         /// </summary>
         public List<RoleInfo> roleInfoList { get; } = new List<RoleInfo>();
 
         /// <summary>
-        /// 角色信息
+        /// 角色信息3
         /// </summary>
         public HashSet<RoleInfo> roleInfoSet { get; } = new HashSet<RoleInfo>();
 
         /// <summary>
-        /// 角色信息
+        /// 角色信息4
         /// </summary>
         public Dictionary<long, RoleInfo> roleInfoMap { get; } = new Dictionary<long, RoleInfo>();
 

@@ -1,28 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <package cs-name="Item">
 
-    <bean name="Reward" delimiter="_">奖励
+    奖励
+    <bean name="Reward" delimiter="_">
         <field name="itemId" type="int" ref="ItemConfig.id"/>
         <field name="itemNum" type="int"/>
     </bean>
 
-    <enum name="ItemType">道具类型
+    道具类型
+    <enum name="ItemType">
         <field name="type1" value="1"/>道具类型1
         <field name="type2" value="2"/>道具类型2
     </enum>
 
-    <bean name="UseEffect" delimiter="_">使用效果
+    使用效果
+    <bean name="UseEffect" delimiter="_">
         <field name="aaa" type="int"/>
         <bean name="UseEffect2">使用效果2
             <field name="bbb" type="int"/>
         </bean>
     </bean>
 
-    <bean name="UseEffect3" parent="UseEffect">使用效果3
+    使用效果3
+    <bean name="UseEffect3" parent="UseEffect">
         <field name="ccc" type="int"/>
     </bean>
 
-    <bean name="UseEffect4" parent="UseEffect">使用效果4
+    使用效果4
+    <bean name="UseEffect4" parent="UseEffect">
         <field name="itemType" type="ItemType" ref="ItemConfig.type"/>
     </bean>
 

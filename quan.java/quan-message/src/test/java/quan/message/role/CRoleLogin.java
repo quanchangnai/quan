@@ -5,7 +5,7 @@ import quan.message.*;
 import quan.message.user.UserInfo;
 
 /**
- * 角色登录，自定义ID<br/>
+ * 角色登录，自定义ID，111，角色登录，自定义ID，222<br/>
  * 代码自动生成，请勿手动修改
  */
 public class CRoleLogin extends Message {
@@ -24,13 +24,13 @@ public class CRoleLogin extends Message {
     //角色信息
     private RoleInfo roleInfo = new RoleInfo();
 
-    //角色信息
+    //角色信息2
     private final List<RoleInfo> roleInfoList = new ArrayList<>();
 
-    //角色信息
+    //角色信息3
     private final Set<RoleInfo> roleInfoSet = new HashSet<>();
 
-    //角色信息
+    //角色信息4
     private final Map<Long, RoleInfo> roleInfoMap = new HashMap<>();
 
     //用户信息
@@ -93,21 +93,21 @@ public class CRoleLogin extends Message {
     }
 
     /**
-     * 角色信息
+     * 角色信息2
      */
     public List<RoleInfo> getRoleInfoList() {
         return roleInfoList;
     }
 
     /**
-     * 角色信息
+     * 角色信息3
      */
     public Set<RoleInfo> getRoleInfoSet() {
         return roleInfoSet;
     }
 
     /**
-     * 角色信息
+     * 角色信息4
      */
     public Map<Long, RoleInfo> getRoleInfoMap() {
         return roleInfoMap;

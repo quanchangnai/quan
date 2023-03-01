@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <package>
 
-    <enum name="RoleType">角色类型
+    角色类型
+    <enum name="RoleType">
         <field name="type1" value="1"/>角色类型1
         <field name="type2" value="2"/>角色类型2
     </enum>
 
-    <data name="RoleData" id="id">角色
+    角色
+    <data name="RoleData" id="id">
         <field name="id" type="long"/>角色ID
         <field name="name" type="string"/>
         <field name="name2" type="string"/>

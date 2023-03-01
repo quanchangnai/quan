@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <package cs-name="User">
 
-    <enum name="UserType">用户类型
+    用户类型
+    <enum name="UserType">
         <field name="type1" value="1"/>用户类型1
         <field name="type2" value="2"/>用户类型2
     </enum>
 
-    <bean name="UserInfo">用户信息
+    用户信息
+    <bean name="UserInfo">
         <field id="1" name="id" type="int"/>ID
         <field id="2" name="name" type="string"/>名字
         <field id="3" name="level" type="int"/>等级
@@ -28,7 +30,8 @@
         <field id="19" name="alias" type="string" optional="true"/>
     </bean>
 
-    <bean name="RoleInfo">角色信息2
+    角色信息2
+    <bean name="RoleInfo">
         <field name="id" type="int"/>角色id
         <field name="name" type="string"/>角色名
     </bean>

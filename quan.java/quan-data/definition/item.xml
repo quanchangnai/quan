@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <package>
 
-    <bean name="ItemBean">道具
+    道具
+    <bean name="ItemBean">
         <field name="id" type="int"/>
         <field name="name" type="string"/>
         <field name="list" type="list:int"/>
     </bean>
 
-    <enum name="ItemType">道具类型
+    道具类型
+    <enum name="ItemType">
         <field name="type1" value="1"/>道具类型1
         <field name="type2" value="2"/>道具类型2
     </enum>
