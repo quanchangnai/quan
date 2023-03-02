@@ -10,9 +10,11 @@ import quan.config.read.ConfigConverter;
 import quan.definition.BeanDefinition;
 import quan.definition.Category;
 import quan.definition.ClassDefinition;
+import quan.definition.Language;
 import quan.definition.config.ConfigDefinition;
 import quan.definition.config.ConstantDefinition;
 import quan.definition.parser.DefinitionParser;
+import quan.definition.parser.TableDefinitionParser;
 import quan.generator.Generator;
 
 import java.io.IOException;
@@ -77,14 +79,23 @@ public abstract class ConfigGenerator extends Generator {
 
         String optionPrefix1 = optionPrefix(false);
 
-        if (parser != null) {
-            parser.setConfigNamePattern(options.getProperty(optionPrefix1 + "namePattern"));
-            parser.setConstantNamePattern(options.getProperty(optionPrefix1 + "constantNamePattern"));
-        }
-
         definitionType = options.getProperty(optionPrefix1 + "definitionType");
         if (StringUtils.isBlank(definitionType)) {
             definitionType = "xml";
+        }
+
+        if (parser != null) {
+            parser.setConfigNamePattern(options.getProperty(optionPrefix1 + "namePattern"));
+            parser.setConstantNamePattern(options.getProperty(optionPrefix1 + "constantNamePattern"));
+            if (parser instanceof TableDefinitionParser) {
+                TableDefinitionParser tableDefinitionParser = (TableDefinitionParser) parser;
+                for (String language : Language.names()) {
+                    String alias = options.getProperty(optionPrefix1 + language + ".alias");
+                    if (!StringUtils.isBlank(alias)) {
+                        tableDefinitionParser.getLanguageAliases().put(language, alias);
+                    }
+                }
+            }
         }
 
         tableType = options.getProperty(optionPrefix1 + "tableType");
@@ -114,6 +125,10 @@ public abstract class ConfigGenerator extends Generator {
         }
 
         if (parser != null) {
+            if (parser instanceof TableDefinitionParser) {
+                ((TableDefinitionParser) parser).checkLanguageAlias();
+            }
+
             int minTableBodyStartRow = parser.getMinTableBodyStartRow();
             if (!StringUtils.isBlank(this.tableBodyStartRow)) {
                 try {

@@ -1,7 +1,7 @@
 package quan.config;
 
 /**
- * 卡片类型--<br/>
+ * 卡片类型-<br/>
  * 代码自动生成，请勿手动修改
  */
 public enum CardType {

@@ -1,7 +1,7 @@
 require("quan.table")
 
 ---
----卡片类型--
+---卡片类型-
 ---代码自动生成，请勿手动修改
 ---
 local CardType = {

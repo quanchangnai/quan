@@ -75,7 +75,7 @@ public abstract class Generator {
     //当前代码生成记录
     protected Map<String, String> newRecords = new HashMap<>();
 
-    protected List<String> addClasses = new ArrayList<>();
+    protected Set<String> addClasses = new HashSet<>();
 
     protected Set<String> deleteClasses = new HashSet<>();
 
@@ -277,7 +277,7 @@ public abstract class Generator {
 
         List<ClassDefinition> classDefinitions = new ArrayList<>();
         for (ClassDefinition classDefinition : parser.getClasses().values()) {
-            if (support(classDefinition) && classDefinition.isSupportLanguage(this.language())) {
+            if (support(classDefinition) && classDefinition.isSupportedLanguage(this.language())) {
                 classDefinition.reset();
                 prepareClass(classDefinition);
                 classDefinitions.add(classDefinition);

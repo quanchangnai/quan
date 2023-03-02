@@ -6,17 +6,26 @@ import org.dom4j.Element;
 import quan.definition.ClassDefinition;
 import quan.definition.Constants;
 import quan.definition.FieldDefinition;
+import quan.definition.Language;
 import quan.definition.config.ConfigDefinition;
 import quan.definition.config.ConstantDefinition;
+import quan.util.CollectionUtils;
 import quan.util.FileUtils;
 
 import java.io.File;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * 基于表格的【定义】解析器，在表格中直接定义配置，支持使用xml扩展复杂结构
  */
 public abstract class TableDefinitionParser extends DefinitionParser {
+
+    private Map<String, String> languageAliases = new HashMap<>();
+
+    private Map<String, String> aliasLanguages = new HashMap<>();
+
+    private static Set<String> illegalLanguageAlias = CollectionUtils.asSet(Constants.CONFIG_BUILTIN_TYPES, "i", "I", "index", "u", "U", "unique", "o", "O", "optional", "ref", "lang", "min", "max");
 
     private ExtDefinitionParser extDefinitionParser = new ExtDefinitionParser();
 
@@ -29,10 +38,28 @@ public abstract class TableDefinitionParser extends DefinitionParser {
     //表名(相对根路径):配置定义
     private Map<String, ConfigDefinition> extConfigDefinitions = new HashMap<>();
 
+    public Map<String, String> getLanguageAliases() {
+        return languageAliases;
+    }
 
     @Override
     public int getMinTableBodyStartRow() {
         return 4;
+    }
+
+
+    public void checkLanguageAlias() {
+        for (String language : languageAliases.keySet()) {
+            String alias = languageAliases.get(language);
+            if (illegalLanguageAlias.contains(alias) || !Pattern.matches("\\w", alias) || Language.names().contains(alias) && !alias.equals(language)) {
+                throw new IllegalArgumentException(String.format("配置的自定义语言[%s]别名[%s]不合法", language, alias));
+            }
+            aliasLanguages.put(alias, language);
+        }
+
+        if (languageAliases.size() != new HashSet<>(languageAliases.values()).size()) {
+            throw new IllegalArgumentException("配置的自定义语言别名有重复：" + languageAliases);
+        }
     }
 
     @Override
@@ -124,51 +151,54 @@ public abstract class TableDefinitionParser extends DefinitionParser {
             String constraintType;
             String constraintValue;
 
+            String language = aliasLanguages.get(constraint);
+            if (language != null) {
+                constraint = language;
+            }
+
             switch (constraint) {
-                case "cs":
-                case "lua":
-                case "java":
-                    constraintType = "lang";
-                    constraintValue = constraint;
-                    break;
+                case "i":
+                case "I":
                 case "index":
                     constraintType = "index";
                     constraintValue = "normal";
                     break;
+                case "u":
+                case "U":
                 case "unique":
                     constraintType = "index";
                     constraintValue = "unique";
                     break;
+                case "o":
+                case "O":
                 case "optional":
                     constraintType = "optional";
                     constraintValue = "true";
                     break;
                 default:
-                    try {
-                        String[] constraintTypeAndValue = constraint.split("=", -1);
-                        Validate.isTrue(constraintTypeAndValue.length == 2);
-                        constraintType = constraintTypeAndValue[0].trim();
-                        constraintValue = constraintTypeAndValue[1].trim();
-                    } catch (Exception ignored) {
-                        addValidatedError(configDefinition.getValidatedName() + "的字段[" + fieldName + "]约束[" + constraint + "]格式错误");
-                        continue;
+                    if (Language.names().contains(constraint)) {
+                        constraintType = "lang";
+                        constraintValue = constraint;
+                    } else {
+                        try {
+
+                            String[] constraintTypeAndValue = constraint.split("=", -1);
+                            Validate.isTrue(constraintTypeAndValue.length == 2);
+                            constraintType = constraintTypeAndValue[0].trim();
+                            constraintValue = constraintTypeAndValue[1].trim();
+                            Validate.isTrue(!StringUtils.isBlank(constraintType) && !StringUtils.isBlank(constraintValue));
+                        } catch (Exception ignored) {
+                            addValidatedError(configDefinition.getValidatedName() + "的字段[" + fieldName + "]约束[" + constraint + "]不合法");
+                            continue;
+                        }
                     }
                     break;
-            }
-
-            if (constraintType.isEmpty()) {
-                addValidatedError(configDefinition.getValidatedName() + "的字段[" + fieldName + "]约束[" + constraint + "]格式错误");
-                continue;
             }
 
             if (constraintTypes.contains(constraintType)) {
                 addValidatedError(configDefinition.getValidatedName() + "的字段[" + fieldName + "]有重复约束类型:" + constraintType);
             } else {
                 constraintTypes.add(constraintType);
-            }
-
-            if (constraintValue.isEmpty()) {
-                addValidatedError(configDefinition.getValidatedName() + "的字段[" + fieldName + "]约束[" + constraintType + "]不能为空值");
             }
 
             switch (constraintType) {
