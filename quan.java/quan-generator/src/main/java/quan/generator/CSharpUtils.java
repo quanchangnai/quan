@@ -15,9 +15,9 @@ import quan.util.CollectionUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -25,7 +25,7 @@ public class CSharpUtils {
 
     private static Logger logger = LoggerFactory.getLogger(CSharpUtils.class);
 
-    public static void updateProjFile(String codePath, String projFileName, List<String> addClasses, Set<String> deleteClasses) {
+    public static void updateProjFile(String codePath, String projFileName, Set<String> addClasses, Set<String> deleteClasses) {
         if (StringUtils.isBlank(projFileName) || CollectionUtils.isEmpty(addClasses) && CollectionUtils.isEmpty(deleteClasses)) {
             return;
         }
@@ -66,9 +66,12 @@ public class CSharpUtils {
         }
 
         deleteClasses = deleteClasses.stream().map(c -> resolveInclude(codePath, projPath, c)).collect(Collectors.toSet());
+        addClasses = addClasses.stream().map(c -> resolveInclude(codePath, projPath, c)).collect(Collectors.toSet());
 
         for (Element element2 : element.elements()) {
-            if (deleteClasses.contains(element2.attributeValue("Include"))) {
+            String include = element2.attributeValue("Include");
+            addClasses.remove(include);
+            if (deleteClasses.contains(include)) {
                 element.remove(element2);
             }
         }
@@ -77,12 +80,11 @@ public class CSharpUtils {
             element.addElement("Compile").add(new DOMAttribute(QName.get("Include"), resolveInclude(codePath, projPath, addClass)));
         }
 
-        try {
-            OutputFormat outputFormat = new OutputFormat(null, true, document.getXMLEncoding());
-            outputFormat.setIndentSize(2);
+        try (OutputStream outputStream = Files.newOutputStream(projFile.toPath())) {
+            OutputFormat outputFormat = new OutputFormat("  ", true, document.getXMLEncoding());
             outputFormat.setTrimText(true);
             outputFormat.setNewLineAfterDeclaration(false);
-            XMLWriter xmlWriter = new XMLWriter(Files.newOutputStream(projFile.toPath()), outputFormat) {
+            XMLWriter xmlWriter = new XMLWriter(outputStream, outputFormat) {
                 protected void writeEmptyElementClose(String qualifiedName) throws IOException {
                     writer.write(" />");
                 }
