@@ -2,7 +2,6 @@ package quan.definition;
 
 import com.google.common.base.CaseFormat;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import quan.definition.config.ConfigDefinition;
 
 import java.util.ArrayList;
@@ -78,10 +77,9 @@ public class FieldDefinition extends Definition implements Cloneable {
     private String ref;
     private String refType;//语言相关
 
-    //配置:是支持还是排除设置的语言
-    private boolean excludeLanguage;
+    private String languageStr;
 
-    //配置:支持或者排除的语言
+    //配置:支持的语言
     protected Set<String> languages = new HashSet<>();
 
     //配置:字段对应的表格列号,对象或者集合类型可能会对应多列，校验表头时设置
@@ -676,17 +674,12 @@ public class FieldDefinition extends Definition implements Cloneable {
         return null;
     }
 
-    public void setLanguage(String language) {
-        if (StringUtils.isBlank(language) || category != Category.config) {
-            return;
-        }
-        Pair<Set<String>, Boolean> pair = Language.parse(language);
-        languages = pair.getLeft();
-        excludeLanguage = pair.getRight();
+    public void setLanguageStr(String languageStr) {
+        this.languageStr = languageStr;
     }
 
-    public boolean isExcludeLanguage() {
-        return excludeLanguage;
+    public String getLanguageStr() {
+        return languageStr;
     }
 
     public Set<String> getLanguages() {
@@ -696,16 +689,12 @@ public class FieldDefinition extends Definition implements Cloneable {
     /**
      * 字段本身是否支持特定语言，实际使用要先判断字段所在的配置是否支持该语言
      */
-    public boolean isSupportLanguage(String language) {
-        boolean support = languages.isEmpty() || languages.contains(language);
-        if (excludeLanguage) {
-            support = !support;
-        }
-        return support;
+    public boolean isSupportedLanguage(String language) {
+        return languages.contains(language);
     }
 
-    public boolean isSupportLanguage(Language language) {
-        return isSupportLanguage(language.name());
+    public boolean isSupportedLanguage(Language language) {
+        return isSupportedLanguage(language.name());
     }
 
     public List<Integer> getColumnNums() {

@@ -14,11 +14,10 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
 <#if !selfFields??>
     <#assign selfFields = fields>
 </#if>
-<#assign supportJava = isSupportLanguage("java")>
 <#assign JSONObject=getDependentName("JSONObject") JSONArray=getDependentName("JSONArray")>
 <#assign String=getDependentName("String") List=getDependentName("List") ArrayList=getDependentName("ArrayList") Map=getDependentName("Map") HashMap=getDependentName("HashMap") Collections=getDependentName("Collections")>
 <#list selfFields as field>
-    <#if !(supportJava &&field.isSupportLanguage("java"))>
+    <#if !field.isSupportedLanguage("java")>
         <#continue>
     </#if>
 
@@ -69,7 +68,7 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
         super(json);
 
 <#list selfFields as field>
-    <#if !(supportJava &&field.isSupportLanguage("java"))>
+    <#if !field.isSupportedLanguage("java")>
         <#continue>
     </#if>
     <#if field.type=="string">
@@ -179,7 +178,7 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
     public ${String} toString() {
         return "${name}{" +
         <#list fields as field>
-            <#if !(supportJava &&field.isSupportLanguage("java"))>
+            <#if !field.isSupportedLanguage("java")>
                 <#continue>
             </#if>
                 "<#rt>
@@ -202,6 +201,9 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
     ${tab}private static volatile ${List}<${name}> _configs = ${Collections}.emptyList();
 
     <#list indexes as index>
+        <#if !index.isSupportedLanguage("java")>
+            <#continue>
+        </#if>
         <#if index.comment !="">
     ${tab}//索引:${index.comment}
         </#if>
@@ -230,6 +232,9 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
     ${tab}}
 
     <#list indexes as index>
+        <#if !index.isSupportedLanguage("java")>
+            <#continue>
+        </#if>
         <#if index.unique && index.fields?size==1>
     ${tab}public static ${Map}<${index.fields[0].classType}, ${name}> get${index.name?cap_first}All() {
         ${tab}return _${index.name}Configs;
@@ -314,6 +319,9 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
     ${tab}@${getDependentName("SuppressWarnings")}({"unchecked"})
     ${tab}private static ${List}<${String}> load(${List}<${name}> configs) {
     <#list indexes as index>
+        <#if !index.isSupportedLanguage("java")>
+            <#continue>
+        </#if>
         <#if index.unique && index.fields?size==1>
         ${tab}${Map}<${index.fields[0].classType}, ${name}> ${index.name}Configs = new ${HashMap}<>();
         <#elseif index.normal && index.fields?size==1>
@@ -333,6 +341,9 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
 
         ${tab}for (${name} config : configs) {
     <#list indexes as index>
+        <#if !index.isSupportedLanguage("java")>
+            <#continue>
+        </#if>
         <#if index.fields?size==1>
             <#if isConstantKeyField("${index.fields[0].name}")>
             ${tab}if (!config.${index.fields[0].name}.isEmpty()) {
@@ -351,12 +362,16 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
 
         ${tab}configs = ${Collections}.unmodifiableList(configs);
     <#list indexes as index>
+        <#if index.isSupportedLanguage("java")>
         ${tab}${index.name}Configs = unmodifiableMap(${index.name}Configs);
+        </#if>
     </#list>
 
         ${tab}${name}.<#if parent??>self.</#if>_configs = configs;
     <#list indexes as index>
+        <#if index.isSupportedLanguage("java")>
         ${tab}${name}.<#if parent??>self.</#if>_${index.name}Configs = ${index.name}Configs;
+        </#if>
     </#list>
 
         ${tab}return errors;

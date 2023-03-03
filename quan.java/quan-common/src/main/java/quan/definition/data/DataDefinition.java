@@ -97,11 +97,15 @@ public class DataDefinition extends BeanDefinition {
         super.validate1();
         if (getIdName() == null) {
             addValidatedError(getValidatedName() + "的主键不能为空");
-            return;
-        }
-        if (getFields().stream().noneMatch(t -> t.getName().equals(getIdName()))) {
+        } else if (getFields().stream().noneMatch(t -> t.getName().equals(getIdName()))) {
             addValidatedError(getValidatedName() + "的主键[" + getIdName() + "]不存在");
         }
+
+    }
+
+    @Override
+    public void validate2() {
+        super.validate2();
 
         IndexDefinition.validate(indexes, indexes, fields);
 
@@ -116,5 +120,5 @@ public class DataDefinition extends BeanDefinition {
             }
         }
     }
-
+    
 }

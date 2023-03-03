@@ -1,7 +1,6 @@
 package quan.definition;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import quan.definition.DependentSource.DependentType;
 
 import java.util.*;
@@ -28,14 +27,10 @@ public abstract class ClassDefinition extends Definition {
     //定义版本
     private String version;
 
-    //是支持还是排除语言
-    protected boolean excludeLanguage;
-
-    //支持或者排除的语言
-    protected Set<String> languages = new HashSet<>();
+    private String languageStr;
 
     //支持的语言
-    protected Set<String> supportedLanguages;
+    protected Set<String> languages = new HashSet<>();
 
     //依赖的类，Map<依赖的类名, <来源, ClassDefinition>>
     protected Map<String, TreeMap<DependentSource, ClassDefinition>> dependentsClasses = new HashMap<>();
@@ -236,21 +231,12 @@ public abstract class ClassDefinition extends Definition {
     }
 
 
-    public void setLanguage(String language) {
-        if (isBlank(language) || category == Category.data) {
-            return;
-        }
-        Pair<Set<String>, Boolean> pair = Language.parse(language);
-        languages = pair.getLeft();
-        excludeLanguage = pair.getRight();
+    public void setLanguageStr(String languageStr) {
+        this.languageStr = languageStr;
     }
 
-    public boolean isExcludeLanguage() {
-        return excludeLanguage;
-    }
-
-    public void setExcludeLanguage(boolean excludeLanguage) {
-        this.excludeLanguage = excludeLanguage;
+    public String getLanguageStr() {
+        return languageStr;
     }
 
     public Set<String> getLanguages() {
@@ -269,30 +255,13 @@ public abstract class ClassDefinition extends Definition {
         imports.put(importName, null);
     }
 
-    public boolean isSupportLanguage(Language language) {
-        boolean support = languages.isEmpty() || languages.contains(language.name());
-        if (excludeLanguage) {
-            support = !support;
-        }
-        return support;
+    public boolean isSupportedLanguage(Language language) {
+        return languages.contains(language.name());
     }
 
 
-    public boolean isSupportLanguage(String language) {
-        return isSupportLanguage(Language.valueOf(language));
-    }
-
-    public Set<String> getSupportedLanguages() {
-        if (supportedLanguages != null) {
-            return supportedLanguages;
-        }
-        supportedLanguages = new HashSet<>();
-        for (Language language : Language.values()) {
-            if (isSupportLanguage(language)) {
-                supportedLanguages.add(language.name());
-            }
-        }
-        return supportedLanguages;
+    public boolean isSupportedLanguage(String language) {
+        return isSupportedLanguage(Language.valueOf(language));
     }
 
     public void addDependent(DependentType dependentType, ClassDefinition ownerClass, Definition ownerDefinition, ClassDefinition dependentClass) {
@@ -318,6 +287,9 @@ public abstract class ClassDefinition extends Definition {
      * 依赖{@link #validate1()}的结果，必须等所有类的{@link #validate1()}执行完成后再执行
      */
     public void validate2() {
+        for (FieldDefinition fieldDefinition : getFields()) {
+            validateFieldNameDuplicate(fieldDefinition);
+        }
     }
 
     /**
@@ -334,16 +306,20 @@ public abstract class ClassDefinition extends Definition {
             addValidatedError(getValidatedName() + "的名字格式错误,正确格式:" + getNamePattern());
         }
 
-        if (!languages.isEmpty() && !Language.names().containsAll(languages)) {
-            addValidatedError(getValidatedName() + "的语言类型" + languages + "非法,合法的语言类型" + Language.names());
+        try {
+            languages = Language.parse(languageStr);
+        } catch (IllegalArgumentException e) {
+            addValidatedError(getValidatedName() + "的语言约束[" + languageStr + "]非法,合法的语言类型" + Language.names());
         }
     }
 
     protected void validateField(FieldDefinition fieldDefinition) {
         validateFieldName(fieldDefinition);
-        validateFieldNameDuplicate(fieldDefinition);
     }
 
+    /**
+     * 校验字段名
+     */
     protected void validateFieldName(FieldDefinition fieldDefinition) {
         if (fieldDefinition.getName() == null) {
             addValidatedError(getValidatedName() + "的字段名不能为空");

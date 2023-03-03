@@ -145,8 +145,12 @@ public class BeanDefinition extends ClassDefinition {
 
     @Override
     public void validate2() {
-        super.validate2();
         validateParent();
+
+        for (FieldDefinition field : fields) {
+            validateFieldLanguage(field);
+            validateFieldNameDuplicate(field);
+        }
     }
 
     @Override
@@ -155,8 +159,32 @@ public class BeanDefinition extends ClassDefinition {
         validateDelimiter();
 
         for (FieldDefinition field : fields) {
-            //校验字段引用
             validateFieldRef(field);
+            validateFieldRefLanguage(field);
+        }
+    }
+
+    @Override
+    protected void validateNameAndLanguage() {
+        super.validateNameAndLanguage();
+
+        BeanDefinition ancestor = getParent();
+        Set<String> ancestors = new HashSet<>();
+
+        while (ancestor != null && ancestor.getParent() != null) {
+            if (ancestors.contains(ancestor.getLongName())) {
+                return;
+            }
+            ancestors.add(ancestor.getLongName());
+            ancestor = ancestor.getParent();
+        }
+
+        if (ancestor != null) {
+            Set<String> ancestorLanguages = ancestor.getLanguages();
+            if (ancestorLanguages.isEmpty()) {
+                ancestor.validateNameAndLanguage();
+            }
+            languages.addAll(ancestorLanguages);
         }
     }
 
@@ -173,6 +201,14 @@ public class BeanDefinition extends ClassDefinition {
             return;
         }
 
+        if (delimiter != null) {
+            addValidatedError(getValidatedName() + "的分隔符继承自父类，不支持自定义");
+        }
+
+        if (getLanguageStr() != null) {
+            addValidatedError(getValidatedName() + "的语言约束继承自父类，不支持自定义");
+        }
+
         BeanDefinition parent = getParent();
         if (parent == null) {
             addValidatedError(getValidatedName() + "的父" + getKindName() + "[" + parentName + "]不存在");
@@ -185,60 +221,71 @@ public class BeanDefinition extends ClassDefinition {
         parent.children.add(this);
         parent.dependentChildren.put(this.getLongName(), getName());
 
+        BeanDefinition ancestor = parent;
         Set<String> ancestors = new HashSet<>();
-        while (parent != null) {
-            if (ancestors.contains(parent.getLongName())) {
+
+        while (ancestor != null) {
+            delimiter = ancestor.delimiter;
+
+            if (ancestors.contains(ancestor.getLongName())) {
                 addValidatedError(getValidatedName() + "和" + ancestors + "的父子关系不能有循环");
                 return;
             }
-            ancestors.add(parent.getLongName());
 
-            for (int i = parent.selfFields.size() - 1; i >= 0; i--) {
-                FieldDefinition parentField = parent.selfFields.get(i).clone();
-                parentField.setOwner(this);
-                fields.add(0, parentField);
+            for (int i = ancestor.selfFields.size() - 1; i >= 0; i--) {
+                FieldDefinition previousField = ancestor.selfFields.get(i).clone();
+                previousField.setOwner(this);
+                fields.add(0, previousField);
             }
 
-            parent.descendants.add(getLongName());
-            parent = parent.getParent();
+            ancestors.add(ancestor.getLongName());
+            ancestor.descendants.add(getLongName());
+            ancestor = ancestor.getParent();
         }
 
-        if (delimiter != null) {
-            addValidatedError(getValidatedName() + "的分隔符继承自父类，不支持自定义");
-        }
-
-        parent = getParent();
-        while (parent != null) {
-            delimiter = parent.delimiter;
-            if (fields.size() > parent.descendantMaxFieldCount) {
-                parent.descendantMaxFieldCount = fields.size();
+        ancestor = parent;
+        while (ancestor != null) {
+            if (fields.size() > ancestor.descendantMaxFieldCount) {
+                ancestor.descendantMaxFieldCount = fields.size();
             }
-            parent = parent.getParent();
+            ancestor = ancestor.getParent();
+        }
+    }
+
+    @Override
+    protected void validateDependents() {
+        BeanDefinition parent = getParent();
+        if (parent != null) {
+            addDependent(DependentType.PARENT, this, this, parent);
         }
 
+        for (FieldDefinition fieldDefinition : getFields()) {
+            addDependent(DependentType.FIELD, this, fieldDefinition, fieldDefinition.getEnum());
+            addDependent(DependentType.FIELD, this, fieldDefinition, fieldDefinition.getTypeBean());
+            addDependent(DependentType.FIELD_VALUE, this, fieldDefinition, fieldDefinition.getValueTypeBean());
+            if (fieldDefinition.isSimpleRef()) {
+                addDependent(DependentType.FIELD_REF, this, fieldDefinition, fieldDefinition.getRefConfig());
+            }
+        }
 
+        for (BeanDefinition child : getChildren()) {
+            addDependent(DependentType.CHILD, this, this, child);
+        }
     }
 
     @Override
     protected void validateField(FieldDefinition field) {
         super.validateField(field);
 
-        //校验字段类型
         validateFieldType(field);
-
-        //校验字段数值范围限制
         validateFieldRange(field);
-
-        //校验字段循环依赖
         validateFieldBeanCycle(field);
-
-        //校验字段依赖语言
-        validateFieldBeanLanguage(field);
-
-        //校验消息的字段ID
         validateFieldId(field);
     }
 
+    /**
+     * /校验字段类型
+     */
     protected void validateFieldType(FieldDefinition field) {
         if (field.getTypeInfo() == null) {
             addValidatedError(getValidatedName("的") + field.getValidatedName() + "类型不能为空");
@@ -314,6 +361,9 @@ public class BeanDefinition extends ClassDefinition {
 
     }
 
+    /**
+     * 校验字段数值范围限制
+     */
     protected void validateFieldRange(FieldDefinition field) {
         Object min = field.getMin();
         Number minValue = null;
@@ -401,46 +451,20 @@ public class BeanDefinition extends ClassDefinition {
         return false;
     }
 
-    protected void validateFieldBeanLanguage(FieldDefinition field) {
-        if (category == Category.data) {
-            return;
-        }
-
-        BeanDefinition fieldBean = null;
-        if (field.isBeanType()) {
-            fieldBean = field.getTypeBean();
-        } else if (field.isCollectionType()) {
-            fieldBean = field.getValueTypeBean();
-        }
-        if (fieldBean == null) {
-            return;
-        }
-        if (!fieldBean.getSupportedLanguages().containsAll(getSupportedLanguages())) {
-            addValidatedError(getValidatedName() + "支持的语言范围" + supportedLanguages + "必须小于或等于其依赖" + fieldBean.getValidatedName() + "支持的语言范围" + fieldBean.supportedLanguages);
+    /**
+     * 校验字段支持的语言
+     */
+    protected void validateFieldLanguage(FieldDefinition field) {
+        try {
+            field.getLanguages().addAll(Language.parse(languages, field.getLanguageStr()));
+        } catch (IllegalArgumentException e) {
+            addValidatedError(getValidatedName("的") + field.getValidatedName() + "语言约束[" + field.getLanguageStr() + "]非法,合法语言类型" + languages);
         }
     }
 
-    @Override
-    protected void validateDependents() {
-        BeanDefinition parent = getParent();
-        if (parent != null) {
-            addDependent(DependentType.PARENT, this, this, parent);
-        }
-
-        for (FieldDefinition fieldDefinition : getFields()) {
-            addDependent(DependentType.FIELD, this, fieldDefinition, fieldDefinition.getEnum());
-            addDependent(DependentType.FIELD, this, fieldDefinition, fieldDefinition.getTypeBean());
-            addDependent(DependentType.FIELD_VALUE, this, fieldDefinition, fieldDefinition.getValueTypeBean());
-            if (fieldDefinition.isSimpleRef()) {
-                addDependent(DependentType.FIELD_REF, this, fieldDefinition, fieldDefinition.getRefConfig());
-            }
-        }
-
-        for (BeanDefinition child : getChildren()) {
-            addDependent(DependentType.CHILD, this, this, child);
-        }
-    }
-
+    /**
+     * 校验消息的字段ID
+     */
     protected void validateFieldId(FieldDefinition field) {
         if (category != Category.message || field.getId() == null) {
             return;
@@ -481,6 +505,9 @@ public class BeanDefinition extends ClassDefinition {
         return ConfigDefinition.escapeDelimiter(delimiter);
     }
 
+    /**
+     * 校验字段引用，依赖索引校验结果
+     */
     protected void validateFieldRef(FieldDefinition field) {
         if (field.getType() == null || getCategory() != Category.config || field.getRef() == null) {
             return;
@@ -571,8 +598,12 @@ public class BeanDefinition extends ClassDefinition {
             return;
         }
 
-        if (!refConfig.getSupportedLanguages().containsAll(getSupportedLanguages())) {
-            addValidatedError(getValidatedName() + "支持的语言范围" + supportedLanguages + "必须小于或等于其引用" + refConfig.getValidatedName() + "支持的语言范围" + refConfig.supportedLanguages);
+        for (String language : languages) {
+            Set<String> refFieldLanguages = refField.getLanguages();
+            if (!refFieldLanguages.contains(language)) {
+                addValidatedError(getValidatedName() + "支持的语言范围" + languages + "必须小于或等于其" + field.getValidatedName() + "的引用[" + refConfigAndField + "]支持的语言范围" + refFieldLanguages);
+                break;
+            }
         }
 
         if (field.isCollectionType()) {
@@ -589,6 +620,28 @@ public class BeanDefinition extends ClassDefinition {
         IndexDefinition refFieldIndex = refConfig.getIndexByField1(refField);
         if (refFieldIndex == null) {
             addValidatedError(getValidatedName() + field.getValidatedName() + "的引用字段[" + refConfigAndField + "]不是一级索引");
+        }
+    }
+
+    /**
+     * 校验字段依赖语言
+     */
+    protected void validateFieldRefLanguage(FieldDefinition field) {
+        if (getCategory() != Category.config) {
+            return;
+        }
+
+        BeanDefinition fieldBean = null;
+        if (field.isBeanType()) {
+            fieldBean = field.getTypeBean();
+        } else if (field.isCollectionType()) {
+            fieldBean = field.getValueTypeBean();
+        }
+        if (fieldBean == null) {
+            return;
+        }
+        if (!fieldBean.languages.containsAll(this.languages)) {
+            addValidatedError(getValidatedName() + "支持的语言范围" + languages + "必须小于或等于其依赖" + fieldBean.getValidatedName() + "支持的语言范围" + fieldBean.languages);
         }
     }
 

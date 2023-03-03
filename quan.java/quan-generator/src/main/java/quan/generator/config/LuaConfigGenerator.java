@@ -107,7 +107,7 @@ public class LuaConfigGenerator extends ConfigGenerator {
 
         boolean start = true;
         for (FieldDefinition field : beanDefinition.getFields()) {
-            if (!field.isSupportLanguage(this.language())) {
+            if (!field.isSupportedLanguage(this.language())) {
                 continue;
             }
             if (!start) {

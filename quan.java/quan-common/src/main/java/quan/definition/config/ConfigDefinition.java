@@ -120,15 +120,6 @@ public class ConfigDefinition extends BeanDefinition {
         return allTables;
     }
 
-
-    @Override
-    public void addField(FieldDefinition fieldDefinition) {
-        super.addField(fieldDefinition);
-        if (fieldDefinition.getName().equals("id") && fieldDefinition.getIndex() == null) {
-            fieldDefinition.setIndex("unique");
-        }
-    }
-
     public List<IndexDefinition> getIndexes() {
         return indexes;
     }
@@ -249,8 +240,6 @@ public class ConfigDefinition extends BeanDefinition {
         super.validate2();
 
         for (FieldDefinition field : fields) {
-            validateFieldNameDuplicate(field);
-
             if (field.getColumn() != null) {
                 if (!columnFields.containsKey(field.getColumn())) {
                     columnFields.put(field.getColumn(), field);
@@ -267,11 +256,8 @@ public class ConfigDefinition extends BeanDefinition {
     public void validate3() {
         validateDependents();
         for (FieldDefinition field : selfFields) {
-            //校验字段引用
             validateFieldRef(field);
-            //校验字段支持的语言
-            validateFieldLanguage(field);
-            //校验字段的分隔符
+            validateFieldRefLanguage(field);
             validateFieldDelimiter(field);
         }
     }
@@ -285,44 +271,36 @@ public class ConfigDefinition extends BeanDefinition {
             return;
         }
 
-        if (!parent.getSupportedLanguages().containsAll(getSupportedLanguages())) {
-            addValidatedError(getValidatedName() + "支持的语言范围" + supportedLanguages + "必须小于或等于其父配置[" + parentName + "]所支持的语言范围" + parent.supportedLanguages);
+        if (!parent.languages.containsAll(languages)) {
+            addValidatedError(getValidatedName() + "支持的语言范围" + languages + "必须小于或等于其父配置[" + parentName + "]所支持的语言范围" + parent.languages);
         }
 
+        ConfigDefinition ancestor = parent;
         Set<String> ancestors = new HashSet<>();
-        while (parent != null) {
-            if (ancestors.contains(parent.getName())) {
+
+        while (ancestor != null) {
+            if (ancestors.contains(ancestor.getLongName())) {
                 return;
             }
-            ancestors.add(parent.getName());
 
-            for (int i = parent.selfIndexes.size() - 1; i >= 0; i--) {
-                IndexDefinition parentIndex = parent.selfIndexes.get(i).clone();
+            for (int i = ancestor.selfIndexes.size() - 1; i >= 0; i--) {
+                IndexDefinition parentIndex = ancestor.selfIndexes.get(i).clone();
                 parentIndex.setOwnerDefinition(this);
                 indexes.add(0, parentIndex);
             }
 
-            parent = parent.getParent();
+            ancestors.add(ancestor.getLongName());
+            ancestor = ancestor.getParent();
         }
     }
 
 
     @Override
     protected void validateField(FieldDefinition field) {
-        //校验字段名
         validateFieldName(field);
-
-        //校验字段类型
         validateFieldType(field);
-
-        //校验字段数值范围限制
         validateFieldRange(field);
-
-        //校验字段循环依赖
         validateFieldBeanCycle(field);
-
-        //校验字段依赖语言
-        validateFieldBeanLanguage(field);
 
         if (field.getColumn() == null) {
             addValidatedError(getValidatedName("的") + field.getValidatedName() + "对应的列不能为空");
@@ -330,28 +308,14 @@ public class ConfigDefinition extends BeanDefinition {
             field.setComment(field.getColumn());
         }
 
-    }
-
-    private void validateFieldLanguage(FieldDefinition field) {
-        if (isIndexField(field) && (field.isExcludeLanguage() || !field.getLanguages().isEmpty())) {
-            addValidatedError(getValidatedName("的索引") + field.getValidatedName() + "不支持设置语言");
-            return;
-        }
-
-        getSupportedLanguages();
-        Set<String> fieldIllegalLanguages = new HashSet<>();
-
-        for (String fieldLanguage : field.getLanguages()) {
-            if (!supportedLanguages.contains(fieldLanguage)) {
-                fieldIllegalLanguages.add(fieldLanguage);
-            }
-        }
-
-        if (!fieldIllegalLanguages.isEmpty()) {
-            addValidatedError(getValidatedName("的") + field.getValidatedName() + "支持的语言类型" + fieldIllegalLanguages + "非法,合法语言类型" + supportedLanguages);
+        if ("id".equals(field.getName()) && field.getIndex() == null) {
+            field.setIndex("unique");
         }
     }
 
+    /**
+     * 校验字段的分隔符
+     */
     private void validateFieldDelimiter(FieldDefinition field) {
         if (field.isCycle() || !field.isCollectionType()) {
             return;

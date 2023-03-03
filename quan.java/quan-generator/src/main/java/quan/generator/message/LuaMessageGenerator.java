@@ -42,7 +42,7 @@ public class LuaMessageGenerator extends MessageGenerator {
 
         for (ClassDefinition classDefinition : classDefinitions) {
             generate(classDefinition);
-            if (classDefinition instanceof MessageDefinition) {
+            if (classDefinition instanceof MessageDefinition && classDefinition.isSupportedLanguage(language())) {
                 messageDefinitions.add((MessageDefinition) classDefinition);
             }
         }

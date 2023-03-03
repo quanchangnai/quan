@@ -19,9 +19,8 @@ namespace ${getFullPackageName("cs")}
 <#if !selfFields??>
     <#assign selfFields = fields>
 </#if>
-<#assign supportCs = isSupportLanguage("cs")>
 <#list selfFields as field>
-    <#if !(supportCs &&field.isSupportLanguage("cs"))>
+    <#if !field.isSupportedLanguage("cs")>
         <#continue>
     </#if>
     <#if field.comment !="">
@@ -59,7 +58,7 @@ namespace ${getFullPackageName("cs")}
         public ${name}(${JObject} json) : base(json)
         {
 <#list selfFields as field>
-    <#if !(supportCs &&field.isSupportLanguage("cs"))>
+    <#if !field.isSupportedLanguage("cs")>
         <#continue>
     </#if>
     <#if field.type=="list" || field.type=="set">
@@ -160,7 +159,7 @@ namespace ${getFullPackageName("cs")}
         {
             return "${name}{" +
             <#list fields as field>
-                <#if !(supportCs &&field.isSupportLanguage("cs"))>
+                <#if !field.isSupportedLanguage("cs")>
                     <#continue>
                 </#if>
                    "<#rt>
@@ -183,6 +182,9 @@ namespace ${getFullPackageName("cs")}
         private static volatile ${IList}<${name}> _configs = new ${List}<${name}>();
 
     <#list indexes as index>
+        <#if !index.isSupportedLanguage("cs")>
+            <#continue>
+        </#if>
         <#if index.comment !="">
         // 索引:${index.comment}
         </#if>
@@ -212,6 +214,9 @@ namespace ${getFullPackageName("cs")}
         }
 
     <#list indexes as index>
+        <#if !index.isSupportedLanguage("cs")>
+            <#continue>
+        </#if>
         <#assign newMethod><#if !isSelfIndex(index)>new <#else></#if></#assign>
         <#if index.unique && index.fields?size==1>
         public ${newMethod}static ${IDictionary}<${index.fields[0].classType}, ${name}> Get${index.name?cap_first}All()
@@ -327,6 +332,9 @@ namespace ${getFullPackageName("cs")}
         public static void Load(${IList}<${name}> configs)
         {
     <#list indexes as index>
+        <#if !index.isSupportedLanguage("cs")>
+            <#continue>
+        </#if>
         <#if index.unique && index.fields?size==1>
             ${IDictionary}<${index.fields[0].classType}, ${name}> ${index.name}Configs = new ${Dictionary}<${index.fields[0].classType}, ${name}>();
         <#elseif index.normal && index.fields?size==1>
@@ -345,6 +353,9 @@ namespace ${getFullPackageName("cs")}
             foreach (var config in configs)
             {
     <#list indexes as index>
+        <#if !index.isSupportedLanguage("cs")>
+            <#continue>
+        </#if>
         <#if index.fields?size==1>
                 <#if parentClassName??>ConfigBase.</#if>Load(${index.name}Configs, config, config.${index.fields[0].name});
         <#elseif index.fields?size==2>
@@ -357,12 +368,16 @@ namespace ${getFullPackageName("cs")}
 
             configs = configs.ToImmutableList();
     <#list indexes as index>
+        <#if index.isSupportedLanguage("cs")>
             ${index.name}Configs = ToImmutableDictionary(${index.name}Configs);
+        </#if>
     </#list>
 
             _configs = configs;
     <#list indexes as index>
+        <#if index.isSupportedLanguage("cs")>
             _${index.name}Configs = ${index.name}Configs;
+        </#if>
     </#list>
         }
 </#if>

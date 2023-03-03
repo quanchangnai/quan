@@ -239,7 +239,7 @@ public class XmlDefinitionParser extends DefinitionParser {
             classDefinition.setParser(getDefinitionParser());
             classDefinition.setCategory(getCategory());
             classDefinition.setName(element.attributeValue("name"));
-            classDefinition.setLanguage(element.attributeValue("lang"));
+            classDefinition.setLanguageStr(element.attributeValue("lang"));
             classDefinition.setComment(getComment(element, indexInParent));
             classDefinition.setDefinitionFile(definitionFile);
             classDefinition.setVersion(DigestUtils.md5Hex(element.asXML()).trim());
@@ -329,8 +329,6 @@ public class XmlDefinitionParser extends DefinitionParser {
 
                 beanDefinition.setPackageName(classDefinition.getPackageName());
                 beanDefinition.getPackageNames().putAll(classDefinition.getPackageNames());
-                beanDefinition.setExcludeLanguage(classDefinition.isExcludeLanguage());
-                beanDefinition.getLanguages().addAll(classDefinition.getLanguages());
 
                 parseClassChildren(beanDefinition, childElement);
 
@@ -345,6 +343,7 @@ public class XmlDefinitionParser extends DefinitionParser {
         FieldDefinition fieldDefinition = new FieldDefinition();
         fieldDefinition.setParser(classDefinition.getParser());
         fieldDefinition.setCategory(category);
+        classDefinition.addField(fieldDefinition);
 
         fieldDefinition.setName(fieldElement.attributeValue("name"));
         String typeInfo = fieldElement.attributeValue("type");
@@ -360,9 +359,7 @@ public class XmlDefinitionParser extends DefinitionParser {
         fieldDefinition.setDelimiter(fieldElement.attributeValue("delimiter"));
         fieldDefinition.setRef(fieldElement.attributeValue("ref"));
         fieldDefinition.setComment(getComment(fieldElement, indexInParent));
-        fieldDefinition.setLanguage(fieldElement.attributeValue("lang"));
-
-        classDefinition.addField(fieldDefinition);
+        fieldDefinition.setLanguageStr(fieldElement.attributeValue("lang"));
 
         String type = typeInfo == null ? null : typeInfo.split("[:：]")[0];
 

@@ -212,7 +212,7 @@ public abstract class TableDefinitionParser extends DefinitionParser {
                     fieldDefinition.setOptional(constraintValue);
                     break;
                 case "lang":
-                    fieldDefinition.setLanguage(constraintValue);
+                    fieldDefinition.setLanguageStr(constraintValue);
                     break;
                 case "min":
                     fieldDefinition.setMin(constraintValue);

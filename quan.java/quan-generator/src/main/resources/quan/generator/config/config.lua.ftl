@@ -15,7 +15,9 @@ local configs = {
 }
 
 <#list indexes as index>
-    <#if index.comment !="">
+    <#if !index.isSupportedLanguage("lua")>
+        <#continue>
+    <#elseif index.comment !="">
 ---索引:${index.comment}
     </#if>
 local ${index.name}Configs = {}
@@ -32,7 +34,9 @@ local function loadConfigs()
 </#list>
     for _, config in ipairs(configs) do
 <#list indexes as index>
-    <#if index.fields?size==1>
+    <#if !index.isSupportedLanguage("lua")>
+        <#continue>
+    <#elseif index.fields?size==1>
         _Config.load(${index.name}Configs, config, ${index.unique?c}, { "${index.fields[0].name}" }, { config.${index.fields[0].name} })
     <#elseif index.fields?size==2>
         _Config.load(${index.name}Configs, config, ${index.unique?c}, { "${index.fields[0].name}", "${index.fields[1].name}" }, { config.${index.fields[0].name}, config.${index.fields[1].name} })
@@ -58,7 +62,10 @@ function ${name}.getAll()
 end
 
 <#list indexes as index>
-   <#if index.unique && index.fields?size==1>
+    <#if !index.isSupportedLanguage("lua")>
+        <#continue>
+    </#if>
+    <#if index.unique && index.fields?size==1>
 ---
 ---获取所有${name}
 ---@return map<${index.fields[0].name}:${index.fields[0].type},${name}>

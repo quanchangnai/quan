@@ -182,7 +182,7 @@ public class DefinitionConfigLoader extends ConfigLoader {
         Set<ConfigDefinition> configDefinitions = new HashSet<>(parser.getTableConfigs().values());
 
         for (ConfigDefinition configDefinition : configDefinitions) {
-            if (!configDefinition.isSupportLanguage(language)) {
+            if (!configDefinition.isSupportedLanguage(language)) {
                 continue;
             }
             JSONArray rows = new JSONArray();
@@ -200,7 +200,7 @@ public class DefinitionConfigLoader extends ConfigLoader {
                         if (fieldDefinition == null) {
                             fieldDefinition = configDefinition.getField(fieldName.substring(0, fieldName.length() - 1));
                         }
-                        if (fieldDefinition.isSupportLanguage(language)) {
+                        if (fieldDefinition.isSupportedLanguage(language)) {
                             row.put(fieldName, fieldValue);
                         }
                     });

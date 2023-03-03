@@ -211,8 +211,38 @@ public class IndexDefinition extends Definition implements Cloneable {
                 continue;
             }
             indexNames.add(indexDefinition.getName());
+
+            for (String language : Language.names()) {
+                List<FieldDefinition> indexFields = indexDefinition.getFields();
+                if (indexFields.isEmpty()) {
+                    continue;
+                }
+
+                boolean allSupported = true;
+                boolean allUnsupported = true;
+                
+                for (FieldDefinition field : indexFields) {
+                    boolean supported = field.isSupportedLanguage(language);
+                    allSupported &= supported;
+                    allUnsupported &= !supported;
+                }
+
+                if (allSupported == allUnsupported) {
+                    indexDefinition.getOwnerDefinition().addValidatedError(indexDefinition.getOwnerDefinition().getValidatedName() + indexDefinition.getValidatedName() + "的字段支持的语言不一致");
+                    break;
+                }
+            }
+        }
+    }
+
+    public boolean isSupportedLanguage(String language) {
+        for (FieldDefinition field : getFields()) {
+            if (!field.isSupportedLanguage(language)) {
+                return false;
+            }
         }
 
+        return true;
     }
 
     private void validate() {
