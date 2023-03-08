@@ -3,7 +3,7 @@ package quan.generator.message;
 import quan.definition.BeanDefinition;
 import quan.definition.FieldDefinition;
 import quan.definition.Language;
-import quan.generator.CSharpUtils;
+import quan.generator.util.CSharpUtils;
 
 import java.util.Properties;
 

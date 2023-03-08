@@ -1,4 +1,4 @@
-package quan.generator;
+package quan.generator.util;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;

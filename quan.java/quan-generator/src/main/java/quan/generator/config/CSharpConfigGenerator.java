@@ -5,7 +5,7 @@ import quan.definition.ClassDefinition;
 import quan.definition.FieldDefinition;
 import quan.definition.Language;
 import quan.definition.config.ConfigDefinition;
-import quan.generator.CSharpUtils;
+import quan.generator.util.CSharpUtils;
 
 import java.util.Properties;
 
