@@ -20,7 +20,6 @@ import quan.util.FileUtils;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 
 /**
@@ -253,6 +252,7 @@ public abstract class Generator {
         if (!enable) {
             return;
         }
+
         checkOptions();
         parseDefinitions();
 
@@ -312,7 +312,6 @@ public abstract class Generator {
         File recordsFile = new File(recordsPath, getClass().getSimpleName() + ".json");
         try {
             if (!recordsPath.exists()) {
-                //noinspection ResultOfMethodCallIgnored
                 recordsPath.mkdirs();
             }
             JSON.writeJSONString(new FileWriter(recordsFile), newRecords);
@@ -327,7 +326,7 @@ public abstract class Generator {
     protected void putRecord(ClassDefinition classDefinition) {
         String fullName = classDefinition.getFullName(language());
         String version = classDefinition.getVersion();
-        if (oldRecords.remove(fullName)==null) {
+        if (oldRecords.remove(fullName) == null) {
             addClasses.add(fullName);
         }
         newRecords.put(fullName, version);
@@ -528,34 +527,51 @@ public abstract class Generator {
     }
 
     /**
-     * 指定生成器选项配置文件执行代码生成
+     * 执行代码生成
      *
-     * @param optionsFile 选项文件名为空时使用默认文件
+     * @param optionsFileName 选项文件名为空时使用默认文件
+     * @param extraOptions    附加的选项会覆盖选项文件里的选项
+     * @return 成功或失败，部分成功也会返回false
      */
-    public static void generate(String optionsFile) {
+    public static boolean generate(String optionsFileName, Properties extraOptions) {
         long startTime = System.currentTimeMillis();
-
-        if (StringUtils.isBlank(optionsFile)) {
-            optionsFile = "generator.properties";
-            logger.info("使用默认位置的生成器选项配置文件：{}\n", optionsFile);
-        }
-
         Properties options = new Properties();
-        try (InputStream inputStream = Files.newInputStream(Paths.get(optionsFile.trim()))) {
-            options.load(inputStream);
-        } catch (IOException e) {
-            logger.error("加载生成器选项配置文件[{}]出错", optionsFile, e);
-            return;
+
+        if (!StringUtils.isBlank(optionsFileName)) {
+            File optionsFile = new File(optionsFileName);
+            try (InputStream inputStream = Files.newInputStream(optionsFile.toPath())) {
+                options.load(inputStream);
+                logger.info("加载生成器选项配置文件成功：{}\n", optionsFile.getCanonicalPath());
+            } catch (IOException e) {
+                logger.error("加载生成器选项配置文件出错", e);
+                return false;
+            }
         }
 
-        generate(DataGenerator.class, options);
-        generate(MessageGenerator.class, options);
-        generate(ConfigGenerator.class, options);
+        if (extraOptions != null) {
+            options.putAll(extraOptions);
+        }
+
+        boolean success = generate(DataGenerator.class, options);
+        success &= generate(MessageGenerator.class, options);
+        success &= generate(ConfigGenerator.class, options);
 
         logger.info("生成完成，耗时{}s", (System.currentTimeMillis() - startTime) / 1000D);
+        return success;
     }
 
-    private static void generate(Class<? extends Generator> superClass, Properties options) {
+    public static void generate(Properties options) {
+        generate("", options);
+    }
+
+    public static void generate(String optionsFile) {
+        if (StringUtils.isBlank(optionsFile)) {
+            optionsFile = "generator.properties";
+        }
+        generate(optionsFile, null);
+    }
+
+    private static boolean generate(Class<? extends Generator> superClass, Properties options) {
         List<Generator> generators = new ArrayList<>();
 
         String definitionType = superClass == ConfigGenerator.class ? options.getProperty("config.definitionType") : "xml";
@@ -570,16 +586,47 @@ public abstract class Generator {
             }
         }
 
+        boolean success = true;
+
         for (int i = 0; i < generators.size(); i++) {
-            generators.get(i).generate(i == generators.size() - 1);
+            Generator generator = generators.get(i);
+            generator.generate(i == generators.size() - 1);
+            if (generator.getParser() != null) {
+                success &= generator.getParser().getValidatedErrors().isEmpty();
+            }
         }
+
+        return success;
     }
 
     public static void main(String[] args) {
-        if (args.length > 0) {
-            generate(args[0]);
-        } else {
-            generate("");
+        String optionsFile = "";
+        if (args.length > 0 && !args[0].startsWith("--")) {
+            optionsFile = args[0];
+        }
+
+        boolean exit1OnFail = false;
+        if (args.length > 1 && !args[1].startsWith("--")) {
+            exit1OnFail = Boolean.parseBoolean(args[1]);
+        }
+
+        Properties extraOptions = new Properties();
+        for (String arg : args) {
+            if (!arg.startsWith("--")) {
+                continue;
+            }
+            String option = arg.substring(2);
+            String optionKey = option;
+            String optionValue = "true";
+            if (option.contains("=")) {
+                optionKey = option.substring(0, option.indexOf("="));
+                optionValue = option.substring(option.indexOf("=") + 1);
+            }
+            extraOptions.put(optionKey, optionValue);
+        }
+
+        if (!generate(optionsFile, extraOptions) && exit1OnFail) {
+            System.exit(1);
         }
     }
 
