@@ -1,0 +1,39 @@
+@SuppressWarnings('UnstableApiUsage')
+@UntrackedTask(because = "为了保证每次发布时一定会复制所有jar包")
+class Dist extends Copy {
+
+    private String path = "${project.buildDir}/dist"
+
+    @Option(option = "path", description = "目标路径")
+    void setPath(String path) {
+        this.path = path
+    }
+
+    @Input
+    String getPath() {
+        return path
+    }
+
+    @Override
+    Task configure(Closure closure) {
+        dependsOn project.tasks.named("jar")
+        from project.configurations.runtimeClasspath
+        from "${project.buildDir}/libs"
+        into path
+        include "**/*.jar"
+        includeEmptyDirs false
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        return super.configure(closure)
+    }
+
+    @Override
+    @TaskAction
+    void copy() {
+        into path
+        project.file(path).deleteDir()
+        super.copy()
+    }
+
+}
+
+tasks.register('dist', Dist) {}
