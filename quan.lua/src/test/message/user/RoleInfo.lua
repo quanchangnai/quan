@@ -17,12 +17,14 @@ local RoleInfo = {
 local function onSet(self, key, value)
     assert(not RoleInfo[key], "不允许修改只读属性:" .. key)
 
+    local propTypeError = string.format("属性%s类型%s错误", key, type(value))
+
     if key == "id" then
-        assert(type(value) == "number", string.format("属性%s类型%s错误", key, type(value)))
+        assert(type(value) == "number", propTypeError)
     end
 
     if key == "name" then
-        assert(type(value) == "string", string.format("属性%s类型%s错误", key, type(value)))
+        assert(type(value) == "string", propTypeError)
     end
 
     rawset(self, key, value)

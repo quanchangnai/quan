@@ -19,80 +19,82 @@ local UserInfo = {
 local function onSet(self, key, value)
     assert(not UserInfo[key], "不允许修改只读属性:" .. key)
 
+    local propTypeError = string.format("属性%s类型%s错误", key, type(value))
+
     if key == "id" then
-        assert(type(value) == "number", string.format("属性%s类型%s错误", key, type(value)))
+        assert(type(value) == "number", propTypeError)
     end
 
     if key == "name" then
-        assert(type(value) == "string", string.format("属性%s类型%s错误", key, type(value)))
+        assert(type(value) == "string", propTypeError)
     end
 
     if key == "level" then
-        assert(type(value) == "number", string.format("属性%s类型%s错误", key, type(value)))
+        assert(type(value) == "number", propTypeError)
     end
 
     if key == "type" then
-        assert(type(value) == "number", string.format("属性%s类型%s错误", key, type(value)))
+        assert(type(value) == "number", propTypeError)
     end
 
     if key == "roleInfo1" then
-        assert(value == nil or type(value) == "table" and value.class == test_message_role_RoleInfo.class, string.format("属性%s类型%s错误", key, type(value)))
+        assert(value == nil or type(value) == "table" and value.class == test_message_role_RoleInfo.class, propTypeError)
     end
 
     if key == "roleInfo2" then
-        assert(type(value) == "table", string.format("属性%s类型%s错误", key, type(value)))
+        assert(type(value) == "table", propTypeError)
     end
 
     if key == "roleInfo3" then
-        assert(type(value) == "table", string.format("属性%s类型%s错误", key, type(value)))
+        assert(type(value) == "table", propTypeError)
     end
 
     if key == "roleList" then
-        assert(type(value) == "table", string.format("属性%s类型%s错误", key, type(value)))
+        assert(type(value) == "table", propTypeError)
     end
 
     if key == "roleSet" then
-        assert(type(value) == "table", string.format("属性%s类型%s错误", key, type(value)))
+        assert(type(value) == "table", propTypeError)
     end
 
     if key == "roleMap" then
-        assert(type(value) == "table", string.format("属性%s类型%s错误", key, type(value)))
+        assert(type(value) == "table", propTypeError)
     end
 
     if key == "f11" then
-        assert(type(value) == "string", string.format("属性%s类型%s错误", key, type(value)))
+        assert(type(value) == "string", propTypeError)
     end
 
     if key == "f12" then
-        assert(type(value) == "boolean", string.format("属性%s类型%s错误", key, type(value)))
+        assert(type(value) == "boolean", propTypeError)
     end
 
     if key == "f13" then
-        assert(type(value) == "boolean", string.format("属性%s类型%s错误", key, type(value)))
+        assert(type(value) == "boolean", propTypeError)
     end
 
     if key == "f14" then
-        assert(type(value) == "number", string.format("属性%s类型%s错误", key, type(value)))
+        assert(type(value) == "number", propTypeError)
     end
 
     if key == "f15" then
-        assert(type(value) == "number", string.format("属性%s类型%s错误", key, type(value)))
+        assert(type(value) == "number", propTypeError)
     end
 
     if key == "f16" then
-        assert(type(value) == "number", string.format("属性%s类型%s错误", key, type(value)))
+        assert(type(value) == "number", propTypeError)
     end
 
     if key == "f17" then
-        assert(type(value) == "number", string.format("属性%s类型%s错误", key, type(value)))
+        assert(type(value) == "number", propTypeError)
     end
 
     if key == "f18" then
-        assert(type(value) == "number", string.format("属性%s类型%s错误", key, type(value)))
+        assert(type(value) == "number", propTypeError)
     end
 
     if key == "alias" then
-        assert(type(value) == "string", string.format("属性%s类型%s错误", key, type(value)))
+        assert(type(value) == "string", propTypeError)
     end
 
     rawset(self, key, value)

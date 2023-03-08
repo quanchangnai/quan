@@ -21,32 +21,34 @@ local SRoleLogin = {
 local function onSet(self, key, value)
     assert(not SRoleLogin[key], "不允许修改只读属性:" .. key)
 
+    local propTypeError = string.format("属性%s类型%s错误", key, type(value))
+
     if key == "roleId" then
-        assert(type(value) == "number", string.format("属性%s类型%s错误", key, type(value)))
+        assert(type(value) == "number", propTypeError)
     end
 
     if key == "roleName" then
-        assert(type(value) == "string", string.format("属性%s类型%s错误", key, type(value)))
+        assert(type(value) == "string", propTypeError)
     end
 
     if key == "roleInfo" then
-        assert(type(value) == "table", string.format("属性%s类型%s错误", key, type(value)))
+        assert(type(value) == "table", propTypeError)
     end
 
     if key == "roleInfoList" then
-        assert(type(value) == "table", string.format("属性%s类型%s错误", key, type(value)))
+        assert(type(value) == "table", propTypeError)
     end
 
     if key == "roleInfoSet" then
-        assert(type(value) == "table", string.format("属性%s类型%s错误", key, type(value)))
+        assert(type(value) == "table", propTypeError)
     end
 
     if key == "roleInfoMap" then
-        assert(type(value) == "table", string.format("属性%s类型%s错误", key, type(value)))
+        assert(type(value) == "table", propTypeError)
     end
 
     if key == "userInfo" then
-        assert(value == nil or type(value) == "table" and value.class == UserInfo.class, string.format("属性%s类型%s错误", key, type(value)))
+        assert(value == nil or type(value) == "table" and value.class == UserInfo.class, propTypeError)
     end
 
     rawset(self, key, value)

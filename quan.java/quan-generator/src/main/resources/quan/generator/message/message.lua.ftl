@@ -28,24 +28,29 @@ local ${name} = {
 local function onSet(self, key, value)
     assert(not ${name}[key], "不允许修改只读属性:" .. key)
 
+<#if fields?size gt 0 >
+    local propTypeError = string.format("属性%s类型%s错误", key, type(value))
+</#if>
+
 <#list fields as field>
     if key == "${field.name}" then
+    <#if field.numberType || field.enumType>
+        assert(type(value) == "number", propTypeError)
+    <#elseif field.type == "bool">
+        assert(type(value) == "boolean", propTypeError)
+    <#elseif field.type == "string" || field.type == "bytes">
+        assert(type(value) == "string", propTypeError)
+    <#elseif field.collectionType || field.beanType && !field.optional>
+        assert(type(value) == "table", propTypeError)
+    <#else>
+        assert(<#if field.optional>value == nil or </#if>type(value) == "table" and value.class == ${field.classType?replace('.','_')}.class, propTypeError)
+    </#if>
     <#if field.min?? && field.max??>
         _Message.checkRange(value, ${field.min}, ${field.max});
     <#elseif field.min??>
         _Message.checkMin(value, ${field.min});
     <#elseif field.max??>
         _Message.checkMax(value, ${field.max});
-    <#elseif field.numberType || field.enumType>
-        assert(type(value) == "number", string.format("属性%s类型%s错误", key, type(value)))
-    <#elseif field.type == "bool">
-        assert(type(value) == "boolean", string.format("属性%s类型%s错误", key, type(value)))
-    <#elseif field.type == "string" || field.type == "bytes">
-        assert(type(value) == "string", string.format("属性%s类型%s错误", key, type(value)))
-    <#elseif field.collectionType || field.beanType && !field.optional>
-        assert(type(value) == "table", string.format("属性%s类型%s错误", key, type(value)))
-    <#else>
-        assert(<#if field.optional>value == nil or </#if>type(value) == "table" and value.class == ${field.classType?replace('.','_')}.class, string.format("属性%s类型%s错误", key, type(value)))
     </#if>
     end
 
