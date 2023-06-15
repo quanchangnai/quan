@@ -25,6 +25,10 @@ namespace Quan.Message
         {
         }
 
+        public virtual void Validate()
+        {
+        }
+
         public void WriteTag(CodedBuffer buffer, int tag)
         {
             buffer.WriteByte((byte)tag);
@@ -54,28 +58,32 @@ namespace Quan.Message
             }
         }
 
-        protected static void CheckRange(double value, double min, double max)
+        protected static double ValidateRange(double value, double min, double max, string name = "参数")
         {
             if (value < min || value > max)
-            {
-                throw new ArgumentException($"参数${value}不在范围(${min},${max})之中");
-            }
+                throw new ArgumentException($"{name}({value})不在范围({min},{max})之中");
+            return value;
         }
-        
-        protected static void CheckMin(double value, double min)
+
+        protected static double ValidateMin(double value, double min, string name = "参数")
         {
             if (value < min)
-            {
-                throw new ArgumentException($"参数${value}不能小于${min}");
-            }
+                throw new ArgumentException($"{name}({value})不能小于({min})");
+            return value;
         }
-        
-        protected static void CheckMax(double value,  double max)
+
+        protected static double ValidateMax(double value, double max, string name = "参数")
         {
-            if ( value > max)
-            {
-                throw new ArgumentException($"参数${value}不能大于${max}");
-            }
+            if (value > max)
+                throw new ArgumentException($"{name}({value})不能大于({max})");
+            return value;
+        }
+
+        protected static object ValidateNull(object value, string name = "参数")
+        {
+            if (value == null)
+                throw new ArgumentException($"{name}不能为空");
+            return value;
         }
     }
 }

@@ -59,13 +59,13 @@ namespace Test
         {
             Console.WriteLine("Test2====================");
 
-            var sRoleLogin1 = new SRoleLogin {roleId = 1111, roleName = "张三1111"};
+            var sRoleLogin1 = new SRoleLogin { roleId = 1111, roleName = "张三1111" };
 
-            var roleInfo1 = new RoleInfo {id = 111, name = "aaa", type = RoleType.type1};
+            var roleInfo1 = new RoleInfo { id = 111, name = "aaa", type = RoleType.type1, i = 5 };
 
             sRoleLogin1.roleInfo = roleInfo1;
 
-            var roleInfo2 = new RoleInfo {id = 222, name = "bbb", type = RoleType.type2};
+            var roleInfo2 = new RoleInfo { id = 222, name = "bbb", type = RoleType.type2, i = 10 };
             roleInfo2.set.Add(2213);
 
             sRoleLogin1.roleInfoList.Add(roleInfo2);
@@ -124,9 +124,9 @@ namespace Test
         {
             Console.WriteLine("Test4====================");
 
-            var sRoleLogin1 = new SRoleLogin {roleId = 1111, roleName = "张三1111"};
+            var sRoleLogin1 = new SRoleLogin { roleId = 1111, roleName = "张三1111" };
 
-            var roleInfo = new RoleInfo {id = 1312, name = "李四1123123"};
+            var roleInfo = new RoleInfo { id = 1312, name = "李四1123123" };
 
             sRoleLogin1.roleInfo = roleInfo;
 

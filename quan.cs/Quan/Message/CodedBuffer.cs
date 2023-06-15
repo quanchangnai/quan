@@ -135,12 +135,12 @@ namespace Quan.Message
 
         public short ReadShort()
         {
-            return (short) ReadVarInt(3);
+            return (short)ReadVarInt(3);
         }
 
         public int ReadInt()
         {
-            return (int) ReadVarInt(5);
+            return (int)ReadVarInt(5);
         }
 
         public long ReadLong()
@@ -175,7 +175,7 @@ namespace Quan.Message
                 return ReadFloat();
             }
 
-            return (float) (ReadInt() / Math.Pow(10, scale));
+            return (float)(ReadInt() / Math.Pow(10, scale));
         }
 
         public double ReadDouble()
@@ -270,11 +270,11 @@ namespace Quan.Message
             {
                 if ((n & ~0x7F) == 0)
                 {
-                    _bytes[_writeIndex++] = (byte) (n & 0x7F);
+                    _bytes[_writeIndex++] = (byte)(n & 0x7F);
                     return;
                 }
 
-                _bytes[_writeIndex++] = (byte) (n & 0x7F | 0x80);
+                _bytes[_writeIndex++] = (byte)(n & 0x7F | 0x80);
                 n = (n >> 7) & 0xFFFFFFFFFFFFFFFL;
             }
         }
@@ -308,7 +308,7 @@ namespace Quan.Message
 
             while (shift < 32)
             {
-                _bytes[_writeIndex++] = (byte) (temp >> shift & 0xFF);
+                _bytes[_writeIndex++] = (byte)(temp >> shift & 0xFF);
                 shift += 8;
             }
         }
@@ -321,7 +321,7 @@ namespace Quan.Message
             }
             else
             {
-                WriteLong(CheckScale(n, scale));
+                WriteLong(ValidateScale(n, scale));
             }
         }
 
@@ -334,23 +334,23 @@ namespace Quan.Message
 
             while (shift < 64)
             {
-                _bytes[_writeIndex++] = (byte) (temp >> shift & 0xFF);
+                _bytes[_writeIndex++] = (byte)(temp >> shift & 0xFF);
                 shift += 8;
             }
         }
 
-        public static int CheckScale(double n, int scale)
+        public static int ValidateScale(double n, int scale, string name = "参数")
         {
             var times = Math.Pow(10, scale);
             var minValue = int.MinValue * times;
             var maxValue = int.MaxValue * times;
+
             if (n < minValue || n > maxValue)
             {
-                var error = $"参数[{n}]超出了限定范围[{minValue},{maxValue}],无法转换为指定精度[{scale}]的定点型数据";
-                throw new ArgumentException(error);
+                throw new ArgumentException($"{name}({n})超出了限定范围({minValue},{maxValue}),无法转换为指定精度({scale})的定点型数据");
             }
 
-            return (int) Math.Floor(n * times);
+            return (int)Math.Floor(n * times);
         }
 
         public void WriteDouble(double n, int scale)
@@ -361,7 +361,7 @@ namespace Quan.Message
             }
             else
             {
-                WriteLong(CheckScale(n, scale));
+                WriteLong(ValidateScale(n, scale));
             }
         }
 
@@ -390,7 +390,7 @@ namespace Quan.Message
         {
             WriteBytes(System.Text.Encoding.UTF8.GetBytes(s));
         }
-        
+
         public void WriteByte(byte b)
         {
             _bytes[_writeIndex++] = b;
@@ -403,7 +403,7 @@ namespace Quan.Message
 
         public void WriteTag(int tag)
         {
-            WriteByte((byte) tag) ;
+            WriteByte((byte)tag);
         }
 
         public int ReadTag()

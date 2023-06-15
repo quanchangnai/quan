@@ -31,6 +31,8 @@ namespace Test.Message.User
         {
             base.Encode(buffer);
 
+            Validate();
+
             buffer.WriteInt(id);
             buffer.WriteString(name);
         }
@@ -41,6 +43,15 @@ namespace Test.Message.User
 
             id = buffer.ReadInt();
             name = buffer.ReadString();
+
+            Validate();
+        }
+
+        public override void Validate()
+        {
+            base.Validate();
+
+            ValidateNull(name, "字段[name]");
         }
 
         public override string ToString()
