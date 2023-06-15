@@ -28,7 +28,9 @@ public class RoleInfo extends Bean {
 
     private double d;
 
-    private byte[] data = new byte[0];
+    private byte[] bb1 = new byte[0];
+
+    private byte[] bb2;
 
     private final List<Integer> list = new ArrayList<>();
 
@@ -63,7 +65,7 @@ public class RoleInfo extends Bean {
      * 角色名
      */
     public RoleInfo setName(String name) {
-        Objects.requireNonNull(name);
+        Objects.requireNonNull(name,"参数[name]不能为空");
         this.name = name;
         return this;
     }
@@ -109,7 +111,7 @@ public class RoleInfo extends Bean {
     }
 
     public RoleInfo setI(int i) {
-        NumberUtils.checkRange(i, 1, 20);
+        NumberUtils.validateRange(i, 1, 20, "参数[i]");
         this.i = i;
         return this;
     }
@@ -123,13 +125,22 @@ public class RoleInfo extends Bean {
         return this;
     }
 
-    public byte[] getData() {
-        return data;
+    public byte[] getBb1() {
+        return bb1;
     }
 
-    public RoleInfo setData(byte[] data) {
-        Objects.requireNonNull(data);
-        this.data = data;
+    public RoleInfo setBb1(byte[] bb1) {
+        Objects.requireNonNull(bb1,"参数[bb1]不能为空");
+        this.bb1 = bb1;
+        return this;
+    }
+
+    public byte[] getBb2() {
+        return bb2;
+    }
+
+    public RoleInfo setBb2(byte[] bb2) {
+        this.bb2 = bb2;
         return this;
     }
 
@@ -148,16 +159,28 @@ public class RoleInfo extends Bean {
     @Override
     public void encode(CodedBuffer buffer) {
         super.encode(buffer);
+        
+        validate();
 
         buffer.writeInt(this.id);
         buffer.writeString(this.name);
-        buffer.writeString(this.alias);
+
+        buffer.writeBool(this.alias != null);
+        if (this.alias != null) {
+            buffer.writeString(this.alias);
+        }
+
         buffer.writeInt(this.type == null ? 0 : this.type.value);
         buffer.writeBool(this.b);
         buffer.writeShort(this.s);
         buffer.writeInt(this.i);
         buffer.writeDouble(this.d);
-        buffer.writeBytes(this.data);
+        buffer.writeBytes(this.bb1);
+
+        buffer.writeBool(this.bb2 != null);
+        if (this.bb2 != null) {
+            buffer.writeBytes(this.bb2);
+        }
 
         buffer.writeInt(this.list.size());
         for (Integer list$Value : this.list) {
@@ -174,15 +197,23 @@ public class RoleInfo extends Bean {
     public void decode(CodedBuffer buffer) {
         super.decode(buffer);
 
-        setId(buffer.readInt());
+        this.id = buffer.readInt();
         this.name = buffer.readString();
-        this.alias = buffer.readString();
+
+        if (buffer.readBool()) {
+           this.alias = buffer.readString();
+        }
+
         this.type = RoleType.valueOf(buffer.readInt());
         this.b = buffer.readBool();
-        setS(buffer.readShort());
-        setI(buffer.readInt());
-        setD(buffer.readDouble());
-        this.data = buffer.readBytes();
+        this.s = buffer.readShort();
+        this.i = buffer.readInt();
+        this.d = buffer.readDouble();
+        this.bb1 = buffer.readBytes();
+
+        if (buffer.readBool()) {
+           this.bb2 = buffer.readBytes();
+        }
 
         int list$Size = buffer.readInt();
         for (int i = 0; i < list$Size; i++) {
@@ -193,6 +224,17 @@ public class RoleInfo extends Bean {
         for (int i = 0; i < set$Size; i++) {
             this.set.add(buffer.readInt());
         }
+
+        validate();
+    }
+
+    @Override
+    public void validate() {
+        super.validate();
+
+        Objects.requireNonNull(name, "字段[name]不能为空");
+        NumberUtils.validateRange(i, 1, 20, "字段[i]");
+        Objects.requireNonNull(bb1, "字段[bb1]不能为空");
     }
 
     @Override
@@ -206,7 +248,8 @@ public class RoleInfo extends Bean {
                 ",s=" + s +
                 ",i=" + i +
                 ",d=" + d +
-                ",data=" + Arrays.toString(data) +
+                ",bb1=" + Arrays.toString(bb1) +
+                ",bb2=" + Arrays.toString(bb2) +
                 ",list=" + list +
                 ",set=" + set +
                 ",map=" + map +

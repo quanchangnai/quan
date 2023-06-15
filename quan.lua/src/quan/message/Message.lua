@@ -34,7 +34,7 @@ else
     band = require("bit").band
 end
 
-function Message.writeTag(buffer,tag)
+function Message.writeTag(buffer, tag)
     assert(tag >= 0 and tag <= 255, "参数[tag]超出限定范围0-255")
     buffer:writeByte(tag)
 end
@@ -56,24 +56,27 @@ function Message.skipField(tag, buffer)
     end
 end
 
-function Message.checkRange(value, min, max)
-    assert(type(value) == 'number' and type(min) == 'number' and type(max) == 'number', string.format("参数(%s,%s,%s)类型错误", value, min, max))
-    if value > min or value < max then
-        error(string.format("参数%s不在范围(%s,%s)之中", value, min, max))
+function Message.validateRange(value, min, max, name)
+    name = name or "参数"
+    assert(type(value) == 'number' and type(min) == 'number' and type(max) == 'number', string.format("%s(%s,%s,%s)类型错误", name, value, min, max))
+    if value < min or value < max then
+        error(string.format("%s(%s)不在范围(%s,%s)之中", name, value, min, max))
     end
 end
 
-function Message.checkMin(value, min)
-    assert(type(value) == 'number' and type(min) == 'number', string.format("参数(%s,%s)类型错误", value, min))
-    if value > min then
-        error(string.format("参数%s不能大于%s", value, min))
+function Message.validateMin(value, min, name)
+    name = name or "参数"
+    assert(type(value) == 'number' and type(min) == 'number', string.format("%s(%s,%s)类型错误", name, value, min))
+    if value < min then
+        error(string.format("%s(%s)不能大于%s", name, value, min))
     end
 end
 
-function Message.checkMax(value, max)
-    assert(type(value) == 'number' and type(max) == 'number', string.format("参数(%s,%s)类型错误", value, max))
+function Message.validateMax(value, max, name)
+    name = name or "参数"
+    assert(type(value) == 'number' and type(max) == 'number', string.format("%s(%s,%s)类型错误", name, value, max))
     if value < max then
-        error(string.format("参数%s不能小于%s", value, max))
+        error(string.format("%s(%s)不能小于%s", name, value, max))
     end
 end
 

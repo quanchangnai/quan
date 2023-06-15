@@ -49,7 +49,7 @@ public class RoleInfo extends Bean {
      * 角色名
      */
     public RoleInfo setName(String name) {
-        Objects.requireNonNull(name);
+        Objects.requireNonNull(name,"参数[name]不能为空");
         this.name = name;
         return this;
     }
@@ -57,6 +57,8 @@ public class RoleInfo extends Bean {
     @Override
     public void encode(CodedBuffer buffer) {
         super.encode(buffer);
+        
+        validate();
 
         buffer.writeInt(this.id);
         buffer.writeString(this.name);
@@ -66,8 +68,17 @@ public class RoleInfo extends Bean {
     public void decode(CodedBuffer buffer) {
         super.decode(buffer);
 
-        setId(buffer.readInt());
+        this.id = buffer.readInt();
         this.name = buffer.readString();
+
+        validate();
+    }
+
+    @Override
+    public void validate() {
+        super.validate();
+
+        Objects.requireNonNull(name, "字段[name]不能为空");
     }
 
     @Override

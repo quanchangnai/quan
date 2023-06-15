@@ -21,6 +21,10 @@ public abstract class Bean {
     public void decode(CodedBuffer buffer) {
     }
 
+    public void validate() {
+
+    }
+
     protected static void writeTag(CodedBuffer buffer, int tag) {
         buffer.writeByte((byte) tag);
     }

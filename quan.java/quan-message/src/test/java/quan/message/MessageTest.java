@@ -92,6 +92,7 @@ public class MessageTest {
         roleInfo1.setId(111);
         roleInfo1.setName("aaa");
         roleInfo1.setType(RoleType.type1);
+        roleInfo1.setI(5);
 
         sRoleLogin1.setRoleInfo(roleInfo1);
 
@@ -100,6 +101,7 @@ public class MessageTest {
         roleInfo2.setName("暗访方式的法人");
         roleInfo2.setType(RoleType.type2);
         roleInfo2.getSet().add(2213);
+        roleInfo2.setI(10);
 
         sRoleLogin1.getRoleInfoList().add(roleInfo2);
         sRoleLogin1.getRoleInfoList().add(roleInfo2);
@@ -126,10 +128,10 @@ public class MessageTest {
 
         byte[] encodedBytes = sRoleLogin1.encode();
 
-        FileOutputStream fileOutputStream = new FileOutputStream(new File("D:\\SRoleLogin"));
+        FileOutputStream fileOutputStream = new FileOutputStream("D:\\SRoleLogin");
         fileOutputStream.write(encodedBytes);
 
-        FileInputStream fileInputStream = new FileInputStream(new File("D:\\SRoleLogin"));
+        FileInputStream fileInputStream = new FileInputStream("D:\\SRoleLogin");
         encodedBytes = new byte[fileInputStream.available()];
         fileInputStream.read(encodedBytes);
 

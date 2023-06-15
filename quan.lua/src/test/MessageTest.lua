@@ -73,9 +73,10 @@ local function testMessage1()
     local roleInfo = RoleInfo.new()
     roleInfo.id = 111
     roleInfo.type = RoleType.type2
+    roleInfo.i = 5
     sRoleLogin1.roleInfo = roleInfo
 
-    local roleInfo2 = RoleInfo.new({ id = 222, name = "bbb", type = RoleType.type2, set = { 2233 } })
+    local roleInfo2 = RoleInfo.new({ id = 222, name = "bbb", type = RoleType.type2, set = { 2233 }, i = 10 })
 
     local roleInfoBuffer = roleInfo2:encode()
     local roleInfo3 = RoleInfo.decode(roleInfoBuffer)
@@ -108,13 +109,13 @@ local function testMessage1()
 
     local file1 = io.open("D:\\SRoleLogin", "r")
     local bytes = file1:read("*a")
-    print("bytes length",#bytes)
+    print("bytes length", #bytes)
     local buffer = CodedBuffer.new(bytes);
     local sRoleLogin3 = SRoleLogin.decode(buffer)
-    print("buffer:readableCount()",buffer:readableCount())
+    print("buffer:readableCount()", buffer:readableCount())
 
     local buffer = SRoleLogin.encode(sRoleLogin3)
-    print("buffer:size()",buffer:size())
+    print("buffer:size()", buffer:size())
     local file2 = io.open("D:\\SRoleLogin", "w")
     file2:write(buffer.bytes)
     file2:flush()

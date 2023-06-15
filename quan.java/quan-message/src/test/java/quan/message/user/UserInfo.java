@@ -84,7 +84,7 @@ public class UserInfo extends Bean {
      * 名字
      */
     public UserInfo setName(String name) {
-        Objects.requireNonNull(name);
+        Objects.requireNonNull(name,"参数[name]不能为空");
         this.name = name;
         return this;
     }
@@ -145,7 +145,7 @@ public class UserInfo extends Bean {
      * 角色信息2
      */
     public UserInfo setRoleInfo2(RoleInfo roleInfo2) {
-        Objects.requireNonNull(roleInfo2);
+        Objects.requireNonNull(roleInfo2,"参数[roleInfo2]不能为空");
         this.roleInfo2 = roleInfo2;
         return this;
     }
@@ -161,7 +161,7 @@ public class UserInfo extends Bean {
      * 角色信息2
      */
     public UserInfo setRoleInfo3(RoleInfo roleInfo3) {
-        Objects.requireNonNull(roleInfo3);
+        Objects.requireNonNull(roleInfo3,"参数[roleInfo3]不能为空");
         this.roleInfo3 = roleInfo3;
         return this;
     }
@@ -192,7 +192,7 @@ public class UserInfo extends Bean {
     }
 
     public UserInfo setF11(byte[] f11) {
-        Objects.requireNonNull(f11);
+        Objects.requireNonNull(f11,"参数[f11]不能为空");
         this.f11 = f11;
         return this;
     }
@@ -238,7 +238,7 @@ public class UserInfo extends Bean {
     }
 
     public UserInfo setF16(float f16) {
-        CodedBuffer.checkScale(f16, 2);
+        CodedBuffer.validateScale(f16, 2);
         this.f16 = f16;
         return this;
     }
@@ -257,7 +257,7 @@ public class UserInfo extends Bean {
     }
 
     public UserInfo setF18(double f18) {
-        CodedBuffer.checkScale(f18, 2);
+        CodedBuffer.validateScale(f18, 2);
         this.f18 = f18;
         return this;
     }
@@ -274,6 +274,8 @@ public class UserInfo extends Bean {
     @Override
     public void encode(CodedBuffer buffer) {
         super.encode(buffer);
+        
+        validate();
 
         if (this.id != 0) {
             writeTag(buffer, 4);
@@ -392,13 +394,13 @@ public class UserInfo extends Bean {
         for (int tag = readTag(buffer); tag != 0; tag = readTag(buffer)) {
             switch (tag) {
                 case 4:
-                    setId(buffer.readInt());
+                    this.id = buffer.readInt();
                     break;
                 case 11:
                     this.name = buffer.readString();
                     break;
                 case 12:
-                    setLevel(buffer.readInt());
+                    this.level = buffer.readInt();
                     break;
                 case 16:
                     this.type = UserType.valueOf(buffer.readInt());
@@ -456,19 +458,19 @@ public class UserInfo extends Bean {
                     this.f13 = buffer.readBool();
                     break;
                 case 56:
-                    setF14(buffer.readShort());
+                    this.f14 = buffer.readShort();
                     break;
                 case 61:
-                    setF15(buffer.readFloat());
+                    this.f15 = buffer.readFloat();
                     break;
                 case 64:
-                    setF16(buffer.readFloat(2));
+                    this.f16 = buffer.readFloat(2);
                     break;
                 case 70:
-                    setF17(buffer.readDouble());
+                    this.f17 = buffer.readDouble();
                     break;
                 case 72:
-                    setF18(buffer.readDouble(2));
+                    this.f18 = buffer.readDouble(2);
                     break;
                 case 79:
                     this.alias = buffer.readString();
@@ -477,6 +479,20 @@ public class UserInfo extends Bean {
                     skipField(tag, buffer);
             }
         }
+
+        validate();
+    }
+
+    @Override
+    public void validate() {
+        super.validate();
+
+        Objects.requireNonNull(name, "字段[name]不能为空");
+        Objects.requireNonNull(roleInfo2, "字段[roleInfo2]不能为空");
+        Objects.requireNonNull(roleInfo3, "字段[roleInfo3]不能为空");
+        Objects.requireNonNull(f11, "字段[f11]不能为空");
+        CodedBuffer.validateScale(f16, 2, "字段[f16]");
+        CodedBuffer.validateScale(f18, 2, "字段[f18]");
     }
 
     @Override

@@ -74,6 +74,8 @@ namespace Test.Message.Role
         {
             base.Encode(buffer);
 
+            Validate();
+
             buffer.WriteInt(roleId);
             buffer.WriteString(roleName);
             roleInfo.Encode(buffer);
@@ -98,7 +100,10 @@ namespace Test.Message.Role
             }
 
             buffer.WriteBool(userInfo != null);
-            userInfo?.Encode(buffer);
+            if (userInfo != null) 
+            {
+                userInfo.Encode(buffer);
+            }
         }
 
         public override void Decode(CodedBuffer buffer)
@@ -139,6 +144,16 @@ namespace Test.Message.Role
                 userInfo = userInfo ?? new UserInfo();
                 userInfo.Decode(buffer);
             }
+
+            Validate();
+        }
+
+        public override void Validate()
+        {
+            base.Validate();
+
+            ValidateNull(roleName, "字段[roleName]");
+            ValidateNull(roleInfo, "字段[roleInfo]");
         }
 
         public override string ToString()

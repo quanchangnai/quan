@@ -38,11 +38,11 @@ namespace ${getFullPackageName("cs")}
         </#if>
         public ${field.basicType}<${field.keyClassType}, ${field.valueClassType}> ${field.name} { get; } = new ${field.classType}<${field.keyClassType}, ${field.valueClassType}>();
 
-    <#elseif field.type == "string" || field.type == "bytes">
+    <#elseif (field.type == "string" || field.type == "bytes") && !field.optional>
         <#if field.type == "string">
-        private string _${field.name}<#if !field.optional> = ""</#if>;
+        private string _${field.name} = "";
         <#else>
-        private byte[] _${field.name}<#if !field.optional> = ${Array}.Empty<byte>()</#if>;
+        private byte[] _${field.name} = ${Array}.Empty<byte>();
         </#if>
 
         <#if field.comment !="">
@@ -70,14 +70,14 @@ namespace ${getFullPackageName("cs")}
             set
             {
             <#if field.min?? && field.max??>
-                CheckRange(value, ${field.min}, ${field.max});
+                ValidateRange(value, ${field.min}, ${field.max});
             <#elseif field.min??>
-                CheckMin(value, ${field.min});
+                ValidateMin(value, ${field.min});
             <#elseif field.max??>
-                CheckMax(value, ${field.max});
+                ValidateMax(value, ${field.max});
             </#if>
             <#if field.scale gt 0>
-                ${CodedBuffer}.CheckScale(value, ${field.scale});
+                ${CodedBuffer}.ValidateScale(value, ${field.scale});
             </#if>
                 _${field.name} = value;
             }
@@ -126,6 +126,8 @@ namespace ${getFullPackageName("cs")}
         public override void Encode(${CodedBuffer} buffer)
         {
             base.Encode(buffer);
+
+            Validate();
 
 <#list fields as field>
      <#if field.ignore>
@@ -189,7 +191,11 @@ namespace ${getFullPackageName("cs")}
                 buffer.Write${field.type?cap_first}(${thisField1});
             }
         <#elseif field.type=="string">
+            <#if field.optional>
+            if (${thisField1} != null)
+            <#else>
             if (${thisField1}.Length > 0)
+            </#if>
             {
                 WriteTag(buffer, ${field.tag});
                 buffer.Write${field.type?cap_first}(${thisField1});
@@ -257,7 +263,7 @@ namespace ${getFullPackageName("cs")}
             </#if>
         <#elseif field.type=="float"||field.type=="double">
             buffer.Write${field.type?cap_first}(${thisField1}<#if field.scale gt 0>, ${field.scale}</#if>);
-        <#elseif field.builtinType>
+        <#elseif field.builtinType && !field.optional>
             buffer.Write${field.type?cap_first}(${thisField1});
         <#elseif field.enumType>
             buffer.WriteInt((int) ${thisField1});
@@ -266,7 +272,14 @@ namespace ${getFullPackageName("cs")}
 
             </#if>
             buffer.WriteBool(${thisField1} != null);
-            ${thisField1}?.Encode(buffer);
+            if (${thisField1} != null) 
+            {
+                <#if field.type=="string" || field.type=="bytes">
+                buffer.Write${field.type?cap_first}(${thisField1});
+                <#else>
+                ${thisField1}.Encode(buffer);
+                </#if>
+            }
             <#if field?has_next && !fields[field?index+1].collectionType && (fields[field?index+1].primitiveType || !fields[field?index+1].optional) >
 
             </#if>
@@ -400,7 +413,7 @@ namespace ${getFullPackageName("cs")}
         </#if>
     <#elseif field.type=="float"||field.type=="double">
             ${thisField1} = buffer.Read${field.type?cap_first}(<#if field.scale gt 0>${field.scale}</#if>);
-    <#elseif field.builtinType>
+    <#elseif field.builtinType && !field.optional>
             ${thisField1} = buffer.Read${field.type?cap_first}();
     <#elseif field.enumType>
             ${thisField1} = (${field.type}) buffer.ReadInt();
@@ -410,8 +423,12 @@ namespace ${getFullPackageName("cs")}
         </#if>
             if (buffer.ReadBool()) 
             {
+                <#if field.type=="string" || field.type=="bytes">
+                ${thisField1} = buffer.Read${field.type?cap_first}();
+                <#else>
                 ${thisField1} = ${thisField1} ?? new ${field.classType}();
                 ${thisField1}.Decode(buffer);
+                </#if>
             }
         <#if field?has_next && !fields[field?index+1].collectionType && (fields[field?index+1].primitiveType || !fields[field?index+1].optional) >
 
@@ -421,6 +438,27 @@ namespace ${getFullPackageName("cs")}
     </#if>
 </#list>
 </#if>
+
+            Validate();
+        }
+
+        public override void Validate()
+        {
+            base.Validate();
+
+        <#list fields as field>
+            <#if field.min?? && field.max??>
+            ValidateRange(${field.name}, ${field.min}, ${field.max}, "字段[${field.name}]");
+            <#elseif field.min??>
+            ValidateMin(${field.name}, ${field.min}, "字段[${field.name}]");
+            <#elseif field.max??>
+            ValidateMax(${field.name}, ${field.max}, "字段[${field.name}]");
+            <#elseif field.scale gt 0>
+            ${CodedBuffer}.ValidateScale(${field.name}, ${field.scale}, "字段[${field.name}]");
+            <#elseif (field.type == "string" || field.type == "bytes" || field.beanType) && !field.optional>
+            ValidateNull(${field.name}, "字段[${field.name}]");
+            </#if>
+         </#list>
         }
 
         public override string ToString()

@@ -27,13 +27,7 @@ namespace Test.Message.Role
             set => _name = value ?? throw new NullReferenceException();
         }
 
-        private string _alias;
-
-        public string alias
-        {
-            get => _alias;
-            set => _alias = value;
-        }
+        public string alias { get; set; }
 
         public RoleType type { get; set; }
 
@@ -48,20 +42,22 @@ namespace Test.Message.Role
             get => _i;
             set
             {
-                CheckRange(value, 1, 20);
+                ValidateRange(value, 1, 20);
                 _i = value;
             }
         }
 
         public double d { get; set; }
 
-        private byte[] _data = Array.Empty<byte>();
+        private byte[] _bb1 = Array.Empty<byte>();
 
-        public byte[] data
+        public byte[] bb1
         {
-            get => _data;
-            set => _data = value ?? throw new NullReferenceException();
+            get => _bb1;
+            set => _bb1 = value ?? throw new NullReferenceException();
         }
+
+        public byte[] bb2 { get; set; }
 
         public List<int> list { get; } = new List<int>();
 
@@ -74,15 +70,29 @@ namespace Test.Message.Role
         {
             base.Encode(buffer);
 
+            Validate();
+
             buffer.WriteInt(id);
             buffer.WriteString(name);
-            buffer.WriteString(alias);
+
+            buffer.WriteBool(alias != null);
+            if (alias != null) 
+            {
+                buffer.WriteString(alias);
+            }
+
             buffer.WriteInt((int) type);
             buffer.WriteBool(b);
             buffer.WriteShort(s);
             buffer.WriteInt(i);
             buffer.WriteDouble(d);
-            buffer.WriteBytes(data);
+            buffer.WriteBytes(bb1);
+
+            buffer.WriteBool(bb2 != null);
+            if (bb2 != null) 
+            {
+                buffer.WriteBytes(bb2);
+            }
 
             buffer.WriteInt(list.Count);
             foreach (var listValue in list)
@@ -103,13 +113,23 @@ namespace Test.Message.Role
 
             id = buffer.ReadInt();
             name = buffer.ReadString();
-            alias = buffer.ReadString();
+
+            if (buffer.ReadBool()) 
+            {
+                alias = buffer.ReadString();
+            }
+
             type = (RoleType) buffer.ReadInt();
             b = buffer.ReadBool();
             s = buffer.ReadShort();
             i = buffer.ReadInt();
             d = buffer.ReadDouble();
-            data = buffer.ReadBytes();
+            bb1 = buffer.ReadBytes();
+
+            if (buffer.ReadBool()) 
+            {
+                bb2 = buffer.ReadBytes();
+            }
 
             var list_Size = buffer.ReadInt();
             for (var i = 0; i < list_Size; i++)
@@ -122,6 +142,17 @@ namespace Test.Message.Role
             {
                 set.Add(buffer.ReadInt());
             }
+
+            Validate();
+        }
+
+        public override void Validate()
+        {
+            base.Validate();
+
+            ValidateNull(name, "字段[name]");
+            ValidateRange(i, 1, 20, "字段[i]");
+            ValidateNull(bb1, "字段[bb1]");
         }
 
         public override string ToString()
@@ -135,7 +166,8 @@ namespace Test.Message.Role
                    ",s=" + s.ToString2() +
                    ",i=" + i.ToString2() +
                    ",d=" + d.ToString2() +
-                   ",data=" + data.ToString2() +
+                   ",bb1=" + bb1.ToString2() +
+                   ",bb2=" + bb2.ToString2() +
                    ",list=" + list.ToString2() +
                    ",set=" + set.ToString2() +
                    ",map=" + map.ToString2() +

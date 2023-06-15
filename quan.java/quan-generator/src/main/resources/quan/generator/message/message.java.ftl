@@ -110,16 +110,16 @@ public class ${name} extends <#if kind ==2>${Bean}<#else>${Message}</#if> {
     </#if>
     public ${name} set${field.name?cap_first}(${field.basicType} ${field.name}) {
         <#if (field.type=="float"||field.type=="double") && field.scale gt 0>
-        ${CodedBuffer}.checkScale(${field.name}, ${field.scale});
+        ${CodedBuffer}.validateScale(${field.name}, ${field.scale});
         </#if>
         <#if field.min?? && field.max??>
-        ${NumberUtils}.checkRange(${field.name}, ${field.min}, ${field.max});
+        ${NumberUtils}.validateRange(${field.name}, ${field.min}, ${field.max}, "参数[${field.name}]");
         <#elseif field.min??>
-        ${NumberUtils}.checkMin(${field.name}, ${field.min});
+        ${NumberUtils}.validateMin(${field.name}, ${field.min}, "参数[${field.name}]");
         <#elseif field.max??>
-        ${NumberUtils}.checkMax(${field.name}, ${field.max});
+        ${NumberUtils}.validateMax(${field.name}, ${field.max}, "参数[${field.name}]");
         <#elseif (field.type == "string" || field.type == "bytes" || field.beanType) && !field.optional>
-        ${Objects}.requireNonNull(${field.name});
+        ${Objects}.requireNonNull(${field.name},"参数[${field.name}]不能为空");
         </#if>
         this.${field.name} = ${field.name};
         return this;
@@ -137,6 +137,8 @@ public class ${name} extends <#if kind ==2>${Bean}<#else>${Message}</#if> {
     @${Override}
     public void encode(${CodedBuffer} buffer) {
         super.encode(buffer);
+        
+        validate();
 
 <#list fields as field>
     <#if field.ignore>
@@ -252,9 +254,9 @@ public class ${name} extends <#if kind ==2>${Bean}<#else>${Message}</#if> {
             <#if field?has_next && !fields[field?index+1].collectionType && (fields[field?index+1].primitiveType|| fields[field?index+1].enumType || !fields[field?index+1].optional) >
 
             </#if>
-        <#elseif field.type=="float"||field.type=="double">
+        <#elseif field.type=="float" || field.type=="double">
         buffer.write${field.type?cap_first}(this.${field.name}<#if field.scale gt 0>, ${field.scale}</#if>);
-        <#elseif field.builtinType>
+        <#elseif field.builtinType && !field.optional>
         buffer.write${field.type?cap_first}(this.${field.name});
         <#elseif field.enumType>
         buffer.writeInt(this.${field.name} == null ? 0 : this.${field.name}.value);
@@ -264,7 +266,11 @@ public class ${name} extends <#if kind ==2>${Bean}<#else>${Message}</#if> {
             </#if>
         buffer.writeBool(this.${field.name} != null);
         if (this.${field.name} != null) {
+            <#if field.type=="string" || field.type=="bytes">
+            buffer.write${field.type?cap_first}(this.${field.name});
+            <#else>
             this.${field.name}.encode(buffer);
+            </#if>
         }
             <#if field?has_next && !fields[field?index+1].collectionType && (fields[field?index+1].primitiveType || fields[field?index+1].enumType || !fields[field?index+1].optional) >
 
@@ -315,9 +321,9 @@ public class ${name} extends <#if kind ==2>${Bean}<#else>${Message}</#if> {
                     </#if>
                     }
                 <#elseif field.type=="float"||field.type=="double">
-                    set${field.name?cap_first}(buffer.read${field.type?cap_first}(<#if field.scale gt 0>${field.scale}</#if>));
+                    this.${field.name} = buffer.read${field.type?cap_first}(<#if field.scale gt 0>${field.scale}</#if>);
                 <#elseif field.numberType>
-                    set${field.name?cap_first}(buffer.read${field.type?cap_first}());
+                    this.${field.name} = buffer.read${field.type?cap_first}();
                 <#elseif field.builtinType>
                     this.${field.name} = buffer.read${field.type?cap_first}();
                 <#elseif field.enumType>
@@ -378,10 +384,10 @@ public class ${name} extends <#if kind ==2>${Bean}<#else>${Message}</#if> {
 
         </#if>
     <#elseif field.type=="float"||field.type=="double">
-        set${field.name?cap_first}(buffer.read${field.type?cap_first}(<#if field.scale gt 0>${field.scale}</#if>));
+        this.${field.name} = buffer.read${field.type?cap_first}(<#if field.scale gt 0>${field.scale}</#if>);
     <#elseif field.numberType>
-        set${field.name?cap_first}(buffer.read${field.type?cap_first}());
-    <#elseif field.builtinType>
+        this.${field.name} = buffer.read${field.type?cap_first}();
+    <#elseif field.builtinType && !field.optional>
         this.${field.name} = buffer.read${field.type?cap_first}();
     <#elseif field.enumType>
         this.${field.name} = ${field.type}.valueOf(buffer.readInt());
@@ -390,10 +396,14 @@ public class ${name} extends <#if kind ==2>${Bean}<#else>${Message}</#if> {
 
         </#if>
         if (buffer.readBool()) {
+        <#if field.type=="string" || field.type=="bytes">
+           this.${field.name} = buffer.read${field.type?cap_first}();
+        <#else>
             if (this.${field.name} == null) {
                 this.${field.name} = new ${field.classType}();
             }
             this.${field.name}.decode(buffer);
+        </#if>
         }
         <#if field?has_next && !fields[field?index+1].collectionType && (fields[field?index+1].primitiveType|| fields[field?index+1].enumType || !fields[field?index+1].optional) >
 
@@ -403,6 +413,28 @@ public class ${name} extends <#if kind ==2>${Bean}<#else>${Message}</#if> {
     </#if>
 </#list>
 </#if>
+
+        validate();
+    }
+
+    @Override
+    public void validate() {
+        super.validate();
+
+        <#list fields as field>
+            <#if (field.type=="float"||field.type=="double") && field.scale gt 0>
+        ${CodedBuffer}.validateScale(${field.name}, ${field.scale}, "字段[${field.name}]");
+            </#if>
+            <#if field.min?? && field.max??>
+        ${NumberUtils}.validateRange(${field.name}, ${field.min}, ${field.max}, "字段[${field.name}]");
+            <#elseif field.min??>
+        ${NumberUtils}.validateMin(${field.name}, ${field.min}, "字段[${field.name}]");
+            <#elseif field.max??>
+        ${NumberUtils}.validateMax(${field.name}, ${field.max});
+            <#elseif (field.type == "string" || field.type == "bytes" || field.beanType) && !field.optional>
+        ${Objects}.requireNonNull(${field.name}, "字段[${field.name}]不能为空");
+            </#if>
+        </#list>
     }
 
     @${Override}

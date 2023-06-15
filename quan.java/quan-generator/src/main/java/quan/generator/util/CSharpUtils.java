@@ -77,7 +77,7 @@ public class CSharpUtils {
         }
 
         for (String addClass : addClasses) {
-            element.addElement("Compile").add(new DOMAttribute(QName.get("Include"), resolveInclude(codePath, projPath, addClass)));
+            element.addElement("Compile").add(new DOMAttribute(QName.get("Include"), addClass));
         }
 
         try (OutputStream outputStream = Files.newOutputStream(projFile.toPath())) {

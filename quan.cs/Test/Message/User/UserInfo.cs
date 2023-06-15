@@ -102,7 +102,7 @@ namespace Test.Message.User
             get => _f16;
             set
             {
-                CodedBuffer.CheckScale(value, 2);
+                CodedBuffer.ValidateScale(value, 2);
                 _f16 = value;
             }
         }
@@ -116,23 +116,19 @@ namespace Test.Message.User
             get => _f18;
             set
             {
-                CodedBuffer.CheckScale(value, 2);
+                CodedBuffer.ValidateScale(value, 2);
                 _f18 = value;
             }
         }
 
-        private string _alias;
-
-        public string alias
-        {
-            get => _alias;
-            set => _alias = value;
-        }
+        public string alias { get; set; }
 
 
         public override void Encode(CodedBuffer buffer)
         {
             base.Encode(buffer);
+
+            Validate();
 
             if (id != 0)
             {
@@ -261,7 +257,7 @@ namespace Test.Message.User
                 buffer.WriteDouble(f18, 2);
             }
 
-            if (alias.Length > 0)
+            if (alias != null)
             {
                 WriteTag(buffer, 79);
                 buffer.WriteString(alias);
@@ -366,6 +362,20 @@ namespace Test.Message.User
                         break;
                 }
             }
+
+            Validate();
+        }
+
+        public override void Validate()
+        {
+            base.Validate();
+
+            ValidateNull(name, "字段[name]");
+            ValidateNull(roleInfo2, "字段[roleInfo2]");
+            ValidateNull(roleInfo3, "字段[roleInfo3]");
+            ValidateNull(f11, "字段[f11]");
+            CodedBuffer.ValidateScale(f16, 2, "字段[f16]");
+            CodedBuffer.ValidateScale(f18, 2, "字段[f18]");
         }
 
         public override string ToString()

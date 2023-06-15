@@ -18,7 +18,8 @@
         <field name="i" type="int" min="1" max="20"/>
 <!--        <field name="f" type="float:2"/>-->
         <field name="d" type="double"/>
-        <field name="data" type="bytes"/>
+        <field name="bb1" type="bytes"/>
+        <field name="bb2" type="bytes" optional="true"/>
         <field name="list" type="list:int"/>
         <field name="set" type="set:int"/>
         <field name="map" type="map:int:int" ignore="true"/>

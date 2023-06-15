@@ -56,6 +56,7 @@ function RoleInfo.new(args)
     }
 
     instance = setmetatable(instance, meta)
+
     return instance
 end
 
@@ -69,6 +70,7 @@ setmetatable(RoleInfo, { __call = RoleInfo.new })
 function RoleInfo:encode(buffer)
     assert(type(self) == "table" and self.class == RoleInfo.class, "参数[self]类型错误")
     assert(buffer == nil or type(buffer) == "table" and buffer.class == _CodedBuffer.class, "参数[buffer]类型错误")
+    self:validate()
 
     buffer = buffer or _CodedBuffer.new()
 
@@ -93,7 +95,14 @@ function RoleInfo.decode(buffer, self)
     self.id = buffer:readInt()
     self.name = buffer:readString()
 
+    self:validate()
+
     return self
+end
+
+function RoleInfo:validate()
+    assert(type(self.id) == "number", "属性[id]类型错误")
+    assert(type(self.name) == "string",  "属性[name]类型错误")
 end
 
 RoleInfo = table.readOnly(RoleInfo)

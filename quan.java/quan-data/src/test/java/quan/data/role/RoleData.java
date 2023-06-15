@@ -220,7 +220,7 @@ public class RoleData extends Data<Long> {
     }
 
     public RoleData setB2(int b2) {
-        NumberUtils.checkRange(b2, 1, 20);
+        NumberUtils.validateRange(b2, 1, 20, "参数[b2]");
         this.b2.setValue(b2, this);
         return this;
     }
@@ -236,7 +236,7 @@ public class RoleData extends Data<Long> {
      * sssss
      */
     public RoleData setS(short s) {
-        NumberUtils.checkRange(s, 1, 20);
+        NumberUtils.validateRange(s, 1, 20, "参数[s]");
         this.s.setValue(s, this);
         return this;
     }
@@ -276,7 +276,7 @@ public class RoleData extends Data<Long> {
     }
 
     public RoleData setD(double d) {
-        NumberUtils.checkRange(d, 1, 20);
+        NumberUtils.validateRange(d, 1, 20, "参数[d]");
         this.d.setValue(d, this);
         return this;
     }

@@ -71,7 +71,7 @@ public class SRoleLogin extends Message {
      * 角色名
      */
     public SRoleLogin setRoleName(String roleName) {
-        Objects.requireNonNull(roleName);
+        Objects.requireNonNull(roleName,"参数[roleName]不能为空");
         this.roleName = roleName;
         return this;
     }
@@ -87,7 +87,7 @@ public class SRoleLogin extends Message {
      * 角色信息
      */
     public SRoleLogin setRoleInfo(RoleInfo roleInfo) {
-        Objects.requireNonNull(roleInfo);
+        Objects.requireNonNull(roleInfo,"参数[roleInfo]不能为空");
         this.roleInfo = roleInfo;
         return this;
     }
@@ -136,6 +136,8 @@ public class SRoleLogin extends Message {
     @Override
     public void encode(CodedBuffer buffer) {
         super.encode(buffer);
+        
+        validate();
 
         buffer.writeInt(this.roleId);
         buffer.writeString(this.roleName);
@@ -167,7 +169,7 @@ public class SRoleLogin extends Message {
     public void decode(CodedBuffer buffer) {
         super.decode(buffer);
 
-        setRoleId(buffer.readInt());
+        this.roleId = buffer.readInt();
         this.roleName = buffer.readString();
         this.roleInfo.decode(buffer);
 
@@ -199,6 +201,16 @@ public class SRoleLogin extends Message {
             }
             this.userInfo.decode(buffer);
         }
+
+        validate();
+    }
+
+    @Override
+    public void validate() {
+        super.validate();
+
+        Objects.requireNonNull(roleName, "字段[roleName]不能为空");
+        Objects.requireNonNull(roleInfo, "字段[roleInfo]不能为空");
     }
 
     @Override

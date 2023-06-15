@@ -28,7 +28,7 @@ local function onSet(self, key, value)
     end
 
     if key == "alias" then
-        assert(type(value) == "string", propTypeError)
+        assert(value == nil or type(value) == "string", propTypeError)
     end
 
     if key == "type" then
@@ -45,15 +45,19 @@ local function onSet(self, key, value)
 
     if key == "i" then
         assert(type(value) == "number", propTypeError)
-        _Message.checkRange(value, 1, 20);
+        _Message.validateRange(value, 1, 20);
     end
 
     if key == "d" then
         assert(type(value) == "number", propTypeError)
     end
 
-    if key == "data" then
+    if key == "bb1" then
         assert(type(value) == "string", propTypeError)
+    end
+
+    if key == "bb2" then
+        assert(value == nil or type(value) == "string", propTypeError)
     end
 
     if key == "list" then
@@ -81,7 +85,8 @@ local function toString(self)
             ",s=" .. tostring(self.s) ..
             ",i=" .. tostring(self.i) ..
             ",d=" .. tostring(self.d) ..
-            ",data=" .. tostring(self.data) ..
+            ",bb1=" .. tostring(self.bb1) ..
+            ",bb2=" .. tostring(self.bb2) ..
             ",list=" .. table.toString(self.list) ..
             ",set=" .. table.toString(self.set) ..
             ",map=" .. table.toString(self.map) ..
@@ -110,13 +115,15 @@ function RoleInfo.new(args)
         s = args.s or 0,
         i = args.i or 0,
         d = args.d or 0.0,
-        data = args.data or "",
+        bb1 = args.bb1 or "",
+        bb2 = args.bb2,
         list = args.list or {},
         set = args.set or {},
         map = args.map or {},
     }
 
     instance = setmetatable(instance, meta)
+
     return instance
 end
 
@@ -130,6 +137,7 @@ setmetatable(RoleInfo, { __call = RoleInfo.new })
 function RoleInfo:encode(buffer)
     assert(type(self) == "table" and self.class == RoleInfo.class, "参数[self]类型错误")
     assert(buffer == nil or type(buffer) == "table" and buffer.class == _CodedBuffer.class, "参数[buffer]类型错误")
+    self:validate()
 
     buffer = buffer or _CodedBuffer.new()
 
@@ -146,7 +154,12 @@ function RoleInfo:encode(buffer)
     buffer:writeShort(self.s)
     buffer:writeInt(self.i)
     buffer:writeDouble(self.d)
-    buffer:writeBytes(self.data)
+    buffer:writeBytes(self.bb1)
+
+    buffer:writeBool(self.bb2 ~= nil)
+    if self.bb2 ~= nil then
+        buffer:writeBytes(self.bb2) 
+    end
 
     buffer:writeInt(#self.list)
     for i, value in ipairs(self.list) do
@@ -185,7 +198,11 @@ function RoleInfo.decode(buffer, self)
     self.s = buffer:readShort()
     self.i = buffer:readInt()
     self.d = buffer:readDouble()
-    self.data = buffer:readBytes()
+    self.bb1 = buffer:readBytes()
+
+    if buffer:readBool() then
+        self.bb2 = buffer:readBytes()
+    end
 
     for i = 1, buffer:readInt() do
         self.list[i] = buffer:readInt()
@@ -195,7 +212,26 @@ function RoleInfo.decode(buffer, self)
         self.set[i] = buffer:readInt()
     end
 
+    self:validate()
+
     return self
+end
+
+function RoleInfo:validate()
+    assert(type(self.id) == "number", "属性[id]类型错误")
+    assert(type(self.name) == "string",  "属性[name]类型错误")
+    assert(self.alias == nil or type(self.alias) == "string",  "属性[alias]类型错误")
+    assert(type(self.type) == "number", "属性[type]类型错误")
+    assert(type(self.b) == "boolean", "属性[b]类型错误")
+    assert(type(self.s) == "number", "属性[s]类型错误")
+    assert(type(self.i) == "number", "属性[i]类型错误")
+    _Message.validateRange(self.i, 1, 20, "属性[i]");
+    assert(type(self.d) == "number", "属性[d]类型错误")
+    assert(type(self.bb1) == "string",  "属性[bb1]类型错误")
+    assert(self.bb2 == nil or type(self.bb2) == "string",  "属性[bb2]类型错误")
+    assert(type(self.list) == "table",  "属性[list]类型错误")
+    assert(type(self.set) == "table",  "属性[set]类型错误")
+    assert(type(self.map) == "table",  "属性[map]类型错误")
 end
 
 RoleInfo = table.readOnly(RoleInfo)

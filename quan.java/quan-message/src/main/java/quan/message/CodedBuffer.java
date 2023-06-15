@@ -260,7 +260,7 @@ public abstract class CodedBuffer {
         if (scale < 0) {
             writeFloat(n);
         } else {
-            writeInt(checkScale(n, scale));
+            writeInt(validateScale(n, scale));
         }
     }
 
@@ -276,14 +276,20 @@ public abstract class CodedBuffer {
         }
     }
 
-    public static int checkScale(double n, int scale) {
+    public static int validateScale(double n, int scale) {
+        return validateScale(n, scale, null);
+    }
+    public static int validateScale(double n, int scale,String name) {
+        name = name == null ? "参数" : name;
         double times = Math.pow(10, scale);
         double minValue = Integer.MIN_VALUE * times;
         double maxValue = Integer.MAX_VALUE * times;
+
         if (n < minValue || n > maxValue) {
-            String format = "参数[%s]超出了限定范围[%s,%s],无法转换为指定精度[%s]的定点型数据";
-            throw new IllegalArgumentException(String.format(format, n, minValue, maxValue, scale));
+            String format = "%s(%s)超出了限定范围(%s,%s),无法转换为指定精度(%s)的定点型数据";
+            throw new IllegalArgumentException(String.format(format, name,n, minValue, maxValue, scale));
         }
+
         return (int) Math.floor(n * times);
     }
 
@@ -291,7 +297,7 @@ public abstract class CodedBuffer {
         if (scale < 0) {
             writeDouble(n);
         } else {
-            writeInt(checkScale(n, scale));
+            writeInt(validateScale(n, scale));
         }
     }
 

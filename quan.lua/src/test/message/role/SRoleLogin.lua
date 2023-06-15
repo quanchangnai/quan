@@ -96,6 +96,7 @@ function SRoleLogin.new(args)
     }
 
     instance = setmetatable(instance, meta)
+
     return instance
 end
 
@@ -168,7 +169,19 @@ function SRoleLogin.decode(buffer)
         self.userInfo = UserInfo.decode(buffer)
     end
 
+    self:validate()
+
     return self
+end
+
+function SRoleLogin:validate()
+    assert(type(self.roleId) == "number", "属性[roleId]类型错误")
+    assert(type(self.roleName) == "string",  "属性[roleName]类型错误")
+    assert(type(self.roleInfo) == "table",  "属性[roleInfo]类型错误")
+    assert(type(self.roleInfoList) == "table",  "属性[roleInfoList]类型错误")
+    assert(type(self.roleInfoSet) == "table",  "属性[roleInfoSet]类型错误")
+    assert(type(self.roleInfoMap) == "table",  "属性[roleInfoMap]类型错误")
+    assert(self.userInfo == nil or type(self.userInfo) == "table" and self.userInfo.class == UserInfo.class, "属性[userInfo]类型错误")
 end
 
 SRoleLogin = table.readOnly(SRoleLogin)

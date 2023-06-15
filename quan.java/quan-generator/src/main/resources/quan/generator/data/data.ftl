@@ -146,11 +146,11 @@ public class ${name} extends <#if kind ==2>${getDependentName("Bean")}<#elseif k
     </#if>
     public ${name} set${field.name?cap_first}(${field.basicType} ${field.name}) {
         <#if field.min?? && field.max??>
-        ${getDependentName("NumberUtils")}.checkRange(${field.name}, ${field.min}, ${field.max});
+        ${getDependentName("NumberUtils")}.validateRange(${field.name}, ${field.min}, ${field.max}, "参数[${field.name}]");
         <#elseif field.min??>
-        ${getDependentName("NumberUtils")}.checkMin(${field.name}, ${field.min});
+        ${getDependentName("NumberUtils")}.validateMin(${field.name}, ${field.min}, "参数[${field.name}]");
         <#elseif field.max??>
-        ${getDependentName("NumberUtils")}.checkMax(${field.name}, ${field.max});
+        ${getDependentName("NumberUtils")}.validateMax(${field.name}, ${field.max}, "参数[${field.name}]");
         </#if>
         this.${field.name}.setValue(${field.name}, ${root});
         return this;

@@ -94,7 +94,7 @@ local function onSet(self, key, value)
     end
 
     if key == "alias" then
-        assert(type(value) == "string", propTypeError)
+        assert(value == nil or type(value) == "string", propTypeError)
     end
 
     rawset(self, key, value)
@@ -168,6 +168,7 @@ function UserInfo.new(args)
     }
 
     instance = setmetatable(instance, meta)
+
     return instance
 end
 
@@ -181,6 +182,7 @@ setmetatable(UserInfo, { __call = UserInfo.new })
 function UserInfo:encode(buffer)
     assert(type(self) == "table" and self.class == UserInfo.class, "参数[self]类型错误")
     assert(buffer == nil or type(buffer) == "table" and buffer.class == _CodedBuffer.class, "参数[buffer]类型错误")
+    self:validate()
 
     buffer = buffer or _CodedBuffer.new()
 
@@ -374,7 +376,31 @@ function UserInfo.decode(buffer, self)
         end
     end
 
+    self:validate()
+
     return self
+end
+
+function UserInfo:validate()
+    assert(type(self.id) == "number", "属性[id]类型错误")
+    assert(type(self.name) == "string",  "属性[name]类型错误")
+    assert(type(self.level) == "number", "属性[level]类型错误")
+    assert(type(self.type) == "number", "属性[type]类型错误")
+    assert(self.roleInfo1 == nil or type(self.roleInfo1) == "table" and self.roleInfo1.class == test_message_role_RoleInfo.class, "属性[roleInfo1]类型错误")
+    assert(type(self.roleInfo2) == "table",  "属性[roleInfo2]类型错误")
+    assert(type(self.roleInfo3) == "table",  "属性[roleInfo3]类型错误")
+    assert(type(self.roleList) == "table",  "属性[roleList]类型错误")
+    assert(type(self.roleSet) == "table",  "属性[roleSet]类型错误")
+    assert(type(self.roleMap) == "table",  "属性[roleMap]类型错误")
+    assert(type(self.f11) == "string",  "属性[f11]类型错误")
+    assert(type(self.f12) == "boolean", "属性[f12]类型错误")
+    assert(type(self.f13) == "boolean", "属性[f13]类型错误")
+    assert(type(self.f14) == "number", "属性[f14]类型错误")
+    assert(type(self.f15) == "number", "属性[f15]类型错误")
+    assert(type(self.f16) == "number", "属性[f16]类型错误")
+    assert(type(self.f17) == "number", "属性[f17]类型错误")
+    assert(type(self.f18) == "number", "属性[f18]类型错误")
+    assert(self.alias == nil or type(self.alias) == "string",  "属性[alias]类型错误")
 end
 
 UserInfo = table.readOnly(UserInfo)

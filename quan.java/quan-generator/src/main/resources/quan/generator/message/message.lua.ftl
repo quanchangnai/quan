@@ -39,18 +39,18 @@ local function onSet(self, key, value)
     <#elseif field.type == "bool">
         assert(type(value) == "boolean", propTypeError)
     <#elseif field.type == "string" || field.type == "bytes">
-        assert(type(value) == "string", propTypeError)
+        assert(<#if field.optional>value == nil or </#if>type(value) == "string", propTypeError)
     <#elseif field.collectionType || field.beanType && !field.optional>
         assert(type(value) == "table", propTypeError)
     <#else>
         assert(<#if field.optional>value == nil or </#if>type(value) == "table" and value.class == ${field.classType?replace('.','_')}.class, propTypeError)
     </#if>
     <#if field.min?? && field.max??>
-        _Message.checkRange(value, ${field.min}, ${field.max});
+        _Message.validateRange(value, ${field.min}, ${field.max});
     <#elseif field.min??>
-        _Message.checkMin(value, ${field.min});
+        _Message.validateMin(value, ${field.min});
     <#elseif field.max??>
-        _Message.checkMax(value, ${field.max});
+        _Message.validateMax(value, ${field.max});
     </#if>
     end
 
@@ -112,6 +112,7 @@ function ${name}.new(args)
     }
 
     instance = setmetatable(instance, meta)
+
     return instance
 end
 
@@ -137,6 +138,7 @@ function ${name}:encode(buffer)
     assert(type(self) == "table" and self.class == ${name}.class, "参数[self]类型错误")
     </#if>
     assert(buffer == nil or type(buffer) == "table" and buffer.class == _CodedBuffer.class, "参数[buffer]类型错误")
+    self:validate()
 
     buffer = buffer or _CodedBuffer.new()
 
@@ -431,7 +433,33 @@ function ${name}.decode(buffer, self)
 </#list>
 </#if>
 
+    self:validate()
+
     return self
+end
+
+function ${name}:validate()
+<#list fields as field>
+    <#assign fieldTypeError = "属性[${field.name}]类型错误"/>
+    <#if field.numberType || field.enumType>
+    assert(type(self.${field.name}) == "number", "${fieldTypeError}")
+    <#elseif field.type == "bool">
+    assert(type(self.${field.name}) == "boolean", "${fieldTypeError}")
+    <#elseif field.type == "string" || field.type == "bytes">
+    assert(<#if field.optional>self.${field.name} == nil or </#if>type(self.${field.name}) == "string",  "${fieldTypeError}")
+    <#elseif field.collectionType || field.beanType && !field.optional>
+    assert(type(self.${field.name}) == "table",  "${fieldTypeError}")
+    <#else>
+    assert(<#if field.optional>self.${field.name} == nil or </#if>type(self.${field.name}) == "table" and self.${field.name}.class == ${field.classType?replace('.','_')}.class, "${fieldTypeError}")
+    </#if>
+    <#if field.min?? && field.max??>
+    _Message.validateRange(self.${field.name}, ${field.min}, ${field.max}, "属性[${field.name}]");
+    <#elseif field.min??>
+    _Message.validateMin(self.${field.name}, ${field.min}, "属性[${field.name}]");
+    <#elseif field.max??>
+    _Message.validateMax(self.${field.name}, ${field.max}, "属性[${field.name}]");
+    </#if>
+</#list>
 end
 
 ${name} = table.readOnly(${name})
