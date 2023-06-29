@@ -31,6 +31,7 @@ public class OperationAspect {
     private void execute() {
     }
 
+    @SuppressWarnings("rawtypes")
     @Around("execute() && args(com.mongodb.operation.ReadOperation,..,com.mongodb.client.ClientSession)")
     public Object aroundRead(ProceedingJoinPoint joinPoint) throws Throwable {
         if (!OperationThread.isInside()) {

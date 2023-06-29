@@ -1,6 +1,6 @@
 package quan.data;
 
-import org.apache.commons.lang3.tuple.Triple;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.data.field.Field;
@@ -110,8 +110,11 @@ public class Transaction {
 
     void setFieldLog(Field field, Object value, Data<?> data) {
         fieldLogs.put(field, value);
-        if (data != null && data.writer != null && data.state != null && !dataLogs.containsKey(data)) {
-            setDataLog(data, new Data.Log(data.writer, data.state));
+        if (data != null && !dataLogs.containsKey(data)) {
+            DataWriter writer = data._getWriter();
+            if (writer != null) {
+                setDataLog(data, new Data.Log(writer, Data.State.SAVE));
+            }
         }
     }
 
@@ -347,8 +350,8 @@ public class Transaction {
             field.commit(fieldLogs.get(field));
         }
 
-        Map<DataWriter, Triple> writings = new HashMap<>();
-        Function<DataWriter, Triple> function = w -> Triple.of(new ArrayList(), new ArrayList(), new ArrayList());
+        Map<DataWriter, Pair> writings = new HashMap<>();
+        Function<DataWriter, Pair> function = w -> Pair.of(new LinkedHashSet(), new LinkedHashSet<>());
 
         for (Data<?> data : dataLogs.keySet()) {
             Data.Log log = dataLogs.get(data);
@@ -358,15 +361,12 @@ public class Transaction {
                 continue;
             }
 
-            Triple<List, List, List> writing = writings.computeIfAbsent(log.writer, function);
+            Pair<Set, Set> writing = writings.computeIfAbsent(log.writer, function);
             switch (log.state) {
-                case INSERTION:
+                case SAVE:
                     writing.getLeft().add(data);
                     break;
-                case UPDATE:
-                    writing.getMiddle().add(data);
-                    break;
-                case DELETION:
+                case DELETE:
                     writing.getRight().add(data);
                     break;
             }
@@ -374,8 +374,8 @@ public class Transaction {
 
         for (DataWriter writer : writings.keySet()) {
             try {
-                Triple<List, List, List> writing = writings.get(writer);
-                writer.write(writing.getLeft(), writing.getMiddle(), writing.getRight());
+                Pair<Set, Set> writing = writings.get(writer);
+                writer.write(writing.getLeft(), writing.getRight());
             } catch (Exception e) {
                 logger.error("内存事务提交后写数据库出错", e);
             }

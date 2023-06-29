@@ -108,7 +108,6 @@ public final class SetField<E> extends Node implements Set<E>, Field {
         return getCurrent().toArray();
     }
 
-    @SuppressWarnings("SuspiciousToArrayCall")
     @Override
     public <T> T[] toArray(T[] a) {
         return getCurrent().toArray(a);

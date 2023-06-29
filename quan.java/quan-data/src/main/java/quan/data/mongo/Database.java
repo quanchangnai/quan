@@ -126,7 +126,12 @@ public class Database implements DataWriter, MongoDatabase, Executor {
             databasesLock.writeLock().unlock();
         }
 
-        ClassUtils.loadClasses(dataPackage, Data.class).forEach(this::initCollection);
+        try {
+            getExecutor().submit(() -> ClassUtils.loadClasses(dataPackage, Data.class).forEach(this::initCollection)).get();
+        } catch (Exception e) {
+            throw new MongoException("初始化数据库集合失败", e);
+        }
+
     }
 
     static Database getDatabase(MongoClient client, String databaseName) {
@@ -201,8 +206,7 @@ public class Database implements DataWriter, MongoDatabase, Executor {
      */
     @Override
     public void execute(Runnable task) {
-        int index = RandomUtils.nextInt(0, executors.size());
-        executors.get(index).execute(task);
+        getExecutor().execute(task);
     }
 
     /**
@@ -228,6 +232,11 @@ public class Database implements DataWriter, MongoDatabase, Executor {
      */
     public <D extends Data> ExecutorService getExecutor(Class<D> clazz) {
         int index = (clazz.hashCode() & 0x7FFFFFFF) % executors.size();
+        return executors.get(index);
+    }
+
+    public ExecutorService getExecutor() {
+        int index = RandomUtils.nextInt(0, executors.size());
         return executors.get(index);
     }
 
@@ -262,33 +271,28 @@ public class Database implements DataWriter, MongoDatabase, Executor {
     }
 
     /**
-     * @see DataWriter#write(List, List, List)
+     * @see DataWriter#write(Set, Set)
      */
     @Override
-    public void write(List<Data<?>> insertions, List<Data<?>> updates, List<Data<?>> deletions) {
+    public void write(Set<Data<?>> saves, Set<Data<?>> deletes) {
         Map<MongoCollection<Data<?>>, List<WriteModel<Data<?>>>> writeModels = new HashMap<>();
 
-        if (insertions != null) {
-            for (Data<?> data : insertions) {
-                writeModels.computeIfAbsent(collections.get(data.getClass()), this::list).add(new InsertOneModel(data));
-            }
-        }
 
-        if (updates != null) {
-            for (Data<?> data : updates) {
+        if (saves != null) {
+            for (Data<?> data : saves) {
                 ReplaceOneModel<Data<?>> replaceOneModel = new ReplaceOneModel<>(Filters.eq(data.id()), data, replaceOptions);
                 writeModels.computeIfAbsent(collections.get(data.getClass()), this::list).add(replaceOneModel);
             }
         }
 
-        if (deletions != null) {
-            for (Data<?> data : deletions) {
+        if (deletes != null) {
+            for (Data<?> data : deletes) {
                 writeModels.computeIfAbsent(collections.get(data.getClass()), this::list).add(new DeleteOneModel<>(Filters.eq(data.id())));
             }
         }
 
         if (!clientsExecutors.containsKey(client)) {
-            logger.error("MongoClient已经关闭了，数据无法写入数据库");
+            logger.error("MongoClient已经关闭了，数据无法写入到数据库");
             return;
         }
 

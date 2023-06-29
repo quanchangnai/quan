@@ -21,9 +21,19 @@ public abstract class Data<I> {
      */
     public static final String _ID = "_id";
 
+    private static DataWriter defaultWriter;
+
     DataWriter writer;
 
     State state;
+
+    public static DataWriter _getDefaultWriter() {
+        return defaultWriter;
+    }
+
+    public static void _setDefaultWriter(DataWriter writer) {
+        Data.defaultWriter = writer;
+    }
 
     public static String name(Class<? extends Data<?>> clazz) {
         try {
@@ -34,7 +44,7 @@ public abstract class Data<I> {
     }
 
     /**
-     * 主键
+     * 主键ID
      */
     public abstract I id();
 
@@ -44,7 +54,7 @@ public abstract class Data<I> {
     @SuppressWarnings("unused")
     private static final BiConsumer<Data<?>, DataWriter> _setWriter = (data, writer) -> {
         data.writer = writer;
-        data.state = State.UPDATE;
+        data.state = State.SAVE;
     };
 
     private void _setWriter(Transaction transaction, DataWriter writer, State state) {
@@ -58,36 +68,37 @@ public abstract class Data<I> {
         }
     }
 
+    public DataWriter _getWriter() {
+        if (writer == null) {
+            return defaultWriter;
+        }
+        return writer;
+    }
+
+
     /**
-     * 使用指定的写入器插入数据，在内存事务中操作将会在提交时真正执行
+     * 使用指定的写入器保存数据，在内存事务中操作将会在提交时真正执行
      */
-    public final void insert(DataWriter writer) {
+    public final void save(DataWriter writer) {
         Objects.requireNonNull(writer, "参数[writer]不能为空");
 
         Transaction transaction = Transaction.get();
         if (transaction != null) {
-            _setWriter(transaction, writer, State.INSERTION);
+            _setWriter(transaction, writer, State.SAVE);
         } else if (Transaction.isOptional()) {
-            writer.write(Collections.singletonList(this), null, null);
+            writer.write(Collections.singleton(this), null);
         } else {
             Validations.transactionError();
         }
     }
 
     /**
-     * 使用指定的写入器更新数据，在内存事务中操作将会在提交时真正执行
+     * 使用缓存下来或者默认的写入器保存数据，在内存事务中设置数据字段时会自动保存
+     *
+     * @see #save(DataWriter)
      */
-    public final void update(DataWriter writer) {
-        Objects.requireNonNull(writer, "参数[writer]不能为空");
-
-        Transaction transaction = Transaction.get();
-        if (transaction != null) {
-            _setWriter(transaction, writer, State.UPDATE);
-        } else if (Transaction.isOptional()) {
-            writer.write(null, Collections.singletonList(this), null);
-        } else {
-            Validations.transactionError();
-        }
+    public final void save() {
+        save(_getWriter());
     }
 
     /**
@@ -98,16 +109,25 @@ public abstract class Data<I> {
 
         Transaction transaction = Transaction.get();
         if (transaction != null) {
-            _setWriter(transaction, writer, State.DELETION);
+            _setWriter(transaction, writer, State.DELETE);
         } else if (Transaction.isOptional()) {
-            writer.write(null, null, Collections.singletonList(this));
+            writer.write(null, Collections.singleton(this));
         } else {
             Validations.transactionError();
         }
     }
 
     /**
-     * 数据从数据库查询出来时，会设置默认写入器和状态(更新)，本操作会清除以上设置
+     * 使用缓存下来或者默认的写入器删除数据
+     *
+     * @see #delete(DataWriter)
+     */
+    public final void delete() {
+        delete(_getWriter());
+    }
+
+    /**
+     * 清除设置的写入器和状态，数据从数据库查询出来时会自动设置
      */
     public final void free() {
         Transaction transaction = Transaction.get();
@@ -132,12 +152,12 @@ public abstract class Data<I> {
      * 提交日志中记录的写入器
      */
     void commit(Log log) {
-        if (log.state == State.DELETION) {
+        if (log.state == State.DELETE) {
             this.writer = null;
             this.state = null;
         } else {
             this.writer = log.writer;
-            this.state = State.UPDATE;
+            this.state = State.SAVE;
         }
     }
 
@@ -160,7 +180,7 @@ public abstract class Data<I> {
      * 数据的状态,代表事务提交后对数据执行什么操作
      */
     enum State {
-        INSERTION, UPDATE, DELETION
+        SAVE, DELETE
     }
 
 }

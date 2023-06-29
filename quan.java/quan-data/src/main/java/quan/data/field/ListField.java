@@ -179,7 +179,6 @@ public final class ListField<E> extends Node implements List<E>, Field {
         return getCurrent().toArray();
     }
 
-    @SuppressWarnings("SuspiciousToArrayCall")
     @Override
     public <T> T[] toArray(T[] a) {
         return getCurrent().toArray(a);
@@ -253,7 +252,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        return getCurrent().containsAll(c);
+        return new HashSet<>(getCurrent()).containsAll(c);
     }
 
     @Override
@@ -597,7 +596,6 @@ public final class ListField<E> extends Node implements List<E>, Field {
             return field.toArray();
         }
 
-        @SuppressWarnings("SuspiciousToArrayCall")
         @Override
         public <T> T[] toArray(T[] a) {
             return field.toArray(a);
@@ -615,7 +613,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
 
         @Override
         public boolean containsAll(Collection<?> c) {
-            return field.containsAll(c);
+            return new HashSet<>(field).containsAll(c);
         }
 
         @Override

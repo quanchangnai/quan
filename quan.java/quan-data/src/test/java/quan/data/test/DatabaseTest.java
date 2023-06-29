@@ -14,6 +14,7 @@ import org.junit.Test;
 import org.pcollections.Empty;
 import org.pcollections.PMap;
 import org.pcollections.PVector;
+import quan.data.Data;
 import quan.data.Index;
 import quan.data.Transaction;
 import quan.data.item.ItemBean;
@@ -28,6 +29,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by quanchangnai on 2020/4/1.
@@ -187,10 +189,19 @@ public class DatabaseTest {
         System.err.println("testDatabase==============");
         String connectionString = "mongodb://127.0.0.1:27017";
         Database database = new Database(connectionString, "test", "quan.data");
+        Data._setDefaultWriter(database);
 
+        try {
+            database.getExecutor().submit(() -> testDatabase0(database)).get();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void testDatabase0(Database database) {
         testMongoCollection0(database);
 
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < 2; i++) {
             System.err.println("=============" + i);
             testMongoCollection1(database);
             System.err.println();
@@ -215,7 +226,7 @@ public class DatabaseTest {
             RoleData roleData = roleDataCollection.find().first();
             if (roleData != null) {
 //                roleData.delete(database);
-                roleData.free();
+//                roleData.free();
                 roleData.setName("name:" + System.currentTimeMillis());
             }
         });
@@ -237,7 +248,7 @@ public class DatabaseTest {
             roleDataMax = new RoleData(1L);
             roleDataMax.setName("张三:1");
             roleDataMax.setName("bbb:1");
-            roleDataMax.insert(database);
+//            roleDataMax.save(database);
         } else {
             roleDataMax.setName("max:" + System.nanoTime());
             roleDataMax.setName("max:" + System.nanoTime());
@@ -262,7 +273,7 @@ public class DatabaseTest {
                 .setName("name:" + roleDataMax.getId() + 3)
                 .setName2("name2:" + roleDataMax.getId() + 1);
 
-        database.insert(roleData1, roleData2, roleData3);
+        database.save(roleData1, roleData2, roleData3);
 
         List<RoleData> roleDataList = new ArrayList<>();
         for (long i = roleData3.getId() + 1; i < roleData3.getId() + 20; i++) {
@@ -275,12 +286,11 @@ public class DatabaseTest {
                 roleData.getList2().add(new ItemBean().setId((int) i).setName("item2:" + i));
             }
             roleDataList.add(roleData);
-            roleData.update(database);
+            roleData.save(database);
         }
 
-        database.insert(roleDataList);
+        database.save(roleDataList);
 
-//        Transaction.breakdown();
     }
 
     private void testMongoCollection2(Database database) {
