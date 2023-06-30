@@ -1,11 +1,10 @@
 package quan.data.mongo;
 
 import com.mongodb.client.MongoClient;
-import com.mongodb.client.internal.MongoClientDelegate;
 import com.mongodb.client.internal.OperationExecutor;
-import com.mongodb.operation.BatchCursor;
-import com.mongodb.operation.FindOperation;
-import com.mongodb.operation.ReadOperation;
+import com.mongodb.internal.operation.BatchCursor;
+import com.mongodb.internal.operation.FindOperation;
+import com.mongodb.internal.operation.ReadOperation;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -21,7 +20,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 
 @Aspect
-@SuppressWarnings("deprecation")
 public class OperationAspect {
 
     //一般情况只会创建一个MongoClient，这里兼容一下可能有多个数据源的情况
@@ -32,7 +30,7 @@ public class OperationAspect {
     }
 
     @SuppressWarnings("rawtypes")
-    @Around("execute() && args(com.mongodb.operation.ReadOperation,..,com.mongodb.client.ClientSession)")
+    @Around("execute() && args(com.mongodb.internal.operation.ReadOperation,..,com.mongodb.client.ClientSession)")
     public Object aroundRead(ProceedingJoinPoint joinPoint) throws Throwable {
         if (!OperationThread.isInside()) {
             throw new IllegalStateException("只能在数据库线程里读数据库");
@@ -52,7 +50,7 @@ public class OperationAspect {
         return new Cursor(database, cursor);
     }
 
-    @Before("execute() && args(com.mongodb.operation.WriteOperation,..,com.mongodb.client.ClientSession)")
+    @Before("execute() && args(com.mongodb.internal.operation.WriteOperation,..,com.mongodb.client.ClientSession)")
     public void beforeWrite() {
         if (Transaction.isInside()) {
             throw new IllegalStateException("不能在内存事务中写数据库");
@@ -80,7 +78,7 @@ public class OperationAspect {
 
         Field field1 = executor.getClass().getDeclaredField("this$0");
         field1.setAccessible(true);
-        MongoClientDelegate mongoClientDelegate = (MongoClientDelegate) field1.get(executor);
+        Object mongoClientDelegate = field1.get(executor);
 
         Field field2 = mongoClientDelegate.getClass().getDeclaredField("originator");
         field2.setAccessible(true);

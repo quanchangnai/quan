@@ -138,7 +138,7 @@ public class DataGenerator extends Generator {
         beanDefinition.addImport("quan.data.*");
         beanDefinition.addImport("quan.data.field.*");
         if (beanDefinition instanceof DataDefinition) {
-            beanDefinition.addImport("quan.data.mongo.JsonStringWriter");
+            beanDefinition.addImport("quan.data.mongo.DataCodecProvider");
         }
 
         super.prepareBean(beanDefinition);

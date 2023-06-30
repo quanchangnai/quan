@@ -3,9 +3,7 @@ package quan.data.test;
 import quan.data.Transaction;
 import quan.data.Transactional;
 import quan.data.item.ItemBean;
-import quan.data.item.ItemBean2;
 import quan.data.role.RoleData;
-import quan.data.role.RoleData2;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -20,8 +18,6 @@ public class Role {
     private RoleData roleData1 = new RoleData();
 
     private RoleData roleData2 = new RoleData();
-
-    private RoleData2 roleData3 = new RoleData2(3L);
 
     private Random random = new Random();
 
@@ -40,7 +36,6 @@ public class Role {
         roleId = 0;
         roleData1 = new RoleData();
         roleData2 = new RoleData();
-        roleData3 = new RoleData2(3L);
     }
 
     public void test1() {
@@ -116,43 +111,6 @@ public class Role {
 
         roleData2.setItem(ItemBean1);
         roleData2.setItem(null);
-
-    }
-
-    public void test3() {
-        if (roleId > 0) {
-            System.err.println("Role.test3(),roleId:" + roleId);
-        }
-
-        roleData3.setName("aaa");
-        roleData3.setI(random.nextInt());
-        roleData3.getSet().add(true);
-
-        for (int i = 0; i < 10; i++) {
-            roleData3.getList().add("aaa" + i);
-            roleData3.getMap().put(i, i + random.nextInt());
-            roleData3.getItems().put(i, new ItemBean2(i, "item" + i, new ArrayList<>()));
-        }
-
-        for (String s : roleData3.getList()) {
-            if (s.equals("aaa5")) {
-//                roleData3.getList().remove(2);
-            }
-        }
-
-        for (Integer k : roleData3.getMap().keySet()) {
-            if (k == 5) {
-//                roleData3.getMap().remove(3);
-            }
-        }
-
-
-        ItemBean2 ItemBean1 = new ItemBean2();
-        ItemBean1.setId(random.nextInt());
-        ItemBean1.setName("item111");
-
-        roleData3.setItem(ItemBean1);
-        roleData3.setItem(null);
 
     }
 
@@ -232,6 +190,5 @@ public class Role {
         System.err.println("list.size:");
         System.err.println(roleData1.getList().size());
         System.err.println(roleData2.getList().size());
-        System.err.println(roleData3.getList().size());
     }
 }

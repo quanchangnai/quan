@@ -4,6 +4,6 @@
 
 dependencies {
     api project(':quan-common')
-    api 'org.pcollections:pcollections:3.2.0'
-    api 'org.mongodb:mongo-java-driver:3.12.2'
+    api 'org.pcollections:pcollections:4.0.1'
+    api 'org.mongodb:mongodb-driver-sync:4.10.0'
 }

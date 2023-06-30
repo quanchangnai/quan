@@ -2,7 +2,7 @@ package quan.data.mongo;
 
 import com.mongodb.ServerAddress;
 import com.mongodb.ServerCursor;
-import com.mongodb.operation.BatchCursor;
+import com.mongodb.internal.operation.BatchCursor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.data.Data;
@@ -12,7 +12,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-@SuppressWarnings({"deprecation", "unchecked", "rawtypes"})
+@SuppressWarnings({"unchecked", "rawtypes", "NullableProblems"})
 public class Cursor implements BatchCursor {
 
     private static final Logger logger = LoggerFactory.getLogger(Cursor.class);
@@ -55,6 +55,11 @@ public class Cursor implements BatchCursor {
             list.stream().filter(d -> d instanceof Data).forEach(d -> setDataWriter.accept((Data) d, database));
         }
         return list;
+    }
+
+    @Override
+    public int available() {
+        return cursor.available();
     }
 
     @Override

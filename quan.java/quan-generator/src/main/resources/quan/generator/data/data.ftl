@@ -284,7 +284,7 @@ public class ${name} extends <#if kind ==2>${getDependentName("Bean")}<#elseif k
             writer.writeStartDocument();
             <#if kind ==5>
 
-            if (writer instanceof ${getDependentName("JsonStringWriter")}) {
+            if (writer instanceof ${getDependentName("DataCodecProvider")}) {
                 writer.write${bsonTypes[idField.type]}(${name}.${idField.underscoreName}, value.${idField.name}.getValue(transaction));
             } else {
                 writer.write${bsonTypes[idField.type]}(${name}._ID, value.${idField.name}.getValue(transaction));

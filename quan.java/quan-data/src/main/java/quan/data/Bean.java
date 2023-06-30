@@ -1,22 +1,13 @@
 package quan.data;
 
-import org.bson.codecs.Codec;
-import org.bson.codecs.EncoderContext;
-import org.bson.json.JsonWriter;
-import quan.data.mongo.CodecsRegistry;
-import quan.data.mongo.JsonStringWriter;
-
-import java.io.StringWriter;
+import quan.data.mongo.DataJsonWriter;
 
 public abstract class Bean extends Node {
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
     public String toJson() {
-        StringWriter stringWriter = new StringWriter();
-        JsonWriter jsonWriter = new JsonStringWriter(stringWriter);
-        Codec codec = CodecsRegistry.getDefault().get(getClass());
-        codec.encode(jsonWriter, this, EncoderContext.builder().build());
-        return stringWriter.toString();
+        try (DataJsonWriter dataJsonWriter = new DataJsonWriter(this)) {
+            return dataJsonWriter.toJson();
+        }
     }
 
 }

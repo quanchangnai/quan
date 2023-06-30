@@ -2,7 +2,6 @@ package quan.data.mongo;
 
 import com.mongodb.*;
 import com.mongodb.assertions.Assertions;
-import com.mongodb.client.MongoClient;
 import com.mongodb.client.*;
 import com.mongodb.client.model.*;
 import org.apache.commons.lang3.RandomUtils;
@@ -91,8 +90,8 @@ public class Database implements DataWriter, MongoDatabase, Executor {
 
     private void initClient(MongoClientSettings.Builder clientSettings, String databaseName) {
         Assertions.notNull("databaseName", databaseName);
-        CodecRegistry codecRegistry = new CodecsRegistry(dataPackage);
-        clientSettings.codecRegistry(CodecRegistries.fromRegistries(codecRegistry, MongoClientSettings.getDefaultCodecRegistry()));
+
+        clientSettings.codecRegistry(CodecRegistries.fromProviders(DataCodecProvider.getDefault(), MongoClientSettings.getDefaultCodecRegistry()));
         client = MongoClients.create(clientSettings.build());
 
         initExecutors();
@@ -150,6 +149,9 @@ public class Database implements DataWriter, MongoDatabase, Executor {
             return;
         }
 
+        MongoCollection<?> collection = db.getCollection(collectionName, clazz);
+        collections.put(clazz, collection);
+
         Map<String, Index> collectionIndexes = new HashMap<>();
         Index.List indexes = clazz.getAnnotation(Index.List.class);
         if (indexes != null) {
@@ -157,9 +159,6 @@ public class Database implements DataWriter, MongoDatabase, Executor {
                 collectionIndexes.put(index.name(), index);
             }
         }
-
-        MongoCollection<?> collection = db.getCollection(collectionName, clazz);
-        collections.put(clazz, collection);
 
         Set<String> dropIndexes = new HashSet<>();
         for (Document index : collection.listIndexes()) {
