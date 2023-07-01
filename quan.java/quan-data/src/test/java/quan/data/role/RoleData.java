@@ -1,5 +1,6 @@
 package quan.data.role;
 
+import java.util.*;
 import org.bson.BsonReader;
 import org.bson.BsonType;
 import org.bson.BsonWriter;
@@ -7,18 +8,11 @@ import org.bson.codecs.Codec;
 import org.bson.codecs.DecoderContext;
 import org.bson.codecs.EncoderContext;
 import org.bson.codecs.configuration.CodecRegistry;
-import quan.data.Data;
-import quan.data.Index;
-import quan.data.Transaction;
+import quan.data.*;
+import quan.data.bson.JsonStringWriter;
 import quan.data.field.*;
 import quan.data.item.ItemBean;
-import quan.data.mongo.DataCodecProvider;
 import quan.util.NumberUtils;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * 角色<br/>
@@ -362,6 +356,10 @@ public class RoleData extends Data<Long> {
 
     }
 
+    public static RoleData parseJson(String json) {
+        return Entity.parseJson(RoleData.class, json);
+    }
+
     public static class CodecImpl implements Codec<RoleData> {
 
         private final CodecRegistry registry;
@@ -477,7 +475,7 @@ public class RoleData extends Data<Long> {
             Transaction transaction = Transaction.get();
             writer.writeStartDocument();
 
-            if (writer instanceof DataCodecProvider) {
+            if (writer instanceof JsonStringWriter) {
                 writer.writeInt64(RoleData.ID, value.id.getValue(transaction));
             } else {
                 writer.writeInt64(RoleData._ID, value.id.getValue(transaction));

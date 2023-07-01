@@ -15,7 +15,7 @@ import quan.data.Data;
 import quan.data.Index;
 import quan.data.Transaction;
 import quan.data.item.ItemBean;
-import quan.data.mongo.DataCodecProvider;
+import quan.data.bson.EntityCodecProvider;
 import quan.data.mongo.Database;
 import quan.data.role.RoleData;
 import quan.util.ClassUtils;
@@ -39,8 +39,8 @@ public class DatabaseTest {
         Index.List indexes = RoleData.class.getAnnotation(Index.List.class);
         System.err.println("RoleData indexes:" + Arrays.toString(indexes.value()));
 
-        DataCodecProvider dataCodecProvider = new DataCodecProvider();
-        Codec<RoleData> roleDataCodec = dataCodecProvider.get(RoleData.class, null);
+        EntityCodecProvider entityCodecProvider = new EntityCodecProvider();
+        Codec<RoleData> roleDataCodec = entityCodecProvider.get(RoleData.class, null);
         System.err.println("roleDataCodec:" + roleDataCodec);
     }
 

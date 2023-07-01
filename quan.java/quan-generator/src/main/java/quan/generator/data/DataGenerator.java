@@ -57,7 +57,7 @@ public class DataGenerator extends Generator {
 
         classNames.put("NumberUtils", "quan.util.NumberUtils");
         classNames.put("Index", "java.data.Index");
-        classNames.put("Bean", "java.data.Bean");
+        classNames.put("NodeBean", "java.data.NodeBean");
         classNames.put("Data", "java.data.Data");
         classNames.put("Transaction", "java.data.Transaction");
         classNames.put("IntField", "java.data.field.IntField");
@@ -71,13 +71,6 @@ public class DataGenerator extends Generator {
         classNames.put("SetField", "java.data.field.SetField");
         classNames.put("ShortField", "java.data.field.ShortField");
         classNames.put("StringField", "java.data.field.StringField");
-
-        classNames.put("Codec", "org.bson.codecs.Codec");
-        classNames.put("CodecRegistry", "org.bson.codecs.configuration.CodecRegistry");
-        classNames.put("BsonReader", "org.bson.BsonReader");
-        classNames.put("BsonWriter", "org.bson.BsonWriter");
-        classNames.put("DecoderContext", "org.bson.codecs.DecoderContext");
-        classNames.put("BsonType", "org.bson.codecs.BsonType");
     }
 
     public DataGenerator(Properties options) {
@@ -132,13 +125,17 @@ public class DataGenerator extends Generator {
     @Override
     protected void prepareBean(BeanDefinition beanDefinition) {
         beanDefinition.addImport("java.util.*");
-        beanDefinition.addImport("org.bson.*");
-        beanDefinition.addImport("org.bson.codecs.*");
+        beanDefinition.addImport("org.bson.BsonType");
+        beanDefinition.addImport("org.bson.BsonReader");
+        beanDefinition.addImport("org.bson.BsonWriter");
+        beanDefinition.addImport("org.bson.codecs.Codec");
+        beanDefinition.addImport("org.bson.codecs.EncoderContext");
+        beanDefinition.addImport("org.bson.codecs.DecoderContext");
         beanDefinition.addImport("org.bson.codecs.configuration.CodecRegistry");
         beanDefinition.addImport("quan.data.*");
         beanDefinition.addImport("quan.data.field.*");
         if (beanDefinition instanceof DataDefinition) {
-            beanDefinition.addImport("quan.data.mongo.DataCodecProvider");
+            beanDefinition.addImport("quan.data.bson.JsonStringWriter");
         }
 
         super.prepareBean(beanDefinition);

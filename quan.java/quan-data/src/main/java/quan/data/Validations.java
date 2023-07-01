@@ -32,14 +32,6 @@ public class Validations {
         Objects.requireNonNull(value, "字段值不能为null");
     }
 
-    public static Transaction validateTransaction() {
-        Transaction transaction = Transaction.get();
-        if (transaction == null) {
-            transactionError();
-        }
-        return transaction;
-    }
-
     public static void transactionError() {
         throw new IllegalStateException("当前不在事务中");
     }

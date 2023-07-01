@@ -10,7 +10,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static java.lang.Boolean.FALSE;
-import static quan.data.Validations.validateTransaction;
 
 /**
  * 事务实现，多线程并发时需要自己加锁，否则隔离级别就是【读已提交】
@@ -159,6 +158,17 @@ public class Transaction {
      */
     public static boolean isInside() {
         return threadLocal.get() != null;
+    }
+
+    /**
+     * 获取当前事务
+     */
+    public static Transaction get(boolean validate) {
+        Transaction transaction = threadLocal.get();
+        if (validate && transaction == null) {
+            Validations.transactionError();
+        }
+        return transaction;
     }
 
     /**
@@ -333,7 +343,7 @@ public class Transaction {
      */
     public static void rollback() {
         //标记事务为失败状态
-        Transaction transaction = validateTransaction();
+        Transaction transaction = get(true);
         transaction.failed = true;
     }
 
@@ -387,7 +397,7 @@ public class Transaction {
      * 在当前事务执行成功之后再执行特殊任务
      */
     public static void onSucceeded(Runnable task) {
-        Transaction transaction = validateTransaction();
+        Transaction transaction = get(true);
         transaction.listeners.add(new Listener(task, Listener.WHEN_SUCCEEDED));
     }
 
@@ -395,7 +405,7 @@ public class Transaction {
      * 在当前事务执行失败之后再执行特殊任务
      */
     public static void onFailed(Runnable task) {
-        Transaction transaction = validateTransaction();
+        Transaction transaction = get(true);
         transaction.listeners.add(new Listener(task, Listener.WHEN_FAILED));
     }
 
@@ -403,7 +413,7 @@ public class Transaction {
      * 在当前事务执行完成(不管成功或者失败)之后再执行特殊任务
      */
     public static void onFinished(Runnable task) {
-        Transaction transaction = validateTransaction();
+        Transaction transaction = get(true);
         transaction.listeners.add(new Listener(task, Listener.WHEN_FINISHED));
     }
 

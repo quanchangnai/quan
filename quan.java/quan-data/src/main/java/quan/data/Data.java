@@ -1,7 +1,5 @@
 package quan.data;
 
-import quan.data.mongo.DataJsonWriter;
-
 import java.util.Collections;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -9,7 +7,7 @@ import java.util.function.BiConsumer;
 /**
  * 数据类对应一张表，每个数据实例对应表中的一行
  */
-public abstract class Data<I> {
+public abstract class Data<I> implements Entity {
 
     /**
      * 主键(_id)
@@ -131,12 +129,6 @@ public abstract class Data<I> {
         } else {
             this.writer = null;
             this.state = null;
-        }
-    }
-
-    public String toJson() {
-        try (DataJsonWriter dataJsonWriter = new DataJsonWriter(this)) {
-            return dataJsonWriter.toJson();
         }
     }
 

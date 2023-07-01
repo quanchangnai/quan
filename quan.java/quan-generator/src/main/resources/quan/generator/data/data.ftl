@@ -206,6 +206,10 @@ public class ${name} extends <#if kind ==2>${getDependentName("Bean")}<#elseif k
                 '}';
 
     }
+
+    public static ${name} parseJson(${getDependentName("String")} json) {
+        return Entity.parseJson(${name}.class, json);
+    }
     <#assign bsonTypes={"byte":"Int32","bool":"Boolean","short":"Int32","int":"Int32","long":"Int64","float":"Double","double":"Double","string":"String"}/>
     <#assign convertTypes={"byte":"byte","short":"short","float":"float"}/>
 
@@ -284,7 +288,7 @@ public class ${name} extends <#if kind ==2>${getDependentName("Bean")}<#elseif k
             writer.writeStartDocument();
             <#if kind ==5>
 
-            if (writer instanceof ${getDependentName("DataCodecProvider")}) {
+            if (writer instanceof ${getDependentName("JsonStringWriter")}) {
                 writer.write${bsonTypes[idField.type]}(${name}.${idField.underscoreName}, value.${idField.name}.getValue(transaction));
             } else {
                 writer.write${bsonTypes[idField.type]}(${name}._ID, value.${idField.name}.getValue(transaction));

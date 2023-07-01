@@ -1,8 +1,12 @@
 package quan.data.item;
 
 import java.util.*;
-import org.bson.*;
-import org.bson.codecs.*;
+import org.bson.BsonReader;
+import org.bson.BsonType;
+import org.bson.BsonWriter;
+import org.bson.codecs.Codec;
+import org.bson.codecs.DecoderContext;
+import org.bson.codecs.EncoderContext;
 import org.bson.codecs.configuration.CodecRegistry;
 import quan.data.*;
 import quan.data.field.*;
@@ -71,6 +75,10 @@ public class ItemBean extends Bean {
                 ",list=" + list +
                 '}';
 
+    }
+
+    public static ItemBean parseJson(String json) {
+        return Entity.parseJson(ItemBean.class, json);
     }
 
     public static class CodecImpl implements Codec<ItemBean> {

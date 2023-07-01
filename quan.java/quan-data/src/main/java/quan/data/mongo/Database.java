@@ -12,6 +12,7 @@ import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.conversions.Bson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import quan.data.bson.EntityCodecProvider;
 import quan.data.Data;
 import quan.data.DataWriter;
 import quan.data.Index;
@@ -91,7 +92,7 @@ public class Database implements DataWriter, MongoDatabase, Executor {
     private void initClient(MongoClientSettings.Builder clientSettings, String databaseName) {
         Assertions.notNull("databaseName", databaseName);
 
-        clientSettings.codecRegistry(CodecRegistries.fromProviders(DataCodecProvider.getDefault(), MongoClientSettings.getDefaultCodecRegistry()));
+        clientSettings.codecRegistry(CodecRegistries.fromProviders(EntityCodecProvider.DEFAULT_PROVIDER, MongoClientSettings.getDefaultCodecRegistry()));
         client = MongoClients.create(clientSettings.build());
 
         initExecutors();

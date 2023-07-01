@@ -1,32 +1,34 @@
-package quan.data.mongo;
+package quan.data.bson;
 
 import org.bson.codecs.Codec;
 import org.bson.codecs.configuration.CodecProvider;
+import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import quan.data.Bean;
-import quan.data.Data;
+import quan.data.Entity;
 
 import java.util.HashMap;
 import java.util.Map;
 
 
 @SuppressWarnings("unchecked")
-public class DataCodecProvider implements CodecProvider {
+public class EntityCodecProvider implements CodecProvider {
 
-    protected final static Logger logger = LoggerFactory.getLogger(DataCodecProvider.class);
+    protected final static Logger logger = LoggerFactory.getLogger(EntityCodecProvider.class);
 
-    private static DataCodecProvider _default = new DataCodecProvider();
+    public static final EntityCodecProvider DEFAULT_PROVIDER = new EntityCodecProvider();
+
+    public static final CodecRegistry DEFAULT_REGISTRY = CodecRegistries.fromProviders(DEFAULT_PROVIDER);
 
     private Map<Class<?>, Codec<?>> codecs = new HashMap<>();
 
-    public DataCodecProvider() {
+    public EntityCodecProvider() {
     }
 
     @Override
     public <T> Codec<T> get(Class<T> clazz, CodecRegistry registry) {
-        if (!Data.class.isAssignableFrom(clazz) && !Bean.class.isAssignableFrom(clazz)) {
+        if (!Entity.class.isAssignableFrom(clazz)) {
             return null;
         }
 
@@ -43,10 +45,6 @@ public class DataCodecProvider implements CodecProvider {
         }
 
         return codec;
-    }
-
-    public static DataCodecProvider getDefault() {
-        return _default;
     }
 
 }
