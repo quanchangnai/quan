@@ -279,7 +279,8 @@ public abstract class CodedBuffer {
     public static int validateScale(double n, int scale) {
         return validateScale(n, scale, null);
     }
-    public static int validateScale(double n, int scale,String name) {
+
+    public static int validateScale(double n, int scale, String name) {
         name = name == null ? "参数" : name;
         double times = Math.pow(10, scale);
         double minValue = Integer.MIN_VALUE * times;
@@ -287,7 +288,7 @@ public abstract class CodedBuffer {
 
         if (n < minValue || n > maxValue) {
             String format = "%s(%s)超出了限定范围(%s,%s),无法转换为指定精度(%s)的定点型数据";
-            throw new IllegalArgumentException(String.format(format, name,n, minValue, maxValue, scale));
+            throw new IllegalArgumentException(String.format(format, name, n, minValue, maxValue, scale));
         }
 
         return (int) Math.floor(n * times);

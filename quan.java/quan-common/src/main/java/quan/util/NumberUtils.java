@@ -38,6 +38,8 @@ public class NumberUtils extends org.apache.commons.lang3.math.NumberUtils {
     }
 
     public static void validateMax(Number value, Number max, String name) {
+        name = name == null ? "参数" : name;
+
         if (value == null || max == null) {
             throw new IllegalArgumentException(String.format("%s(%s,%s)不能为空", name, value, max));
         }
