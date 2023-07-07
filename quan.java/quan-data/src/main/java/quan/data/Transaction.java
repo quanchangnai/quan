@@ -1,6 +1,7 @@
 package quan.data;
 
-import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
+import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.data.field.Field;
@@ -39,17 +40,17 @@ public class Transaction {
     boolean failed;
 
     /**
-     * 记录数据的状态(插入、更新、删除)和使用的写入器
+     * 数据日志
      */
     private Map<Data<?>, Data.Log> dataLogs = new LinkedHashMap<>();
 
     /**
-     * 记录节点的根
+     * 节点日志
      */
-    private Map<Node, Data<?>> rootLogs = new HashMap<>();
+    private Map<Node, Node.Log> nodeLogs = new HashMap<>();
 
     /**
-     * 记录字段值
+     * 字段日志
      */
     private Map<Field, Object> fieldLogs = new HashMap<>();
 
@@ -87,8 +88,8 @@ public class Transaction {
         return globalOptional || localOptional.get();
     }
 
-    void setDataLog(Data<?> data, Data.Log log) {
-        dataLogs.put(data, log);
+    void setDataLog(Data<?> data, DataWriter writer, Data.State state) {
+        dataLogs.put(data, new Data.Log(writer, state));
     }
 
     Data.Log getDataLog(Data<?> data) {
@@ -107,12 +108,37 @@ public class Transaction {
         return null;
     }
 
-    void setFieldLog(Field field, Object value, Data<?> data) {
+    Data.Log getPrevDataLog(Data<?> data, Data.Log log) {
+        boolean finded = dataLogs.get(data) == log;
+
+        for (int i = depth - 2; i >= 0; i--) {
+            Data.Log _log = savepoints[i].dataLogs.get(data);
+            if (finded && _log != null) {
+                return _log;
+            }
+            if (_log == log) {
+                finded = true;
+            }
+        }
+
+        return null;
+    }
+
+    void setFieldLog(Field field, Object value, Data<?> owner, int position) {
         fieldLogs.put(field, value);
-        if (data != null && !dataLogs.containsKey(data)) {
-            DataWriter writer = data._getWriter();
-            if (writer != null) {
-                setDataLog(data, new Data.Log(writer, Data.State.SAVE));
+
+        if (field instanceof Node) {
+            setNodeLog((Node) field, owner, position);
+        }
+
+        if (owner != null) {
+            Data.Log dataLog = getDataLog(owner);
+            if (dataLog == null && owner.state == Data.State.UPDATE) {
+                setDataLog(owner, owner._getWriter(), owner.state);
+                dataLog = getDataLog(owner);
+            }
+            if (dataLog != null) {
+                dataLog.updatedFields.set(position);
             }
         }
     }
@@ -133,18 +159,20 @@ public class Transaction {
         return null;
     }
 
-    void setRootLog(Node node, Data<?> root) {
-        rootLogs.put(node, root);
+    void setNodeLog(Node node, Data<?> owner, int position) {
+        Node.Log log = nodeLogs.computeIfAbsent(node, k -> new Node.Log());
+        log.owner = owner;
+        log.position = position;
     }
 
-    Data<?> getRootLog(Node node) {
-        Data<?> log = rootLogs.get(node);
+    Node.Log getNodeLog(Node node) {
+        Node.Log log = nodeLogs.get(node);
         if (log != null) {
             return log;
         }
 
         for (int i = depth - 2; i >= 0; i--) {
-            log = savepoints[i].rootLogs.get(node);
+            log = savepoints[i].nodeLogs.get(node);
             if (log != null) {
                 return log;
             }
@@ -291,7 +319,7 @@ public class Transaction {
         Savepoint savepoint = new Savepoint();
         savepoint.failed = transaction.failed;
         savepoint.dataLogs = transaction.dataLogs;
-        savepoint.rootLogs = transaction.rootLogs;
+        savepoint.nodeLogs = transaction.nodeLogs;
         savepoint.fieldLogs = transaction.fieldLogs;
         savepoint.listeners = transaction.listeners;
 
@@ -300,7 +328,7 @@ public class Transaction {
 
         transaction.failed = false;
         transaction.dataLogs = new HashMap<>();
-        transaction.rootLogs = new HashMap<>();
+        transaction.nodeLogs = new HashMap<>();
         transaction.fieldLogs = new HashMap<>();
         transaction.listeners = new ArrayList<>();
     }
@@ -315,7 +343,7 @@ public class Transaction {
 
         if (!transaction.failed) {
             savepoint.dataLogs.putAll(transaction.dataLogs);
-            savepoint.rootLogs.putAll(transaction.rootLogs);
+            savepoint.nodeLogs.putAll(transaction.nodeLogs);
             savepoint.fieldLogs.putAll(transaction.fieldLogs);
         }
 
@@ -332,7 +360,7 @@ public class Transaction {
         }
 
         transaction.dataLogs = savepoint.dataLogs;
-        transaction.rootLogs = savepoint.rootLogs;
+        transaction.nodeLogs = savepoint.nodeLogs;
         transaction.fieldLogs = savepoint.fieldLogs;
         transaction.failed = savepoint.failed;
         transaction.listeners = savepoint.listeners;
@@ -352,40 +380,46 @@ public class Transaction {
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
     private void commit() {
-        for (Node node : rootLogs.keySet()) {
-            node.commit(rootLogs.get(node));
+        for (Node node : nodeLogs.keySet()) {
+            node.commit(nodeLogs.get(node));
         }
 
         for (Field field : fieldLogs.keySet()) {
             field.commit(fieldLogs.get(field));
         }
 
-        Map<DataWriter, Pair> writings = new HashMap<>();
-        Function<DataWriter, Pair> function = w -> Pair.of(new LinkedHashSet(), new LinkedHashSet<>());
+        Map<DataWriter, Triple> writes = new HashMap<>();
+        Function<DataWriter, Triple> newTriple = k -> Triple.of(new LinkedHashSet(), new LinkedHashMap<>(), new LinkedHashSet<>());
 
         for (Data<?> data : dataLogs.keySet()) {
             Data.Log log = dataLogs.get(data);
             data.commit(log);
 
-            if (log.writer == null || log.state == null) {
-                continue;
+            if (log.writer != null && log.state != null) {
+                Triple<Set, Map, Set> write = writes.computeIfAbsent(log.writer, newTriple);
+                switch (log.state) {
+                    case INSERT:
+                        write.getLeft().add(data);
+                        break;
+                    case UPDATE:
+                        Document patch = data._getUpdatePatch();
+                        if (patch != null) {
+                            write.getMiddle().put(data, patch);
+                        }
+                        break;
+                    case DELETE:
+                        write.getRight().add(data);
+                        break;
+                }
             }
 
-            Pair<Set, Set> writing = writings.computeIfAbsent(log.writer, function);
-            switch (log.state) {
-                case SAVE:
-                    writing.getLeft().add(data);
-                    break;
-                case DELETE:
-                    writing.getRight().add(data);
-                    break;
-            }
+            data._updatedFields.clear();
         }
 
-        for (DataWriter writer : writings.keySet()) {
+        for (DataWriter writer : writes.keySet()) {
             try {
-                Pair<Set, Set> writing = writings.get(writer);
-                writer.write(writing.getLeft(), writing.getRight());
+                Triple<Set, Map, Set> write = writes.get(writer);
+                writer.write(write.getLeft(), write.getRight(), write.getMiddle());
             } catch (Exception e) {
                 logger.error("内存事务提交后写数据库出错", e);
             }
@@ -427,7 +461,7 @@ public class Transaction {
 
         Map<Data<?>, Data.Log> dataLogs = new LinkedHashMap<>();
 
-        Map<Node, Data<?>> rootLogs = new HashMap<>();
+        Map<Node, Node.Log> nodeLogs = new HashMap<>();
 
         Map<Field, Object> fieldLogs = new HashMap<>();
 

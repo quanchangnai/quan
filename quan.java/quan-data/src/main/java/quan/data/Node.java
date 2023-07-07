@@ -3,54 +3,100 @@ package quan.data;
 /**
  * 数据节点
  */
-public abstract class Node extends Loggable {
-
-    private Data<?> root;
-
-    protected void _setRoot(Data<?> root) {
-        this.root = root;
-    }
-
-    protected Data<?> _getRoot() {
-        return root;
-    }
+public abstract class Node extends Protection {
 
     /**
-     * 提交节点的根
+     * 拥有者，即所属的数据
      */
-    protected void commit(Data<?> root) {
-        this.root = root;
+    private Data<?> owner;
+
+    /**
+     * 在数据中的位置，即数据的第几个字段
+     */
+    private int position;
+
+    protected void _setOwner(Data<?> owner, int position, boolean updateField) {
+        this.owner = owner;
+        this.position = position;
+        if (owner != null && updateField) {
+            owner._updatedFields.set(position);
+        }
     }
 
-    protected Data<?> _getLogRoot() {
-        return _getLogRoot(Transaction.get());
+    protected Data<?> _getOwner() {
+        return owner;
     }
 
-    protected Data<?> _getLogRoot(Transaction transaction) {
+    protected int _getPosition() {
+        return position;
+    }
+
+    protected void commit(Log log) {
+        this.owner = log.owner;
+        this.position = log.position;
+        if (owner != null) {
+            owner._updatedFields.set(this.position);
+        }
+    }
+
+    protected void _setLogOwner(Data<?> owner, int position) {
+        _setNodeLog(Transaction.get(), this, owner, position);
+        _setChildrenLogOwner(owner, position);
+    }
+
+    protected Data<?> _getLogOwner() {
+        return _getLogOwner(Transaction.get());
+    }
+
+    protected Data<?> _getLogOwner(Transaction transaction) {
         if (transaction != null) {
-            Data<?> root = _getRootLog(transaction, this);
-            if (root != null) {
-                return root;
+            Log log = _getNodeLog(transaction, this);
+            if (log != null) {
+                return log.owner;
             }
         }
-        return root;
+        return owner;
     }
 
-    protected void _setLogRoot(Data<?> root) {
-        _setRootLog(Transaction.get(), this, root);
-        _setChildrenLogRoot(root);
+    protected int _getLogPosition() {
+        return _getLogPosition(Transaction.get());
     }
 
-    protected abstract void _setChildrenLogRoot(Data<?> root);
-
-    protected static void _setRoot(Node node, Data<?> root) {
-        node._setRoot(root);
-    }
-
-    protected static void _setLogRoot(Node node, Data<?> root) {
-        if (node != null) {
-            node._setLogRoot(root);
+    protected int _getLogPosition(Transaction transaction) {
+        if (transaction != null) {
+            Log log = _getNodeLog(transaction, this);
+            if (log != null) {
+                return log.position;
+            }
         }
+        return position;
+    }
+
+
+    protected abstract void _setChildrenLogOwner(Data<?> owner, int position);
+
+    protected static void _setOwner(Node node, Data<?> owner, int position) {
+        node._setOwner(owner, position, true);
+    }
+
+    protected static void _setLogOwner(Node node, Data<?> owner, int position) {
+        if (node != null) {
+            node._setLogOwner(owner, position);
+        }
+    }
+
+    static class Log {
+
+        /**
+         * @see Node#owner
+         */
+        Data<?> owner;
+
+        /**
+         * @see Node#position
+         */
+        int position;
+
     }
 
 }

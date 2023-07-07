@@ -1,45 +1,66 @@
 package quan.data;
 
+import org.bson.Document;
+
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 
 /**
- * 负责把数据的插入、更新和删除操作写到到数据库
+ * 数据写入器，负责数据的插入、删除和更新
  */
 public interface DataWriter {
 
     /**
      * 把数据更改写到数据库
+     *
+     * @param inserts 要插入的数据
+     * @param deletes 要删除的数据
+     * @param updates 要更新的数据和更新补丁
      */
-    void write(Set<Data<?>> saves, Set<Data<?>> deletes);
+    void write(Set<Data<?>> inserts, Set<Data<?>> deletes, Map<Data<?>, Document> updates);
 
     /**
-     * 保存数据到数据库，参考{@link Data#save(DataWriter)}
+     * 插入数据，参考{@link Data#insert(DataWriter)}
      */
-    default void save(Data<?>... data) {
-        Arrays.stream(data).forEach(d -> d.save(this));
+    default void insert(Data<?>... data) {
+        Arrays.stream(data).forEach(d -> d.insert(this));
     }
 
     /**
-     * 保存数据到数据库，参考{@link Data#save(DataWriter)}
+     * 插入数据，参考{@link Data#insert(DataWriter)}
      */
-    default void save(Collection<? extends Data<?>> data) {
-        data.forEach(d -> d.save(this));
+    default void insert(Collection<? extends Data<?>> data) {
+        data.forEach(d -> d.insert(this));
     }
 
     /**
-     * 从数据库中删除数据，参考{@link Data#delete(DataWriter)}
+     * 删除数据，参考{@link Data#delete(DataWriter)}
      */
     default void delete(Data<?>... data) {
         Arrays.stream(data).forEach(d -> d.delete(this));
     }
 
     /**
-     * 从数据库中删除数据，参考{@link Data#delete(DataWriter)}
+     * 删除数据，参考{@link Data#delete(DataWriter)}
      */
     default void delete(Collection<? extends Data<?>> data) {
         data.forEach(d -> d.delete(this));
+    }
+
+    /**
+     * 更新数据，参考{@link Data#update(DataWriter)}
+     */
+    default void update(Data<?>... data) {
+        Arrays.stream(data).forEach(d -> d.update(this));
+    }
+
+    /**
+     * 更新数据，参考{@link Data#update(DataWriter)}
+     */
+    default void update(Collection<? extends Data<?>> data) {
+        data.forEach(d -> d.update(this));
     }
 
 }

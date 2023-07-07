@@ -8,28 +8,29 @@ import java.util.Objects;
 public class Validations {
 
     public static void validateMapKey(Object key) {
-        Objects.requireNonNull(key, "map的key不能为null");
+        Objects.requireNonNull(key, "map的key不能为空");
     }
 
     public static void validateCollectionValue(Object value) {
-        Objects.requireNonNull(value, "集合元素不能为null");
+        Objects.requireNonNull(value, "集合元素不能为空");
         if (value instanceof Bean) {
-            validateEntityRoot((Bean) value);
+            validateEntityOwner((Bean) value);
         }
     }
 
-    public static void validateEntityRoot(Bean bean) {
+    public static void validateEntityOwner(Bean bean) {
         if (bean == null) {
             return;
         }
-        Data<?> root = bean._getLogRoot();
-        if (root != null) {
-            throw new IllegalStateException("参数已经受到了" + root.getClass().getSimpleName() + "[" + root.id() + "]的管理");
+
+        Data<?> owner = bean._getLogOwner();
+        if (owner != null) {
+            throw new IllegalStateException(String.format("参数已经受到了[%s(%s)]的管理", owner.getClass().getName(), owner.id()));
         }
     }
 
     public static void validateFieldValue(Object value) {
-        Objects.requireNonNull(value, "字段值不能为null");
+        Objects.requireNonNull(value, "字段值不能为空");
     }
 
     public static void transactionError() {

@@ -1,63 +1,37 @@
 package quan.data.field;
 
-import quan.data.*;
+import quan.data.Bean;
+import quan.data.Data;
+import quan.data.Transaction;
+import quan.data.Validations;
 
 /**
  * Created by quanchangnai on 2019/5/16.
  */
 @SuppressWarnings("unchecked")
-public final class BeanField<V extends Bean> extends Loggable implements Field {
-
-    private V value;
+public final class BeanField<V extends Bean> extends BaseField<V> implements Field {
 
     public BeanField() {
+        super(null);
     }
 
-    public void setValue(V value) {
-        this.value = value;
-    }
-
-    @Override
-    public void commit(Object log) {
-        this.value = (V) log;
-    }
-
-    public V getValue() {
-        return getValue(Transaction.get());
-    }
-
-    public V getValue(Transaction transaction) {
-        if (transaction != null) {
-            V log = (V) _getFieldLog(transaction, this);
-            if (log != null) {
-                return log;
-            }
-        }
-        return value;
-    }
-
-    public void setValue(V value, Data<?> root) {
-        Validations.validateEntityRoot(value);
+    public void setValue(V value, Data<?> owner, int position) {
+        Validations.validateEntityOwner(value);
         Transaction transaction = Transaction.get();
 
         if (transaction != null) {
             V log = (V) _getFieldLog(transaction, this);
             if (log != null) {
-                _setRootLog(transaction, log, null);
+                _setNodeLog(transaction, log, null, 0);
             }
-            _setRootLog(transaction, value, root);
+            _setFieldLog(transaction, this, value, owner, position);
         } else if (Transaction.isOptional()) {
-            _setRoot(this.value, null);
-            this.value = value;
-            _setRoot(value, root);
+            _setNodeOwner(this.getValue(), null, 0);
+            setValue(value);
+            _setNodeOwner(value, owner, position);
         } else {
             Validations.transactionError();
         }
-    }
-
-    @Override
-    public String toString() {
-        return String.valueOf(getValue());
     }
 
 }

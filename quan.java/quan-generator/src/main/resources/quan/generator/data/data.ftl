@@ -38,17 +38,22 @@ public class ${name} extends <#if kind ==2>${getDependentName("Bean")}<#elseif k
     public static final ${getDependentName("String")} ${field.underscoreName} = "${field.name}";
 </#list>
 
-<#assign root><#if kind ==5>this<#else>_getLogRoot()</#if></#assign>
+<#assign owner><#if kind ==5>this<#else>_getLogOwner()</#if></#assign>
+<#macro position index><#if kind ==5>${index + 1}<#else>_getLogPosition()</#if></#macro>
 <#list fields as field>
 
     <#if field.type == "set" || field.type == "list">
-    private final ${field.classType}<${field.valueClassType}> ${field.name} = new ${field.classType}<>(${root});
+    private final ${field.classType}<${field.valueClassType}> ${field.name} = new ${field.classType}<>(${owner}, <@position field?index/>);
     <#elseif field.type == "map">
-    private final ${field.classType}<${field.keyClassType}, ${field.valueClassType}> ${field.name} = new ${field.classType}<>(${root});
-    <#elseif field.enumType>
-    private final ${getDependentName("IntField")} ${field.name} = new ${getDependentName("IntField")}();
-    <#elseif field.primitiveType>
-    private final ${getDependentName(field.type?cap_first+"Field")} ${field.name} = new ${getDependentName(field.type?cap_first+"Field")}();
+    private final ${field.classType}<${field.keyClassType}, ${field.valueClassType}> ${field.name} = new ${field.classType}<>(${owner}, <@position field?index/>);
+    <#elseif field.enumType || field.type="int">
+    private final ${getDependentName("BaseField")}<${getDependentName("Integer")}> ${field.name} = new ${getDependentName("BaseField")}<>(0);
+    <#elseif field.type =="bool">
+    private final ${getDependentName("BaseField")}<${field.classType}> ${field.name} = new ${getDependentName("BaseField")}<>(false);
+    <#elseif field.type =="string">
+    private final ${getDependentName("BaseField")}<${field.classType}> ${field.name} = new ${getDependentName("BaseField")}<>("");
+    <#elseif field.numberType>
+    private final ${getDependentName("BaseField")}<${field.classType}> ${field.name} = new ${getDependentName("BaseField")}<>((${field.basicType}) 0);
     <#else>
     private final ${getDependentName("BeanField")}<${field.classType}> ${field.name} = new ${getDependentName("BeanField")}<>();
     </#if>
@@ -62,7 +67,7 @@ public class ${name} extends <#if kind ==2>${getDependentName("Bean")}<#elseif k
     <#if idField.type=="string">    
         ${getDependentName("Objects")}.requireNonNull(${idName}, "参数[${idName}]不能为空");
     </#if>
-        this.${idName}.setValue(${idName},this);
+        this.set${idName?cap_first}(${idName});
     }
 
     /**
@@ -130,7 +135,7 @@ public class ${name} extends <#if kind ==2>${getDependentName("Bean")}<#elseif k
      */
     </#if>
     public ${name} set${field.name?cap_first}(${field.classType} ${field.name}) {
-        this.${field.name}.setValue(${field.name}.value, ${root});
+        this.${field.name}.setValue(${field.name}.value, ${owner}, <@position field?index/>);
         return this;
     }
 
@@ -152,7 +157,7 @@ public class ${name} extends <#if kind ==2>${getDependentName("Bean")}<#elseif k
         <#elseif field.max??>
         ${getDependentName("NumberUtils")}.validateMax(${field.name}, ${field.max}, "参数[${field.name}]");
         </#if>
-        this.${field.name}.setValue(${field.name}, ${root});
+        this.${field.name}.setValue(${field.name}, ${owner}, <@position field?index/>);
         return this;
     }
 
@@ -167,7 +172,7 @@ public class ${name} extends <#if kind ==2>${getDependentName("Bean")}<#elseif k
      */
     </#if>
     public ${name} set${field.name?cap_first}(${field.classType} ${field.name}) {
-        this.${field.name}.setValue(${field.name}, ${root});
+        this.${field.name}.setValue(${field.name}, ${owner}, <@position field?index/>);
         return this;
     }
 
@@ -176,15 +181,43 @@ public class ${name} extends <#if kind ==2>${getDependentName("Bean")}<#elseif k
 <#if kind !=5>
 
     @${getDependentName("Override")}
-    protected void _setChildrenLogRoot(${getDependentName("Data")}<?> root) {
+    protected void _setChildrenLogOwner(${getDependentName("Data")}<?> owner, int position) {
     <#list fields as field>
         <#if field.collectionType>
-        _setLogRoot(${field.name}, root);
+        _setLogOwner(${field.name}, owner, position);
         <#elseif field.beanType>
-        _setLogRoot(${field.name}.getValue(), root);
+        _setLogOwner(${field.name}.getValue(), owner, positionr);
         </#if>
     </#list>
     }
+ <#elseif fields?size gt 1>
+
+    @${getDependentName("Override")}
+    protected ${getDependentName("Document")} _getUpdatePatch() {
+        if (_updatedFields.isEmpty()) {
+            return null;
+        }
+
+        ${getDependentName("Transaction")} transaction = ${getDependentName("Transaction")}.get();
+        ${getDependentName("Document")} patch = new ${getDependentName("Document")}();
+
+    <#list fields as field>
+        <#if field.ignore || field==idField>
+            <#continue/>
+        <#else>
+        if (_updatedFields.get(${field?index+1})) {
+            <#if field.collectionType>
+            patch.put(${field.underscoreName}, this.${field.name}.getCurrent(transaction));
+            <#else>
+            patch.put(${field.underscoreName}, this.${field.name}.getValue(transaction));
+            </#if>
+        }
+
+       </#if>
+    </#list>
+        return patch;
+    }
+
 </#if>
 
     @${getDependentName("Override")}

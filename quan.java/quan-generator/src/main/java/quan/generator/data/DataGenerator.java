@@ -135,6 +135,7 @@ public class DataGenerator extends Generator {
         beanDefinition.addImport("quan.data.*");
         beanDefinition.addImport("quan.data.field.*");
         if (beanDefinition instanceof DataDefinition) {
+            beanDefinition.addImport("org.bson.Document");
             beanDefinition.addImport("quan.data.bson.JsonStringWriter");
         }
 

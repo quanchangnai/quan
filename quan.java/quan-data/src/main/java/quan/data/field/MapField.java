@@ -16,8 +16,8 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
 
     private Delegate<K, V> delegate = new Delegate<>(this);
 
-    public MapField(Data<?> root) {
-        _setRoot(root);
+    public MapField(Data<?> owner, int position) {
+        _setOwner(owner, position, false);
     }
 
     public Map<K, V> getDelegate() {
@@ -30,10 +30,10 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
     }
 
     @Override
-    public void _setChildrenLogRoot(Data<?> root) {
+    public void _setChildrenLogOwner(Data<?> owner, int position) {
         for (V value : getCurrent().values()) {
             if (value instanceof Bean) {
-                _setLogRoot((Bean) value, root);
+                _setLogOwner((Bean) value, owner, position);
             }
         }
     }
@@ -89,14 +89,15 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
             V oldValue = oldMap.get(key);
             PMap<K, V> newMap = oldMap.plus(key, value);
 
-            Data<?> root = _getLogRoot(transaction);
+            Data<?> owner = _getLogOwner(transaction);
+            int position = _getLogPosition();
             if (value instanceof Bean) {
-                _setLogRoot((Bean) value, root);
+                _setLogOwner((Bean) value, owner, position);
             }
             if (oldValue instanceof Bean) {
-                _setLogRoot((Bean) oldValue, null);
+                _setLogOwner((Bean) oldValue, null, 0);
             }
-            _setFieldLog(transaction, this, newMap, root);
+            _setFieldLog(transaction, this, newMap, owner, position);
 
             return oldValue;
         } else if (Transaction.isOptional()) {
@@ -115,11 +116,11 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
         origin = origin.plus(key, value);
 
         if (value instanceof Bean) {
-            _setRoot((Bean) value, _getRoot());
+            _setOwner((Bean) value, _getOwner(), _getPosition());
         }
 
         if (oldValue instanceof Bean) {
-            _setRoot((Bean) oldValue, null);
+            _setOwner((Bean) oldValue, null, 0);
         }
 
         return oldValue;
@@ -133,16 +134,16 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
             PMap<K, V> oldMap = getCurrent(transaction);
             V value = oldMap.get(key);
             if (value != null) {
-                _setFieldLog(transaction, this, oldMap.minus(key), _getLogRoot(transaction));
+                _setFieldLog(transaction, this, oldMap.minus(key), _getLogOwner(transaction), _getLogPosition(transaction));
                 if (value instanceof Bean) {
-                    _setLogRoot((Bean) value, null);
+                    _setLogOwner((Bean) value, null, 0);
                 }
             }
             return value;
         } else if (Transaction.isOptional()) {
             V value = origin.get(key);
             if (value instanceof Bean) {
-                _setRoot((Bean) value, null);
+                _setOwner((Bean) value, null, 0);
             }
             return value;
         } else {
@@ -159,32 +160,34 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
         Transaction transaction = Transaction.get();
         if (transaction != null) {
             PMap<K, V> oldMap = getCurrent(transaction);
-            Data<?> root = _getLogRoot(transaction);
-            _setFieldLog(transaction, this, oldMap.plusAll(m), root);
+            Data<?> owner = _getLogOwner(transaction);
+            int position = _getLogPosition();
+            _setFieldLog(transaction, this, oldMap.plusAll(m), owner, position);
 
             for (K key : m.keySet()) {
                 V newValue = m.get(key);
                 if (newValue instanceof Bean) {
-                    _setLogRoot((Bean) newValue, root);
+                    _setLogOwner((Bean) newValue, owner, position);
                 }
                 V oldValue = oldMap.get(key);
                 if (oldValue != newValue && oldValue instanceof Bean) {
-                    _setLogRoot((Bean) oldValue, null);
+                    _setLogOwner((Bean) oldValue, null, 0);
                 }
             }
         } else if (Transaction.isOptional()) {
             PMap<K, V> oldMap = origin;
             origin = oldMap.plusAll(m);
-            Data<?> root = _getRoot();
+            Data<?> owner = _getOwner();
+            int position = _getPosition();
 
             for (K key : m.keySet()) {
                 V newValue = m.get(key);
                 if (newValue instanceof Bean) {
-                    _setRoot((Bean) newValue, root);
+                    _setOwner((Bean) newValue, owner, position);
                 }
                 V oldValue = oldMap.get(key);
                 if (oldValue != newValue && oldValue instanceof Bean) {
-                    _setRoot((Bean) oldValue, null);
+                    _setOwner((Bean) oldValue, null, 0);
                 }
             }
         } else {
@@ -201,12 +204,12 @@ public final class MapField<K, V> extends Node implements Map<K, V>, Field {
         }
 
         if (transaction != null) {
-            _setChildrenLogRoot(null);
-            _setFieldLog(transaction, this, Empty.map(), _getLogRoot(transaction));
+            _setChildrenLogOwner(null, 0);
+            _setFieldLog(transaction, this, Empty.map(), _getLogOwner(transaction), _getLogPosition(transaction));
         } else if (Transaction.isOptional()) {
             for (V value : this.origin.values()) {
                 if (value instanceof Bean) {
-                    _setRoot((Bean) value, null);
+                    _setOwner((Bean) value, null, 0);
                 }
             }
             if (!this.origin.isEmpty()) {

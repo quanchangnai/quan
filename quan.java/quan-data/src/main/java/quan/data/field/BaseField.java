@@ -1,33 +1,38 @@
 package quan.data.field;
 
 import quan.data.Data;
-import quan.data.Loggable;
+import quan.data.Protection;
 import quan.data.Transaction;
 import quan.data.Validations;
 
 /**
  * Created by quanchangnai on 2020/4/17.
  */
-public class ShortField extends Loggable implements Field {
+@SuppressWarnings("unchecked")
+public class BaseField<V> extends Protection implements Field {
 
-    private short value;
+    private V value;
 
-    public void setValue(short value) {
+    public BaseField(V value) {
+        this.value = value;
+    }
+
+    public void setValue(V value) {
         this.value = value;
     }
 
     @Override
     public void commit(Object log) {
-        this.value = (short) log;
+        this.value = (V) log;
     }
 
-    public short getValue() {
+    public V getValue() {
         return getValue(Transaction.get());
     }
 
-    public short getValue(Transaction transaction) {
+    public V getValue(Transaction transaction) {
         if (transaction != null) {
-            Short log = (Short) _getFieldLog(transaction, this);
+            V log = (V) _getFieldLog(transaction, this);
             if (log != null) {
                 return log;
             }
@@ -35,12 +40,13 @@ public class ShortField extends Loggable implements Field {
         return value;
     }
 
-    public void setValue(short value, Data<?> root) {
+    public void setValue(V value, Data<?> owner, int position) {
         Transaction transaction = Transaction.get();
         if (transaction != null) {
-            _setFieldLog(transaction, this, value, root);
+            _setFieldLog(transaction, this, value, owner, position);
         } else if (Transaction.isOptional()) {
             this.value = value;
+            _setDataUpdatedField(owner, position);
         } else {
             Validations.transactionError();
         }

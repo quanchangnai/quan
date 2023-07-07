@@ -1,6 +1,5 @@
 package quan.data.item;
 
-import java.util.*;
 import org.bson.BsonReader;
 import org.bson.BsonType;
 import org.bson.BsonWriter;
@@ -8,8 +7,15 @@ import org.bson.codecs.Codec;
 import org.bson.codecs.DecoderContext;
 import org.bson.codecs.EncoderContext;
 import org.bson.codecs.configuration.CodecRegistry;
-import quan.data.*;
-import quan.data.field.*;
+import quan.data.Bean;
+import quan.data.Data;
+import quan.data.Entity;
+import quan.data.Transaction;
+import quan.data.field.BaseField;
+import quan.data.field.ListField;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * 道具<br/>
@@ -24,11 +30,11 @@ public class ItemBean extends Bean {
     public static final String LIST = "list";
 
 
-    private final IntField id = new IntField();
+    private final BaseField<Integer> id = new BaseField<>(0);
 
-    private final StringField name = new StringField();
+    private final BaseField<String> name = new BaseField<>("");
 
-    private final ListField<Integer> list = new ListField<>(_getLogRoot());
+    private final ListField<Integer> list = new ListField<>(_getLogOwner(), _getLogPosition());
 
     public ItemBean() {
     }
@@ -44,7 +50,7 @@ public class ItemBean extends Bean {
     }
 
     public ItemBean setId(int id) {
-        this.id.setValue(id, _getLogRoot());
+        this.id.setValue(id, _getLogOwner(), _getLogPosition());
         return this;
     }
 
@@ -53,7 +59,7 @@ public class ItemBean extends Bean {
     }
 
     public ItemBean setName(String name) {
-        this.name.setValue(name, _getLogRoot());
+        this.name.setValue(name, _getLogOwner(), _getLogPosition());
         return this;
     }
 
@@ -63,8 +69,8 @@ public class ItemBean extends Bean {
 
 
     @Override
-    protected void _setChildrenLogRoot(Data<?> root) {
-        _setLogRoot(list, root);
+    protected void _setChildrenLogOwner(Data<?> owner, int position) {
+        _setLogOwner(list, owner, position);
     }
 
     @Override

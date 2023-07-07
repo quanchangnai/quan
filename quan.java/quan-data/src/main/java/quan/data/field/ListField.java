@@ -18,8 +18,8 @@ public final class ListField<E> extends Node implements List<E>, Field {
 
     private int modCount;
 
-    public ListField(Data<?> root) {
-        _setRoot(root);
+    public ListField(Data<?> owner, int position) {
+        _setOwner(owner, position, false);
     }
 
     public List<E> getDelegate() {
@@ -34,10 +34,10 @@ public final class ListField<E> extends Node implements List<E>, Field {
     }
 
     @Override
-    public void _setChildrenLogRoot(Data<?> root) {
+    public void _setChildrenLogOwner(Data<?> owner, int position) {
         for (E e : getCurrent()) {
             if (e instanceof Bean) {
-                _setLogRoot((Bean) e, root);
+                _setLogOwner((Bean) e, owner, position);
             }
         }
     }
@@ -50,7 +50,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
         Log<E> log = (Log<E>) _getFieldLog(transaction, this);
         if (write && log == null) {
             log = new Log<>(origin, modCount);
-            _setFieldLog(transaction, this, log, _getLogRoot(transaction));
+            _setFieldLog(transaction, this, log, _getLogOwner(transaction), _getLogPosition(transaction));
         }
 
         return log;
@@ -194,7 +194,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
             log.modCount++;
             log.list = log.list.plus(e);
             if (e instanceof Bean) {
-                _setLogRoot((Bean) e, _getLogRoot(transaction));
+                _setLogOwner((Bean) e, _getLogOwner(transaction), _getLogPosition(transaction));
             }
         } else if (Transaction.isOptional()) {
             return plus(e);
@@ -211,7 +211,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
         modCount++;
         origin = origin.plus(e);
         if (e instanceof Bean) {
-            _setRoot((Bean) e, _getRoot());
+            _setOwner((Bean) e, _getOwner(), _getPosition());
         }
 
         return true;
@@ -228,7 +228,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
 
             if (oldList != log.list) {
                 if (o instanceof Bean) {
-                    _setLogRoot((Bean) o, null);
+                    _setLogOwner((Bean) o, null, 0);
                 }
                 return true;
             }
@@ -239,7 +239,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
 
             if (oldList != origin) {
                 if (o instanceof Bean) {
-                    _setRoot((Bean) o, null);
+                    _setOwner((Bean) o, null, 0);
                 }
                 return true;
             }
@@ -273,10 +273,11 @@ public final class ListField<E> extends Node implements List<E>, Field {
             log.modCount++;
 
             if (oldList != log.list) {
-                Data<?> root = _getLogRoot(transaction);
+                Data<?> owner = _getLogOwner(transaction);
+                int position = _getLogPosition(transaction);
                 for (E e : c) {
                     if (e instanceof Bean) {
-                        _setLogRoot((Bean) e, root);
+                        _setLogOwner((Bean) e, owner, position);
                     }
                 }
                 return true;
@@ -287,10 +288,11 @@ public final class ListField<E> extends Node implements List<E>, Field {
             origin = oldList.plusAll(index, c);
 
             if (oldList != origin) {
-                Data<?> root = _getRoot();
+                Data<?> owner = _getOwner();
+                int position = _getPosition();
                 for (E e : c) {
                     if (e instanceof Bean) {
-                        _setRoot((Bean) e, root);
+                        _setOwner((Bean) e, owner, position);
                     }
                 }
                 return true;
@@ -320,7 +322,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
             Log<E> log = getLog(transaction, true);
             if (!log.list.isEmpty()) {
                 log.modCount++;
-                _setChildrenLogRoot(null);
+                _setChildrenLogOwner(null, 0);
                 log.list = Empty.vector();
             }
         } else if (!Transaction.isOptional()) {
@@ -329,7 +331,7 @@ public final class ListField<E> extends Node implements List<E>, Field {
             modCount++;
             for (E e : origin) {
                 if (e instanceof Bean) {
-                    _setRoot((Bean) e, null);
+                    _setOwner((Bean) e, null, _getPosition());
                 }
             }
             origin = Empty.vector();
@@ -371,11 +373,11 @@ public final class ListField<E> extends Node implements List<E>, Field {
             log.list = oldList.with(index, e);
 
             if (e instanceof Bean) {
-                _setLogRoot((Bean) e, _getLogRoot(transaction));
+                _setLogOwner((Bean) e, _getLogOwner(transaction), _getLogPosition(transaction));
             }
             E old = oldList.get(index);
             if (old instanceof Bean) {
-                _setLogRoot((Bean) old, null);
+                _setLogOwner((Bean) old, null, 0);
             }
             return old;
         } else if (Transaction.isOptional()) {
@@ -384,11 +386,11 @@ public final class ListField<E> extends Node implements List<E>, Field {
             origin = oldList.with(index, e);
 
             if (e instanceof Bean) {
-                _setRoot((Bean) e, _getRoot());
+                _setOwner((Bean) e, _getOwner(), _getPosition());
             }
             E old = oldList.get(index);
             if (old instanceof Bean) {
-                _setRoot((Bean) old, null);
+                _setOwner((Bean) old, null, 0);
             }
             return old;
         } else {
@@ -407,13 +409,13 @@ public final class ListField<E> extends Node implements List<E>, Field {
             log.modCount++;
             log.list = log.list.plus(index, e);
             if (e instanceof Bean) {
-                _setLogRoot((Bean) e, _getLogRoot(transaction));
+                _setLogOwner((Bean) e, _getLogOwner(transaction), _getLogPosition(transaction));
             }
         } else if (Transaction.isOptional()) {
             modCount++;
             origin = origin.plus(index, e);
             if (e instanceof Bean) {
-                _setRoot((Bean) e, _getRoot());
+                _setOwner((Bean) e, _getOwner(), _getPosition());
             }
         } else {
             Validations.transactionError();
@@ -425,25 +427,25 @@ public final class ListField<E> extends Node implements List<E>, Field {
         Transaction transaction = Transaction.get();
         if (transaction != null) {
             Log<E> log = getLog(transaction, true);
-            E old = log.list.get(index);
+            E e = log.list.get(index);
             log.modCount++;
             log.list = log.list.minus(index);
 
-            if (old instanceof Bean) {
-                _setLogRoot((Bean) old, null);
+            if (e instanceof Bean) {
+                _setLogOwner((Bean) e, null, 0);
             }
 
-            return old;
+            return e;
         } else if (Transaction.isOptional()) {
-            E old = origin.get(index);
+            E e = origin.get(index);
             modCount++;
             origin = origin.minus(index);
 
-            if (old instanceof Bean) {
-                _setRoot((Bean) old, null);
+            if (e instanceof Bean) {
+                _setOwner((Bean) e, null, 0);
             }
 
-            return old;
+            return e;
         } else {
             Validations.transactionError();
             return null;

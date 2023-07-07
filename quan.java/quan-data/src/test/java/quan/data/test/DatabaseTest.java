@@ -7,6 +7,7 @@ import org.bson.BsonWriter;
 import org.bson.codecs.Codec;
 import org.bson.json.JsonReader;
 import org.bson.json.JsonWriter;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.pcollections.Empty;
 import org.pcollections.PMap;
@@ -14,8 +15,8 @@ import org.pcollections.PVector;
 import quan.data.Data;
 import quan.data.Index;
 import quan.data.Transaction;
-import quan.data.item.ItemBean;
 import quan.data.bson.EntityCodecProvider;
+import quan.data.item.ItemBean;
 import quan.data.mongo.Database;
 import quan.data.role.RoleData;
 import quan.util.ClassUtils;
@@ -178,7 +179,7 @@ public class DatabaseTest {
         System.err.println(list2.size());
     }
 
-    //    @Ignore
+    @Ignore
     @Test
     public void testDatabase() {
         Transaction.setGlobalOptional(true);
@@ -195,13 +196,9 @@ public class DatabaseTest {
     }
 
     public void testDatabase0(Database database) {
-        testMongoCollection0(database);
+        testMongoCollection1(database);
 
-        for (int i = 0; i < 2; i++) {
-            System.err.println("=============" + i);
-            testMongoCollection1(database);
-            System.err.println();
-        }
+        testMongoCollection2(database);
 
 //        ChangeStreamIterable<RoleData> changeStream = database.getCollection(RoleData.class).watch(RoleData.class);
 //        MongoChangeStreamCursor<ChangeStreamDocument<RoleData>> cursor = changeStream.cursor();
@@ -220,42 +217,46 @@ public class DatabaseTest {
 
     private static final double timeBase = 1000000D;
 
-    private void testMongoCollection0(Database database) {
+    private void testMongoCollection1(Database database) {
+        System.err.println("\ntestMongoCollection1===========");
         Transaction.run(() -> {
             MongoCollection<RoleData> roleDataCollection = database.getCollection(RoleData.class);
             RoleData roleData = roleDataCollection.find().first();
             if (roleData != null) {
-//                roleData.delete(database);
+                System.err.println("roleData:" + roleData);
+                roleData.delete(database);
+                roleData.insert(database);
 //                roleData.free();
-                roleData.setName("name:" + System.currentTimeMillis());
+                long currentTime = System.currentTimeMillis();
+                roleData.setName("name:" + currentTime);
+                roleData.setName2("name2:" + currentTime);
+                if (!roleData.getList2().isEmpty()) {
+                    roleData.getList2().get(0).setName("道具:" + currentTime);
+                }
             }
         });
     }
 
-    private void testMongoCollection1(Database database) {
-        System.err.println("testMongoCollection1 start===========");
+    private void testMongoCollection2(Database database) {
+        System.err.println("\ntestMongoCollection2 start===========");
         long startTime = System.nanoTime();
-        Transaction.run(() -> doTestMongoCollection1(database));
-        System.err.println("testMongoCollection1 costTime:" + (System.nanoTime() - startTime) / timeBase);
+        Transaction.run(() -> doTestMongoCollection2(database));
+        System.err.println("testMongoCollection2 costTime:" + (System.nanoTime() - startTime) / timeBase);
     }
 
-    private void doTestMongoCollection1(Database database) {
+    private void doTestMongoCollection2(Database database) {
         MongoCollection<RoleData> roleDataCollection = database.getCollection(RoleData.class);
 
         RoleData roleDataMax = roleDataCollection.find().sort(Sorts.descending(RoleData._ID)).first();
         System.err.println("roleDataMax:" + roleDataMax);
         if (roleDataMax == null) {
             roleDataMax = new RoleData(1L);
-            roleDataMax.setName("张三:1");
-            roleDataMax.setName("bbb:1");
-            roleDataMax.save(database);
+            roleDataMax.setName("张三:a");
+            roleDataMax.setName2("张三:b");
+            roleDataMax.insert(database);
         } else {
-            roleDataMax.setName("max:" + System.nanoTime());
-            roleDataMax.setName("max:" + System.nanoTime());
-            System.err.println("roleDataMax:" + roleDataMax.toJson());
-
-//            roleDataCollection.insertOne(roleDataMax);
-//            roleDataCollection.deleteOne(Filters.eq(roleDataMax.getId()));
+            roleDataMax.setName("张三:" + System.nanoTime());
+            roleDataMax.setName2(roleDataMax.getName() + ":2");
         }
 
         for (int i = 0; i < 20; i++) {
@@ -273,7 +274,7 @@ public class DatabaseTest {
                 .setName("name:" + roleDataMax.getId() + 3)
                 .setName2("name2:" + roleDataMax.getId() + 1);
 
-        database.save(roleData1, roleData2, roleData3);
+        database.insert(roleData1, roleData2, roleData3);
 
         List<RoleData> roleDataList = new ArrayList<>();
         for (long i = roleData3.getId() + 1; i < roleData3.getId() + 20; i++) {
@@ -286,10 +287,10 @@ public class DatabaseTest {
                 roleData.getList2().add(new ItemBean().setId((int) i).setName("item2:" + i));
             }
             roleDataList.add(roleData);
-            roleData.save(database);
+            roleData.insert(database);
         }
 
-        database.save(roleDataList);
+        database.insert(roleDataList);
 
     }
 

@@ -20,8 +20,8 @@ public final class SetField<E> extends Node implements Set<E>, Field {
     private Delegate<E> delegate = new Delegate<>(this);
 
 
-    public SetField(Data<?> root) {
-        _setRoot(root);
+    public SetField(Data<?> owner, int position) {
+        _setOwner(owner, position, false);
     }
 
     public Set<E> getDelegate() {
@@ -34,10 +34,10 @@ public final class SetField<E> extends Node implements Set<E>, Field {
     }
 
     @Override
-    public void _setChildrenLogRoot(Data<?> root) {
+    public void _setChildrenLogOwner(Data<?> owner, int position) {
         for (E e : getCurrent()) {
             if (e instanceof Bean) {
-                _setLogRoot((Bean) e, root);
+                _setLogOwner((Bean) e, owner, position);
             }
         }
     }
@@ -123,10 +123,11 @@ public final class SetField<E> extends Node implements Set<E>, Field {
             PSet<E> newSet = oldSet.plus(e);
 
             if (oldSet != newSet) {
-                Data<?> root = _getLogRoot(transaction);
-                _setFieldLog(transaction, this, newSet, root);
+                Data<?> owner = _getLogOwner(transaction);
+                int position = _getLogPosition();
+                _setFieldLog(transaction, this, newSet, owner, position);
                 if (e instanceof Bean) {
-                    _setLogRoot((Bean) e, root);
+                    _setLogOwner((Bean) e, owner, position);
                 }
                 return true;
             }
@@ -147,7 +148,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
 
         if (oldSet != origin) {
             if (e instanceof Bean) {
-                _setRoot((Bean) e, _getRoot());
+                _setOwner((Bean) e, _getOwner(), _getPosition());
             }
             return true;
         }
@@ -162,9 +163,9 @@ public final class SetField<E> extends Node implements Set<E>, Field {
             PSet<E> oldSet = getCurrent(transaction);
             PSet<E> newSet = oldSet.minus(o);
             if (oldSet != newSet) {
-                _setFieldLog(transaction, this, newSet, _getLogRoot(transaction));
+                _setFieldLog(transaction, this, newSet, _getLogOwner(transaction), _getLogPosition(transaction));
                 if (o instanceof Bean) {
-                    _setLogRoot((Bean) o, null);
+                    _setLogOwner((Bean) o, null, 0);
                 }
                 return true;
             }
@@ -173,7 +174,7 @@ public final class SetField<E> extends Node implements Set<E>, Field {
             origin = origin.minus(o);
             if (oldSet != origin) {
                 if (o instanceof Bean) {
-                    _setRoot((Bean) o, null);
+                    _setOwner((Bean) o, null, 0);
                 }
                 return true;
             }
@@ -193,17 +194,18 @@ public final class SetField<E> extends Node implements Set<E>, Field {
     public boolean addAll(Collection<? extends E> c) {
         Objects.requireNonNull(c);
         c.forEach(Validations::validateCollectionValue);
-        Transaction transaction = Transaction.get();
 
+        Transaction transaction = Transaction.get();
         if (transaction != null) {
             PSet<E> oldSet = getCurrent(transaction);
             PSet<E> newSet = oldSet.plusAll(c);
             if (oldSet != newSet) {
-                Data<?> root = _getLogRoot(transaction);
-                _setFieldLog(transaction, this, newSet, root);
+                Data<?> owner = _getLogOwner(transaction);
+                int position = _getLogPosition(transaction);
+                _setFieldLog(transaction, this, newSet, owner, position);
                 for (E e : c) {
                     if (e instanceof Bean) {
-                        _setLogRoot((Bean) e, root);
+                        _setLogOwner((Bean) e, owner, position);
                     }
                 }
                 return true;
@@ -212,10 +214,11 @@ public final class SetField<E> extends Node implements Set<E>, Field {
             PSet<E> oldSet = origin;
             origin = oldSet.plusAll(c);
             if (oldSet != origin) {
-                Data<?> root = _getRoot();
+                Data<?> owner = _getOwner();
+                int position = _getPosition();
                 for (E e : c) {
                     if (e instanceof Bean) {
-                        _setLogRoot((Bean) e, root);
+                        _setLogOwner((Bean) e, owner, position);
                     }
                 }
                 return true;
@@ -266,12 +269,12 @@ public final class SetField<E> extends Node implements Set<E>, Field {
         }
 
         if (transaction != null) {
-            _setChildrenLogRoot(null);
-            _setFieldLog(transaction, this, Empty.set(), _getLogRoot(transaction));
+            _setChildrenLogOwner(null, 0);
+            _setFieldLog(transaction, this, Empty.set(), _getLogOwner(transaction), _getLogPosition(transaction));
         } else if (Transaction.isOptional()) {
             for (E e : oldSet) {
                 if (e instanceof Bean) {
-                    _setRoot((Bean) e, null);
+                    _setOwner((Bean) e, null, 0);
                 }
             }
             this.origin = Empty.set();

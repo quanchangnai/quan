@@ -12,10 +12,10 @@ import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.conversions.Bson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import quan.data.bson.EntityCodecProvider;
 import quan.data.Data;
 import quan.data.DataWriter;
 import quan.data.Index;
+import quan.data.bson.EntityCodecProvider;
 import quan.util.ClassUtils;
 
 import java.util.*;
@@ -38,8 +38,6 @@ public class Database implements DataWriter, MongoDatabase, Executor {
     private static final ReadWriteLock databasesLock = new ReentrantReadWriteLock();
 
     static final Map<MongoClient, List<ExecutorService>> clientsExecutors = new ConcurrentHashMap<>();
-
-    private static final ReplaceOptions replaceOptions = new ReplaceOptions().upsert(true);
 
     /**
      * 数据类所在的包名
@@ -271,23 +269,30 @@ public class Database implements DataWriter, MongoDatabase, Executor {
     }
 
     /**
-     * @see DataWriter#write(Set, Set)
+     * @see DataWriter#write(Set, Set, Map)
      */
     @Override
-    public void write(Set<Data<?>> saves, Set<Data<?>> deletes) {
+    public void write(Set<Data<?>> inserts, Set<Data<?>> deletes, Map<Data<?>, Document> updates) {
         Map<MongoCollection<Data<?>>, List<WriteModel<Data<?>>>> writeModels = new HashMap<>();
 
+        if (inserts != null) {
+            for (Data<?> data : inserts) {
+                InsertOneModel<Data<?>> insertOneModel = new InsertOneModel<>(data);
+                writeModels.computeIfAbsent(collections.get(data.getClass()), this::newList).add(insertOneModel);
+            }
+        }
 
-        if (saves != null) {
-            for (Data<?> data : saves) {
-                ReplaceOneModel<Data<?>> replaceOneModel = new ReplaceOneModel<>(Filters.eq(data.id()), data, replaceOptions);
-                writeModels.computeIfAbsent(collections.get(data.getClass()), this::list).add(replaceOneModel);
+        if (updates != null) {
+            for (Data<?> data : updates.keySet()) {
+                UpdateOneModel<Document> updateOneModel = new UpdateOneModel<>(Filters.eq(data.id()), new Document("$set", updates.get(data)));
+                writeModels.computeIfAbsent(collections.get(data.getClass()), this::newList).add(updateOneModel);
             }
         }
 
         if (deletes != null) {
             for (Data<?> data : deletes) {
-                writeModels.computeIfAbsent(collections.get(data.getClass()), this::list).add(new DeleteOneModel<>(Filters.eq(data.id())));
+                DeleteOneModel<Object> deleteOneModel = new DeleteOneModel<>(Filters.eq(data.id()));
+                writeModels.computeIfAbsent(collections.get(data.getClass()), this::newList).add(deleteOneModel);
             }
         }
 
@@ -301,7 +306,7 @@ public class Database implements DataWriter, MongoDatabase, Executor {
         }
     }
 
-    private <K, V> ArrayList<V> list(K k) {
+    private <K, V> ArrayList<V> newList(K k) {
         return new ArrayList<>();
     }
 

@@ -15,7 +15,7 @@ import java.util.Map;
 @SuppressWarnings("unchecked")
 public class EntityCodecProvider implements CodecProvider {
 
-    protected final static Logger logger = LoggerFactory.getLogger(EntityCodecProvider.class);
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     public static final EntityCodecProvider DEFAULT_PROVIDER = new EntityCodecProvider();
 
@@ -24,6 +24,10 @@ public class EntityCodecProvider implements CodecProvider {
     private Map<Class<?>, Codec<?>> codecs = new HashMap<>();
 
     public EntityCodecProvider() {
+    }
+
+    public <T> void addCodec(Codec<T> codec) {
+        codecs.put(codec.getEncoderClass(), codec);
     }
 
     @Override
@@ -38,7 +42,7 @@ public class EntityCodecProvider implements CodecProvider {
             try {
                 Class<?> codecClass = Class.forName(clazz.getName() + "$CodecImpl");
                 codec = (Codec<T>) codecClass.getDeclaredConstructor(CodecRegistry.class).newInstance(registry);
-                codecs.put(codec.getEncoderClass(), codec);
+                addCodec(codec);
             } catch (Exception e) {
                 logger.error("", e);
             }

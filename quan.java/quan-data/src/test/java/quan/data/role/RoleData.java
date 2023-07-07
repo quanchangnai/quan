@@ -1,18 +1,26 @@
 package quan.data.role;
 
-import java.util.*;
 import org.bson.BsonReader;
 import org.bson.BsonType;
 import org.bson.BsonWriter;
+import org.bson.Document;
 import org.bson.codecs.Codec;
 import org.bson.codecs.DecoderContext;
 import org.bson.codecs.EncoderContext;
 import org.bson.codecs.configuration.CodecRegistry;
-import quan.data.*;
+import quan.data.Data;
+import quan.data.Entity;
+import quan.data.Index;
+import quan.data.Transaction;
 import quan.data.bson.JsonStringWriter;
 import quan.data.field.*;
 import quan.data.item.ItemBean;
 import quan.util.NumberUtils;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 角色<br/>
@@ -88,51 +96,51 @@ public class RoleData extends Data<Long> {
     public static final String MAP2 = "map2";
 
 
-    private final LongField id = new LongField();
+    private final BaseField<Long> id = new BaseField<>((long) 0);
 
-    private final StringField name = new StringField();
+    private final BaseField<String> name = new BaseField<>("");
 
-    private final StringField name2 = new StringField();
+    private final BaseField<String> name2 = new BaseField<>("");
 
-    private final IntField roleType = new IntField();
+    private final BaseField<Integer> roleType = new BaseField<>(0);
 
-    private final IntField a = new IntField();
+    private final BaseField<Integer> a = new BaseField<>(0);
 
-    private final IntField a2 = new IntField();
+    private final BaseField<Integer> a2 = new BaseField<>(0);
 
-    private final BoolField b = new BoolField();
+    private final BaseField<Boolean> b = new BaseField<>(false);
 
-    private final IntField b2 = new IntField();
+    private final BaseField<Integer> b2 = new BaseField<>(0);
 
-    private final ShortField s = new ShortField();
+    private final BaseField<Short> s = new BaseField<>((short) 0);
 
-    private final IntField i = new IntField();
+    private final BaseField<Integer> i = new BaseField<>(0);
 
-    private final FloatField f = new FloatField();
+    private final BaseField<Float> f = new BaseField<>((float) 0);
 
-    private final DoubleField d = new DoubleField();
+    private final BaseField<Double> d = new BaseField<>((double) 0);
 
     private final BeanField<ItemBean> item = new BeanField<>();
 
-    private final MapField<Integer, ItemBean> items = new MapField<>(this);
+    private final MapField<Integer, ItemBean> items = new MapField<>(this, 14);
 
-    private final SetField<Boolean> set = new SetField<>(this);
+    private final SetField<Boolean> set = new SetField<>(this, 15);
 
-    private final ListField<String> list = new ListField<>(this);
+    private final ListField<String> list = new ListField<>(this, 16);
 
-    private final MapField<Integer, Integer> map = new MapField<>(this);
+    private final MapField<Integer, Integer> map = new MapField<>(this, 17);
 
-    private final SetField<ItemBean> set2 = new SetField<>(this);
+    private final SetField<ItemBean> set2 = new SetField<>(this, 18);
 
-    private final ListField<ItemBean> list2 = new ListField<>(this);
+    private final ListField<ItemBean> list2 = new ListField<>(this, 19);
 
-    private final MapField<Integer, ItemBean> map2 = new MapField<>(this);
+    private final MapField<Integer, ItemBean> map2 = new MapField<>(this, 20);
 
     public RoleData() {
     }
 
     public RoleData(long id) {
-        this.id.setValue(id,this);
+        this.setId(id);
     }
 
     /**
@@ -155,7 +163,7 @@ public class RoleData extends Data<Long> {
      * 角色ID
      */
     public RoleData setId(long id) {
-        this.id.setValue(id, this);
+        this.id.setValue(id, this, 1);
         return this;
     }
 
@@ -164,7 +172,7 @@ public class RoleData extends Data<Long> {
     }
 
     public RoleData setName(String name) {
-        this.name.setValue(name, this);
+        this.name.setValue(name, this, 2);
         return this;
     }
 
@@ -173,7 +181,7 @@ public class RoleData extends Data<Long> {
     }
 
     public RoleData setName2(String name2) {
-        this.name2.setValue(name2, this);
+        this.name2.setValue(name2, this, 3);
         return this;
     }
 
@@ -188,7 +196,7 @@ public class RoleData extends Data<Long> {
      * 角色类型
      */
     public RoleData setRoleType(RoleType roleType) {
-        this.roleType.setValue(roleType.value, this);
+        this.roleType.setValue(roleType.value, this, 4);
         return this;
     }
 
@@ -197,7 +205,7 @@ public class RoleData extends Data<Long> {
     }
 
     public RoleData setA(int a) {
-        this.a.setValue(a, this);
+        this.a.setValue(a, this, 5);
         return this;
     }
 
@@ -206,7 +214,7 @@ public class RoleData extends Data<Long> {
     }
 
     public RoleData setA2(int a2) {
-        this.a2.setValue(a2, this);
+        this.a2.setValue(a2, this, 6);
         return this;
     }
 
@@ -215,7 +223,7 @@ public class RoleData extends Data<Long> {
     }
 
     public RoleData setB(boolean b) {
-        this.b.setValue(b, this);
+        this.b.setValue(b, this, 7);
         return this;
     }
 
@@ -225,7 +233,7 @@ public class RoleData extends Data<Long> {
 
     public RoleData setB2(int b2) {
         NumberUtils.validateRange(b2, 1, 20, "参数[b2]");
-        this.b2.setValue(b2, this);
+        this.b2.setValue(b2, this, 8);
         return this;
     }
 
@@ -241,7 +249,7 @@ public class RoleData extends Data<Long> {
      */
     public RoleData setS(short s) {
         NumberUtils.validateRange(s, 1, 20, "参数[s]");
-        this.s.setValue(s, this);
+        this.s.setValue(s, this, 9);
         return this;
     }
 
@@ -256,7 +264,7 @@ public class RoleData extends Data<Long> {
      * iiii
      */
     public RoleData setI(int i) {
-        this.i.setValue(i, this);
+        this.i.setValue(i, this, 10);
         return this;
     }
 
@@ -271,7 +279,7 @@ public class RoleData extends Data<Long> {
      * ffff
      */
     public RoleData setF(float f) {
-        this.f.setValue(f, this);
+        this.f.setValue(f, this, 11);
         return this;
     }
 
@@ -281,7 +289,7 @@ public class RoleData extends Data<Long> {
 
     public RoleData setD(double d) {
         NumberUtils.validateRange(d, 1, 20, "参数[d]");
-        this.d.setValue(d, this);
+        this.d.setValue(d, this, 12);
         return this;
     }
 
@@ -296,7 +304,7 @@ public class RoleData extends Data<Long> {
      * 道具
      */
     public RoleData setItem(ItemBean item) {
-        this.item.setValue(item, this);
+        this.item.setValue(item, this, 13);
         return this;
     }
 
@@ -326,6 +334,91 @@ public class RoleData extends Data<Long> {
 
     public Map<Integer, ItemBean> getMap2() {
         return map2.getDelegate();
+    }
+
+
+    @Override
+    protected Document _getUpdatePatch() {
+        if (_updatedFields.isEmpty()) {
+            return null;
+        }
+
+        Transaction transaction = Transaction.get();
+        Document patch = new Document();
+
+        if (_updatedFields.get(2)) {
+            patch.put(NAME, this.name.getValue(transaction));
+        }
+
+        if (_updatedFields.get(3)) {
+            patch.put(NAME2, this.name2.getValue(transaction));
+        }
+
+        if (_updatedFields.get(4)) {
+            patch.put(ROLE_TYPE, this.roleType.getValue(transaction));
+        }
+
+        if (_updatedFields.get(5)) {
+            patch.put(A, this.a.getValue(transaction));
+        }
+
+        if (_updatedFields.get(6)) {
+            patch.put(A2, this.a2.getValue(transaction));
+        }
+
+        if (_updatedFields.get(7)) {
+            patch.put(B, this.b.getValue(transaction));
+        }
+
+        if (_updatedFields.get(8)) {
+            patch.put(B2, this.b2.getValue(transaction));
+        }
+
+        if (_updatedFields.get(9)) {
+            patch.put(S, this.s.getValue(transaction));
+        }
+
+        if (_updatedFields.get(10)) {
+            patch.put(I, this.i.getValue(transaction));
+        }
+
+        if (_updatedFields.get(11)) {
+            patch.put(F, this.f.getValue(transaction));
+        }
+
+        if (_updatedFields.get(12)) {
+            patch.put(D, this.d.getValue(transaction));
+        }
+
+        if (_updatedFields.get(13)) {
+            patch.put(ITEM, this.item.getValue(transaction));
+        }
+
+        if (_updatedFields.get(14)) {
+            patch.put(ITEMS, this.items.getCurrent(transaction));
+        }
+
+        if (_updatedFields.get(15)) {
+            patch.put(SET, this.set.getCurrent(transaction));
+        }
+
+        if (_updatedFields.get(16)) {
+            patch.put(LIST, this.list.getCurrent(transaction));
+        }
+
+        if (_updatedFields.get(17)) {
+            patch.put(MAP, this.map.getCurrent(transaction));
+        }
+
+        if (_updatedFields.get(18)) {
+            patch.put(SET2, this.set2.getCurrent(transaction));
+        }
+
+        if (_updatedFields.get(19)) {
+            patch.put(LIST2, this.list2.getCurrent(transaction));
+        }
+
+        return patch;
     }
 
 
