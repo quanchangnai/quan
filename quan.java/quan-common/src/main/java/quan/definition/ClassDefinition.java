@@ -384,6 +384,10 @@ public abstract class ClassDefinition extends Definition {
         }
     }
 
+    public String dn(String className) {
+        return getDependentName(className);
+    }
+
     public Language getCurrentLanguage() {
         return currentLanguage;
     }

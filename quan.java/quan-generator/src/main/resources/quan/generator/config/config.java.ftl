@@ -10,12 +10,12 @@ import ${import};
 </#if>
  * 代码自动生成，请勿手动修改
  */
-public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif kind ==2>${getDependentName("Bean")}<#else>${getDependentName("Config")}</#if> {
+public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif kind ==2>${dn("Bean")}<#else>${dn("Config")}</#if> {
 <#if !selfFields??>
     <#assign selfFields = fields>
 </#if>
-<#assign JSONObject=getDependentName("JSONObject") JSONArray=getDependentName("JSONArray")>
-<#assign String=getDependentName("String") List=getDependentName("List") ArrayList=getDependentName("ArrayList") Map=getDependentName("Map") HashMap=getDependentName("HashMap") Collections=getDependentName("Collections")>
+<#assign JSONObject=dn("JSONObject") JSONArray=dn("JSONArray")>
+<#assign String=dn("String") List=dn("List") ArrayList=dn("ArrayList") Map=dn("Map") HashMap=dn("HashMap") Collections=dn("Collections")>
 <#list selfFields as field>
     <#if !field.isSupportedLanguage("java")>
         <#continue>
@@ -140,7 +140,7 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
     }
 
  <#if kind ==6>
-    @${getDependentName("Override")}
+    @${dn("Override")}
     public ${name} create(${JSONObject} json) {
         return new ${name}(json);
     }
@@ -174,7 +174,7 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
     }
 </#if>
 
-    @${getDependentName("Override")}
+    @${dn("Override")}
     public ${String} toString() {
         return "${name}{" +
         <#list fields as field>
@@ -316,7 +316,7 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
         </#if>
     </#list>
 
-    ${tab}@${getDependentName("SuppressWarnings")}({"unchecked"})
+    ${tab}@${dn("SuppressWarnings")}({"unchecked"})
     ${tab}private static ${List}<${String}> load(${List}<${name}> configs) {
     <#list indexes as index>
         <#if !index.isSupportedLanguage("java")>
@@ -394,7 +394,7 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
     </#if>
 
     static {
-        ${getDependentName("ConfigLoader")}.registerLoadFunction(${name}.class, ${name}<#if parent??>.self</#if>::load);
+        ${dn("ConfigLoader")}.registerLoadFunction(${name}.class, ${name}<#if parent??>.self</#if>::load);
     }
 
 </#if>

@@ -2,10 +2,10 @@
 using ${import};
 </#list>
 
-<#assign JObject=getDependentName("JObject") JArray=getDependentName("JArray")>
-<#assign IList=getDependentName("IList") List=getDependentName("List") ImmutableList=getDependentName("ImmutableList")>
-<#assign IDictionary=getDependentName("IDictionary") Dictionary=getDependentName("Dictionary") ImmutableDictionary=getDependentName("ImmutableDictionary")>
-<#assign Bean=getDependentName("Bean") ConfigBase=getDependentName("ConfigBase")>
+<#assign JObject=dn("JObject") JArray=dn("JArray")>
+<#assign IList=dn("IList") List=dn("List") ImmutableList=dn("ImmutableList")>
+<#assign IDictionary=dn("IDictionary") Dictionary=dn("Dictionary") ImmutableDictionary=dn("ImmutableDictionary")>
+<#assign Bean=dn("Bean") ConfigBase=dn("ConfigBase")>
 namespace ${getFullPackageName("cs")}
 {
     /// <summary>
@@ -66,7 +66,7 @@ namespace ${getFullPackageName("cs")}
 
         </#if>
             var ${field.name}1 = json["${field.name}"]?.Value<${JArray}>();
-            var ${field.name}2 = ${getDependentName("Immutable${field.classType}")}<${field.valueClassType}>.Empty;
+            var ${field.name}2 = ${dn("Immutable${field.classType}")}<${field.valueClassType}>.Empty;
             if (${field.name}1 != null)
             {
                 foreach (var ${field.name}Value in ${field.name}1)

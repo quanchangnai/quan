@@ -2,8 +2,8 @@
 using ${import};
 </#list>
 
-<#assign Array=getDependentName("Array") NullReferenceException=getDependentName("NullReferenceException")>
-<#assign Bean=getDependentName("Bean") MessageBase=getDependentName("MessageBase") CodedBuffer=getDependentName("CodedBuffer")>
+<#assign Array=dn("Array") NullReferenceException=dn("NullReferenceException")>
+<#assign Bean=dn("Bean") MessageBase=dn("MessageBase") CodedBuffer=dn("CodedBuffer")>
 namespace ${getFullPackageName("cs")}
 {
     /// <summary>

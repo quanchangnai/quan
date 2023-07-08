@@ -4,8 +4,8 @@ package ${getFullPackageName("java")};
 import ${import};
 </#list>
 
-<#assign String=getDependentName("String") Objects=getDependentName("Objects") Arrays=getDependentName("Arrays") Override=getDependentName("Override")>
-<#assign Bean=getDependentName("Bean") Message=getDependentName("Message") CodedBuffer=getDependentName("CodedBuffer") NumberUtils=getDependentName("NumberUtils")>
+<#assign String=dn("String") Objects=dn("Objects") Arrays=dn("Arrays") Override=dn("Override")>
+<#assign Bean=dn("Bean") Message=dn("Message") CodedBuffer=dn("CodedBuffer") NumberUtils=dn("NumberUtils")>
 /**
 <#if comment !="">
  * ${comment}<br/>
