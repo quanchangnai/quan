@@ -1,7 +1,6 @@
 package quan.data;
 
 import org.apache.commons.lang3.tuple.Triple;
-import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.data.field.Field;
@@ -402,7 +401,7 @@ public class Transaction {
                         write.getLeft().add(data);
                         break;
                     case UPDATE:
-                        Document patch = data._getUpdatePatch();
+                        Map<String, Object> patch = data._getUpdatePatch();
                         if (patch != null) {
                             write.getMiddle().put(data, patch);
                         }

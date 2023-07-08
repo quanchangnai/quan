@@ -135,7 +135,6 @@ public class DataGenerator extends Generator {
         beanDefinition.addImport("quan.data.*");
         beanDefinition.addImport("quan.data.field.*");
         if (beanDefinition instanceof DataDefinition) {
-            beanDefinition.addImport("org.bson.Document");
             beanDefinition.addImport("quan.data.bson.JsonStringWriter");
         }
 
@@ -145,12 +144,7 @@ public class DataGenerator extends Generator {
     @Override
     protected void prepareField(FieldDefinition fieldDefinition) {
         super.prepareField(fieldDefinition);
-        if (fieldDefinition.getOwner() instanceof DataDefinition) {
-            DataDefinition owner = (DataDefinition) fieldDefinition.getOwner();
-            if (fieldDefinition.getName().equals(owner.getIdName())) {
-                owner.setIdField(fieldDefinition);
-            }
-        }
+
         if (fieldDefinition.getMin() != null || fieldDefinition.getMax() != null) {
             fieldDefinition.getOwner().addImport("quan.util.NumberUtils");
         }

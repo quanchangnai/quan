@@ -1,7 +1,5 @@
 package quan.data;
 
-import org.bson.Document;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
@@ -17,9 +15,9 @@ public interface DataWriter {
      *
      * @param inserts 要插入的数据
      * @param deletes 要删除的数据
-     * @param updates 要更新的数据和更新补丁
+     * @param updates 要更新的数据和更新补丁，参考{@link Data#_getUpdatePatch()}
      */
-    void write(Set<Data<?>> inserts, Set<Data<?>> deletes, Map<Data<?>, Document> updates);
+    void write(Set<Data<?>> inserts, Set<Data<?>> deletes, Map<Data<?>, Map<String, Object>> updates);
 
     /**
      * 插入数据，参考{@link Data#insert(DataWriter)}

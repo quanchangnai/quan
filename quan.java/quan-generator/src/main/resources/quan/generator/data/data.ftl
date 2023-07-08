@@ -60,7 +60,7 @@ public class ${name} extends <#if kind ==2>${getDependentName("Bean")}<#elseif k
 </#list>
 
 <#if kind ==5>
-    public ${name}() {
+    private ${name}() {
     }
 
     public ${name}(${idField.type} ${idName}) {
@@ -149,15 +149,15 @@ public class ${name} extends <#if kind ==2>${getDependentName("Bean")}<#elseif k
      * ${field.comment}
      */
     </#if>
-    public ${name} set${field.name?cap_first}(${field.basicType} ${field.name}) {
-        <#if field.min?? && field.max??>
+    <#if !idName?? || field.name != idName>public<#else>private</#if> ${name} set${field.name?cap_first}(${field.basicType} ${field.name}) {
+    <#if field.min?? && field.max??>
         ${getDependentName("NumberUtils")}.validateRange(${field.name}, ${field.min}, ${field.max}, "参数[${field.name}]");
-        <#elseif field.min??>
+    <#elseif field.min??>
         ${getDependentName("NumberUtils")}.validateMin(${field.name}, ${field.min}, "参数[${field.name}]");
-        <#elseif field.max??>
+    <#elseif field.max??>
         ${getDependentName("NumberUtils")}.validateMax(${field.name}, ${field.max}, "参数[${field.name}]");
-        </#if>
-        this.${field.name}.setValue(${field.name}, ${owner}, <@position field?index/>);
+    </#if>
+        this.${field.name}.setValue(${field.name}<#if !idName?? || field.name != idName>, ${owner}, <@position field?index/></#if>);
         return this;
     }
 
@@ -193,25 +193,20 @@ public class ${name} extends <#if kind ==2>${getDependentName("Bean")}<#elseif k
  <#elseif fields?size gt 1>
 
     @${getDependentName("Override")}
-    protected ${getDependentName("Document")} _getUpdatePatch() {
+    protected ${getDependentName("Map")}<${getDependentName("String")}, ${getDependentName("Object")}> _getUpdatePatch() {
         if (_updatedFields.isEmpty()) {
             return null;
         }
 
         ${getDependentName("Transaction")} transaction = ${getDependentName("Transaction")}.get();
-        ${getDependentName("Document")} patch = new ${getDependentName("Document")}();
+        ${getDependentName("Map")}<${getDependentName("String")}, ${getDependentName("Object")}> patch = new ${getDependentName("HashMap")}<>();
 
     <#list fields as field>
         <#if field.ignore || field==idField>
             <#continue/>
         <#else>
-        if (_updatedFields.get(${field?index+1})) {
-            <#if field.collectionType>
-            patch.put(${field.underscoreName}, this.${field.name}.getCurrent(transaction));
-            <#else>
-            patch.put(${field.underscoreName}, this.${field.name}.getValue(transaction));
-            </#if>
-        }
+        if (_updatedFields.get(${field?index+1}))
+            patch.put(${field.underscoreName}, ${field.name}.<#if field.collectionType>getCurrent<#else>getValue</#if>(transaction));
 
        </#if>
     </#list>

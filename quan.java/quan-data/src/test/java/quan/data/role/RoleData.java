@@ -3,7 +3,6 @@ package quan.data.role;
 import org.bson.BsonReader;
 import org.bson.BsonType;
 import org.bson.BsonWriter;
-import org.bson.Document;
 import org.bson.codecs.Codec;
 import org.bson.codecs.DecoderContext;
 import org.bson.codecs.EncoderContext;
@@ -17,10 +16,7 @@ import quan.data.field.*;
 import quan.data.item.ItemBean;
 import quan.util.NumberUtils;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 角色<br/>
@@ -136,7 +132,7 @@ public class RoleData extends Data<Long> {
 
     private final MapField<Integer, ItemBean> map2 = new MapField<>(this, 20);
 
-    public RoleData() {
+    private RoleData() {
     }
 
     public RoleData(long id) {
@@ -162,8 +158,8 @@ public class RoleData extends Data<Long> {
     /**
      * 角色ID
      */
-    public RoleData setId(long id) {
-        this.id.setValue(id, this, 1);
+    private RoleData setId(long id) {
+        this.id.setValue(id);
         return this;
     }
 
@@ -338,85 +334,67 @@ public class RoleData extends Data<Long> {
 
 
     @Override
-    protected Document _getUpdatePatch() {
+    protected Map<String, Object> _getUpdatePatch() {
         if (_updatedFields.isEmpty()) {
             return null;
         }
 
         Transaction transaction = Transaction.get();
-        Document patch = new Document();
+        Map<String, Object> patch = new HashMap<>();
 
-        if (_updatedFields.get(2)) {
-            patch.put(NAME, this.name.getValue(transaction));
-        }
+        if (_updatedFields.get(2))
+            patch.put(NAME, name.getValue(transaction));
 
-        if (_updatedFields.get(3)) {
-            patch.put(NAME2, this.name2.getValue(transaction));
-        }
+        if (_updatedFields.get(3))
+            patch.put(NAME2, name2.getValue(transaction));
 
-        if (_updatedFields.get(4)) {
-            patch.put(ROLE_TYPE, this.roleType.getValue(transaction));
-        }
+        if (_updatedFields.get(4))
+            patch.put(ROLE_TYPE, roleType.getValue(transaction));
 
-        if (_updatedFields.get(5)) {
-            patch.put(A, this.a.getValue(transaction));
-        }
+        if (_updatedFields.get(5))
+            patch.put(A, a.getValue(transaction));
 
-        if (_updatedFields.get(6)) {
-            patch.put(A2, this.a2.getValue(transaction));
-        }
+        if (_updatedFields.get(6))
+            patch.put(A2, a2.getValue(transaction));
 
-        if (_updatedFields.get(7)) {
-            patch.put(B, this.b.getValue(transaction));
-        }
+        if (_updatedFields.get(7))
+            patch.put(B, b.getValue(transaction));
 
-        if (_updatedFields.get(8)) {
-            patch.put(B2, this.b2.getValue(transaction));
-        }
+        if (_updatedFields.get(8))
+            patch.put(B2, b2.getValue(transaction));
 
-        if (_updatedFields.get(9)) {
-            patch.put(S, this.s.getValue(transaction));
-        }
+        if (_updatedFields.get(9))
+            patch.put(S, s.getValue(transaction));
 
-        if (_updatedFields.get(10)) {
-            patch.put(I, this.i.getValue(transaction));
-        }
+        if (_updatedFields.get(10))
+            patch.put(I, i.getValue(transaction));
 
-        if (_updatedFields.get(11)) {
-            patch.put(F, this.f.getValue(transaction));
-        }
+        if (_updatedFields.get(11))
+            patch.put(F, f.getValue(transaction));
 
-        if (_updatedFields.get(12)) {
-            patch.put(D, this.d.getValue(transaction));
-        }
+        if (_updatedFields.get(12))
+            patch.put(D, d.getValue(transaction));
 
-        if (_updatedFields.get(13)) {
-            patch.put(ITEM, this.item.getValue(transaction));
-        }
+        if (_updatedFields.get(13))
+            patch.put(ITEM, item.getValue(transaction));
 
-        if (_updatedFields.get(14)) {
-            patch.put(ITEMS, this.items.getCurrent(transaction));
-        }
+        if (_updatedFields.get(14))
+            patch.put(ITEMS, items.getCurrent(transaction));
 
-        if (_updatedFields.get(15)) {
-            patch.put(SET, this.set.getCurrent(transaction));
-        }
+        if (_updatedFields.get(15))
+            patch.put(SET, set.getCurrent(transaction));
 
-        if (_updatedFields.get(16)) {
-            patch.put(LIST, this.list.getCurrent(transaction));
-        }
+        if (_updatedFields.get(16))
+            patch.put(LIST, list.getCurrent(transaction));
 
-        if (_updatedFields.get(17)) {
-            patch.put(MAP, this.map.getCurrent(transaction));
-        }
+        if (_updatedFields.get(17))
+            patch.put(MAP, map.getCurrent(transaction));
 
-        if (_updatedFields.get(18)) {
-            patch.put(SET2, this.set2.getCurrent(transaction));
-        }
+        if (_updatedFields.get(18))
+            patch.put(SET2, set2.getCurrent(transaction));
 
-        if (_updatedFields.get(19)) {
-            patch.put(LIST2, this.list2.getCurrent(transaction));
-        }
+        if (_updatedFields.get(19))
+            patch.put(LIST2, list2.getCurrent(transaction));
 
         return patch;
     }

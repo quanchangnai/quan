@@ -272,7 +272,7 @@ public class Database implements DataWriter, MongoDatabase, Executor {
      * @see DataWriter#write(Set, Set, Map)
      */
     @Override
-    public void write(Set<Data<?>> inserts, Set<Data<?>> deletes, Map<Data<?>, Document> updates) {
+    public void write(Set<Data<?>> inserts, Set<Data<?>> deletes, Map<Data<?>, Map<String, Object>> updates) {
         Map<MongoCollection<Data<?>>, List<WriteModel<Data<?>>>> writeModels = new HashMap<>();
 
         if (inserts != null) {

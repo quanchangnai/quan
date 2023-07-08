@@ -93,19 +93,19 @@ public class DataDefinition extends BeanDefinition {
     }
 
     @Override
-    public void validate1() {
-        super.validate1();
-        if (getIdName() == null) {
-            addValidatedError(getValidatedName() + "的主键不能为空");
-        } else if (getFields().stream().noneMatch(t -> t.getName().equals(getIdName()))) {
-            addValidatedError(getValidatedName() + "的主键[" + getIdName() + "]不存在");
-        }
-
-    }
-
-    @Override
     public void validate2() {
         super.validate2();
+
+        if (getIdName() == null) {
+            addValidatedError(getValidatedName() + "的主键不能为空");
+        } else {
+            idField = nameFields.get(getIdName());
+            if (idField == null) {
+                addValidatedError(getValidatedName() + "的主键[" + getIdName() + "]不存在对应字段");
+            } else if (!idField.isPrimitiveType()) {
+                addValidatedError(getValidatedName() + "的主键[" + getIdName() + "]类型[" + idField.getType() + "]不合法");
+            }
+        }
 
         IndexDefinition.validate(indexes, indexes, fields);
 
@@ -120,5 +120,5 @@ public class DataDefinition extends BeanDefinition {
             }
         }
     }
-    
+
 }

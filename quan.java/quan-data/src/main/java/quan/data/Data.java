@@ -1,7 +1,5 @@
 package quan.data;
 
-import org.bson.Document;
-
 import java.util.*;
 import java.util.function.BiConsumer;
 
@@ -92,7 +90,10 @@ public abstract class Data<I> implements Entity {
         return writer;
     }
 
-    protected Document _getUpdatePatch() {
+    /**
+     * 更新补丁，字段名:字段值
+     */
+    protected Map<String, Object> _getUpdatePatch() {
         return null;
     }
 
@@ -133,10 +134,10 @@ public abstract class Data<I> implements Entity {
             _setWriter(transaction, writer, State.UPDATE);
         } else if (Transaction.isOptional()) {
             this.writer = writer;
-            Document patch = _getUpdatePatch();
+            Map<String, Object> patch = _getUpdatePatch();
             if (patch != null) {
                 _updatedFields.clear();
-                Map<Data<?>, Document> updates = new HashMap<>();
+                Map<Data<?>, Map<String, Object>> updates = new HashMap<>();
                 updates.put(this, patch);
                 writer.write(null, null, updates);
             }

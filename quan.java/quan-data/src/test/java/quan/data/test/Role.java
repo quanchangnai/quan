@@ -15,9 +15,9 @@ public class Role {
 
     private long roleId;
 
-    private RoleData roleData1 = new RoleData();
+    private RoleData roleData1 = new RoleData(1);
 
-    private RoleData roleData2 = new RoleData();
+    private RoleData roleData2 = new RoleData(2);
 
     private Random random = new Random();
 
@@ -34,8 +34,8 @@ public class Role {
 
     public void reset() {
         roleId = 0;
-        roleData1 = new RoleData();
-        roleData2 = new RoleData();
+        roleData1 = new RoleData(1);
+        roleData2 = new RoleData(2L);
     }
 
     public void test1() {
@@ -82,7 +82,6 @@ public class Role {
             System.err.println("Role.test2(),roleId:" + roleId);
         }
 
-        roleData2.setId(2L);
         roleData2.setName("aaa");
         roleData2.setI(random.nextInt());
         roleData2.getSet().add(true);
