@@ -1,11 +1,10 @@
 package quan.definition.data;
 
-import com.google.common.base.CaseFormat;
-import org.apache.commons.lang3.StringUtils;
 import quan.definition.BeanDefinition;
 import quan.definition.Category;
 import quan.definition.FieldDefinition;
 import quan.definition.IndexDefinition;
+import quan.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +57,9 @@ public class DataDefinition extends BeanDefinition {
     @Override
     public void setName(String name) {
         super.setName(name);
-        underscoreName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, getName());
+        if (name != null) {
+            underscoreName = StringUtils.toUnderscore(name, true);
+        }
     }
 
     @Override

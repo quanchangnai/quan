@@ -1,8 +1,7 @@
 package quan.definition;
 
-import com.google.common.base.CaseFormat;
-import org.apache.commons.lang3.StringUtils;
 import quan.definition.config.ConfigDefinition;
+import quan.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -111,7 +110,7 @@ public class FieldDefinition extends Definition implements Cloneable {
     public void setName(String name) {
         super.setName(name);
         if (name != null) {
-            underscoreName = CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, getName());
+            underscoreName = StringUtils.toUnderscore(name, false);
         }
     }
 
