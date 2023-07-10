@@ -134,27 +134,35 @@ public abstract class ClassDefinition extends Definition {
     }
 
     /**
-     * 不带包名的类名
+     * 短类名是否允许相同
      */
-    public static String getShortName(String className) {
-        if (className == null) {
-            return null;
-        }
-        int index = className.lastIndexOf(".");
-        if (index >= 0) {
-            return className.substring(index + 1);
-        }
-        return className;
+    public boolean isAllowSameName() {
+        return true;
     }
 
     /**
-     * 和具体语言环境无关的[不含前缀的包名.类名]
+     * 获取短类名，即不带包名的类名
      */
-    public static String getLongName(ClassDefinition owner, String className) {
-        if (!isBlank(owner.getPackageName()) && !isBlank(className) && !className.contains(".")) {
-            className = owner.getPackageName() + "." + className;
+    public static String getShortName(String name) {
+        if (name == null) {
+            return null;
         }
-        return className;
+        int index = name.lastIndexOf(".");
+        if (index >= 0) {
+            return name.substring(index + 1);
+        }
+        return name;
+    }
+
+
+    /**
+     * 获取长类名，即和具体语言环境无关的[不含前缀的包名.类名]
+     */
+    public static String getLongName(ClassDefinition owner, String name) {
+        if (!isBlank(owner.getPackageName()) && !isBlank(name) && !name.contains(".")) {
+            name = owner.getPackageName() + "." + name;
+        }
+        return name;
     }
 
     public String getFullPackageName(String lang) {

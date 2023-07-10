@@ -139,7 +139,7 @@ public class BeanDefinition extends ClassDefinition {
         super.validate1();
 
         if (!fieldIds.isEmpty() && fieldIds.size() != fields.size()) {
-            addValidatedError(getValidatedName("的") + "所有字段必须要同时定义ID或者同时不定义ID");
+            addValidatedError(getValidatedName() + "的所有字段必须要同时定义ID或者同时不定义ID");
         }
     }
 

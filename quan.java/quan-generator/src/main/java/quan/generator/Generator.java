@@ -273,12 +273,12 @@ public abstract class Generator {
 
         readRecords();
 
-        for (ClassDefinition classDefinition : parser.getClasses().values()) {
+        for (ClassDefinition classDefinition : parser.getClasses()) {
             packagesClasses.computeIfAbsent(classDefinition.getPackageName(language()), k -> new HashMap<>()).put(classDefinition.getName(), classDefinition);
         }
 
         List<ClassDefinition> classDefinitions = new ArrayList<>();
-        for (ClassDefinition classDefinition : parser.getClasses().values()) {
+        for (ClassDefinition classDefinition : parser.getClasses()) {
             if (support(classDefinition) && classDefinition.isSupportedLanguage(this.language())) {
                 classDefinition.reset();
                 prepareClass(classDefinition);

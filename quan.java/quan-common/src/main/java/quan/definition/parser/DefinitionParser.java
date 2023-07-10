@@ -51,16 +51,19 @@ public abstract class DefinitionParser {
     //配置常量类名格式
     private Pattern constantNamePattern;
 
-    //解析出来的类定义
+    //解析出来的类定义，还未校验类名
     protected List<ClassDefinition> parsedClasses = new ArrayList<>();
 
-    //已校验过的类定义，类名:类定义
-    private Map<String, ClassDefinition> validatedClasses = new HashMap<>();
+    //key:长类名
+    private Map<String, ClassDefinition> longName2Classes = new HashMap<>();
+
+    //key:短类名
+    private Map<String, Set<ClassDefinition>> shortName2Classes = new HashMap<>();
 
     //校验出的错误信息
     private LinkedHashSet<String> validatedErrors = new LinkedHashSet<>();
 
-    //表名:配置
+    //key:表格文件名
     private Map<String, ConfigDefinition> tableConfigs = new HashMap<>();
 
 
@@ -183,16 +186,27 @@ public abstract class DefinitionParser {
         }
     }
 
-    public Map<String, ClassDefinition> getClasses() {
-        return validatedClasses;
+    /**
+     * 获取所有的类定义
+     */
+    public Collection<ClassDefinition> getClasses() {
+        return longName2Classes.values();
     }
 
     /**
-     * 通过[与语言无关的的包名.类名]获取类定义
+     * 通过长类名获取类定义
      */
-    public ClassDefinition getClass(String name) {
-        return validatedClasses.get(name);
+    public ClassDefinition getClass(String longName) {
+        return longName2Classes.get(longName);
     }
+
+    /**
+     * 通过短类名获取类定义
+     */
+    public Set<ClassDefinition> getClasses(String shortName) {
+        return shortName2Classes.get(shortName);
+    }
+
 
     public ClassDefinition getClass(ClassDefinition owner, String name) {
         ClassDefinition classDefinition = getClass(ClassDefinition.getLongName(owner, name));
@@ -202,16 +216,8 @@ public abstract class DefinitionParser {
         return classDefinition;
     }
 
-    public String getLongName(ClassDefinition owner, String className) {
-        ClassDefinition classDefinition = getClass(owner, className);
-        if (classDefinition != null) {
-            return classDefinition.getLongName();
-        }
-        return className;
-    }
-
     public ConfigDefinition getConfig(String name) {
-        ClassDefinition classDefinition = validatedClasses.get(name);
+        ClassDefinition classDefinition = longName2Classes.get(name);
         if (classDefinition instanceof ConfigDefinition) {
             return (ConfigDefinition) classDefinition;
         }
@@ -231,7 +237,7 @@ public abstract class DefinitionParser {
     }
 
     public BeanDefinition getBean(String name) {
-        ClassDefinition classDefinition = validatedClasses.get(name);
+        ClassDefinition classDefinition = longName2Classes.get(name);
         if (classDefinition instanceof BeanDefinition) {
             return (BeanDefinition) classDefinition;
         }
@@ -263,7 +269,7 @@ public abstract class DefinitionParser {
 
     public void parse() {
         Objects.requireNonNull(category);
-        if (!validatedClasses.isEmpty()) {
+        if (!longName2Classes.isEmpty()) {
             return;
         }
 
@@ -296,36 +302,45 @@ public abstract class DefinitionParser {
         parsedClasses.forEach(ClassDefinition::validate3);
     }
 
-    protected void validateClassName() {
-        Map<String, ClassDefinition> dissimilarClasses = new HashMap<>();
+    private void addNameError(ClassDefinition classDefinition1, ClassDefinition classDefinition2, String append) {
+        String error = classDefinition1.getValidatedName("和") + classDefinition2.getValidatedName();
 
-        for (ClassDefinition classDefinition : parsedClasses) {
-            if (classDefinition.getName() == null) {
+        if (append != null) {
+            error += append;
+        }
+
+        validatedErrors.add(error);
+    }
+
+    protected void validateClassName() {
+        Map<String, ClassDefinition> dissimilarNameClasses = new HashMap<>();
+
+        for (ClassDefinition classDefinition1 : parsedClasses) {
+            if (classDefinition1.getName() == null) {
                 continue;
             }
 
-            ClassDefinition validatedClassDefinition = validatedClasses.get(classDefinition.getLongName());
-            if (validatedClassDefinition != null) {
-                String error = "定义文件[" + classDefinition.getDefinitionFile() + "]";
-                if (!classDefinition.getDefinitionFile().equals(validatedClassDefinition.getDefinitionFile())) {
-                    error += "和[" + validatedClassDefinition.getDefinitionFile() + "]";
+            if (shortName2Classes.containsKey(classDefinition1.getName())) {
+                for (ClassDefinition classDefinition2 : shortName2Classes.get(classDefinition1.getName())) {
+                    if (!classDefinition1.isAllowSameName() && !classDefinition2.isAllowSameName()) {
+                        addNameError(classDefinition1, classDefinition2, "名字相同");
+                    }
                 }
-                error += "有同名类[" + classDefinition.getName() + "]";
-                validatedErrors.add(error);
+            }
+            shortName2Classes.computeIfAbsent(classDefinition1.getName(), k -> new HashSet<>()).add(classDefinition1);
+
+            ClassDefinition classDefinition3 = longName2Classes.get(classDefinition1.getLongName());
+            if (classDefinition3 == null) {
+                longName2Classes.put(classDefinition1.getLongName(), classDefinition1);
             } else {
-                validatedClasses.put(classDefinition.getLongName(), classDefinition);
+                addNameError(classDefinition1, classDefinition3, "名字相同");
             }
 
-            ClassDefinition similarClassDefinition = dissimilarClasses.get(classDefinition.getLongName().toLowerCase());
-            if (similarClassDefinition != null && !similarClassDefinition.getLongName().equals(classDefinition.getLongName())) {
-                String error = "定义文件[" + classDefinition.getDefinitionFile() + "]的类[" + similarClassDefinition.getName() + "]和";
-                if (!classDefinition.getDefinitionFile().equals(similarClassDefinition.getDefinitionFile())) {
-                    error += "[" + similarClassDefinition.getDefinitionFile() + "]的";
-                }
-                error += "类[" + classDefinition.getName() + "]名字相似";
-                validatedErrors.add(error);
-            } else {
-                dissimilarClasses.put(classDefinition.getName().toLowerCase(), classDefinition);
+            ClassDefinition classDefinition4 = dissimilarNameClasses.get(classDefinition1.getLongName().toLowerCase());
+            if (classDefinition4 == null) {
+                dissimilarNameClasses.put(classDefinition1.getLongName().toLowerCase(), classDefinition1);
+            } else if (!classDefinition1.getLongName().equals(classDefinition4.getLongName())) {
+                addNameError(classDefinition1, classDefinition4, "名字相似");
             }
         }
     }
@@ -333,7 +348,7 @@ public abstract class DefinitionParser {
     public void clear() {
         definitionFilePaths.clear();
         parsedClasses.clear();
-        validatedClasses.clear();
+        longName2Classes.clear();
         validatedErrors.clear();
         tableConfigs.clear();
     }

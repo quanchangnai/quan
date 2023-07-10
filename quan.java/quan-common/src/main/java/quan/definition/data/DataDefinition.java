@@ -62,6 +62,11 @@ public class DataDefinition extends BeanDefinition {
     }
 
     @Override
+    public boolean isAllowSameName() {
+        return false;
+    }
+
+    @Override
     public Pattern getNamePattern() {
         Pattern namePattern = parser.getDataNamePattern();
         if (namePattern == null) {

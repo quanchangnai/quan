@@ -86,7 +86,7 @@ public abstract class MessageGenerator extends Generator {
         Map<Integer, MessageDefinition> definedIdMessageDefinitions = new HashMap<>();
         Set<MessageDefinition> hashIdMessageDefinitions = new HashSet<>();
 
-        for (ClassDefinition classDefinition : parser.getClasses().values()) {
+        for (ClassDefinition classDefinition : parser.getClasses()) {
             if (!(classDefinition instanceof MessageDefinition)) {
                 continue;
             }
