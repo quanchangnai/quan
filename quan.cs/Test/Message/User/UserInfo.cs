@@ -67,17 +67,17 @@ namespace Test.Message.User
         /// <summary>
         /// 角色信息List
         /// </summary>
-        public List<Test.Message.Role.RoleInfo> roleList { get; } = new List<Test.Message.Role.RoleInfo>();
+        public IList<Test.Message.Role.RoleInfo> roleList { get; } = new List<Test.Message.Role.RoleInfo>();
 
         /// <summary>
         /// 角色信息Set
         /// </summary>
-        public HashSet<Test.Message.Role.RoleInfo> roleSet { get; } = new HashSet<Test.Message.Role.RoleInfo>();
+        public ISet<Test.Message.Role.RoleInfo> roleSet { get; } = new HashSet<Test.Message.Role.RoleInfo>();
 
         /// <summary>
         /// 角色信息Map
         /// </summary>
-        public Dictionary<int, Test.Message.Role.RoleInfo> roleMap { get; } = new Dictionary<int, Test.Message.Role.RoleInfo>();
+        public IDictionary<int, Test.Message.Role.RoleInfo> roleMap { get; } = new Dictionary<int, Test.Message.Role.RoleInfo>();
 
         private byte[] _f11 = Array.Empty<byte>();
 
@@ -302,7 +302,7 @@ namespace Test.Message.User
                     case 35:
                         buffer.ReadInt();
                         var roleList_Size = buffer.ReadInt();
-                        for (var i = 0; i < roleList_Size; i++) 
+                        for (var roleList_i = 0; roleList_i < roleList_Size; roleList_i++) 
                         {
                             var roleListValue = new Test.Message.Role.RoleInfo();
                             roleListValue.Decode(buffer);
@@ -312,7 +312,7 @@ namespace Test.Message.User
                     case 39:
                         buffer.ReadInt();
                         var roleSet_Size = buffer.ReadInt();
-                        for (var i = 0; i < roleSet_Size; i++) 
+                        for (var roleSet_i = 0; roleSet_i < roleSet_Size; roleSet_i++) 
                         {
                             var roleSetValue = new Test.Message.Role.RoleInfo();
                             roleSetValue.Decode(buffer);
@@ -322,7 +322,7 @@ namespace Test.Message.User
                     case 43:
                         buffer.ReadInt();
                         var roleMap_Size = buffer.ReadInt();
-                        for (var i = 0; i < roleMap_Size; i++)
+                        for (var roleMap_i = 0; roleMap_i < roleMap_Size; roleMap_i++)
                         {
                             var roleMapKey = buffer.ReadInt();
                             var roleMapValue = new Test.Message.Role.RoleInfo();

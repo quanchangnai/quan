@@ -37,7 +37,9 @@ public abstract class Generator {
     protected Map<String, String> classTypes = new HashMap<>();
 
 
-    //类的简单名对应全名
+    /**
+     * 类的简单名对应全名
+     */
     protected Map<String, String> classNames = new HashMap<>();
 
     protected boolean enable = true;

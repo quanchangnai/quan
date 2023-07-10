@@ -4,6 +4,7 @@ import quan.definition.BeanDefinition;
 import quan.definition.FieldDefinition;
 import quan.definition.Language;
 import quan.definition.parser.DefinitionParser;
+import quan.generator.util.JavaUtils;
 
 import java.util.Properties;
 
@@ -13,48 +14,13 @@ import java.util.Properties;
 public class JavaMessageGenerator extends MessageGenerator {
 
     {
-        basicTypes.put("bool", "boolean");
-        basicTypes.put("short", "short");
-        basicTypes.put("int", "int");
-        basicTypes.put("long", "long");
-        basicTypes.put("float", "float");
-        basicTypes.put("double", "double");
-        basicTypes.put("string", "String");
-        basicTypes.put("set", "Set");
-        basicTypes.put("list", "List");
-        basicTypes.put("map", "Map");
+        JavaUtils.fillGeneratorBasicTypes(basicTypes);
         basicTypes.put("bytes", "byte[]");
 
-        classTypes.put("bool", "Boolean");
-        classTypes.put("short", "Short");
-        classTypes.put("int", "Integer");
-        classTypes.put("long", "Long");
-        classTypes.put("float", "Float");
-        classTypes.put("double", "Double");
-        classTypes.put("string", "String");
-        classTypes.put("set", "HashSet");
-        classTypes.put("list", "ArrayList");
-        classTypes.put("map", "HashMap");
+        JavaUtils.fillGeneratorClassTypes(classTypes);
         classTypes.put("bytes", "byte[]");
 
-        classNames.put("Boolean", "java.lang.Boolean");
-        classNames.put("Short", "java.lang.Short");
-        classNames.put("Integer", "java.lang.Integer");
-        classNames.put("Long", "java.lang.Long");
-        classNames.put("Float", "java.lang.Float");
-        classNames.put("Double", "java.lang.Double");
-        classNames.put("String", "java.lang.String");
-        classNames.put("Override", "java.lang.Override");
-
-        classNames.put("Set", "java.util.Set");
-        classNames.put("HashSet", "java.util.HashSet");
-        classNames.put("List", "java.util.List");
-        classNames.put("ArrayList", "java.util.ArrayList");
-        classNames.put("Map", "java.util.Map");
-        classNames.put("HashMap", "java.util.HashMap");
-        classNames.put("Objects", "java.util.Objects");
-        classNames.put("Arrays", "java.util.Arrays");
-
+        JavaUtils.fillGeneratorClassNames(classNames);
         classNames.put("Bean", "quan.message.Bean");
         classNames.put("Message", "quan.message.Message");
         classNames.put("CodedBuffer", "quan.message.CodedBuffer");

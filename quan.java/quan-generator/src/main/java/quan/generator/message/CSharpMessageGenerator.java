@@ -13,36 +13,13 @@ import java.util.Properties;
 public class CSharpMessageGenerator extends MessageGenerator {
 
     {
-        basicTypes.put("bool", "bool");
-        basicTypes.put("short", "short");
-        basicTypes.put("int", "int");
-        basicTypes.put("long", "long");
-        basicTypes.put("float", "float");
-        basicTypes.put("double", "double");
-        basicTypes.put("string", "string");
-        basicTypes.put("set", "HashSet");
-        basicTypes.put("list", "List");
-        basicTypes.put("map", "Dictionary");
+        CSharpUtils.fillGeneratorBasicTypes(basicTypes);
         basicTypes.put("bytes", "byte[]");
 
-        classTypes.put("bool", "bool");
-        classTypes.put("short", "short");
-        classTypes.put("int", "int");
-        classTypes.put("long", "long");
-        classTypes.put("float", "float");
-        classTypes.put("double", "double");
-        classTypes.put("string", "string");
-        classTypes.put("set", "HashSet");
-        classTypes.put("list", "List");
-        classTypes.put("map", "Dictionary");
+        CSharpUtils.fillGeneratorClassTypes(classTypes);
         classTypes.put("bytes", "byte[]");
 
-        classNames.put("Array", "System.Array");
-        classNames.put("HashSet", "System.Collections.Generic.HashSet");
-        classNames.put("List", "System.Collections.Generic.List");
-        classNames.put("Dictionary", "System.Collections.Generic.Dictionary");
-        classNames.put("NullReferenceException", "System.NullReferenceException");
-
+        CSharpUtils.fillGeneratorClassNames(classNames);
         classNames.put("Bean", "Quan.Message.Bean");
         classNames.put("MessageBase", "Quan.Message.MessageBase");
         classNames.put("CodedBuffer", "Quan.Message.CodedBuffer");

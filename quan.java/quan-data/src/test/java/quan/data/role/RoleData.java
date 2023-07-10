@@ -1,5 +1,6 @@
 package quan.data.role;
 
+import java.util.*;
 import org.bson.BsonReader;
 import org.bson.BsonType;
 import org.bson.BsonWriter;
@@ -7,16 +8,11 @@ import org.bson.codecs.Codec;
 import org.bson.codecs.DecoderContext;
 import org.bson.codecs.EncoderContext;
 import org.bson.codecs.configuration.CodecRegistry;
-import quan.data.Data;
-import quan.data.Entity;
-import quan.data.Index;
-import quan.data.Transaction;
+import quan.data.*;
 import quan.data.bson.JsonStringWriter;
 import quan.data.field.*;
 import quan.data.item.ItemBean;
 import quan.util.NumberUtils;
-
-import java.util.*;
 
 /**
  * 角色<br/>

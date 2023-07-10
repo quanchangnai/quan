@@ -15,43 +15,20 @@ import java.util.Properties;
 public class CSharpConfigGenerator extends ConfigGenerator {
 
     {
-        basicTypes.put("bool", "bool");
-        basicTypes.put("short", "short");
-        basicTypes.put("int", "int");
-        basicTypes.put("long", "long");
-        basicTypes.put("float", "float");
-        basicTypes.put("double", "double");
-        basicTypes.put("string", "string");
-        basicTypes.put("set", "ISet");
-        basicTypes.put("list", "IList");
-        basicTypes.put("map", "IDictionary");
+        CSharpUtils.fillGeneratorBasicTypes(basicTypes);
         basicTypes.put("date", "DateTime");
         basicTypes.put("time", "DateTime");
         basicTypes.put("datetime", "DateTime");
 
-        classTypes.put("bool", "bool");
-        classTypes.put("short", "short");
-        classTypes.put("int", "int");
-        classTypes.put("long", "long");
-        classTypes.put("float", "float");
-        classTypes.put("double", "double");
-        classTypes.put("string", "string");
-        classTypes.put("set", "HashSet");
-        classTypes.put("list", "List");
-        classTypes.put("map", "Dictionary");
+        CSharpUtils.fillGeneratorClassTypes(classTypes);
         classTypes.put("date", "DateTime");
         classTypes.put("time", "DateTime");
         classTypes.put("datetime", "DateTime");
 
+        CSharpUtils.fillGeneratorClassNames(classNames);
         classNames.put("DateTime", "System.DateTime");
-        classNames.put("ISet", "System.Collections.Generic.ISet");
-        classNames.put("HashSet", "System.Collections.Generic.HashSet");
         classNames.put("ImmutableSet", "System.Collections.Immutable.ImmutableSet");
-        classNames.put("IList", "System.Collections.Generic.IList");
-        classNames.put("List", "System.Collections.Generic.List");
         classNames.put("ImmutableList", "System.Collections.Immutable.ImmutableList");
-        classNames.put("IDictionary", "System.Collections.Generic.IDictionary");
-        classNames.put("Dictionary", "System.Collections.Generic.Dictionary");
         classNames.put("ImmutableDictionary", "System.Collections.Immutable.ImmutableDictionary");
 
         classNames.put("Bean", "Quan.Config.Bean");

@@ -2,8 +2,8 @@
 using ${import};
 </#list>
 
-<#assign Array=dn("Array") NullReferenceException=dn("NullReferenceException")>
-<#assign Bean=dn("Bean") MessageBase=dn("MessageBase") CodedBuffer=dn("CodedBuffer")>
+<#assign Array = dn("Array") NullReferenceException = dn("NullReferenceException")>
+<#assign Bean = dn("Bean") MessageBase = dn("MessageBase") CodedBuffer = dn("CodedBuffer")>
 namespace ${getFullPackageName("cs")}
 {
     /// <summary>
@@ -12,7 +12,7 @@ namespace ${getFullPackageName("cs")}
 </#if>
     /// 代码自动生成，请勿手动修改
     /// </summary>
-    public class ${name} : <#if kind ==2>${Bean}<#else>${MessageBase}</#if>
+    public class ${name} : <#if kind == 2>${Bean}<#else>${MessageBase}</#if>
     {
 <#if kind ==3>
         /// <summary>
@@ -28,7 +28,7 @@ namespace ${getFullPackageName("cs")}
         /// ${field.comment}
         /// </summary>
         </#if>
-        public ${field.classType}<${field.valueClassType}> ${field.name} { get; } = new ${field.classType}<${field.valueClassType}>();
+        public ${field.basicType}<${field.valueClassType}> ${field.name} { get; } = new ${field.classType}<${field.valueClassType}>();
 
     <#elseif field.type == "map">
         <#if field.comment !="">
@@ -317,7 +317,7 @@ namespace ${getFullPackageName("cs")}
                     <#if field.type=="set" || field.type=="list">
                         buffer.ReadInt();
                         var ${field.name}_Size = buffer.ReadInt();
-                        for (var i = 0; i < ${field.name}_Size; i++) 
+                        for (var ${field.name}_i = 0; ${field.name}_i < ${field.name}_Size; ${field.name}_i++) 
                         {
                         <#if field.builtinValueType>
                             ${thisField2}.Add(buffer.Read${field.valueType?cap_first}());
@@ -330,7 +330,7 @@ namespace ${getFullPackageName("cs")}
                     <#elseif field.type=="map">
                         buffer.ReadInt();
                         var ${field.name}_Size = buffer.ReadInt();
-                        for (var i = 0; i < ${field.name}_Size; i++)
+                        for (var ${field.name}_i = 0; ${field.name}_i < ${field.name}_Size; ${field.name}_i++)
                         {
                         <#if field.builtinValueType>
                             ${thisField2}.Add(buffer.Read${field.keyType?cap_first}(), buffer.Read${field.valueType?cap_first}());
@@ -379,7 +379,7 @@ namespace ${getFullPackageName("cs")}
 
         </#if>
             var ${field.name}_Size = buffer.ReadInt();
-            for (var i = 0; i < ${field.name}_Size; i++)
+            for (var ${field.name}_i = 0; ${field.name}_i < ${field.name}_Size; ${field.name}_i++)
             {
         <#if field.builtinValueType>
                 ${thisField2}.Add(buffer.Read${field.valueType?cap_first}());
@@ -397,7 +397,7 @@ namespace ${getFullPackageName("cs")}
 
         </#if>
             var ${field.name}_Size = buffer.ReadInt();
-            for (var i = 0; i < ${field.name}_Size; i++)
+            for (var ${field.name}_i = 0; ${field.name}_i < ${field.name}_Size; ${field.name}_i++)
             {
         <#if field.builtinValueType>
                 ${thisField2}.Add(buffer.Read${field.keyType?cap_first}(), buffer.Read${field.valueType?cap_first}());

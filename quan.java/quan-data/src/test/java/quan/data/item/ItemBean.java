@@ -1,5 +1,6 @@
 package quan.data.item;
 
+import java.util.*;
 import org.bson.BsonReader;
 import org.bson.BsonType;
 import org.bson.BsonWriter;
@@ -7,15 +8,8 @@ import org.bson.codecs.Codec;
 import org.bson.codecs.DecoderContext;
 import org.bson.codecs.EncoderContext;
 import org.bson.codecs.configuration.CodecRegistry;
-import quan.data.Bean;
-import quan.data.Data;
-import quan.data.Entity;
-import quan.data.Transaction;
-import quan.data.field.BaseField;
-import quan.data.field.ListField;
-
-import java.util.Collection;
-import java.util.List;
+import quan.data.*;
+import quan.data.field.*;
 
 /**
  * 道具<br/>

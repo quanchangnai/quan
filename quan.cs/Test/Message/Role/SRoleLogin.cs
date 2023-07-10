@@ -47,17 +47,17 @@ namespace Test.Message.Role
         /// <summary>
         /// 角色信息
         /// </summary>
-        public List<RoleInfo> roleInfoList { get; } = new List<RoleInfo>();
+        public IList<RoleInfo> roleInfoList { get; } = new List<RoleInfo>();
 
         /// <summary>
         /// 角色信息
         /// </summary>
-        public HashSet<RoleInfo> roleInfoSet { get; } = new HashSet<RoleInfo>();
+        public ISet<RoleInfo> roleInfoSet { get; } = new HashSet<RoleInfo>();
 
         /// <summary>
         /// 角色信息
         /// </summary>
-        public Dictionary<int, RoleInfo> roleInfoMap { get; } = new Dictionary<int, RoleInfo>();
+        public IDictionary<int, RoleInfo> roleInfoMap { get; } = new Dictionary<int, RoleInfo>();
 
         /// <summary>
         /// 用户信息
@@ -115,7 +115,7 @@ namespace Test.Message.Role
             roleInfo.Decode(buffer);
 
             var roleInfoList_Size = buffer.ReadInt();
-            for (var i = 0; i < roleInfoList_Size; i++)
+            for (var roleInfoList_i = 0; roleInfoList_i < roleInfoList_Size; roleInfoList_i++)
             {
                 var roleInfoListValue = new RoleInfo();
                 roleInfoListValue.Decode(buffer);
@@ -123,7 +123,7 @@ namespace Test.Message.Role
             }
 
             var roleInfoSet_Size = buffer.ReadInt();
-            for (var i = 0; i < roleInfoSet_Size; i++)
+            for (var roleInfoSet_i = 0; roleInfoSet_i < roleInfoSet_Size; roleInfoSet_i++)
             {
                 var roleInfoSetValue = new RoleInfo();
                 roleInfoSetValue.Decode(buffer);
@@ -131,7 +131,7 @@ namespace Test.Message.Role
             }
 
             var roleInfoMap_Size = buffer.ReadInt();
-            for (var i = 0; i < roleInfoMap_Size; i++)
+            for (var roleInfoMap_i = 0; roleInfoMap_i < roleInfoMap_Size; roleInfoMap_i++)
             {
                 var roleInfoMapKey = buffer.ReadInt();
                 var roleInfoMapValue = new RoleInfo();

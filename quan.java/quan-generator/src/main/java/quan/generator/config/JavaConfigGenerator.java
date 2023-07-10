@@ -4,7 +4,9 @@ import quan.definition.BeanDefinition;
 import quan.definition.FieldDefinition;
 import quan.definition.Language;
 import quan.definition.config.ConfigDefinition;
+import quan.generator.util.JavaUtils;
 
+import java.util.Date;
 import java.util.Properties;
 
 /**
@@ -13,51 +15,18 @@ import java.util.Properties;
 public class JavaConfigGenerator extends ConfigGenerator {
 
     {
-        basicTypes.put("bool", "boolean");
-        basicTypes.put("short", "short");
-        basicTypes.put("int", "int");
-        basicTypes.put("long", "long");
-        basicTypes.put("float", "float");
-        basicTypes.put("double", "double");
-        basicTypes.put("string", "String");
-        basicTypes.put("set", "Set");
-        basicTypes.put("list", "List");
-        basicTypes.put("map", "Map");
+        JavaUtils.fillGeneratorBasicTypes(basicTypes);
         basicTypes.put("date", "Date");
         basicTypes.put("time", "Date");
         basicTypes.put("datetime", "Date");
 
-        classTypes.put("bool", "Boolean");
-        classTypes.put("short", "Short");
-        classTypes.put("int", "Integer");
-        classTypes.put("long", "Long");
-        classTypes.put("float", "Float");
-        classTypes.put("double", "Double");
-        classTypes.put("string", "String");
-        classTypes.put("set", "HashSet");
-        classTypes.put("list", "ArrayList");
-        classTypes.put("map", "HashMap");
+        JavaUtils.fillGeneratorClassTypes(classTypes);
         classTypes.put("date", "Date");
         classTypes.put("time", "Date");
         classTypes.put("datetime", "Date");
 
-        classNames.put("Boolean", "java.lang.Boolean");
-        classNames.put("Short", "java.lang.Short");
-        classNames.put("Integer", "java.lang.Integer");
-        classNames.put("Long", "java.lang.Long");
-        classNames.put("Float", "java.lang.Float");
-        classNames.put("Double", "java.lang.Double");
-        classNames.put("String", "java.lang.String");
-        classNames.put("Override", "java.lang.Override");
-        classNames.put("SuppressWarnings", "java.lang.SuppressWarnings");
-        classNames.put("Set", "java.util.Set");
-        classNames.put("HashSet", "java.util.HashSet");
-        classNames.put("List", "java.util.List");
-        classNames.put("ArrayList", "java.util.ArrayList");
-        classNames.put("Map", "java.util.Map");
-        classNames.put("HashMap", "java.util.HashMap");
-        classNames.put("Collections", "java.util.Collections");
-
+        JavaUtils.fillGeneratorClassNames(classNames);
+        classNames.put("Date", Date.class.getName());
         classNames.put("Bean", "quan.config.Bean");
         classNames.put("Config", "quan.config.Config");
         classNames.put("ConfigLoader", "quan.config.load.ConfigLoader");

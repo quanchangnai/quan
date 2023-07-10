@@ -4,6 +4,7 @@ import freemarker.template.Template;
 import quan.definition.*;
 import quan.definition.data.DataDefinition;
 import quan.generator.Generator;
+import quan.generator.util.JavaUtils;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -14,17 +15,7 @@ import java.util.Properties;
 public class DataGenerator extends Generator {
 
     {
-        basicTypes.put("byte", "byte");
-        basicTypes.put("bool", "boolean");
-        basicTypes.put("short", "short");
-        basicTypes.put("int", "int");
-        basicTypes.put("long", "long");
-        basicTypes.put("float", "float");
-        basicTypes.put("double", "double");
-        basicTypes.put("string", "String");
-        basicTypes.put("set", "Set");
-        basicTypes.put("list", "List");
-        basicTypes.put("map", "Map");
+        JavaUtils.fillGeneratorBasicTypes(basicTypes);
 
         classTypes.put("byte", "Byte");
         classTypes.put("bool", "Boolean");
@@ -34,43 +25,33 @@ public class DataGenerator extends Generator {
         classTypes.put("float", "Float");
         classTypes.put("double", "Double");
         classTypes.put("string", "String");
+
+        JavaUtils.fillGeneratorClassTypes(classTypes);
+
         classTypes.put("set", "SetField");
         classTypes.put("list", "ListField");
         classTypes.put("map", "MapField");
 
-        classNames.put("Boolean", "java.util.Boolean");
-        classNames.put("Short", "java.util.Short");
-        classNames.put("Integer", "java.util.Integer");
-        classNames.put("Long", "java.util.Long");
-        classNames.put("Float", "java.util.Float");
-        classNames.put("Double", "java.util.Double");
-        classNames.put("String", "java.util.String");
-        classNames.put("Set", "java.util.Set");
-        classNames.put("HashSet", "java.util.HashSet");
-        classNames.put("List", "java.util.List");
-        classNames.put("ArrayList", "java.util.ArrayList");
-        classNames.put("Map", "java.util.Map");
-        classNames.put("HashMap", "java.util.HashMap");
-        classNames.put("Collection", "java.util.Collection");
-        classNames.put("Objects", "java.util.Objects");
-        classNames.put("Class", "java.lang.Class");
 
+        JavaUtils.fillGeneratorClassNames(classNames);
+        classNames.put("Index", "quan.data.Index");
+        classNames.put("Bean", "quan.data.Bean");
+        classNames.put("Data", "quan.data.Data");
+        classNames.put("Transaction", "quan.data.Transaction");
+        classNames.put("BaseField", "quan.data.field.BaseField");
+        classNames.put("BeanField", "quan.data.field.BeanField");
+        classNames.put("ListField", "quan.data.field.ListField");
+        classNames.put("MapField", "quan.data.field.MapField");
+        classNames.put("SetField", "quan.data.field.SetField");
         classNames.put("NumberUtils", "quan.util.NumberUtils");
-        classNames.put("Index", "java.data.Index");
-        classNames.put("NodeBean", "java.data.NodeBean");
-        classNames.put("Data", "java.data.Data");
-        classNames.put("Transaction", "java.data.Transaction");
-        classNames.put("IntField", "java.data.field.IntField");
-        classNames.put("BeanField", "java.data.field.BeanField");
-        classNames.put("BoolField", "java.data.field.BoolField");
-        classNames.put("DoubleField", "java.data.field.DoubleField");
-        classNames.put("FloatField", "java.data.field.FloatField");
-        classNames.put("ListField", "java.data.field.ListField");
-        classNames.put("LongField", "java.data.field.LongField");
-        classNames.put("MapField", "java.data.field.MapField");
-        classNames.put("SetField", "java.data.field.SetField");
-        classNames.put("ShortField", "java.data.field.ShortField");
-        classNames.put("StringField", "java.data.field.StringField");
+        classNames.put("JsonStringWriter", "quan.data.bson.JsonStringWriter");
+        classNames.put("Codec", "org.bson.codecs.Codec");
+        classNames.put("BsonType", "org.bson.codecs.BsonType");
+        classNames.put("BsonReader", "org.bson.BsonReader");
+        classNames.put("BsonWriter", "org.bson.BsonWriter");
+        classNames.put("EncoderContext", "org.bson.codecs.EncoderContext");
+        classNames.put("DecoderContext", "org.bson.codecs.DecoderContext");
+        classNames.put("CodecRegistry", "org.bson.codecs.configuration.CodecRegistry");
     }
 
     public DataGenerator(Properties options) {

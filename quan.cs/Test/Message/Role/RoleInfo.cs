@@ -59,11 +59,11 @@ namespace Test.Message.Role
 
         public byte[] bb2 { get; set; }
 
-        public List<int> list { get; } = new List<int>();
+        public IList<int> list { get; } = new List<int>();
 
-        public HashSet<int> set { get; } = new HashSet<int>();
+        public ISet<int> set { get; } = new HashSet<int>();
 
-        public Dictionary<int, int> map { get; } = new Dictionary<int, int>();
+        public IDictionary<int, int> map { get; } = new Dictionary<int, int>();
 
 
         public override void Encode(CodedBuffer buffer)
@@ -132,13 +132,13 @@ namespace Test.Message.Role
             }
 
             var list_Size = buffer.ReadInt();
-            for (var i = 0; i < list_Size; i++)
+            for (var list_i = 0; list_i < list_Size; list_i++)
             {
                 list.Add(buffer.ReadInt());
             }
 
             var set_Size = buffer.ReadInt();
-            for (var i = 0; i < set_Size; i++)
+            for (var set_i = 0; set_i < set_Size; set_i++)
             {
                 set.Add(buffer.ReadInt());
             }

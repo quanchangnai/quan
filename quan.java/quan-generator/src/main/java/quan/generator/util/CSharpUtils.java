@@ -18,12 +18,45 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class CSharpUtils {
 
     private static Logger logger = LoggerFactory.getLogger(CSharpUtils.class);
+
+    public static void fillGeneratorBasicTypes(Map<String, String> basicTypes) {
+        basicTypes.put("bool", "bool");
+        basicTypes.put("short", "short");
+        basicTypes.put("int", "int");
+        basicTypes.put("long", "long");
+        basicTypes.put("float", "float");
+        basicTypes.put("double", "double");
+        basicTypes.put("string", "string");
+        basicTypes.put("set", "ISet");
+        basicTypes.put("list", "IList");
+        basicTypes.put("map", "IDictionary");
+    }
+
+    public static void fillGeneratorClassTypes(Map<String, String> classTypes) {
+        fillGeneratorBasicTypes(classTypes);
+        classTypes.put("set", "HashSet");
+        classTypes.put("list", "List");
+        classTypes.put("map", "Dictionary");
+    }
+
+    public static void fillGeneratorClassNames(Map<String, String> classNames) {
+        classNames.put("Array", "System.Array");
+        classNames.put("NullReferenceException", "System.NullReferenceException");
+
+        classNames.put("ISet", "System.Collections.Generic.ISet");
+        classNames.put("HashSet", "System.Collections.Generic.HashSet");
+        classNames.put("IList", "System.Collections.Generic.IList");
+        classNames.put("List", "System.Collections.Generic.List");
+        classNames.put("IDictionary", "System.Collections.Generic.IDictionary");
+        classNames.put("Dictionary", "System.Collections.Generic.Dictionary");
+    }
 
     public static void updateProjFile(String codePath, String projFileName, Set<String> addClasses, Set<String> deleteClasses) {
         if (StringUtils.isBlank(projFileName) || CollectionUtils.isEmpty(addClasses) && CollectionUtils.isEmpty(deleteClasses)) {
