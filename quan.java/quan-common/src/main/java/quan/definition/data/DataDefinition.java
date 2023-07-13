@@ -58,7 +58,7 @@ public class DataDefinition extends BeanDefinition {
     public void setName(String name) {
         super.setName(name);
         if (name != null) {
-            underscoreName = StringUtils.toUnderscore(name, true);
+            underscoreName = StringUtils.toSnakeCase(name, true);
         }
     }
 

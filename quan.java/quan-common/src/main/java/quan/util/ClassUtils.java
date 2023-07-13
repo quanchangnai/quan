@@ -34,15 +34,15 @@ public class ClassUtils extends org.apache.commons.lang3.ClassUtils {
         return instrumentation;
     }
 
-    private static boolean aopInit;
+    private static boolean aop;
 
     /**
      * 初始化AOP
      */
     public synchronized static void initAop() {
-        if (!aopInit) {
-            aopInit = true;
+        if (!aop) {
             getInstrumentation().addTransformer(new ClassPreProcessorAgentAdapter());
+            aop = true;
             try {
                 //环绕通知内联支持
                 Class.forName("quan.data.TransactionAspect");

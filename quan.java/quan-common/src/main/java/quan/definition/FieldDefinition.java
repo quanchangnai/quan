@@ -110,7 +110,7 @@ public class FieldDefinition extends Definition implements Cloneable {
     public void setName(String name) {
         super.setName(name);
         if (name != null) {
-            underscoreName = StringUtils.toUnderscore(name, false);
+            underscoreName = StringUtils.toSnakeCase(name, false);
         }
     }
 
