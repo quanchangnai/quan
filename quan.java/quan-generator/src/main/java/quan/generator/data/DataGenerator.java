@@ -44,11 +44,11 @@ public class DataGenerator extends Generator {
         classNames.put("MapField", "quan.data.field.MapField");
         classNames.put("SetField", "quan.data.field.SetField");
         classNames.put("NumberUtils", "quan.util.NumberUtils");
-        classNames.put("JsonStringWriter", "quan.data.bson.JsonStringWriter");
-        classNames.put("Codec", "org.bson.codecs.Codec");
-        classNames.put("BsonType", "org.bson.codecs.BsonType");
         classNames.put("BsonReader", "org.bson.BsonReader");
         classNames.put("BsonWriter", "org.bson.BsonWriter");
+        classNames.put("Codec", "org.bson.codecs.Codec");
+        classNames.put("BsonType", "org.bson.codecs.BsonType");
+        classNames.put("JsonWriter", "org.bson.json.JsonWriter");
         classNames.put("EncoderContext", "org.bson.codecs.EncoderContext");
         classNames.put("DecoderContext", "org.bson.codecs.DecoderContext");
         classNames.put("CodecRegistry", "org.bson.codecs.configuration.CodecRegistry");
@@ -116,7 +116,7 @@ public class DataGenerator extends Generator {
         beanDefinition.addImport("quan.data.*");
         beanDefinition.addImport("quan.data.field.*");
         if (beanDefinition instanceof DataDefinition) {
-            beanDefinition.addImport("quan.data.bson.JsonStringWriter");
+            beanDefinition.addImport("org.bson.json.JsonWriter");
         }
 
         super.prepareBean(beanDefinition);

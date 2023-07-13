@@ -13,9 +13,9 @@ public abstract class Data<I> implements Entity {
      */
     public static final String _ID = "_id";
 
-    private static DataWriter defaultWriter;
+    private static DataAccessor defaultAccessor;
 
-    DataWriter writer;
+    DataAccessor accessor;
 
     State state;
 
@@ -24,12 +24,12 @@ public abstract class Data<I> implements Entity {
      */
     protected final BitSet _updatedFields = new BitSet();
 
-    public static DataWriter _getDefaultWriter() {
-        return defaultWriter;
+    public static DataAccessor _getDefaultAccessor() {
+        return defaultAccessor;
     }
 
-    public static void _setDefaultWriter(DataWriter writer) {
-        Data.defaultWriter = writer;
+    public static void _setDefaultAccessor(DataAccessor accessor) {
+        Data.defaultAccessor = accessor;
     }
 
     public static String name(Class<? extends Data<?>> clazz) {
@@ -46,16 +46,16 @@ public abstract class Data<I> implements Entity {
     public abstract I id();
 
     /**
-     * 不在事务中需要设置写入器时通过反射引用此方法
+     * 不在事务中需要设置存取器时通过反射引用此方法
      */
     @SuppressWarnings("unused")
-    private static final BiConsumer<Data<?>, DataWriter> _setWriter = (data, writer) -> {
-        data.writer = writer;
+    private static final BiConsumer<Data<?>, DataAccessor> _setAccessor = (data, accessor) -> {
+        data.accessor = accessor;
         data.state = State.UPDATE;
     };
 
 
-    private void _setWriter(Transaction transaction, DataWriter writer, State state) {
+    private void _setAccessor(Transaction transaction, DataAccessor accessor, State state) {
         State oldState = this.state;
         Log log = transaction.getDataLog(this);
         if (log != null) {
@@ -76,18 +76,18 @@ public abstract class Data<I> implements Entity {
         }
 
         if (log == null) {
-            transaction.setDataLog(this, writer, state);
+            transaction.setDataLog(this, accessor, state);
         } else {
-            log.writer = writer;
+            log.accessor = accessor;
             log.state = state;
         }
     }
 
-    public DataWriter _getWriter() {
-        if (writer == null) {
-            return defaultWriter;
+    public DataAccessor _getAccessor() {
+        if (accessor == null) {
+            return defaultAccessor;
         }
-        return writer;
+        return accessor;
     }
 
     /**
@@ -98,48 +98,48 @@ public abstract class Data<I> implements Entity {
     }
 
     /**
-     * 使用指定的写入器插入数据，在内存事务中操作将会在提交时真正执行
+     * 使用指定的存取器插入数据，在内存事务中操作将会在提交时真正执行
      */
-    public final void insert(DataWriter writer) {
-        Objects.requireNonNull(writer, "参数[writer]不能为空");
+    public final void insert(DataAccessor accessor) {
+        Objects.requireNonNull(accessor, "参数[accessor]不能为空");
 
         Transaction transaction = Transaction.get();
         if (transaction != null) {
-            _setWriter(transaction, writer, State.INSERT);
+            _setAccessor(transaction, accessor, State.INSERT);
         } else if (Transaction.isOptional()) {
-            this.writer = writer;
-            writer.write(Collections.singleton(this), null, null);
+            this.accessor = accessor;
+            accessor.write(Collections.singleton(this), null, null);
         } else {
             Validations.transactionError();
         }
     }
 
     /**
-     * 使用缓存下来或者默认的写入器插入数据
+     * 使用缓存下来或者默认的存取器插入数据
      *
-     * @see #insert(DataWriter)
+     * @see #insert(DataAccessor)
      */
     public final void insert() {
-        insert(_getWriter());
+        insert(_getAccessor());
     }
 
     /**
-     * 使用指定的写入器更新数据，在内存事务中操作将会在提交时真正执行
+     * 使用指定的存取器更新数据，在内存事务中操作将会在提交时真正执行
      */
-    public final void update(DataWriter writer) {
-        Objects.requireNonNull(writer, "参数[writer]不能为空");
+    public final void update(DataAccessor accessor) {
+        Objects.requireNonNull(accessor, "参数[accessor]不能为空");
 
         Transaction transaction = Transaction.get();
         if (transaction != null) {
-            _setWriter(transaction, writer, State.UPDATE);
+            _setAccessor(transaction, accessor, State.UPDATE);
         } else if (Transaction.isOptional()) {
-            this.writer = writer;
+            this.accessor = accessor;
             Map<String, Object> patch = _getUpdatePatch();
             if (patch != null) {
                 _updatedFields.clear();
                 Map<Data<?>, Map<String, Object>> updates = new HashMap<>();
                 updates.put(this, patch);
-                writer.write(null, null, updates);
+                accessor.write(null, null, updates);
             }
         } else {
             Validations.transactionError();
@@ -147,49 +147,49 @@ public abstract class Data<I> implements Entity {
     }
 
     /**
-     * 使用缓存下来或者默认的写入器更新数据，在内存事务中设置数据字段时会自动更新
+     * 使用缓存下来或者默认的存取器更新数据，在内存事务中设置数据字段时会自动更新
      *
-     * @see #update(DataWriter)
+     * @see #update(DataAccessor)
      */
     public final void update() {
-        update(_getWriter());
+        update(_getAccessor());
     }
 
     /**
-     * 使用指定的写入器删除数据，在内存事务中操作将会在提交时真正执行
+     * 使用指定的存取器删除数据，在内存事务中操作将会在提交时真正执行
      */
-    public final void delete(DataWriter writer) {
-        Objects.requireNonNull(writer, "参数[writer]不能为空");
+    public final void delete(DataAccessor accessor) {
+        Objects.requireNonNull(accessor, "参数[accessor]不能为空");
 
         Transaction transaction = Transaction.get();
         if (transaction != null) {
-            _setWriter(transaction, writer, State.DELETE);
+            _setAccessor(transaction, accessor, State.DELETE);
         } else if (Transaction.isOptional()) {
-            this.writer = writer;
-            writer.write(null, Collections.singleton(this), null);
+            this.accessor = accessor;
+            accessor.write(null, Collections.singleton(this), null);
         } else {
             Validations.transactionError();
         }
     }
 
     /**
-     * 使用缓存下来或者默认的写入器删除数据
+     * 使用缓存下来或者默认的存取器删除数据
      *
-     * @see #delete(DataWriter)
+     * @see #delete(DataAccessor)
      */
     public final void delete() {
-        delete(_getWriter());
+        delete(_getAccessor());
     }
 
     /**
-     * 清除设置的写入器和状态
+     * 清除设置的存取器和状态
      */
     public final void free() {
         Transaction transaction = Transaction.get();
         if (transaction != null) {
-            _setWriter(transaction, null, null);
+            _setAccessor(transaction, null, null);
         } else if (Transaction.isOptional()) {
-            this.writer = null;
+            this.accessor = null;
             this.state = null;
         } else {
             Validations.transactionError();
@@ -197,15 +197,15 @@ public abstract class Data<I> implements Entity {
     }
 
     /**
-     * 提交日志中记录的写入器
+     * 提交日志中记录的存取器
      */
     void commit(Log log) {
         if (log.state == State.DELETE) {
-            this.writer = null;
+            this.accessor = null;
             this.state = null;
             this._updatedFields.clear();
         } else {
-            this.writer = log.writer;
+            this.accessor = log.accessor;
             this.state = State.UPDATE;
             this._updatedFields.or(log.updatedFields);
         }
@@ -214,9 +214,9 @@ public abstract class Data<I> implements Entity {
     static class Log {
 
         /**
-         * @see Data#writer
+         * @see Data#accessor
          */
-        DataWriter writer;
+        DataAccessor accessor;
 
         /**
          * @see Data#state
@@ -228,8 +228,8 @@ public abstract class Data<I> implements Entity {
          */
         final BitSet updatedFields = new BitSet();
 
-        public Log(DataWriter writer, State state) {
-            this.writer = writer;
+        public Log(DataAccessor accessor, State state) {
+            this.accessor = accessor;
             this.state = state;
         }
     }

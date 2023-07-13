@@ -32,7 +32,7 @@ public class OperationAspect {
     @SuppressWarnings("rawtypes")
     @Around("execute() && args(com.mongodb.internal.operation.ReadOperation,..,com.mongodb.client.ClientSession)")
     public Object aroundRead(ProceedingJoinPoint joinPoint) throws Throwable {
-        if (!OperationThread.isInside()) {
+        if (Database.validateThread && !OperationThread.isInside()) {
             throw new IllegalStateException("只能在数据库线程里读数据库");
         }
 
@@ -55,7 +55,7 @@ public class OperationAspect {
         if (Transaction.isInside()) {
             throw new IllegalStateException("不能在内存事务中写数据库");
         }
-        if (!OperationThread.isInside()) {
+        if (Database.validateThread && !OperationThread.isInside()) {
             throw new IllegalStateException("只能在数据库线程里写数据库");
         }
     }

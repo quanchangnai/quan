@@ -87,8 +87,8 @@ public class Transaction {
         return globalOptional || localOptional.get();
     }
 
-    void setDataLog(Data<?> data, DataWriter writer, Data.State state) {
-        dataLogs.put(data, new Data.Log(writer, state));
+    void setDataLog(Data<?> data, DataAccessor accessor, Data.State state) {
+        dataLogs.put(data, new Data.Log(accessor, state));
     }
 
     Data.Log getDataLog(Data<?> data) {
@@ -133,7 +133,7 @@ public class Transaction {
         if (owner != null) {
             Data.Log dataLog = getDataLog(owner);
             if (dataLog == null && owner.state == Data.State.UPDATE) {
-                setDataLog(owner, owner._getWriter(), owner.state);
+                setDataLog(owner, owner._getAccessor(), owner.state);
                 dataLog = getDataLog(owner);
             }
             if (dataLog != null) {
@@ -387,15 +387,15 @@ public class Transaction {
             field.commit(fieldLogs.get(field));
         }
 
-        Map<DataWriter, Triple> writes = new HashMap<>();
-        Function<DataWriter, Triple> newTriple = k -> Triple.of(new LinkedHashSet(), new LinkedHashMap<>(), new LinkedHashSet<>());
+        Map<DataAccessor, Triple> writes = new HashMap<>();
+        Function<DataAccessor, Triple> newTriple = k -> Triple.of(new LinkedHashSet(), new LinkedHashMap<>(), new LinkedHashSet<>());
 
         for (Data<?> data : dataLogs.keySet()) {
             Data.Log log = dataLogs.get(data);
             data.commit(log);
 
-            if (log.writer != null && log.state != null) {
-                Triple<Set, Map, Set> write = writes.computeIfAbsent(log.writer, newTriple);
+            if (log.accessor != null && log.state != null) {
+                Triple<Set, Map, Set> write = writes.computeIfAbsent(log.accessor, newTriple);
                 switch (log.state) {
                     case INSERT:
                         write.getLeft().add(data);
@@ -415,10 +415,10 @@ public class Transaction {
             data._updatedFields.clear();
         }
 
-        for (DataWriter writer : writes.keySet()) {
+        for (DataAccessor accessor : writes.keySet()) {
             try {
-                Triple<Set, Map, Set> write = writes.get(writer);
-                writer.write(write.getLeft(), write.getRight(), write.getMiddle());
+                Triple<Set, Map, Set> write = writes.get(accessor);
+                accessor.write(write.getLeft(), write.getRight(), write.getMiddle());
             } catch (Exception e) {
                 logger.error("内存事务提交后写数据库出错", e);
             }

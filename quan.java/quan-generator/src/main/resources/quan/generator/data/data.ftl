@@ -316,7 +316,7 @@ public class ${name} extends <#if kind ==2>${dn("Bean")}<#elseif kind ==5>${dn("
             writer.writeStartDocument();
             <#if kind ==5>
 
-            if (writer instanceof ${dn("JsonStringWriter")}) {
+            if (writer instanceof ${dn("JsonWriter")}) {
                 writer.write${bsonTypes[idField.type]}(${name}.${idField.underscoreName}, value.${idField.name}.getValue(transaction));
             } else {
                 writer.write${bsonTypes[idField.type]}(${name}._ID, value.${idField.name}.getValue(transaction));
@@ -392,8 +392,8 @@ public class ${name} extends <#if kind ==2>${dn("Bean")}<#elseif kind ==5>${dn("
 
             writer.writeEndDocument();
         }
-
-       @${dn("Override")}
+        
+        @${dn("Override")}
         public ${dn("Class")}<${name}> getEncoderClass() {
             return ${name}.class;
         }

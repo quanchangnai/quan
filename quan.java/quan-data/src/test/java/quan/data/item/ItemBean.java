@@ -141,8 +141,8 @@ public class ItemBean extends Bean {
 
             writer.writeEndDocument();
         }
-
-       @Override
+        
+        @Override
         public Class<ItemBean> getEncoderClass() {
             return ItemBean.class;
         }

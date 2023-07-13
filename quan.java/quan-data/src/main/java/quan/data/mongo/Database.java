@@ -13,9 +13,9 @@ import org.bson.conversions.Bson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.data.Data;
-import quan.data.DataWriter;
+import quan.data.DataAccessor;
 import quan.data.Index;
-import quan.data.bson.EntityCodecProvider;
+import quan.data.EntityCodecProvider;
 import quan.util.ClassUtils;
 
 import java.util.*;
@@ -29,7 +29,7 @@ import java.util.function.Supplier;
  * MongoDB数据库封装
  */
 @SuppressWarnings({"unchecked", "rawtypes", "NullableProblems"})
-public class Database implements DataWriter, MongoDatabase, Executor {
+public class Database implements DataAccessor, MongoDatabase, Executor {
 
     private static final Logger logger = LoggerFactory.getLogger(Database.class);
 
@@ -38,6 +38,11 @@ public class Database implements DataWriter, MongoDatabase, Executor {
     private static final ReadWriteLock databasesLock = new ReentrantReadWriteLock();
 
     static final Map<MongoClient, List<ExecutorService>> clientsExecutors = new ConcurrentHashMap<>();
+
+    /**
+     * 是否校验数据库线程
+     */
+    static boolean validateThread = true;
 
     /**
      * 数据类所在的包名
@@ -61,10 +66,10 @@ public class Database implements DataWriter, MongoDatabase, Executor {
      *
      * @param connectionString 连接字符串，参考{@link ConnectionString}
      * @param databaseName     数据库名
-     * @param dataPackage      数据类所在的包名
+     * @param dataPackageName  数据类所在的包名
      */
-    public Database(String connectionString, String databaseName, String dataPackage) {
-        this.dataPackage = Assertions.notNull("dataPackage", dataPackage);
+    public Database(String connectionString, String databaseName, String dataPackageName) {
+        this.dataPackage = Assertions.notNull("dataPackageName", dataPackageName);
         Assertions.notNull("connectionString", connectionString);
 
         MongoClientSettings.Builder builder = MongoClientSettings.builder();
@@ -73,14 +78,14 @@ public class Database implements DataWriter, MongoDatabase, Executor {
         initClient(builder, databaseName);
     }
 
-    public Database(MongoClientSettings.Builder clientSettings, String databaseName, String dataPackage) {
-        this.dataPackage = Assertions.notNull("dataPackage", dataPackage);
+    public Database(MongoClientSettings.Builder clientSettings, String databaseName, String dataPackageName) {
+        this.dataPackage = Assertions.notNull("dataPackageName", dataPackageName);
         initClient(clientSettings, databaseName);
     }
 
-    public Database(MongoClient client, String databaseName, String dataPackage) {
+    public Database(MongoClient client, String databaseName, String dataPackageName) {
         this.client = Assertions.notNull("client", client);
-        this.dataPackage = Assertions.notNull("dataPackage", dataPackage);
+        this.dataPackage = Assertions.notNull("dataPackageName", dataPackageName);
         Assertions.notNull("databaseName", databaseName);
 
         initExecutors();
@@ -102,9 +107,14 @@ public class Database implements DataWriter, MongoDatabase, Executor {
             return;
         }
 
+        String threadNamingPattern = "database-thread-%d";
+        if (!clientsExecutors.isEmpty()) {
+            threadNamingPattern = "database-" + (clientsExecutors.size() + 1) + "-thread-%d";
+        }
+
         ThreadFactory threadFactory = new BasicThreadFactory.Builder()
                 .wrappedFactory(OperationThread::new)
-                .namingPattern("database-thread-%d")
+                .namingPattern(threadNamingPattern)
                 .daemon(true).build();
 
         for (int i = 1; i <= Runtime.getRuntime().availableProcessors(); i++) {
@@ -199,6 +209,14 @@ public class Database implements DataWriter, MongoDatabase, Executor {
         return client;
     }
 
+    public static boolean isValidateThread() {
+        return validateThread;
+    }
+
+    public static void setValidateThread(boolean validateThread) {
+        Database.validateThread = validateThread;
+    }
+
     /**
      * 随机选择一个线程执行指定的任务
      */
@@ -210,17 +228,17 @@ public class Database implements DataWriter, MongoDatabase, Executor {
     /**
      * 随机选择一个线程执行指定的任务，并且通过外部指定的执行器消费结果
      *
-     * @param supplier 需要执行的带结果的任务，一般来说是数据库查询任务
-     * @param consumer 接收结果的消费者
-     * @param executor 接收结果的执行器
      * @param <R>      结果泛型
+     * @param task     需要执行的带结果的任务，一般是查询任务
+     * @param executor 接收结果的执行器
+     * @param consumer 接收结果的消费者
      */
-    public <R> void execute(Supplier<R> supplier, Consumer<R> consumer, Executor executor) {
-        if (supplier == null || consumer == null || executor == null) {
+    public <R> void execute(Supplier<R> task, Executor executor, Consumer<R> consumer) {
+        if (task == null || consumer == null || executor == null) {
             throw new NullPointerException("参数不能为空");
         }
         execute(() -> {
-            R r = supplier.get();
+            R r = task.get();
             executor.execute(() -> consumer.accept(r));
         });
     }
@@ -228,11 +246,14 @@ public class Database implements DataWriter, MongoDatabase, Executor {
     /**
      * 获取指定的数据类{@link Data}对应的执行器
      */
-    public <D extends Data> ExecutorService getExecutor(Class<D> clazz) {
+    public <D extends Data<?>> ExecutorService getExecutor(Class<D> clazz) {
         int index = (clazz.hashCode() & 0x7FFFFFFF) % executors.size();
         return executors.get(index);
     }
 
+    /**
+     * 随机获取一个执行器
+     */
     public ExecutorService getExecutor() {
         int index = RandomUtils.nextInt(0, executors.size());
         return executors.get(index);
@@ -241,26 +262,40 @@ public class Database implements DataWriter, MongoDatabase, Executor {
     /**
      * 获取指定的数据类对应的集合
      */
-    public <D extends Data> MongoCollection<D> getCollection(Class<D> clazz) {
+    public <D extends Data<?>> MongoCollection<D> getCollection(Class<D> clazz) {
         return (MongoCollection<D>) collections.get(clazz);
     }
 
     /**
-     * 通过主键_id查询数据
-     *
-     * @param <D> @see {@link Data}
+     * 通过主键_id同步查询数据，必须在数据库线程{@link OperationThread}里执行
      */
-    public <D extends Data, I> D find(Class<D> clazz, I _id) {
+    @Override
+    public <D extends Data<I>, I> D find(Class<D> clazz, I _id) {
         return find(clazz, Filters.eq(Data._ID, _id)).first();
     }
 
     /**
-     * 通用查询数据
+     * 通过主键_id异步查询数据
      *
-     * @param <D>    @see {@link Data}
-     * @param filter @see {@link Filters}
+     * @see #find(Class, Object)
+     * @see #execute(Supplier, Executor, Consumer)
      */
-    public <D extends Data> FindIterable<D> find(Class<D> clazz, Bson filter) {
+    public <D extends Data<I>, I> void find(Class<D> clazz, I _id, Executor executor, Consumer<D> consumer) {
+        execute(() -> find(clazz, _id), executor, consumer);
+    }
+
+    @Override
+    public <D extends Data<?>> FindIterable<D> find(Class<D> clazz, Map<String, Object> conditions) {
+        return find(clazz, (Bson) new Document(conditions));
+    }
+
+    /**
+     * 查询数据
+     *
+     * @param filter {@link Filters}
+     * @param <D>    {@link Data}
+     */
+    public <D extends Data<?>> FindIterable<D> find(Class<D> clazz, Bson filter) {
         MongoCollection<D> collection = getCollection(clazz);
         if (collection == null) {
             throw new IllegalArgumentException("数据类[" + clazz + "]未注册");
@@ -269,7 +304,9 @@ public class Database implements DataWriter, MongoDatabase, Executor {
     }
 
     /**
-     * @see DataWriter#write(Set, Set, Map)
+     * 写数据
+     *
+     * @see DataAccessor#write(Set, Set, Map)
      */
     @Override
     public void write(Set<Data<?>> inserts, Set<Data<?>> deletes, Map<Data<?>, Map<String, Object>> updates) {
@@ -311,7 +348,7 @@ public class Database implements DataWriter, MongoDatabase, Executor {
     }
 
 
-    //下面都是代理MongoDatabase的方法
+    //下面的都是代理MongoDatabase的方法
 
     @Override
     public String getName() {

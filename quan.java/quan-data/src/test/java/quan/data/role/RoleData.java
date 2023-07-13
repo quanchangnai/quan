@@ -8,8 +8,8 @@ import org.bson.codecs.Codec;
 import org.bson.codecs.DecoderContext;
 import org.bson.codecs.EncoderContext;
 import org.bson.codecs.configuration.CodecRegistry;
+import org.bson.json.JsonWriter;
 import quan.data.*;
-import quan.data.bson.JsonStringWriter;
 import quan.data.field.*;
 import quan.data.item.ItemBean;
 import quan.util.NumberUtils;
@@ -542,7 +542,7 @@ public class RoleData extends Data<Long> {
             Transaction transaction = Transaction.get();
             writer.writeStartDocument();
 
-            if (writer instanceof JsonStringWriter) {
+            if (writer instanceof JsonWriter) {
                 writer.writeInt64(RoleData.ID, value.id.getValue(transaction));
             } else {
                 writer.writeInt64(RoleData._ID, value.id.getValue(transaction));
@@ -624,8 +624,8 @@ public class RoleData extends Data<Long> {
 
             writer.writeEndDocument();
         }
-
-       @Override
+        
+        @Override
         public Class<RoleData> getEncoderClass() {
             return RoleData.class;
         }

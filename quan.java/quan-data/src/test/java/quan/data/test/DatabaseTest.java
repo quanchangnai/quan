@@ -15,7 +15,7 @@ import org.pcollections.PVector;
 import quan.data.Data;
 import quan.data.Index;
 import quan.data.Transaction;
-import quan.data.bson.EntityCodecProvider;
+import quan.data.EntityCodecProvider;
 import quan.data.item.ItemBean;
 import quan.data.mongo.Database;
 import quan.data.role.RoleData;
@@ -186,7 +186,7 @@ public class DatabaseTest {
         System.err.println("testDatabase==============");
         String connectionString = "mongodb://127.0.0.1:27017";
         Database database = new Database(connectionString, "test", "quan.data");
-        Data._setDefaultWriter(database);
+        Data._setDefaultAccessor(database);
 
         try {
             database.getExecutor().submit(() -> testDatabase0(database)).get();

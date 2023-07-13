@@ -1,4 +1,4 @@
-package quan.data.bson;
+package quan.data;
 
 import org.bson.codecs.Codec;
 import org.bson.codecs.configuration.CodecProvider;
@@ -6,7 +6,6 @@ import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import quan.data.Entity;
 
 import java.util.HashMap;
 import java.util.Map;

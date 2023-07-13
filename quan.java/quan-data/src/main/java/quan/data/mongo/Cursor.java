@@ -6,7 +6,7 @@ import com.mongodb.internal.operation.BatchCursor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quan.data.Data;
-import quan.data.DataWriter;
+import quan.data.DataAccessor;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -17,13 +17,13 @@ public class Cursor implements BatchCursor {
 
     private static final Logger logger = LoggerFactory.getLogger(Cursor.class);
 
-    private static BiConsumer<Data, DataWriter> setDataWriter;
+    private static BiConsumer<Data, DataAccessor> setDataAccessor;
 
     static {
         try {
-            Field field = Data.class.getDeclaredField("_setWriter");
+            Field field = Data.class.getDeclaredField("_setAccessor");
             field.setAccessible(true);
-            setDataWriter = (BiConsumer<Data, DataWriter>) field.get(Data.class);
+            setDataAccessor = (BiConsumer<Data, DataAccessor>) field.get(Data.class);
         } catch (Exception e) {
             logger.error("", e);
         }
@@ -52,7 +52,7 @@ public class Cursor implements BatchCursor {
     public List next() {
         List list = cursor.next();
         if (database != null) {
-            list.stream().filter(d -> d instanceof Data).forEach(d -> setDataWriter.accept((Data) d, database));
+            list.stream().filter(d -> d instanceof Data).forEach(d -> setDataAccessor.accept((Data) d, database));
         }
         return list;
     }

@@ -4,19 +4,22 @@ import org.bson.codecs.Codec;
 import org.bson.codecs.DecoderContext;
 import org.bson.codecs.EncoderContext;
 import org.bson.json.JsonReader;
-import quan.data.bson.EntityCodecProvider;
-import quan.data.bson.JsonStringWriter;
+import org.bson.json.JsonWriter;
 
+import java.io.StringWriter;
 import java.util.Objects;
 
 public interface Entity {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default String toJson() {
-        try (JsonStringWriter writer = new JsonStringWriter()) {
+        try (StringWriter stringWriter = new StringWriter()) {
+            JsonWriter jsonWriter = new JsonWriter(stringWriter);
             Codec codec = EntityCodecProvider.DEFAULT_REGISTRY.get(getClass());
-            codec.encode(writer, this, EncoderContext.builder().build());
-            return writer.toJsonString();
+            codec.encode(jsonWriter, this, EncoderContext.builder().build());
+            return stringWriter.toString();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
