@@ -77,20 +77,20 @@ public abstract class ConfigGenerator extends Generator {
             return;
         }
 
-        String optionPrefix1 = optionPrefix(false);
+        String optionPrefix = optionPrefix(false);
 
-        definitionType = options.getProperty(optionPrefix1 + "definitionType");
+        definitionType = options.getProperty(optionPrefix + "definitionType");
         if (StringUtils.isBlank(definitionType)) {
             definitionType = "xml";
         }
 
         if (parser != null) {
-            parser.setConfigNamePattern(options.getProperty(optionPrefix1 + "namePattern"));
-            parser.setConstantNamePattern(options.getProperty(optionPrefix1 + "constantNamePattern"));
+            parser.setConfigNamePattern(options.getProperty(optionPrefix + "namePattern"));
+            parser.setConstantNamePattern(options.getProperty(optionPrefix + "constantNamePattern"));
             if (parser instanceof TableDefinitionParser) {
                 TableDefinitionParser tableDefinitionParser = (TableDefinitionParser) parser;
                 for (String language : Language.names()) {
-                    String alias = options.getProperty(optionPrefix1 + language + ".alias");
+                    String alias = options.getProperty(optionPrefix + language + ".alias");
                     if (!StringUtils.isBlank(alias)) {
                         tableDefinitionParser.getLanguageAliases().put(language, alias);
                     }
@@ -98,13 +98,13 @@ public abstract class ConfigGenerator extends Generator {
             }
         }
 
-        tableType = options.getProperty(optionPrefix1 + "tableType");
-        tablePath = options.getProperty(optionPrefix1 + "tablePath");
-        tableBodyStartRow = options.getProperty(optionPrefix1 + "tableBodyStartRow");
+        tableType = options.getProperty(optionPrefix + "tableType");
+        tablePath = options.getProperty(optionPrefix + "tablePath");
+        tableBodyStartRow = options.getProperty(optionPrefix + "tableBodyStartRow");
 
-        ConfigConverter.setDatetimePattern(options.getProperty(optionPrefix1 + "datetimePattern"));
-        ConfigConverter.setDatePattern(options.getProperty(optionPrefix1 + "datePattern"));
-        ConfigConverter.setTimePattern(options.getProperty(optionPrefix1 + "timePattern"));
+        ConfigConverter.setDatetimePattern(options.getProperty(optionPrefix + "datetimePattern"));
+        ConfigConverter.setDatePattern(options.getProperty(optionPrefix + "datePattern"));
+        ConfigConverter.setTimePattern(options.getProperty(optionPrefix + "timePattern"));
 
     }
 

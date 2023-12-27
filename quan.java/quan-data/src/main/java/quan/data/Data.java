@@ -84,10 +84,7 @@ public abstract class Data<I> implements Entity {
     }
 
     public DataAccessor _getAccessor() {
-        if (accessor == null) {
-            return defaultAccessor;
-        }
-        return accessor;
+        return accessor != null ? accessor : defaultAccessor;
     }
 
     /**

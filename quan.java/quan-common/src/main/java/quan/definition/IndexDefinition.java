@@ -147,10 +147,10 @@ public class IndexDefinition extends Definition implements Cloneable {
     }
 
     public IndexDefinition setFieldNames(String fieldNames) {
-        if (StringUtils.isBlank(fieldNames)) {
-            return this;
+        if (!StringUtils.isBlank(fieldNames)) {
+            this.fieldNames = fieldNames.trim();
         }
-        this.fieldNames = fieldNames.trim();
+
         return this;
     }
 

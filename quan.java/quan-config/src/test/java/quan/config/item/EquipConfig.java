@@ -25,8 +25,8 @@ public class EquipConfig extends ItemConfig {
     public EquipConfig(JSONObject json) {
         super(json);
 
-        this.position = json.getIntValue("position");
-        this.color = json.getIntValue("color");
+        this.position = json.getIntValue(Field.POSITION);
+        this.color = json.getIntValue(Field.COLOR);
     }
 
     @Override
@@ -50,6 +50,20 @@ public class EquipConfig extends ItemConfig {
                 ",position=" + position +
                 ",color=" + color +
                 '}';
+
+    }
+
+    public static class Field extends ItemConfig.Field{
+
+        /**
+         * 部位
+         */
+        public static final String POSITION = "position";
+
+        /**
+         * 颜色
+         */
+        public static final String COLOR = "color";
 
     }
 

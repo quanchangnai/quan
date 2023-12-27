@@ -310,8 +310,16 @@ public abstract class ClassDefinition extends Definition {
     protected void validateNameAndLanguage() {
         if (getName() == null) {
             addValidatedError("定义文件[" + getDefinitionFile() + "]中" + getKindName() + "的名字不能为空");
-        } else if (!getNamePattern().matcher(getName()).matches()) {
-            addValidatedError(getValidatedName() + "的名字格式错误,正确格式:" + getNamePattern());
+        } else {
+            if (isReservedWord(getName())) {
+                addValidatedError(getValidatedName() + "的名字不合法,不能使用保留字");
+            }
+            if (!getNamePattern().matcher(getName()).matches()) {
+                addValidatedError(getValidatedName() + "的名字格式错误,正确格式:" + getNamePattern());
+            }
+            if (getIllegalNames().contains(getName())) {
+                addValidatedError(getValidatedName() + "的名字不合法");
+            }
         }
 
         try {
@@ -319,6 +327,10 @@ public abstract class ClassDefinition extends Definition {
         } catch (IllegalArgumentException e) {
             addValidatedError(getValidatedName() + "的语言约束[" + languageStr + "]非法,合法的语言类型" + Language.names());
         }
+    }
+
+    protected Set<String> getIllegalNames() {
+        return Collections.emptySet();
     }
 
     protected void validateField(FieldDefinition fieldDefinition) {
@@ -345,17 +357,17 @@ public abstract class ClassDefinition extends Definition {
         }
     }
 
-    protected boolean isReservedWord(String fieldName) {
+    protected boolean isReservedWord(String name) {
         if (category == Category.data) {
-            return Language.java.reservedWords().contains(fieldName);
+            return Language.java.reservedWords().contains(name);
         }
-        if (Language.java.reservedWords().contains(fieldName)) {
+        if (Language.java.reservedWords().contains(name)) {
             return true;
         }
-        if (Language.cs.reservedWords().contains(fieldName)) {
+        if (Language.cs.reservedWords().contains(name)) {
             return true;
         }
-        return Language.lua.reservedWords().contains(fieldName);
+        return Language.lua.reservedWords().contains(name);
     }
 
     protected void validateFieldNameDuplicate(FieldDefinition fieldDefinition) {

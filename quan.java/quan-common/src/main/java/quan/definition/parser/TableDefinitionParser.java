@@ -93,7 +93,7 @@ public abstract class TableDefinitionParser extends DefinitionParser {
         ConfigDefinition configDefinition = new ConfigDefinition();
         configDefinition.setParser(this);
         configDefinition.setDefinitionFile(definitionFilePath);
-        configDefinition.setVersion(definitionFile.lastModified() + "");
+        configDefinition.setVersion(String.valueOf(definitionFile.lastModified()));
 
         String s = File.separator;
         if (definitionFileName.contains(s)) {

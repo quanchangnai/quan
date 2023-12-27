@@ -4,10 +4,12 @@ import quan.definition.BeanDefinition;
 import quan.definition.Category;
 import quan.definition.FieldDefinition;
 import quan.definition.IndexDefinition;
+import quan.util.CollectionUtils;
 import quan.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -26,6 +28,8 @@ public class DataDefinition extends BeanDefinition {
     {
         category = Category.data;
     }
+
+    public static final Set<String> illegalNames = CollectionUtils.asSet("CodecImpl");
 
     public DataDefinition() {
     }
@@ -96,6 +100,11 @@ public class DataDefinition extends BeanDefinition {
 
     public List<IndexDefinition> getIndexes() {
         return indexes;
+    }
+
+    @Override
+    protected Set<String> getIllegalNames() {
+        return illegalNames;
     }
 
     @Override

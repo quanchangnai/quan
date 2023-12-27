@@ -717,7 +717,7 @@ public class FieldDefinition extends Definition implements Cloneable {
                 return columnNums.size() == beanDefinition.getFields().size();
             }
         } else if (isMapType()) {
-            return columnNums.size() > 0 && columnNums.size() % 2 == 0;
+            return !columnNums.isEmpty() && columnNums.size() % 2 == 0;
         }
 
         return true;

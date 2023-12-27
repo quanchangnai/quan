@@ -124,7 +124,7 @@ public abstract class CodedBuffer {
 
         while (shift < 32) {
             final byte b = readByte();
-            temp |= (b & 0xFFL) << shift;
+            temp |= (b & 0xFF) << shift;
             shift += 8;
         }
 

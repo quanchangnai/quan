@@ -30,9 +30,9 @@ public class QuestTargetConfig extends Config {
     public QuestTargetConfig(JSONObject json) {
         super(json);
 
-        this.id = json.getIntValue("id");
-        this.noon = json.getDate("noon");
-        this.noon_ = json.getOrDefault("noon_", "").toString();
+        this.id = json.getIntValue(Field.ID);
+        this.noon = json.getDate(Field.NOON);
+        this.noon_ = json.getOrDefault(Field.NOON + "_", "").toString();
     }
 
     @Override
@@ -46,6 +46,25 @@ public class QuestTargetConfig extends Config {
                 "id=" + id +
                 ",noon='" + noon_ + '\'' +
                 '}';
+
+    }
+
+    public static class Field {
+
+        /**
+         * ID
+         */
+        public static final String ID = "id";
+
+        /**
+         * 名字
+         */
+        public static final String NAME = "name";
+
+        /**
+         * 中午
+         */
+        public static final String NOON = "noon";
 
     }
 

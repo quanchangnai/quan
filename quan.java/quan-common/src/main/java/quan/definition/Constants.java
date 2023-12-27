@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 import static quan.util.CollectionUtils.asSet;
 
 /**
- * 常量
+ * 通用常量
  */
 public final class Constants {
 

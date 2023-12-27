@@ -2,6 +2,7 @@ package quan.definition.config;
 
 import org.apache.commons.lang3.StringUtils;
 import quan.definition.*;
+import quan.util.CollectionUtils;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -39,6 +40,8 @@ public class ConfigDefinition extends BeanDefinition {
     {
         category = Category.config;
     }
+
+    public static final Set<String> illegalNames = CollectionUtils.asSet("Field","self");
 
     public ConfigDefinition() {
     }
@@ -233,6 +236,11 @@ public class ConfigDefinition extends BeanDefinition {
         for (FieldDefinition field : selfFields) {
             validateField(field);
         }
+    }
+
+    @Override
+    protected Set<String> getIllegalNames() {
+        return illegalNames;
     }
 
     @Override

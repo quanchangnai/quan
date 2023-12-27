@@ -48,17 +48,17 @@ public class ConstantConfig extends Config {
     public ConstantConfig(JSONObject json) {
         super(json);
 
-        this.key = json.getOrDefault("key", "").toString();
-        this.itemId = json.getIntValue("itemId");
+        this.key = json.getOrDefault(Field.KEY, "").toString();
+        this.itemId = json.getIntValue(Field.ITEM_ID);
 
-        JSONObject reward = json.getJSONObject("reward");
+        JSONObject reward = json.getJSONObject(Field.REWARD);
         if (reward != null) {
             this.reward = Reward.create(reward);
         } else {
             this.reward = null;
         }
 
-        JSONArray rewardList$1 = json.getJSONArray("rewardList");
+        JSONArray rewardList$1 = json.getJSONArray(Field.REWARD_LIST);
         List<quan.config.item.Reward> rewardList$2 = new ArrayList<>();
         if (rewardList$1 != null) {
             for (int i = 0; i < rewardList$1.size(); i++) {
@@ -68,7 +68,7 @@ public class ConstantConfig extends Config {
         }
         this.rewardList = Collections.unmodifiableList(rewardList$2);
 
-        this.comment = json.getOrDefault("comment", "").toString();
+        this.comment = json.getOrDefault(Field.COMMENT, "").toString();
     }
 
     @Override
@@ -85,6 +85,35 @@ public class ConstantConfig extends Config {
                 ",rewardList=" + rewardList +
                 ",comment='" + comment + '\'' +
                 '}';
+
+    }
+
+    public static class Field {
+
+        /**
+         * 常量Key
+         */
+        public static final String KEY = "key";
+
+        /**
+         * 道具ID
+         */
+        public static final String ITEM_ID = "itemId";
+
+        /**
+         * 奖励
+         */
+        public static final String REWARD = "reward";
+
+        /**
+         * 奖励List
+         */
+        public static final String REWARD_LIST = "rewardList";
+
+        /**
+         * 备注
+         */
+        public static final String COMMENT = "comment";
 
     }
 

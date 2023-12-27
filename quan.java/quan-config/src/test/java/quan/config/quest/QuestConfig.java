@@ -113,30 +113,30 @@ public class QuestConfig extends Config {
     public QuestConfig(JSONObject json) {
         super(json);
 
-        this.id = json.getIntValue("id");
-        this.name = json.getOrDefault("name", "").toString();
-        this.type = QuestType.valueOf(json.getIntValue("type"));
-        this.target = json.getIntValue("target");
+        this.id = json.getIntValue(Field.ID);
+        this.name = json.getOrDefault(Field.NAME, "").toString();
+        this.type = QuestType.valueOf(json.getIntValue(Field.TYPE));
+        this.target = json.getIntValue(Field.TARGET);
 
-        JSONObject reward = json.getJSONObject("reward");
+        JSONObject reward = json.getJSONObject(Field.REWARD);
         if (reward != null) {
             this.reward = Reward.create(reward);
         } else {
             this.reward = null;
         }
 
-        this.a1 = json.getIntValue("a1");
-        this.a2 = json.getIntValue("a2");
-        this.b1 = json.getIntValue("b1");
-        this.b2 = json.getBooleanValue("b2");
-        this.c1 = json.getOrDefault("c1", "").toString();
-        this.c2 = json.getIntValue("c2");
-        this.c3 = json.getIntValue("c3");
-        this.d1 = json.getOrDefault("d1", "").toString();
-        this.d2 = json.getIntValue("d2");
-        this.d3 = json.getIntValue("d3");
+        this.a1 = json.getIntValue(Field.A1);
+        this.a2 = json.getIntValue(Field.A2);
+        this.b1 = json.getIntValue(Field.B1);
+        this.b2 = json.getBooleanValue(Field.B2);
+        this.c1 = json.getOrDefault(Field.C1, "").toString();
+        this.c2 = json.getIntValue(Field.C2);
+        this.c3 = json.getIntValue(Field.C3);
+        this.d1 = json.getOrDefault(Field.D1, "").toString();
+        this.d2 = json.getIntValue(Field.D2);
+        this.d3 = json.getIntValue(Field.D3);
 
-        JSONArray s1$1 = json.getJSONArray("s1");
+        JSONArray s1$1 = json.getJSONArray(Field.S1);
         Set<Integer> s1$2 = new HashSet<>();
         if (s1$1 != null) {
             for (int i = 0; i < s1$1.size(); i++) {
@@ -145,7 +145,7 @@ public class QuestConfig extends Config {
         }
         this.s1 = Collections.unmodifiableSet(s1$2);
 
-        JSONArray l1$1 = json.getJSONArray("l1");
+        JSONArray l1$1 = json.getJSONArray(Field.L1);
         List<Integer> l1$2 = new ArrayList<>();
         if (l1$1 != null) {
             for (int i = 0; i < l1$1.size(); i++) {
@@ -154,7 +154,7 @@ public class QuestConfig extends Config {
         }
         this.l1 = Collections.unmodifiableList(l1$2);
 
-        JSONObject m1$1 = json.getJSONObject("m1");
+        JSONObject m1$1 = json.getJSONObject(Field.M1);
         Map<Integer, Integer> m1$2 = new HashMap<>();
         if (m1$1 != null) {
             for (String m1$Key : m1$1.keySet()) {
@@ -191,6 +191,100 @@ public class QuestConfig extends Config {
                 ",l1=" + l1 +
                 ",m1=" + m1 +
                 '}';
+
+    }
+
+    public static class Field {
+
+        /**
+         * ID
+         */
+        public static final String ID = "id";
+
+        /**
+         * 名字
+         */
+        public static final String NAME = "name";
+
+        /**
+         * 类型
+         */
+        public static final String TYPE = "type";
+
+        /**
+         * 任务目标
+         */
+        public static final String TARGET = "target";
+
+        /**
+         * 奖励
+         */
+        public static final String REWARD = "reward";
+
+        /**
+         * A1
+         */
+        public static final String A1 = "a1";
+
+        /**
+         * A2
+         */
+        public static final String A2 = "a2";
+
+        /**
+         * B1
+         */
+        public static final String B1 = "b1";
+
+        /**
+         * B2
+         */
+        public static final String B2 = "b2";
+
+        /**
+         * C1
+         */
+        public static final String C1 = "c1";
+
+        /**
+         * C2
+         */
+        public static final String C2 = "c2";
+
+        /**
+         * C3
+         */
+        public static final String C3 = "c3";
+
+        /**
+         * D1
+         */
+        public static final String D1 = "d1";
+
+        /**
+         * D2
+         */
+        public static final String D2 = "d2";
+
+        /**
+         * D3
+         */
+        public static final String D3 = "d3";
+
+        /**
+         * S1
+         */
+        public static final String S1 = "s1";
+
+        /**
+         * L1
+         */
+        public static final String L1 = "l1";
+
+        /**
+         * M1
+         */
+        public static final String M1 = "m1";
 
     }
 

@@ -59,12 +59,12 @@ public class CardConfig extends Config {
     public CardConfig(JSONObject json) {
         super(json);
 
-        this.id = json.getIntValue("id");
-        this.key = json.getOrDefault("key", "").toString();
-        this.name = json.getOrDefault("name", "").toString();
-        this.type = CardType.valueOf(json.getIntValue("type"));
+        this.id = json.getIntValue(Field.ID);
+        this.key = json.getOrDefault(Field.KEY, "").toString();
+        this.name = json.getOrDefault(Field.NAME, "").toString();
+        this.type = CardType.valueOf(json.getIntValue(Field.TYPE));
 
-        JSONArray list$1 = json.getJSONArray("list");
+        JSONArray list$1 = json.getJSONArray(Field.LIST);
         List<Integer> list$2 = new ArrayList<>();
         if (list$1 != null) {
             for (int i = 0; i < list$1.size(); i++) {
@@ -73,7 +73,7 @@ public class CardConfig extends Config {
         }
         this.list = Collections.unmodifiableList(list$2);
 
-        JSONArray set$1 = json.getJSONArray("set");
+        JSONArray set$1 = json.getJSONArray(Field.SET);
         Set<Integer> set$2 = new HashSet<>();
         if (set$1 != null) {
             for (int i = 0; i < set$1.size(); i++) {
@@ -82,7 +82,7 @@ public class CardConfig extends Config {
         }
         this.set = Collections.unmodifiableSet(set$2);
 
-        JSONObject map$1 = json.getJSONObject("map");
+        JSONObject map$1 = json.getJSONObject(Field.MAP);
         Map<Integer, Integer> map$2 = new HashMap<>();
         if (map$1 != null) {
             for (String map$Key : map$1.keySet()) {
@@ -91,8 +91,8 @@ public class CardConfig extends Config {
         }
         this.map = Collections.unmodifiableMap(map$2);
 
-        this.effectiveTime = json.getDate("effectiveTime");
-        this.effectiveTime_ = json.getOrDefault("effectiveTime_", "").toString();
+        this.effectiveTime = json.getDate(Field.EFFECTIVE_TIME);
+        this.effectiveTime_ = json.getOrDefault(Field.EFFECTIVE_TIME + "_", "").toString();
     }
 
     @Override
@@ -112,6 +112,50 @@ public class CardConfig extends Config {
                 ",map=" + map +
                 ",effectiveTime='" + effectiveTime_ + '\'' +
                 '}';
+
+    }
+
+    public static class Field {
+
+        /**
+         * ID
+         */
+        public static final String ID = "id";
+
+        /**
+         * 常量Key
+         */
+        public static final String KEY = "key";
+
+        /**
+         * 名字
+         */
+        public static final String NAME = "name";
+
+        /**
+         * 类型
+         */
+        public static final String TYPE = "type";
+
+        /**
+         * List
+         */
+        public static final String LIST = "list";
+
+        /**
+         * Set
+         */
+        public static final String SET = "set";
+
+        /**
+         * Map
+         */
+        public static final String MAP = "map";
+
+        /**
+         * 生效时间
+         */
+        public static final String EFFECTIVE_TIME = "effectiveTime";
 
     }
 

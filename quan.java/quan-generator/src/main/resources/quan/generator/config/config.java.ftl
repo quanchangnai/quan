@@ -16,6 +16,7 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
 </#if>
 <#assign JSONObject=dn("JSONObject") JSONArray=dn("JSONArray")>
 <#assign String=dn("String") List=dn("List") ArrayList=dn("ArrayList") Map=dn("Map") HashMap=dn("HashMap") Collections=dn("Collections")>
+<#macro fieldName field><#if kind ==6>Field.${field.underscoreName}<#else>"${field.name}"</#if></#macro> 
 <#list selfFields as field>
     <#if !field.isSupportedLanguage("java")>
         <#continue>
@@ -72,17 +73,17 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
         <#continue>
     </#if>
     <#if field.type=="string">
-        this.${field.name} = json.getOrDefault("${field.name}", "").toString();
+        this.${field.name} = json.getOrDefault(<@fieldName field/>, "").toString();
     <#elseif field.type=="bool">
-        this.${field.name} = json.getBooleanValue("${field.name}");
+        this.${field.name} = json.getBooleanValue(<@fieldName field/>);
     <#elseif field.timeType>
-        this.${field.name} = json.getDate("${field.name}");
-        this.${field.name}_ = json.getOrDefault("${field.name}_", "").toString();
+        this.${field.name} = json.getDate(<@fieldName field/>);
+        this.${field.name}_ = json.getOrDefault(<@fieldName field/> + "_", "").toString();
     <#elseif field.type=="list" || field.type=="set">
         <#if field_index gt 0 >
 
         </#if>
-        ${JSONArray} ${field.name}$1 = json.getJSONArray("${field.name}");
+        ${JSONArray} ${field.name}$1 = json.getJSONArray(<@fieldName field/>);
         ${field.basicType}<${field.valueClassType}> ${field.name}$2 = new ${field.classType}<>();
         if (${field.name}$1 != null) {
             for (int i = 0; i < ${field.name}$1.size(); i++) {
@@ -102,7 +103,7 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
         <#if field_index gt 0 >
 
         </#if>
-        ${JSONObject} ${field.name}$1 = json.getJSONObject("${field.name}");
+        ${JSONObject} ${field.name}$1 = json.getJSONObject(<@fieldName field/>);
         ${field.basicType}<${field.keyClassType}, ${field.valueClassType}> ${field.name}$2 = new ${field.classType}<>();
         if (${field.name}$1 != null) {
             for (String ${field.name}$Key : ${field.name}$1.keySet()) {
@@ -119,14 +120,14 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
 
         </#if>
     <#elseif field.builtinType>
-        this.${field.name} = json.get${field.type?cap_first}Value("${field.name}");
+        this.${field.name} = json.get${field.type?cap_first}Value(<@fieldName field/>);
     <#elseif field.enumType>
-        this.${field.name} = ${field.classType}.valueOf(json.getIntValue("${field.name}"));
+        this.${field.name} = ${field.classType}.valueOf(json.getIntValue(<@fieldName field/>));
     <#else>
         <#if field_index gt 0 >
 
         </#if>
-        ${JSONObject} ${field.name} = json.getJSONObject("${field.name}");
+        ${JSONObject} ${field.name} = json.getJSONObject(<@fieldName field/>);
         if (${field.name} != null) {
             this.${field.name} = ${field.classType}.create(${field.name});
         } else {
@@ -196,6 +197,21 @@ public class ${name} extends <#if parentClassName??>${parentClassName}<#elseif k
                 '}';
 
     }
+<#if kind ==6>   
+
+    public static class Field <#if parentClassName??>extends ${parentClassName}.Field</#if>{
+    <#list selfFields as field>
+
+        <#if field.comment !="">
+        /**
+         * ${field.comment}
+         */
+        </#if>
+        public static final String ${field.underscoreName} = "${field.name}";
+    </#list>     
+
+    }
+</#if>
 <#macro indexer tab>
     ${tab}//所有${name}
     ${tab}private static volatile ${List}<${name}> _configs = ${Collections}.emptyList();
