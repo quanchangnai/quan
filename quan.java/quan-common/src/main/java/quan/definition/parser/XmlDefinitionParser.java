@@ -310,8 +310,21 @@ public class XmlDefinitionParser extends DefinitionParser {
                     configDefinition.addIndex(parseIndex(classDefinition, childElement, index));
                     continue;
                 }
+
                 if (childName.equals("constant")) {
                     parseConstant(configDefinition, childElement, index);
+                    continue;
+                }
+
+                if (childName.equals("validations")) {
+                    String validations = childElement.getText();
+                    if (!StringUtils.isBlank(validations)) {
+                        for (String validation : validations.trim().split("[\r\n;；]")) {
+                            if (!StringUtils.isBlank(validation)) {
+                                configDefinition.getValidations().add(validation.trim());
+                            }
+                        }
+                    }
                     continue;
                 }
             }
@@ -375,7 +388,13 @@ public class XmlDefinitionParser extends DefinitionParser {
             illegalAttributes.addAll(Arrays.asList("type", "ignore"));
         } else if (category == Category.config) {
             if (classDefinition instanceof ConfigDefinition) {
-                illegalAttributes.addAll(Arrays.asList("type", "ref", "lang", "optional", "column"));
+                ConfigDefinition configDefinition = (ConfigDefinition) classDefinition;
+                String validation = fieldElement.attributeValue("validation");
+                if (!StringUtils.isBlank(validation)) {
+                    configDefinition.getValidations().add(validation);
+                }
+
+                illegalAttributes.addAll(Arrays.asList("type", "ref", "lang", "optional", "column", "validation"));
                 if (type != null && !Constants.COLLECTION_TYPES.contains(type) && !Constants.TIME_TYPES.contains(type)) {
                     //只支持原生类型和枚举类型，但是在这里没法判断是不是枚举类型
                     illegalAttributes.add("index");

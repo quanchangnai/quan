@@ -28,6 +28,10 @@ public class ExcelDefinitionParser extends TableDefinitionParser {
         this.definitionType = definitionType;
     }
 
+    public ExcelDefinitionParser(Collection<String> definitionPaths) {
+        setDefinitionPaths(definitionPaths);
+    }
+
     public ExcelDefinitionParser(String definitionType, Collection<String> definitionPaths) {
         this(definitionType);
         setDefinitionPaths(definitionPaths);
@@ -50,20 +54,28 @@ public class ExcelDefinitionParser extends TableDefinitionParser {
             Sheet sheet = workbook.getSheetAt(0);
             configDefinition.setComment(sheet.getSheetName());
 
-            if (sheet.getPhysicalNumberOfRows() < 3) {
-                addValidatedError(configDefinition.getValidatedName() + "的定义文件不完整，要求表头第1行是字段名、第2行是字段约束、第3行是字段注释");
+            Row row0 = sheet.getRow(0);
+
+            if (row0 == null || sheet.getLastRowNum() < 2) {
+                addValidatedError(configDefinition.getValidatedName() + "的定义文件不完整，要求表头第1行是字段名、第2行是字段约束、第3行是校验表达式、第4行是字段注释");
                 return false;
             }
 
             int c = 0;
 
-            for (Cell cell : sheet.getRow(0)) {
+            for (Cell cell : row0) {
                 String fieldName = dataFormatter.formatCellValue(cell).trim();
-                String constraints = dataFormatter.formatCellValue(sheet.getRow(1).getCell(c)).trim();
-                String comment = dataFormatter.formatCellValue(sheet.getRow(2).getCell(c)).trim();
-                addField(configDefinition, fieldName, constraints, comment);
+                Row row1 = sheet.getRow(1);
+                Row row2 = sheet.getRow(2);
+                Row row3 = sheet.getRow(3);
+
+                String constraints = row1 == null ? null : dataFormatter.formatCellValue(row1.getCell(c)).trim();
+                String validation = row2 == null ? null : dataFormatter.formatCellValue(row2.getCell(c)).trim();
+                String comment = row3 == null ? null : dataFormatter.formatCellValue(row3.getCell(c)).trim();
+                addField(configDefinition, fieldName, constraints, validation, comment);
                 c++;
             }
+
             return true;
         } catch (Exception e) {
             throw new RuntimeException(e);

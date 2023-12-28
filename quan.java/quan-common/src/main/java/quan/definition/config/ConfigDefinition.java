@@ -1,5 +1,7 @@
 package quan.definition.config;
 
+import ognl.Ognl;
+import ognl.OgnlException;
 import org.apache.commons.lang3.StringUtils;
 import quan.definition.*;
 import quan.util.CollectionUtils;
@@ -30,6 +32,9 @@ public class ConfigDefinition extends BeanDefinition {
     //列名:字段
     private final Map<String, FieldDefinition> columnFields = new HashMap<>();
 
+    //校验表达式(OGNL)
+    private Set<Object> validations = new LinkedHashSet<>();
+
     private List<String> rows = new ArrayList<>();
 
     //配置数据版本
@@ -41,7 +46,7 @@ public class ConfigDefinition extends BeanDefinition {
         category = Category.config;
     }
 
-    public static final Set<String> illegalNames = CollectionUtils.asSet("Field","self");
+    public static final Set<String> illegalNames = CollectionUtils.asSet("Field", "self");
 
     public ConfigDefinition() {
     }
@@ -193,6 +198,10 @@ public class ConfigDefinition extends BeanDefinition {
         return false;
     }
 
+    public Set<Object> getValidations() {
+        return validations;
+    }
+
     public List<String> getRows() {
         return rows;
     }
@@ -233,9 +242,26 @@ public class ConfigDefinition extends BeanDefinition {
             parser.getTableConfigs().put(t, this);
         }
 
+        parseValidationExpressions();
+
         for (FieldDefinition field : selfFields) {
             validateField(field);
         }
+    }
+
+    private void parseValidationExpressions() {
+        List<Object> expressions = new ArrayList<>();
+
+        for (Object validation : validations) {
+            try {
+                expressions.add(Ognl.parseExpression((String) validation));
+            } catch (OgnlException e) {
+                addValidatedError(getValidatedName() + "的校验规则[" + validation + "]错误:" + e.getMessage());
+            }
+        }
+
+        validations.clear();
+        validations.addAll(expressions);
     }
 
     @Override

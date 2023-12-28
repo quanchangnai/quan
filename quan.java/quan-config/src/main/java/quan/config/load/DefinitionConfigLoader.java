@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import ognl.*;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.tuple.Triple;
 import quan.config.Config;
@@ -37,6 +38,25 @@ public class DefinitionConfigLoader extends ConfigLoader {
 
     {
         tableType = TableType.xlsx;
+    }
+
+    private static ThreadLocal<JSONObject> localConfigJson = new ThreadLocal<>();
+
+    private static ThreadLocal<ConfigDefinition> localConfigDefinition = new ThreadLocal<>();
+
+
+    static {
+        OgnlRuntime.setPropertyAccessor(JSONObject.class, new MapPropertyAccessor() {
+            @Override
+            public Object getProperty(OgnlContext context, Object target, Object name) throws OgnlException {
+                ConfigDefinition configDefinition = localConfigDefinition.get();
+                if (localConfigJson.get() == target && configDefinition != null && configDefinition.getField(name.toString()) == null) {
+                    throw new OgnlException(String.format("%s不存在字段:%s", configDefinition.getValidatedName(), name));
+                } else {
+                    return super.getProperty(context, target, name);
+                }
+            }
+        });
     }
 
     public DefinitionConfigLoader(String tablePath) {
@@ -135,6 +155,7 @@ public class DefinitionConfigLoader extends ConfigLoader {
             //索引校验
             if (supportValidate()) {
                 allConfigIndexedJsons.put(configDefinition, validateIndex(configDefinition));
+                validateByOgnl(configDefinition);
             }
             //needLoad():加载配置
             load(configDefinition.getFullName(Language.java), getConfigTables(configDefinition), false);
@@ -267,7 +288,7 @@ public class DefinitionConfigLoader extends ConfigLoader {
             ConfigReader configReader = getReader(configTable);
             sb.append(configReader.getTableFile().lastModified());
         }
-        return DigestUtils.md2Hex(sb.toString());
+        return DigestUtils.md5Hex(sb.toString());
     }
 
     private Map<IndexDefinition, Map> validateIndex(ConfigDefinition configDefinition) {
@@ -290,6 +311,38 @@ public class DefinitionConfigLoader extends ConfigLoader {
 
         return configIndexedJsons;
     }
+
+    private void validateByOgnl(ConfigDefinition configDefinition) {
+        Set<Object> validations = configDefinition.getValidations();
+        if (validations.isEmpty()) {
+            return;
+        }
+
+        localConfigDefinition.set(configDefinition);
+
+        for (String table : getConfigTables(configDefinition)) {
+            ConfigReader reader = getReader(table);
+            List<JSONObject> tableJsons = reader.getJsons();
+            for (int i = 0; i < tableJsons.size(); i++) {
+                int row = reader.getTableBodyStartRow() + i;
+                JSONObject json = tableJsons.get(i);
+                localConfigJson.set(json);
+
+                for (Object validation : validations) {
+                    try {
+                        Boolean result = (Boolean) Ognl.getValue(validation, json, Boolean.class);
+                        if (result != null && !result) {
+                            validatedErrors.add(String.format("配置[%s]的第%s行数据不符合校验规则:%s", table, row, validation));
+                        }
+                    } catch (Exception e) {
+                        String reason = e instanceof OgnlException ? e.getMessage() : e.toString();
+                        validatedErrors.add(String.format("配置[%s]的第%s行数据执行校验规则[%s]时出错:%s", table, row, validation, reason));
+                    }
+                }
+            }
+        }
+    }
+
 
     private void validateTableIndex(IndexDefinition indexDefinition, Map indexedJsons, Map<JSONObject, String> jsonTables,
                                     JSONObject json) {
@@ -354,8 +407,10 @@ public class DefinitionConfigLoader extends ConfigLoader {
 
     private void validateRef(ConfigDefinition configDefinition, Map<ConfigDefinition, Map<IndexDefinition, Map>> allConfigIndexedJsons) {
         for (String table : getConfigTables(configDefinition)) {
-            List<JSONObject> tableJsons = getReader(table).getJsons();
+            ConfigReader reader = getReader(table);
+            List<JSONObject> tableJsons = reader.getJsons();
             for (int i = 0; i < tableJsons.size(); i++) {
+                String row = String.valueOf(reader.getTableBodyStartRow() + i);
                 JSONObject json = tableJsons.get(i);
                 for (String fieldName : json.keySet()) {
                     FieldDefinition field = configDefinition.getField(fieldName);
@@ -363,7 +418,7 @@ public class DefinitionConfigLoader extends ConfigLoader {
                         continue;
                     }
                     Object fieldValue = json.get(fieldName);
-                    Triple position = Triple.of(table + "." + tableType, String.valueOf(i + 1), field.getColumn());
+                    Triple position = Triple.of(table + "." + tableType, row, field.getColumn());
                     validateFieldRef(position, configDefinition, field, fieldValue, allConfigIndexedJsons);
                 }
             }

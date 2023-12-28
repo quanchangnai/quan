@@ -44,15 +44,16 @@ public class CSVDefinitionParser extends TableDefinitionParser {
         }
 
         if (records.size() < 3) {
-            addValidatedError(configDefinition.getValidatedName() + "的定义文件不完整，要求表头第1行是字段名、第2行是字段约束、第3行是字段注释");
+            addValidatedError(configDefinition.getValidatedName() + "的定义文件不完整，要求表头第1行是字段名、第2行是字段约束、第3行是校验表达式、第4行是字段注释");
             return false;
         }
 
         for (int i = 0; i < records.get(0).size(); i++) {
             String fieldName = records.get(0).get(i);
             String constraints = records.get(1).get(i);
-            String comment = records.get(2).get(i);
-            addField(configDefinition, fieldName, constraints, comment);
+            String validation = records.get(2).get(i);
+            String comment = records.get(3).get(i);
+            addField(configDefinition, fieldName, constraints, validation, comment);
         }
 
         return true;

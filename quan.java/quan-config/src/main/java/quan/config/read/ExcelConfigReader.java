@@ -3,6 +3,7 @@ package quan.config.read;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.poi.ss.usermodel.*;
 import quan.definition.config.ConfigDefinition;
+import quan.definition.parser.TableDefinitionParser;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -15,6 +16,10 @@ import java.util.List;
 public class ExcelConfigReader extends ConfigReader {
 
     private static final DataFormatter formatter = new DataFormatter();
+
+    {
+        tableBodyStartRow = TableDefinitionParser.MIN_TABLE_BODY_START_ROW;
+    }
 
     public ExcelConfigReader(File tableFile, ConfigDefinition configDefinition) {
         super(tableFile, configDefinition);

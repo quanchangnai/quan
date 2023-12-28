@@ -29,7 +29,9 @@ public abstract class ConfigReader {
 
     protected ConfigConverter converter;
 
-    //表格正文开始行号(从1开始计数)
+    /**
+     * 表格正文开始行号(从1开始计数)
+     */
     protected int tableBodyStartRow = 2;
 
     protected Config prototype;
@@ -69,7 +71,7 @@ public abstract class ConfigReader {
             Class<Config> configClass = (Class<Config>) Class.forName(configName);
             prototype = configClass.getDeclaredConstructor(JSONObject.class).newInstance(new JSONObject());
         } catch (Exception e) {
-            initErrors.add(String.format("实例化配置类[%s]失败，%s", configName, e.getMessage()));
+            initErrors.add(String.format("实例化配置类[%s]失败:%s", configName, e));
         }
     }
 
@@ -90,6 +92,10 @@ public abstract class ConfigReader {
     public ConfigReader setTableBodyStartRow(int tableBodyStartRow) {
         this.tableBodyStartRow = tableBodyStartRow;
         return this;
+    }
+
+    public int getTableBodyStartRow() {
+        return tableBodyStartRow;
     }
 
     public ConfigDefinition getConfigDefinition() {

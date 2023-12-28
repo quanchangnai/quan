@@ -8,6 +8,8 @@ import quan.config.load.DefinitionConfigLoader;
 import quan.config.load.JsonConfigLoader;
 import quan.config.quest.QuestConfig;
 import quan.definition.Language;
+import quan.definition.parser.CSVDefinitionParser;
+import quan.definition.parser.ExcelDefinitionParser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,15 +23,26 @@ public class ConfigTest {
     public static void main(String[] args) {
         long startTime = System.currentTimeMillis();
 
+        int configLoaderType = args.length == 0 ? 0 : Integer.parseInt(args[0]);
+
         ConfigLoader configLoader;
-        if (args.length > 0 && args[0].equals("1")) {
-            configLoader = jsonConfigLoader();
-        } else {
-            configLoader = definitionConfigLoader();
+
+        switch (configLoaderType) {
+            case 1:
+                configLoader = jsonConfigLoader();
+                break;
+            case 2:
+                configLoader = excelDefinitionConfigLoader();
+                break;
+            case 3:
+                configLoader = csvDefinitionConfigLoader();
+                break;
+            default:
+                configLoader = xmlDefinitionConfigLoader();
         }
 
-        configLoader.registerListener(reload -> System.err.println("配置重加载监听器1,reload:" + reload));
 
+        configLoader.registerListener(reload -> System.err.println("配置重加载监听器1,reload:" + reload));
         configLoader.registerListener(ItemConfig.class, reload -> System.err.println("配置重加载监听器2,reload:" + reload));
 
         loadConfig(configLoader);
@@ -46,18 +59,52 @@ public class ConfigTest {
     }
 
 
-    private static ConfigLoader definitionConfigLoader() {
+    private static ConfigLoader xmlDefinitionConfigLoader() {
         List<String> definitionPaths = new ArrayList<>();
         definitionPaths.add("quan-config\\definition-xml");
 
-//        TableType tableType = TableType.csv;
-//        String tablePath = "config\\csv";
         TableType tableType = TableType.xlsx;
         String tablePath = "quan-config\\excel";
 
         DefinitionConfigLoader configLoader = new DefinitionConfigLoader(tablePath);
         configLoader.useXmlDefinition(definitionPaths, "quan.config");
         configLoader.initValidators("quan");
+        configLoader.setTableType(tableType);
+
+        return configLoader;
+    }
+
+    private static ConfigLoader excelDefinitionConfigLoader() {
+        List<String> definitionPaths = new ArrayList<>();
+        definitionPaths.add("quan-config\\definition-table");
+
+        TableType tableType = TableType.xlsx;
+        String tablePath = "quan-config\\definition-table";
+
+        DefinitionConfigLoader configLoader = new DefinitionConfigLoader(tablePath);
+
+        ExcelDefinitionParser definitionParser = new ExcelDefinitionParser(definitionPaths);
+        definitionParser.setPackagePrefix("quan.config");
+        configLoader.setParser(definitionParser);
+
+        configLoader.setTableType(tableType);
+
+        return configLoader;
+    }
+
+    private static ConfigLoader csvDefinitionConfigLoader() {
+        List<String> definitionPaths = new ArrayList<>();
+        definitionPaths.add("quan-config\\definition-table");
+
+        TableType tableType = TableType.csv;
+        String tablePath = "quan-config\\definition-table";
+
+        DefinitionConfigLoader configLoader = new DefinitionConfigLoader(tablePath);
+
+        CSVDefinitionParser definitionParser = new CSVDefinitionParser(definitionPaths);
+        definitionParser.setPackagePrefix("quan.config");
+        configLoader.setParser(definitionParser);
+
         configLoader.setTableType(tableType);
 
         return configLoader;

@@ -21,6 +21,8 @@ import java.util.regex.Pattern;
  */
 public abstract class TableDefinitionParser extends DefinitionParser {
 
+    public static final int MIN_TABLE_BODY_START_ROW = 5;
+
     private Map<String, String> languageAliases = new HashMap<>();
 
     private Map<String, String> aliasLanguages = new HashMap<>();
@@ -44,7 +46,7 @@ public abstract class TableDefinitionParser extends DefinitionParser {
 
     @Override
     public int getMinTableBodyStartRow() {
-        return 4;
+        return MIN_TABLE_BODY_START_ROW;
     }
 
 
@@ -117,7 +119,7 @@ public abstract class TableDefinitionParser extends DefinitionParser {
 
     protected abstract boolean parseTable(ConfigDefinition configDefinition, File definitionFile);
 
-    protected void addField(ConfigDefinition configDefinition, String fieldName, String constraints, String comment) {
+    protected void addField(ConfigDefinition configDefinition, String fieldName, String constraints, String validation, String comment) {
         if (fieldName.startsWith("#")) {
             //忽略被注释掉的字段
             return;
@@ -130,6 +132,10 @@ public abstract class TableDefinitionParser extends DefinitionParser {
         fieldDefinition.setColumn(fieldName);
         fieldDefinition.setComment(comment);
         configDefinition.addField(fieldDefinition);
+
+        if (!StringUtils.isBlank(validation)) {
+            configDefinition.getValidations().add(validation);
+        }
 
         if (StringUtils.isBlank(constraints)) {
             if (StringUtils.isBlank(fieldName)) {
@@ -287,6 +293,7 @@ public abstract class TableDefinitionParser extends DefinitionParser {
                 continue;
             }
 
+            configDefinition.getValidations().addAll(extConfigDefinition.getValidations());
             configDefinition.setPackageName(extConfigDefinition.getPackageName());
             configDefinition.setName(extConfigDefinition.getName());
             configDefinition.setParentName(extConfigDefinition.getParentName());

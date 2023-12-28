@@ -10,6 +10,11 @@
     <config name="CardConfig">
         <index name="key" type="u"  fields="key"/>
         <constant name="CardIds"  key="key" value="id" comment="name"/>卡片ID
+        <validations>
+            <![CDATA[
+               list.size<1
+            ]]>
+        </validations>
     </config>
 
 </classes>

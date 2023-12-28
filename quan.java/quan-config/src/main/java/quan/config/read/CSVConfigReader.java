@@ -5,6 +5,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import quan.definition.config.ConfigDefinition;
+import quan.definition.parser.TableDefinitionParser;
 
 import java.io.File;
 import java.io.InputStreamReader;
@@ -16,6 +17,10 @@ import java.util.List;
  * CSV配置读取器
  */
 public class CSVConfigReader extends ConfigReader {
+
+    {
+        tableBodyStartRow = TableDefinitionParser.MIN_TABLE_BODY_START_ROW;
+    }
 
     public CSVConfigReader(File tableFile, ConfigDefinition configDefinition) {
         super(tableFile, configDefinition);

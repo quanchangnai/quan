@@ -8,4 +8,5 @@ dependencies {
     api 'org.apache.poi:poi:5.2.2'
     api 'org.apache.poi:poi-ooxml:5.2.2'
     api 'org.apache.commons:commons-csv:1.7'
+    api 'ognl:ognl:3.4.2'
 }

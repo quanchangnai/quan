@@ -10,6 +10,7 @@ dependencies {
     api 'com.alibaba:fastjson:1.2.83'
     api 'org.aspectj:aspectjweaver:1.9.4'
     api 'net.bytebuddy:byte-buddy-agent:1.9.13'
+    api 'ognl:ognl:3.4.2'
     implementation 'org.dom4j:dom4j:2.1.4'
     implementation 'org.apache.poi:poi:5.2.2'
     implementation 'org.apache.poi:poi-ooxml:5.2.2'
