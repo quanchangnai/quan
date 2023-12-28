@@ -318,28 +318,33 @@ public class DefinitionConfigLoader extends ConfigLoader {
             return;
         }
 
-        localConfigDefinition.set(configDefinition);
+        try {
+            localConfigDefinition.set(configDefinition);
 
-        for (String table : getConfigTables(configDefinition)) {
-            ConfigReader reader = getReader(table);
-            List<JSONObject> tableJsons = reader.getJsons();
-            for (int i = 0; i < tableJsons.size(); i++) {
-                int row = reader.getTableBodyStartRow() + i;
-                JSONObject json = tableJsons.get(i);
-                localConfigJson.set(json);
+            for (String table : getConfigTables(configDefinition)) {
+                ConfigReader reader = getReader(table);
+                List<JSONObject> tableJsons = reader.getJsons();
+                for (int i = 0; i < tableJsons.size(); i++) {
+                    int row = reader.getTableBodyStartRow() + i;
+                    JSONObject json = tableJsons.get(i);
+                    localConfigJson.set(json);
 
-                for (Object validation : validations) {
-                    try {
-                        Boolean result = (Boolean) Ognl.getValue(validation, json, Boolean.class);
-                        if (result != null && !result) {
-                            validatedErrors.add(String.format("配置[%s]的第%s行数据不符合校验规则:%s", table, row, validation));
+                    for (Object validation : validations) {
+                        try {
+                            Object result = Ognl.getValue(validation, json);
+                            if (result != null && !(Boolean) result) {
+                                validatedErrors.add(String.format("配置[%s]的第%s行数据不符合校验规则:%s", table, row, validation));
+                            }
+                        } catch (Exception e) {
+                            String reason = e instanceof OgnlException ? e.getMessage() : e.toString();
+                            validatedErrors.add(String.format("配置[%s]的第%s行数据执行校验规则[%s]时出错:%s", table, row, validation, reason));
                         }
-                    } catch (Exception e) {
-                        String reason = e instanceof OgnlException ? e.getMessage() : e.toString();
-                        validatedErrors.add(String.format("配置[%s]的第%s行数据执行校验规则[%s]时出错:%s", table, row, validation, reason));
                     }
                 }
             }
+        } finally {
+            localConfigDefinition.remove();
+            localConfigJson.remove();
         }
     }
 
