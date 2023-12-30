@@ -57,7 +57,7 @@ public class ExcelDefinitionParser extends TableDefinitionParser {
             Row row0 = sheet.getRow(0);
 
             if (row0 == null || sheet.getLastRowNum() < 2) {
-                addValidatedError(configDefinition.getValidatedName() + "的定义文件不完整，要求表头第1行是字段名、第2行是字段约束、第3行是校验表达式、第4行是字段注释");
+                addValidatedError(configDefinition.getValidatedName() + "的定义文件不完整，要求表头第1行是字段名、第2行时字段约束、第3行是字段注释");
                 return false;
             }
 
@@ -67,12 +67,9 @@ public class ExcelDefinitionParser extends TableDefinitionParser {
                 String fieldName = dataFormatter.formatCellValue(cell).trim();
                 Row row1 = sheet.getRow(1);
                 Row row2 = sheet.getRow(2);
-                Row row3 = sheet.getRow(3);
-
                 String constraints = row1 == null ? null : dataFormatter.formatCellValue(row1.getCell(c)).trim();
-                String validation = row2 == null ? null : dataFormatter.formatCellValue(row2.getCell(c)).trim();
-                String comment = row3 == null ? null : dataFormatter.formatCellValue(row3.getCell(c)).trim();
-                addField(configDefinition, fieldName, constraints, validation, comment);
+                String comment = row2 == null ? null : dataFormatter.formatCellValue(row2.getCell(c)).trim();
+                addField(configDefinition, fieldName, constraints, comment);
                 c++;
             }
 

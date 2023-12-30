@@ -1,5 +1,6 @@
 package quan.definition;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import quan.definition.DependentSource.DependentType;
 
@@ -85,7 +86,9 @@ public abstract class ClassDefinition extends Definition {
     }
 
     public void setPackageName(String packageName) {
-        this.packageName = packageName;
+        if (!StringUtils.isBlank(packageName)) {
+            this.packageName = packageName;
+        }
     }
 
     public String getPackageName() {
@@ -235,12 +238,13 @@ public abstract class ClassDefinition extends Definition {
     }
 
     public void setVersion(String version) {
-        this.version = version;
+        this.version = DigestUtils.md5Hex(version);
     }
 
-
     public void setLanguageStr(String languageStr) {
-        this.languageStr = languageStr;
+        if (!StringUtils.isBlank(languageStr)) {
+            this.languageStr = languageStr;
+        }
     }
 
     public String getLanguageStr() {

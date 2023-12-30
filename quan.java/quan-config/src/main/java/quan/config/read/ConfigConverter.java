@@ -25,6 +25,11 @@ public class ConfigConverter {
 
     private static SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
 
+    public static void main(String[] args) throws ParseException {
+        Date date = datetimeFormat.parse("2020-09-01");
+        System.err.println(date);
+    }
+
     private final DefinitionParser parser;
 
     public static void setDatetimePattern(String pattern) {
@@ -33,8 +38,8 @@ public class ConfigConverter {
         }
     }
 
-    public static String getDateTimePattern() {
-        return datetimeFormat.toPattern();
+    public static SimpleDateFormat getDateTimePattern() {
+        return datetimeFormat;
     }
 
     public static void setDatePattern(String pattern) {
@@ -43,8 +48,8 @@ public class ConfigConverter {
         }
     }
 
-    public static String getDatePattern() {
-        return dateFormat.toPattern();
+    public static SimpleDateFormat getDatePattern() {
+        return dateFormat;
     }
 
     public static void setTimePattern(String pattern) {
@@ -53,8 +58,8 @@ public class ConfigConverter {
         }
     }
 
-    public static String getTimePattern() {
-        return timeFormat.toPattern();
+    public static SimpleDateFormat getTimePattern() {
+        return timeFormat;
     }
 
     public ConfigConverter(DefinitionParser parser) {
@@ -161,9 +166,8 @@ public class ConfigConverter {
         if (enumField == null) {
             throw new ConvertException(ErrorType.ENUM_NAME, value);
         }
-        enumValue = Integer.parseInt(enumField.getValue());
 
-        return enumValue;
+        return Integer.parseInt(enumField.getEnumValue());
     }
 
     private Object convertPrimitiveType(String type, String value, Number min, Number max) {
@@ -174,28 +178,7 @@ public class ConfigConverter {
         Object result;
 
         try {
-            switch (type) {
-                case "bool":
-                    result = Boolean.parseBoolean(value.toLowerCase());
-                    break;
-                case "short":
-                    result = Short.parseShort(value);
-                    break;
-                case "int":
-                    result = Integer.parseInt(value);
-                    break;
-                case "long":
-                    result = Long.parseLong(value);
-                    break;
-                case "float":
-                    result = Float.parseFloat(value);
-                    break;
-                case "double":
-                    result = Double.parseDouble(value);
-                    break;
-                default:
-                    result = value;
-            }
+            result = parsePrimitiveType(type, value);
         } catch (Exception e) {
             throw new ConvertException(ErrorType.TYPE_ERROR, e, value, type);
         }
@@ -212,6 +195,25 @@ public class ConfigConverter {
         }
 
         return result;
+    }
+
+    private static Object parsePrimitiveType(String type, String value) {
+        switch (type) {
+            case "bool":
+                return Boolean.parseBoolean(value.toLowerCase());
+            case "short":
+                return Short.parseShort(value);
+            case "int":
+                return Integer.parseInt(value);
+            case "long":
+                return Long.parseLong(value);
+            case "float":
+                return Float.parseFloat(value);
+            case "double":
+                return Double.parseDouble(value);
+            default:
+                return value;
+        }
     }
 
     private Object convertPrimitiveType(String type, String value) {
@@ -235,6 +237,25 @@ public class ConfigConverter {
             }
         } catch (ParseException e) {
             throw new ConvertException(ErrorType.COMMON, e);
+        }
+    }
+
+    /**
+     * 字符串动态转换为时间
+     */
+    public static Date convertTime(String value) {
+        try {
+            return datetimeFormat.parse(value);
+        } catch (ParseException e) {
+            try {
+                return dateFormat.parse(value);
+            } catch (ParseException ex) {
+                try {
+                    return timeFormat.parse(value);
+                } catch (ParseException exc) {
+                    throw new IllegalArgumentException(value + "不能转换为时间类型");
+                }
+            }
         }
     }
 

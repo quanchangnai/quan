@@ -202,6 +202,20 @@ public class ConfigDefinition extends BeanDefinition {
         return validations;
     }
 
+    public boolean isHasValidations() {
+        if (!validations.isEmpty()) {
+            return true;
+        }
+
+        for (FieldDefinition fieldDefinition : getFields()) {
+            if (fieldDefinition.getValidation() != null) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public List<String> getRows() {
         return rows;
     }
@@ -254,14 +268,29 @@ public class ConfigDefinition extends BeanDefinition {
 
         for (Object validation : validations) {
             try {
-                expressions.add(Ognl.parseExpression((String) validation));
+                String validationStr = (String) validation;
+                expressions.add(Ognl.parseExpression(validationStr));
             } catch (OgnlException e) {
-                addValidatedError(getValidatedName() + "的校验规则[" + validation + "]错误:" + e.getMessage());
+                addValidatedError(getValidatedName() + "的校验表达式[" + validation + "]错误:" + e.getMessage());
             }
         }
 
         validations.clear();
         validations.addAll(expressions);
+    }
+
+    private void parseFieldValidationExpression(FieldDefinition field) {
+        Object validation = field.getValidation();
+        if (!(validation instanceof String)) {
+            return;
+        }
+
+        try {
+            String validationStr = ((String) validation).trim();
+            field.setValidation(Ognl.parseExpression((validationStr)));
+        } catch (OgnlException e) {
+            addValidatedError(getValidatedName("的") + field.getValidatedName() + "的校验表达式[" + validation + "]错误:" + e.getMessage());
+        }
     }
 
     @Override
@@ -335,6 +364,7 @@ public class ConfigDefinition extends BeanDefinition {
         validateFieldType(field);
         validateFieldRange(field);
         validateFieldBeanCycle(field);
+        parseFieldValidationExpression(field);
 
         if (field.getColumn() == null) {
             addValidatedError(getValidatedName("的") + field.getValidatedName() + "对应的列不能为空");

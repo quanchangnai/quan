@@ -46,7 +46,7 @@ public class FieldDefinition extends Definition implements Cloneable {
     private Object max;
 
     //枚举值
-    private String value;
+    private String enumValue;
 
     //消息:字段ID
     private String id;
@@ -83,6 +83,9 @@ public class FieldDefinition extends Definition implements Cloneable {
 
     //配置:字段对应的表格列号,对象或者集合类型可能会对应多列，校验表头时设置
     private List<Integer> columnNums = new ArrayList<>();
+
+    //配置:校验表达式
+    private Object validation;
 
     public FieldDefinition() {
     }
@@ -215,7 +218,6 @@ public class FieldDefinition extends Definition implements Cloneable {
         return isBuiltinType() || isBeanType() || isEnumType() || (category == Category.config && isTimeType());
     }
 
-
     public boolean isMapType() {
         return "map".equals(type);
     }
@@ -235,7 +237,6 @@ public class FieldDefinition extends Definition implements Cloneable {
     public boolean isBytesType() {
         return "bytes".equals(type);
     }
-
 
     public Object getMin() {
         return min;
@@ -259,15 +260,15 @@ public class FieldDefinition extends Definition implements Cloneable {
         this.max = max;
     }
 
-    public String getValue() {
-        return value;
+    public String getEnumValue() {
+        return enumValue;
     }
 
-    public void setValue(String value) {
-        if (StringUtils.isBlank(value)) {
+    public void setEnumValue(String enumValue) {
+        if (StringUtils.isBlank(enumValue)) {
             return;
         }
-        this.value = value.trim();
+        this.enumValue = enumValue.trim();
     }
 
     public boolean isOptional() {
@@ -486,10 +487,9 @@ public class FieldDefinition extends Definition implements Cloneable {
     }
 
     public FieldDefinition setColumn(String column) {
-        if (StringUtils.isBlank(column)) {
-            return this;
+        if (!StringUtils.isBlank(column)) {
+            this.column = column.trim();
         }
-        this.column = column.trim();
         return this;
     }
 
@@ -723,12 +723,32 @@ public class FieldDefinition extends Definition implements Cloneable {
         return true;
     }
 
+    public Object getValidation() {
+        return validation;
+    }
+
+    public void setValidation(Object validation) {
+        this.validation = validation;
+    }
+
     @Override
     public FieldDefinition clone() {
         try {
             return (FieldDefinition) super.clone();
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public Object getDefaultValue() {
+        if (Constants.NUMBER_TYPES.contains(type)) {
+            return 0;
+        } else if ("string".equals(type)) {
+            return "";
+        } else if ("bool".equals(type)) {
+            return false;
+        } else {
+            return null;
         }
     }
 

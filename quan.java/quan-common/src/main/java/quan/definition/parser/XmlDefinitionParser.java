@@ -1,6 +1,5 @@
 package quan.definition.parser;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Attribute;
 import org.dom4j.Element;
@@ -80,11 +79,11 @@ public class XmlDefinitionParser extends DefinitionParser {
         if (rootElement.getName().equals("package")) {
             validateElementAttributes(definitionFilePath, rootElement, "name", Pattern.compile("(" + String.join("|", Language.names()) + ")-name"));
 
-            String packageName0 = rootElement.attributeValue("name");
-            if (packageName0 != null && Constants.LOWER_PACKAGE_NAME_PATTERN.matcher(packageName0).matches()) {
-                packageName = packageName0;
-            } else if (!StringUtils.isBlank(packageName0)) {
-                addValidatedError("定义文件[" + definitionFilePath + "]的包名[" + packageName0 + "]格式错误,正确格式:" + Constants.LOWER_PACKAGE_NAME_PATTERN);
+            String packageNameAttr = rootElement.attributeValue("name");
+            if (packageNameAttr != null && Constants.LOWER_PACKAGE_NAME_PATTERN.matcher(packageNameAttr).matches()) {
+                packageName = packageNameAttr;
+            } else if (!StringUtils.isBlank(packageNameAttr)) {
+                addValidatedError("定义文件[" + definitionFilePath + "]的包名[" + packageNameAttr + "]格式错误,正确格式:" + Constants.LOWER_PACKAGE_NAME_PATTERN);
             }
 
             for (Attribute attribute : rootElement.attributes()) {
@@ -242,7 +241,7 @@ public class XmlDefinitionParser extends DefinitionParser {
             classDefinition.setLanguageStr(element.attributeValue("lang"));
             classDefinition.setComment(getComment(element, indexInParent));
             classDefinition.setDefinitionFile(definitionFile);
-            classDefinition.setVersion(DigestUtils.md5Hex(element.asXML()).trim());
+            classDefinition.setVersion(element.asXML().trim());
         }
 
         return classDefinition;
@@ -363,7 +362,7 @@ public class XmlDefinitionParser extends DefinitionParser {
         fieldDefinition.setTypeInfo(typeInfo);
         fieldDefinition.setMin(fieldElement.attributeValue("min"));
         fieldDefinition.setMax(fieldElement.attributeValue("max"));
-        fieldDefinition.setValue(fieldElement.attributeValue("value"));
+        fieldDefinition.setEnumValue(fieldElement.attributeValue("value"));
         fieldDefinition.setColumn(fieldElement.attributeValue("column"));
         fieldDefinition.setOptional(fieldElement.attributeValue("optional"));
         fieldDefinition.setId(fieldElement.attributeValue("id"));
@@ -388,10 +387,9 @@ public class XmlDefinitionParser extends DefinitionParser {
             illegalAttributes.addAll(Arrays.asList("type", "ignore"));
         } else if (category == Category.config) {
             if (classDefinition instanceof ConfigDefinition) {
-                ConfigDefinition configDefinition = (ConfigDefinition) classDefinition;
                 String validation = fieldElement.attributeValue("validation");
                 if (!StringUtils.isBlank(validation)) {
-                    configDefinition.getValidations().add(validation);
+                    fieldDefinition.setValidation(validation);
                 }
 
                 illegalAttributes.addAll(Arrays.asList("type", "ref", "lang", "optional", "column", "validation"));
@@ -444,7 +442,7 @@ public class XmlDefinitionParser extends DefinitionParser {
         constantDefinition.setKeyField(constantElement.attributeValue("key"));
         constantDefinition.setValueField(constantElement.attributeValue("value"));
         constantDefinition.setCommentField(constantElement.attributeValue("comment"));
-        constantDefinition.setVersion(DigestUtils.md5Hex(constantElement.asXML().trim()));
+        constantDefinition.setVersion(configDefinition.getVersion() + constantElement.asXML().trim());
 
         if (indexInParent >= 0) {
             constantDefinition.setComment(getComment(constantElement, indexInParent));

@@ -15,9 +15,9 @@ namespace ${getFullPackageName("cs")}
         /// </summary>
         </#if>
         <#if field_has_next>
-        ${field.name} = ${field.value},
+        ${field.name} = ${field.enumValue},
         <#else>
-        ${field.name} = ${field.value}
+        ${field.name} = ${field.enumValue}
         </#if>
 
     </#list>

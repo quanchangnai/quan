@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classes>
 
+    <!--excel或csv表格中包含了配置的基础定义和数据，xml是用来做扩展定义的-->
+
     卡片类型-
     <enum name="CardType">卡片类型--
         <field name="type1" value="1"/>道具类型1
         <field name="type2" value="2"/>道具类型2
-    </enum>卡片类型---
+    </enum>
+    卡片类型---
 
-    <config name="CardConfig">
-        <index name="key" type="u"  fields="key"/>
-        <constant name="CardIds"  key="key" value="id" comment="name"/>卡片ID
+    <config table="CardConfig">
+        <index name="key" type="u" fields="key"/>
+        <constant name="CardIds" key="key" value="id" comment="name"/>卡片ID
         <validations>
             <![CDATA[
                list.size<1

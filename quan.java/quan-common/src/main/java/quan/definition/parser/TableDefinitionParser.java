@@ -14,6 +14,7 @@ import quan.util.FileUtils;
 
 import java.io.File;
 import java.util.*;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -21,7 +22,9 @@ import java.util.regex.Pattern;
  */
 public abstract class TableDefinitionParser extends DefinitionParser {
 
-    public static final int MIN_TABLE_BODY_START_ROW = 5;
+    public static final int MIN_TABLE_BODY_START_ROW = 4;
+
+    private static Pattern constraintsPattern = Pattern.compile("[\\w:.]+(;\\w+(=\\w+)?)*(\\{(.+)})?");
 
     private Map<String, String> languageAliases = new HashMap<>();
 
@@ -31,13 +34,19 @@ public abstract class TableDefinitionParser extends DefinitionParser {
 
     private ExtDefinitionParser extDefinitionParser = new ExtDefinitionParser();
 
-    //主表路径对应分表路径
-    private Map<String, Set<String>> subtables = new HashMap<>();
+    /**
+     * 主表路径对应分表路径
+     */
+    private Map<String, Set<String>> mainSubTables = new HashMap<>();
 
-    //表名(相对根路径):配置定义
+    /**
+     * 表名(相对根路径):配置定义
+     */
     private Map<String, ConfigDefinition> configDefinitions = new HashMap<>();
 
-    //表名(相对根路径):配置定义
+    /**
+     * 表名(相对根路径):配置定义
+     */
     private Map<String, ConfigDefinition> extConfigDefinitions = new HashMap<>();
 
     public Map<String, String> getLanguageAliases() {
@@ -86,9 +95,8 @@ public abstract class TableDefinitionParser extends DefinitionParser {
 
         //分表
         if (definitionFileName.contains("-")) {
-            //主表
             String mainTableName = definitionFileName.substring(0, definitionFileName.indexOf("-")).trim();
-            subtables.computeIfAbsent(mainTableName, k -> new LinkedHashSet<>()).add(definitionFileName);
+            mainSubTables.computeIfAbsent(mainTableName, k -> new LinkedHashSet<>()).add(definitionFileName);
             return;
         }
 
@@ -119,7 +127,7 @@ public abstract class TableDefinitionParser extends DefinitionParser {
 
     protected abstract boolean parseTable(ConfigDefinition configDefinition, File definitionFile);
 
-    protected void addField(ConfigDefinition configDefinition, String fieldName, String constraints, String validation, String comment) {
+    protected void addField(ConfigDefinition configDefinition, String fieldName, String constraints, String comment) {
         if (fieldName.startsWith("#")) {
             //忽略被注释掉的字段
             return;
@@ -133,10 +141,6 @@ public abstract class TableDefinitionParser extends DefinitionParser {
         fieldDefinition.setComment(comment);
         configDefinition.addField(fieldDefinition);
 
-        if (!StringUtils.isBlank(validation)) {
-            configDefinition.getValidations().add(validation);
-        }
-
         if (StringUtils.isBlank(constraints)) {
             if (StringUtils.isBlank(fieldName)) {
                 addValidatedError(configDefinition.getValidatedName() + "的字段约束不能为空，至少要包含字段类型");
@@ -146,7 +150,26 @@ public abstract class TableDefinitionParser extends DefinitionParser {
             return;
         }
 
-        String[] constraintArray = constraints.split("[;；]", -1);
+        String originalConstraints = constraints;
+        constraints = escapeConstraints(constraints);
+
+        Matcher matcher = constraintsPattern.matcher(constraints);
+        if (!matcher.matches()) {
+            if (StringUtils.isBlank(fieldName)) {
+                addValidatedError(configDefinition.getValidatedName() + "的字段[" + fieldName + "]约束[" + originalConstraints + "]格式错误");
+            } else {
+                addValidatedError(configDefinition.getValidatedName() + "的字段约束[" + originalConstraints + "]格式错误");
+            }
+            return;
+        }
+
+        String validation = matcher.group(4);
+        if (!StringUtils.isBlank(validation)) {
+            fieldDefinition.setValidation(validation);
+            constraints = constraints.substring(0, matcher.start(3));
+        }
+
+        String[] constraintArray = constraints.split(";", -1);
 
         fieldDefinition.setTypeInfo(constraintArray[0]);
 
@@ -187,14 +210,13 @@ public abstract class TableDefinitionParser extends DefinitionParser {
                         constraintValue = constraint;
                     } else {
                         try {
-
                             String[] constraintTypeAndValue = constraint.split("=", -1);
                             Validate.isTrue(constraintTypeAndValue.length == 2);
                             constraintType = constraintTypeAndValue[0].trim();
                             constraintValue = constraintTypeAndValue[1].trim();
                             Validate.isTrue(!StringUtils.isBlank(constraintType) && !StringUtils.isBlank(constraintValue));
                         } catch (Exception ignored) {
-                            addValidatedError(configDefinition.getValidatedName() + "的字段[" + fieldName + "]约束[" + constraint + "]不合法");
+                            addValidatedError(configDefinition.getValidatedName() + "的字段[" + fieldName + "]约束[" + constraint + "]错误");
                             continue;
                         }
                     }
@@ -233,6 +255,44 @@ public abstract class TableDefinitionParser extends DefinitionParser {
         }
     }
 
+    private static String escapeConstraints(String constraints) {
+        constraints = constraints.trim();
+        StringBuilder sb = new StringBuilder();
+
+        boolean escape = true;
+        boolean trim = true;
+
+        for (int i = 0; i < constraints.length(); i++) {
+            char c = constraints.charAt(i);
+            if (escape) {
+                if (c == '；') {
+                    sb.append(';');
+                } else if (c == '：') {
+                    sb.append(':');
+                } else if (c == '（') {
+                    sb.append('(');
+                } else if (c == '）') {
+                    sb.append(')');
+                }
+            }
+
+            if (!trim || c != ' ') {
+                sb.append(c);
+            }
+
+            if (c == '{') {
+                //校验表达式必须保留空格
+                trim = false;
+            } else if (c == '\'' || c == '"') {
+                //字符串不转义
+                escape = !escape;
+            }
+        }
+
+        constraints = sb.toString();
+        return constraints;
+    }
+
     @Override
     protected void validate() {
         getValidatedErrors().addAll(extDefinitionParser.getValidatedErrors());
@@ -240,10 +300,10 @@ public abstract class TableDefinitionParser extends DefinitionParser {
 
         validateClassName();
 
-        for (String mainTableName : subtables.keySet()) {
+        for (String mainTableName : mainSubTables.keySet()) {
             ConfigDefinition configDefinition = configDefinitions.get(mainTableName);
             if (configDefinition != null) {
-                String table = mainTableName + "," + String.join(",", subtables.get(mainTableName));
+                String table = mainTableName + "," + String.join(",", mainSubTables.get(mainTableName));
                 configDefinition.setTable(table);
             }
         }
@@ -262,19 +322,11 @@ public abstract class TableDefinitionParser extends DefinitionParser {
 
             ConfigDefinition extConfigDefinition = (ConfigDefinition) classDefinition;
 
-            String configName = extConfigDefinition.getName();
             String tableName = extConfigDefinition.getTable();
-
-            if (configName == null) {
-                addValidatedError("定义文件[" + extConfigDefinition.getDefinitionFile() + "]中配置的名字不能为空");
+            if (tableName == null) {
+                addValidatedError("定义文件[" + extConfigDefinition.getDefinitionFile() + "]中的" + extConfigDefinition.getValidatedName() + "表格名不能为空");
                 continue;
             }
-
-            if (tableName == null) {
-                tableName = configName;
-            }
-
-            extConfigDefinition.setTable(tableName);
 
             if (extConfigDefinitions.put(tableName, extConfigDefinition) != null) {
                 addValidatedError(String.format("相同表格[%s]不能有多个配置定义", tableName));
@@ -293,13 +345,19 @@ public abstract class TableDefinitionParser extends DefinitionParser {
                 continue;
             }
 
-            configDefinition.getValidations().addAll(extConfigDefinition.getValidations());
             configDefinition.setPackageName(extConfigDefinition.getPackageName());
+
+            if (!extConfigDefinition.getPackageNames().isEmpty()) {
+                configDefinition.getPackageNames().putAll(extConfigDefinition.getPackageNames());
+            }
+
             configDefinition.setName(extConfigDefinition.getName());
             configDefinition.setParentName(extConfigDefinition.getParentName());
+            configDefinition.setLanguageStr(extConfigDefinition.getLanguageStr());
             configDefinition.setComment(extConfigDefinition.getComment());
-            configDefinition.setVersion(extConfigDefinition.getVersion() + ":" + configDefinition.getVersion());
+            configDefinition.setVersion(extConfigDefinition.getVersion() + configDefinition.getVersion());
 
+            configDefinition.getValidations().addAll(extConfigDefinition.getValidations());
             extConfigDefinition.getIndexes().forEach(configDefinition::addIndex);
 
             for (ConstantDefinition constantDefinition : extConfigDefinition.getConstantDefinitions()) {
@@ -314,7 +372,7 @@ public abstract class TableDefinitionParser extends DefinitionParser {
         super.clear();
         extDefinitionParser.clear();
         this.configDefinitions.clear();
-        this.subtables.clear();
+        this.mainSubTables.clear();
         this.extConfigDefinitions.clear();
     }
 

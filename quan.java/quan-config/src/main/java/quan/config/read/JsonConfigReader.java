@@ -27,7 +27,7 @@ public class JsonConfigReader extends ConfigReader {
         try {
             Class<Config> configClass = (Class<Config>) Class.forName(configFullName);
             prototype = configClass.getDeclaredConstructor(JSONObject.class).newInstance(new JSONObject());
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logger.error("实例化配置类[{}]失败", configFullName, e);
         }
     }

@@ -10,10 +10,7 @@ import org.apache.commons.lang3.tuple.Triple;
 import quan.config.Config;
 import quan.config.TableType;
 import quan.config.ValidatedException;
-import quan.config.read.CSVConfigReader;
-import quan.config.read.ConfigReader;
-import quan.config.read.ExcelConfigReader;
-import quan.config.read.JsonConfigReader;
+import quan.config.read.*;
 import quan.definition.*;
 import quan.definition.config.ConfigDefinition;
 import quan.definition.parser.DefinitionParser;
@@ -206,6 +203,7 @@ public class DefinitionConfigLoader extends ConfigLoader {
             if (!configDefinition.isSupportedLanguage(language)) {
                 continue;
             }
+
             JSONArray rows = new JSONArray();
             for (String table : configDefinition.getTables()) {
                 ConfigReader reader = readers.get(table);
@@ -313,8 +311,7 @@ public class DefinitionConfigLoader extends ConfigLoader {
     }
 
     private void validateByOgnl(ConfigDefinition configDefinition) {
-        Set<Object> validations = configDefinition.getValidations();
-        if (validations.isEmpty()) {
+        if (!configDefinition.isHasValidations()) {
             return;
         }
 
@@ -324,20 +321,44 @@ public class DefinitionConfigLoader extends ConfigLoader {
             for (String table : getConfigTables(configDefinition)) {
                 ConfigReader reader = getReader(table);
                 List<JSONObject> tableJsons = reader.getJsons();
+
                 for (int i = 0; i < tableJsons.size(); i++) {
                     int row = reader.getTableBodyStartRow() + i;
                     JSONObject json = tableJsons.get(i);
                     localConfigJson.set(json);
 
-                    for (Object validation : validations) {
+                    for (Object configValidation : configDefinition.getValidations()) {
                         try {
-                            Object result = Ognl.getValue(validation, json);
+                            Object result = Ognl.getValue(configValidation, createOgnlContext(json), json);
                             if (result != null && !(Boolean) result) {
-                                validatedErrors.add(String.format("配置[%s]的第%s行数据不符合校验规则:%s", table, row, validation));
+                                validatedErrors.add(String.format("配置[%s]的第%s行数据不符合校验规则:%s", table, row, configValidation));
                             }
                         } catch (Exception e) {
-                            String reason = e instanceof OgnlException ? e.getMessage() : e.toString();
-                            validatedErrors.add(String.format("配置[%s]的第%s行数据执行校验规则[%s]时出错:%s", table, row, validation, reason));
+                            String reason = getOgnlExceptionReason(e);
+                            validatedErrors.add(String.format("配置[%s]的第%s行数据执行校验表达式[%s]时出错:%s", table, row, configValidation, reason));
+                        }
+                    }
+
+                    for (FieldDefinition fieldDefinition : configDefinition.getFields()) {
+                        Object fieldValidation = fieldDefinition.getValidation();
+                        if (fieldValidation == null) {
+                            continue;
+                        }
+
+                        String column = fieldDefinition.getColumn();
+                        Object fieldValue = json.get(fieldDefinition.getName());
+
+                        try {
+                            if (fieldValue == null) {
+                                fieldValue = fieldDefinition.getDefaultValue();
+                            }
+                            Object result = Ognl.getValue(fieldValidation, createOgnlContext(fieldValue), fieldValue);
+                            if (result != null && !(Boolean) result) {
+                                validatedErrors.add(String.format("配置[%s]的第%s行[%s]数据不符合校验规则: %s", table, row, column, fieldValidation));
+                            }
+                        } catch (Exception e) {
+                            String reason = getOgnlExceptionReason(e);
+                            validatedErrors.add(String.format("配置[%s]的第%s行[%s]数据执行校验表达式[%s]时出错: %s", table, row, column, fieldValidation, reason));
                         }
                     }
                 }
@@ -345,6 +366,27 @@ public class DefinitionConfigLoader extends ConfigLoader {
         } finally {
             localConfigDefinition.remove();
             localConfigJson.remove();
+        }
+    }
+
+    private static OgnlContext createOgnlContext(Object root) {
+        return Ognl.createDefaultContext(root, null, new DefaultTypeConverter() {
+            @Override
+            public Object convertValue(OgnlContext context, Object value, Class<?> toType) {
+                if (Date.class.isAssignableFrom(toType) && value instanceof String) {
+                    return ConfigConverter.convertTime(value.toString());
+                } else {
+                    return super.convertValue(context, value, toType);
+                }
+            }
+        });
+    }
+
+    private static String getOgnlExceptionReason(Exception e) {
+        if (e instanceof OgnlException && !(e instanceof NoSuchPropertyException)) {
+            return e.getMessage();
+        } else {
+            return e.toString();
         }
     }
 
@@ -498,12 +540,11 @@ public class DefinitionConfigLoader extends ConfigLoader {
 
     private void validateBeanTypeRef(Triple position, BeanDefinition bean, JSONObject json,
                                      Map<ConfigDefinition, Map<IndexDefinition, Map>> allConfigIndexedJsons) {
-        if (json == null) {
-            return;
-        }
-        for (FieldDefinition field : bean.getFields()) {
-            Object fieldValue = json.get(field.getName());
-            validateFieldRef(position, bean, field, fieldValue, allConfigIndexedJsons);
+        if (json != null) {
+            for (FieldDefinition field : bean.getFields()) {
+                Object fieldValue = json.get(field.getName());
+                validateFieldRef(position, bean, field, fieldValue, allConfigIndexedJsons);
+            }
         }
     }
 
@@ -589,6 +630,7 @@ public class DefinitionConfigLoader extends ConfigLoader {
         checkReload();
 
         Set<String> readerNames = new LinkedHashSet<>();
+
         for (String tableName : tableNames) {
             ConfigDefinition configDefinition = parser.getTableConfigs().get(tableName);
             if (configDefinition == null) {

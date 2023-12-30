@@ -38,7 +38,7 @@ public class CSVConfigReader extends ConfigReader {
             return;
         }
 
-        if (records.size() < 1) {
+        if (records.isEmpty()) {
             return;
         }
 

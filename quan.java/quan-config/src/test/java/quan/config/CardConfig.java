@@ -31,6 +31,11 @@ public class CardConfig extends Config {
     public final CardType type;
 
     /**
+     * 价格
+     */
+    public final int price;
+
+    /**
      * List
      */
     public final List<Integer> list;
@@ -63,6 +68,7 @@ public class CardConfig extends Config {
         this.key = json.getOrDefault(Field.KEY, "").toString();
         this.name = json.getOrDefault(Field.NAME, "").toString();
         this.type = CardType.valueOf(json.getIntValue(Field.TYPE));
+        this.price = json.getIntValue(Field.PRICE);
 
         JSONArray list$1 = json.getJSONArray(Field.LIST);
         List<Integer> list$2 = new ArrayList<>();
@@ -107,6 +113,7 @@ public class CardConfig extends Config {
                 ",key='" + key + '\'' +
                 ",name='" + name + '\'' +
                 ",type=" + type +
+                ",price=" + price +
                 ",list=" + list +
                 ",set=" + set +
                 ",map=" + map +
@@ -136,6 +143,11 @@ public class CardConfig extends Config {
          * 类型
          */
         public static final String TYPE = "type";
+
+        /**
+         * 价格
+         */
+        public static final String PRICE = "price";
 
         /**
          * List

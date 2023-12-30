@@ -15,9 +15,9 @@ public enum ${name} {
      */
     </#if>
     <#if field_has_next>
-    ${field.name}(${field.value}),
+    ${field.name}(${field.enumValue}),
     <#else>
-    ${field.name}(${field.value});
+    ${field.name}(${field.enumValue});
     </#if>
 
 </#list>
@@ -31,7 +31,7 @@ public enum ${name} {
     public static ${name} valueOf(int value) {
         switch (value) {
         <#list fields  as field>
-            case ${field.value}:
+            case ${field.enumValue}:
                 return ${field.name};
         </#list>
             default:

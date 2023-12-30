@@ -297,11 +297,11 @@ public abstract class Generator {
         logger.info("生成{}{}代码完成\n", language(), category().alias());
     }
 
+    @SuppressWarnings("unchecked")
     private void readRecords() {
         File recordsFile = new File(".records" + File.separator + getClass().getSimpleName() + ".json");
         if (recordsFile.exists()) {
             try {
-                //noinspection unchecked
                 oldRecords = JSON.parseObject(new String(Files.readAllBytes(recordsFile.toPath())), HashMap.class);
             } catch (IOException e) {
                 logger.error("", e);
@@ -601,18 +601,10 @@ public abstract class Generator {
         return success;
     }
 
-    public static void main(String[] args) {
-        String optionsFile = "";
-        if (args.length > 0 && !args[0].startsWith("--")) {
-            optionsFile = args[0];
-        }
 
-        boolean exit1OnFail = false;
-        if (args.length > 1 && !args[1].startsWith("--")) {
-            exit1OnFail = Boolean.parseBoolean(args[1]);
-        }
-
+    private static Properties getExtraOptions(String[] args) {
         Properties extraOptions = new Properties();
+
         for (String arg : args) {
             if (!arg.startsWith("--")) {
                 continue;
@@ -626,6 +618,22 @@ public abstract class Generator {
             }
             extraOptions.put(optionKey, optionValue);
         }
+
+        return extraOptions;
+    }
+
+    public static void main(String[] args) {
+        String optionsFile = "";
+        if (args.length > 0 && !args[0].startsWith("--")) {
+            optionsFile = args[0];
+        }
+
+        boolean exit1OnFail = false;
+        if (args.length > 1 && !args[1].startsWith("--")) {
+            exit1OnFail = Boolean.parseBoolean(args[1]);
+        }
+
+        Properties extraOptions = getExtraOptions(args);
 
         if (!generate(optionsFile, extraOptions) && exit1OnFail) {
             System.exit(1);

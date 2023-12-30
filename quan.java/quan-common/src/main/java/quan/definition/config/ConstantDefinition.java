@@ -1,6 +1,7 @@
 package quan.definition.config;
 
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import quan.definition.ClassDefinition;
@@ -37,8 +38,7 @@ public class ConstantDefinition extends ClassDefinition {
 
     private Map<String, Pair<String, String>> rows = new TreeMap<>();
 
-    //常量数据版本
-    private String version2;
+    private String updatedVersion;
 
     @Override
     public int getKind() {
@@ -140,12 +140,24 @@ public class ConstantDefinition extends ClassDefinition {
     }
 
 
-    public String getVersion2() {
-        return version2;
+    @Override
+    public void setVersion(String version) {
+        super.setVersion(version);
+        updatedVersion = null;
     }
 
-    public void setVersion2(String version2) {
-        this.version2 = version2;
+    @Override
+    public String getVersion() {
+        if (updatedVersion != null) {
+            return updatedVersion;
+        } else {
+            return super.getVersion();
+        }
+    }
+
+    public void updateVersion(String extVersion) {
+        updatedVersion = null;
+        this.updatedVersion = DigestUtils.md5Hex(getVersion() + extVersion);
     }
 
     @Override
@@ -153,8 +165,6 @@ public class ConstantDefinition extends ClassDefinition {
         if (ownerDefinition == null) {
             return;
         }
-
-        setVersion(getVersion() + ":" + ownerDefinition.getVersion());
 
         validateKeyField();
         validateValueField();

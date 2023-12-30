@@ -9,7 +9,7 @@ require("quan.table")
 local ${name} = {
 <#list fields as field>
     <#if field.comment !="">--- ${field.comment}</#if>
-    <#if field_has_next>${field.name} = ${field.value},<#else>${field.name} = ${field.value}</#if>
+    <#if field_has_next>${field.name} = ${field.enumValue},<#else>${field.name} = ${field.enumValue}</#if>
 </#list>
 }
 

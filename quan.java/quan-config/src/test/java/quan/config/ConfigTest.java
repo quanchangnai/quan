@@ -1,5 +1,6 @@
 package quan.config;
 
+import org.apache.commons.io.FileUtils;
 import quan.config.item.EquipConfig;
 import quan.config.item.ItemConfig;
 import quan.config.item.WeaponConfig;
@@ -11,8 +12,12 @@ import quan.definition.Language;
 import quan.definition.parser.CSVDefinitionParser;
 import quan.definition.parser.ExcelDefinitionParser;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -22,25 +27,27 @@ public class ConfigTest {
 
     public static void main(String[] args) {
         long startTime = System.currentTimeMillis();
-
-        int configLoaderType = args.length == 0 ? 0 : Integer.parseInt(args[0]);
-
-        ConfigLoader configLoader;
+        int configLoaderType = args.length == 0 ? 1 : Integer.parseInt(args[0]);
+        ConfigLoader configLoader = null;
 
         switch (configLoaderType) {
-            case 1:
-                configLoader = jsonConfigLoader();
-                break;
             case 2:
                 configLoader = excelDefinitionConfigLoader();
                 break;
             case 3:
                 configLoader = csvDefinitionConfigLoader();
                 break;
-            default:
+            case 4:
+                configLoader = jsonConfigLoader();
+                break;
+            case 1:
                 configLoader = xmlDefinitionConfigLoader();
         }
 
+        if (configLoader == null) {
+            System.err.println("参数错误:" + Arrays.asList(args));
+            return;
+        }
 
         configLoader.registerListener(reload -> System.err.println("配置重加载监听器1,reload:" + reload));
         configLoader.registerListener(ItemConfig.class, reload -> System.err.println("配置重加载监听器2,reload:" + reload));
@@ -60,11 +67,9 @@ public class ConfigTest {
 
 
     private static ConfigLoader xmlDefinitionConfigLoader() {
-        List<String> definitionPaths = new ArrayList<>();
-        definitionPaths.add("quan-config\\definition-xml");
-
         TableType tableType = TableType.xlsx;
-        String tablePath = "quan-config\\excel";
+        String tablePath = "quan-config\\config1\\xlsx";
+        List<String> definitionPaths = Collections.singletonList("quan-config\\config1");
 
         DefinitionConfigLoader configLoader = new DefinitionConfigLoader(tablePath);
         configLoader.useXmlDefinition(definitionPaths, "quan.config");
@@ -75,11 +80,9 @@ public class ConfigTest {
     }
 
     private static ConfigLoader excelDefinitionConfigLoader() {
-        List<String> definitionPaths = new ArrayList<>();
-        definitionPaths.add("quan-config\\definition-table");
-
         TableType tableType = TableType.xlsx;
-        String tablePath = "quan-config\\definition-table";
+        String tablePath = "quan-config\\config2";
+        List<String> definitionPaths = Collections.singletonList("quan-config\\config2");
 
         DefinitionConfigLoader configLoader = new DefinitionConfigLoader(tablePath);
 
@@ -93,11 +96,9 @@ public class ConfigTest {
     }
 
     private static ConfigLoader csvDefinitionConfigLoader() {
-        List<String> definitionPaths = new ArrayList<>();
-        definitionPaths.add("quan-config\\definition-table");
-
         TableType tableType = TableType.csv;
-        String tablePath = "quan-config\\definition-table";
+        String tablePath = "quan-config\\config2";
+        List<String> definitionPaths = Collections.singletonList("quan-config\\config2");
 
         DefinitionConfigLoader configLoader = new DefinitionConfigLoader(tablePath);
 
@@ -143,7 +144,18 @@ public class ConfigTest {
         System.err.println("writeJson()=============");
         long startTime = System.currentTimeMillis();
 
-        configLoader1.writeJson("quan-config\\json", Language.cs);
+        String jsonPath = "quan-config\\json";
+        File pathFile = new File(jsonPath);
+
+        if (pathFile.exists()) {
+            try {
+                FileUtils.deleteDirectory(pathFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        configLoader1.writeJson(jsonPath, Language.java);
 
         System.err.println("writeJson()耗时:" + (System.currentTimeMillis() - startTime) / 1000D + "s");
         System.err.println();

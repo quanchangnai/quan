@@ -207,34 +207,11 @@ public abstract class ConfigGenerator extends Generator {
     protected void prepareConstant(ConstantDefinition constantDefinition) {
         prepareField(constantDefinition.getValueField());
         if (configLoader != null) {
-            constantDefinition.setVersion2(constantDefinition.getVersion() + ":" + configLoader.getConfigVersion(constantDefinition.getOwnerDefinition(), false));
+            constantDefinition.updateVersion(configLoader.getConfigVersion(constantDefinition.getOwnerDefinition(), false));
             if (checkChange(constantDefinition)) {
                 List<JSONObject> configJsons = configLoader.loadJsons(constantDefinition.getOwnerDefinition(), false);
                 constantDefinition.setConfigs(configJsons);
             }
-        }
-    }
-
-
-    @Override
-    protected boolean isChange(ClassDefinition classDefinition) {
-        if (classDefinition instanceof ConstantDefinition) {
-            String fullName = classDefinition.getFullName(language());
-            String version = ((ConstantDefinition) classDefinition).getVersion2();
-            return !version.equals(oldRecords.get(fullName));
-        }
-        return super.isChange(classDefinition);
-    }
-
-    @Override
-    public void putRecord(ClassDefinition classDefinition) {
-        if (classDefinition instanceof ConstantDefinition) {
-            String fullName = classDefinition.getFullName(language());
-            String version = ((ConstantDefinition) classDefinition).getVersion2();
-            oldRecords.remove(fullName);
-            newRecords.put(fullName, version);
-        } else {
-            super.putRecord(classDefinition);
         }
     }
 

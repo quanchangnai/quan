@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <package cs-name="Common">
 
+    <!--配置的定义都在xml中，excel或csv表格中只有数据-->
+
     <config name="ConstantConfig" table="常量">
         <field name="key" type="string" column="常量Key" index="u"/>
         <field name="itemId" type="int" column="道具ID" ref="item.ItemConfig.id"/>

@@ -34,6 +34,11 @@ namespace Test.Config
         public readonly CardType type;
 
         /// <summary>
+        /// 价格
+        /// </summary>
+        public readonly int price;
+
+        /// <summary>
         /// List
         /// </summary>
         public readonly IList<int> list;
@@ -62,6 +67,7 @@ namespace Test.Config
             key = json["key"]?.Value<string>() ?? "";
             name = json["name"]?.Value<string>() ?? "";
             type = (CardType) (json["type"]?.Value<int>() ?? default);
+            price = json["price"]?.Value<int>() ?? default;
 
             var list1 = json["list"]?.Value<JArray>();
             var list2 = ImmutableList<int>.Empty;
@@ -112,6 +118,7 @@ namespace Test.Config
                    ",key='" + key + '\'' +
                    ",name='" + name + '\'' +
                    ",type=" + type.ToString2() +
+                   ",price=" + price.ToString2() +
                    ",list=" + list.ToString2() +
                    ",set=" + set.ToString2() +
                    ",map=" + map.ToString2() +

@@ -1,7 +1,0 @@
-id,key,name,type,list,set,map,effectiveTime
-int,string,string,CardType;index=normal,list:int,set:int,map:int:int,datetime
-,,,,,,,
-ID,常量Key,名字,类型,List,Set,Map,生效时间
-1,card1,卡片1,1,11,554;465;655,122*2;322*22;455*33,2019/8/5 12:33
-2,card2,卡片2,1,56;22,244,32*11;34:19,
-3,,卡片3,2,44;223,22;22;456,43*45,
