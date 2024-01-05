@@ -52,7 +52,7 @@
 
     <config name="WeaponConfig" parent="EquipConfig" table="道具/武器">
         <field name="w1" type="int" column="字段1" min="1" max="20"/>
-        <field name="w2" type="int" column="字段2" validation=" #this gt 500"/>
+        <field name="w2" type="int" column="字段2" validation=" #this gt 5 and #this lt #row.w1"/>
         <field name="rewardList" type="list:Reward" column="奖励List"/>
         <field name="rewardSet" type="set:Reward" column="奖励Set"/>
         <field name="rewardMap" type="map:int:Reward" column="奖励Map"/>

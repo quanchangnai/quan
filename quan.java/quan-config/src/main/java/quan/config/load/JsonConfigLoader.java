@@ -43,13 +43,9 @@ public class JsonConfigLoader extends ConfigLoader {
     @Override
     protected void doLoadAll() {
         initConfigDescendants();
+
         for (String configFullName : configDescendants.keySet()) {
             load(configFullName, configDescendants.get(configFullName), true);
-        }
-
-        //格式错误
-        for (ConfigReader reader : readers.values()) {
-            validatedErrors.addAll(reader.getValidatedErrors());
         }
     }
 
@@ -124,7 +120,7 @@ public class JsonConfigLoader extends ConfigLoader {
 
         Set<Class<? extends Config>> reloadedConfigs = reloadReaders.values().stream().map(r -> r.getPrototype().getClass()).collect(Collectors.toSet());
 
-        callListeners(reloadedConfigs, true);
+        invokeListeners(reloadedConfigs, true);
 
         if (!validatedErrors.isEmpty()) {
             throw new ValidatedException(validatedErrors);

@@ -316,14 +316,7 @@ public class XmlDefinitionParser extends DefinitionParser {
                 }
 
                 if (childName.equals("validations")) {
-                    String validations = childElement.getText();
-                    if (!StringUtils.isBlank(validations)) {
-                        for (String validation : validations.trim().split("[\r\n;；]")) {
-                            if (!StringUtils.isBlank(validation)) {
-                                configDefinition.getValidations().add(validation.trim());
-                            }
-                        }
-                    }
+                    parseValidations(configDefinition, childElement);
                     continue;
                 }
             }
@@ -334,17 +327,23 @@ public class XmlDefinitionParser extends DefinitionParser {
                 continue;
             }
 
-            if (category == Category.config && classDefinition instanceof BeanDefinition && childName.equals("bean")) {
-                BeanDefinition beanDefinition = (BeanDefinition) parseClassDefinition(classDefinition.getDefinitionFile(), childElement, index);
-                beanDefinition.setParentName(classDefinition.getName());
-                parsedClasses.add(beanDefinition);
+            if (category == Category.config && classDefinition instanceof BeanDefinition) {
+                if (childName.equals("bean")) {
+                    BeanDefinition beanDefinition = (BeanDefinition) parseClassDefinition(classDefinition.getDefinitionFile(), childElement, index);
+                    beanDefinition.setParentName(classDefinition.getName());
+                    parsedClasses.add(beanDefinition);
 
-                beanDefinition.setPackageName(classDefinition.getPackageName());
-                beanDefinition.getPackageNames().putAll(classDefinition.getPackageNames());
+                    beanDefinition.setPackageName(classDefinition.getPackageName());
+                    beanDefinition.getPackageNames().putAll(classDefinition.getPackageNames());
 
-                parseClassChildren(beanDefinition, childElement);
+                    parseClassChildren(beanDefinition, childElement);
+                    continue;
+                }
 
-                continue;
+                if (childName.equals("validations")) {
+                    parseValidations((BeanDefinition) classDefinition, childElement);
+                    continue;
+                }
             }
 
             addValidatedError("定义文件[" + classDefinition.getDefinitionFile() + "]中的元素[" + classElement.getName() + "]不支持定义子元素:" + childName);
@@ -386,20 +385,23 @@ public class XmlDefinitionParser extends DefinitionParser {
         } else if (category == Category.data) {
             illegalAttributes.addAll(Arrays.asList("type", "ignore"));
         } else if (category == Category.config) {
-            if (classDefinition instanceof ConfigDefinition) {
+            if (classDefinition instanceof BeanDefinition) {
+                illegalAttributes.addAll(Arrays.asList("type", "ref", "optional", "validation"));
+
+                if (classDefinition instanceof ConfigDefinition) {
+                    illegalAttributes.addAll(Arrays.asList("lang", "column"));
+                    if (type != null && !Constants.COLLECTION_TYPES.contains(type) && !Constants.TIME_TYPES.contains(type)) {
+                        //只支持原生类型和枚举类型，但是在这里没法判断是不是枚举类型
+                        illegalAttributes.add("index");
+                    }
+                }
+
                 String validation = fieldElement.attributeValue("validation");
                 if (!StringUtils.isBlank(validation)) {
                     fieldDefinition.setValidation(validation);
                 }
-
-                illegalAttributes.addAll(Arrays.asList("type", "ref", "lang", "optional", "column", "validation"));
-                if (type != null && !Constants.COLLECTION_TYPES.contains(type) && !Constants.TIME_TYPES.contains(type)) {
-                    //只支持原生类型和枚举类型，但是在这里没法判断是不是枚举类型
-                    illegalAttributes.add("index");
-                }
-            } else if (classDefinition instanceof BeanDefinition) {
-                illegalAttributes.addAll(Arrays.asList("type", "ref", "optional"));
             }
+
             if (type != null && Constants.COLLECTION_TYPES.contains(type)) {
                 illegalAttributes.add("delimiter");
             }
@@ -451,6 +453,19 @@ public class XmlDefinitionParser extends DefinitionParser {
         parsedClasses.add(constantDefinition);
 
         constantDefinition.setOwnerDefinition(configDefinition);
+    }
+
+    protected void parseValidations(BeanDefinition beanDefinition, Element childElement) {
+        String validations = childElement.getText();
+        if (StringUtils.isBlank(validations)) {
+            return;
+        }
+
+        for (String validation : validations.trim().split("[\r\n;；]")) {
+            if (!StringUtils.isBlank(validation)) {
+                beanDefinition.getValidations().add(validation.trim());
+            }
+        }
     }
 
 }

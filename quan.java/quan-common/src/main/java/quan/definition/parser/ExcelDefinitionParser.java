@@ -64,11 +64,11 @@ public class ExcelDefinitionParser extends TableDefinitionParser {
             int c = 0;
 
             for (Cell cell : row0) {
-                String fieldName = dataFormatter.formatCellValue(cell).trim();
+                String fieldName = dataFormatter.formatCellValue(cell);
                 Row row1 = sheet.getRow(1);
                 Row row2 = sheet.getRow(2);
-                String constraints = row1 == null ? null : dataFormatter.formatCellValue(row1.getCell(c)).trim();
-                String comment = row2 == null ? null : dataFormatter.formatCellValue(row2.getCell(c)).trim();
+                String constraints = row1 == null ? null : dataFormatter.formatCellValue(row1.getCell(c));
+                String comment = row2 == null ? null : dataFormatter.formatCellValue(row2.getCell(c));
                 addField(configDefinition, fieldName, constraints, comment);
                 c++;
             }

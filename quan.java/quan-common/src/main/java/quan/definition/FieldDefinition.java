@@ -63,7 +63,7 @@ public class FieldDefinition extends Definition implements Cloneable {
     ///配置、数据:索引类型
     private String index;
 
-    //配置:对应表格中的列
+    //配置:对应表格中的列名
     private String column;
 
     //配置:集合类型字段的分隔符

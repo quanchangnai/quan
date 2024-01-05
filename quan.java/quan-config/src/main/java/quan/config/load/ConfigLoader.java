@@ -128,23 +128,26 @@ public abstract class ConfigLoader {
         doLoadAll();
 
         if (supportValidate()) {
-            List<String> errors = new ArrayList<>();
+            for (ConfigReader reader : readers.values()) {
+                validatedErrors.addAll(reader.getValidatedErrors());
+            }
+
             for (ConfigValidator validator : validators) {
                 try {
+                    List<String> errors = new ArrayList<>();
                     validator.validateConfig(errors);
                     validatedErrors.addAll(errors);
-                    errors.clear();
                 } catch (ValidatedException e) {
                     validatedErrors.addAll(e.getErrors());
                 } catch (Exception e) {
                     String error = String.format("配置校验报错:%s", e.getMessage());
-                    validatedErrors.add(error);
                     logger.error(error, e);
+                    validatedErrors.add(error);
                 }
             }
         }
 
-        callListeners(null, reload);
+        invokeListeners(null, reload);
 
         if (!validatedErrors.isEmpty()) {
             throw new ValidatedException(validatedErrors);
@@ -170,6 +173,7 @@ public abstract class ConfigLoader {
         }
 
         String configName = configFullName.substring(configFullName.lastIndexOf(".") + 1);
+
         List<Config> configs = new ArrayList<>();
         for (String table : configTables) {
             ConfigReader configReader = getReader(table);
@@ -284,7 +288,7 @@ public abstract class ConfigLoader {
     /**
      * 调用配置加载监听器
      */
-    protected void callListeners(Set<Class<? extends Config>> configs, boolean reload) {
+    protected void invokeListeners(Set<Class<? extends Config>> configs, boolean reload) {
         Set<ConfigLoadListener> targetListeners = new HashSet<>();
 
         if (configs == null) {

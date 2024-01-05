@@ -13,6 +13,6 @@ public interface ConfigValidator {
      * @param errors 校验出来的错误信息可以加到这里
      * @throws ValidatedException 校验出来的错误信息也可以通过异常抛出
      */
-    void validateConfig(List<String> errors);
+    void validateConfig(final List<String> errors);
 
 }

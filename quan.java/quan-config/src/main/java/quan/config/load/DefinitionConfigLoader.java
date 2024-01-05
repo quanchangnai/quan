@@ -37,18 +37,18 @@ public class DefinitionConfigLoader extends ConfigLoader {
         tableType = TableType.xlsx;
     }
 
-    private static ThreadLocal<JSONObject> localConfigJson = new ThreadLocal<>();
+    private static ThreadLocal<JSONObject> ognlJson = new ThreadLocal<>();
 
-    private static ThreadLocal<ConfigDefinition> localConfigDefinition = new ThreadLocal<>();
+    private static ThreadLocal<BeanDefinition> ognlDefinition = new ThreadLocal<>();
 
 
     static {
         OgnlRuntime.setPropertyAccessor(JSONObject.class, new MapPropertyAccessor() {
             @Override
             public Object getProperty(OgnlContext context, Object target, Object name) throws OgnlException {
-                ConfigDefinition configDefinition = localConfigDefinition.get();
-                if (localConfigJson.get() == target && configDefinition != null && configDefinition.getField(name.toString()) == null) {
-                    throw new OgnlException(String.format("%s不存在字段:%s", configDefinition.getValidatedName(), name));
+                BeanDefinition beanDefinition = ognlDefinition.get();
+                if (ognlJson.get() == target && beanDefinition != null && beanDefinition.getField(name.toString()) == null) {
+                    throw new OgnlException(String.format("%s不存在字段:%s", beanDefinition.getValidatedName(), name));
                 } else {
                     return super.getProperty(context, target, name);
                 }
@@ -144,26 +144,20 @@ public class DefinitionConfigLoader extends ConfigLoader {
     protected void doLoadAll() {
         parseDefinitions();
 
-        Set<ConfigDefinition> configDefinitions = new HashSet<>(parser.getTableConfigs().values());
-        //配置对应的其已索引JSON数据
+        //配置对应的已索引JSON数据
         Map<ConfigDefinition, Map<IndexDefinition, Map>> allConfigIndexedJsons = new HashMap<>();
 
-        for (ConfigDefinition configDefinition : configDefinitions) {
-            //索引校验
+        for (ConfigDefinition configDefinition : parser.getTableConfigs().values()) {
             if (supportValidate()) {
                 allConfigIndexedJsons.put(configDefinition, validateIndex(configDefinition));
                 validateByOgnl(configDefinition);
             }
-            //needLoad():加载配置
-            load(configDefinition.getFullName(Language.java), getConfigTables(configDefinition), false);
+            if (supportLoad()) {
+                load(configDefinition.getFullName(Language.java), getConfigTables(configDefinition), false);
+            }
         }
 
         if (supportValidate()) {
-            //格式错误
-            for (ConfigReader reader : readers.values()) {
-                validatedErrors.addAll(reader.getValidatedErrors());
-            }
-            //引用校验，依赖索引结果
             for (ConfigDefinition configDefinition : allConfigIndexedJsons.keySet()) {
                 validateRef(configDefinition, allConfigIndexedJsons);
             }
@@ -289,6 +283,142 @@ public class DefinitionConfigLoader extends ConfigLoader {
         return DigestUtils.md5Hex(sb.toString());
     }
 
+    @Override
+    protected void checkReload() {
+        super.checkReload();
+        Objects.requireNonNull(parser, "配置定义解析器不能为空");
+    }
+
+    @Override
+    public Set<Class<? extends Config>> reloadByConfigName(Collection<String> configNames) {
+        checkReload();
+        validatedErrors.clear();
+
+        Map<String, ConfigDefinition> configDefinitions = new HashMap<>();
+        for (ConfigDefinition configDefinition : parser.getTableConfigs().values()) {
+            String configName = configDefinition.getPackageName(Language.java) + "." + configDefinition.getName();
+            configDefinitions.put(configName, configDefinition);
+        }
+
+        Set<String> readerNames = new LinkedHashSet<>();
+        for (String configName : configNames) {
+            ConfigDefinition configDefinition = configDefinitions.get(configName);
+            if (configDefinition == null) {
+                validatedErrors.add(String.format("重加载[%s]失败，不存在该配置", configName));
+                continue;
+            }
+            readerNames.addAll(getConfigTables(configDefinition));
+        }
+
+        return reloadByReaderName(readerNames);
+    }
+
+    private Set<Class<? extends Config>> reloadByReaderName(Collection<String> readerNames) {
+        checkReload();
+        validatedErrors.clear();
+
+        Set<ConfigDefinition> needReloadConfigs = new LinkedHashSet<>();
+        Set<ConfigReader> reloadReaders = new LinkedHashSet<>();
+
+        for (String readerName : readerNames) {
+            ConfigReader configReader = readers.get(readerName);
+            if (configReader == null) {
+                validatedErrors.add(String.format("重加载[%s]失败，对应配置从未被加载", readerName));
+                continue;
+            }
+            configReader.clear();
+            reloadReaders.add(configReader);
+
+            ConfigDefinition configDefinition = getConfigByTable(readerName);
+            while (configDefinition != null) {
+                needReloadConfigs.add(configDefinition);
+                configDefinition = configDefinition.getParent();
+            }
+        }
+
+        for (ConfigDefinition configDefinition : needReloadConfigs) {
+            load(configDefinition.getFullName(Language.java), getConfigTables(configDefinition), true);
+        }
+
+        for (ConfigReader reloadReader : reloadReaders) {
+            List<String> errors = reloadReader.getValidatedErrors();
+            if (supportValidate()) {
+                this.validatedErrors.addAll(errors);
+            }
+        }
+
+        Set<Class<? extends Config>> reloadedConfigs = reloadReaders.stream().map(r -> r.getPrototype().getClass()).collect(Collectors.toSet());
+
+        invokeListeners(reloadedConfigs, true);
+
+        if (!validatedErrors.isEmpty()) {
+            throw new ValidatedException(validatedErrors);
+        }
+
+        return reloadedConfigs;
+    }
+
+    /**
+     * 通过表名(包含目录)重加载
+     */
+    public void reloadByTableName(Collection<String> tableNames) {
+        checkReload();
+
+        Set<String> readerNames = new LinkedHashSet<>();
+
+        for (String tableName : tableNames) {
+            ConfigDefinition configDefinition = parser.getTableConfigs().get(tableName);
+            if (configDefinition == null) {
+                validatedErrors.add(String.format("重加载[%s]失败，不存在该配置", tableName));
+                continue;
+            }
+            if (tableType == TableType.json) {
+                readerNames.add(configDefinition.getFullName(Language.java));
+            } else {
+                readerNames.add(tableName);
+            }
+        }
+
+        reloadByReaderName(readerNames);
+    }
+
+    /**
+     * @see #reloadByTableName(Collection)
+     */
+    public void reloadByTableName(String... originalNames) {
+        reloadByTableName(Arrays.asList(originalNames));
+    }
+
+
+    @Override
+    protected ConfigReader createReader(String table) {
+        File tableFile = new File(tablePath, table + "." + tableType);
+
+        ConfigReader configReader = null;
+        ConfigDefinition configDefinition = getConfigByTable(table);
+        switch (tableType) {
+            case csv:
+                configReader = new CSVConfigReader(tableFile, configDefinition);
+                break;
+            case xls:
+            case xlsx:
+                configReader = new ExcelConfigReader(tableFile, configDefinition);
+                break;
+            case json: {
+                configReader = new JsonConfigReader(tableFile, configDefinition.getFullName(Language.java));
+                break;
+            }
+        }
+
+        configReader.setTable(table + "." + tableType);
+        configReader.setTableBodyStartRow(tableBodyStartRow);
+
+        return configReader;
+    }
+
+    /**
+     * 校验索引
+     */
     private Map<IndexDefinition, Map> validateIndex(ConfigDefinition configDefinition) {
         //索引对应的配置JSON
         Map<IndexDefinition, Map> configIndexedJsons = new HashMap<>();
@@ -299,7 +429,6 @@ public class DefinitionConfigLoader extends ConfigLoader {
             List<JSONObject> tableJsons = getReader(table).getJsons();
             for (JSONObject json : tableJsons) {
                 jsonTables.put(json, table + "." + tableType);
-                //校验索引
                 for (IndexDefinition indexDefinition : configDefinition.getIndexes()) {
                     Map indexedJsons = configIndexedJsons.computeIfAbsent(indexDefinition, k -> new HashMap());
                     validateTableIndex(indexDefinition, indexedJsons, jsonTables, json);
@@ -310,89 +439,7 @@ public class DefinitionConfigLoader extends ConfigLoader {
         return configIndexedJsons;
     }
 
-    private void validateByOgnl(ConfigDefinition configDefinition) {
-        if (!configDefinition.isHasValidations()) {
-            return;
-        }
-
-        try {
-            localConfigDefinition.set(configDefinition);
-
-            for (String table : getConfigTables(configDefinition)) {
-                ConfigReader reader = getReader(table);
-                List<JSONObject> tableJsons = reader.getJsons();
-
-                for (int i = 0; i < tableJsons.size(); i++) {
-                    int row = reader.getTableBodyStartRow() + i;
-                    JSONObject json = tableJsons.get(i);
-                    localConfigJson.set(json);
-
-                    for (Object configValidation : configDefinition.getValidations()) {
-                        try {
-                            Object result = Ognl.getValue(configValidation, createOgnlContext(json), json);
-                            if (result != null && !(Boolean) result) {
-                                validatedErrors.add(String.format("配置[%s]的第%s行数据不符合校验规则:%s", table, row, configValidation));
-                            }
-                        } catch (Exception e) {
-                            String reason = getOgnlExceptionReason(e);
-                            validatedErrors.add(String.format("配置[%s]的第%s行数据执行校验表达式[%s]时出错:%s", table, row, configValidation, reason));
-                        }
-                    }
-
-                    for (FieldDefinition fieldDefinition : configDefinition.getFields()) {
-                        Object fieldValidation = fieldDefinition.getValidation();
-                        if (fieldValidation == null) {
-                            continue;
-                        }
-
-                        String column = fieldDefinition.getColumn();
-                        Object fieldValue = json.get(fieldDefinition.getName());
-
-                        try {
-                            if (fieldValue == null) {
-                                fieldValue = fieldDefinition.getDefaultValue();
-                            }
-                            Object result = Ognl.getValue(fieldValidation, createOgnlContext(fieldValue), fieldValue);
-                            if (result != null && !(Boolean) result) {
-                                validatedErrors.add(String.format("配置[%s]的第%s行[%s]数据不符合校验规则: %s", table, row, column, fieldValidation));
-                            }
-                        } catch (Exception e) {
-                            String reason = getOgnlExceptionReason(e);
-                            validatedErrors.add(String.format("配置[%s]的第%s行[%s]数据执行校验表达式[%s]时出错: %s", table, row, column, fieldValidation, reason));
-                        }
-                    }
-                }
-            }
-        } finally {
-            localConfigDefinition.remove();
-            localConfigJson.remove();
-        }
-    }
-
-    private static OgnlContext createOgnlContext(Object root) {
-        return Ognl.createDefaultContext(root, null, new DefaultTypeConverter() {
-            @Override
-            public Object convertValue(OgnlContext context, Object value, Class<?> toType) {
-                if (Date.class.isAssignableFrom(toType) && value instanceof String) {
-                    return ConfigConverter.convertTime(value.toString());
-                } else {
-                    return super.convertValue(context, value, toType);
-                }
-            }
-        });
-    }
-
-    private static String getOgnlExceptionReason(Exception e) {
-        if (e instanceof OgnlException && !(e instanceof NoSuchPropertyException)) {
-            return e.getMessage();
-        } else {
-            return e.toString();
-        }
-    }
-
-
-    private void validateTableIndex(IndexDefinition indexDefinition, Map indexedJsons, Map<JSONObject, String> jsonTables,
-                                    JSONObject json) {
+    private void validateTableIndex(IndexDefinition indexDefinition, Map indexedJsons, Map<JSONObject, String> jsonTables, JSONObject json) {
         String table = jsonTables.get(json);
 
         if (indexDefinition.isUnique() && indexDefinition.getFields().size() == 1) {
@@ -425,8 +472,8 @@ public class DefinitionConfigLoader extends ConfigLoader {
                 if (!jsonTables.get(oldJson).equals(table)) {
                     repeatedTables += "," + jsonTables.get(oldJson);
                 }
-                validatedErrors.add(String.format("配置[%s]有重复数据[(%s,%s) = (%s,%s)]", repeatedTables, field1.getColumn(), field2.getColumn(),
-                        json.get(field1.getName()), json.get(field2.getName())));
+                validatedErrors.add(String.format("配置[%s]有重复数据[(%s,%s) = (%s,%s)]", repeatedTables, field1.getColumn(),
+                        field2.getColumn(), json.get(field1.getName()), json.get(field2.getName())));
             }
         }
 
@@ -440,33 +487,154 @@ public class DefinitionConfigLoader extends ConfigLoader {
 
             JSONObject oldJson = (JSONObject) ((Map) ((Map) indexedJsons.computeIfAbsent(json.get(field1.getName()), k -> new HashMap<>()))
                     .computeIfAbsent(json.get(field2.getName()), k -> new HashMap<>())).put(json.get(field3.getName()), json);
+
             if (oldJson != null) {
                 String repeatedTables = table;
                 if (!jsonTables.get(oldJson).equals(table)) {
                     repeatedTables += "," + jsonTables.get(oldJson);
                 }
-                validatedErrors.add(String
-                        .format("配置[%s]有重复数据[(%s,%s,%s) = (%s,%s,%s)]", repeatedTables, field1.getColumn(), field2.getColumn(),
-                                field3.getColumn(), json.get(field1.getName()), json.get(field2.getName()), json.get(field3.getName())));
+                validatedErrors.add(String.format("配置[%s]有重复数据[(%s,%s,%s) = (%s,%s,%s)]", repeatedTables, field1.getColumn(), field2.getColumn(),
+                        field3.getColumn(), json.get(field1.getName()), json.get(field2.getName()), json.get(field3.getName())));
             }
         }
     }
 
+
+    private void validateByOgnl(ConfigDefinition configDefinition) {
+        if (!configDefinition.isHasValidations()) {
+            return;
+        }
+
+        for (String table : getConfigTables(configDefinition)) {
+            ConfigReader reader = getReader(table);
+            List<JSONObject> jsons = reader.getJsons();
+
+            for (int i = 0; i < jsons.size(); i++) {
+                int rowNum = reader.getTableBodyStartRow() + i;
+                JSONObject json = jsons.get(i);
+                validateByOgnl(configDefinition, table, rowNum, null, json, json);
+            }
+        }
+    }
+
+    private void validateByOgnl(BeanDefinition beanDefinition, String table, int rowNum, String columnName, JSONObject rowJson, JSONObject beanJson) {
+        if (!beanDefinition.isHasValidations()) {
+            return;
+        }
+
+        BeanDefinition ognlOldDefinition = ognlDefinition.get();
+        JSONObject ognlOldJson = ognlJson.get();
+        ognlDefinition.set(beanDefinition);
+        ognlJson.set(beanJson);
+
+        try {
+            String validationOwnerInfo = "";
+            if (!(beanDefinition instanceof ConfigDefinition)) {
+                validationOwnerInfo = beanDefinition.getValidatedName("的");
+            }
+
+            for (Object beanValidation : beanDefinition.getValidations()) {
+                try {
+                    Object result = Ognl.getValue(beanValidation, createOgnlContext(beanJson), beanJson);
+                    if (result != null && !(Boolean) result) {
+                        validatedErrors.add(String.format("配置[%s]的第%s行数据不符合%s校验规则:%s", table, rowNum, validationOwnerInfo, beanValidation));
+                    }
+                } catch (Throwable e) {
+                    String reason = getOgnlErrorReason(e);
+                    validatedErrors.add(String.format("配置[%s]的第%s行数据执行%s校验规则[%s]时出错:%s", table, rowNum, validationOwnerInfo, beanValidation, reason));
+                }
+            }
+
+            for (FieldDefinition fieldDefinition : beanDefinition.getFields()) {
+                if (beanDefinition instanceof ConfigDefinition) {
+                    columnName = fieldDefinition.getColumn();
+                }
+
+                Object fieldValue = beanJson.get(fieldDefinition.getName());
+                Object fieldValidation = fieldDefinition.getValidation();
+
+                if (fieldValidation != null) {
+                    if (fieldValue == null) {
+                        fieldValue = fieldDefinition.getDefaultValue();
+                    }
+
+                    if (!(beanDefinition instanceof ConfigDefinition)) {
+                        validationOwnerInfo = beanDefinition.getValidatedName() + fieldDefinition.getValidatedName("的");
+                    }
+
+                    try {
+                        OgnlContext ognlContext = createOgnlContext(fieldValue);
+                        ognlContext.put("row", rowJson);
+                        ognlContext.put("owner", beanJson);
+
+                        Object result = Ognl.getValue(fieldValidation, ognlContext, fieldValue);
+                        if (result != null && !(Boolean) result) {
+                            validatedErrors.add(String.format("配置[%s]的第%s行[%s]数据不符合%s校验规则", table, rowNum, columnName, validationOwnerInfo));
+                        }
+                    } catch (Throwable e) {
+                        String reason = getOgnlErrorReason(e);
+                        validatedErrors.add(String.format("配置[%s]的第%s行[%s]数据执行%s校验规则时出错: %s", table, rowNum, columnName, validationOwnerInfo, reason));
+                    }
+                }
+
+                if (fieldValue != null) {
+                    if (fieldDefinition.isBeanType()) {
+                        validateByOgnl(fieldDefinition.getTypeBean(), table, rowNum, columnName, rowJson, (JSONObject) fieldValue);
+                    } else if (fieldDefinition.isBeanValueType()) {
+                        Collection<Object> fieldBeans = fieldDefinition.isMapType() ? ((JSONObject) fieldValue).values() : (JSONArray) fieldValue;
+                        for (Object arrayValue : fieldBeans) {
+                            validateByOgnl(fieldDefinition.getValueTypeBean(), table, rowNum, columnName, rowJson, (JSONObject) arrayValue);
+                        }
+                    }
+                }
+            }
+        } finally {
+            ognlDefinition.set(ognlOldDefinition);
+            ognlJson.set(ognlOldJson);
+        }
+    }
+
+    private static OgnlContext createOgnlContext(Object root) {
+        return Ognl.createDefaultContext(root, null, new DefaultTypeConverter() {
+            @Override
+            public Object convertValue(OgnlContext context, Object value, Class<?> toType) {
+                if (Date.class.isAssignableFrom(toType) && value instanceof String) {
+                    return ConfigConverter.convertTime(value.toString());
+                } else if (value == null && toType == String.class) {
+                    return "";
+                } else {
+                    return super.convertValue(context, value, toType);
+                }
+            }
+        });
+    }
+
+    private static String getOgnlErrorReason(Throwable e) {
+        if (e instanceof OgnlException && !(e instanceof NoSuchPropertyException)) {
+            return e.getMessage();
+        } else {
+            return e.toString();
+        }
+    }
+
+    /**
+     * 校验引用，依赖索引结果
+     */
     private void validateRef(ConfigDefinition configDefinition, Map<ConfigDefinition, Map<IndexDefinition, Map>> allConfigIndexedJsons) {
         for (String table : getConfigTables(configDefinition)) {
             ConfigReader reader = getReader(table);
             List<JSONObject> tableJsons = reader.getJsons();
             for (int i = 0; i < tableJsons.size(); i++) {
-                String row = String.valueOf(reader.getTableBodyStartRow() + i);
+                int rowNum = reader.getTableBodyStartRow() + i;
                 JSONObject json = tableJsons.get(i);
                 for (String fieldName : json.keySet()) {
-                    FieldDefinition field = configDefinition.getField(fieldName);
-                    if (field == null) {
+                    FieldDefinition fieldDefinition = configDefinition.getField(fieldName);
+                    if (fieldDefinition == null) {
                         continue;
                     }
                     Object fieldValue = json.get(fieldName);
-                    Triple position = Triple.of(table + "." + tableType, row, field.getColumn());
-                    validateFieldRef(position, configDefinition, field, fieldValue, allConfigIndexedJsons);
+                    Triple position = Triple.of(table + "." + tableType, rowNum, fieldDefinition.getColumn());
+                    validateFieldRef(position, configDefinition, fieldDefinition, fieldValue, allConfigIndexedJsons);
                 }
             }
         }
@@ -546,139 +714,6 @@ public class DefinitionConfigLoader extends ConfigLoader {
                 validateFieldRef(position, bean, field, fieldValue, allConfigIndexedJsons);
             }
         }
-    }
-
-    @Override
-    protected void checkReload() {
-        super.checkReload();
-        Objects.requireNonNull(parser, "配置定义解析器不能为空");
-    }
-
-    @Override
-    public Set<Class<? extends Config>> reloadByConfigName(Collection<String> configNames) {
-        checkReload();
-        validatedErrors.clear();
-
-        Map<String, ConfigDefinition> configDefinitions = new HashMap<>();
-        for (ConfigDefinition configDefinition : parser.getTableConfigs().values()) {
-            String configName = configDefinition.getPackageName(Language.java) + "." + configDefinition.getName();
-            configDefinitions.put(configName, configDefinition);
-        }
-
-        Set<String> readerNames = new LinkedHashSet<>();
-        for (String configName : configNames) {
-            ConfigDefinition configDefinition = configDefinitions.get(configName);
-            if (configDefinition == null) {
-                validatedErrors.add(String.format("重加载[%s]失败，不存在该配置", configName));
-                continue;
-            }
-            readerNames.addAll(getConfigTables(configDefinition));
-        }
-
-        return reloadByReaderName(readerNames);
-    }
-
-    private Set<Class<? extends Config>> reloadByReaderName(Collection<String> readerNames) {
-        checkReload();
-        validatedErrors.clear();
-
-        Set<ConfigDefinition> needReloadConfigs = new LinkedHashSet<>();
-        Set<ConfigReader> reloadReaders = new LinkedHashSet<>();
-
-        for (String readerName : readerNames) {
-            ConfigReader configReader = readers.get(readerName);
-            if (configReader == null) {
-                validatedErrors.add(String.format("重加载[%s]失败，对应配置从未被加载", readerName));
-                continue;
-            }
-            configReader.clear();
-            reloadReaders.add(configReader);
-
-            ConfigDefinition configDefinition = getConfigByTable(readerName);
-            while (configDefinition != null) {
-                needReloadConfigs.add(configDefinition);
-                configDefinition = configDefinition.getParent();
-            }
-        }
-
-        for (ConfigDefinition configDefinition : needReloadConfigs) {
-            load(configDefinition.getFullName(Language.java), getConfigTables(configDefinition), true);
-        }
-
-        for (ConfigReader reloadReader : reloadReaders) {
-            List<String> errors = reloadReader.getValidatedErrors();
-            if (supportValidate()) {
-                this.validatedErrors.addAll(errors);
-            }
-        }
-
-        Set<Class<? extends Config>> reloadedConfigs = reloadReaders.stream().map(r -> r.getPrototype().getClass()).collect(Collectors.toSet());
-
-        callListeners(reloadedConfigs, true);
-
-        if (!validatedErrors.isEmpty()) {
-            throw new ValidatedException(validatedErrors);
-        }
-
-        return reloadedConfigs;
-    }
-
-    /**
-     * 通过表名(包含目录)重加载
-     */
-    public void reloadByTableName(Collection<String> tableNames) {
-        checkReload();
-
-        Set<String> readerNames = new LinkedHashSet<>();
-
-        for (String tableName : tableNames) {
-            ConfigDefinition configDefinition = parser.getTableConfigs().get(tableName);
-            if (configDefinition == null) {
-                validatedErrors.add(String.format("重加载[%s]失败，不存在该配置", tableName));
-                continue;
-            }
-            if (tableType == TableType.json) {
-                readerNames.add(configDefinition.getFullName(Language.java));
-            } else {
-                readerNames.add(tableName);
-            }
-        }
-
-        reloadByReaderName(readerNames);
-    }
-
-    /**
-     * @see #reloadByTableName(Collection)
-     */
-    public void reloadByTableName(String... originalNames) {
-        reloadByTableName(Arrays.asList(originalNames));
-    }
-
-
-    @Override
-    protected ConfigReader createReader(String table) {
-        File tableFile = new File(tablePath, table + "." + tableType);
-
-        ConfigReader configReader = null;
-        ConfigDefinition configDefinition = getConfigByTable(table);
-        switch (tableType) {
-            case csv:
-                configReader = new CSVConfigReader(tableFile, configDefinition);
-                break;
-            case xls:
-            case xlsx:
-                configReader = new ExcelConfigReader(tableFile, configDefinition);
-                break;
-            case json: {
-                configReader = new JsonConfigReader(tableFile, configDefinition.getFullName(Language.java));
-                break;
-            }
-        }
-
-        configReader.setTable(table + "." + tableType);
-        configReader.setTableBodyStartRow(tableBodyStartRow);
-
-        return configReader;
     }
 
 }

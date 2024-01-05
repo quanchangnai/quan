@@ -1,5 +1,7 @@
 package quan.definition;
 
+import ognl.Ognl;
+import ognl.OgnlException;
 import org.apache.commons.lang3.StringUtils;
 import quan.definition.DependentSource.DependentType;
 import quan.definition.config.ConfigDefinition;
@@ -33,11 +35,16 @@ public class BeanDefinition extends ClassDefinition {
 
     protected List<FieldDefinition> selfFields = new ArrayList<>();
 
-    //配置Bean的字段分隔符
+    //消息：字段ID，用来标记和识别字段，不能识别的字段丢弃掉
+    private final Set<Integer> fieldIds = new HashSet<>();
+
+    //配置：字段分隔符
     private String delimiter;
 
-    //消息的字段ID，用来标记和识别字段，不能识别的字段丢弃掉
-    private final Set<Integer> fieldIds = new HashSet<>();
+    //配置：校验规则(OGNL表达式)
+    private Set<Object> validations = new LinkedHashSet<>();
+
+    private Boolean hasValidation;
 
     public BeanDefinition() {
     }
@@ -134,6 +141,34 @@ public class BeanDefinition extends ClassDefinition {
         return dependentChildren;
     }
 
+
+    public Set<Object> getValidations() {
+        return validations;
+    }
+
+    public boolean isHasValidations() {
+        if (hasValidation != null) {
+            return hasValidation;
+        }
+
+        hasValidation = false;
+
+        if (!validations.isEmpty()) {
+            hasValidation = true;
+        } else {
+            for (FieldDefinition fieldDefinition : getFields()) {
+                if (fieldDefinition.getValidation() != null
+                        || fieldDefinition.isBeanType() && (fieldDefinition.getTypeBean()).isHasValidations()
+                        || fieldDefinition.isBeanValueType() && (fieldDefinition.getValueTypeBean()).isHasValidations()) {
+                    hasValidation = true;
+                    break;
+                }
+            }
+        }
+
+        return hasValidation;
+    }
+
     @Override
     public void validate1() {
         super.validate1();
@@ -141,6 +176,8 @@ public class BeanDefinition extends ClassDefinition {
         if (!fieldIds.isEmpty() && fieldIds.size() != fields.size()) {
             addValidatedError(getValidatedName() + "的所有字段必须要同时定义ID或者同时不定义ID");
         }
+
+        parseValidationExpressions();
     }
 
     @Override
@@ -150,6 +187,7 @@ public class BeanDefinition extends ClassDefinition {
         for (FieldDefinition field : fields) {
             validateFieldLanguage(field);
             validateFieldNameDuplicate(field);
+            parseFieldValidationExpression(field);
         }
     }
 
@@ -162,6 +200,32 @@ public class BeanDefinition extends ClassDefinition {
             validateFieldRef(field);
             validateFieldRefLanguage(field);
         }
+    }
+
+    /**
+     * 解析校验表达式
+     */
+    protected void parseValidationExpressions() {
+        if (this.category != Category.config) {
+            if (!validations.isEmpty()) {
+                addValidatedError(getValidatedName() + "不支持校验表达式");
+            }
+            return;
+        }
+
+        List<Object> expressions = new ArrayList<>();
+
+        for (Object validation : validations) {
+            try {
+                String validationStr = (String) validation;
+                expressions.add(Ognl.parseExpression(validationStr));
+            } catch (OgnlException e) {
+                addValidatedError(getValidatedName() + "的校验表达式[" + validation + "]错误:" + e.getMessage());
+            }
+        }
+
+        validations.clear();
+        validations.addAll(expressions);
     }
 
     @Override
@@ -281,6 +345,31 @@ public class BeanDefinition extends ClassDefinition {
         validateFieldRange(field);
         validateFieldBeanCycle(field);
         validateFieldId(field);
+    }
+
+    /**
+     * 解析字段的校验表达式
+     */
+    private void parseFieldValidationExpression(FieldDefinition field) {
+        Object validation = field.getValidation();
+
+        if (this.category != Category.config) {
+            if (validation != null) {
+                addValidatedError(getValidatedName() + "不支持校验表达式");
+            }
+            return;
+        }
+
+        if (!(validation instanceof String)) {
+            return;
+        }
+
+        try {
+            String validationStr = ((String) validation).trim();
+            field.setValidation(Ognl.parseExpression((validationStr)));
+        } catch (OgnlException e) {
+            addValidatedError(getValidatedName("的") + field.getValidatedName() + "的校验表达式[" + validation + "]错误:" + e.getMessage());
+        }
     }
 
     /**

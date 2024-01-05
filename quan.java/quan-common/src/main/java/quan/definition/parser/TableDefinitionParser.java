@@ -24,7 +24,7 @@ public abstract class TableDefinitionParser extends DefinitionParser {
 
     public static final int MIN_TABLE_BODY_START_ROW = 4;
 
-    private static Pattern constraintsPattern = Pattern.compile("[\\w:.]+(;\\w+(=\\w+)?)*(\\{(.+)})?");
+    private static Pattern constraintsPattern = Pattern.compile("[\\w:.]+(\\s*;\\s*\\w+(\\s*=\\s*\\w+)?)*(\\s*\\{(.+)})?");
 
     private Map<String, String> languageAliases = new HashMap<>();
 
@@ -128,6 +128,10 @@ public abstract class TableDefinitionParser extends DefinitionParser {
     protected abstract boolean parseTable(ConfigDefinition configDefinition, File definitionFile);
 
     protected void addField(ConfigDefinition configDefinition, String fieldName, String constraints, String comment) {
+        fieldName = fieldName.trim();
+        constraints = constraints.trim();
+        comment = comment.trim();
+
         if (fieldName.startsWith("#")) {
             //忽略被注释掉的字段
             return;
@@ -142,11 +146,7 @@ public abstract class TableDefinitionParser extends DefinitionParser {
         configDefinition.addField(fieldDefinition);
 
         if (StringUtils.isBlank(constraints)) {
-            if (StringUtils.isBlank(fieldName)) {
-                addValidatedError(configDefinition.getValidatedName() + "的字段约束不能为空，至少要包含字段类型");
-            } else {
-                addValidatedError(configDefinition.getValidatedName() + "的字段[" + fieldName + "]约束不能为空，至少要包含字段类型");
-            }
+            addValidatedError(configDefinition.getValidatedName("的") + fieldDefinition.getValidatedName() + "约束不能为空，至少要包含字段类型");
             return;
         }
 
@@ -155,11 +155,7 @@ public abstract class TableDefinitionParser extends DefinitionParser {
 
         Matcher matcher = constraintsPattern.matcher(constraints);
         if (!matcher.matches()) {
-            if (StringUtils.isBlank(fieldName)) {
-                addValidatedError(configDefinition.getValidatedName() + "的字段[" + fieldName + "]约束[" + originalConstraints + "]格式错误");
-            } else {
-                addValidatedError(configDefinition.getValidatedName() + "的字段约束[" + originalConstraints + "]格式错误");
-            }
+            addValidatedError(configDefinition.getValidatedName("的") + fieldDefinition.getValidatedName() + "约束[" + originalConstraints + "]格式错误");
             return;
         }
 
@@ -256,11 +252,8 @@ public abstract class TableDefinitionParser extends DefinitionParser {
     }
 
     private static String escapeConstraints(String constraints) {
-        constraints = constraints.trim();
         StringBuilder sb = new StringBuilder();
-
         boolean escape = true;
-        boolean trim = true;
 
         for (int i = 0; i < constraints.length(); i++) {
             char c = constraints.charAt(i);
@@ -273,24 +266,20 @@ public abstract class TableDefinitionParser extends DefinitionParser {
                     sb.append('(');
                 } else if (c == '）') {
                     sb.append(')');
+                } else {
+                    sb.append(c);
                 }
-            }
-
-            if (!trim || c != ' ') {
+            } else {
                 sb.append(c);
             }
 
-            if (c == '{') {
-                //校验表达式必须保留空格
-                trim = false;
-            } else if (c == '\'' || c == '"') {
+            if ((c == '\'' || c == '"') && i > 1 && constraints.charAt(i - 1) != '\\') {
                 //字符串不转义
                 escape = !escape;
             }
         }
 
-        constraints = sb.toString();
-        return constraints;
+        return sb.toString();
     }
 
     @Override
